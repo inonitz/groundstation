@@ -1,0 +1,227 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        // Windows Debug Tests
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Windows, Static)",
+            "program": "${workspaceFolder}/build/debug/static/bin/sttserver_sandbox",
+            "args": [
+                "--model=dependencies/models/ivrit-ai-whisper-large-v3-turbo/ggml-model-q8.bin",
+                "--fa",
+                "--language=he",
+                "--translate",
+                "--threads=1"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [
+                "settings set target.process.follow-fork-mode child",
+                // "breakpoint set --name main"
+            ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Windows, DLL)",
+            "program": "${workspaceFolder}/build/debug/shared/bin/sttserver_sandbox",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        // Linux Debug Tests
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug)",
+            "program": "${workspaceFolder}/build/debug/static/bin/sttserver_sandbox",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) (Parakeet)",
+            "program": "${workspaceFolder}/build/debug/static/bin/parakeet_example",
+            "args": [
+                "--model=dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
+                "--fa",
+                "--language=en",
+                "--threads=1",
+                "--gid=1",
+                "--captureid=1",
+                "--playbackid=0",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) (Whispercpp)",
+            "program": "${workspaceFolder}/build/debug/static/bin/whisper_example",
+            "args": [
+                "--model=dependencies/models/distil-whisper-large-v3.5/ggml-model-q5k.bin",
+                "--fa",
+                "--language=en",
+                "--threads=1",
+                "--gid=1",
+                "--captureid=1",
+                "--playbackid=0",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) (SherpaOnnx)",
+            "program": "${workspaceFolder}/build/debug/static/bin/sherpaonnx_example",
+            "args": [
+                "--fa",
+                "--threads=2",
+                "--keep=5000",
+                "--captureid=1",
+                "--playbackid=0",
+                "--mfp=dependencies/models/sherpa-onnx/sherpa-onnx-nemo-parakeet-tdt-0.6b-v2-fp16",
+                "--en=encoder.fp16.onnx",
+                "--de=decoder.fp16.onnx",
+                "--jo=joiner.fp16.onnx",
+                "--tok=tokens.txt",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) (UnifiedBackend)",
+            "program": "${workspaceFolder}/build/debug/static/bin/unified_example",
+            "args": [
+                "--fa",
+                "--threads=2",
+                "--captureid=1",
+                "--playbackid=0",
+                "--backend=whisper-parakeet",
+                "--model=dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) (Debugging Tests)",
+            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
+            "args": [],
+            "cwd": "${workspaceFolder}/build/debug/static/ctest",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
+        },
+
+        {
+            "name": "Debug CTest Instance",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
+            "args": [
+                "--gtest_filter=DynamicAudioFolder/ASRModelTest.TranscribeAndVerify/10",
+                "--gtest_also_run_disabled_tests",
+                "--model=../../../../dependencies/models/distil-whisper-large-v3.5/ggml-model-q5k.bin",
+                "--backend=whisper-whisper",
+                "--fa",
+                "--threads=1",
+                "--gid=1",
+                "--captureid=1",
+                "--playbackid=0"
+            ],
+            "cwd": "${workspaceFolder}/build/debug/static/test",
+            "stopOnEntry": false
+        },
+
+        {
+            "name": "Debug CTest Instance",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
+            "args": [
+                // "--gtest_filter=DynamicAudioFolder/ASRModelTest.TranscribeAndVerify/10",
+                "--gtest_also_run_disabled_tests",
+                "--model=../../../../dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
+                "--backend=whisper-parakeet",
+                "--fa",
+                "--gid=1",
+                "--threads=2",
+                "--captureid=1",
+                "--playbackid=0",
+            ],
+            "cwd": "${workspaceFolder}/build/debug/static/test",
+            "stopOnEntry": false
+        },
+
+        {
+            // Run the lldb server manually ->
+            // [NOTE]: 
+            // ALWAYS Launch the terminal for the server outside vscode!
+            // Gemini Pro wrote a pretty good explanation: 
+            //
+            // The Diagnosis: Why Your Executable is "Deleted"
+            // 
+            // When you use platform select remote-linux and connect to 127.0.0.1, 
+            // LLDB treats your local machine as a literal remote server. 
+            // Its default behavior during a launch request, is to deploy (upload) 
+            // the target executable to this "remote" machine to ensure it has the latest build.
+            //
+            // Because the "remote" filesystem is actually your local filesystem, 
+            // LLDB attempts to upload the file to the exact same absolute path. 
+            // In doing so, it opens the destination file with a truncate flag (O_TRUNC) to write the incoming data. 
+            // This instantly wipes your executable to 0 bytes before the read operation even begins. 
+            // The file destroys itself, which is why VS Code errors out with "no such file or directory",
+            // despite establishing a connection.
+            
+            // You can find an issue that discusses this here:
+            // https://github.com/vadimcn/codelldb/discussions/964
+
+            // sudo ~/.vscode/extensions/vadimcn.vscode-lldb-1.12.1/lldb/bin/lldb-server platform --server --listen *:1234
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB (Linux-x86_64-Static-Debug) Remote",
+            "program": "${workspaceFolder}/build/debug/static/bin/sttserver_sandbox",
+            "args": [
+                "--model=dependencies/models/distil-whisper-large-v3.5/ggml-model-q5k.bin",
+                "--fa",
+                "--gpu",
+                "--step=0",
+                "--language=en",
+                "--threads=1",
+                "--gid=1",
+                "--captureid=12",
+                "--playbackid=12",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ 
+                "settings set target.process.follow-fork-mode child",
+                "platform select remote-linux",
+                "platform connect connect://127.0.0.1:1234",
+            ],
+        },
+    ]
+}

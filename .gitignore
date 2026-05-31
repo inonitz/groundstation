@@ -1,0 +1,41 @@
+# Dependency Files
+dependencies/local_models/*
+dependencies/models/*
+dependencies/recordings/*
+dependencies/asr_data.zip
+
+
+# Build output
+build/
+
+# Python Venv Files
+venv
+*/venv
+
+
+# Makefiles
+Makefile
+
+# Ninja Build Files
+.ninja_deps
+.ninja_log
+*.ninja
+
+# Visual Studio Code files
+# .vscode/launch.json
+# .vscode/settings.json
+
+# clangd Compilation Database
+.vscode/compile_commands
+.cache
+
+# Visual Studio files
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+
+# misc
+imgui.ini
