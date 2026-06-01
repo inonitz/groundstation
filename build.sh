@@ -17,14 +17,13 @@ PROJECT_NAME="all"
 # For More options see BuildDiagnostics.cmake
 CMAKE_ARGLIST="\
     -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-    -DSTTSERVER_BUILD_EXECUTABLE=ON \
-    -DSTTSERVER_BUILD_TESTS=ON \
-    -DSTTSERVER_BUILD_BACKEND_PARAKEET=ON \
-    -DSTTSERVER_BUILD_BACKEND_SHERPA_ONNX=ON
+    -DGROUNDSTATION_BUILD_EXECUTABLE=ON \
+    -DGROUNDSTATION_BUILD_TESTS=OFF \
+    -DGROUNDSTATION_BUILD_BENCHMARKS=OFF \
     "
 
 
-#    -DSTTSERVER_BUILD_BACKEND_WHISPER=ON \
+#    -DGROUNDSTATION_BUILD_BACKEND_WHISPER=ON \
 
 # CMAKE_ARGLIST="\
 #     -DCMAKE_C_COMPILER=clang \
@@ -219,10 +218,10 @@ fi
 
 if [[ "$RUN_SANDBOX_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    ninja run_sttserver_sandbox
+    ninja run_mavlink_example
 fi
 
 if [[ "$RUN_DEBUG_SANDBOX_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    ninja debug_sttserver_sandbox
+    ninja debug_mavlink_example
 fi

@@ -5,16 +5,14 @@
 - Follow identity constraints in `SOUL.md`.
 - Follow execution workflow in `AGENTS.md`.
 
-## Tech Stack (Inferred from groundstation / main/master branch)
+## Tech Stack (Inferred from groundstation/main/master branch)
 
-- **Target Project**: Speech-to-Text Server (`sttserv`)
-- **Active Feature**: Push-to-Talk (`feature-ptt`)
+- **Target Project**: MAVLink Server Example (`groundstation`)
+- **Active Feature**: MAVSDK Example
 - **Dependencies**  
-  - miniaudio
-  - whispercpp
   - util2
-  - tracy
-  - googletest
+  - cxxopts
+  - MAVSDK
   - C++/C/Python
 
 ## Anti-Patterns & Constraints

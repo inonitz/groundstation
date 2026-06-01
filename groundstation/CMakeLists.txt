@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(mavlink_server C CXX)
+project(mavlink_example C CXX)
 
 
 set(SOURCES
-    main.cpp
+    source/main.cpp
 )
 
 set(HEADERS
@@ -21,7 +21,8 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     UTIL2::util2
     cxxopts::cxxopts
-    WORKSPACE_CONFIG::ProjectDefaultConfig
+    mavsdk
+    # WORKSPACE_CONFIG::ProjectDefaultConfig
 )
 
 

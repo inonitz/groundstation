@@ -10,7 +10,7 @@
 
 - **Mandatory**: Start every turn with `<scratchpad>` block.
 - **Format**: Descriptive narrative format. Thorough planning.
-- **Step Count**: Label every step with `#` tag (e.g., `#1`, `#2`). Max 50 steps per turn.
+- **Step Count**: Label every step with `#` tag (e.g., `#1`, `#2`). Max 15 steps per turn.
 - **Categorization**: Wrap every step with `<S Type> Category </S Type>`.
 - **Valid Categories**:
   - `Planning steps`
