@@ -108,9 +108,8 @@ CMAKE_INTRMD_BUILD_DIR=""
 CLEAN_CURRENT_ROOT_BUILD_DIR="false"
 CONFIGURE_CMAKE_FLAG="false"
 BUILD_BINARIES_FLAG="false"
-RUN_SANDBOX_FLAG="false"
-RUN_DEBUG_SANDBOX_FLAG="false"
-
+RUN_GROUNDSTATION_FLAG="false"
+RUN_DOCKER_SIMULATION_FLAG="false"
 
 if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
     cat << EOF
@@ -119,7 +118,7 @@ Usage: $0 <build_type> <library_type> <action>
 Arguments:
   build_type   - Type of build: debug, release, release_dbginfo, debug_perf, release_perf
   library_type - Type of library: shared (.dll/.so), static (.lib/.a)
-  action       - Action to take: cleanbuild, configure, build, sandbox, debugsandbox
+  action       - Action to take: cleanbuild, configure, build, rungs, runsim
 
 Options:
   help         - Display this help message
@@ -160,8 +159,6 @@ fi
 
 if [[ "$2" == "shared" ]]; then
     CMAKE_ARGLIST+=" -DBUILD_SHARED_LIBS=1"
-    CMAKE_ARGLIST+=" -DSHERPA_ONNX_LINK_LIBSTDCPP_STATICALLY=OFF"
-    CMAKE_ARGLIST+=" -DSHERPA_ONNX_USE_STATIC_CRT=OFF"
     CMAKE_INTRMD_BUILD_DIR+="shared/"
 elif [[ "$2" == "static" ]]; then
     CMAKE_ARGLIST+=" -DBUILD_SHARED_LIBS=0"
@@ -178,10 +175,10 @@ elif [[ "$3" == "configure" ]]; then
     CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON"
 elif [[ "$3" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"
-elif [[ "$3" == "sandbox" ]]; then
-    RUN_SANDBOX_FLAG="true"
-elif [[ "$3" == "debugsandbox" ]]; then
-    RUN_DEBUG_SANDBOX_FLAG="true"
+elif [[ "$3" == "rungs" ]]; then
+    RUN_GROUNDSTATION_FLAG="true"
+elif [[ "$3" == "runsim" ]]; then
+    RUN_DOCKER_SIMULATION_FLAG="true"
 else
     printf "Unknown Argument %s - valid values are: cleanbuild, configure, build, sandbox, debugsandbox\nExiting...\n" "$3"
     exit 1
@@ -216,12 +213,12 @@ if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     ninja "$PROJECT_NAME" -j$(( $(nproc) / 2 > 0 ? $(nproc) / 2 : 1 ))
 fi
 
-if [[ "$RUN_SANDBOX_FLAG" == "true" ]]; then
+if [[ "$RUN_GROUNDSTATION_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
     ninja run_mavlink_example
 fi
 
-if [[ "$RUN_DEBUG_SANDBOX_FLAG" == "true" ]]; then
-    cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    ninja debug_mavlink_example
+if [[ "$RUN_DOCKER_SIMULATION_FLAG" == "true" ]]; then
+    cd "$CMAKE_ORIGINAL_SCRIPT_PATH" || exit 1
+    ./dockerfiles/gazebo.sh
 fi
