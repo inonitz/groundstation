@@ -1,18 +1,6 @@
 #!/bin/bash
 
 PROJECT_NAME="all"
-    # -DCMAKE_CUDA_HOST_COMPILER=clang++ \
-    # -DCMAKE_C_COMPILER=clang \
-    # -DCMAKE_CXX_COMPILER=clang++ \
-    # -DCMAKE_AR=/usr/bin/llvm-ar-18 \
-    # -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-18 \
-    # -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.8/bin/nvcc \
-    # -DCMAKE_CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.8 \
-    # -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld-18 \
-    # -DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld-18 \
-    # -DCMAKE_MODULE_LINKER_FLAGS=-fuse-ld=lld-18 \
-    # -DCMAKE_SKIP_RPATH=ON \
-
 
 # For More options see BuildDiagnostics.cmake
 CMAKE_ARGLIST="\
@@ -24,6 +12,17 @@ CMAKE_ARGLIST="\
 
 
 #    -DGROUNDSTATION_BUILD_BACKEND_WHISPER=ON \
+
+    # -DCMAKE_C_COMPILER=clang \
+    # -DCMAKE_CXX_COMPILER=clang++ \
+    # -DCMAKE_AR=/usr/bin/llvm-ar-18 \
+    # -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-18 \
+    # -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.8/bin/nvcc \
+    # -DCMAKE_CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.8 \
+    # -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld-18 \
+    # -DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld-18 \
+    # -DCMAKE_MODULE_LINKER_FLAGS=-fuse-ld=lld-18 \
+    # -DCMAKE_SKIP_RPATH=ON \
 
 # CMAKE_ARGLIST="\
 #     -DCMAKE_C_COMPILER=clang \
@@ -180,7 +179,7 @@ elif [[ "$3" == "rungs" ]]; then
 elif [[ "$3" == "runsim" ]]; then
     RUN_DOCKER_SIMULATION_FLAG="true"
 else
-    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build, sandbox, debugsandbox\nExiting...\n" "$3"
+    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build, rungs, runsim\nExiting...\n" "$3"
     exit 1
 fi
 
