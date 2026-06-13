@@ -61,3 +61,15 @@ RUN apt-get update && apt-get install -y \
     libegl1 \
     libgl1 \
     libvulkan1
+
+
+# px4_msgs Is a dependency required for the project
+WORKDIR /opt/px4_ws
+
+RUN git clone https://github.com/PX4/px4_msgs.git src/px4_msgs \
+    && bash -c "source /opt/ros/jazzy/setup.bash && colcon build"
+
+RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc \
+    && echo "source /opt/px4_ws/install/setup.bash" >> /root/.bashrc
+
+WORKDIR /root

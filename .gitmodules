@@ -38,5 +38,3 @@
 	path = dependencies/util2
 	url = https://github.com/inonitz/util2.git
 	branch = main
-[submodule "dependencies/px4_msgs"]
-	path = dependencies/px4_msgs

@@ -68,14 +68,12 @@ print_all_workspace_flags_and_vars()
 
 
 find_package(rclcpp REQUIRED)
-
+find_package(px4_msgs REQUIRED)
 
 # 6.
 # ---------------- The Actual Start of the cmake (after all the configuration bullshit) ----------------
 add_subdirectory(dependencies/cxxopts)
-add_subdirectory(dependencies/MAVSDK)
 add_subdirectory(dependencies/util2)
-add_subdirectory(dependencies/px4_msgs)
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(src/groundstation)
 endif()
