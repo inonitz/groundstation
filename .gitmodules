@@ -42,3 +42,5 @@
 	path = dependencies/MAVSDK
 	url = https://github.com/mavlink/MAVSDK.git
 	branch = main
+[submodule "dependencies/px4_msgs"]
+	path = dependencies/px4_msgs

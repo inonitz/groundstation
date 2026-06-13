@@ -66,13 +66,18 @@ endif()
 # 5. Print Enabled/Disabled Flags For Verbose Diagnostics
 print_all_workspace_flags_and_vars()
 
+
+find_package(rclcpp REQUIRED)
+
+
 # 6.
 # ---------------- The Actual Start of the cmake (after all the configuration bullshit) ----------------
 add_subdirectory(dependencies/cxxopts)
 add_subdirectory(dependencies/MAVSDK)
 add_subdirectory(dependencies/util2)
+add_subdirectory(dependencies/px4_msgs)
 if(GROUNDSTATION_BUILD_EXECUTABLE)
-    add_subdirectory(groundstation)
+    add_subdirectory(src/groundstation)
 endif()
 if(GROUNDSTATION_BUILD_TESTS)
     add_subdirectory(dependencies/googletest)
