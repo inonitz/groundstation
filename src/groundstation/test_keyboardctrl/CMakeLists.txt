@@ -4,10 +4,13 @@ project(px4_ros2_test C CXX)
 
 set(SOURCES
     main.cpp
+    async_key.cpp
+    key_codes.cpp
 )
 
 set(HEADERS
-
+    async_key.hpp
+    key_codes.hpp
 )
 
 

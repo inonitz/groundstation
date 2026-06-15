@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(mavlink_example_userctrl C CXX)
+project(px4_ros2_control_test C CXX)
 
 
 set(SOURCES
@@ -21,7 +21,8 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     UTIL2::util2
     cxxopts::cxxopts
-    mavsdk
+    rclcpp::rclcpp
+    px4_msgs::px4_msgs__rosidl_typesupport_cpp
     # WORKSPACE_CONFIG::ProjectDefaultConfig
 )
 
@@ -33,3 +34,4 @@ add_custom_target(run_${PROJECT_NAME}
     USES_TERMINAL
     COMMENT "Running Sandbox..."
 )
+

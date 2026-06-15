@@ -3,4 +3,6 @@ project(mavlink_sandbox C CXX)
 
 
 add_subdirectory(test)
+add_subdirectory(test_keyboardctrl)
+
 # add_subdirectory()

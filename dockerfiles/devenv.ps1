@@ -1,5 +1,6 @@
-
-$HostPath        = "/mnt/c/CTools/Projects/groundstation"
+$RawPath       = Split-Path $PSScriptRoot -Parent
+$LinuxSafePath = $RawPath -replace '\\', '/'
+$HostPath        = (wsl wslpath -a "$LinuxSafePath").Trim()
 $ContainerPath   = "/root/groundstation"
 $dockerArguments = @(
     "docker run --rm -it",
@@ -28,7 +29,7 @@ $dockerArguments = @(
     "-v ${HostPath}:${ContainerPath}",
 
     # VSCode Extensions
-    "-v vscode_extensions_cache:/root/.vscode-server",
+    "-v vscode_server_cache:/root/.vscode-server",
 
     # The Image and Execution Command
     "px4_gazebo-lts-2028_ros2-lts-2029 bash"
@@ -36,5 +37,6 @@ $dockerArguments = @(
 
 
 Write-Host "Firing up Gazebo in WSL2..." -ForegroundColor Cyan
+Write-Host "Path Variables: $RawPath\n$LinuxSafePath\n$HostPath\n"
 $dockerCmd = $dockerArguments -join ' '
 wsl --exec bash -c $dockerCmd
