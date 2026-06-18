@@ -38,3 +38,6 @@
 	path = dependencies/util2
 	url = https://github.com/inonitz/util2.git
 	branch = main
+[submodule "dependencies/Eigen"]
+	path = dependencies/Eigen
+	url = https://gitlab.com/libeigen/eigen
