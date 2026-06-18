@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(px4_ros2_control_test C CXX)
+project(px4_mavlink_control_test C CXX)
 
 
 set(SOURCES

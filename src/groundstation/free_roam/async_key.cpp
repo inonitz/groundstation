@@ -79,7 +79,7 @@ void AsyncKeyHook::unbindKey(KeyCode key) {
 	return;
 }
 
-void AsyncKeyHook::dispatch(KeyCode key) {
+void AsyncKeyHook::dispatch(KeyCode key, KeyAction pressType) {
 	Callback cb    = nullptr;
 	Callback anycb = nullptr;
 	{
@@ -95,10 +95,10 @@ void AsyncKeyHook::dispatch(KeyCode key) {
 		anycb = (anyit != m_bindings.end()) ? anyit->second : nullptr;
 	}
 	if (cb) {
-		cb(key);
+		cb(key, pressType);
     }
 	if(anycb) {
-		anycb(key);
+		anycb(key, pressType);
 	}
     return;
 }
@@ -141,25 +141,38 @@ void AsyncKeyHook::printLastError(const char* format, ...) {
 }
 
 LRESULT CALLBACK AsyncKeyHook::keyboardCallback(int nCode, WPARAM wParam, LPARAM lParam) {
-	AsyncKeyHook* self = s_instance;
-	if (self && nCode == HC_ACTION &&
-		(wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
-		auto* kb = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
+    AsyncKeyHook* self = s_instance;
+	KeyAction action = 
+		(wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? KeyAction::PRESSED
+		:
+		(wParam == WM_KEYUP || wParam == WM_SYSKEYUP) ? KeyAction::RELEASED
+		:
+		KeyAction::UNKNOWN;
+    
+    if (self && nCode == HC_ACTION && 
+		( (action == KeyAction::PRESSED) || (action == KeyAction::RELEASED) )
+	) {
+        auto* kb = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 		{
 			std::lock_guard<std::mutex> lock(self->m_queueMtx);
-			self->m_keyQueue.push(KeyMessage{static_cast<std::uint16_t>(wParam), kb->vkCode});
+			self->m_keyQueue.push(KeyMessage{
+				kb->vkCode, 
+				static_cast<std::uint16_t>(action),
+				static_cast<std::uint16_t>(wParam)
+			});
 		}
 		self->m_cv.notify_one();
-	}
-	return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+    
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
 void AsyncKeyHook::producerThread() {
 	m_keyHook = SetWindowsHookEx(
-		WH_KEYBOARD_LL,
-		&AsyncKeyHook::keyboardCallback,
-		GetModuleHandle(nullptr),
-		0
+	    WH_KEYBOARD_LL,
+	    &AsyncKeyHook::keyboardCallback,
+	    GetModuleHandle(nullptr),
+	    0
 	);
 	if (m_keyHook == nullptr) {
 		printLastError("Error hooking low-level keyboard hook\n");
@@ -198,7 +211,10 @@ void AsyncKeyHook::consumerThread() {
 			km = m_keyQueue.front();
 			m_keyQueue.pop();
 		}
-		dispatch(static_cast<KeyCode>(km.m_virtualKey));
+		dispatch(
+			static_cast<KeyCode>(km.m_virtualKey),
+			static_cast<KeyAction>(km.m_action)
+		);
 	}
 	return;
 }
@@ -265,10 +281,11 @@ void AsyncKeyHook::producerThread() {
 		if (bytesRead == onErrorBytesRead)
 			break;
 
-		if (ev.type == EV_KEY && ev.value == 1) {
+		bool relevantEvent = (ev.type == EV_KEY) && (ev.value > -1 && ev.value < 3);
+		if(relevantEvent) {
 			{
 				std::lock_guard<std::mutex> lock(m_queueMtx);
-				m_keyQueue.push(KeyMessage{static_cast<std::uint16_t>(ev.value), ev.code});
+				m_keyQueue.push(KeyMessage{ev.code, static_cast<std::uint8_t>(ev.value), 0});
 			}
 			m_cv.notify_one();
 		}
@@ -296,7 +313,10 @@ void AsyncKeyHook::consumerThread() {
 			km = m_keyQueue.front();
 			m_keyQueue.pop();
 		}
-		dispatch(static_cast<KeyCode>(km.m_keyCode));
+		dispatch(
+			static_cast<KeyCode>(km.m_keyCode),
+			static_cast<KeyAction>(km.m_action)
+		);
 	}
 
 

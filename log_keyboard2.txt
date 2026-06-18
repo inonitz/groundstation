@@ -1,0 +1,2211 @@
+[DEBUG] [1781777434.808030681] [rclcpp]: signal handler installed
+[DEBUG] [1781777434.808046417] [rclcpp]: deferred_signal_handler(): waiting for SIGINT/SIGTERM or uninstall
+[DEBUG] [1781777434.808460820] [rcl]: Initializing node 'px4_keyboard_teleop' in namespace ''
+[DEBUG] [1781777434.808551350] [rcl]: Using domain ID of '0'
+[DEBUG] [1781777434.824744573] [rcl]: Node initialized
+[DEBUG] [1781777434.824822435] [rcl]: Initializing publisher for topic name '/rosout'
+[DEBUG] [1781777434.824845478] [rcl]: Expanded and remapped topic name '/rosout'
+[DEBUG] [1781777434.828050427] [rcl]: Publisher initialized
+[DEBUG] [1781777434.828255009] [rcl]: Initializing service for service name 'px4_keyboard_teleop/get_parameters'
+[DEBUG] [1781777434.828275331] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/get_parameters'
+[DEBUG] [1781777434.831020531] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.831109679] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/get_parametersRequest
+[DEBUG] [1781777434.831117028] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/get_parametersReply
+[DEBUG] [1781777434.831122381] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.831283356] [rcl]: Service initialized
+[DEBUG] [1781777434.831397265] [rcl]: Initializing service for service name 'px4_keyboard_teleop/get_parameter_types'
+[DEBUG] [1781777434.831455423] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/get_parameter_types'
+[DEBUG] [1781777434.833037394] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.833238128] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/get_parameter_typesRequest
+[DEBUG] [1781777434.833258640] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/get_parameter_typesReply
+[DEBUG] [1781777434.833264741] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.833450799] [rcl]: Service initialized
+[DEBUG] [1781777434.833572352] [rcl]: Initializing service for service name 'px4_keyboard_teleop/set_parameters'
+[DEBUG] [1781777434.833596314] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/set_parameters'
+[DEBUG] [1781777434.834509825] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.834554638] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/set_parametersRequest
+[DEBUG] [1781777434.834582935] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/set_parametersReply
+[DEBUG] [1781777434.834588305] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.834753528] [rcl]: Service initialized
+[DEBUG] [1781777434.834782964] [rcl]: Initializing service for service name 'px4_keyboard_teleop/set_parameters_atomically'
+[DEBUG] [1781777434.834796111] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/set_parameters_atomically'
+[DEBUG] [1781777434.835369177] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.835392392] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/set_parameters_atomicallyRequest
+[DEBUG] [1781777434.835398911] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/set_parameters_atomicallyReply
+[DEBUG] [1781777434.835405481] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.835550030] [rcl]: Service initialized
+[DEBUG] [1781777434.835579983] [rcl]: Initializing service for service name 'px4_keyboard_teleop/describe_parameters'
+[DEBUG] [1781777434.835592739] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/describe_parameters'
+[DEBUG] [1781777434.836522859] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.836591345] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/describe_parametersRequest
+[DEBUG] [1781777434.836599159] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/describe_parametersReply
+[DEBUG] [1781777434.836603939] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.836998332] [rcl]: Service initialized
+[DEBUG] [1781777434.837055422] [rcl]: Initializing service for service name 'px4_keyboard_teleop/list_parameters'
+[DEBUG] [1781777434.837092365] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/list_parameters'
+[DEBUG] [1781777434.838531827] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.838589508] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/list_parametersRequest
+[DEBUG] [1781777434.838595760] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/list_parametersReply
+[DEBUG] [1781777434.838601258] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.838932456] [rcl]: Service initialized
+[DEBUG] [1781777434.839007622] [rcl]: Initializing publisher for topic name '/parameter_events'
+[DEBUG] [1781777434.839026447] [rcl]: Expanded and remapped topic name '/parameter_events'
+[DEBUG] [1781777434.842540194] [rcl]: Publisher initialized
+[DEBUG] [1781777434.842848752] [rcl]: Initializing subscription for topic name '/parameter_events'
+[DEBUG] [1781777434.842871059] [rcl]: Expanded and remapped topic name '/parameter_events'
+[DEBUG] [1781777434.843371838] [rcl]: Subscription initialized
+[DEBUG] [1781777434.843533898] [rcl]: Initializing service for service name '/px4_keyboard_teleop/get_type_description'
+[DEBUG] [1781777434.843552261] [rcl]: Expanded and remapped service name '/px4_keyboard_teleop/get_type_description'
+[DEBUG] [1781777434.844232542] [rmw_fastrtps_cpp]: ************ Service Details *********
+[DEBUG] [1781777434.844303847] [rmw_fastrtps_cpp]: Sub Topic rq/px4_keyboard_teleop/get_type_descriptionRequest
+[DEBUG] [1781777434.844312934] [rmw_fastrtps_cpp]: Pub Topic rr/px4_keyboard_teleop/get_type_descriptionReply
+[DEBUG] [1781777434.844319286] [rmw_fastrtps_cpp]: ***********
+[DEBUG] [1781777434.844812831] [rcl]: Service initialized
+[DEBUG] [1781777434.845041794] [rcl]: Initializing publisher for topic name '/px4_keyboard/cmd_vel'
+[DEBUG] [1781777434.845053861] [rcl]: Expanded and remapped topic name '/px4_keyboard/cmd_vel'
+[DEBUG] [1781777434.848505020] [rcl]: Publisher initialized
+[DEBUG] [1781777434.848596392] [rcl]: Initializing publisher for topic name '/px4_keyboard/arm_msg'
+[DEBUG] [1781777434.848615472] [rcl]: Expanded and remapped topic name '/px4_keyboard/arm_msg'
+[DEBUG] [1781777434.849657966] [rcl]: Publisher initialized
+[DEBUG] [1781777434.849764359] [rcl]: Initializing timer with period: 50000000ns
+[INFO] [1781777434.850000015] [px4_keyboard_teleop]: AsyncKeyHook successfully attached.
+[DEBUG] [1781777434.850190315] [rcl]: Initializing wait set with '0' subscriptions, '0' guard conditions, '0' timers, '0' clients, '0' services
+[DEBUG] [1781777434.850638419] [rcl]: Subscription taking message
+[DEBUG] [1781777434.850804217] [rcl]: Subscription take succeeded: true
+[DEBUG] [1781777434.850918566] [rcl]: Subscription taking message
+[DEBUG] [1781777434.850943575] [rcl]: Subscription take succeeded: true
+[DEBUG] [1781777434.850961730] [rcl]: Subscription taking message
+[DEBUG] [1781777434.850972064] [rcl]: Subscription take succeeded: true
+[DEBUG] [1781777434.850984855] [rcl]: Subscription taking message
+[DEBUG] [1781777434.850997100] [rcl]: Subscription take succeeded: true
+[DEBUG] [1781777434.851010177] [rcl]: Subscription taking message
+[DEBUG] [1781777434.851019304] [rcl]: Subscription take succeeded: true
+[DEBUG] [1781777434.899881734] [rcl]: Calling timer
+[DEBUG] [1781777434.899923829] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777434.949908516] [rcl]: Calling timer
+[DEBUG] [1781777434.949945388] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777434.999893630] [rcl]: Calling timer
+[DEBUG] [1781777434.999940942] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.049925697] [rcl]: Calling timer
+[DEBUG] [1781777435.050031537] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.100016475] [rcl]: Calling timer
+[DEBUG] [1781777435.100155021] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.149971633] [rcl]: Calling timer
+[DEBUG] [1781777435.150122889] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.199991246] [rcl]: Calling timer
+[DEBUG] [1781777435.200132737] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.249956928] [rcl]: Calling timer
+[DEBUG] [1781777435.250066477] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.299889750] [rcl]: Calling timer
+[DEBUG] [1781777435.299929971] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.349884078] [rcl]: Calling timer
+[DEBUG] [1781777435.349932398] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.399879458] [rcl]: Calling timer
+[DEBUG] [1781777435.399934738] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.449940937] [rcl]: Calling timer
+[DEBUG] [1781777435.450053514] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.499923331] [rcl]: Calling timer
+[DEBUG] [1781777435.499996840] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.549935926] [rcl]: Calling timer
+[DEBUG] [1781777435.550026759] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.599938913] [rcl]: Calling timer
+[DEBUG] [1781777435.600024332] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.650522655] [rcl]: Calling timer
+[DEBUG] [1781777435.650739550] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.699900288] [rcl]: Calling timer
+[DEBUG] [1781777435.699940272] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.749943109] [rcl]: Calling timer
+[DEBUG] [1781777435.750042047] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.799954408] [rcl]: Calling timer
+[DEBUG] [1781777435.800038001] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.849897947] [rcl]: Calling timer
+[DEBUG] [1781777435.849951556] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.899983301] [rcl]: Calling timer
+[DEBUG] [1781777435.900133864] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.949898729] [rcl]: Calling timer
+[DEBUG] [1781777435.949953394] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777435.999929949] [rcl]: Calling timer
+[DEBUG] [1781777436.000007685] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.049905836] [rcl]: Calling timer
+[DEBUG] [1781777436.049974075] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.100006593] [rcl]: Calling timer
+[DEBUG] [1781777436.100181087] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.149910487] [rcl]: Calling timer
+[DEBUG] [1781777436.149984355] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.199896706] [rcl]: Calling timer
+[DEBUG] [1781777436.199949212] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.249914633] [rcl]: Calling timer
+[DEBUG] [1781777436.250008091] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.300005859] [rcl]: Calling timer
+[DEBUG] [1781777436.300142670] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.350006154] [rcl]: Calling timer
+[DEBUG] [1781777436.350148406] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.399958441] [rcl]: Calling timer
+[DEBUG] [1781777436.400025538] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.450008613] [rcl]: Calling timer
+[DEBUG] [1781777436.450192183] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.499974955] [rcl]: Calling timer
+[DEBUG] [1781777436.500093488] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.549950512] [rcl]: Calling timer
+[DEBUG] [1781777436.550078257] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.599948635] [rcl]: Calling timer
+[DEBUG] [1781777436.600059809] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.649992733] [rcl]: Calling timer
+[DEBUG] [1781777436.650108414] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.700214622] [rcl]: Calling timer
+[DEBUG] [1781777436.700261412] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.749983545] [rcl]: Calling timer
+[DEBUG] [1781777436.750061159] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.799917383] [rcl]: Calling timer
+[DEBUG] [1781777436.799996579] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.849906821] [rcl]: Calling timer
+[DEBUG] [1781777436.849979800] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.899960284] [rcl]: Calling timer
+[DEBUG] [1781777436.900022031] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.949905598] [rcl]: Calling timer
+[DEBUG] [1781777436.949963643] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777436.999909424] [rcl]: Calling timer
+[DEBUG] [1781777436.999982994] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.049942175] [rcl]: Calling timer
+[DEBUG] [1781777437.050048038] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777437.090669708] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777437.099982337] [rcl]: Calling timer
+[DEBUG] [1781777437.100109015] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777437.150097982] [rcl]: Calling timer
+[DEBUG] [1781777437.150226598] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777437.200002579] [rcl]: Calling timer
+[DEBUG] [1781777437.200141918] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777437.216590562] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777437.250284822] [rcl]: Calling timer
+[DEBUG] [1781777437.250359439] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.299894812] [rcl]: Calling timer
+[DEBUG] [1781777437.299940685] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.349996388] [rcl]: Calling timer
+[DEBUG] [1781777437.350044439] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.399885008] [rcl]: Calling timer
+[DEBUG] [1781777437.399935665] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.449929066] [rcl]: Calling timer
+[DEBUG] [1781777437.450028465] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.499970538] [rcl]: Calling timer
+[DEBUG] [1781777437.500097252] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.549987657] [rcl]: Calling timer
+[DEBUG] [1781777437.550112320] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.599972661] [rcl]: Calling timer
+[DEBUG] [1781777437.600110978] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.649962517] [rcl]: Calling timer
+[DEBUG] [1781777437.650072718] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777437.687913058] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777437.699935378] [rcl]: Calling timer
+[DEBUG] [1781777437.700022401] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.749950683] [rcl]: Calling timer
+[DEBUG] [1781777437.750052549] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777437.763580197] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777437.799892975] [rcl]: Calling timer
+[DEBUG] [1781777437.799935115] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777437.839014123] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777437.849906909] [rcl]: Calling timer
+[DEBUG] [1781777437.849976205] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.899899910] [rcl]: Calling timer
+[DEBUG] [1781777437.899967463] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777437.949891757] [rcl]: Calling timer
+[DEBUG] [1781777437.949942200] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777437.963017562] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777437.999880692] [rcl]: Calling timer
+[DEBUG] [1781777437.999924852] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.049888354] [rcl]: Calling timer
+[DEBUG] [1781777438.049957283] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.099906676] [rcl]: Calling timer
+[DEBUG] [1781777438.099969933] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.149927655] [rcl]: Calling timer
+[DEBUG] [1781777438.149994550] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.199918807] [rcl]: Calling timer
+[DEBUG] [1781777438.199983533] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777438.243465065] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777438.250158592] [rcl]: Calling timer
+[DEBUG] [1781777438.250658411] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.299923945] [rcl]: Calling timer
+[DEBUG] [1781777438.300013464] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.349953030] [rcl]: Calling timer
+[DEBUG] [1781777438.350026863] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.399908239] [rcl]: Calling timer
+[DEBUG] [1781777438.399975184] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777438.421481082] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777438.449986674] [rcl]: Calling timer
+[DEBUG] [1781777438.450041277] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.499930486] [rcl]: Calling timer
+[DEBUG] [1781777438.500024258] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.549930323] [rcl]: Calling timer
+[DEBUG] [1781777438.550043057] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.599956302] [rcl]: Calling timer
+[DEBUG] [1781777438.600024497] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.649929870] [rcl]: Calling timer
+[DEBUG] [1781777438.650023867] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.699952847] [rcl]: Calling timer
+[DEBUG] [1781777438.700047257] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.749915483] [rcl]: Calling timer
+[DEBUG] [1781777438.749998259] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777438.798321439] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 1
+[DEBUG] [1781777438.800015000] [rcl]: Calling timer
+[DEBUG] [1781777438.800113076] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.850006700] [rcl]: Calling timer
+[DEBUG] [1781777438.850099596] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.899893134] [rcl]: Calling timer
+[DEBUG] [1781777438.899929900] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777438.919311149] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 0
+[DEBUG] [1781777438.949877423] [rcl]: Calling timer
+[DEBUG] [1781777438.949911934] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777438.999947637] [rcl]: Calling timer
+[DEBUG] [1781777439.000047846] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.049956334] [rcl]: Calling timer
+[DEBUG] [1781777439.050060218] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.099977898] [rcl]: Calling timer
+[DEBUG] [1781777439.100165594] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.149992098] [rcl]: Calling timer
+[DEBUG] [1781777439.150089015] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.200489927] [rcl]: Calling timer
+[DEBUG] [1781777439.200624227] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.249924022] [rcl]: Calling timer
+[DEBUG] [1781777439.249999379] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.299921318] [rcl]: Calling timer
+[DEBUG] [1781777439.299963401] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.349904105] [rcl]: Calling timer
+[DEBUG] [1781777439.349956641] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.399890538] [rcl]: Calling timer
+[DEBUG] [1781777439.399942581] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.449883358] [rcl]: Calling timer
+[DEBUG] [1781777439.449915822] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.499879236] [rcl]: Calling timer
+[DEBUG] [1781777439.499921627] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.549878124] [rcl]: Calling timer
+[DEBUG] [1781777439.549921209] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.599876320] [rcl]: Calling timer
+[DEBUG] [1781777439.599913367] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.649915898] [rcl]: Calling timer
+[DEBUG] [1781777439.649997730] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.699972018] [rcl]: Calling timer
+[DEBUG] [1781777439.700059794] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.749905126] [rcl]: Calling timer
+[DEBUG] [1781777439.749973811] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.799894559] [rcl]: Calling timer
+[DEBUG] [1781777439.799951161] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.849905737] [rcl]: Calling timer
+[DEBUG] [1781777439.849991764] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.900473273] [rcl]: Calling timer
+[DEBUG] [1781777439.900512797] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777439.949930878] [rcl]: Calling timer
+[DEBUG] [1781777439.950019726] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.000278278] [rcl]: Calling timer
+[DEBUG] [1781777440.000490233] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.049966460] [rcl]: Calling timer
+[DEBUG] [1781777440.050104152] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.102625498] [rcl]: Calling timer
+[DEBUG] [1781777440.102770680] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.150016580] [rcl]: Calling timer
+[DEBUG] [1781777440.150151995] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.199961132] [rcl]: Calling timer
+[DEBUG] [1781777440.200083086] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.250590639] [rcl]: Calling timer
+[DEBUG] [1781777440.251007775] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.300027549] [rcl]: Calling timer
+[DEBUG] [1781777440.300180963] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.350231243] [rcl]: Calling timer
+[DEBUG] [1781777440.350379650] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.399932431] [rcl]: Calling timer
+[DEBUG] [1781777440.399999820] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.449904506] [rcl]: Calling timer
+[DEBUG] [1781777440.450001810] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.499901418] [rcl]: Calling timer
+[DEBUG] [1781777440.499940315] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.549947567] [rcl]: Calling timer
+[DEBUG] [1781777440.550182981] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.599996501] [rcl]: Calling timer
+[DEBUG] [1781777440.600110451] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.650071859] [rcl]: Calling timer
+[DEBUG] [1781777440.650200594] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.699945320] [rcl]: Calling timer
+[DEBUG] [1781777440.700027503] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.749905299] [rcl]: Calling timer
+[DEBUG] [1781777440.749960183] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.799895920] [rcl]: Calling timer
+[DEBUG] [1781777440.799958024] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.849949272] [rcl]: Calling timer
+[DEBUG] [1781777440.850046648] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.899933233] [rcl]: Calling timer
+[DEBUG] [1781777440.899984784] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.949969067] [rcl]: Calling timer
+[DEBUG] [1781777440.950074783] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777440.999910607] [rcl]: Calling timer
+[DEBUG] [1781777440.999982148] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.049932804] [rcl]: Calling timer
+[DEBUG] [1781777441.050025463] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.099928483] [rcl]: Calling timer
+[DEBUG] [1781777441.100024866] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.150038480] [rcl]: Calling timer
+[DEBUG] [1781777441.150146984] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.200004412] [rcl]: Calling timer
+[DEBUG] [1781777441.200053590] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.250191909] [rcl]: Calling timer
+[DEBUG] [1781777441.250231805] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.299881285] [rcl]: Calling timer
+[DEBUG] [1781777441.299921749] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.350022951] [rcl]: Calling timer
+[DEBUG] [1781777441.350091397] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.399881554] [rcl]: Calling timer
+[DEBUG] [1781777441.399923580] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.449912768] [rcl]: Calling timer
+[DEBUG] [1781777441.449983422] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.499894894] [rcl]: Calling timer
+[DEBUG] [1781777441.499931296] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.549876947] [rcl]: Calling timer
+[DEBUG] [1781777441.549968275] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.599877545] [rcl]: Calling timer
+[DEBUG] [1781777441.599919019] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.649875767] [rcl]: Calling timer
+[DEBUG] [1781777441.649911828] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.699952811] [rcl]: Calling timer
+[DEBUG] [1781777441.700090040] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.749975803] [rcl]: Calling timer
+[DEBUG] [1781777441.750082997] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.799952684] [rcl]: Calling timer
+[DEBUG] [1781777441.800062516] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.850024182] [rcl]: Calling timer
+[DEBUG] [1781777441.850139059] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.900024708] [rcl]: Calling timer
+[DEBUG] [1781777441.900146786] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.950679301] [rcl]: Calling timer
+[DEBUG] [1781777441.950759106] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777441.999993805] [rcl]: Calling timer
+[DEBUG] [1781777442.000099444] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.050143268] [rcl]: Calling timer
+[DEBUG] [1781777442.050268916] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.100024483] [rcl]: Calling timer
+[DEBUG] [1781777442.100122380] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.150036782] [rcl]: Calling timer
+[DEBUG] [1781777442.150112729] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.199959959] [rcl]: Calling timer
+[DEBUG] [1781777442.200071194] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.249980730] [rcl]: Calling timer
+[DEBUG] [1781777442.250106530] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.299966497] [rcl]: Calling timer
+[DEBUG] [1781777442.300069733] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.349974060] [rcl]: Calling timer
+[DEBUG] [1781777442.350097777] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.400485953] [rcl]: Calling timer
+[DEBUG] [1781777442.400518624] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.449884016] [rcl]: Calling timer
+[DEBUG] [1781777442.449922959] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.499888103] [rcl]: Calling timer
+[DEBUG] [1781777442.499930158] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.549980951] [rcl]: Calling timer
+[DEBUG] [1781777442.550019019] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.599906266] [rcl]: Calling timer
+[DEBUG] [1781777442.599964116] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.649907843] [rcl]: Calling timer
+[DEBUG] [1781777442.649974365] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.699911450] [rcl]: Calling timer
+[DEBUG] [1781777442.699992604] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.749966316] [rcl]: Calling timer
+[DEBUG] [1781777442.750043226] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.799948575] [rcl]: Calling timer
+[DEBUG] [1781777442.800044800] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.849934263] [rcl]: Calling timer
+[DEBUG] [1781777442.850003322] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.899919696] [rcl]: Calling timer
+[DEBUG] [1781777442.900014365] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777442.949921598] [rcl]: Calling timer
+[DEBUG] [1781777442.950087112] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.000221442] [rcl]: Calling timer
+[DEBUG] [1781777443.000317391] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.049921569] [rcl]: Calling timer
+[DEBUG] [1781777443.050005860] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.099920128] [rcl]: Calling timer
+[DEBUG] [1781777443.099998299] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.149919344] [rcl]: Calling timer
+[DEBUG] [1781777443.149997536] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.199929060] [rcl]: Calling timer
+[DEBUG] [1781777443.200003635] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.249990064] [rcl]: Calling timer
+[DEBUG] [1781777443.250092160] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.299977932] [rcl]: Calling timer
+[DEBUG] [1781777443.300057999] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.349933405] [rcl]: Calling timer
+[DEBUG] [1781777443.350096446] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.399905839] [rcl]: Calling timer
+[DEBUG] [1781777443.399953289] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.449938750] [rcl]: Calling timer
+[DEBUG] [1781777443.450046697] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.499904728] [rcl]: Calling timer
+[DEBUG] [1781777443.499948564] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.549883844] [rcl]: Calling timer
+[DEBUG] [1781777443.549924862] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.599894226] [rcl]: Calling timer
+[DEBUG] [1781777443.599958357] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.649908536] [rcl]: Calling timer
+[DEBUG] [1781777443.649974950] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.699912305] [rcl]: Calling timer
+[DEBUG] [1781777443.699993857] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.749920141] [rcl]: Calling timer
+[DEBUG] [1781777443.749980019] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.799917136] [rcl]: Calling timer
+[DEBUG] [1781777443.799993240] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.849944931] [rcl]: Calling timer
+[DEBUG] [1781777443.850060552] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.900163544] [rcl]: Calling timer
+[DEBUG] [1781777443.900235242] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.949993041] [rcl]: Calling timer
+[DEBUG] [1781777443.950363493] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777443.999886783] [rcl]: Calling timer
+[DEBUG] [1781777443.999918483] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.049933286] [rcl]: Calling timer
+[DEBUG] [1781777444.050161803] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.099911953] [rcl]: Calling timer
+[DEBUG] [1781777444.100003166] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.149981364] [rcl]: Calling timer
+[DEBUG] [1781777444.150080555] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.199938123] [rcl]: Calling timer
+[DEBUG] [1781777444.200011472] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.249909647] [rcl]: Calling timer
+[DEBUG] [1781777444.249974748] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.300007557] [rcl]: Calling timer
+[DEBUG] [1781777444.300080842] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.351237119] [rcl]: Calling timer
+[DEBUG] [1781777444.351323520] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.399921953] [rcl]: Calling timer
+[DEBUG] [1781777444.399991919] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.449886727] [rcl]: Calling timer
+[DEBUG] [1781777444.450023342] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.499890013] [rcl]: Calling timer
+[DEBUG] [1781777444.499922355] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.549874324] [rcl]: Calling timer
+[DEBUG] [1781777444.549907720] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.599954402] [rcl]: Calling timer
+[DEBUG] [1781777444.600105813] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.650085062] [rcl]: Calling timer
+[DEBUG] [1781777444.650281612] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.700005920] [rcl]: Calling timer
+[DEBUG] [1781777444.700127967] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.749991776] [rcl]: Calling timer
+[DEBUG] [1781777444.750100830] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.799951934] [rcl]: Calling timer
+[DEBUG] [1781777444.800070568] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.849991788] [rcl]: Calling timer
+[DEBUG] [1781777444.850094552] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.899975060] [rcl]: Calling timer
+[DEBUG] [1781777444.900071846] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.950029241] [rcl]: Calling timer
+[DEBUG] [1781777444.950249712] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777444.999980098] [rcl]: Calling timer
+[DEBUG] [1781777445.000086274] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.049908681] [rcl]: Calling timer
+[DEBUG] [1781777445.049991623] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.099968986] [rcl]: Calling timer
+[DEBUG] [1781777445.100089285] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.149980547] [rcl]: Calling timer
+[DEBUG] [1781777445.150068485] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.199903493] [rcl]: Calling timer
+[DEBUG] [1781777445.199936605] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.249886623] [rcl]: Calling timer
+[DEBUG] [1781777445.250005259] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.299882707] [rcl]: Calling timer
+[DEBUG] [1781777445.299921537] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.350020560] [rcl]: Calling timer
+[DEBUG] [1781777445.350056275] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.399902169] [rcl]: Calling timer
+[DEBUG] [1781777445.399976366] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.449882272] [rcl]: Calling timer
+[DEBUG] [1781777445.449921435] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.499941473] [rcl]: Calling timer
+[DEBUG] [1781777445.499997292] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.549937735] [rcl]: Calling timer
+[DEBUG] [1781777445.549973054] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.599869636] [rcl]: Calling timer
+[DEBUG] [1781777445.599898214] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.649958323] [rcl]: Calling timer
+[DEBUG] [1781777445.650010857] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.699877204] [rcl]: Calling timer
+[DEBUG] [1781777445.699902544] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.749890286] [rcl]: Calling timer
+[DEBUG] [1781777445.749922351] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.799894188] [rcl]: Calling timer
+[DEBUG] [1781777445.799956056] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.849938075] [rcl]: Calling timer
+[DEBUG] [1781777445.849974541] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.899869260] [rcl]: Calling timer
+[DEBUG] [1781777445.899892880] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.949920186] [rcl]: Calling timer
+[DEBUG] [1781777445.950010967] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777445.999926927] [rcl]: Calling timer
+[DEBUG] [1781777445.999973169] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.050038524] [rcl]: Calling timer
+[DEBUG] [1781777446.050144191] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.099902234] [rcl]: Calling timer
+[DEBUG] [1781777446.099954413] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.149959587] [rcl]: Calling timer
+[DEBUG] [1781777446.150073198] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.200651846] [rcl]: Calling timer
+[DEBUG] [1781777446.200768636] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.249966347] [rcl]: Calling timer
+[DEBUG] [1781777446.250117530] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.299986381] [rcl]: Calling timer
+[DEBUG] [1781777446.300117953] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.349967489] [rcl]: Calling timer
+[DEBUG] [1781777446.350090153] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.399922224] [rcl]: Calling timer
+[DEBUG] [1781777446.399979121] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.450181466] [rcl]: Calling timer
+[DEBUG] [1781777446.450221745] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.499962719] [rcl]: Calling timer
+[DEBUG] [1781777446.500079726] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.549889172] [rcl]: Calling timer
+[DEBUG] [1781777446.549959786] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.599925244] [rcl]: Calling timer
+[DEBUG] [1781777446.600031322] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.649980416] [rcl]: Calling timer
+[DEBUG] [1781777446.650093005] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.700017798] [rcl]: Calling timer
+[DEBUG] [1781777446.700188013] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.750018443] [rcl]: Calling timer
+[DEBUG] [1781777446.750201966] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.799930063] [rcl]: Calling timer
+[DEBUG] [1781777446.800050651] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.849921701] [rcl]: Calling timer
+[DEBUG] [1781777446.850001711] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.899976591] [rcl]: Calling timer
+[DEBUG] [1781777446.900155738] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.949945442] [rcl]: Calling timer
+[DEBUG] [1781777446.950035804] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777446.999948139] [rcl]: Calling timer
+[DEBUG] [1781777447.000036395] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.049948572] [rcl]: Calling timer
+[DEBUG] [1781777447.050130615] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.100031595] [rcl]: Calling timer
+[DEBUG] [1781777447.100122254] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.149944675] [rcl]: Calling timer
+[DEBUG] [1781777447.150034560] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.200064940] [rcl]: Calling timer
+[DEBUG] [1781777447.200170614] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.249943157] [rcl]: Calling timer
+[DEBUG] [1781777447.250041551] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.299905517] [rcl]: Calling timer
+[DEBUG] [1781777447.299963558] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.349892694] [rcl]: Calling timer
+[DEBUG] [1781777447.349967148] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.399892102] [rcl]: Calling timer
+[DEBUG] [1781777447.399939044] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.449875920] [rcl]: Calling timer
+[DEBUG] [1781777447.449913357] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.499875409] [rcl]: Calling timer
+[DEBUG] [1781777447.499910591] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.549967080] [rcl]: Calling timer
+[DEBUG] [1781777447.550109641] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.599984491] [rcl]: Calling timer
+[DEBUG] [1781777447.600092446] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.650012673] [rcl]: Calling timer
+[DEBUG] [1781777447.650137095] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.700078380] [rcl]: Calling timer
+[DEBUG] [1781777447.700191276] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.750021768] [rcl]: Calling timer
+[DEBUG] [1781777447.750137770] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.799977586] [rcl]: Calling timer
+[DEBUG] [1781777447.800094440] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.849991913] [rcl]: Calling timer
+[DEBUG] [1781777447.850096784] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.899972111] [rcl]: Calling timer
+[DEBUG] [1781777447.900079079] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.949975002] [rcl]: Calling timer
+[DEBUG] [1781777447.950089453] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777447.999970109] [rcl]: Calling timer
+[DEBUG] [1781777448.000101963] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.050012484] [rcl]: Calling timer
+[DEBUG] [1781777448.050075055] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.099909997] [rcl]: Calling timer
+[DEBUG] [1781777448.099961646] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.149890180] [rcl]: Calling timer
+[DEBUG] [1781777448.149964577] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777448.152422161] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 1
+[DEBUG] [1781777448.199908897] [rcl]: Calling timer
+[DEBUG] [1781777448.199970200] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.249931939] [rcl]: Calling timer
+[DEBUG] [1781777448.249992981] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777448.269236990] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 0
+[DEBUG] [1781777448.299909050] [rcl]: Calling timer
+[DEBUG] [1781777448.299971073] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.349931623] [rcl]: Calling timer
+[DEBUG] [1781777448.350000844] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.399915087] [rcl]: Calling timer
+[DEBUG] [1781777448.399980684] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.450002822] [rcl]: Calling timer
+[DEBUG] [1781777448.450128675] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.499934755] [rcl]: Calling timer
+[DEBUG] [1781777448.499971211] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.550080599] [rcl]: Calling timer
+[DEBUG] [1781777448.550398222] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.599958979] [rcl]: Calling timer
+[DEBUG] [1781777448.600056875] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.649940808] [rcl]: Calling timer
+[DEBUG] [1781777448.650066749] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.700146406] [rcl]: Calling timer
+[DEBUG] [1781777448.700255073] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.749984661] [rcl]: Calling timer
+[DEBUG] [1781777448.750080128] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.799956913] [rcl]: Calling timer
+[DEBUG] [1781777448.800054257] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.849962942] [rcl]: Calling timer
+[DEBUG] [1781777448.850082380] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.900019574] [rcl]: Calling timer
+[DEBUG] [1781777448.900161554] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777448.950543903] [rcl]: Calling timer
+[DEBUG] [1781777448.950657197] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.000361322] [rcl]: Calling timer
+[DEBUG] [1781777449.000496205] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.049938945] [rcl]: Calling timer
+[DEBUG] [1781777449.050017487] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.099988825] [rcl]: Calling timer
+[DEBUG] [1781777449.100092962] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.149964990] [rcl]: Calling timer
+[DEBUG] [1781777449.150072150] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.199955411] [rcl]: Calling timer
+[DEBUG] [1781777449.200057056] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.250030320] [rcl]: Calling timer
+[DEBUG] [1781777449.250173039] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.299977014] [rcl]: Calling timer
+[DEBUG] [1781777449.300040047] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.349901778] [rcl]: Calling timer
+[DEBUG] [1781777449.349949680] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.399907436] [rcl]: Calling timer
+[DEBUG] [1781777449.399964770] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.449873081] [rcl]: Calling timer
+[DEBUG] [1781777449.449906362] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.499878504] [rcl]: Calling timer
+[DEBUG] [1781777449.500029947] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.549998117] [rcl]: Calling timer
+[DEBUG] [1781777449.550137982] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.599981419] [rcl]: Calling timer
+[DEBUG] [1781777449.600097633] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.649967436] [rcl]: Calling timer
+[DEBUG] [1781777449.650060474] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.699988382] [rcl]: Calling timer
+[DEBUG] [1781777449.700108865] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.749992911] [rcl]: Calling timer
+[DEBUG] [1781777449.750104264] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.799975895] [rcl]: Calling timer
+[DEBUG] [1781777449.800103394] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.850079800] [rcl]: Calling timer
+[DEBUG] [1781777449.850200623] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.899984398] [rcl]: Calling timer
+[DEBUG] [1781777449.900102554] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.949972475] [rcl]: Calling timer
+[DEBUG] [1781777449.950103264] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777449.999976007] [rcl]: Calling timer
+[DEBUG] [1781777450.000092956] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.049976160] [rcl]: Calling timer
+[DEBUG] [1781777450.050095937] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.099962482] [rcl]: Calling timer
+[DEBUG] [1781777450.100092139] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.151322631] [rcl]: Calling timer
+[DEBUG] [1781777450.151488329] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.199983088] [rcl]: Calling timer
+[DEBUG] [1781777450.200450194] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.249941934] [rcl]: Calling timer
+[DEBUG] [1781777450.250027211] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.299943530] [rcl]: Calling timer
+[DEBUG] [1781777450.300027506] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.349915847] [rcl]: Calling timer
+[DEBUG] [1781777450.350012021] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.399905977] [rcl]: Calling timer
+[DEBUG] [1781777450.399949020] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.449947553] [rcl]: Calling timer
+[DEBUG] [1781777450.450128214] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.499908158] [rcl]: Calling timer
+[DEBUG] [1781777450.499947234] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.549893015] [rcl]: Calling timer
+[DEBUG] [1781777450.549946842] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.599922777] [rcl]: Calling timer
+[DEBUG] [1781777450.600020339] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.649968238] [rcl]: Calling timer
+[DEBUG] [1781777450.650052106] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.699988157] [rcl]: Calling timer
+[DEBUG] [1781777450.700080315] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.749957871] [rcl]: Calling timer
+[DEBUG] [1781777450.750064628] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.799950003] [rcl]: Calling timer
+[DEBUG] [1781777450.800038587] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.849951373] [rcl]: Calling timer
+[DEBUG] [1781777450.850045960] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.899927876] [rcl]: Calling timer
+[DEBUG] [1781777450.900018130] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.949956500] [rcl]: Calling timer
+[DEBUG] [1781777450.950065447] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777450.999961901] [rcl]: Calling timer
+[DEBUG] [1781777451.000059590] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.049944186] [rcl]: Calling timer
+[DEBUG] [1781777451.050040028] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.099942801] [rcl]: Calling timer
+[DEBUG] [1781777451.100197701] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.149949742] [rcl]: Calling timer
+[DEBUG] [1781777451.150068376] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.199965732] [rcl]: Calling timer
+[DEBUG] [1781777451.200077137] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.249974200] [rcl]: Calling timer
+[DEBUG] [1781777451.250095458] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777451.287192967] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 1
+[DEBUG] [1781777451.299945494] [rcl]: Calling timer
+[DEBUG] [1781777451.300028964] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.349949961] [rcl]: Calling timer
+[DEBUG] [1781777451.350049204] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777451.396477662] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 0
+[DEBUG] [1781777451.399901125] [rcl]: Calling timer
+[DEBUG] [1781777451.399945402] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.449910566] [rcl]: Calling timer
+[DEBUG] [1781777451.449983023] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.499924880] [rcl]: Calling timer
+[DEBUG] [1781777451.500002114] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.549911774] [rcl]: Calling timer
+[DEBUG] [1781777451.549978730] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.599961776] [rcl]: Calling timer
+[DEBUG] [1781777451.600051158] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.649950775] [rcl]: Calling timer
+[DEBUG] [1781777451.650050883] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.699956661] [rcl]: Calling timer
+[DEBUG] [1781777451.700042801] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.749938402] [rcl]: Calling timer
+[DEBUG] [1781777451.750027312] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.799946300] [rcl]: Calling timer
+[DEBUG] [1781777451.800030993] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.849983058] [rcl]: Calling timer
+[DEBUG] [1781777451.850065812] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.899935155] [rcl]: Calling timer
+[DEBUG] [1781777451.900016219] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.949947754] [rcl]: Calling timer
+[DEBUG] [1781777451.950022529] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777451.999932175] [rcl]: Calling timer
+[DEBUG] [1781777452.000009346] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.049936065] [rcl]: Calling timer
+[DEBUG] [1781777452.050088002] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.099956761] [rcl]: Calling timer
+[DEBUG] [1781777452.100039146] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.150536292] [rcl]: Calling timer
+[DEBUG] [1781777452.150622224] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.199963963] [rcl]: Calling timer
+[DEBUG] [1781777452.200121203] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.250011640] [rcl]: Calling timer
+[DEBUG] [1781777452.250129595] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.300079697] [rcl]: Calling timer
+[DEBUG] [1781777452.300342158] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777452.349936251] [rcl]: Calling timer
+[DEBUG] [1781777452.350017971] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777452.395051483] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777452.399916592] [rcl]: Calling timer
+[DEBUG] [1781777452.399984647] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777452.449899530] [rcl]: Calling timer
+[DEBUG] [1781777452.449963824] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777452.499874848] [rcl]: Calling timer
+[DEBUG] [1781777452.499908926] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777452.549916519] [rcl]: Calling timer
+[DEBUG] [1781777452.550031946] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777452.599942768] [rcl]: Calling timer
+[DEBUG] [1781777452.600066501] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.642295519] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.649952626] [rcl]: Calling timer
+[DEBUG] [1781777452.650065216] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.671227472] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.699970625] [rcl]: Calling timer
+[DEBUG] [1781777452.700127882] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.700378987] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777452.729764772] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.749974485] [rcl]: Calling timer
+[DEBUG] [1781777452.750063460] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.758988395] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777452.792372286] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.799953987] [rcl]: Calling timer
+[DEBUG] [1781777452.800050998] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.821771377] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.849965924] [rcl]: Calling timer
+[DEBUG] [1781777452.850125856] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.850955662] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777452.880652005] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.899994320] [rcl]: Calling timer
+[DEBUG] [1781777452.900127350] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.911295871] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777452.939346059] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777452.949989892] [rcl]: Calling timer
+[DEBUG] [1781777452.950115146] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777452.968698050] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777452.997870498] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.000030478] [rcl]: Calling timer
+[DEBUG] [1781777453.000117793] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.027368715] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.050383137] [rcl]: Calling timer
+[DEBUG] [1781777453.050508517] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.056474400] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.086509068] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.099990116] [rcl]: Calling timer
+[DEBUG] [1781777453.100102444] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.116420473] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.144994705] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.150012531] [rcl]: Calling timer
+[DEBUG] [1781777453.150110164] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.177366993] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.199989613] [rcl]: Calling timer
+[DEBUG] [1781777453.200110179] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.206509147] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.235558318] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.249914677] [rcl]: Calling timer
+[DEBUG] [1781777453.249986304] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.264707207] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.298375411] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.300027865] [rcl]: Calling timer
+[DEBUG] [1781777453.300157536] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.327923356] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.349985134] [rcl]: Calling timer
+[DEBUG] [1781777453.350109874] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.357216366] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.386471427] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.400084691] [rcl]: Calling timer
+[DEBUG] [1781777453.400159800] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.415660041] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.444873151] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.449907394] [rcl]: Calling timer
+[DEBUG] [1781777453.449940630] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.474116280] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.499877641] [rcl]: Calling timer
+[DEBUG] [1781777453.499921304] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.503379230] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.532675249] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.549871242] [rcl]: Calling timer
+[DEBUG] [1781777453.549905914] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.563119955] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.592417858] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777453.599911318] [rcl]: Calling timer
+[DEBUG] [1781777453.599979646] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.621742607] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.625881053] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777453.649944534] [rcl]: Calling timer
+[DEBUG] [1781777453.650052175] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777453.699964389] [rcl]: Calling timer
+[DEBUG] [1781777453.700088880] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777453.714733389] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777453.750017406] [rcl]: Calling timer
+[DEBUG] [1781777453.750161938] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777453.800013708] [rcl]: Calling timer
+[DEBUG] [1781777453.800117268] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777453.850293664] [rcl]: Calling timer
+[DEBUG] [1781777453.850493254] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777453.899981898] [rcl]: Calling timer
+[DEBUG] [1781777453.900097213] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777453.950012157] [rcl]: Calling timer
+[DEBUG] [1781777453.950132111] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777453.961581778] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777453.990839162] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.000019424] [rcl]: Calling timer
+[DEBUG] [1781777454.000194981] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.020191201] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.049966175] [rcl]: Calling timer
+[DEBUG] [1781777454.050071911] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.052692775] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.082001413] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.100127025] [rcl]: Calling timer
+[DEBUG] [1781777454.100254122] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.111880574] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.143779562] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.151285340] [rcl]: Calling timer
+[DEBUG] [1781777454.151394855] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.172407810] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.199993276] [rcl]: Calling timer
+[DEBUG] [1781777454.200134610] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.201747413] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.230974587] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.250027994] [rcl]: Calling timer
+[DEBUG] [1781777454.250167759] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.260423072] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.289730980] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.299961905] [rcl]: Calling timer
+[DEBUG] [1781777454.300091145] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.319090546] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.348306436] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.349995557] [rcl]: Calling timer
+[DEBUG] [1781777454.350131716] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.377419736] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.399905856] [rcl]: Calling timer
+[DEBUG] [1781777454.399939062] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.406693081] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.436020263] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.449838257] [rcl]: Calling timer
+[DEBUG] [1781777454.449873883] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.465151563] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.494577328] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.499875943] [rcl]: Calling timer
+[DEBUG] [1781777454.499935899] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.536272661] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.549934052] [rcl]: Calling timer
+[DEBUG] [1781777454.550060811] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.553032005] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.582567363] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.599941959] [rcl]: Calling timer
+[DEBUG] [1781777454.600037111] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.611602188] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.641966612] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.650172819] [rcl]: Calling timer
+[DEBUG] [1781777454.650289501] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.671558392] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.700013429] [rcl]: Calling timer
+[DEBUG] [1781777454.700149975] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.700854546] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.729803845] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.750159491] [rcl]: Calling timer
+[DEBUG] [1781777454.750289586] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.760417360] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.788298843] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.799954003] [rcl]: Calling timer
+[DEBUG] [1781777454.800065848] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.821500365] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.849914289] [rcl]: Calling timer
+[DEBUG] [1781777454.849971819] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.850843513] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.880147596] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.899881261] [rcl]: Calling timer
+[DEBUG] [1781777454.899913894] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.909899479] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.938675197] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.950158949] [rcl]: Calling timer
+[DEBUG] [1781777454.950199820] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777454.968229890] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777454.997251067] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777454.999968831] [rcl]: Calling timer
+[DEBUG] [1781777455.000065717] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.028860809] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.050001357] [rcl]: Calling timer
+[DEBUG] [1781777455.050088836] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.058190640] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.087537587] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.099983224] [rcl]: Calling timer
+[DEBUG] [1781777455.100120699] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.119641624] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.148953428] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.150011085] [rcl]: Calling timer
+[DEBUG] [1781777455.150094185] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.178474350] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.199977180] [rcl]: Calling timer
+[DEBUG] [1781777455.200162848] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.207488455] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.236568135] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.249943684] [rcl]: Calling timer
+[DEBUG] [1781777455.250020245] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.266245690] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.295372120] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.299903456] [rcl]: Calling timer
+[DEBUG] [1781777455.300071815] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.324696706] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.349897029] [rcl]: Calling timer
+[DEBUG] [1781777455.349939433] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.353964610] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.383799851] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.400523708] [rcl]: Calling timer
+[DEBUG] [1781777455.400592225] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.412490737] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.441777599] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.449909575] [rcl]: Calling timer
+[DEBUG] [1781777455.449949437] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.470961443] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.499895841] [rcl]: Calling timer
+[DEBUG] [1781777455.499930495] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.511347388] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.540803830] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.549892526] [rcl]: Calling timer
+[DEBUG] [1781777455.549925761] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.569982486] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.600741229] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.601013933] [rcl]: Calling timer
+[DEBUG] [1781777455.601082105] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.628850853] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.649968725] [rcl]: Calling timer
+[DEBUG] [1781777455.650063861] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.657918882] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.687116042] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.699966846] [rcl]: Calling timer
+[DEBUG] [1781777455.700088179] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.716828695] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.745680177] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.749966805] [rcl]: Calling timer
+[DEBUG] [1781777455.750065781] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.774897463] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.799982423] [rcl]: Calling timer
+[DEBUG] [1781777455.800100193] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.804202827] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.833492540] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.850150082] [rcl]: Calling timer
+[DEBUG] [1781777455.850292755] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.862806296] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.892076538] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.899975196] [rcl]: Calling timer
+[DEBUG] [1781777455.900084336] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.921407974] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777455.949992255] [rcl]: Calling timer
+[DEBUG] [1781777455.950129006] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777455.950606748] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777455.980341591] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777456.000028258] [rcl]: Calling timer
+[DEBUG] [1781777456.000173975] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777456.010899493] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777456.039870316] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777456.050166108] [rcl]: Calling timer
+[DEBUG] [1781777456.050244891] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777456.069156566] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777456.099906614] [rcl]: Calling timer
+[DEBUG] [1781777456.099969510] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777456.101757809] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777456.130557119] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777456.143683527] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777456.149903709] [rcl]: Calling timer
+[DEBUG] [1781777456.149955486] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777456.199902547] [rcl]: Calling timer
+[DEBUG] [1781777456.199960794] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777456.250007784] [rcl]: Calling timer
+[DEBUG] [1781777456.250148400] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777456.287859886] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 1
+[DEBUG] [1781777456.299924225] [rcl]: Calling timer
+[DEBUG] [1781777456.299993498] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[DEBUG] [1781777456.349935139] [rcl]: Calling timer
+[DEBUG] [1781777456.350007880] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[DEBUG] [1781777456.399904204] [rcl]: Calling timer
+[DEBUG] [1781777456.399960344] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[DEBUG] [1781777456.449928183] [rcl]: Calling timer
+[DEBUG] [1781777456.449955008] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[DEBUG] [1781777456.499942084] [rcl]: Calling timer
+[DEBUG] [1781777456.500044012] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777456.534155105] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 2
+[DEBUG] [1781777456.549942456] [rcl]: Calling timer
+[DEBUG] [1781777456.550042416] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777456.563235541] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 2
+[INFO] [1781777456.592419989] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 2
+[DEBUG] [1781777456.599932740] [rcl]: Calling timer
+[DEBUG] [1781777456.600003890] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777456.621802430] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 2
+[DEBUG] [1781777456.649929170] [rcl]: Calling timer
+[DEBUG] [1781777456.650027162] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777456.651026167] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 2
+[INFO] [1781777456.680215222] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 0
+[DEBUG] [1781777456.699944207] [rcl]: Calling timer
+[DEBUG] [1781777456.700150945] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777456.749947712] [rcl]: Calling timer
+[DEBUG] [1781777456.750024872] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777456.784088120] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777456.800131737] [rcl]: Calling timer
+[DEBUG] [1781777456.800302321] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777456.849940289] [rcl]: Calling timer
+[DEBUG] [1781777456.850028194] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777456.899949032] [rcl]: Calling timer
+[DEBUG] [1781777456.900028405] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777456.949921995] [rcl]: Calling timer
+[DEBUG] [1781777456.949999321] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777456.999940176] [rcl]: Calling timer
+[DEBUG] [1781777457.000027320] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.031304565] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.049932493] [rcl]: Calling timer
+[DEBUG] [1781777457.050019170] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.062621151] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.091700084] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.099995891] [rcl]: Calling timer
+[DEBUG] [1781777457.100114181] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.121111080] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.150002227] [rcl]: Calling timer
+[DEBUG] [1781777457.150095454] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.150182764] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.179489351] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.200013721] [rcl]: Calling timer
+[DEBUG] [1781777457.200138400] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.208927508] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.238084575] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.249956836] [rcl]: Calling timer
+[DEBUG] [1781777457.250051595] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.267372329] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.298014397] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.299925697] [rcl]: Calling timer
+[DEBUG] [1781777457.300012209] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.326165267] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.349912378] [rcl]: Calling timer
+[DEBUG] [1781777457.349973377] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.355191957] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.384418108] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.399891315] [rcl]: Calling timer
+[DEBUG] [1781777457.399938610] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.413791178] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.442989282] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.449885883] [rcl]: Calling timer
+[DEBUG] [1781777457.449948147] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.473480976] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.499896623] [rcl]: Calling timer
+[DEBUG] [1781777457.499929964] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.502723165] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.532114565] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.549985144] [rcl]: Calling timer
+[DEBUG] [1781777457.550117978] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.562309123] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.591566465] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.600004446] [rcl]: Calling timer
+[DEBUG] [1781777457.600104856] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.620846957] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.650062700] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.650065290] [rcl]: Calling timer
+[DEBUG] [1781777457.650317419] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.679371543] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.699917744] [rcl]: Calling timer
+[DEBUG] [1781777457.699969517] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.708505843] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.737816827] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.749940149] [rcl]: Calling timer
+[DEBUG] [1781777457.750016340] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.767076519] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.796972561] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.799923526] [rcl]: Calling timer
+[DEBUG] [1781777457.799997789] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.826297760] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.849938809] [rcl]: Calling timer
+[DEBUG] [1781777457.849994398] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.859706527] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.888831874] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.899909425] [rcl]: Calling timer
+[DEBUG] [1781777457.899982671] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.918003082] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.949946705] [rcl]: Calling timer
+[DEBUG] [1781777457.950005084] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777457.952459586] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777457.981591201] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777457.999912903] [rcl]: Calling timer
+[DEBUG] [1781777458.000060645] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.010872996] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.043738275] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.049937577] [rcl]: Calling timer
+[DEBUG] [1781777458.050027378] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.072343252] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.099926164] [rcl]: Calling timer
+[DEBUG] [1781777458.100000906] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.101687834] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.131024564] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.149849504] [rcl]: Calling timer
+[DEBUG] [1781777458.149913571] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.160733969] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.189535919] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.199962845] [rcl]: Calling timer
+[DEBUG] [1781777458.200054291] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.219049040] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.248768383] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.249987127] [rcl]: Calling timer
+[DEBUG] [1781777458.250103384] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.277802400] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.300072152] [rcl]: Calling timer
+[DEBUG] [1781777458.300207730] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.306942159] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.336229843] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.350029239] [rcl]: Calling timer
+[DEBUG] [1781777458.350159234] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.365393956] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.394617778] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.400126832] [rcl]: Calling timer
+[DEBUG] [1781777458.400179283] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.423969261] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.449917748] [rcl]: Calling timer
+[DEBUG] [1781777458.449951839] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.454272522] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.483584880] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.499952511] [rcl]: Calling timer
+[DEBUG] [1781777458.500044604] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.512902545] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.543287206] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.550282316] [rcl]: Calling timer
+[DEBUG] [1781777458.550326804] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.572478442] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.599966196] [rcl]: Calling timer
+[DEBUG] [1781777458.600105680] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.603115016] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.632569324] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.650569488] [rcl]: Calling timer
+[DEBUG] [1781777458.650676555] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.661723443] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.690844859] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.700065028] [rcl]: Calling timer
+[DEBUG] [1781777458.700155857] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.720468908] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.749495770] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.749980184] [rcl]: Calling timer
+[DEBUG] [1781777458.750056180] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.779159648] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.799948013] [rcl]: Calling timer
+[DEBUG] [1781777458.800054367] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.808021277] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.837271675] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.849946361] [rcl]: Calling timer
+[DEBUG] [1781777458.850043051] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.867197868] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.896531710] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.900029794] [rcl]: Calling timer
+[DEBUG] [1781777458.900160238] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.929808155] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777458.950696901] [rcl]: Calling timer
+[DEBUG] [1781777458.950805348] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777458.954974336] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777458.984694814] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.000001854] [rcl]: Calling timer
+[DEBUG] [1781777459.000156096] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.015549708] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.046525208] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.049997099] [rcl]: Calling timer
+[DEBUG] [1781777459.050087266] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.074057008] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.099970785] [rcl]: Calling timer
+[DEBUG] [1781777459.100068469] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.104088460] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.132641118] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.149960880] [rcl]: Calling timer
+[DEBUG] [1781777459.150049003] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.162033674] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.191465792] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.199955058] [rcl]: Calling timer
+[DEBUG] [1781777459.200055805] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.224760303] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.249975995] [rcl]: Calling timer
+[DEBUG] [1781777459.250097406] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.258263962] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.287213830] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.299933856] [rcl]: Calling timer
+[DEBUG] [1781777459.300001871] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.316404011] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.349829345] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.349897969] [rcl]: Calling timer
+[DEBUG] [1781777459.349949892] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.379256604] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.399885210] [rcl]: Calling timer
+[DEBUG] [1781777459.399922734] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.418341587] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.447649556] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.449871817] [rcl]: Calling timer
+[DEBUG] [1781777459.449897447] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.477703119] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.500261314] [rcl]: Calling timer
+[DEBUG] [1781777459.501464948] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.506909919] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.536199793] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.549958770] [rcl]: Calling timer
+[DEBUG] [1781777459.550378323] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.565576394] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.599342964] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.599978263] [rcl]: Calling timer
+[DEBUG] [1781777459.600058196] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.628329068] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.649987941] [rcl]: Calling timer
+[DEBUG] [1781777459.650121477] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.658564967] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.686807913] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.699956682] [rcl]: Calling timer
+[DEBUG] [1781777459.700096451] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.716042606] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.745998169] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.749973679] [rcl]: Calling timer
+[DEBUG] [1781777459.750104797] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.775178651] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.799974587] [rcl]: Calling timer
+[DEBUG] [1781777459.800115328] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.804412310] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.833664826] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.849933864] [rcl]: Calling timer
+[DEBUG] [1781777459.850029054] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.862935039] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.892204320] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.899905141] [rcl]: Calling timer
+[DEBUG] [1781777459.899956967] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.922451790] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.950071333] [rcl]: Calling timer
+[DEBUG] [1781777459.950118449] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777459.951590164] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777459.980994806] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777459.999888237] [rcl]: Calling timer
+[DEBUG] [1781777459.999933578] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.013025762] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.042452333] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.049881483] [rcl]: Calling timer
+[DEBUG] [1781777460.049930203] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.071566623] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.099890732] [rcl]: Calling timer
+[DEBUG] [1781777460.099934709] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.100873604] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.130156141] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.149883377] [rcl]: Calling timer
+[DEBUG] [1781777460.149931044] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.159558018] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.188841111] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.199998436] [rcl]: Calling timer
+[DEBUG] [1781777460.200077098] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.218620822] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.247423313] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.249929062] [rcl]: Calling timer
+[DEBUG] [1781777460.250029354] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.276632475] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.299992641] [rcl]: Calling timer
+[DEBUG] [1781777460.300132596] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.305956972] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.335208393] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.349993364] [rcl]: Calling timer
+[DEBUG] [1781777460.350117019] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.364531474] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.395006223] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.400192252] [rcl]: Calling timer
+[DEBUG] [1781777460.400256527] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.424298724] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.449897275] [rcl]: Calling timer
+[DEBUG] [1781777460.449929405] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.453614155] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.482745327] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.499867535] [rcl]: Calling timer
+[DEBUG] [1781777460.499895141] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.512105593] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.541480992] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.549940312] [rcl]: Calling timer
+[DEBUG] [1781777460.550069909] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.570701220] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.599943623] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.599997692] [rcl]: Calling timer
+[DEBUG] [1781777460.600218818] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.629246517] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.649973990] [rcl]: Calling timer
+[DEBUG] [1781777460.650089598] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.659154790] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.688485397] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.700083842] [rcl]: Calling timer
+[DEBUG] [1781777460.700227946] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.719033808] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.747028373] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.749951834] [rcl]: Calling timer
+[DEBUG] [1781777460.750057693] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.776533542] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.800205950] [rcl]: Calling timer
+[DEBUG] [1781777460.800334526] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.805701847] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.834911644] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.849944339] [rcl]: Calling timer
+[DEBUG] [1781777460.850035176] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.865590858] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.895636369] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777460.899988022] [rcl]: Calling timer
+[DEBUG] [1781777460.900115788] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777460.924862167] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777460.933267046] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777460.949887241] [rcl]: Calling timer
+[DEBUG] [1781777460.949936138] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777460.999881990] [rcl]: Calling timer
+[DEBUG] [1781777460.999924147] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777461.049902650] [rcl]: Calling timer
+[DEBUG] [1781777461.049960158] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777461.100015786] [rcl]: Calling timer
+[DEBUG] [1781777461.100146969] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777461.149908779] [rcl]: Calling timer
+[DEBUG] [1781777461.149945314] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.159475556] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.203571857] [rcl]: Calling timer
+[DEBUG] [1781777461.203686169] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777461.251605844] [rcl]: Calling timer
+[DEBUG] [1781777461.251734300] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777461.263831600] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777461.299959681] [rcl]: Calling timer
+[DEBUG] [1781777461.300110519] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.312118650] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.349955615] [rcl]: Calling timer
+[DEBUG] [1781777461.350029162] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777461.399913146] [rcl]: Calling timer
+[DEBUG] [1781777461.399951036] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777461.417047499] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777461.449898710] [rcl]: Calling timer
+[DEBUG] [1781777461.449934887] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.476691812] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.499878870] [rcl]: Calling timer
+[DEBUG] [1781777461.499925358] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777461.549892328] [rcl]: Calling timer
+[DEBUG] [1781777461.549954499] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777461.572802731] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777461.599912221] [rcl]: Calling timer
+[DEBUG] [1781777461.600001737] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.633967289] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.650003188] [rcl]: Calling timer
+[DEBUG] [1781777461.650165531] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777461.699989429] [rcl]: Calling timer
+[DEBUG] [1781777461.700089128] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777461.734417429] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777461.749997756] [rcl]: Calling timer
+[DEBUG] [1781777461.750174790] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.793548227] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.799950012] [rcl]: Calling timer
+[DEBUG] [1781777461.800039282] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777461.849929213] [rcl]: Calling timer
+[DEBUG] [1781777461.850023167] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777461.888095615] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777461.899990151] [rcl]: Calling timer
+[DEBUG] [1781777461.900131531] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777461.949670727] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777461.950001645] [rcl]: Calling timer
+[DEBUG] [1781777461.950089873] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.000206010] [rcl]: Calling timer
+[DEBUG] [1781777462.000263684] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.049729633] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.049864407] [rcl]: Calling timer
+[DEBUG] [1781777462.049902743] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.097077725] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.099898088] [rcl]: Calling timer
+[DEBUG] [1781777462.099957112] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.149888804] [rcl]: Calling timer
+[DEBUG] [1781777462.149937287] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.199891210] [rcl]: Calling timer
+[DEBUG] [1781777462.199936491] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.210813817] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.249914433] [rcl]: Calling timer
+[DEBUG] [1781777462.250004012] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.261900638] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.299950010] [rcl]: Calling timer
+[DEBUG] [1781777462.300048187] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.349993101] [rcl]: Calling timer
+[DEBUG] [1781777462.350116299] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.361506158] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.399961087] [rcl]: Calling timer
+[DEBUG] [1781777462.400065100] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.413389421] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.449894554] [rcl]: Calling timer
+[DEBUG] [1781777462.449942606] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.499883292] [rcl]: Calling timer
+[DEBUG] [1781777462.499926101] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.513767900] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.549877753] [rcl]: Calling timer
+[DEBUG] [1781777462.549914136] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.564048912] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.599901358] [rcl]: Calling timer
+[DEBUG] [1781777462.599971082] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.649890885] [rcl]: Calling timer
+[DEBUG] [1781777462.649948279] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.661525257] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.700095679] [rcl]: Calling timer
+[DEBUG] [1781777462.700255216] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.728098575] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.749962934] [rcl]: Calling timer
+[DEBUG] [1781777462.750065759] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.799985402] [rcl]: Calling timer
+[DEBUG] [1781777462.800154143] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.819928576] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777462.850013548] [rcl]: Calling timer
+[DEBUG] [1781777462.850116338] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777462.881254990] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777462.899995634] [rcl]: Calling timer
+[DEBUG] [1781777462.900126427] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777462.950022606] [rcl]: Calling timer
+[DEBUG] [1781777462.950139615] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777462.967811707] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777463.000068824] [rcl]: Calling timer
+[DEBUG] [1781777463.000207800] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777463.028115533] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777463.049996386] [rcl]: Calling timer
+[DEBUG] [1781777463.050148488] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777463.100009161] [rcl]: Calling timer
+[DEBUG] [1781777463.100121468] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777463.148754729] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777463.149977218] [rcl]: Calling timer
+[DEBUG] [1781777463.150068432] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.199967319] [rcl]: Calling timer
+[DEBUG] [1781777463.200069625] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.249981455] [rcl]: Calling timer
+[DEBUG] [1781777463.250076385] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.299946154] [rcl]: Calling timer
+[DEBUG] [1781777463.300054669] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.349970104] [rcl]: Calling timer
+[DEBUG] [1781777463.350032546] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.400081651] [rcl]: Calling timer
+[DEBUG] [1781777463.400125582] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.449878940] [rcl]: Calling timer
+[DEBUG] [1781777463.449915226] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.499963288] [rcl]: Calling timer
+[DEBUG] [1781777463.500080675] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.549956358] [rcl]: Calling timer
+[DEBUG] [1781777463.550089906] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.600001151] [rcl]: Calling timer
+[DEBUG] [1781777463.600102812] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.649977218] [rcl]: Calling timer
+[DEBUG] [1781777463.650076387] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777463.652079366] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 1
+[DEBUG] [1781777463.699966368] [rcl]: Calling timer
+[DEBUG] [1781777463.700053494] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.749940396] [rcl]: Calling timer
+[DEBUG] [1781777463.750022701] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777463.761561503] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 0
+[DEBUG] [1781777463.799987126] [rcl]: Calling timer
+[DEBUG] [1781777463.800094866] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.849950295] [rcl]: Calling timer
+[DEBUG] [1781777463.850076859] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.900495282] [rcl]: Calling timer
+[DEBUG] [1781777463.900627241] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.950568537] [rcl]: Calling timer
+[DEBUG] [1781777463.950676286] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777463.999967429] [rcl]: Calling timer
+[DEBUG] [1781777464.000066289] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.050057544] [rcl]: Calling timer
+[DEBUG] [1781777464.050172610] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.099963350] [rcl]: Calling timer
+[DEBUG] [1781777464.100058071] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.149944765] [rcl]: Calling timer
+[DEBUG] [1781777464.150150680] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777464.182810654] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 1
+[DEBUG] [1781777464.200076204] [rcl]: Calling timer
+[DEBUG] [1781777464.200115836] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.249891769] [rcl]: Calling timer
+[DEBUG] [1781777464.249938850] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777464.274931349] [px4_keyboard_teleop]: Raw Key Event -> Code: 28, Action: 0
+[DEBUG] [1781777464.300021116] [rcl]: Calling timer
+[DEBUG] [1781777464.300133281] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.350010869] [rcl]: Calling timer
+[DEBUG] [1781777464.350134059] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.400162541] [rcl]: Calling timer
+[DEBUG] [1781777464.400232787] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.449922853] [rcl]: Calling timer
+[DEBUG] [1781777464.449973848] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.499910912] [rcl]: Calling timer
+[DEBUG] [1781777464.499948609] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.549874103] [rcl]: Calling timer
+[DEBUG] [1781777464.549905701] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.599903570] [rcl]: Calling timer
+[DEBUG] [1781777464.599965768] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.650006550] [rcl]: Calling timer
+[DEBUG] [1781777464.650120707] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777464.700002664] [rcl]: Calling timer
+[DEBUG] [1781777464.700139538] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777464.738286693] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777464.749952184] [rcl]: Calling timer
+[DEBUG] [1781777464.750049529] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777464.799980790] [rcl]: Calling timer
+[DEBUG] [1781777464.800097262] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777464.850021324] [rcl]: Calling timer
+[DEBUG] [1781777464.850147501] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777464.900036062] [rcl]: Calling timer
+[DEBUG] [1781777464.900166546] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777464.949998740] [rcl]: Calling timer
+[DEBUG] [1781777464.950130838] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777464.984069372] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777464.999985882] [rcl]: Calling timer
+[DEBUG] [1781777465.000083460] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777465.013083635] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777465.042380838] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777465.049983231] [rcl]: Calling timer
+[DEBUG] [1781777465.050110351] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777465.054941311] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777465.099990478] [rcl]: Calling timer
+[DEBUG] [1781777465.100097858] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.123780053] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777465.149942852] [rcl]: Calling timer
+[DEBUG] [1781777465.150034807] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777465.199926792] [rcl]: Calling timer
+[DEBUG] [1781777465.200021742] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777465.216857161] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777465.250069081] [rcl]: Calling timer
+[DEBUG] [1781777465.250168355] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.290862487] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777465.299971339] [rcl]: Calling timer
+[DEBUG] [1781777465.300059121] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777465.349926726] [rcl]: Calling timer
+[DEBUG] [1781777465.349998045] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777465.387187884] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777465.399888544] [rcl]: Calling timer
+[DEBUG] [1781777465.399922475] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777465.449871472] [rcl]: Calling timer
+[DEBUG] [1781777465.449908203] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.478372998] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777465.499958352] [rcl]: Calling timer
+[DEBUG] [1781777465.500113905] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777465.549950054] [rcl]: Calling timer
+[DEBUG] [1781777465.550057268] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777465.599990892] [rcl]: Calling timer
+[DEBUG] [1781777465.600120625] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.625226949] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777465.649996040] [rcl]: Calling timer
+[DEBUG] [1781777465.650153457] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.675597758] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777465.700045503] [rcl]: Calling timer
+[DEBUG] [1781777465.700133193] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777465.749885817] [rcl]: Calling timer
+[DEBUG] [1781777465.749934267] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.794081883] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777465.799881261] [rcl]: Calling timer
+[DEBUG] [1781777465.799920096] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.833966114] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777465.849934855] [rcl]: Calling timer
+[DEBUG] [1781777465.849991823] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777465.869038219] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 1
+[INFO] [1781777465.877502338] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777465.899910748] [rcl]: Calling timer
+[DEBUG] [1781777465.899986146] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777465.949903415] [rcl]: Calling timer
+[DEBUG] [1781777465.949955812] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.000005119] [rcl]: Calling timer
+[DEBUG] [1781777466.000085990] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.049900601] [rcl]: Calling timer
+[DEBUG] [1781777466.049945506] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.099908308] [rcl]: Calling timer
+[DEBUG] [1781777466.099991623] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.112402339] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 2
+[INFO] [1781777466.141767338] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 2
+[DEBUG] [1781777466.149894419] [rcl]: Calling timer
+[DEBUG] [1781777466.149941761] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.162857170] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 0
+[INFO] [1781777466.171273512] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777466.199901282] [rcl]: Calling timer
+[DEBUG] [1781777466.199982489] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.249905962] [rcl]: Calling timer
+[DEBUG] [1781777466.249976409] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.299904908] [rcl]: Calling timer
+[DEBUG] [1781777466.299952903] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.335351927] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777466.350021757] [rcl]: Calling timer
+[DEBUG] [1781777466.350191442] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.351506485] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 1
+[DEBUG] [1781777466.399911042] [rcl]: Calling timer
+[DEBUG] [1781777466.399974012] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.449899064] [rcl]: Calling timer
+[DEBUG] [1781777466.449943624] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.499896548] [rcl]: Calling timer
+[DEBUG] [1781777466.499930483] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.519994535] [px4_keyboard_teleop]: Raw Key Event -> Code: 106, Action: 0
+[DEBUG] [1781777466.549956497] [rcl]: Calling timer
+[DEBUG] [1781777466.550083327] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777466.600066017] [rcl]: Calling timer
+[DEBUG] [1781777466.600203637] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.605873525] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777466.649948984] [rcl]: Calling timer
+[DEBUG] [1781777466.650034032] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777466.700011400] [rcl]: Calling timer
+[DEBUG] [1781777466.700133082] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777466.715030100] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777466.749989018] [rcl]: Calling timer
+[DEBUG] [1781777466.750088878] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.772203904] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777466.799966795] [rcl]: Calling timer
+[DEBUG] [1781777466.800091500] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777466.849991957] [rcl]: Calling timer
+[DEBUG] [1781777466.850095952] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777466.884975090] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777466.900029552] [rcl]: Calling timer
+[DEBUG] [1781777466.900153457] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777466.942631923] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777466.949937158] [rcl]: Calling timer
+[DEBUG] [1781777466.949997243] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777467.000081780] [rcl]: Calling timer
+[DEBUG] [1781777467.000169216] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777467.049917132] [rcl]: Calling timer
+[DEBUG] [1781777467.049991617] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777467.100035762] [rcl]: Calling timer
+[DEBUG] [1781777467.100262663] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777467.149928490] [rcl]: Calling timer
+[DEBUG] [1781777467.149991147] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777467.186045111] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777467.199940797] [rcl]: Calling timer
+[DEBUG] [1781777467.200011842] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777467.215207918] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777467.247841195] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777467.249973944] [rcl]: Calling timer
+[DEBUG] [1781777467.250106752] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777467.276975478] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[DEBUG] [1781777467.301182715] [rcl]: Calling timer
+[DEBUG] [1781777467.301253990] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777467.306499348] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 2
+[INFO] [1781777467.311981995] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 1
+[INFO] [1781777467.312151752] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777467.349947785] [rcl]: Calling timer
+[DEBUG] [1781777467.350023414] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[DEBUG] [1781777467.400161426] [rcl]: Calling timer
+[DEBUG] [1781777467.400272448] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[INFO] [1781777467.446123152] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 0
+[INFO] [1781777467.446215411] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 1
+[DEBUG] [1781777467.449884494] [rcl]: Calling timer
+[DEBUG] [1781777467.449927217] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777467.499873108] [rcl]: Calling timer
+[DEBUG] [1781777467.499906792] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777467.549895745] [rcl]: Calling timer
+[DEBUG] [1781777467.549959893] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777467.572948245] [px4_keyboard_teleop]: Raw Key Event -> Code: 30, Action: 1
+[DEBUG] [1781777467.599965814] [rcl]: Calling timer
+[DEBUG] [1781777467.600085086] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777467.637213982] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 0
+[INFO] [1781777467.649855749] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 1
+[DEBUG] [1781777467.649990235] [rcl]: Calling timer
+[DEBUG] [1781777467.650074426] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[DEBUG] [1781777467.699946421] [rcl]: Calling timer
+[DEBUG] [1781777467.700029963] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[INFO] [1781777467.732674738] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 1
+[DEBUG] [1781777467.749964935] [rcl]: Calling timer
+[DEBUG] [1781777467.750078572] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[INFO] [1781777467.779575943] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 0
+[DEBUG] [1781777467.799982336] [rcl]: Calling timer
+[DEBUG] [1781777467.800085881] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777467.849955865] [rcl]: Calling timer
+[DEBUG] [1781777467.850100345] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777467.895496686] [px4_keyboard_teleop]: Raw Key Event -> Code: 31, Action: 1
+[DEBUG] [1781777467.899936303] [rcl]: Calling timer
+[DEBUG] [1781777467.900025492] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: -1.0, Z: 0.0)
+[INFO] [1781777467.924725380] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 0
+[DEBUG] [1781777467.949964962] [rcl]: Calling timer
+[DEBUG] [1781777467.950070708] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: -1.0, Z: 0.0)
+[INFO] [1781777467.992131249] [px4_keyboard_teleop]: Raw Key Event -> Code: 30, Action: 0
+[DEBUG] [1781777468.000006445] [rcl]: Calling timer
+[DEBUG] [1781777468.000082795] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: -1.0, Z: 0.0)
+[INFO] [1781777468.025994088] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 1
+[DEBUG] [1781777468.049951380] [rcl]: Calling timer
+[DEBUG] [1781777468.050044814] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: -1.0, Z: 0.0)
+[INFO] [1781777468.067889358] [px4_keyboard_teleop]: Raw Key Event -> Code: 31, Action: 0
+[DEBUG] [1781777468.099962000] [rcl]: Calling timer
+[DEBUG] [1781777468.100092836] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777468.145378877] [px4_keyboard_teleop]: Raw Key Event -> Code: 30, Action: 1
+[DEBUG] [1781777468.149997181] [rcl]: Calling timer
+[DEBUG] [1781777468.150111408] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777468.150491209] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 1
+[INFO] [1781777468.174468666] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 0
+[DEBUG] [1781777468.199981463] [rcl]: Calling timer
+[DEBUG] [1781777468.200092646] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[DEBUG] [1781777468.250097441] [rcl]: Calling timer
+[DEBUG] [1781777468.250258931] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[DEBUG] [1781777468.299962632] [rcl]: Calling timer
+[DEBUG] [1781777468.300044992] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 1.0, Z: 0.0)
+[INFO] [1781777468.305571812] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 1
+[INFO] [1781777468.322466630] [px4_keyboard_teleop]: Raw Key Event -> Code: 17, Action: 0
+[INFO] [1781777468.343740586] [px4_keyboard_teleop]: Raw Key Event -> Code: 30, Action: 0
+[DEBUG] [1781777468.349958058] [rcl]: Calling timer
+[DEBUG] [1781777468.350037133] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.399909387] [rcl]: Calling timer
+[DEBUG] [1781777468.399945824] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777468.444990844] [px4_keyboard_teleop]: Raw Key Event -> Code: 32, Action: 0
+[DEBUG] [1781777468.449879257] [rcl]: Calling timer
+[DEBUG] [1781777468.449918233] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.499863259] [rcl]: Calling timer
+[DEBUG] [1781777468.499890090] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.549877834] [rcl]: Calling timer
+[DEBUG] [1781777468.549923501] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.599942082] [rcl]: Calling timer
+[DEBUG] [1781777468.600037698] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777468.609162121] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777468.650751665] [rcl]: Calling timer
+[DEBUG] [1781777468.650887139] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777468.684478128] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777468.699964780] [rcl]: Calling timer
+[DEBUG] [1781777468.700071082] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777468.739538907] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 1
+[DEBUG] [1781777468.749930248] [rcl]: Calling timer
+[DEBUG] [1781777468.750033941] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[DEBUG] [1781777468.800070248] [rcl]: Calling timer
+[DEBUG] [1781777468.800159279] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 1.0)
+[INFO] [1781777468.828973953] [px4_keyboard_teleop]: Raw Key Event -> Code: 103, Action: 0
+[DEBUG] [1781777468.849999319] [rcl]: Calling timer
+[DEBUG] [1781777468.850108792] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.899938710] [rcl]: Calling timer
+[DEBUG] [1781777468.900022552] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.951079338] [rcl]: Calling timer
+[DEBUG] [1781777468.951211682] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777468.999955701] [rcl]: Calling timer
+[DEBUG] [1781777469.000049170] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777469.015138059] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 1
+[DEBUG] [1781777469.049955233] [rcl]: Calling timer
+[DEBUG] [1781777469.050086330] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777469.086337039] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 1
+[DEBUG] [1781777469.099973157] [rcl]: Calling timer
+[DEBUG] [1781777469.100064634] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[DEBUG] [1781777469.149926183] [rcl]: Calling timer
+[DEBUG] [1781777469.150042881] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: -1.0)
+[INFO] [1781777469.153881202] [px4_keyboard_teleop]: Raw Key Event -> Code: 108, Action: 0
+[DEBUG] [1781777469.199966984] [rcl]: Calling timer
+[DEBUG] [1781777469.200055042] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[INFO] [1781777469.213019630] [px4_keyboard_teleop]: Raw Key Event -> Code: 105, Action: 0
+[DEBUG] [1781777469.249970130] [rcl]: Calling timer
+[DEBUG] [1781777469.250075717] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.299928556] [rcl]: Calling timer
+[DEBUG] [1781777469.299984546] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.349912644] [rcl]: Calling timer
+[DEBUG] [1781777469.349980794] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.399895102] [rcl]: Calling timer
+[DEBUG] [1781777469.399934488] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.449876320] [rcl]: Calling timer
+[DEBUG] [1781777469.449907897] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.500161395] [rcl]: Calling timer
+[DEBUG] [1781777469.500200858] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.549903260] [rcl]: Calling timer
+[DEBUG] [1781777469.549946820] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.599907687] [rcl]: Calling timer
+[DEBUG] [1781777469.600006231] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.649926541] [rcl]: Calling timer
+[DEBUG] [1781777469.650005750] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.699975250] [rcl]: Calling timer
+[DEBUG] [1781777469.700048914] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.749952659] [rcl]: Calling timer
+[DEBUG] [1781777469.750011845] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.799918999] [rcl]: Calling timer
+[DEBUG] [1781777469.799969652] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.849910450] [rcl]: Calling timer
+[DEBUG] [1781777469.849980413] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.899922619] [rcl]: Calling timer
+[DEBUG] [1781777469.900008225] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.949953641] [rcl]: Calling timer
+[DEBUG] [1781777469.950029496] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777469.999958621] [rcl]: Calling timer
+[DEBUG] [1781777470.000057686] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.049926182] [rcl]: Calling timer
+[DEBUG] [1781777470.049998896] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.100052345] [rcl]: Calling timer
+[DEBUG] [1781777470.100224045] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.149974967] [rcl]: Calling timer
+[DEBUG] [1781777470.150058427] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.199913941] [rcl]: Calling timer
+[DEBUG] [1781777470.199976376] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.249975214] [rcl]: Calling timer
+[DEBUG] [1781777470.250075721] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.299952924] [rcl]: Calling timer
+[DEBUG] [1781777470.300028106] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.349919846] [rcl]: Calling timer
+[DEBUG] [1781777470.350027806] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.399906666] [rcl]: Calling timer
+[DEBUG] [1781777470.399995497] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.450014615] [rcl]: Calling timer
+[DEBUG] [1781777470.450159380] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.499910602] [rcl]: Calling timer
+[DEBUG] [1781777470.499963712] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.549942289] [rcl]: Calling timer
+[DEBUG] [1781777470.550066671] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.599885713] [rcl]: Calling timer
+[DEBUG] [1781777470.599917336] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.649942263] [rcl]: Calling timer
+[DEBUG] [1781777470.650040949] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.699969020] [rcl]: Calling timer
+[DEBUG] [1781777470.700136412] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.749983716] [rcl]: Calling timer
+[DEBUG] [1781777470.750354901] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.799976863] [rcl]: Calling timer
+[DEBUG] [1781777470.800122265] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.849987400] [rcl]: Calling timer
+[DEBUG] [1781777470.850204624] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.899924215] [rcl]: Calling timer
+[DEBUG] [1781777470.899999079] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.949951860] [rcl]: Calling timer
+[DEBUG] [1781777470.950056798] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777470.999921838] [rcl]: Calling timer
+[DEBUG] [1781777470.999999682] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.049980194] [rcl]: Calling timer
+[DEBUG] [1781777471.050076727] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.099915667] [rcl]: Calling timer
+[DEBUG] [1781777471.100015744] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.149974426] [rcl]: Calling timer
+[DEBUG] [1781777471.150050946] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.199918704] [rcl]: Calling timer
+[DEBUG] [1781777471.200015040] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.250043122] [rcl]: Calling timer
+[DEBUG] [1781777471.250198633] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.299962649] [rcl]: Calling timer
+[DEBUG] [1781777471.300043487] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.349913107] [rcl]: Calling timer
+[DEBUG] [1781777471.349985536] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.399893351] [rcl]: Calling timer
+[DEBUG] [1781777471.399927901] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.449885688] [rcl]: Calling timer
+[DEBUG] [1781777471.449934348] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.499975816] [rcl]: Calling timer
+[DEBUG] [1781777471.500139781] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.550006330] [rcl]: Calling timer
+[DEBUG] [1781777471.550163666] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.600035085] [rcl]: Calling timer
+[DEBUG] [1781777471.600143189] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.650889551] [rcl]: Calling timer
+[DEBUG] [1781777471.651086948] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.699978567] [rcl]: Calling timer
+[DEBUG] [1781777471.700101437] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.749958182] [rcl]: Calling timer
+[DEBUG] [1781777471.750076574] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.799984533] [rcl]: Calling timer
+[DEBUG] [1781777471.800110901] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.849965635] [rcl]: Calling timer
+[DEBUG] [1781777471.850050223] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.899886547] [rcl]: Calling timer
+[DEBUG] [1781777471.899931807] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.949898393] [rcl]: Calling timer
+[DEBUG] [1781777471.950299049] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777471.999922427] [rcl]: Calling timer
+[DEBUG] [1781777471.999973349] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.049941285] [rcl]: Calling timer
+[DEBUG] [1781777472.050062892] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.099977056] [rcl]: Calling timer
+[DEBUG] [1781777472.100090289] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.149919606] [rcl]: Calling timer
+[DEBUG] [1781777472.150031402] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.199950537] [rcl]: Calling timer
+[DEBUG] [1781777472.200028815] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.249958369] [rcl]: Calling timer
+[DEBUG] [1781777472.250085263] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.299906904] [rcl]: Calling timer
+[DEBUG] [1781777472.299930269] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.349910320] [rcl]: Calling timer
+[DEBUG] [1781777472.349959405] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.399875350] [rcl]: Calling timer
+[DEBUG] [1781777472.399914054] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.449940441] [rcl]: Calling timer
+[DEBUG] [1781777472.450014043] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.499905426] [rcl]: Calling timer
+[DEBUG] [1781777472.499929942] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.549900705] [rcl]: Calling timer
+[DEBUG] [1781777472.549961061] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.599916650] [rcl]: Calling timer
+[DEBUG] [1781777472.599956365] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.649945049] [rcl]: Calling timer
+[DEBUG] [1781777472.650080490] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.699930187] [rcl]: Calling timer
+[DEBUG] [1781777472.699989440] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.749907770] [rcl]: Calling timer
+[DEBUG] [1781777472.749993534] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.799924983] [rcl]: Calling timer
+[DEBUG] [1781777472.799988519] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.850007090] [rcl]: Calling timer
+[DEBUG] [1781777472.850106884] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.899940371] [rcl]: Calling timer
+[DEBUG] [1781777472.899992299] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.949943492] [rcl]: Calling timer
+[DEBUG] [1781777472.950149928] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777472.999929533] [rcl]: Calling timer
+[DEBUG] [1781777472.999993425] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.049920582] [rcl]: Calling timer
+[DEBUG] [1781777473.050015016] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.099918406] [rcl]: Calling timer
+[DEBUG] [1781777473.099956909] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.149977599] [rcl]: Calling timer
+[DEBUG] [1781777473.150032338] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.199893698] [rcl]: Calling timer
+[DEBUG] [1781777473.199936688] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.249877960] [rcl]: Calling timer
+[DEBUG] [1781777473.249916155] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.299870825] [rcl]: Calling timer
+[DEBUG] [1781777473.299895809] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.349897373] [rcl]: Calling timer
+[DEBUG] [1781777473.349918468] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.399891082] [rcl]: Calling timer
+[DEBUG] [1781777473.399913582] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.449879173] [rcl]: Calling timer
+[DEBUG] [1781777473.449923196] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.499878346] [rcl]: Calling timer
+[DEBUG] [1781777473.499916677] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.549935160] [rcl]: Calling timer
+[DEBUG] [1781777473.549973382] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.599881474] [rcl]: Calling timer
+[DEBUG] [1781777473.599914902] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.649911767] [rcl]: Calling timer
+[DEBUG] [1781777473.649988927] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.699965077] [rcl]: Calling timer
+[DEBUG] [1781777473.700058724] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.749987896] [rcl]: Calling timer
+[DEBUG] [1781777473.750097020] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.800124338] [rcl]: Calling timer
+[DEBUG] [1781777473.800246296] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.850003878] [rcl]: Calling timer
+[DEBUG] [1781777473.850490117] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.899981646] [rcl]: Calling timer
+[DEBUG] [1781777473.900127336] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.950001646] [rcl]: Calling timer
+[DEBUG] [1781777473.950117989] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777473.999989049] [rcl]: Calling timer
+[DEBUG] [1781777474.000092923] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.049991535] [rcl]: Calling timer
+[DEBUG] [1781777474.050106764] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.099960501] [rcl]: Calling timer
+[DEBUG] [1781777474.100061165] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.149988288] [rcl]: Calling timer
+[DEBUG] [1781777474.150110981] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.199976360] [rcl]: Calling timer
+[DEBUG] [1781777474.200078575] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.249971456] [rcl]: Calling timer
+[DEBUG] [1781777474.250063464] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.300021202] [rcl]: Calling timer
+[DEBUG] [1781777474.300129456] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.349981767] [rcl]: Calling timer
+[DEBUG] [1781777474.350086001] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.399927462] [rcl]: Calling timer
+[DEBUG] [1781777474.399999345] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.449940639] [rcl]: Calling timer
+[DEBUG] [1781777474.449979072] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.499897192] [rcl]: Calling timer
+[DEBUG] [1781777474.499930723] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.549974221] [rcl]: Calling timer
+[DEBUG] [1781777474.550119598] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.599893449] [rcl]: Calling timer
+[DEBUG] [1781777474.599927506] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.649924009] [rcl]: Calling timer
+[DEBUG] [1781777474.649969110] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.699908574] [rcl]: Calling timer
+[DEBUG] [1781777474.699979798] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.749908249] [rcl]: Calling timer
+[DEBUG] [1781777474.749973110] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.799910606] [rcl]: Calling timer
+[DEBUG] [1781777474.799967289] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.849986076] [rcl]: Calling timer
+[DEBUG] [1781777474.850214290] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.899911783] [rcl]: Calling timer
+[DEBUG] [1781777474.899974764] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.949982922] [rcl]: Calling timer
+[DEBUG] [1781777474.950080856] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777474.999946025] [rcl]: Calling timer
+[DEBUG] [1781777475.000041306] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.049987848] [rcl]: Calling timer
+[DEBUG] [1781777475.050086900] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.099945778] [rcl]: Calling timer
+[DEBUG] [1781777475.100052977] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.149972021] [rcl]: Calling timer
+[DEBUG] [1781777475.150105798] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.199956521] [rcl]: Calling timer
+[DEBUG] [1781777475.200071047] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.249902861] [rcl]: Calling timer
+[DEBUG] [1781777475.249961023] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.299937060] [rcl]: Calling timer
+[DEBUG] [1781777475.300025463] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.349950189] [rcl]: Calling timer
+[DEBUG] [1781777475.350037616] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.400086991] [rcl]: Calling timer
+[DEBUG] [1781777475.400393358] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.449963849] [rcl]: Calling timer
+[DEBUG] [1781777475.450090033] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.499981506] [rcl]: Calling timer
+[DEBUG] [1781777475.500111567] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.549967171] [rcl]: Calling timer
+[DEBUG] [1781777475.550063040] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.599983815] [rcl]: Calling timer
+[DEBUG] [1781777475.600093472] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.649957324] [rcl]: Calling timer
+[DEBUG] [1781777475.650063107] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.699971164] [rcl]: Calling timer
+[DEBUG] [1781777475.700074433] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.749951505] [rcl]: Calling timer
+[DEBUG] [1781777475.750066860] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.799965915] [rcl]: Calling timer
+[DEBUG] [1781777475.800074947] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.849944138] [rcl]: Calling timer
+[DEBUG] [1781777475.850057741] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.899985407] [rcl]: Calling timer
+[DEBUG] [1781777475.900102783] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.949986422] [rcl]: Calling timer
+[DEBUG] [1781777475.950059440] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777475.999932377] [rcl]: Calling timer
+[DEBUG] [1781777476.000015947] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.049961612] [rcl]: Calling timer
+[DEBUG] [1781777476.050042749] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.100010383] [rcl]: Calling timer
+[DEBUG] [1781777476.100142238] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.149996105] [rcl]: Calling timer
+[DEBUG] [1781777476.150076908] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.199960807] [rcl]: Calling timer
+[DEBUG] [1781777476.200039487] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.249995374] [rcl]: Calling timer
+[DEBUG] [1781777476.250064379] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.299925430] [rcl]: Calling timer
+[DEBUG] [1781777476.300036042] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.350005410] [rcl]: Calling timer
+[DEBUG] [1781777476.350112122] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.399958277] [rcl]: Calling timer
+[DEBUG] [1781777476.400068402] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.449962183] [rcl]: Calling timer
+[DEBUG] [1781777476.450091109] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.499921809] [rcl]: Calling timer
+[DEBUG] [1781777476.499967665] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.549991239] [rcl]: Calling timer
+[DEBUG] [1781777476.550030471] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.599889012] [rcl]: Calling timer
+[DEBUG] [1781777476.599948268] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.649894677] [rcl]: Calling timer
+[DEBUG] [1781777476.649950020] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.699877172] [rcl]: Calling timer
+[DEBUG] [1781777476.699913845] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.750024346] [rcl]: Calling timer
+[DEBUG] [1781777476.750061991] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.799928543] [rcl]: Calling timer
+[DEBUG] [1781777476.800007643] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.849918449] [rcl]: Calling timer
+[DEBUG] [1781777476.849996500] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.899948368] [rcl]: Calling timer
+[DEBUG] [1781777476.900067047] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777476.949954537] [rcl]: Calling timer
+[DEBUG] [1781777476.950058006] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.000014929] [rcl]: Calling timer
+[DEBUG] [1781777477.000124892] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.049975342] [rcl]: Calling timer
+[DEBUG] [1781777477.050078400] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.099988488] [rcl]: Calling timer
+[DEBUG] [1781777477.100111219] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.149993981] [rcl]: Calling timer
+[DEBUG] [1781777477.150100385] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.199905188] [rcl]: Calling timer
+[DEBUG] [1781777477.199963566] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.249888044] [rcl]: Calling timer
+[DEBUG] [1781777477.249931931] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.299878659] [rcl]: Calling timer
+[DEBUG] [1781777477.299919953] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.349910327] [rcl]: Calling timer
+[DEBUG] [1781777477.349955882] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.399894451] [rcl]: Calling timer
+[DEBUG] [1781777477.399932847] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.449922276] [rcl]: Calling timer
+[DEBUG] [1781777477.450025575] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.499990908] [rcl]: Calling timer
+[DEBUG] [1781777477.500123111] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.549950749] [rcl]: Calling timer
+[DEBUG] [1781777477.550062469] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.599937534] [rcl]: Calling timer
+[DEBUG] [1781777477.600027914] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.649993944] [rcl]: Calling timer
+[DEBUG] [1781777477.650085129] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.699996193] [rcl]: Calling timer
+[DEBUG] [1781777477.700131267] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.750006271] [rcl]: Calling timer
+[DEBUG] [1781777477.750098267] [px4_keyboard_teleop]: Keyboard Timer Tick -> Pub Twist (Linear X: 0.0, Z: 0.0)
+[DEBUG] [1781777477.798351093] [rclcpp]: deferred_signal_handler(): woken up due to SIGINT/SIGTERM or uninstall
+[INFO] [1781777477.798508686] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[DEBUG] [1781777477.798542859] [rclcpp]: deferred_signal_handler(): shutting down
+[DEBUG] [1781777477.798678763] [rclcpp]: deferred_signal_handler(): shutting down rclcpp::Context @ 0x5ff15b6e3b70, because it had shutdown_on_signal == true
+[DEBUG] [1781777477.798756521] [rcl]: Shutting down ROS client library, for context at address: 0x5ff15b63c3e0
+[DEBUG] [1781777477.798935105] [rcl]: Finalizing publisher
+[DEBUG] [1781777477.800522063] [rcl]: Publisher finalized
+[DEBUG] [1781777477.800716189] [rclcpp]: deferred_signal_handler(): waiting for SIGINT/SIGTERM or uninstall
+[DEBUG] [1781777477.987613553] [rcl]: Timer canceled
+[DEBUG] [1781777477.987694771] [rcl]: Timer canceled
+[DEBUG] [1781777477.987752881] [rcl]: Finalizing event
+[DEBUG] [1781777477.987780490] [rcl]: Event finalized
+[DEBUG] [1781777477.987800194] [rcl]: Finalizing event
+[DEBUG] [1781777477.987816449] [rcl]: Event finalized
+[DEBUG] [1781777477.987836743] [rcl]: Finalizing publisher
+[DEBUG] [1781777477.988509235] [rcl]: Publisher finalized
+[DEBUG] [1781777477.988566193] [rcl]: Finalizing event
+[DEBUG] [1781777477.988653149] [rcl]: Event finalized
+[DEBUG] [1781777477.988678355] [rcl]: Finalizing event
+[DEBUG] [1781777477.988697077] [rcl]: Event finalized
+[DEBUG] [1781777477.988716428] [rcl]: Finalizing publisher
+[DEBUG] [1781777477.989119456] [rcl]: Publisher finalized
+[DEBUG] [1781777477.989187033] [rcl]: Finalizing event
+[DEBUG] [1781777477.989209619] [rcl]: Event finalized
+[DEBUG] [1781777477.989228521] [rcl]: Finalizing event
+[DEBUG] [1781777477.989245079] [rcl]: Event finalized
+[DEBUG] [1781777477.989267162] [rcl]: Finalizing subscription
+[DEBUG] [1781777477.989857028] [rcl]: Subscription finalized
+[DEBUG] [1781777477.989922575] [rcl]: Finalizing service
+[DEBUG] [1781777477.990687131] [rcl]: Service finalized
+[DEBUG] [1781777477.990736291] [rcl]: Finalizing service
+[DEBUG] [1781777477.991494347] [rcl]: Service finalized
+[DEBUG] [1781777477.991542976] [rcl]: Finalizing service
+[DEBUG] [1781777477.992285254] [rcl]: Service finalized
+[DEBUG] [1781777477.992334532] [rcl]: Finalizing service
+[DEBUG] [1781777477.992902335] [rcl]: Service finalized
+[DEBUG] [1781777477.992948946] [rcl]: Finalizing service
+[DEBUG] [1781777477.993448958] [rcl]: Service finalized
+[DEBUG] [1781777477.993491655] [rcl]: Finalizing service
+[DEBUG] [1781777477.993988745] [rcl]: Service finalized
+[DEBUG] [1781777477.994032606] [rcl]: Finalizing event
+[DEBUG] [1781777477.994057797] [rcl]: Event finalized
+[DEBUG] [1781777477.994074730] [rcl]: Finalizing event
+[DEBUG] [1781777477.994091840] [rcl]: Event finalized
+[DEBUG] [1781777477.994110284] [rcl]: Finalizing publisher
+[DEBUG] [1781777477.994609045] [rcl]: Publisher finalized
+[DEBUG] [1781777477.994745769] [rcl]: Finalizing service
+[DEBUG] [1781777477.995245750] [rcl]: Service finalized
+[DEBUG] [1781777477.995319793] [rcl]: Finalizing node
+[DEBUG] [1781777478.002769248] [rcl]: Node finalized
+[DEBUG] [1781777478.003010086] [rclcpp]: SignalHandler::uninstall(): notifying deferred signal handler
+[DEBUG] [1781777478.003114333] [rclcpp]: deferred_signal_handler(): woken up due to SIGINT/SIGTERM or uninstall
+[DEBUG] [1781777478.003159408] [rclcpp]: deferred_signal_handler(): signal handling uninstalled
+[DEBUG] [1781777478.003338625] [rclcpp]: signal handler uninstalled

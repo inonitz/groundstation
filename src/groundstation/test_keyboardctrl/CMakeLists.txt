@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(px4_ros2_test C CXX)
+project(px4_ros2_keyboard C CXX)
 
 
 set(SOURCES
@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     cxxopts::cxxopts
     rclcpp::rclcpp
     px4_msgs::px4_msgs__rosidl_typesupport_cpp
+    Eigen3::Eigen
     # WORKSPACE_CONFIG::ProjectDefaultConfig
 )
 
