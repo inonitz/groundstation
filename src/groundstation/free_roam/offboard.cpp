@@ -1,5 +1,4 @@
 #include "offboard.hpp"
-#include "base.hpp"
 
 
 void OffboardControl::arm(bool armTrueDisarmFalse)
@@ -33,33 +32,84 @@ void OffboardControl::land()
     publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_NAV_LAND, list);
 }
 
+void OffboardControl::force_disarm()
+{
+    RCLCPP_INFO(this->get_logger(), "Executing FORCE DISARM.");
+    DroneCmdParamList list{};
+    list[0] = 0.0f;     // 0.0 = DISARM
+    list[1] = 21196.0f; // Magic number to bypass PX4 landing checks // https://mavlink.io/en/messages/common.html#MAV_CMD_COMPONENT_ARM_DISARM
+    publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_COMPONENT_ARM_DISARM, list);
+}
+
 
 void OffboardControl::timer_callback(OffboardControl& toModify)
 {
-    // High frequency logs should use DEBUG to avoid flooding the terminal
-    RCLCPP_DEBUG(this->get_logger(), "Publishing Offboard Mode & Trajectory Setpoint. (Vel: %.2f, %.2f, %.2f)", 
-        m_currentVel.x, 
-		m_currentVel.y, 
-		m_currentVel.z
-	);
+    toModify.publish_offboardctrl_mode();
 
-	// https://docs.px4.io/main/en/flight_modes/offboard.html
-	// Continuous streaming loop matching PX4 spec
-	toModify.publish_offboardctrl_mode();
-	toModify.publish_trajectory_setpoint(m_currentVel, m_currentYawSpeed);
-	return;
+    Vec3 target_vel{0.0f, 0.0f, 0.0f};
+    f32 target_yaw = 0.0f;
+
+    switch (m_state) {
+        case DroneState::STANDBY:
+            // Send zero vectors to keep Offboard watchdog happy while on ground
+        break;
+
+        case DroneState::TAKEOFF:
+            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, 
+                "Taking off... Current Altitude (NED): %.2f", m_current_z_ned);
+
+            if (m_current_z_ned > -2.0f) { 
+                target_vel.z = -2.0f; 
+            } else {
+                RCLCPP_INFO(this->get_logger(), "Altitude reached. Transition -> FLIGHT");
+                m_state = DroneState::FLIGHT;
+            }
+        break;
+
+
+        case DroneState::FLIGHT:
+            // Route keyboard inputs only during active flight
+            target_vel = m_currentVel; 
+            target_yaw = m_currentYawSpeed;
+        break;
+
+        case DroneState::LANDING:
+            target_vel.z = 0.5f; // Descend slowly (NED Down is positive)
+
+            if (m_current_z_ned >= -0.1f) { 
+                RCLCPP_INFO(this->get_logger(), "Ground Detected. Transition -> STANDBY");
+                force_disarm(); 
+                m_state = DroneState::STANDBY; 
+            }
+        break;
+    }
+
+    toModify.publish_trajectory_setpoint(target_vel, target_yaw);
 }
 
 
 void OffboardControl::external_arming_callback(Px4KeyboardArmType::ConstSharedPtr msg)
 {
-	const bool arm_intent = msg->data & 0x01;
-	RCLCPP_INFO(this->get_logger(), "Arming Callback Triggered. Intent: %d", arm_intent);
+    bool arm_intent = (msg->data & 0x01);
 
-	arm(arm_intent);
-	if(arm_intent) {
-		takeoff();
-	}
+    if (arm_intent && m_state == DroneState::STANDBY) {
+        RCLCPP_INFO(this->get_logger(), "Transition -> TAKEOFF");
+        arm(true);
+        takeoff(); // Sets offboard mode // https://docs.px4.io/main/en/ros/ros2_offboard_control.html
+        m_state = DroneState::TAKEOFF;
+    } 
+    else if (!arm_intent && m_state == DroneState::FLIGHT) {
+		if(m_current_z_ned >= -1.5f) { /* If UpIsPositive_DroneHeight <= 1.5m we can safely land */
+			RCLCPP_INFO(this->get_logger(), "Transition -> LANDING");
+			m_state = DroneState::LANDING;
+		} else {
+			RCLCPP_INFO(this->get_logger(), 
+				"Transition -> LANDING NOT SUCCEEDED - Current Height is %2.2f",
+				-1.0f * m_current_z_ned
+			);
+		};
+    }
+
 	return;
 }
 

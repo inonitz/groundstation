@@ -16,16 +16,24 @@ public:
             return;
         };
 
-        m_path   = this->create_publisher<DronePathPoint>(kInTrajectoryPointTopic,  qos_profile);
-		m_status = this->create_publisher<DroneStatus   >(kInOffboardCtrlModeTopic, qos_profile);
-		m_cmd    = this->create_publisher<DroneCmd      >(kInVehicleCmdTopic,       qos_profile);
+        m_pubPath   = this->create_publisher<DronePathPoint>(kInTrajectoryPointTopic,  qos_profile);
+		m_pubStatus = this->create_publisher<DroneStatus   >(kInOffboardCtrlModeTopic, qos_profile);
+		m_pubCMD    = this->create_publisher<DroneCmd      >(kInVehicleCmdTopic,       qos_profile);
+        
         m_subKeyboardTwist = this->create_subscription<Px4KeyboardTwistType>(
             kPx4KeyboardTwistTopic, kDefaultHistoryBufSize,
-            [this](Px4KeyboardTwistType::ConstSharedPtr msg) { external_velocity_callback(msg); });
-
+            [this](Px4KeyboardTwistType::ConstSharedPtr msg) { external_velocity_callback(msg); }
+        );
         m_subKeyboardArm = this->create_subscription<Px4KeyboardArmType>(
             kPx4KeyboardCmdVelTopic, kDefaultHistoryBufSize,
-            [this](Px4KeyboardArmType::ConstSharedPtr msg) { external_arming_callback(msg); });
+            [this](Px4KeyboardArmType::ConstSharedPtr msg) { external_arming_callback(msg); }
+        );
+        m_subLocalPos = this->create_subscription<DroneOdometry>(
+            kOutVehicleOdometryTopic, rclcpp::SensorDataQoS(),
+            [this](const DroneOdometry::ConstSharedPtr msg) {
+                m_current_z_ned = msg->position[2];
+            }
+        );
 
         m_timer = this->create_wall_timer(kOffboardUpdatePeriod, timer_cb);
 
@@ -38,6 +46,7 @@ public:
     void arm(bool armTrueDisarmFalse);
     void takeoff();
     void land();
+    void force_disarm();
 
     /* 
         Will run every 'frame' depending on the Refresh/Update period set. 
@@ -77,7 +86,7 @@ private:
         _.yaw          = kNan[0];
         _.yawspeed     = yawPerSec;
 
-        m_path->publish(_);
+        m_pubPath->publish(_);
         ++m_setPointPublished;
         return;
     }
@@ -93,7 +102,7 @@ private:
         _.thrust_and_torque = false;
         _.direct_actuator   = false;
 
-        m_status->publish(_);
+        m_pubStatus->publish(_);
         ++m_setModePublished;
         return;
     }
@@ -119,24 +128,25 @@ private:
         _.source_component  = 0;    /* Default Component ID */
         _.confirmation      = 0;    /* Always Zero for Offboard Scripts: */
         _.from_external     = true; /* Not coming from the internal PX4 C++ Code */
-        m_cmd->publish(_);
+        m_pubCMD->publish(_);
         ++m_cmdPublished;
         return;
     }
 
 private:
-    enum class DroneState { 
+    enum class DroneState : std::uint8_t { 
         STANDBY, 
         TAKEOFF, 
         FLIGHT, 
         LANDING 
     };
 
-	PublisherPtr<DronePathPoint> m_path;
-	PublisherPtr<DroneStatus>    m_status;
-	PublisherPtr<DroneCmd>       m_cmd;
+	PublisherPtr<DronePathPoint> m_pubPath;
+	PublisherPtr<DroneStatus>    m_pubStatus;
+	PublisherPtr<DroneCmd>       m_pubCMD;
     SubscriberPtr<Px4KeyboardTwistType> m_subKeyboardTwist;
     SubscriberPtr<Px4KeyboardArmType>   m_subKeyboardArm;
+    SubscriberPtr<DroneOdometry>        m_subLocalPos;
 
 	rclcpp::TimerBase::SharedPtr m_timer;
     std::atomic<u64>             m_setPointPublished;
@@ -145,4 +155,6 @@ private:
 
     Vec3 m_currentVel{0.0f, 0.0f, 0.0f};
     f32  m_currentYawSpeed{0.0f};
+    f32  m_current_z_ned{0.0f};
+    DroneState m_state{DroneState::STANDBY};
 };

@@ -9,6 +9,8 @@
 #include <px4_msgs/msg/vehicle_command.hpp>
 #include <px4_msgs/msg/vehicle_control_mode.hpp>
 #include <px4_msgs/srv/vehicle_command.hpp>
+#include <px4_msgs/msg/vehicle_local_position.hpp>
+#include <px4_msgs/msg/vehicle_odometry.hpp>
 // #include <px4_msgs/msg/timesync_status.hpp>
 
 #include <geometry_msgs/msg/twist.hpp>
@@ -31,8 +33,11 @@ constexpr const char* kInVehicleCmdTopic       = "/fmu/in/vehicle_command";
 constexpr const char* kInTrajectoryPointTopic  = "/fmu/in/trajectory_setpoint";
 constexpr const char* kInOffboardCtrlModeTopic = "/fmu/in/offboard_control_mode";
 constexpr const char* kOutTimeSyncStatusTopic  = "/fmu/out/timesync_status";
+constexpr const char* kOutVehiclePositionTopic = "/fmu/out/vehicle_local_position"; 
+constexpr const char* kOutVehicleOdometryTopic = "/fmu/out/vehicle_odometry";
 constexpr const char* kOutVehicleStatusTopic   = "/fmu/out/vehicle_status_v1";
 constexpr const char* kOutVehicleAttitudeTopic = "/fmu/out/vehicle_attitude";
+
 
 constexpr const char* kPx4KeyboardCmdVelTopic = "/px4_keyboard/arm_msg";
 constexpr const char* kPx4KeyboardTwistTopic  = "/px4_keyboard/cmd_vel";
@@ -55,5 +60,7 @@ using DroneStatus            = px4_msgs::msg::OffboardControlMode;
 using DroneCmd               = px4_msgs::msg::VehicleCommand;
 using DroneCmdIdType         = u32;
 using DroneCmdParamList      = std::array<f32, 7>;
+using DroneLocalPosition     = px4_msgs::msg::VehicleLocalPosition;
+using DroneOdometry          = px4_msgs::msg::VehicleOdometry;
 // using DroneTimeSyncPoint     = px4_msgs::msg::TimesyncStatus;
 
