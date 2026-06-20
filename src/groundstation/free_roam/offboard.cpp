@@ -97,7 +97,7 @@ void OffboardControl::external_arming_callback(Px4KeyboardArmType::ConstSharedPt
         arm(true);
         takeoff(); // Sets offboard mode // https://docs.px4.io/main/en/ros/ros2_offboard_control.html
         m_state = DroneState::TAKEOFF;
-    } 
+    }
     else if (!arm_intent && m_state == DroneState::FLIGHT) {
 		if(m_current_z_ned >= -1.5f) { /* If UpIsPositive_DroneHeight <= 1.5m we can safely land */
 			RCLCPP_INFO(this->get_logger(), "Transition -> LANDING");

@@ -125,7 +125,7 @@
     "lldb.dereferencePointers": false,
     "lldb.consoleMode": "commands",
     
-    "python.analysis.typeCheckingMode": "standard"
+    "python.analysis.typeCheckingMode": "standard",
     // If you'll ever need to use fallback flags, use the config below
     //
     // "clangd.fallbackFlags": [
@@ -137,4 +137,13 @@
     //     "--include-directory=${workspaceFolder}/src",
     //     "-D_DEBUG"
     // ],
+    "acp.agents": {
+        "hermes-host": {
+            "command": "socat",
+            "args": [
+            "-",
+            "TCP:172.17.0.1:3000"
+            ]
+        }
+    }
 }

@@ -47,7 +47,7 @@ public:
     }
     
     ~Px4KeyboardTeleop() { 
-        m_keyHook.destroy(); 
+        m_keyHook.destroy();
     }
 
 private:
