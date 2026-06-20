@@ -42,3 +42,7 @@
 [submodule "dependencies/Eigen"]
 	path = dependencies/Eigen
 	url = https://gitlab.com/libeigen/eigen
+[submodule "dependencies/sttserver"]
+	path = dependencies/sttserver
+	url = https://github.com/inonitz/sttserv
+	branch = feature-multimodel
