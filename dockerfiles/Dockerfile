@@ -21,9 +21,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libegl1 \
     libgl1 \
     libvulkan1 \
+    libvulkan-dev \
+    vulkan-tools \
     clangd \
     clang-format \
     ninja-build \
+    tmux \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Cache Gazebo apt packages
@@ -52,12 +55,12 @@ RUN git clone --depth 1 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git \
     && make install \
     && ldconfig
 
-# 5. Shallow clone MAVSDK
-RUN git clone --depth 1 --recursive --shallow-submodules https://github.com/mavlink/MAVSDK.git /root/MAVSDK \
-    && cd /root/MAVSDK/cpp \
-    && cmake -Bbuild -S. -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build build -j$(nproc) --target install \
-    && ldconfig
+# # 5. Shallow clone MAVSDK
+# RUN git clone --depth 1 --recursive --shallow-submodules https://github.com/mavlink/MAVSDK.git /root/MAVSDK \
+#     && cd /root/MAVSDK/cpp \
+#     && cmake -Bbuild -S. -DCMAKE_BUILD_TYPE=Release \
+#     && cmake --build build -j$(nproc) --target install \
+#     && ldconfig
 
 # 6. Shallow clone & Build PX4
 RUN git clone --depth 1 --recursive --shallow-submodules https://github.com/PX4/PX4-Autopilot.git

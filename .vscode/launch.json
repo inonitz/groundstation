@@ -51,129 +51,20 @@
             "type": "lldb",
             "request": "launch",
             "name": "LLDB (Linux-x86_64-Static-Debug) (Parakeet)",
-            "program": "${workspaceFolder}/build/debug/static/bin/parakeet_example",
+            "program": "${workspaceFolder}/build/debug/static/bin/ros2_speech_to_action_asr_server",
             "args": [
-                "--model=dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
-                "--fa",
-                "--language=en",
-                "--threads=1",
-                "--gid=1",
-                "--captureid=1",
-                "--playbackid=0",
-            ],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug) (Whispercpp)",
-            "program": "${workspaceFolder}/build/debug/static/bin/whisper_example",
-            "args": [
-                "--model=dependencies/models/distil-whisper-large-v3.5/ggml-model-q5k.bin",
-                "--fa",
-                "--language=en",
-                "--threads=1",
-                "--gid=1",
-                "--captureid=1",
-                "--playbackid=0",
-            ],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug) (SherpaOnnx)",
-            "program": "${workspaceFolder}/build/debug/static/bin/sherpaonnx_example",
-            "args": [
-                "--fa",
-                "--threads=2",
-                "--keep=5000",
-                "--captureid=1",
-                "--playbackid=0",
-                "--mfp=dependencies/models/sherpa-onnx/sherpa-onnx-nemo-parakeet-tdt-0.6b-v2-fp16",
-                "--en=encoder.fp16.onnx",
-                "--de=decoder.fp16.onnx",
-                "--jo=joiner.fp16.onnx",
-                "--tok=tokens.txt",
-            ],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug) (UnifiedBackend)",
-            "program": "${workspaceFolder}/build/debug/static/bin/unified_example",
-            "args": [
-                "--fa",
-                "--threads=2",
-                "--captureid=1",
-                "--playbackid=0",
-                "--backend=whisper-parakeet",
-                "--model=dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
-            ],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug) (Debugging Tests)",
-            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
-            "args": [],
-            "cwd": "${workspaceFolder}/build/debug/static/ctest",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "name": "Debug CTest Instance",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
-            "args": [
-                "--gtest_filter=DynamicAudioFolder/ASRModelTest.TranscribeAndVerify/10",
-                "--gtest_also_run_disabled_tests",
-                "--model=../../../../dependencies/models/distil-whisper-large-v3.5/ggml-model-q5k.bin",
-                "--backend=whisper-whisper",
-                "--fa",
-                "--threads=1",
-                "--gid=1",
-                "--captureid=1",
-                "--playbackid=0"
-            ],
-            "cwd": "${workspaceFolder}/build/debug/static/test",
-            "stopOnEntry": false
-        },
-
-        {
-            "name": "Debug CTest Instance",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/debug/static/bin/accuracy_test",
-            "args": [
-                // "--gtest_filter=DynamicAudioFolder/ASRModelTest.TranscribeAndVerify/10",
-                "--gtest_also_run_disabled_tests",
-                "--model=../../../../dependencies/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
+                "--model=/root/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
                 "--backend=whisper-parakeet",
                 "--fa",
-                "--gid=1",
+                "--language=en",
                 "--threads=2",
-                "--captureid=1",
-                "--playbackid=0",
+                "--gid=0",
+                "--captureid=2",
+                "--playbackid=7",
             ],
-            "cwd": "${workspaceFolder}/build/debug/static/test",
-            "stopOnEntry": false
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
         },
 
         {

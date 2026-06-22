@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Important to propagate errors to parent terminals.
+set -e
+
+
 PROJECT_NAME="all"
 
 # For More options see BuildDiagnostics.cmake
@@ -14,11 +18,10 @@ CMAKE_ARGLIST="\
     -DSTTSERVER_ENABLE_SANITIZER_UNDEFINED=OFF \
     -DSTTSERVER_ENABLE_SANITIZER_MEMORY=OFF \
     -DSTTSERVER_ENABLE_LINK_TIME_OPTIMIZATION=OFF \
-    -DSTTSERVER_ENABLE_TRACY_PROFILING=OFF \
-    -DSTTSERVER_BUILD_BACKEND_WHISPER=OFF \
-    -DSTTSERVER_BUILD_BACKEND_PARAKEET=ON \
-    -DSTTSERVER_BUILD_BACKEND_SHERPA_ONNX=OFF \
-    -DSTTSERVER_BUILD_EXECUTABLE=OFF \
+    -DSTTSERVER_BUILD_LIBRARY_BACKEND_WHISPER=OFF \
+    -DSTTSERVER_BUILD_LIBRARY_BACKEND_PARAKEET=ON \
+    -DSTTSERVER_BUILD_LIBRARY_BACKEND_SHERPA_ONNX=ON \
+    -DSTTSERVER_BUILD_LIBRARY=ON \
     -DSTTSERVER_BUILD_TESTS=OFF \
     -DSTTSERVER_BUILD_BENCHMARKS=OFF \
     "
@@ -222,7 +225,12 @@ if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
     cp "compile_commands.json" "../../compile_commands.json"
     echo "CURRENT WORKING DIRECTORY IS $PWD"
-    ninja "$PROJECT_NAME" -j$(( $(nproc) / 2 > 0 ? $(nproc) / 2 : 1 ))
+    
+    # Safely fallback to 1 core if nproc fails or is missing
+    CORES=$(nproc 2>/dev/null || echo 1)
+    JOBS=$(( CORES / 2 > 0 ? CORES / 2 : 1 ))
+    
+    ninja "$PROJECT_NAME" -j$JOBS
 fi
 
 if [[ "$RUN_GROUNDSTATION_FLAG" == "true" ]]; then

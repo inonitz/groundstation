@@ -6,5 +6,7 @@ add_subdirectory(test)
 add_subdirectory(ros2_test)
 add_subdirectory(test_keyboardctrl)
 add_subdirectory(free_roam)
+add_subdirectory(speech_to_action)
+
 # add_subdirectory()
 

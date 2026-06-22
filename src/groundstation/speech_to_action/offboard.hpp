@@ -20,13 +20,21 @@ public:
 		m_pubStatus = this->create_publisher<DroneStatus   >(kInOffboardCtrlModeTopic, qos_profile);
 		m_pubCMD    = this->create_publisher<DroneCmd      >(kInVehicleCmdTopic,       qos_profile);
         
-        m_subASRTwist = this->create_subscription<Px4KeyboardTwistType>(
-            kPx4KeyboardTwistTopic, kDefaultHistoryBufSize,
-            [this](Px4KeyboardTwistType::ConstSharedPtr msg) { external_velocity_callback(msg); }
+        // m_subKeyboardTwist = this->create_subscription<Px4KeyboardTwistType>(
+        //     kPx4KeyboardTwistTopic, kDefaultHistoryBufSize,
+        //     [this](Px4KeyboardTwistType::ConstSharedPtr msg) { external_velocity_callback(msg); }
+        // );
+        // m_subKeyboardArm = this->create_subscription<Px4KeyboardArmType>(
+        //     kPx4KeyboardArmingStateTopic, kDefaultHistoryBufSize,
+        //     [this](Px4KeyboardArmType::ConstSharedPtr msg) { external_arming_callback(msg); }
+        // );
+        m_subASRTwist = this->create_subscription<ASRTextTwistType>(
+            kOutASRServerTwistTopic, kDefaultHistoryBufSize,
+            [this](ASRTextTwistType::ConstSharedPtr msg) { external_velocity_callback(msg); }
         );
-        m_subASRArmState = this->create_subscription<Px4KeyboardArmType>(
-            kPx4KeyboardArmingStateTopic, kDefaultHistoryBufSize,
-            [this](Px4KeyboardArmType::ConstSharedPtr msg) { external_arming_callback(msg); }
+        m_subASRArmState = this->create_subscription<ASRArmType>(
+            kOutASRServerArmStateTopic, kDefaultHistoryBufSize,
+            [this](ASRArmType::ConstSharedPtr msg) { external_arming_callback(msg); }
         );
         m_subLocalPos = this->create_subscription<DroneOdometry>(
             kOutVehicleOdometryTopic, rclcpp::SensorDataQoS(),
@@ -144,9 +152,11 @@ private:
 	PublisherPtr<DronePathPoint> m_pubPath;
 	PublisherPtr<DroneStatus>    m_pubStatus;
 	PublisherPtr<DroneCmd>       m_pubCMD;
-    SubscriberPtr<Px4KeyboardTwistType> m_subASRTwist;
-    SubscriberPtr<Px4KeyboardArmType>   m_subASRArmState;
-    SubscriberPtr<DroneOdometry>        m_subLocalPos;
+    // SubscriberPtr<Px4KeyboardTwistType> m_subKeyboardTwist;
+    // SubscriberPtr<Px4KeyboardArmType>   m_subKeyboardArm;
+    SubscriberPtr<ASRTextTwistType> m_subASRTwist;
+    SubscriberPtr<ASRArmType>       m_subASRArmState;
+    SubscriberPtr<DroneOdometry>    m_subLocalPos;
 
 	rclcpp::TimerBase::SharedPtr m_timer;
     std::atomic<u64>             m_setPointPublished;

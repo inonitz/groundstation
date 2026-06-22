@@ -15,7 +15,8 @@
 
 #include <geometry_msgs/msg/twist.hpp>
 #include <std_msgs/msg/bool.hpp>
-
+#include <std_msgs/msg/string.hpp>
+#include <std_msgs/msg/int32_multi_array.hpp>
 
 struct alignpk(16) Vec3 {
     f32 x;
@@ -38,11 +39,20 @@ constexpr const char* kOutVehicleOdometryTopic = "/fmu/out/vehicle_odometry";
 constexpr const char* kOutVehicleStatusTopic   = "/fmu/out/vehicle_status_v1";
 constexpr const char* kOutVehicleAttitudeTopic = "/fmu/out/vehicle_attitude";
 
+constexpr const char* kPx4KeyboardArmStateTopic = "/px4_keyboard/arm_msg";
+constexpr const char* kPx4KeyboardTwistTopic    = "/px4_keyboard/cmd_vel";
+constexpr const char* kPx4KeyboardRawTopic      = "/px4_keyboard/in/raw";
+constexpr const char* kOutASRServerTranscriptionTopic = "/asr_server/transcribe";
+constexpr const char* kOutASRServerTwistTopic         = "/asr_server/cmd_vel";
+constexpr const char* kOutASRServerArmStateTopic      = "/asr_server/arm_msg";
 
-constexpr const char* kPx4KeyboardArmingStateTopic = "/px4_keyboard/arm_msg";
-constexpr const char* kPx4KeyboardTwistTopic  = "/px4_keyboard/cmd_vel";
-using Px4KeyboardTwistType = geometry_msgs::msg::Twist;
-using Px4KeyboardArmType   = std_msgs::msg::Bool;
+
+using Px4KeyboardTwistType    = geometry_msgs::msg::Twist;
+using Px4KeyboardArmType      = std_msgs::msg::Bool;
+using Px4KeyboardRawInputType = std_msgs::msg::Int32MultiArray;
+using ASRTextType             = std_msgs::msg::String;
+using ASRTextTwistType        = geometry_msgs::msg::Twist;
+using ASRArmType              = std_msgs::msg::Bool;
 
 
 template<typename T> using PublisherPtr  = typename rclcpp::Publisher<T>::SharedPtr;

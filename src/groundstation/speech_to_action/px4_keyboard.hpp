@@ -18,8 +18,9 @@ public:
         // Publish to standard velocity topic at 20Hz
         // https://docs.ros2.org/latest/api/rclcpp/classrclcpp_1_1Publisher.html
         // https://docs.ros2.org/latest/api/rclcpp/classrclcpp_1_1TimerBase.html
-        m_transcribe  = this->create_publisher<Px4KeyboardTwistType>(kPx4KeyboardTwistTopic, 10);
-        m_arming = this->create_publisher<Px4KeyboardArmType>(kPx4KeyboardArmingStateTopic, 10);
+        m_twist  = this->create_publisher<Px4KeyboardTwistType>(kPx4KeyboardTwistTopic, 10);
+        m_arming = this->create_publisher<Px4KeyboardArmType>(kPx4KeyboardArmStateTopic, 10);
+        m_raw    = this->create_publisher<Px4KeyboardRawInputType>(kPx4KeyboardRawTopic, 10);
         m_timer = this->create_wall_timer(
             std::chrono::milliseconds(50), 
             std::bind(&Px4KeyboardTeleop::timerCallback, this)
@@ -37,12 +38,13 @@ public:
         m_keyHook.bindKey(KeyCode::S, cb);
         m_keyHook.bindKey(KeyCode::A, cb);
         m_keyHook.bindKey(KeyCode::D, cb);
+        m_keyHook.bindKey(KeyCode::H, cb);
         m_keyHook.bindKey(KeyCode::UpArrow, cb);
         m_keyHook.bindKey(KeyCode::DownArrow, cb);
         m_keyHook.bindKey(KeyCode::LeftArrow, cb);
         m_keyHook.bindKey(KeyCode::RightArrow, cb);
         m_keyHook.bindKey(KeyCode::Enter, cb);
-        // m_keyHook.bindKey(KeyCode::SPACE, cb);
+        m_keyHook.bindKey(KeyCode::Space, cb);
         return;
     }
     
@@ -56,15 +58,24 @@ private:
             static_cast<int>(k), 
             static_cast<int>(action)
         );
-        if (action == KeyAction::UNKNOWN) return;
 
-        std::lock_guard<std::mutex> lock(m_lock); // https://en.cppreference.com/w/cpp/thread/lock_guard
-        
+        // 1. Publish raw array
+        Px4KeyboardRawInputType _;
+        _.data.push_back(static_cast<int32_t>(k));
+        _.data.push_back(static_cast<int32_t>(action));
+        m_raw->publish(_);
+
+        // 2. Handle Inputs for Px4 Drone
+        if (action == KeyAction::UNKNOWN) {
+            return;
+        }
+    
         // Handle Arming Toggle on Enter key press
+        std::lock_guard<std::mutex> lock(m_lock);
         if (k == KeyCode::Enter && action == KeyAction::PRESSED) {
             m_armState = !m_armState;
             
-            std_msgs::msg::Bool _{};
+            Px4KeyboardArmType _{};
             _.data = m_armState;
 
             m_arming->publish(_);
@@ -89,7 +100,7 @@ private:
 
 
     void timerCallback() {
-        geometry_msgs::msg::Twist msg;
+        Px4KeyboardTwistType msg;
         {
             std::lock_guard<std::mutex> lock(m_lock);
             msg = m_velcmd;
@@ -99,14 +110,15 @@ private:
             msg.linear.x, 
             msg.linear.z
         );
-        m_transcribe->publish(msg);
+        m_twist->publish(msg);
     }
 
-    PublisherPtr<Px4KeyboardTwistType> m_transcribe;
-    PublisherPtr<Px4KeyboardArmType>   m_arming;
-    rclcpp::TimerBase::SharedPtr       m_timer;
-    AsyncKeyHook                       m_keyHook;
-    Px4KeyboardTwistType               m_velcmd;
-    bool                               m_armState;
-    std::mutex                         m_lock;
+    PublisherPtr<Px4KeyboardTwistType>    m_twist;
+    PublisherPtr<Px4KeyboardArmType>      m_arming;
+    PublisherPtr<Px4KeyboardRawInputType> m_raw;
+    rclcpp::TimerBase::SharedPtr          m_timer;
+    AsyncKeyHook                          m_keyHook;
+    Px4KeyboardTwistType                  m_velcmd;
+    bool                                  m_armState;
+    std::mutex                            m_lock;
 };

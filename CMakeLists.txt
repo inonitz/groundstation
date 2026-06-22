@@ -7,6 +7,7 @@ else()
     set(GROUNDSTATION_IS_TOP_LEVEL OFF)
 endif()
 
+include(FetchContent)
 include(cmake/SubmoduleUpdate.cmake)
 include(cmake/UseCCache.cmake)
 include(cmake/ColouredOutput.cmake)
@@ -71,8 +72,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 
 # 6. The Actual Start of the cmake
-add_subdirectory(dependencies/Eigen)
 add_subdirectory(dependencies/sttserver)
+set_target_properties(parakeet whisper ggml ggml-cpu ggml-vulkan PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(src/groundstation)
