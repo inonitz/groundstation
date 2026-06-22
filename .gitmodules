@@ -29,19 +29,11 @@
 # 	url = https://github.com/ggml-org/whisper.cpp
 # 	branch = master
 
-[submodule "dependencies/cxxopts"]
-	path = dependencies/cxxopts
-	url = https://github.com/jarro2783/cxxopts
-	branch = master
-
 [submodule "dependencies/util2"]
 	path = dependencies/util2
 	url = https://github.com/inonitz/util2.git
 	branch = main
 
-[submodule "dependencies/Eigen"]
-	path = dependencies/Eigen
-	url = https://gitlab.com/libeigen/eigen
 [submodule "dependencies/sttserver"]
 	path = dependencies/sttserver
 	url = https://github.com/inonitz/sttserv
