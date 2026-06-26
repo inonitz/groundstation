@@ -80,3 +80,6 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc \
     && echo "source /opt/px4_ws/install/setup.bash" >> /root/.bashrc
 
 WORKDIR /root
+
+RUN git config --global --add safe.directory /root/groundstation
+RUN git config --global --add safe.directory /root/groundstation/dependencies
