@@ -30,7 +30,7 @@ CMD_BUILD_CONF="./build.sh release shared configure"
 CMD_BUILD_MAKE="./build.sh release shared build"
 CMD_TERMINAL_2="MicroXRCEAgent udp4 -p 8888"
 # Wrap the command in 'bash -c' with a 'read' at the end
-CMD_TERMINAL_3="cd $PX4_DIRECTORY && make px4_sitl gz_x500; echo 'CRASHED. Press enter to exit...'; read"
+CMD_TERMINAL_3="cd $PX4_DIRECTORY && make px4_sitl gz_x500_gimbal; echo 'CRASHED. Press enter to exit...'; read"
 CMD_TERMINAL_4="./build/release/static/bin/ros2_speech_to_action_keyboard_input"
 
 ASR_FLAGS=(
