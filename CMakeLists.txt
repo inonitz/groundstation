@@ -7,20 +7,20 @@ else()
     set(GROUNDSTATION_IS_TOP_LEVEL OFF)
 endif()
 
-
+# 1. Include Utility Headers
+include(cmake/FetchCPM.cmake)
 include(cmake/SubmoduleUpdate.cmake)
 include(cmake/UseCCache.cmake)
 include(cmake/ColouredOutput.cmake)
 include(cmake/OutputDir.cmake)
 include(cmake/WorkspaceOptions.cmake)
 include(cmake/BuildDiagnostics.cmake)
-
+include_cpm()
 
 enable_coloured_diagnostics_if_available()
 use_ccache_program_if_exists()
 define_aggregate_output_artifact_directory()
 update_submodules_on_cmake_configure("dependencies")
-
 
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS      "Enable AddressSanitizer"                       OFF)
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_UNDEFINED    "Enable UndefinedBehaviorSanitizer"             OFF)
@@ -34,20 +34,99 @@ if(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS AND GROUNDSTATION_ENABLE_SANITIZER_MEM
     message(FATAL_ERROR "ASan and MSan are mutually exclusive.")
 endif()
 
-
 declare_optional_interface_library_different_sanitizers()
 declare_optional_interface_library_lto()
 declare_optional_interface_default_project_configuration()
 
-
+# ROS 2 Dependencies
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 
+
+# ---------------------------------------------------------------------------
+# Local Subdirectories 
+# This has to be First due to sherpa-onnx dependency inside sttserver,
+# which pulls nlohmann_json without tracking for duplicates
+# Reserving the order between "Migrated VLMNav" & "Local Subdirectories"
+# will cause a duplicate target error
+# ---------------------------------------------------------------------------
 add_subdirectory(dependencies/util2)
 add_subdirectory(dependencies/sttserver)
-# add_subdirectory(dependencies/vlmnav)
 
+
+# ---------------------------------------------------------------------------
+# Migrated VLMNav CPM Remote Dependencies
+# ---------------------------------------------------------------------------
+safe_cpm_add_package(
+    NAME opencv
+    GIT_REPOSITORY https://github.com/opencv/opencv.git
+    GIT_TAG        4.10.0
+    OPTIONS
+        "BUILD_LIST core,imgproc,videoio,imgcodecs"
+        "WITH_IPP OFF"
+        "WITH_GUI OFF"
+        "WITH_TIFF OFF"
+        "WITH_OPENEXR OFF"
+        "BUILD_opencv_apps OFF"
+        "BUILD_opencv_python2 OFF"
+        "BUILD_opencv_python3 OFF"
+        "BUILD_JAVA OFF"
+        "BUILD_TESTS OFF"
+        "BUILD_PERF_TESTS OFF"
+        "BUILD_EXAMPLES OFF"
+)
+
+safe_cpm_add_package(
+    NAME cpp-httplib
+    GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+    GIT_TAG        v0.18.0
+)
+
+safe_cpm_add_package(
+    NAME cpp-base64
+    GIT_REPOSITORY https://github.com/inonitz/cpp-base64.git
+    GIT_TAG        feature-cmake
+)
+
+safe_cpm_add_package(
+    NAME cxxopts
+    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+    GIT_TAG        v3.2.0
+)
+
+safe_cpm_add_package(
+    NAME nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+)
+
+safe_cpm_add_package(
+    NAME llama_cpp
+    GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
+    GIT_TAG        master
+    OPTIONS
+        "LLAMA_BUILD_EXAMPLES OFF"
+        "LLAMA_BUILD_COMMON ON"
+        "LLAMA_BUILD_SERVER ON"
+        "LLAMA_BUILD_TOOLS ON"
+        "LLAMA_BUILD_UI OFF"
+        "LLAMA_LLGUIDANCE OFF"
+        "NO_ISA_EXTENSIONS ON"
+        "GGML_VULKAN ON"
+        "GGML_CUDA OFF"
+        "GGML_METAL OFF"
+        "GGML_MUSA OFF"
+        "GGML_SYCL OFF"
+        "BUILD_GMOCK OFF"
+        "INSTALL_GTEST OFF"
+)
+
+
+# ---------------------------------------------------------------------------
+# Local Project
+# ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(src/groundstation)
+    add_subdirectory(src/nav) # Temporary until modularization
 endif()

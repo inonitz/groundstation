@@ -1,0 +1,1092 @@
+Out-of-source Root   Build Directory is 'build' 
+Out-of-source Target Build Directory is 'build/release/shared/' 
+Cmake Arguments passed are ==> { 
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=1     -DGROUNDSTATION_BUILD_EXECUTABLE=ON     -DGROUNDSTATION_BUILD_TESTS=OFF     -DGROUNDSTATION_BUILD_BENCHMARKS=OFF         -DSTTSERVER_FORCE_COLOURED_OUTPUT=OFF     -DSTTSERVER_ENABLE_SANITIZER_ADDRESS=OFF     -DSTTSERVER_ENABLE_SANITIZER_UNDEFINED=OFF     -DSTTSERVER_ENABLE_SANITIZER_MEMORY=OFF     -DSTTSERVER_ENABLE_LINK_TIME_OPTIMIZATION=OFF     -DSTTSERVER_BUILD_LIBRARY_BACKEND_WHISPER=ON     -DSTTSERVER_BUILD_LIBRARY_BACKEND_SHERPA_ONNX=OFF     -DSTTSERVER_BUILD_LIBRARY=ON     -DSTTSERVER_BUILD_TESTS=OFF     -DSTTSERVER_BUILD_BENCHMARKS=OFF      -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
+}
+Script arguments are 'release' 'shared' 'build' 
+CURRENT WORKING DIRECTORY IS /root/groundstation/build/release/shared
+[0/2] Re-checking globbed directories...
+[1/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/debugbreak.c.o
+[2/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/aligned_malloc.c.o
+[3/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/env.c.o
+[4/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/buffer.c.o
+[5/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/file.c.o
+[6/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/ifcrash2.c.o
+[7/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/mt19937ii.c.o
+[8/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/marker4.c.o
+[9/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/image2.c.o
+[10/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/sleep.c.o
+[11/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/print.c.o
+[12/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/random.c.o
+[13/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/thread_sleep.c.o
+[14/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/stb_image.c.o
+[15/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/tinycthread.c.o
+[16/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/print.cpp.o
+In file included from /root/groundstation/dependencies/util2/source/print.cpp:1:
+/root/groundstation/dependencies/util2/include/util2/print.hpp:19:88: warning: ‘util2’ is deprecated: Do not Use this header. It is incomplete and not functioning [-Wdeprecated-declarations]
+   19 | void UTIL2_API selectOutputStream(OutputStreamType stype, void* custom_stream = nullptr);
+      |                                                                                        ^
+/root/groundstation/dependencies/util2/include/util2/print.hpp:10:96: note: declared here
+   10 | namespace UTIL2_DEPRECATED_MSG("Do not Use this header. It is incomplete and not functioning") util2 {
+      |                                                                                                ^~~~~
+/root/groundstation/dependencies/util2/include/util2/print.hpp:19:88: warning: ‘util2’ is deprecated: Do not Use this header. It is incomplete and not functioning [-Wdeprecated-declarations]
+   19 | void UTIL2_API selectOutputStream(OutputStreamType stype, void* custom_stream = nullptr);
+      |                                                                                        ^
+/root/groundstation/dependencies/util2/include/util2/print.hpp:10:96: note: declared here
+   10 | namespace UTIL2_DEPRECATED_MSG("Do not Use this header. It is incomplete and not functioning") util2 {
+      |                                                                                                ^~~~~
+/root/groundstation/dependencies/util2/source/print.cpp:16:1: warning: ‘util2’ is deprecated: Do not Use this header. It is incomplete and not functioning [-Wdeprecated-declarations]
+   16 | ) {
+      | ^
+/root/groundstation/dependencies/util2/include/util2/print.hpp:10:96: note: declared here
+   10 | namespace UTIL2_DEPRECATED_MSG("Do not Use this header. It is incomplete and not functioning") util2 {
+      |                                                                                                ^~~~~
+/root/groundstation/dependencies/util2/source/print.cpp:16:1: warning: ‘util2’ is deprecated: Do not Use this header. It is incomplete and not functioning [-Wdeprecated-declarations]
+   16 | ) {
+      | ^
+/root/groundstation/dependencies/util2/include/util2/print.hpp:10:96: note: declared here
+   10 | namespace UTIL2_DEPRECATED_MSG("Do not Use this header. It is incomplete and not functioning") util2 {
+      |                                                                                                ^~~~~
+[17/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/aligned_malloc.cpp.o
+[18/985] Building C object dependencies/util2/CMakeFiles/util2.dir/source/C/sleep/sleep_linux.c.o
+[19/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/time.cpp.o
+[20/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[21/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/file.cpp.o
+[22/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/random.cpp.o
+[23/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[24/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/pool.cpp.o
+[25/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[26/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[27/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[28/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[29/985] Building CXX object dependencies/util2/CMakeFiles/util2.dir/source/vec2.cpp.o
+In file included from /root/groundstation/dependencies/util2/include/util2/C/debug_macro.h:3,
+                 from /root/groundstation/dependencies/util2/include/util2/C/macro.h:3,
+                 from /root/groundstation/dependencies/util2/include/util2/vec2.hpp:4,
+                 from /root/groundstation/dependencies/util2/source/vec2.cpp:1:
+/root/groundstation/dependencies/util2/include/util2/C/compiler_warning.h:13:38: note: ‘#pragma message: WARNING: function void inverseSimd(mat4f const& in, mat4f& out) has no implementation -> Code not compiled with SSE3 Support’
+   13 | #   define WARN(exp) ("WARNING: " exp)
+      |                                      ^
+/root/groundstation/dependencies/util2/source/vec2.cpp:769:24: note: in expansion of macro ‘WARN’
+  769 | #       pragma message WARN("function void inverseSimd(mat4f const& in, mat4f& out) has no implementation -> Code not compiled with SSE3 Support")
+      |                        ^~~~
+[30/985] Linking CXX shared library bin/libutil2.so
+[31/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[32/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[33/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[34/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[35/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[36/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[37/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[38/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[39/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[40/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+[41/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[42/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[43/985] Linking CXX shared library bin/libggml-base.so.0.15.3
+[44/985] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[45/985] Creating directories for 'vulkan-shaders-gen'
+[46/985] No download step for 'vulkan-shaders-gen'
+[47/985] No update step for 'vulkan-shaders-gen'
+[48/985] No patch step for 'vulkan-shaders-gen'
+[49/985] Building C object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[50/985] Building CXX object _deps/whispercpp-build/examples/deprecation-warning/CMakeFiles/main.dir/deprecation-warning.cpp.o
+[51/985] Performing configure step for 'vulkan-shaders-gen'
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Enabling coopmat glslc support
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /root/groundstation/build/release/shared/_deps/whispercpp-build/ggml/src/ggml-vulkan/vulkan-shaders-gen-prefix/src/vulkan-shaders-gen-build
+[52/985] Linking CXX executable bin/main
+[53/985] Building CXX object _deps/whispercpp-build/examples/deprecation-warning/CMakeFiles/bench.dir/deprecation-warning.cpp.o
+[54/985] Linking CXX executable bin/bench
+[55/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio.dir/miniaudio.c.o
+[56/985] Linking C shared library bin/libminiaudio.so
+[57/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio_channel_combiner_node.dir/extras/nodes/ma_channel_combiner_node/ma_channel_combiner_node.c.o
+[58/985] Linking C shared library bin/libminiaudio_channel_combiner_node.so
+[59/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio_channel_separator_node.dir/extras/nodes/ma_channel_separator_node/ma_channel_separator_node.c.o
+[60/985] Linking C shared library bin/libminiaudio_channel_separator_node.so
+[61/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio_ltrim_node.dir/extras/nodes/ma_ltrim_node/ma_ltrim_node.c.o
+[62/985] Linking C shared library bin/libminiaudio_ltrim_node.so
+[63/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio_reverb_node.dir/extras/nodes/ma_reverb_node/ma_reverb_node.c.o
+[64/985] Linking C shared library bin/libminiaudio_reverb_node.so
+[65/985] Building C object _deps/miniaudio-build/CMakeFiles/miniaudio_vocoder_node.dir/extras/nodes/ma_vocoder_node/ma_vocoder_node.c.o
+[66/985] Linking C shared library bin/libminiaudio_vocoder_node.so
+[67/985] Building C object _deps/opencv-build/3rdparty/ittnotify/CMakeFiles/ittnotify.dir/src/ittnotify/ittnotify_static.c.o
+[68/985] Building C object _deps/opencv-build/3rdparty/ittnotify/CMakeFiles/ittnotify.dir/src/ittnotify/jitprofiling.c.o
+[69/985] Linking C static library _deps/opencv-build/3rdparty/lib/libittnotify.a
+[70/985] Processing OpenCL kernels (core)
+[71/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[72/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[73/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[74/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/algorithm.cpp.o
+[75/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/alloc.cpp.o
+[76/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/arithm.cpp.o
+[77/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/async.cpp.o
+[78/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/array.cpp.o
+[79/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/batch_distance.cpp.o
+[80/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/bindings_utils.cpp.o
+[81/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/buffer_area.cpp.o
+[82/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+[83/985] Linking CXX shared library bin/libggml-cpu.so.0.15.3
+[84/985] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[85/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/check.cpp.o
+[86/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/channels.cpp.o
+[87/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/conjugate_gradient.cpp.o
+[88/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/arithm.dispatch.cpp.o
+[89/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/convert_c.cpp.o
+[90/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/command_line_parser.cpp.o
+[91/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/convert.dispatch.cpp.o
+[92/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/copy.cpp.o
+[93/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/convert_scale.dispatch.cpp.o
+[94/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/cuda_gpu_mat.cpp.o
+[95/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/count_non_zero.dispatch.cpp.o
+[96/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/cuda_host_mem.cpp.o
+[97/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/cuda_info.cpp.o
+[98/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/cuda_gpu_mat_nd.cpp.o
+[99/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/cuda_stream.cpp.o
+[100/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/datastructs.cpp.o
+[101/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/directx.cpp.o
+[102/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/downhill_simplex.cpp.o
+[103/985] Performing build step for 'vulkan-shaders-gen'
+[1/2] Building CXX object CMakeFiles/vulkan-shaders-gen.dir/vulkan-shaders-gen.cpp.o
+[2/2] Linking CXX executable vulkan-shaders-gen
+[104/985] Performing install step for 'vulkan-shaders-gen'
+-- Installing: /root/groundstation/build/release/shared/Release/./vulkan-shaders-gen
+[105/985] Completed 'vulkan-shaders-gen'
+[106/985] Generate vulkan shaders header
+[107/985] Generate vulkan shaders for acc.comp
+[108/985] Generate vulkan shaders for add.comp
+[109/985] Generate vulkan shaders for add1.comp
+[110/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/gl_core_3_1.cpp.o
+[111/985] Generate vulkan shaders for add_id.comp
+[112/985] Generate vulkan shaders for arange.comp
+[113/985] Generate vulkan shaders for argmax.comp
+[114/985] Generate vulkan shaders for argsort.comp
+[115/985] Generate vulkan shaders for argsort_large.comp
+[116/985] Generate vulkan shaders for col2im_1d.comp
+[117/985] Generate vulkan shaders for concat.comp
+[118/985] Generate vulkan shaders for contig_copy.comp
+[119/985] Generate vulkan shaders for conv2d_dw.comp
+[120/985] Generate vulkan shaders for conv2d_mm.comp
+[121/985] Generate vulkan shaders for conv3d_mm.comp
+[122/985] Generate vulkan shaders for conv_transpose_1d.comp
+[123/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/hal_internal.cpp.o
+[124/985] Generate vulkan shaders for copy.comp
+[125/985] Generate vulkan shaders for copy_from_quant.comp
+[126/985] Generate vulkan shaders for copy_transpose.comp
+[127/985] Generate vulkan shaders for count_equal.comp
+[128/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/glob.cpp.o
+[129/985] Generate vulkan shaders for count_experts.comp
+[130/985] Generate vulkan shaders for cumsum.comp
+[131/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/has_non_zero.dispatch.cpp.o
+[132/985] Generate vulkan shaders for cumsum_multipass1.comp
+[133/985] Generate vulkan shaders for cumsum_multipass2.comp
+[134/985] Generate vulkan shaders for dequant_f32.comp
+[135/985] Generate vulkan shaders for copy_to_quant.comp
+[136/985] Generate vulkan shaders for dequant_iq1_m.comp
+[137/985] Generate vulkan shaders for dequant_iq1_s.comp
+[138/985] Generate vulkan shaders for dequant_iq2_xs.comp
+[139/985] Generate vulkan shaders for dequant_iq2_s.comp
+[140/985] Generate vulkan shaders for dequant_iq2_xxs.comp
+[141/985] Generate vulkan shaders for dequant_iq3_xxs.comp
+[142/985] Generate vulkan shaders for dequant_iq3_s.comp
+[143/985] Generate vulkan shaders for dequant_iq4_nl.comp
+[144/985] Generate vulkan shaders for dequant_iq4_xs.comp
+[145/985] Generate vulkan shaders for dequant_mxfp4.comp
+[146/985] Generate vulkan shaders for dequant_q1_0.comp
+[147/985] Generate vulkan shaders for dequant_nvfp4.comp
+[148/985] Generate vulkan shaders for dequant_q3_k.comp
+[149/985] Generate vulkan shaders for dequant_q2_k.comp
+[150/985] Generate vulkan shaders for dequant_q4_0.comp
+[151/985] Generate vulkan shaders for dequant_q4_1.comp
+[152/985] Generate vulkan shaders for dequant_q4_k.comp
+[153/985] Generate vulkan shaders for dequant_q5_0.comp
+[154/985] Generate vulkan shaders for dequant_q5_k.comp
+[155/985] Generate vulkan shaders for dequant_q5_1.comp
+[156/985] Generate vulkan shaders for dequant_q6_k.comp
+[157/985] Generate vulkan shaders for dequant_q8_0.comp
+[158/985] Generate vulkan shaders for diag_mask_inf.comp
+[159/985] Generate vulkan shaders for diag.comp
+[160/985] Generate vulkan shaders for flash_attn_cm2.comp
+[161/985] Generate vulkan shaders for fill.comp
+[162/985] Generate vulkan shaders for div.comp
+[163/985] Generate vulkan shaders for flash_attn_cm1.comp
+[164/985] Generate vulkan shaders for flash_attn_mask_opt.comp
+[165/985] Generate vulkan shaders for flash_attn_split_k_reduce.comp
+[166/985] Generate vulkan shaders for fwht.comp
+[167/985] Generate vulkan shaders for gated_delta_net.comp
+[168/985] Generate vulkan shaders for geglu.comp
+[169/985] Generate vulkan shaders for geglu_erf.comp
+[170/985] Generate vulkan shaders for geglu_quick.comp
+[171/985] Generate vulkan shaders for flash_attn.comp
+[172/985] Generate vulkan shaders for get_rows_back.comp
+[173/985] Generate vulkan shaders for group_norm.comp
+[174/985] Generate vulkan shaders for get_rows.comp
+[175/985] Generate vulkan shaders for l2_norm.comp
+[176/985] Generate vulkan shaders for im2col.comp
+[177/985] Generate vulkan shaders for log.comp
+[178/985] Generate vulkan shaders for im2col_3d.comp
+[179/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/dxt.cpp.o
+[180/985] Generate vulkan shaders for mul_mat_split_k_reduce.comp
+[181/985] Generate vulkan shaders for mul.comp
+[182/985] Generate vulkan shaders for get_rows_quant.comp
+[183/985] Generate vulkan shaders for mul_mat_vec_iq2_s.comp
+[184/985] Generate vulkan shaders for mul_mat_vec_iq1_m.comp
+[185/985] Generate vulkan shaders for mul_mat_vec_iq1_s.comp
+[186/985] Generate vulkan shaders for mul_mat_vec_nc.comp
+[187/985] Generate vulkan shaders for mul_mat_vec_p021.comp
+[188/985] Generate vulkan shaders for mul_mat_vec_iq2_xs.comp
+[189/985] Generate vulkan shaders for mul_mat_vec_iq2_xxs.comp
+[190/985] Generate vulkan shaders for mul_mat_vec_iq3_xxs.comp
+[191/985] Generate vulkan shaders for mul_mat_vec_iq3_s.comp
+[192/985] Generate vulkan shaders for mul_mat_vec_q2_k.comp
+[193/985] Generate vulkan shaders for mul_mat_vecq.comp
+[194/985] Generate vulkan shaders for mul_mat_vec_q4_k.comp
+[195/985] Generate vulkan shaders for mul_mat_vec_q5_k.comp
+[196/985] Generate vulkan shaders for mul_mm_cm2.comp
+[197/985] Generate vulkan shaders for mul_mat_vec_q3_k.comp
+[198/985] Generate vulkan shaders for mul_mmq.comp
+[199/985] Generate vulkan shaders for mul_mat_vec_q6_k.comp
+[200/985] Generate vulkan shaders for opt_step_sgd.comp
+[201/985] Generate vulkan shaders for norm.comp
+[202/985] Generate vulkan shaders for opt_step_adamw.comp
+[203/985] Generate vulkan shaders for pad.comp
+[204/985] Generate vulkan shaders for multi_add.comp
+[205/985] Generate vulkan shaders for pool2d.comp
+[206/985] Generate vulkan shaders for repeat.comp
+[207/985] Generate vulkan shaders for quantize_q8_1.comp
+[208/985] Generate vulkan shaders for reglu.comp
+[209/985] Generate vulkan shaders for repeat_back.comp
+[210/985] Generate vulkan shaders for rms_norm_partials.comp
+[211/985] Generate vulkan shaders for roll.comp
+[212/985] Generate vulkan shaders for rms_norm_back.comp
+[213/985] Generate vulkan shaders for rope_neox.comp
+[214/985] Generate vulkan shaders for rope_multi.comp
+[215/985] Generate vulkan shaders for rope_norm.comp
+[216/985] Generate vulkan shaders for rms_norm.comp
+[217/985] Generate vulkan shaders for rope_vision.comp
+[218/985] Generate vulkan shaders for silu_back.comp
+[219/985] Generate vulkan shaders for scale.comp
+[220/985] Generate vulkan shaders for soft_max_back.comp
+[221/985] Generate vulkan shaders for snake.comp
+[222/985] Generate vulkan shaders for soft_max_large1.comp
+[223/985] Generate vulkan shaders for soft_max_large3.comp
+[224/985] Generate vulkan shaders for solve_tri.comp
+[225/985] Generate vulkan shaders for soft_max_large2.comp
+[226/985] Generate vulkan shaders for ssm_conv.comp
+[227/985] Generate vulkan shaders for mul_mat_vec.comp
+[228/985] Generate vulkan shaders for soft_max.comp
+[229/985] Generate vulkan shaders for sum_rows.comp
+[230/985] Generate vulkan shaders for ssm_scan.comp
+[231/985] Generate vulkan shaders for swiglu.comp
+[232/985] Generate vulkan shaders for sub.comp
+[233/985] Generate vulkan shaders for timestep_embedding.comp
+[234/985] Generate vulkan shaders for swiglu_oai.comp
+[235/985] Generate vulkan shaders for topk_moe.comp
+[236/985] Generate vulkan shaders for topk_argsort.comp
+[237/985] Generate vulkan shaders for topk_nary_search.comp
+[238/985] Generate vulkan shaders for tri.comp
+[239/985] Generate vulkan shaders for wkv6.comp
+[240/985] Generate vulkan shaders for upscale.comp
+[241/985] Generate vulkan shaders for wkv7.comp
+[242/985] Generate vulkan shaders for unary.comp
+[243/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/kmeans.cpp.o
+[244/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/logger.cpp.o
+[245/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/lpsolver.cpp.o
+[246/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/lda.cpp.o
+[247/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/lut.cpp.o
+[248/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/mathfuncs_core.dispatch.cpp.o
+[249/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/mathfuncs.cpp.o
+[250/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix.cpp.o
+[251/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_c.cpp.o
+[252/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_decomp.cpp.o
+[253/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_iterator.cpp.o
+[254/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_expressions.cpp.o
+[255/985] Generate vulkan shaders for mul_mm.comp
+[256/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[257/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_sparse.cpp.o
+[258/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matmul.dispatch.cpp.o
+[259/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/acc.comp.cpp.o
+[260/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/add.comp.cpp.o
+[261/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/add1.comp.cpp.o
+[262/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/add_id.comp.cpp.o
+[263/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/arange.comp.cpp.o
+[264/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/argmax.comp.cpp.o
+[265/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/argsort.comp.cpp.o
+[266/985] Building CXX object _deps/whispercpp-build/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[267/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/argsort_large.comp.cpp.o
+[268/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/col2im_1d.comp.cpp.o
+[269/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/concat.comp.cpp.o
+[270/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/contig_copy.comp.cpp.o
+[271/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/conv2d_dw.comp.cpp.o
+[272/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/conv2d_mm.comp.cpp.o
+[273/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/conv3d_mm.comp.cpp.o
+[274/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/conv_transpose_1d.comp.cpp.o
+[275/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/copy.comp.cpp.o
+[276/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/copy_from_quant.comp.cpp.o
+[277/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/copy_transpose.comp.cpp.o
+[278/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/count_equal.comp.cpp.o
+[279/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/count_experts.comp.cpp.o
+[280/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/cumsum.comp.cpp.o
+[281/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/cumsum_multipass1.comp.cpp.o
+[282/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_transform.cpp.o
+[283/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/cumsum_multipass2.comp.cpp.o
+[284/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_f32.comp.cpp.o
+[285/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq1_m.comp.cpp.o
+[286/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq1_s.comp.cpp.o
+[287/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq2_s.comp.cpp.o
+[288/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq2_xs.comp.cpp.o
+[289/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq2_xxs.comp.cpp.o
+[290/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/copy_to_quant.comp.cpp.o
+[291/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq3_s.comp.cpp.o
+[292/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq3_xxs.comp.cpp.o
+[293/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq4_nl.comp.cpp.o
+[294/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_mxfp4.comp.cpp.o
+[295/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_iq4_xs.comp.cpp.o
+[296/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_nvfp4.comp.cpp.o
+[297/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q1_0.comp.cpp.o
+[298/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q2_k.comp.cpp.o
+[299/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q3_k.comp.cpp.o
+[300/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q4_0.comp.cpp.o
+[301/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q4_1.comp.cpp.o
+[302/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/lapack.cpp.o
+[303/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q5_0.comp.cpp.o
+[304/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q4_k.comp.cpp.o
+[305/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q5_k.comp.cpp.o
+[306/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q6_k.comp.cpp.o
+[307/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q5_1.comp.cpp.o
+[308/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/dequant_q8_0.comp.cpp.o
+[309/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/diag_mask_inf.comp.cpp.o
+[310/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/diag.comp.cpp.o
+[311/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/fill.comp.cpp.o
+[312/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/flash_attn_cm2.comp.cpp.o
+[313/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/div.comp.cpp.o
+[314/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/flash_attn_mask_opt.comp.cpp.o
+[315/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/flash_attn_split_k_reduce.comp.cpp.o
+[316/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/fwht.comp.cpp.o
+[317/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/flash_attn_cm1.comp.cpp.o
+[318/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/gated_delta_net.comp.cpp.o
+[319/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/geglu.comp.cpp.o
+[320/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/geglu_erf.comp.cpp.o
+[321/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/geglu_quick.comp.cpp.o
+[322/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/get_rows.comp.cpp.o
+[323/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/get_rows_back.comp.cpp.o
+[324/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/group_norm.comp.cpp.o
+[325/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/im2col.comp.cpp.o
+[326/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/im2col_3d.comp.cpp.o
+[327/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/flash_attn.comp.cpp.o
+[328/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/l2_norm.comp.cpp.o
+[329/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/log.comp.cpp.o
+[330/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_split_k_reduce.comp.cpp.o
+[331/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul.comp.cpp.o
+[332/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/get_rows_quant.comp.cpp.o
+[333/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_operations.cpp.o
+[334/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq1_s.comp.cpp.o
+[335/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq2_xs.comp.cpp.o
+[336/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq1_m.comp.cpp.o
+[337/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq2_s.comp.cpp.o
+[338/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_nc.comp.cpp.o
+[339/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq2_xxs.comp.cpp.o
+[340/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_p021.comp.cpp.o
+[341/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq3_xxs.comp.cpp.o
+[342/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_iq3_s.comp.cpp.o
+[343/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_q2_k.comp.cpp.o
+[344/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_q4_k.comp.cpp.o
+[345/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_q3_k.comp.cpp.o
+[346/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_q5_k.comp.cpp.o
+[347/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vecq.comp.cpp.o
+[348/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec_q6_k.comp.cpp.o
+[349/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mmq.comp.cpp.o
+[350/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mm_cm2.comp.cpp.o
+[351/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/norm.comp.cpp.o
+[352/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/multi_add.comp.cpp.o
+[353/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/opt_step_adamw.comp.cpp.o
+[354/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/opt_step_sgd.comp.cpp.o
+[355/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/pad.comp.cpp.o
+[356/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/pool2d.comp.cpp.o
+[357/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/reglu.comp.cpp.o
+[358/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/quantize_q8_1.comp.cpp.o
+[359/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/repeat.comp.cpp.o
+[360/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/repeat_back.comp.cpp.o
+[361/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rms_norm_back.comp.cpp.o
+[362/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rms_norm_partials.comp.cpp.o
+[363/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/roll.comp.cpp.o
+[364/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rms_norm.comp.cpp.o
+[365/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rope_multi.comp.cpp.o
+[366/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rope_neox.comp.cpp.o
+[367/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rope_norm.comp.cpp.o
+[368/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/scale.comp.cpp.o
+[369/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/silu_back.comp.cpp.o
+[370/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/rope_vision.comp.cpp.o
+[371/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/soft_max_back.comp.cpp.o
+[372/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/snake.comp.cpp.o
+[373/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/soft_max_large1.comp.cpp.o
+[374/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/soft_max_large2.comp.cpp.o
+[375/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/solve_tri.comp.cpp.o
+[376/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/soft_max_large3.comp.cpp.o
+[377/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/soft_max.comp.cpp.o
+[378/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/ssm_conv.comp.cpp.o
+[379/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/ssm_scan.comp.cpp.o
+[380/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/sum_rows.comp.cpp.o
+[381/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/swiglu.comp.cpp.o
+[382/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/sub.comp.cpp.o
+[383/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/timestep_embedding.comp.cpp.o
+[384/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/swiglu_oai.comp.cpp.o
+[385/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/topk_argsort.comp.cpp.o
+[386/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/topk_moe.comp.cpp.o
+[387/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/topk_nary_search.comp.cpp.o
+[388/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/tri.comp.cpp.o
+[389/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/upscale.comp.cpp.o
+[390/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/wkv6.comp.cpp.o
+[391/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/wkv7.comp.cpp.o
+[392/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/unary.comp.cpp.o
+[393/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mat_vec.comp.cpp.o
+[394/985] Building CXX object _deps/whispercpp-build/src/CMakeFiles/parakeet.dir/parakeet.cpp.o
+[395/985] Building CXX object _deps/whispercpp-build/examples/CMakeFiles/common.dir/common-ggml.cpp.o
+[396/985] Building CXX object _deps/whispercpp-build/examples/CMakeFiles/common.dir/grammar-parser.cpp.o
+[397/985] Building CXX object _deps/whispercpp-build/examples/CMakeFiles/common.dir/common.cpp.o
+[398/985] Building CXX object _deps/whispercpp-build/examples/bench/CMakeFiles/whisper-bench.dir/bench.cpp.o
+[399/985] Building CXX object _deps/whispercpp-build/examples/cli/CMakeFiles/whisper-cli.dir/cli.cpp.o
+[400/985] Building CXX object _deps/whispercpp-build/examples/quantize/CMakeFiles/whisper-quantize.dir/quantize.cpp.o
+[401/985] Building CXX object _deps/whispercpp-build/examples/vad-speech-segments/CMakeFiles/whisper-vad-speech-segments.dir/speech.cpp.o
+[402/985] Building CXX object _deps/whispercpp-build/examples/parakeet-cli/CMakeFiles/parakeet-cli.dir/parakeet-cli.cpp.o
+[403/985] Building CXX object _deps/whispercpp-build/examples/parakeet-quantize/CMakeFiles/parakeet-quantize.dir/parakeet-quantize.cpp.o
+[404/985] Building CXX object _deps/whispercpp-build/src/CMakeFiles/whisper.dir/whisper.cpp.o
+[405/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/audio2.cpp.o
+[406/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/backend.cpp.o
+/root/groundstation/dependencies/sttserver/sttserv/source/backend.cpp: In member function ‘bool ModelBackend::transcribe(const f32*, size_t, u32, u32)’:
+/root/groundstation/dependencies/sttserver/sttserv/source/backend.cpp:82:83: warning: unused parameter ‘sample_rate’ [-Wunused-parameter]
+   82 | bool ModelBackend::transcribe(const f32* pcm, size_t frames, u32 duration_ms, u32 sample_rate) {
+      |                                                                               ~~~~^~~~~~~~~~~
+[407/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/async_key.cpp.o
+[408/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/key_codes.cpp.o
+[409/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/backend_whisper.cpp.o
+In file included from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-cpu.h:4,
+                 from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/../include/whisper.h:5,
+                 from /root/groundstation/dependencies/sttserver/sttserv/source/backend_whisper.cpp:2:
+/root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-backend.h:417:119: warning: ‘ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t, ggml_cgraph*)’ hides constructor for ‘struct ggml_backend_graph_copy’ [-Wshadow]
+  417 |     GGML_API struct ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t backend, struct ggml_cgraph * graph);
+      |                                                                                                                       ^
+[410/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/backend_parakeet.cpp.o
+In file included from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-cpu.h:4,
+                 from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/../include/parakeet.h:5,
+                 from /root/groundstation/dependencies/sttserver/sttserv/source/backend_parakeet.cpp:2:
+/root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-backend.h:417:119: warning: ‘ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t, ggml_cgraph*)’ hides constructor for ‘struct ggml_backend_graph_copy’ [-Wshadow]
+  417 |     GGML_API struct ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t backend, struct ggml_cgraph * graph);
+      |                                                                                                                       ^
+[411/985] Building CXX object _deps/whispercpp-build/examples/CMakeFiles/common.dir/common-whisper.cpp.o
+[412/985] Building CXX object _deps/whispercpp-build/examples/server/CMakeFiles/whisper-server.dir/server.cpp.o
+[413/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/matrix_wrap.cpp.o
+[414/985] Building CXX object dependencies/sttserver/sttserv/CMakeFiles/sttserver.dir/source/cmdline.cpp.o
+[415/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/mean.dispatch.cpp.o
+[416/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/merge.dispatch.cpp.o
+[417/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/opencl/runtime/opencl_clblas.cpp.o
+[418/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/minmax.cpp.o
+[419/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/norm.cpp.o
+[420/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/opencl/runtime/opencl_clfft.cpp.o
+[421/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/opengl.cpp.o
+[422/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/opencl/runtime/opencl_core.cpp.o
+[423/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/out.cpp.o
+[424/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/ovx.cpp.o
+[425/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/parallel.cpp.o
+[426/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/ocl.cpp.o
+[427/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/parallel/parallel_openmp.cpp.o
+[428/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/parallel/parallel_tbb.cpp.o
+[429/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/parallel/parallel.cpp.o
+[430/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/pca.cpp.o
+[431/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/parallel_impl.cpp.o
+[432/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence_base64_encoding.cpp.o
+[433/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence_json.cpp.o
+[434/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence_types.cpp.o
+[435/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence.cpp.o
+[436/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence_xml.cpp.o
+[437/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/rand.cpp.o
+[438/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/persistence_yml.cpp.o
+[439/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/split.dispatch.cpp.o
+[440/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/softfloat.cpp.o
+[441/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/mul_mm.comp.cpp.o
+[442/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/stat.dispatch.cpp.o
+[443/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/stl.cpp.o
+[444/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/stat_c.cpp.o
+[445/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/tables.cpp.o
+[446/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/sum.dispatch.cpp.o
+[447/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/types.cpp.o
+[448/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/system.cpp.o
+[449/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/trace.cpp.o
+[450/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/umatrix.cpp.o
+[451/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/utils/datafile.cpp.o
+[452/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/utils/logtagconfigparser.cpp.o
+[453/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/utils/filesystem.cpp.o
+[454/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/utils/logtagmanager.cpp.o
+[455/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/opencl_kernels_core.cpp.o
+[456/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/utils/samples.cpp.o
+[457/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/src/va_intel.cpp.o
+[458/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/stat.sse4_2.cpp.o
+[459/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/mathfuncs_core.avx.cpp.o
+[460/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/mathfuncs_core.avx2.cpp.o
+[461/985] Building CXX object _deps/whispercpp-build/ggml/src/ggml-vulkan/CMakeFiles/ggml-vulkan.dir/ggml-vulkan.cpp.o
+[462/985] Linking CXX shared library bin/libggml-vulkan.so.0.15.3
+[463/985] Creating library symlink bin/libggml-vulkan.so.0 bin/libggml-vulkan.so
+[464/985] Linking CXX shared library bin/libggml.so.0.15.3
+[465/985] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[466/985] Linking CXX shared library bin/libwhisper.so.1.9.1
+[467/985] Creating library symlink bin/libwhisper.so.1 bin/libwhisper.so
+[468/985] Linking CXX shared library bin/libparakeet.so.1.9.1
+[469/985] Creating library symlink bin/libparakeet.so.1 bin/libparakeet.so
+[470/985] Linking CXX static library bin/libcommon.a
+[471/985] Linking CXX executable bin/whisper-cli
+[472/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/stat.avx2.cpp.o
+[473/985] Linking CXX executable bin/whisper-bench
+[474/985] Linking CXX executable bin/whisper-server
+[475/985] Linking CXX executable bin/whisper-quantize
+[476/985] Linking CXX executable bin/whisper-vad-speech-segments
+[477/985] Linking CXX executable bin/parakeet-cli
+[478/985] Linking CXX executable bin/parakeet-quantize
+[479/985] Linking CXX shared library bin/libsttserver.so
+[480/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/matmul.sse4_1.cpp.o
+[481/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/arithm.sse4_1.cpp.o
+[482/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/count_non_zero.avx2.cpp.o
+[483/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/has_non_zero.avx2.cpp.o
+[484/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/convert.avx2.cpp.o
+[485/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/convert_scale.avx2.cpp.o
+[486/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/merge.avx2.cpp.o
+[487/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/split.avx2.cpp.o
+[488/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/mean.avx2.cpp.o
+[489/985] Building CXX object _deps/cpp-base64-build/CMakeFiles/base64.dir/base64.cpp.o
+[490/985] Linking CXX shared library bin/libbase64.so
+[491/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/sum.avx2.cpp.o
+[492/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/arithm.avx2.cpp.o
+[493/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama.cpp.o
+[494/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-adapter.cpp.o
+[495/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-arch.cpp.o
+[496/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-cparams.cpp.o
+[497/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/matmul.avx2.cpp.o
+[498/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-batch.cpp.o
+[499/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-hparams.cpp.o
+[500/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-chat.cpp.o
+[501/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-io.cpp.o
+[502/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-impl.cpp.o
+[503/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-kv-cache-iswa.cpp.o
+[504/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-graph.cpp.o
+[505/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-memory.cpp.o
+[506/985] Building CXX object _deps/opencv-build/modules/core/CMakeFiles/opencv_core.dir/matmul.avx512_skx.cpp.o
+[507/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-context.cpp.o
+[508/985] Linking CXX shared library _deps/opencv-build/lib/libopencv_core.so.4.10.0
+[509/985] Creating library symlink _deps/opencv-build/lib/libopencv_core.so.410 _deps/opencv-build/lib/libopencv_core.so
+[510/985] Processing OpenCL kernels (imgproc)
+[511/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-kv-cache-dsa.cpp.o
+[512/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-grammar.cpp.o
+[513/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o
+[514/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-memory-hybrid-iswa.cpp.o
+[515/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/accum.cpp.o
+[516/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o
+[517/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/approx.cpp.o
+[518/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/blend.cpp.o
+[519/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/bilateral_filter.dispatch.cpp.o
+[520/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/accum.dispatch.cpp.o
+[521/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/clahe.cpp.o
+[522/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/color.cpp.o
+[523/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/canny.cpp.o
+[524/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/box_filter.dispatch.cpp.o
+[525/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/color_hsv.dispatch.cpp.o
+[526/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/colormap.cpp.o
+[527/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/color_rgb.dispatch.cpp.o
+[528/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/contours.cpp.o
+[529/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/contours_approx.cpp.o
+[530/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/color_lab.cpp.o
+[531/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/contours_common.cpp.o
+[532/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/color_yuv.dispatch.cpp.o
+[533/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/contours_link.cpp.o
+[534/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/convhull.cpp.o
+[535/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/contours_new.cpp.o
+[536/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/cornersubpix.cpp.o
+[537/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/corner.cpp.o
+[538/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/distransform.cpp.o
+[539/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/deriv.cpp.o
+[540/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/demosaicing.cpp.o
+[541/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/emd.cpp.o
+[542/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/drawing.cpp.o
+[543/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/emd_new.cpp.o
+[544/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/featureselect.cpp.o
+[545/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/gabor.cpp.o
+[546/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/floodfill.cpp.o
+[547/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/geometry.cpp.o
+[548/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/generalized_hough.cpp.o
+[549/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/hershey_fonts.cpp.o
+[550/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/grabcut.cpp.o
+[551/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/intelligent_scissors.cpp.o
+[552/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/histogram.cpp.o
+[553/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/hough.cpp.o
+[554/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/intersection.cpp.o
+[555/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/filter.dispatch.cpp.o
+[556/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/linefit.cpp.o
+[557/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/main.cpp.o
+[558/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/matchcontours.cpp.o
+[559/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/connectedcomponents.cpp.o
+[560/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/lsd.cpp.o
+[561/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/min_enclosing_triangle.cpp.o
+[562/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/moments.cpp.o
+[563/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/phasecorr.cpp.o
+[564/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/median_blur.dispatch.cpp.o
+[565/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/imgwarp.cpp.o
+[566/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/rotcalipers.cpp.o
+[567/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/samplers.cpp.o
+[568/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/segmentation.cpp.o
+[569/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/morph.dispatch.cpp.o
+[570/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/pyramids.cpp.o
+[571/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/shapedescr.cpp.o
+[572/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/spatialgradient.cpp.o
+[573/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/subdivision2d.cpp.o
+[574/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/tables.cpp.o
+[575/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/stackblur.cpp.o
+[576/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/sumpixels.dispatch.cpp.o
+[577/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/templmatch.cpp.o
+[578/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/opencl_kernels_imgproc.cpp.o
+[579/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/utils.cpp.o
+[580/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/resize.cpp.o
+[581/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/thresh.cpp.o
+[582/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/resize.sse4_1.cpp.o
+[583/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/smooth.dispatch.cpp.o
+[584/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/imgwarp.sse4_1.cpp.o
+[585/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/accum.sse4_1.cpp.o
+[586/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_hsv.sse4_1.cpp.o
+[587/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/box_filter.sse4_1.cpp.o
+[588/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_rgb.sse4_1.cpp.o
+[589/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_yuv.sse4_1.cpp.o
+[590/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/corner.avx.cpp.o
+[591/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/median_blur.sse4_1.cpp.o
+[592/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/filter.sse4_1.cpp.o
+[593/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/morph.sse4_1.cpp.o
+[594/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/imgwarp.avx2.cpp.o
+[595/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/src/resize.avx2.cpp.o
+[596/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/accum.avx.cpp.o
+[597/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/smooth.sse4_1.cpp.o
+[598/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/bilateral_filter.avx2.cpp.o
+[599/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/accum.avx2.cpp.o
+[600/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_hsv.avx2.cpp.o
+[601/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_rgb.avx2.cpp.o
+[602/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/box_filter.avx2.cpp.o
+[603/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/sumpixels.avx2.cpp.o
+[604/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/color_yuv.avx2.cpp.o
+[605/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/median_blur.avx2.cpp.o
+[606/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/filter.avx2.cpp.o
+[607/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/morph.avx2.cpp.o
+[608/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/utils.cpp.o
+[609/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_avif.cpp.o
+[610/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_base.cpp.o
+[611/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/loadsave.cpp.o
+[612/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/sumpixels.avx512_skx.cpp.o
+[613/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_exr.cpp.o
+[614/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_bmp.cpp.o
+[615/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_gdal.cpp.o
+[616/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_gdcm.cpp.o
+[617/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_hdr.cpp.o
+[618/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_jpeg2000.cpp.o
+[619/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_jpeg.cpp.o
+[620/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_pam.cpp.o
+[621/985] Building CXX object _deps/opencv-build/modules/imgproc/CMakeFiles/opencv_imgproc.dir/smooth.avx2.cpp.o
+[622/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_pfm.cpp.o
+[623/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_jpeg2000_openjpeg.cpp.o
+[624/985] Linking CXX shared library _deps/opencv-build/lib/libopencv_imgproc.so.4.10.0
+[625/985] Creating library symlink _deps/opencv-build/lib/libopencv_imgproc.so.410 _deps/opencv-build/lib/libopencv_imgproc.so
+[626/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_png.cpp.o
+[627/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_pxm.cpp.o
+[628/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_spng.cpp.o
+[629/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_tiff.cpp.o
+[630/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_sunras.cpp.o
+[631/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/grfmt_webp.cpp.o
+[632/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/bitstrm.cpp.o
+[633/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/rgbe.cpp.o
+[634/985] Building CXX object _deps/opencv-build/modules/imgcodecs/CMakeFiles/opencv_imgcodecs.dir/src/exif.cpp.o
+[635/985] Linking CXX shared library _deps/opencv-build/lib/libopencv_imgcodecs.so.4.10.0
+[636/985] Creating library symlink _deps/opencv-build/lib/libopencv_imgcodecs.so.410 _deps/opencv-build/lib/libopencv_imgcodecs.so
+[637/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/videoio_c.cpp.o
+[638/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/videoio_registry.cpp.o
+[639/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_images.cpp.o
+[640/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_mjpeg_encoder.cpp.o
+[641/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_mjpeg_decoder.cpp.o
+[642/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap.cpp.o
+[643/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/container_avi.cpp.o
+[644/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/backend_static.cpp.o
+[645/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_dc1394_v2.cpp.o
+[646/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/backend_plugin.cpp.o
+[647/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_obsensor_capture.cpp.o
+[648/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_v4l.cpp.o
+[649/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-mmap.cpp.o
+[650/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_obsensor/obsensor_uvc_stream_channel.cpp.o
+[651/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-memory-recurrent.cpp.o
+[652/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_ffmpeg.cpp.o
+[653/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-model-saver.cpp.o
+[654/985] Building CXX object _deps/opencv-build/modules/videoio/CMakeFiles/opencv_videoio.dir/src/cap_obsensor/obsensor_stream_channel_v4l2.cpp.o
+[655/985] Linking CXX shared library _deps/opencv-build/lib/libopencv_videoio.so.4.10.0
+[656/985] Creating library symlink _deps/opencv-build/lib/libopencv_videoio.so.410 _deps/opencv-build/lib/libopencv_videoio.so
+[657/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/unicode-data.cpp.o
+[658/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-quant.cpp.o
+[659/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-vocab.cpp.o
+[660/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-model-loader.cpp.o
+[661/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-sampler.cpp.o
+[662/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/afmoe.cpp.o
+[663/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/apertus.cpp.o
+[664/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/arcee.cpp.o
+[665/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/arctic.cpp.o
+[666/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/llama-model.cpp.o
+[667/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/arwkv7.cpp.o
+[668/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/baichuan.cpp.o
+[669/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/bailingmoe.cpp.o
+[670/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/bert.cpp.o
+[671/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/bailingmoe2.cpp.o
+[672/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/bitnet.cpp.o
+[673/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/bloom.cpp.o
+[674/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/chameleon.cpp.o
+[675/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/chatglm.cpp.o
+[676/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/codeshell.cpp.o
+[677/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/cogvlm.cpp.o
+[678/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/cohere2.cpp.o
+[679/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/unicode.cpp.o
+[680/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/dbrx.cpp.o
+[681/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/command-r.cpp.o
+[682/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/cohere2moe.cpp.o
+[683/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/deci.cpp.o
+[684/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/deepseek.cpp.o
+[685/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/deepseek2.cpp.o
+[686/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/deepseek2ocr.cpp.o
+[687/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/delta-net-base.cpp.o
+[688/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/deepseek32.cpp.o
+[689/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/dots1.cpp.o
+[690/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/dream.cpp.o
+[691/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/eagle3.cpp.o
+[692/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/ernie4-5-moe.cpp.o
+[693/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/ernie4-5.cpp.o
+[694/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/eurobert.cpp.o
+[695/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/exaone-moe.cpp.o
+[696/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/exaone.cpp.o
+[697/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/exaone4.cpp.o
+[698/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/falcon-h1.cpp.o
+[699/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/falcon.cpp.o
+[700/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma-embedding.cpp.o
+[701/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma.cpp.o
+[702/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma2.cpp.o
+[703/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma3.cpp.o
+[704/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma3n.cpp.o
+[705/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma4-assistant.cpp.o
+[706/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/glm-dsa.cpp.o
+[707/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gemma4.cpp.o
+[708/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/glm4-moe.cpp.o
+[709/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/glm4.cpp.o
+[710/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gpt2.cpp.o
+[711/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/gptneox.cpp.o
+[712/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/granite-hybrid.cpp.o
+[713/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/granite-moe.cpp.o
+[714/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/hunyuan-dense.cpp.o
+[715/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/grok.cpp.o
+[716/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/granite.cpp.o
+[717/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/grovemoe.cpp.o
+[718/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/hunyuan-vl.cpp.o
+[719/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/hunyuan-moe.cpp.o
+[720/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/internlm2.cpp.o
+[721/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/jais.cpp.o
+[722/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/jais2.cpp.o
+[723/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/jamba.cpp.o
+[724/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/jina-bert-v3.cpp.o
+[725/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/lfm2.cpp.o
+[726/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/jina-bert-v2.cpp.o
+[727/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/llada-moe.cpp.o
+[728/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/kimi-linear.cpp.o
+[729/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/lfm2moe.cpp.o
+[730/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/llada.cpp.o
+[731/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/llama-embed.cpp.o
+[732/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/llama.cpp.o
+[733/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/maincoder.cpp.o
+[734/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/llama4.cpp.o
+[735/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mamba-base.cpp.o
+[736/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mamba.cpp.o
+[737/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mamba2.cpp.o
+[738/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mellum.cpp.o
+[739/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/minicpm.cpp.o
+[740/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mimo2.cpp.o
+[741/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/minimax-m2.cpp.o
+[742/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/minicpm3.cpp.o
+[743/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mistral3.cpp.o
+[744/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mistral4.cpp.o
+[745/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/nemotron-h-moe.cpp.o
+[746/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/modern-bert.cpp.o
+[747/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/mpt.cpp.o
+[748/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/nemotron-h.cpp.o
+[749/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/nemotron.cpp.o
+[750/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/neo-bert.cpp.o
+[751/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/nomic-bert-moe.cpp.o
+[752/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/nomic-bert.cpp.o
+[753/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/olmo.cpp.o
+[754/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/olmo2.cpp.o
+[755/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/olmoe.cpp.o
+[756/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/openai-moe.cpp.o
+[757/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/openelm.cpp.o
+[758/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/paddleocr.cpp.o
+[759/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/orion.cpp.o
+[760/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/pangu-embed.cpp.o
+[761/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/phi2.cpp.o
+[762/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/phi3.cpp.o
+[763/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/phimoe.cpp.o
+[764/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/plamo.cpp.o
+[765/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/plamo2.cpp.o
+[766/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/plamo3.cpp.o
+[767/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/plm.cpp.o
+[768/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen.cpp.o
+[769/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen2.cpp.o
+[770/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen2moe.cpp.o
+[771/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen2vl.cpp.o
+[772/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen3.cpp.o
+[773/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen35.cpp.o
+[774/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen3moe.cpp.o
+[775/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen3next.cpp.o
+[776/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen3vl.cpp.o
+[777/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen35moe.cpp.o
+[778/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/qwen3vlmoe.cpp.o
+[779/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/refact.cpp.o
+[780/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rnd1.cpp.o
+[781/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rwkv6-base.cpp.o
+[782/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rwkv6.cpp.o
+[783/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rwkv6qwen2.cpp.o
+[784/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rwkv7-base.cpp.o
+[785/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/rwkv7.cpp.o
+[786/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/seed-oss.cpp.o
+[787/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/smallthinker.cpp.o
+[788/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/smollm3.cpp.o
+[789/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/stablelm.cpp.o
+[790/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/starcoder.cpp.o
+[791/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/starcoder2.cpp.o
+[792/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/t5encoder.cpp.o
+[793/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/step35.cpp.o
+[794/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/talkie.cpp.o
+[795/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/t5.cpp.o
+[796/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/wavtokenizer-dec.cpp.o
+[797/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common-base.dir/build-info.cpp.o
+[798/985] Linking CXX static library bin/libllama-common-base.a
+[799/985] Building CXX object _deps/llama_cpp-build/src/CMakeFiles/llama.dir/models/xverse.cpp.o
+[800/985] Linking CXX shared library bin/libllama.so.0.0.9827
+[801/985] Creating library symlink bin/libllama.so.0 bin/libllama.so
+[802/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/chat-auto-parser-helpers.cpp.o
+[803/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/chat-auto-parser-generator.cpp.o
+[804/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/console.cpp.o
+[805/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/chat-peg-parser.cpp.o
+[806/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/common.cpp.o
+[807/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/debug.cpp.o
+[808/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/chat-diff-analyzer.cpp.o
+[809/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/imatrix-loader.cpp.o
+[810/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/fit.cpp.o
+[811/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/llguidance.cpp.o
+[812/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/log.cpp.o
+[813/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/chat.cpp.o
+[814/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/ngram-map.cpp.o
+[815/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/ngram-mod.cpp.o
+[816/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/ngram-cache.cpp.o
+[817/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/hf-cache.cpp.o
+[818/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/download.cpp.o
+[819/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/reasoning-budget.cpp.o
+[820/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/arg.cpp.o
+[821/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/preset.cpp.o
+[822/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/sampling.cpp.o
+[823/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/unicode.cpp.o
+[824/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/regex-partial.cpp.o
+[825/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/lexer.cpp.o
+[826/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/speculative.cpp.o
+[827/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/json-schema-to-grammar.cpp.o
+[828/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/parser.cpp.o
+[829/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/string.cpp.o
+[830/985] Building CXX object _deps/llama_cpp-build/tools/batched-bench/CMakeFiles/llama-batched-bench-impl.dir/batched-bench.cpp.o
+[831/985] Building CXX object _deps/llama_cpp-build/tools/batched-bench/CMakeFiles/llama-batched-bench.dir/main.cpp.o
+[832/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/runtime.cpp.o
+[833/985] Building CXX object _deps/llama_cpp-build/tools/gguf-split/CMakeFiles/llama-gguf-split.dir/gguf-split.cpp.o
+[834/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/caps.cpp.o
+[835/985] Building CXX object _deps/llama_cpp-build/tools/llama-bench/CMakeFiles/llama-bench.dir/main.cpp.o
+[836/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/jinja/value.cpp.o
+[837/985] Building CXX object _deps/llama_cpp-build/tools/completion/CMakeFiles/llama-completion.dir/main.cpp.o
+[838/985] Building CXX object _deps/llama_cpp-build/common/CMakeFiles/llama-common.dir/peg-parser.cpp.o
+[839/985] Building CXX object _deps/llama_cpp-build/tools/perplexity/CMakeFiles/llama-perplexity.dir/main.cpp.o
+[840/985] Building CXX object _deps/llama_cpp-build/tools/completion/CMakeFiles/llama-completion-impl.dir/completion.cpp.o
+[841/985] Building CXX object _deps/llama_cpp-build/tools/quantize/CMakeFiles/llama-quantize.dir/main.cpp.o
+[842/985] Building CXX object _deps/llama_cpp-build/tools/imatrix/CMakeFiles/llama-imatrix.dir/imatrix.cpp.o
+[843/985] Building CXX object _deps/llama_cpp-build/tools/perplexity/CMakeFiles/llama-perplexity-impl.dir/perplexity.cpp.o
+[844/985] Building CXX object _deps/llama_cpp-build/tools/cli/CMakeFiles/llama-cli.dir/main.cpp.o
+[845/985] Building CXX object _deps/llama_cpp-build/tools/quantize/CMakeFiles/llama-quantize-impl.dir/quantize.cpp.o
+[846/985] Building CXX object _deps/llama_cpp-build/tools/ui/CMakeFiles/llama-ui-embed.dir/embed.cpp.o
+[847/985] Linking CXX executable _deps/llama_cpp-build/tools/ui/llama-ui-embed
+[848/985] Provisioning UI assets
+-- UI: downloading from b9827: https://huggingface.co/buckets/ggml-org/llama-ui/resolve/b9827/dist.tar.gz
+-- UI: archive verified and extracted
+-- UI: HF download succeeded, stamp updated (b9827)
+-- UI: gzip compression applied (/root/groundstation/build/release/shared/_deps/llama_cpp-build/tools/ui/dist/_gzip)
+embed: write output file /root/groundstation/build/release/shared/_deps/llama_cpp-build/tools/ui/ui.h
+embed: write output file /root/groundstation/build/release/shared/_deps/llama_cpp-build/tools/ui/ui.cpp
+[849/985] Building CXX object _deps/llama_cpp-build/tools/llama-bench/CMakeFiles/llama-bench-impl.dir/llama-bench.cpp.o
+[850/985] Building CXX object _deps/llama_cpp-build/tools/cli/CMakeFiles/llama-cli-impl.dir/cli.cpp.o
+[851/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-queue.cpp.o
+[852/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-chat.cpp.o
+[853/985] Building CXX object _deps/llama_cpp-build/tools/ui/CMakeFiles/llama-ui.dir/ui.cpp.o
+[854/985] Linking CXX static library bin/libllama-ui.a
+[855/985] Building CXX object _deps/llama_cpp-build/vendor/cpp-httplib/CMakeFiles/cpp-httplib.dir/httplib.cpp.o
+[856/985] Linking CXX static library bin/libcpp-httplib.a
+[857/985] Linking CXX shared library bin/libllama-common.so.0.0.9827
+[858/985] Creating library symlink bin/libllama-common.so.0 bin/libllama-common.so
+[859/985] Linking CXX shared library bin/libllama-batched-bench-impl.so
+[860/985] Linking CXX executable bin/llama-batched-bench
+[861/985] Linking CXX executable bin/llama-gguf-split
+[862/985] Linking CXX executable bin/llama-imatrix
+[863/985] Linking CXX shared library bin/libllama-bench-impl.so
+[864/985] Linking CXX executable bin/llama-bench
+[865/985] Linking CXX shared library bin/libllama-completion-impl.so
+[866/985] Linking CXX executable bin/llama-completion
+[867/985] Linking CXX shared library bin/libllama-perplexity-impl.so
+[868/985] Linking CXX executable bin/llama-perplexity
+[869/985] Linking CXX shared library bin/libllama-quantize-impl.so
+[870/985] Linking CXX executable bin/llama-quantize
+[871/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-task.cpp.o
+[872/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-stream.cpp.o
+[873/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-common.cpp.o
+[874/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-schema.cpp.o
+[875/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/llama-server.dir/main.cpp.o
+[876/985] Building CXX object _deps/llama_cpp-build/tools/tokenize/CMakeFiles/llama-tokenize.dir/tokenize.cpp.o
+[877/985] Linking CXX executable bin/llama-tokenize
+[878/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-tools.cpp.o
+[879/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/llama-server-impl.dir/server.cpp.o
+[880/985] Building CXX object _deps/llama_cpp-build/tools/parser/CMakeFiles/llama-debug-template-parser.dir/debug-template-parser.cpp.o
+[881/985] Linking CXX executable bin/llama-debug-template-parser
+[882/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/llama-server-impl.dir/server-http.cpp.o
+[883/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/server-context.dir/server-context.cpp.o
+[884/985] Building CXX object _deps/llama_cpp-build/tools/parser/CMakeFiles/llama-template-analysis.dir/template-analysis.cpp.o
+[885/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/mtmd-audio.cpp.o
+[886/985] Linking CXX executable bin/llama-template-analysis
+[887/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/mtmd.cpp.o
+[888/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/mtmd-image.cpp.o
+[889/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/cogvlm.cpp.o
+[890/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/conformer.cpp.o
+[891/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/dotsocr.cpp.o
+[892/985] Building CXX object _deps/llama_cpp-build/tools/server/CMakeFiles/llama-server-impl.dir/server-models.cpp.o
+[893/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/exaone4_5.cpp.o
+[894/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4a.cpp.o
+[895/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4v.cpp.o
+[896/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4ua.cpp.o
+[897/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4uv.cpp.o
+[898/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/glm4v.cpp.o
+[899/985] Building CXX object _deps/llama_cpp-build/tools/tts/CMakeFiles/llama-tts.dir/tts.cpp.o
+[900/985] Linking CXX executable bin/llama-tts
+[901/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/granite-speech.cpp.o
+[902/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/hunyuanvl.cpp.o
+[903/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/granite4-vision.cpp.o
+[904/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/internvl.cpp.o
+[905/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/kimivl.cpp.o
+[906/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/kimik25.cpp.o
+[907/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/nemotron-v2-vl.cpp.o
+[908/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/llama4.cpp.o
+[909/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/llava.cpp.o
+[910/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/minicpmv.cpp.o
+[911/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/clip.cpp.o
+[912/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/paddleocr.cpp.o
+[913/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/pixtral.cpp.o
+[914/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/qwen2vl.cpp.o
+[915/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3vl.cpp.o
+[916/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3a.cpp.o
+[917/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/mimovl.cpp.o
+[918/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/step3vl.cpp.o
+[919/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/siglip.cpp.o
+[920/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/whisper-enc.cpp.o
+[921/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/deepseekocr2.cpp.o
+[922/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/deepseekocr.cpp.o
+[923/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/mobilenetv5.cpp.o
+[924/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-llava-cli.dir/deprecation-warning.cpp.o
+[925/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-gemma3-cli.dir/deprecation-warning.cpp.o
+[926/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-minicpmv-cli.dir/deprecation-warning.cpp.o
+[927/985] Linking CXX executable bin/llama-llava-cli
+[928/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-qwen2vl-cli.dir/deprecation-warning.cpp.o
+[929/985] Linking CXX executable bin/llama-gemma3-cli
+[930/985] Linking CXX executable bin/llama-minicpmv-cli
+[931/985] Linking CXX executable bin/llama-qwen2vl-cli
+[932/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/youtuvl.cpp.o
+[933/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/models/yasa2.cpp.o
+[934/985] Building CXX object _deps/llama_cpp-build/tools/fit-params/CMakeFiles/llama-fit-params-impl.dir/fit-params.cpp.o
+[935/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-mtmd-debug.dir/debug/mtmd-debug.cpp.o
+[936/985] Building CXX object _deps/llama_cpp-build/tools/fit-params/CMakeFiles/llama-fit-params.dir/main.cpp.o
+[937/985] Linking CXX shared library bin/libllama-fit-params-impl.so
+[938/985] Linking CXX executable bin/llama-fit-params
+[939/985] Building CXX object _deps/llama_cpp-build/tools/export-lora/CMakeFiles/llama-export-lora.dir/export-lora.cpp.o
+[940/985] Building CXX object _deps/llama_cpp-build/tools/cvector-generator/CMakeFiles/llama-cvector-generator.dir/cvector-generator.cpp.o
+[941/985] Linking CXX executable bin/llama-export-lora
+[942/985] Linking CXX executable bin/llama-cvector-generator
+[943/985] Building CXX object src/groundstation/model_roaming/CMakeFiles/ros2_vlmnav_keyboard_input.dir/key_codes.cpp.o
+[944/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/mtmd.dir/mtmd-helper.cpp.o
+[945/985] Linking CXX shared library bin/libmtmd.so.0.0.9827
+[946/985] Creating library symlink bin/libmtmd.so.0 bin/libmtmd.so
+[947/985] Linking CXX static library bin/libserver-context.a
+[948/985] Linking CXX shared library bin/libllama-cli-impl.so
+[949/985] Linking CXX executable bin/llama-cli
+[950/985] Building CXX object _deps/llama_cpp-build/tools/mtmd/CMakeFiles/llama-mtmd-cli.dir/mtmd-cli.cpp.o
+[951/985] Building CXX object _deps/llama_cpp-build/tools/results/CMakeFiles/llama-results.dir/results.cpp.o
+[952/985] Linking CXX shared library bin/libllama-server-impl.so
+[953/985] Linking CXX executable bin/llama-mtmd-cli
+[954/985] Linking CXX executable bin/llama-mtmd-debug
+[955/985] Linking CXX executable bin/llama-results
+[956/985] Linking CXX executable bin/llama-server
+[957/985] Building CXX object src/groundstation/model_roaming/CMakeFiles/ros2_vlmnav_keyboard_input.dir/async_key.cpp.o
+[958/985] Building CXX object src/groundstation/ros2_test/CMakeFiles/ros2_example.dir/main.cpp.o
+[959/985] Building CXX object src/groundstation/ros2_test/CMakeFiles/ros2_example.dir/cmd.cpp.o
+[960/985] Building CXX object src/groundstation/test_keyboardctrl/CMakeFiles/px4_ros2_keyboard.dir/key_codes.cpp.o
+[961/985] Building CXX object src/groundstation/model_roaming/CMakeFiles/ros2_vlmnav_keyboard_input.dir/px4_keyboard.cpp.o
+[962/985] Linking CXX executable bin/ros2_vlmnav_keyboard_input
+[963/985] Building CXX object src/groundstation/free_roam/CMakeFiles/ros2_node_keyboard_input.dir/key_codes.cpp.o
+[964/985] Building CXX object src/groundstation/test_keyboardctrl/CMakeFiles/px4_ros2_keyboard.dir/async_key.cpp.o
+[965/985] Building CXX object src/groundstation/ros2_test/CMakeFiles/ros2_example.dir/offboard.cpp.o
+[966/985] Linking CXX executable bin/ros2_example
+[967/985] Building CXX object src/groundstation/free_roam/CMakeFiles/ros2_node_keyboard_input.dir/async_key.cpp.o
+[968/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_keyboard_input.dir/key_codes.cpp.o
+[969/985] Building CXX object src/groundstation/test_keyboardctrl/CMakeFiles/px4_ros2_keyboard.dir/main.cpp.o
+[970/985] Linking CXX executable bin/px4_ros2_keyboard
+[971/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_keyboard_input.dir/async_key.cpp.o
+[972/985] Building CXX object src/groundstation/free_roam/CMakeFiles/ros2_node_keyboard_input.dir/px4_keyboard.cpp.o
+[973/985] Linking CXX executable bin/ros2_node_keyboard_input
+[974/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/__/__/__/dependencies/sttserver/sttserv/source/backend_whisper.cpp.o
+In file included from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-cpu.h:4,
+                 from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/../include/whisper.h:5,
+                 from /root/groundstation/dependencies/sttserver/sttserv/source/backend_whisper.cpp:2:
+/root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-backend.h:417:119: warning: ‘ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t, ggml_cgraph*)’ hides constructor for ‘struct ggml_backend_graph_copy’ [-Wshadow]
+  417 |     GGML_API struct ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t backend, struct ggml_cgraph * graph);
+      |                                                                                                                       ^
+[975/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/__/__/__/dependencies/sttserver/sttserv/source/backend_parakeet.cpp.o
+In file included from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-cpu.h:4,
+                 from /root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/../include/parakeet.h:5,
+                 from /root/groundstation/dependencies/sttserver/sttserv/source/backend_parakeet.cpp:2:
+/root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include/ggml-backend.h:417:119: warning: ‘ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t, ggml_cgraph*)’ hides constructor for ‘struct ggml_backend_graph_copy’ [-Wshadow]
+  417 |     GGML_API struct ggml_backend_graph_copy ggml_backend_graph_copy(ggml_backend_t backend, struct ggml_cgraph * graph);
+      |                                                                                                                       ^
+[976/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/fat_asr.cpp.o
+FAILED: src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/fat_asr.cpp.o 
+/usr/bin/ccache /usr/bin/c++ -DDEFAULT_RMW_IMPLEMENTATION=rmw_fastrtps_cpp -DFASTCDR_DYN_LINK -DGGML_BACKEND_SHARED -DGGML_SHARED -DGGML_USE_CPU -DGGML_USE_VULKAN -DSTTSERVER_BUILD_LIBRARY_BACKEND_WHISPER=1 -DSTTSERVER_EXPORTS -DUTIL2_EXPORTS -I/root/groundstation/dependencies/util2/include -I/root/groundstation/dependencies/sttserver/dependencies/cxxopts/include -I/root/groundstation/dependencies/sttserver/sttserv/include -I/root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/. -I/root/groundstation/dependencies/sttserver/dependencies/whispercpp/src/../include -I/root/groundstation/dependencies/sttserver/dependencies/whispercpp/ggml/src/../include -I/root/groundstation/dependencies/sttserver/dependencies/miniaudio -isystem /opt/ros/jazzy/include/rclcpp -isystem /opt/ros/jazzy/include/builtin_interfaces -isystem /opt/ros/jazzy/include/rosidl_runtime_c -isystem /opt/ros/jazzy/include/rcutils -isystem /opt/ros/jazzy/include/rosidl_typesupport_interface -isystem /opt/ros/jazzy/include/fastcdr -isystem /opt/ros/jazzy/include/rosidl_runtime_cpp -isystem /opt/ros/jazzy/include/rosidl_typesupport_fastrtps_cpp -isystem /opt/ros/jazzy/include/rmw -isystem /opt/ros/jazzy/include/rosidl_dynamic_typesupport -isystem /opt/ros/jazzy/include/rosidl_typesupport_fastrtps_c -isystem /opt/ros/jazzy/include/rosidl_typesupport_introspection_c -isystem /opt/ros/jazzy/include/rosidl_typesupport_introspection_cpp -isystem /opt/ros/jazzy/include/libstatistics_collector -isystem /opt/ros/jazzy/include/rcl -isystem /opt/ros/jazzy/include/rcl_interfaces -isystem /opt/ros/jazzy/include/service_msgs -isystem /opt/ros/jazzy/include/rcl_logging_interface -isystem /opt/ros/jazzy/include/rcl_yaml_param_parser -isystem /opt/ros/jazzy/include/type_description_interfaces -isystem /opt/ros/jazzy/include/rcpputils -isystem /opt/ros/jazzy/include/statistics_msgs -isystem /opt/ros/jazzy/include/rosgraph_msgs -isystem /opt/ros/jazzy/include/rosidl_typesupport_cpp -isystem /opt/ros/jazzy/include/rosidl_typesupport_c -isystem /opt/ros/jazzy/include/tracetools -isystem /opt/px4_ws/install/px4_msgs/include/px4_msgs -isystem /opt/ros/jazzy/include/geometry_msgs -isystem /opt/ros/jazzy/include/std_msgs -O3 -DNDEBUG -fPIE -fdiagnostics-color=always -Wall -Wextra -Wshadow -Wfloat-equal -Wconversion -Wformat=2 -pedantic -pedantic-errors -fstrict-aliasing -Wold-style-cast -Wnon-virtual-dtor -Woverloaded-virtual -MD -MT src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/fat_asr.cpp.o -MF src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/fat_asr.cpp.o.d -o src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_asr_server.dir/fat_asr.cpp.o -c /root/groundstation/src/groundstation/speech_to_action/fat_asr.cpp
+/root/groundstation/src/groundstation/speech_to_action/fat_asr.cpp: In function ‘float get_transcription_confidence(parakeet_context*)’:
+/root/groundstation/src/groundstation/speech_to_action/fat_asr.cpp:244:25: error: ‘parakeet_full_n_segments’ was not declared in this scope
+  244 |     for (int s = 0; s < parakeet_full_n_segments(ctx); ++s) {
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~
+/root/groundstation/src/groundstation/speech_to_action/fat_asr.cpp:245:29: error: ‘parakeet_full_n_tokens’ was not declared in this scope
+  245 |         for (int t = 0; t < parakeet_full_n_tokens(ctx, s); ++t, ++cnt) {
+      |                             ^~~~~~~~~~~~~~~~~~~~~~
+/root/groundstation/src/groundstation/speech_to_action/fat_asr.cpp:246:20: error: ‘parakeet_full_get_token_data’ was not declared in this scope
+  246 |             sum += parakeet_full_get_token_data(ctx, s, t).plog;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[977/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_keyboard_input.dir/px4_keyboard.cpp.o
+[978/985] Building CXX object src/groundstation/model_roaming/CMakeFiles/ros2_vlmnav_offboard_mode.dir/offboard.cpp.o
+[979/985] Building CXX object src/groundstation/free_roam/CMakeFiles/ros2_node_offboard_mode.dir/offboard.cpp.o
+[980/985] Building CXX object src/groundstation/speech_to_action/CMakeFiles/ros2_speech_to_action_offboard_mode.dir/offboard.cpp.o
+ninja: build stopped: subcommand failed.

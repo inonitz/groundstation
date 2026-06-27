@@ -26,7 +26,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     cxxopts::cxxopts
     rclcpp::rclcpp
     px4_msgs::px4_msgs__rosidl_typesupport_cpp
-    Eigen3::Eigen
+    # Eigen3::Eigen
     # WORKSPACE_CONFIG::ProjectDefaultConfig
 )
 

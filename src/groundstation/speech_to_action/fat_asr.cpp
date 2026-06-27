@@ -239,12 +239,12 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
 }
 
 
-float get_transcription_confidence(struct parakeet_context* ctx) {
-    float sum = 0; int cnt = 0;
-    for (int s = 0; s < parakeet_full_n_segments(ctx); ++s) {
-        for (int t = 0; t < parakeet_full_n_tokens(ctx, s); ++t, ++cnt) {
-            sum += parakeet_full_get_token_data(ctx, s, t).plog;
-        }
-    }
-    return cnt == 0 ? 0.0f : std::exp(sum / static_cast<f32>(cnt));
-}
+// float get_transcription_confidence(struct parakeet_context* ctx) {
+//     float sum = 0; int cnt = 0;
+//     for (int s = 0; s < parakeet_full_n_segments(ctx); ++s) {
+//         for (int t = 0; t < parakeet_full_n_tokens(ctx, s); ++t, ++cnt) {
+//             sum += parakeet_full_get_token_data(ctx, s, t).plog;
+//         }
+//     }
+//     return cnt == 0 ? 0.0f : std::exp(sum / static_cast<f32>(cnt));
+// }
