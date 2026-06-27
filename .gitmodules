@@ -31,9 +31,8 @@
 
 [submodule "dependencies/util2"]
 	path = dependencies/util2
-	url = https://github.com/inonitz/util2.git
+	url = https://github.com/inonitz/util2
 	branch = main
-
 [submodule "dependencies/sttserver"]
 	path = dependencies/sttserver
 	url = https://github.com/inonitz/sttserv
