@@ -141,7 +141,7 @@ if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     
     # Safely fallback to 1 core if nproc fails or is missing
     CORES=$(nproc 2>/dev/null || echo 1)
-    JOBS=$(( CORES / 2 > 0 ? CORES / 2 : 1 ))
+    JOBS=$(( CORES > 2 ? CORES - 2 : 1 ))
     
     ninja "$PROJECT_NAME" -j$JOBS
 fi

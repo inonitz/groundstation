@@ -1,9 +1,12 @@
 #!/bin/sh
-HostPath="$HOME/workspaces/groundstation"
-ContainerPath="/root/groundstation"
+HostPathProjectPath="$HOME/workspaces/groundstation"
+ContainerPathProjectPath="/root/groundstation"
 
-HostModelDirPath="$HOME/workspaces/sttserv/dependencies/models"
-ContainerModelDirPath="/root/models"
+HostPathASRModel="$HOME/models/asr"
+ContainerPathASRModelPath="/root/models/asr"
+
+HostPathVLMModel="$HOME/models/vlm"
+ContainerPathVLMModelPath="/root/models/vlm"
 
 # Clear existing positional parameters
 set --
@@ -27,7 +30,7 @@ set -- "$@" --gpus=all
 set -- "$@" --net=host
 
 # Local Devenv Folder Mount
-set -- "$@" -v "${HostPath}:${ContainerPath}"
+set -- "$@" -v "${HostPathProjectPath}:${ContainerPathProjectPath}"
 
 # Mount the Audio Device (For ASR Testing, Native Linux)
 set -- "$@" -v "/run/user/$(id -u)/pulse/native:/tmp/pulse-socket"
@@ -35,7 +38,10 @@ set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
 
 # Mount the ASR Model Path
-set -- "$@" -v "${HostModelDirPath}:${ContainerModelDirPath}"
+set -- "$@" -v "${HostPathASRModel}:${ContainerPathASRModelPath}"
+
+# Mount the VLM Model Path
+set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
 
 # Mount GPU Direct Rendering Infrastructure (DRI) nodes
 set -- "$@" --device "/dev/dri"

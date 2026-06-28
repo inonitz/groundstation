@@ -155,9 +155,8 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
 
         RCLCPP_INFO(this->get_logger(), "[WORKER] Woken up. Data ready. Processing...");
         m_audioDataReady = false;
-        
-        // RELEASE LOCK BEFORE RUNNING TRANSCRIBE TO PREVENT STARVATION
         lock.unlock();
+
 
         availableFrames = ma_pcm_rb_available_read(m_audioMan.ringBufferHandle());
         // printf("[DEBUG] Available frames in RB: %u\n", availableFrames);

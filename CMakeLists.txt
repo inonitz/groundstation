@@ -41,8 +41,9 @@ declare_optional_interface_default_project_configuration()
 # ROS 2 Dependencies
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
 find_package(px4_msgs REQUIRED)
-
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -58,53 +59,60 @@ add_subdirectory(dependencies/sttserver)
 # ---------------------------------------------------------------------------
 # Migrated VLMNav CPM Remote Dependencies
 # ---------------------------------------------------------------------------
-safe_cpm_add_package(
-    NAME opencv
-    GIT_REPOSITORY https://github.com/opencv/opencv.git
-    GIT_TAG        4.10.0
-    OPTIONS
-        "BUILD_LIST core,imgproc,videoio,imgcodecs"
-        "WITH_IPP OFF"
-        "WITH_GUI OFF"
-        "WITH_TIFF OFF"
-        "WITH_OPENEXR OFF"
-        "BUILD_opencv_apps OFF"
-        "BUILD_opencv_python2 OFF"
-        "BUILD_opencv_python3 OFF"
-        "BUILD_JAVA OFF"
-        "BUILD_TESTS OFF"
-        "BUILD_PERF_TESTS OFF"
-        "BUILD_EXAMPLES OFF"
-)
+# This would be required on a system without ROS2.
+# Since this is meant for a ROS2 Distribution, this isn't relevant for now
+# safe_cpm_add_package(
+#     NAME opencv
+#     URL https://github.com/opencv/opencv/archive/refs/tags/4.10.0.zip
+#     OPTIONS
+#         "BUILD_LIST core,imgproc,videoio,imgcodecs,highgui"
+#         "WITH_IPP OFF"
+#         "WITH_GUI OFF"
+#         "WITH_TIFF OFF"
+#         "WITH_OPENEXR OFF"
+#         "BUILD_opencv_apps OFF"
+#         "BUILD_opencv_python2 OFF"
+#         "BUILD_opencv_python3 OFF"
+#         "BUILD_JAVA OFF"
+#         "BUILD_TESTS OFF"
+#         "BUILD_PERF_TESTS OFF"
+#         "BUILD_EXAMPLES OFF"
+# )
+
 
 safe_cpm_add_package(
     NAME cpp-httplib
     GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
     GIT_TAG        v0.18.0
+    GIT_SHALLOW    TRUE
 )
 
 safe_cpm_add_package(
     NAME cpp-base64
     GIT_REPOSITORY https://github.com/inonitz/cpp-base64.git
     GIT_TAG        feature-cmake
+    GIT_SHALLOW    TRUE
 )
 
 safe_cpm_add_package(
     NAME cxxopts
     GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
     GIT_TAG        v3.2.0
+    GIT_SHALLOW    TRUE
 )
 
 safe_cpm_add_package(
     NAME nlohmann_json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG        v3.11.3
+    GIT_SHALLOW    TRUE
 )
 
 safe_cpm_add_package(
     NAME llama_cpp
     GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
     GIT_TAG        master
+    GIT_SHALLOW    TRUE
     OPTIONS
         "LLAMA_BUILD_EXAMPLES OFF"
         "LLAMA_BUILD_COMMON ON"
