@@ -53,10 +53,11 @@ set(ASR_SERVER_NODE_SOURCES
    fat_asr.cpp
 )
 
+
 define_ros2_node(keyboard_input "${KEYBOARD_NODE_SOURCES}")
 define_ros2_node(offboard_mode "${OFFBOARD_CONTROL_NODE_SOURCES}")
 define_ros2_node(asr_server "${ASR_SERVER_NODE_SOURCES}")
-target_link_libraries(ros2_speech_to_action_asr_server PRIVATE
+target_link_libraries(${PROJECT_NAME}_asr_server PRIVATE
    STTSERVER::SpeechToTextServer
 )
 

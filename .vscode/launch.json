@@ -8,15 +8,9 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Windows, Static)",
-            "program": "${workspaceFolder}/build/debug/static/bin/sttserver_sandbox",
-            "args": [
-                "--model=dependencies/models/ivrit-ai-whisper-large-v3-turbo/ggml-model-q8.bin",
-                "--fa",
-                "--language=he",
-                "--translate",
-                "--threads=1"
-            ],
+            "name": "LLDB (Static)",
+            "program": "${workspaceFolder}/build/debug/static/bin/unified_example",
+            "args": [],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
             "initCommands": [
@@ -27,41 +21,9 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "LLDB (Windows, DLL)",
-            "program": "${workspaceFolder}/build/debug/shared/bin/sttserver_sandbox",
+            "name": "LLDB (Shared)",
+            "program": "${workspaceFolder}/build/debug/shared/bin/unified_example",
             "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        // Linux Debug Tests
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug)",
-            "program": "${workspaceFolder}/build/debug/static/bin/sttserver_sandbox",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "initCommands": [ "settings set target.process.follow-fork-mode child" ]
-        },
-
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "LLDB (Linux-x86_64-Static-Debug) (Parakeet)",
-            "program": "${workspaceFolder}/build/debug/static/bin/ros2_speech_to_action_asr_server",
-            "args": [
-                "--model=/root/models/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-f32.bin",
-                "--backend=whisper-parakeet",
-                "--fa",
-                "--language=en",
-                "--threads=2",
-                "--gid=0",
-                "--captureid=2",
-                "--playbackid=7",
-            ],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
             "initCommands": [ "settings set target.process.follow-fork-mode child" ]

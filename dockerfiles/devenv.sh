@@ -48,6 +48,8 @@ set -- "$@" --device "/dev/dri"
 
 # Mount NVIDIA Vulkan Driver description file (Surgical fix for Vulkan loader)
 set -- "$@" -v "/usr/share/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json:ro"
+# Mount NVIDIA EGL Driver description file (Surgical fix for EGL loader)
+set -- "$@" -v "/usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json:ro"
 
 # VSCode Extensions
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"

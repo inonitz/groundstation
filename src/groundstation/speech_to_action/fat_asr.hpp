@@ -90,6 +90,7 @@ public:
             }
         );
 
+
         m_worker = std::thread(&ASRStandaloneNode::audioProcessingConsumerThread, this);
         return;
     }

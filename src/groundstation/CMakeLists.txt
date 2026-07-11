@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
-project(px4_ros2_workspace C CXX)
+project(ros2_workspace C CXX)
 
 
-
-add_subdirectory(model_roaming)
-add_subdirectory(ros2_test)
-add_subdirectory(test_keyboardctrl)
 add_subdirectory(free_roam)
 add_subdirectory(speech_to_action)
-
-# add_subdirectory()
+add_subdirectory(gst_rx)
 

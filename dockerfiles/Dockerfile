@@ -3,8 +3,6 @@ FROM osrf/ros:jazzy-desktop
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 1. CONSOLIDATED APT LAYER 
-# (Base tools, Windows GUI deps, Dev tools, and Ninja all in one cache hit)
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -27,6 +25,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     clang-format \
     ninja-build \
     tmux \
+    libgstreamer1.0-dev \
+    gstreamer1.0-tools \
+    libgstreamer-plugins-base1.0-dev \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Cache Gazebo apt packages

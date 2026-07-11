@@ -8,6 +8,7 @@ else()
 endif()
 
 # 1. Include Utility Headers
+include(ExternalProject)
 include(cmake/FetchCPM.cmake)
 include(cmake/SubmoduleUpdate.cmake)
 include(cmake/UseCCache.cmake)
@@ -15,12 +16,16 @@ include(cmake/ColouredOutput.cmake)
 include(cmake/OutputDir.cmake)
 include(cmake/WorkspaceOptions.cmake)
 include(cmake/BuildDiagnostics.cmake)
+include(cmake/FetchLLamaCPP.cmake)
+include(cmake/FindGStreamer.cmake)
 include_cpm()
+
 
 enable_coloured_diagnostics_if_available()
 use_ccache_program_if_exists()
 define_aggregate_output_artifact_directory()
 update_submodules_on_cmake_configure("dependencies")
+
 
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS      "Enable AddressSanitizer"                       OFF)
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_UNDEFINED    "Enable UndefinedBehaviorSanitizer"             OFF)
@@ -37,13 +42,15 @@ endif()
 declare_optional_interface_library_different_sanitizers()
 declare_optional_interface_library_lto()
 declare_optional_interface_default_project_configuration()
+define_library_fetch_of_llama_cpp_with_external_project()
+define_library_fetch_of_gstreamer()
 
 # ROS 2 Dependencies
-find_package(rclcpp REQUIRED)
+find_package(rclcpp        REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(cv_bridge REQUIRED)
-find_package(px4_msgs REQUIRED)
+find_package(sensor_msgs   REQUIRED)
+find_package(cv_bridge     REQUIRED)
+find_package(px4_msgs      REQUIRED)
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -52,8 +59,35 @@ find_package(px4_msgs REQUIRED)
 # Reserving the order between "Migrated VLMNav" & "Local Subdirectories"
 # will cause a duplicate target error
 # ---------------------------------------------------------------------------
-add_subdirectory(dependencies/util2)
-add_subdirectory(dependencies/sttserver)
+# add_subdirectory(dependencies/util2)
+# add_subdirectory(dependencies/sttserver)
+
+
+safe_cpm_add_package(
+    NAME sttserver
+    GIT_REPOSITORY https://github.com/inonitz/sttserv.git
+    GIT_TAG        feature-multimodel
+    GIT_SHALLOW    TRUE
+    OPTIONS
+        "STTSERVER_FORCE_COLOURED_OUTPUT OFF"
+        "STTSERVER_ENABLE_SANITIZER_ADDRESS OFF"
+        "STTSERVER_ENABLE_SANITIZER_UNDEFINED OFF"
+        "STTSERVER_ENABLE_SANITIZER_MEMORY OFF"
+        "STTSERVER_ENABLE_LINK_TIME_OPTIMIZATION OFF"
+        "STTSERVER_BUILD_LIBRARY_BACKEND_WHISPER ON"
+        "STTSERVER_BUILD_LIBRARY_BACKEND_SHERPA_ONNX OFF"
+        "STTSERVER_BUILD_LIBRARY ON"
+        "STTSERVER_BUILD_TESTS OFF"
+        "STTSERVER_BUILD_BENCHMARKS OFF"
+)
+
+
+safe_cpm_add_package(
+    NAME util2
+    GIT_REPOSITORY https://github.com/inonitz/util2.git
+    GIT_TAG        main
+    GIT_SHALLOW    TRUE
+)
 
 
 # ---------------------------------------------------------------------------
@@ -108,27 +142,27 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
-safe_cpm_add_package(
-    NAME llama_cpp
-    GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
-    GIT_TAG        master
-    GIT_SHALLOW    TRUE
-    OPTIONS
-        "LLAMA_BUILD_EXAMPLES OFF"
-        "LLAMA_BUILD_COMMON ON"
-        "LLAMA_BUILD_SERVER ON"
-        "LLAMA_BUILD_TOOLS ON"
-        "LLAMA_BUILD_UI OFF"
-        "LLAMA_LLGUIDANCE OFF"
-        "NO_ISA_EXTENSIONS ON"
-        "GGML_VULKAN ON"
-        "GGML_CUDA OFF"
-        "GGML_METAL OFF"
-        "GGML_MUSA OFF"
-        "GGML_SYCL OFF"
-        "BUILD_GMOCK OFF"
-        "INSTALL_GTEST OFF"
-)
+# safe_cpm_add_package(
+#     NAME llama_cpp
+#     GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
+#     GIT_TAG        master
+#     GIT_SHALLOW    TRUE
+#     OPTIONS
+#         "LLAMA_BUILD_EXAMPLES OFF"
+#         "LLAMA_BUILD_COMMON ON"
+#         "LLAMA_BUILD_SERVER ON"
+#         "LLAMA_BUILD_TOOLS ON"
+#         "LLAMA_BUILD_UI OFF"
+#         "LLAMA_LLGUIDANCE OFF"
+#         "NO_ISA_EXTENSIONS ON"
+#         "GGML_VULKAN ON"
+#         "GGML_CUDA OFF"
+#         "GGML_METAL OFF"
+#         "GGML_MUSA OFF"
+#         "GGML_SYCL OFF"
+#         "BUILD_GMOCK OFF"
+#         "INSTALL_GTEST OFF"
+# )
 
 
 # ---------------------------------------------------------------------------
@@ -137,4 +171,5 @@ safe_cpm_add_package(
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(src/groundstation)
     add_subdirectory(src/nav) # Temporary until modularization
+    add_subdirectory(src/gz_cam_plugin)
 endif()
