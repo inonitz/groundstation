@@ -1,26 +1,26 @@
-#include "offboard.hpp"
+#include "offboard_node.hpp"
 
 
 void OffboardControl::arm(bool armTrueDisarmFalse)
 {
 	RCLCPP_INFO(this->get_logger(), "Sending Arm Command: %d", armTrueDisarmFalse);
     
-	DroneCmdParamList list{};
+	DroneCmdParamListType list{};
 	// 1.0 = ARM. 0.0 = DISARM. // https://github.com/PX4/px4_msgs/blob/main/msg/VehicleCommand.msg
     list[0] = armTrueDisarmFalse ? 1.0f : 0.0f;
-    publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_COMPONENT_ARM_DISARM, list);
+    publish_vehicle_cmd(DroneCmdType::VEHICLE_CMD_COMPONENT_ARM_DISARM, list);
 }
 
 void OffboardControl::takeoff()
 {
 	RCLCPP_INFO(this->get_logger(), "Setting Offboard Mode...");
 
-    DroneCmdParamList list{};
+    DroneCmdParamListType list{};
     // Set custom mode to PX4_CUSTOM_MAIN_MODE_OFFBOARD (6)
 	// https://docs.px4.io/main/en/ros/ros2_offboard_control.html
     list[0] = 1.0f; // VEHICLE_MODE_FLAG_CUSTOM_MODE_ENABLED
     list[1] = 6.0f; // PX4_CUSTOM_MAIN_MODE_OFFBOARD
-    publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_DO_SET_MODE, list);
+    publish_vehicle_cmd(DroneCmdType::VEHICLE_CMD_DO_SET_MODE, list);
 }
 
 void OffboardControl::land()
@@ -28,17 +28,17 @@ void OffboardControl::land()
 	RCLCPP_INFO(this->get_logger(), "Sending Vehicle Command: LAND");
 
 	// https://github.com/PX4/px4_msgs/blob/main/msg/VehicleCommand.msg
-    DroneCmdParamList list{};
-    publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_NAV_LAND, list);
+    DroneCmdParamListType list{};
+    publish_vehicle_cmd(DroneCmdType::VEHICLE_CMD_NAV_LAND, list);
 }
 
 void OffboardControl::force_disarm()
 {
     RCLCPP_INFO(this->get_logger(), "Executing FORCE DISARM.");
-    DroneCmdParamList list{};
+    DroneCmdParamListType list{};
     list[0] = 0.0f;     // 0.0 = DISARM
     list[1] = 21196.0f; // Magic number to bypass PX4 landing checks // https://mavlink.io/en/messages/common.html#MAV_CMD_COMPONENT_ARM_DISARM
-    publish_vehicle_cmd(DroneCmd::VEHICLE_CMD_COMPONENT_ARM_DISARM, list);
+    publish_vehicle_cmd(DroneCmdType::VEHICLE_CMD_COMPONENT_ARM_DISARM, list);
 }
 
 
@@ -88,7 +88,7 @@ void OffboardControl::timer_callback(OffboardControl& toModify)
 }
 
 
-void OffboardControl::external_arming_callback(Px4KeyboardArmType::ConstSharedPtr msg)
+void OffboardControl::external_arming_callback(KeyboardArmType::ConstSharedPtr msg)
 {
     bool arm_intent = (msg->data & 0x01);
 
@@ -113,7 +113,7 @@ void OffboardControl::external_arming_callback(Px4KeyboardArmType::ConstSharedPt
 	return;
 }
 
-void OffboardControl::external_velocity_callback(Px4KeyboardTwistType::ConstSharedPtr msg)
+void OffboardControl::external_velocity_callback(KeyboardTwistType::ConstSharedPtr msg)
 {
 	RCLCPP_DEBUG(this->get_logger(), "Velocity Callback Triggered");
     // Convert ROS 2 ENU to PX4 NED

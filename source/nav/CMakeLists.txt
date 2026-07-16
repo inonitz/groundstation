@@ -14,7 +14,8 @@ set(HEADERS
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 target_sources(${PROJECT_NAME} PRIVATE ${HEADERS})
-
+target_include_directories(${PROJECT_NAME} PRIVATE ${moodycamel_readerwriterqueue_SOURCE_DIR})
+message(STATUS "---  (Begin) ---")
 target_compile_features(${PROJECT_NAME} PRIVATE 
     c_std_11
     cxx_std_17

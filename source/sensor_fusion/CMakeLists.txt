@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(gstreamer_rx
-   LANGUAGES C CXX
-)
+project(px4_to_ros2_odometry C CXX)
 
 
 macro(define_ros2_node EXE_NAME FILE_SOURCES)
@@ -17,7 +15,6 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
       UTIL2::util2
       cxxopts::cxxopts
       rclcpp::rclcpp
-      sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
       # WORKSPACE_CONFIG::ProjectDefaultConfig
    )
 
@@ -32,15 +29,19 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
 endmacro()
 
 
-set(GST_RECEIVER_SOURCES
-   rx_node_2.cpp
-
+set(ODOMETRY_NODE_SOURCES
+   px4_odom.hpp
+   px4_odom.cpp
 )
 
 
-define_ros2_node(net_packet_decoder_node "${GST_RECEIVER_SOURCES}")
-target_link_libraries(${PROJECT_NAME}_net_packet_decoder_node PRIVATE
-   GSTREAMER::gstreamer
+define_ros2_node(odometry "${ODOMETRY_NODE_SOURCES}")
+target_include_directories(${PROJECT_NAME}_odometry PRIVATE ${moodycamel_readerwriterqueue_SOURCE_DIR})
+target_link_libraries(${PROJECT_NAME}_odometry PRIVATE
+   px4_msgs::px4_msgs__rosidl_typesupport_cpp
+   sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
+   geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
+   message_filters::message_filters
+   nav_msgs::nav_msgs
 )
-target_deploy_gstreamer(${PROJECT_NAME}_net_packet_decoder_node)
 

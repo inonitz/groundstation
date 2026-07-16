@@ -1,4 +1,4 @@
-#include "fat_asr.hpp"
+#include "asr_node.hpp"
 #include <sttserv/wav_writer.hpp>
 
 
@@ -153,11 +153,12 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             break;
         }
 
-        RCLCPP_INFO(this->get_logger(), "[WORKER] Woken up. Data ready. Processing...");
         m_audioDataReady = false;
         lock.unlock();
-
-
+        
+        
+        /* [NOTE]: AvailableFrames is supposed to be captured inside a loop, not a single if-statement */
+        RCLCPP_INFO(this->get_logger(), "[WORKER] Woken up. Data ready. Processing...");
         availableFrames = ma_pcm_rb_available_read(m_audioMan.ringBufferHandle());
         // printf("[DEBUG] Available frames in RB: %u\n", availableFrames);
         if(!availableFrames) {
@@ -201,8 +202,11 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
                 framesToWrite64, 
                 static_cast<uint32_t>(m_recordTimeMs), 
                 16000
-            )
+            ) == false
         ) {
+            RCLCPP_ERROR(this->get_logger(), "[WORKER] Transcribe failed.");
+
+        } else {
             transcript_time_ns = this->now().nanoseconds() - transcript_time_ns;
             inferenceResultBuffer result_buf;
             if (m_backend.result(result_buf)) {
@@ -229,12 +233,13 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
                 // d.close();
                 m_backend.print_timings();
             }
-        } else {
-            RCLCPP_ERROR(this->get_logger(), "[WORKER] Transcribe failed.");
         }
         transcript_time_ns = 0;
     }
+
+
     RCLCPP_INFO(this->get_logger(), "[WORKER] Background loop thread exiting.");
+    return;
 }
 
 

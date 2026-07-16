@@ -15,7 +15,7 @@ public:
         m_pubText     = this->create_publisher<ASRTextType>(kOutASRServerTranscriptionTopic, 10);
         m_pubTwist    = this->create_publisher<ASRTextTwistType>(kOutASRServerTwistTopic, 10);
         m_pubArmState = this->create_publisher<ASRArmType>(kOutASRServerArmStateTopic, 10);
-        m_pubTimer = this->create_wall_timer(
+        m_timer = this->create_wall_timer(
             std::chrono::milliseconds(50), 
             std::bind(&ASRStandaloneNode::timerCallback, this)
         );
@@ -48,10 +48,10 @@ public:
         }
 
 
-        m_subKey = this->create_subscription<Px4KeyboardRawInputType>(
-            kPx4KeyboardRawTopic, 
+        m_subKey = this->create_subscription<KeyboardRawInputType>(
+            kOutKeyboardRawTopic, 
             10,
-            [this](const Px4KeyboardRawInputType::SharedPtr msg) {
+            [this](const KeyboardRawInputType::SharedPtr msg) {
                 if (msg->data.size() < 2) { 
                     return;
                 }
@@ -119,6 +119,7 @@ private:
             _.linear.z
         );
         m_pubTwist->publish(_);
+        return;
     }
 
 
@@ -140,8 +141,8 @@ private:
     PublisherPtr<ASRTextType>              m_pubText;
     PublisherPtr<ASRTextTwistType>         m_pubTwist;
     PublisherPtr<ASRArmType>               m_pubArmState;
-    SubscriberPtr<Px4KeyboardRawInputType> m_subKey;
-    rclcpp::TimerBase::SharedPtr           m_pubTimer;
+    SubscriberPtr<KeyboardRawInputType> m_subKey;
+    rclcpp::TimerBase::SharedPtr           m_timer;
     
     ModelBackend            m_backend;
     AudioManager2           m_audioMan;

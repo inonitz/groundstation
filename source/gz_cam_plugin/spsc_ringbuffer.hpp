@@ -23,15 +23,15 @@ struct ContentionFreeAtomic {
 
 
 template <typename T>
-class LockFreeSpscDropQueue {
+class LockFreeSpscBufferedQueue {
 public:
-    LockFreeSpscDropQueue(const LockFreeSpscDropQueue&) = delete;
-    LockFreeSpscDropQueue& operator=(const LockFreeSpscDropQueue&) = delete;
-    LockFreeSpscDropQueue(LockFreeSpscDropQueue&&) = delete;
-    LockFreeSpscDropQueue& operator=(LockFreeSpscDropQueue&&) = delete;
+    LockFreeSpscBufferedQueue(const LockFreeSpscBufferedQueue&) = delete;
+    LockFreeSpscBufferedQueue& operator=(const LockFreeSpscBufferedQueue&) = delete;
+    LockFreeSpscBufferedQueue(LockFreeSpscBufferedQueue&&) = delete;
+    LockFreeSpscBufferedQueue& operator=(LockFreeSpscBufferedQueue&&) = delete;
 
-    LockFreeSpscDropQueue() : m_buf(nullptr), m_cap(0) {}
-    ~LockFreeSpscDropQueue() {
+    LockFreeSpscBufferedQueue() : m_buf(nullptr), m_cap(0) {}
+    ~LockFreeSpscBufferedQueue() {
         if (m_buf != nullptr) {
             destroy();
         }
@@ -145,7 +145,7 @@ public:
 
         m_init[current_head] = true; /* Mark as initialized */
         m_head.store(next_head, std::memory_order_release);
-        sizeof(LockFreeSpscDropQueue<uint8_t>);
+        sizeof(LockFreeSpscBufferedQueue<uint8_t>);
         sizeof(std::unique_ptr<bool[]>);
     }
     

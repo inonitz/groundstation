@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-include(${CMAKE_SOURCE_DIR}/cmake/FindGStreamer.cmake)
+# include(${CMAKE_SOURCE_DIR}/cmake/FindGStreamer.cmake)
 project(GazeboGstCameraPlugin 
     VERSION 1.0.0
     DESCRIPTION "Gazebo-Harmonic Zero-Copy Camera Plugin"

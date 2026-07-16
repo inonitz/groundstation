@@ -16,9 +16,9 @@ public:
             return;
         };
 
-        m_pubPath   = this->create_publisher<DronePathPoint>(kInTrajectoryPointTopic,  qos_profile);
-		m_pubStatus = this->create_publisher<DroneStatus   >(kInOffboardCtrlModeTopic, qos_profile);
-		m_pubCMD    = this->create_publisher<DroneCmd      >(kInVehicleCmdTopic,       qos_profile);
+        m_pubPath   = this->create_publisher<DronePathPointType>(kInTrajectoryPointTopic,  qos_profile);
+		m_pubStatus = this->create_publisher<DroneStatusType   >(kInOffboardCtrlModeTopic, qos_profile);
+		m_pubCMD    = this->create_publisher<DroneCmdType      >(kInVehicleCmdTopic,       qos_profile);
         
         // m_subKeyboardTwist = this->create_subscription<Px4KeyboardTwistType>(
         //     kPx4KeyboardTwistTopic, kDefaultHistoryBufSize,
@@ -36,9 +36,9 @@ public:
             kOutASRServerArmStateTopic, kDefaultHistoryBufSize,
             [this](ASRArmType::ConstSharedPtr msg) { external_arming_callback(msg); }
         );
-        m_subLocalPos = this->create_subscription<DroneOdometry>(
+        m_subLocalPos = this->create_subscription<DroneOdometryType>(
             kOutVehicleOdometryTopic, rclcpp::SensorDataQoS(),
-            [this](const DroneOdometry::ConstSharedPtr msg) {
+            [this](const DroneOdometryType::ConstSharedPtr msg) {
                 m_current_z_ned = msg->position[2];
             }
         );
@@ -63,11 +63,11 @@ public:
     void timer_callback(OffboardControl& toModify);
 
     /* Subcriptions - Updating Local State using Keyboard Package */
-    void external_arming_callback(Px4KeyboardArmType::ConstSharedPtr msg);
-    void external_velocity_callback(Px4KeyboardTwistType::ConstSharedPtr msg);
+    void external_arming_callback(KeyboardArmType::ConstSharedPtr msg);
+    void external_velocity_callback(KeyboardTwistType::ConstSharedPtr msg);
 
     /* Subcriptions - Updating Local State using Topics exposed by Flight Controller */
-    void external_status_callback(DroneStatus status);
+    void external_status_callback(DroneStatusType status);
     void external_attitude_callback();
 
 
@@ -83,7 +83,7 @@ private:
             std::numeric_limits<f32>::quiet_NaN(),
             std::numeric_limits<f32>::quiet_NaN()
         };
-        DronePathPoint _{};
+        DronePathPointType _{};
 
 
         _.timestamp    = timestamp_now_ms();
@@ -99,7 +99,7 @@ private:
         return;
     }
     __force_inline void publish_offboardctrl_mode() {
-        DroneStatus _{};
+        DroneStatusType _{};
 
         _.timestamp         = timestamp_now_ms();
         _.position          = false;
@@ -116,10 +116,10 @@ private:
     }
 
     __force_inline void publish_vehicle_cmd(
-        DroneCmdIdType    const& cmd, 
-        DroneCmdParamList const& params={}
+        DroneCmdIdTypeType    const& cmd, 
+        DroneCmdParamListType const& params={}
     ) {
-        DroneCmd _{};
+        DroneCmdType _{};
 
         _.timestamp = timestamp_now_ms();
         _.param1 = params[0];
@@ -149,14 +149,14 @@ private:
         LANDING 
     };
 
-	PublisherPtr<DronePathPoint> m_pubPath;
-	PublisherPtr<DroneStatus>    m_pubStatus;
-	PublisherPtr<DroneCmd>       m_pubCMD;
+	PublisherPtr<DronePathPointType> m_pubPath;
+	PublisherPtr<DroneStatusType>    m_pubStatus;
+	PublisherPtr<DroneCmdType>       m_pubCMD;
     // SubscriberPtr<Px4KeyboardTwistType> m_subKeyboardTwist;
     // SubscriberPtr<Px4KeyboardArmType>   m_subKeyboardArm;
     SubscriberPtr<ASRTextTwistType> m_subASRTwist;
     SubscriberPtr<ASRArmType>       m_subASRArmState;
-    SubscriberPtr<DroneOdometry>    m_subLocalPos;
+    SubscriberPtr<DroneOdometryType>    m_subLocalPos;
 
 	rclcpp::TimerBase::SharedPtr m_timer;
     std::atomic<u64>             m_setPointPublished;

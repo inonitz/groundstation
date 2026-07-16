@@ -46,11 +46,13 @@ define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
 
 # ROS 2 Dependencies
-find_package(rclcpp        REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs   REQUIRED)
-find_package(cv_bridge     REQUIRED)
-find_package(px4_msgs      REQUIRED)
+find_package(rclcpp          REQUIRED)
+find_package(geometry_msgs   REQUIRED)
+find_package(sensor_msgs     REQUIRED)
+find_package(nav_msgs        REQUIRED)
+find_package(cv_bridge       REQUIRED)
+find_package(px4_msgs        REQUIRED)
+find_package(message_filters REQUIRED)
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -142,6 +144,13 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
+safe_cpm_add_package(
+    NAME moodycamel_readerwriterqueue
+    GIT_REPOSITORY https://github.com/cameron314/readerwriterqueue
+    GIT_TAG        v1.0.7
+    GIT_SHALLOW    TRUE
+)
+
 # safe_cpm_add_package(
 #     NAME llama_cpp
 #     GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
@@ -169,7 +178,9 @@ safe_cpm_add_package(
 # Local Project
 # ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_EXECUTABLE)
-    add_subdirectory(src/groundstation)
-    add_subdirectory(src/nav) # Temporary until modularization
-    add_subdirectory(src/gz_cam_plugin)
+    add_subdirectory(source/gz_cam_plugin)
+    add_subdirectory(source/gst_rx)
+    add_subdirectory(source/nav)
+    add_subdirectory(source/speech_to_action)
+    add_subdirectory(source/sensor_fusion)
 endif()

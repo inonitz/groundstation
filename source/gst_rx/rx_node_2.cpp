@@ -14,7 +14,7 @@ public:
     GstReceiverNode() : Node("gst_receiver_node") {
         gst_init(nullptr, nullptr);
 
-        m_publisher = this->create_publisher<sensor_msgs::msg::Image>("camera/stream", 10);
+        m_publisher = this->create_publisher<sensor_msgs::msg::Image>(cameraTopic(), 10);
 
         // emit-signals=true removed. Push-callbacks disabled.
         std::string pipeline_str = 
@@ -23,9 +23,8 @@ public:
             "appsink name=mysink max-buffers=1 drop=true";
 
         m_pipeline = gst_parse_launch(pipeline_str.c_str(), nullptr);
-        m_sink = gst_bin_get_by_name(GST_BIN(m_pipeline), "mysink");
-        m_bus = gst_element_get_bus(m_pipeline);
-
+        m_sink     = gst_bin_get_by_name(GST_BIN(m_pipeline), "mysink");
+        m_bus      = gst_element_get_bus(m_pipeline);
         gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
 
         // Timer 1: Poll appsink directly on ROS 2 thread (100 Hz)
@@ -98,9 +97,12 @@ private:
         msg.data.assign(map.data, map.data + map.size);
         m_publisher->publish(msg);
 
+
         gst_buffer_unmap(buffer, &map);
         gst_sample_unref(sample);
+        return;
     }
+
 
     void PollBusCb() {
         GstMessage* msg = nullptr;
@@ -160,7 +162,8 @@ private:
     }
 
 private:
-    constexpr const char* frameId() { return "camera_link"; };
+    constexpr const char* frameId()     { return "camera_link"; }
+    constexpr const char* cameraTopic() { return "camera/stream"; }
 
 private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr m_publisher;

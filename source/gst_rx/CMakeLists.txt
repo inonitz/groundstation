@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(ros2_speech_to_action C CXX)
+project(GStreamerReceiverNode
+   LANGUAGES C CXX
+)
 
 
 macro(define_ros2_node EXE_NAME FILE_SOURCES)
@@ -15,8 +17,7 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
       UTIL2::util2
       cxxopts::cxxopts
       rclcpp::rclcpp
-      px4_msgs::px4_msgs__rosidl_typesupport_cpp
-      geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
+      sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
       # WORKSPACE_CONFIG::ProjectDefaultConfig
    )
 
@@ -31,33 +32,15 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
 endmacro()
 
 
-set(KEYBOARD_NODE_SOURCES
-   base.hpp
-   async_key.hpp
-   async_key.cpp
-   key_codes.hpp
-   key_codes.cpp
-   px4_keyboard.hpp
-   px4_keyboard.cpp
+set(GST_RECEIVER_SOURCES
+   rx_node_2.cpp
+
 )
 
 
-set(OFFBOARD_CONTROL_NODE_SOURCES
-   base.hpp
-   offboard.hpp
-   offboard.cpp
+define_ros2_node(net_packet_decoder_node "${GST_RECEIVER_SOURCES}")
+target_link_libraries(${PROJECT_NAME}_net_packet_decoder_node PRIVATE
+   GSTREAMER::gstreamer
 )
-
-set(ASR_SERVER_NODE_SOURCES
-   fat_asr.hpp
-   fat_asr.cpp
-)
-
-
-define_ros2_node(keyboard_input "${KEYBOARD_NODE_SOURCES}")
-define_ros2_node(offboard_mode "${OFFBOARD_CONTROL_NODE_SOURCES}")
-define_ros2_node(asr_server "${ASR_SERVER_NODE_SOURCES}")
-target_link_libraries(${PROJECT_NAME}_asr_server PRIVATE
-   STTSERVER::SpeechToTextServer
-)
+target_deploy_gstreamer(${PROJECT_NAME}_net_packet_decoder_node)
 
