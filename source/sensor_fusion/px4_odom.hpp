@@ -63,7 +63,7 @@ public:
 
 
         m_sync = std::make_shared<SyncType>(
-            SyncPolicy(10), 
+            SyncPolicyType(10), 
             m_subImg, 
             m_subPassOdometry
         );
@@ -90,10 +90,10 @@ private:
         OdometryType ros_odom;
         
         uint64_t time_us = msg->timestamp;
-        ros_odom.header.stamp.sec = time_us / 1000000;
+        ros_odom.header.stamp.sec     = time_us / 1000000;
         ros_odom.header.stamp.nanosec = (time_us % 1000000) * 1000;
-        ros_odom.header.frame_id = "odom";
-        ros_odom.child_frame_id = "base_link";
+        ros_odom.header.frame_id      = "odom";
+        ros_odom.child_frame_id       = "base_link";
 
         // NED to ENU coordinate frame transform
         ros_odom.pose.pose.position.x = msg->position[1];  // East

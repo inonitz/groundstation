@@ -3,7 +3,10 @@ include(ExternalProject)
 
 macro(DEFINE_LIBRARY_FETCH_OF_LLAMA_CPP_WITH_EXTERNAL_PROJECT)
     # =============================================================================
-    # INTENT-DRIVEN DEFINITIONS (ALL CONFIGURATION AT TOP)
+    # Why is this shit required when one can just use ExternalProject_Add / git submodule / CPM?
+    # For isolating llama-cpp completely via ExternalProject. 
+    # whisper-cpp & llama-cpp use different ggml commits, which in turn,
+    # creates target collisions in the CMake global namespace if fetched together
     # =============================================================================
     set(LLAMA_UPSTREAM_SOURCE_REPOSITORY              "https://github.com/ggerganov/llama.cpp.git")
     set(LLAMA_TARGET_COMPILATION_BRANCH               "master")
