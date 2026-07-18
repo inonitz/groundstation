@@ -26,6 +26,7 @@ GAZEBO_MAP_FILEPATH="harmonic"
 # Tell Gazebo where groundstation builds the .so file
 GZ_SIM_SYSTEM_PLUGIN_PATH="$BUILD_BINARY_DIR:$GZ_SIM_SYSTEM_PLUGIN_PATH"
 GZ_GIMBAL_SDF_FILE="$PX4_DIRECTORY/Tools/simulation/gz/models/gimbal/model.sdf"
+TARGET_WORLD_DIR="$PX4_DIRECTORY/Tools/simulation/gz/worlds"
 
 # Startup Delays (Adjust if services are racing or crashing on boot)
 DELAY_PX4=2
@@ -77,7 +78,6 @@ CMD_TERMINAL_3="\
 
 CMD_TERMINAL_4="$BUILD_BINARY_DIR/ros2_speech_to_action_keyboard_input; echo 'CRASHED.'; read"
 
-
 ASR_FLAGS=(
     "--backend=whisper-parakeet"
     "--model=$ASR_MODEL_PATH"
@@ -111,13 +111,22 @@ CMD_TERMINAL_8="ros2 run ros_gz_bridge parameter_bridge \
 # ==============================================================================
 # 4. EXECUTION BLOCK
 # ==============================================================================
-echo "[INFO] Building The Project"
-$CMD_BUILD_CONF && $CMD_BUILD_MAKE
-if [ $? -ne 0 ]; then
+# echo "[INFO] Building The Project"
+# $CMD_BUILD_CONF && $CMD_BUILD_MAKE
+# if [ $? -ne 0 ]; then
+#     echo "[ERROR] Build failed. Core logic broken. Exiting."
+#     exit 1
+# fi
 
-    echo "[ERROR] Build failed. Core logic broken. Exiting."
-    exit 1
+echo "[INFO] Syncing Gazebo Simulation World Assets..."
+mkdir -p "$TARGET_WORLD_DIR"
+
+# Clean old or broken links out to safely mount updated configurations
+if [ -L "$TARGET_WORLD_DIR/rubicon.sdf" ] || [ -f "$TARGET_WORLD_DIR/rubicon.sdf" ]; then
+    rm -f "$TARGET_WORLD_DIR/rubicon.sdf"
 fi
+ln -s "$ASSET_DIR_PATH/rubicon.sdf" "$TARGET_WORLD_DIR/rubicon.sdf"
+echo "[SUCCESS] Symbolic link for rubicon.sdf generated dynamically."
 
 echo "[INFO] Creating temporary backup and auto-patching gimbal SDF with GStreamer Plugin..."
 if [ ! -f "${GZ_GIMBAL_SDF_FILE}.bak" ]; then

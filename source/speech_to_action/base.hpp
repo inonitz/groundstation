@@ -39,9 +39,9 @@ constexpr const char* kOutVehicleOdometryTopic = "/fmu/out/vehicle_odometry";
 constexpr const char* kOutVehicleStatusTopic   = "/fmu/out/vehicle_status_v1";
 constexpr const char* kOutVehicleAttitudeTopic = "/fmu/out/vehicle_attitude";
 
-constexpr const char* kOutKeyboardArmStateTopic = "/px4_keyboard/arm_msg";
-constexpr const char* kOutKeyboardTwistTopic    = "/px4_keyboard/cmd_vel";
-constexpr const char* kOutKeyboardRawTopic      = "/px4_keyboard/in/raw";
+constexpr const char* kOutKeyboardArmStateTopic = "/keyboard/arm_msg";
+constexpr const char* kOutKeyboardTwistTopic    = "/keyboard/cmd_vel";
+constexpr const char* kOutKeyboardRawTopic      = "/keyboard/in/raw";
 constexpr const char* kOutASRServerTranscriptionTopic = "/asr_server/transcribe";
 constexpr const char* kOutASRServerTwistTopic         = "/asr_server/cmd_vel";
 constexpr const char* kOutASRServerArmStateTopic      = "/asr_server/arm_msg";

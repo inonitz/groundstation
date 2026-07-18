@@ -2,53 +2,36 @@
 #include <thread>
 #include <atomic>
 #include <open_vins/core/VioManager.h>
+#include <open_vins/state/State.h>
 
-#include <px4_msgs/msg/vehicle_odometry.hpp>
 #include <px4_msgs/msg/sensor_combined.hpp>
 
 #include <rclcpp/rclcpp.hpp>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/pass_through.h>
-#include <message_filters/sync_policies/approximate_time.h>
-
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
 
-#include <nav_msgs/msg/odometry.hpp>
-
-#include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <cv_bridge/cv_bridge.hpp>
 
 #include "readerwriterqueue.h"
 
 
 constexpr const char* kCameraImageTopic    = "camera/stream";
 constexpr const char* kSensorCombinedTopic = "/fmu/out/sensor_combined";
-constexpr const char* kRawOdometryTopic    = "/fmu/out/vehicle_odometry";
-constexpr const char* kOutPointCloudTopic  = "/slam/point_cloud";
-
-struct SyncedFrame {
-    sensor_msgs::msg::Image::ConstSharedPtr img;
-    nav_msgs::msg::Odometry::ConstSharedPtr odom;
-};
+constexpr const char* kOutPointCloudPersistentTopic = "/slam/point_cloud/persistent";
+constexpr const char* kOutPointCloudTransientTopic  = "/slam/point_cloud/transient";
 
 
-class SyncNode : public rclcpp::Node {
+class SLAMNode : public rclcpp::Node {
 private:
     using ImageType          = sensor_msgs::msg::Image;
-    using OdometryType       = nav_msgs::msg::Odometry;
-    using RawOdometryType    = px4_msgs::msg::VehicleOdometry;
     using SensorCombinedType = px4_msgs::msg::SensorCombined;
-    using PointCloudType     = sensor_msgs::msg::PointCloud2;
-
-    template<typename T>
-    using MessageFilterSubscription = typename message_filters::Subscriber<T>;
-
-    template<typename T>
-    using MimickSubscriptionType = typename message_filters::PassThrough<T>;
+    using ImageFrameType = ImageType::ConstSharedPtr;
+    using IMUFrameType   = SensorCombinedType::ConstSharedPtr;
+    using PointCloudType = sensor_msgs::msg::PointCloud2;
 
     template<typename T>
     using SubscriptionPtr = typename rclcpp::Subscription<T>::SharedPtr;
@@ -56,46 +39,37 @@ private:
     template<typename T>
     using PublisherPtr = typename rclcpp::Publisher<T>::SharedPtr;
 
-    using SyncPolicyType = message_filters::sync_policies::ApproximateTime<
-        sensor_msgs::msg::Image, nav_msgs::msg::Odometry>;
-
-    using SyncType = message_filters::Synchronizer<SyncPolicyType>;
-
-    using SPSC_FrameQueue = moodycamel::ReaderWriterQueue<SyncedFrame>;
+    template<typename T>
+    using SPSC_Queue = moodycamel::ReaderWriterQueue<T>;
 
 public:
-    SyncNode() : Node("sync_node") {
-        rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
-        qos_profile.depth = 10;
+    SLAMNode() : Node("slam_openvins_node") 
+    {
+        ov_msckf::VioManagerOptions options{};
 
-        m_subImg.subscribe(this, kCameraImageTopic, qos_profile);
-        m_subRawOdometry = this->create_subscription<RawOdometryType>(
-            kRawOdometryTopic, rclcpp::SensorDataQoS(),
-            std::bind(&SyncNode::rawOdomCallback, this, std::placeholders::_1)
-        );
+        /* Init Subscriptions & Point-Cloud Publisher */
         m_subImuCombined = this->create_subscription<SensorCombinedType>(
-            kSensorCombinedTopic, rclcpp::SensorDataQoS(),
-            std::bind(&SyncNode::imuCallback, this, std::placeholders::_1)
+            kSensorCombinedTopic, 400,
+            std::bind(&SLAMNode::imuCallback, this, std::placeholders::_1)
         );
-        m_pubPointCloud = this->create_publisher<PointCloudType>(kOutPointCloudTopic, 10);
-
-
-        m_sync = std::make_shared<SyncType>(
-            SyncPolicyType(10), 
-            m_subImg, 
-            m_subPassOdometry
+        m_subImg = this->create_subscription<ImageType>(
+            kCameraImageTopic, 60,
+            std::bind(&SLAMNode::imageCallback, this, std::placeholders::_1)
         );
-        m_sync->registerCallback(
-            std::bind(&SyncNode::syncCallback, this, std::placeholders::_1, std::placeholders::_2)
-        );
+        m_pubSlamPointCloud = this->create_publisher<PointCloudType>(kOutPointCloudPersistentTopic, 10);
+        m_pubMsckfPointCloud = this->create_publisher<PointCloudType>(kOutPointCloudTransientTopic, 10);
+
+        /* Init OpenVINS */
+        options.print_and_load_estimator();
+        m_vioManager = std::make_unique<ov_msckf::VioManager>(options);
 
 
-        m_slamThread = std::thread(&SyncNode::slamWorkerThread, this);
-        RCLCPP_INFO(this->get_logger(), "ApproximateTime Synchronizer Active.");
+        m_slamThread = std::thread(&SLAMNode::slamWorkerThread, this);
+        RCLCPP_INFO(this->get_logger(), "OpenVINS SLAM Node Active.");
         return;
     }
 
-    ~SyncNode() {
+    ~SLAMNode() {
         m_exitSlam = true;
         if (m_slamThread.joinable()) {
             m_slamThread.join();
@@ -104,141 +78,145 @@ public:
     }
 
 private:
-    void createVioManager() {
-        ov_msckf::VioManagerOptions options{};
-        options.print_and_load_estimator();
-
-        m_vioManager = std::make_unique<ov_msckf::VioManager>(options);
+    void imuCallback(const IMUFrameType& msg) {
+        IMUFrameType trash;
+        while (!m_imuData.try_enqueue(msg)) {
+            m_imuData.try_dequeue(trash); 
+            RCLCPP_WARN(this->get_logger(), "Queue Full. Dropping OLDEST frame.");
+        }
         return;
     }
 
+    void imageCallback(const ImageFrameType& msg) {
+        ImageFrameType trash;
 
-    void rawOdomCallback(const RawOdometryType::ConstSharedPtr& msg) {
-        OdometryType     ros_odom;
-        ov_core::ImuData slam_imu_data;
-        
-        uint64_t time_us = msg->timestamp;
-        ros_odom.header.stamp.sec     = time_us / 1000000;
-        ros_odom.header.stamp.nanosec = (time_us % 1000000) * 1000;
-        ros_odom.header.frame_id      = "odom";
-        ros_odom.child_frame_id       = "base_link";
-
-        // NED to ENU coordinate frame transform
-        ros_odom.pose.pose.position.x = msg->position[1];  // East
-        ros_odom.pose.pose.position.y = msg->position[0];  // North
-        ros_odom.pose.pose.position.z = -msg->position[2]; // Up
-
-        // Hamilton Quaternion conversion
-        ros_odom.pose.pose.orientation.w = msg->q[0];
-        ros_odom.pose.pose.orientation.x = msg->q[1];
-        ros_odom.pose.pose.orientation.y = -msg->q[2];
-        ros_odom.pose.pose.orientation.z = -msg->q[3];
-
-        // Linear velocity transform
-        ros_odom.twist.twist.linear.x = msg->velocity[1];
-        ros_odom.twist.twist.linear.y = msg->velocity[0];
-        ros_odom.twist.twist.linear.z = -msg->velocity[2];
-
-        // Angular velocities transform
-        ros_odom.twist.twist.angular.x = msg->angular_velocity[0];
-        ros_odom.twist.twist.angular.y = -msg->angular_velocity[1];
-        ros_odom.twist.twist.angular.z = -msg->angular_velocity[2];
-
-        auto ros_odom_ptr = std::make_shared<OdometryType>(ros_odom);
-        m_subPassOdometry.add(ros_odom_ptr);
-        return;
-    }
-
-    void imuCallback(const SensorCombinedType::ConstSharedPtr& msg) {
-        ov_core::ImuData slam_imu_data;
-        slam_imu_data.timestamp = msg->timestamp;
-        slam_imu_data.timestamp *= 1e-6;
-        
-        // Accelerometer
-        slam_imu_data.am = Eigen::Matrix<double, 3, 1>{
-            msg->accelerometer_m_s2[0],
-            msg->accelerometer_m_s2[1],
-            msg->accelerometer_m_s2[2]
-        };
-
-        // Gyroscope
-        slam_imu_data.wm = Eigen::Matrix<double, 3, 1>{
-            msg->gyro_rad[0],
-            msg->gyro_rad[1],
-            msg->gyro_rad[2]
-        };
-
-        m_vioManager->feed_measurement_imu(slam_imu_data);
-        return;
-    }
-
-
-    void syncCallback(
-        const ImageType::ConstSharedPtr&    img_msg, 
-        const OdometryType::ConstSharedPtr& odom_msg
-    ) {
-        RCLCPP_INFO(this->get_logger(), "Synced! Image: %d.%d | Odom: %d.%d", 
-            img_msg->header.stamp.sec, img_msg->header.stamp.nanosec,
-            odom_msg->header.stamp.sec, odom_msg->header.stamp.nanosec
-        );
-
-        // Inside syncCallback, replace the enqueue logic with this:
-        SyncedFrame frame{img_msg, odom_msg};
-        SyncedFrame trash;
-        
-        /* 
-            I hate the fact that I have to push out elements to make way for new ones,
-            But considering that I need to keep atomicity, I'm going to settle for this (for now).
-            If I find a more optimal way to handle this, other than a fucking while-loop, I will.
-        */
-        while (!m_slamQueue.try_enqueue(frame)) {
-            m_slamQueue.try_dequeue(trash); 
-            RCLCPP_WARN(this->get_logger(), "Queue Full. Dropping OLDEST frame");
+        while (!m_imgData.try_enqueue(msg)) {
+            m_imgData.try_dequeue(trash); 
+            RCLCPP_WARN(this->get_logger(), "Queue Full. Dropping OLDEST frame.");
         }
         return;
     }
 
 
     void slamWorkerThread() {
-        SyncedFrame frame;
-        while (rclcpp::ok() && !m_exitSlam.load()) {
-            if (m_slamQueue.try_dequeue(frame)) {
-                RCLCPP_INFO(this->get_logger(), "[SLAM BLACK BOX] Processing Frame %d | Odom %d", 
-                    frame.img->header.stamp.sec, 
-                    frame.odom->header.stamp.sec
+        const auto k_convert_between_imu_types = [](
+            const IMUFrameType& imuFrame, 
+            ov_core::ImuData&   outFrame
+        ) -> void {
+            outFrame.timestamp = imuFrame->timestamp;
+            outFrame.timestamp *= 1e-6;
+            
+            // Accelerometer
+            outFrame.am = Eigen::Matrix<double, 3, 1>{
+                imuFrame->accelerometer_m_s2[0],
+                imuFrame->accelerometer_m_s2[1],
+                imuFrame->accelerometer_m_s2[2]
+            };
+
+            // Gyroscope
+            outFrame.wm = Eigen::Matrix<double, 3, 1>{
+                imuFrame->gyro_rad[0],
+                imuFrame->gyro_rad[1],
+                imuFrame->gyro_rad[2]
+            };
+            return;
+        };
+
+        const auto k_convert_between_image_types = [](
+            const ImageFrameType& imgFrame, 
+            ov_core::CameraData&  outFrame
+        ) -> void {
+                outFrame.timestamp = imgFrame->header.stamp.sec;
+                outFrame.timestamp += 1e-9 * static_cast<double>(
+                    imgFrame->header.stamp.nanosec
                 );
+                outFrame.sensor_ids.push_back(0); // ID 0 for single camera
 
-                // PointCloudType mock_pc;
-                // mock_pc.header.stamp = frame.img->header.stamp;
-                // mock_pc.header.frame_id = "map";
-                // m_pubPointCloud->publish(mock_pc);
+                auto cv_ptr = cv_bridge::toCvShare(imgFrame, sensor_msgs::image_encodings::MONO8);
+                outFrame.images.push_back(cv_ptr->image);
+                return;
+        };
 
-                ov_core::CameraData cam_data;
-                cam_data.timestamp = frame.img->header.stamp.sec;
-                cam_data.timestamp += (frame.img->header.stamp.nanosec * 1e-9);
-                cam_data.sensor_ids.push_back(0); // ID 0 for single camera
+        const auto k_publish_features = [this](const rclcpp::Time& stamp) -> void {
+            std::vector<Eigen::Vector3d> slam_feats = m_vioManager->get_features_SLAM();
+            std::vector<Eigen::Vector3d> msckf_feats = m_vioManager->get_good_features_MSCKF();
 
-                auto cv_ptr = cv_bridge::toCvShare(frame.img, sensor_msgs::image_encodings::MONO8);
-                cam_data.images.push_back(cv_ptr->image);
+            auto const k_build_cloud_msg = [&stamp](const std::vector<Eigen::Vector3d>& points) -> PointCloudType {
+                PointCloudType msg;
+                msg.header.stamp = stamp;
+                msg.header.frame_id = "map"; // Ensure this matches your world/odom frame
+                msg.height = 1;
+                msg.width = points.size();
+                msg.is_dense = true;
 
-                m_vioManager->feed_measurement_camera(cam_data);
-            } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                if (points.empty()) return msg;
+
+                sensor_msgs::PointCloud2Modifier modifier(msg);
+                modifier.setPointCloud2FieldsByString(1, "xyz");
+                modifier.resize(points.size());
+
+                sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");
+                sensor_msgs::PointCloud2Iterator<float> iter_y(msg, "y");
+                sensor_msgs::PointCloud2Iterator<float> iter_z(msg, "z");
+
+                for (const auto& pt : points) { 
+                    *iter_x = static_cast<float>(pt.x());
+                    *iter_y = static_cast<float>(pt.y());
+                    *iter_z = static_cast<float>(pt.z());
+                    ++iter_x; ++iter_y; ++iter_z;
+                }
+                return msg;
+            };
+
+            // 2. Build and publish both independent point clouds
+            m_pubSlamPointCloud->publish(k_build_cloud_msg(slam_feats));
+            m_pubMsckfPointCloud->publish(k_build_cloud_msg(msckf_feats));
+        };
+
+        /* Actual Worker Thread Begin */
+        IMUFrameType     pendingImu;
+        ov_core::ImuData slamImu;
+        ImageFrameType      pendingImg;
+        ov_core::CameraData slamImg;
+        while (rclcpp::ok() && !m_exitSlam.load()) {
+            while(true 
+                && m_imuData.peek() == nullptr 
+                && m_imgData.peek() == nullptr
+                && !m_exitSlam.load()
+            ) {
+                std::this_thread::sleep_for(std::chrono::milliseconds{2});
             }
+
+            /* Feeding IMU Data is way faster and doesn't trigger Expensive Kalman Filters */
+            while (m_imuData.try_dequeue(pendingImu) != false) {
+                k_convert_between_imu_types(pendingImu, slamImu);
+                m_vioManager->feed_measurement_imu(slamImu);
+            }
+
+            /* Pushing Image Data on the other hand, does trigger Kalman Filter updates */
+            while (m_imgData.try_dequeue(pendingImg) != false) {
+                k_convert_between_image_types(pendingImg, slamImg);
+                m_vioManager->feed_measurement_camera(slamImg);
+                slamImg.sensor_ids.resize(0);
+                slamImg.images.resize(0);
+            }
+
+            k_publish_features(pendingImg->header.stamp);
         }
+
+
         return;
     }
 
 
 private:
-    MessageFilterSubscription<ImageType> m_subImg;
-    MimickSubscriptionType<OdometryType> m_subPassOdometry;
-    SubscriptionPtr<RawOdometryType>     m_subRawOdometry;
-    SubscriptionPtr<SensorCombinedType>  m_subImuCombined;
-    PublisherPtr<PointCloudType>         m_pubPointCloud;
-    std::shared_ptr<SyncType>            m_sync;
-    SPSC_FrameQueue                      m_slamQueue{60};
-    std::thread                          m_slamThread;
-    std::atomic<bool>                    m_exitSlam{false};
+    SubscriptionPtr<SensorCombinedType>   m_subImuCombined;
+    SubscriptionPtr<ImageType>            m_subImg;
+    PublisherPtr<PointCloudType>          m_pubSlamPointCloud;
+    PublisherPtr<PointCloudType>          m_pubMsckfPointCloud;
+    SPSC_Queue<IMUFrameType>              m_imuData{400}; /* Expected Refresh Rate ~200Hz, Capture Twice as much */
+    SPSC_Queue<ImageFrameType>            m_imgData{60}; /* Expected Refresh Rate ~30Hz, Capture Twice as much */
+    std::thread                           m_slamThread;
+    std::atomic<bool>                     m_exitSlam{false};
     std::unique_ptr<ov_msckf::VioManager> m_vioManager;
 };
