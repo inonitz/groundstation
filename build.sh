@@ -118,7 +118,6 @@ if [[ "$CLEAN_CURRENT_ROOT_BUILD_DIR" == "true" ]]; then
     rm -rf "$CMAKE_FINAL_BUILD_DIR"
 fi
 
-# 7. FIXED: Missing closing bracket `]]` in this condition
 if [[ "$CONFIGURE_CMAKE_FLAG" == "true" ]]; then
     mkdir -p "$CMAKE_FINAL_BUILD_DIR"
     # CMAKE_ARGLIST remains unquoted here purposely so CMake receives distinct arguments
@@ -134,7 +133,8 @@ if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     CORES=$(nproc 2>/dev/null || echo 1)
     JOBS=$(( CORES > 2 ? CORES - 2 : 1 ))
     
-    ninja "$PROJECT_NAME" -j$JOBS
+    # ninja "$PROJECT_NAME" -j$JOBS
+    time cmake --build . --target "$PROJECT_NAME" -- -j$JOBS
 fi
 
 if [[ "$RUN_GROUNDSTATION_FLAG" == "true" ]]; then

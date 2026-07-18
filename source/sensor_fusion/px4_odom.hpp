@@ -1,21 +1,34 @@
 #pragma once
 #include <thread>
 #include <atomic>
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
-#include <nav_msgs/msg/odometry.hpp>
+#include <open_vins/core/VioManager.h>
+
 #include <px4_msgs/msg/vehicle_odometry.hpp>
+#include <px4_msgs/msg/sensor_combined.hpp>
+
+#include <rclcpp/rclcpp.hpp>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/pass_through.h>
 #include <message_filters/sync_policies/approximate_time.h>
+
+#include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+
+#include <nav_msgs/msg/odometry.hpp>
+
+#include <cv_bridge/cv_bridge.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+
 #include "readerwriterqueue.h"
 
 
-constexpr const char* kCameraImageTopic   = "camera/stream";
-constexpr const char* kRawOdometryTopic   = "/fmu/out/vehicle_odometry";
-constexpr const char* kOutPointCloudTopic = "/slam/point_cloud";
+constexpr const char* kCameraImageTopic    = "camera/stream";
+constexpr const char* kSensorCombinedTopic = "/fmu/out/sensor_combined";
+constexpr const char* kRawOdometryTopic    = "/fmu/out/vehicle_odometry";
+constexpr const char* kOutPointCloudTopic  = "/slam/point_cloud";
 
 struct SyncedFrame {
     sensor_msgs::msg::Image::ConstSharedPtr img;
@@ -25,10 +38,11 @@ struct SyncedFrame {
 
 class SyncNode : public rclcpp::Node {
 private:
-    using ImageType       = sensor_msgs::msg::Image;
-    using OdometryType    = nav_msgs::msg::Odometry;
-    using RawOdometryType = px4_msgs::msg::VehicleOdometry;
-    using PointCloudType = sensor_msgs::msg::PointCloud2;
+    using ImageType          = sensor_msgs::msg::Image;
+    using OdometryType       = nav_msgs::msg::Odometry;
+    using RawOdometryType    = px4_msgs::msg::VehicleOdometry;
+    using SensorCombinedType = px4_msgs::msg::SensorCombined;
+    using PointCloudType     = sensor_msgs::msg::PointCloud2;
 
     template<typename T>
     using MessageFilterSubscription = typename message_filters::Subscriber<T>;
@@ -59,6 +73,10 @@ public:
             kRawOdometryTopic, rclcpp::SensorDataQoS(),
             std::bind(&SyncNode::rawOdomCallback, this, std::placeholders::_1)
         );
+        m_subImuCombined = this->create_subscription<SensorCombinedType>(
+            kSensorCombinedTopic, rclcpp::SensorDataQoS(),
+            std::bind(&SyncNode::imuCallback, this, std::placeholders::_1)
+        );
         m_pubPointCloud = this->create_publisher<PointCloudType>(kOutPointCloudTopic, 10);
 
 
@@ -86,8 +104,18 @@ public:
     }
 
 private:
+    void createVioManager() {
+        ov_msckf::VioManagerOptions options{};
+        options.print_and_load_estimator();
+
+        m_vioManager = std::make_unique<ov_msckf::VioManager>(options);
+        return;
+    }
+
+
     void rawOdomCallback(const RawOdometryType::ConstSharedPtr& msg) {
-        OdometryType ros_odom;
+        OdometryType     ros_odom;
+        ov_core::ImuData slam_imu_data;
         
         uint64_t time_us = msg->timestamp;
         ros_odom.header.stamp.sec     = time_us / 1000000;
@@ -121,6 +149,30 @@ private:
         return;
     }
 
+    void imuCallback(const SensorCombinedType::ConstSharedPtr& msg) {
+        ov_core::ImuData slam_imu_data;
+        slam_imu_data.timestamp = msg->timestamp;
+        slam_imu_data.timestamp *= 1e-6;
+        
+        // Accelerometer
+        slam_imu_data.am = Eigen::Matrix<double, 3, 1>{
+            msg->accelerometer_m_s2[0],
+            msg->accelerometer_m_s2[1],
+            msg->accelerometer_m_s2[2]
+        };
+
+        // Gyroscope
+        slam_imu_data.wm = Eigen::Matrix<double, 3, 1>{
+            msg->gyro_rad[0],
+            msg->gyro_rad[1],
+            msg->gyro_rad[2]
+        };
+
+        m_vioManager->feed_measurement_imu(slam_imu_data);
+        return;
+    }
+
+
     void syncCallback(
         const ImageType::ConstSharedPtr&    img_msg, 
         const OdometryType::ConstSharedPtr& odom_msg
@@ -152,12 +204,24 @@ private:
         while (rclcpp::ok() && !m_exitSlam.load()) {
             if (m_slamQueue.try_dequeue(frame)) {
                 RCLCPP_INFO(this->get_logger(), "[SLAM BLACK BOX] Processing Frame %d | Odom %d", 
-                    frame.img->header.stamp.sec, frame.odom->header.stamp.sec);
+                    frame.img->header.stamp.sec, 
+                    frame.odom->header.stamp.sec
+                );
 
-                PointCloudType mock_pc;
-                mock_pc.header.stamp = frame.img->header.stamp;
-                mock_pc.header.frame_id = "map";
-                m_pubPointCloud->publish(mock_pc);
+                // PointCloudType mock_pc;
+                // mock_pc.header.stamp = frame.img->header.stamp;
+                // mock_pc.header.frame_id = "map";
+                // m_pubPointCloud->publish(mock_pc);
+
+                ov_core::CameraData cam_data;
+                cam_data.timestamp = frame.img->header.stamp.sec;
+                cam_data.timestamp += (frame.img->header.stamp.nanosec * 1e-9);
+                cam_data.sensor_ids.push_back(0); // ID 0 for single camera
+
+                auto cv_ptr = cv_bridge::toCvShare(frame.img, sensor_msgs::image_encodings::MONO8);
+                cam_data.images.push_back(cv_ptr->image);
+
+                m_vioManager->feed_measurement_camera(cam_data);
             } else {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -170,9 +234,11 @@ private:
     MessageFilterSubscription<ImageType> m_subImg;
     MimickSubscriptionType<OdometryType> m_subPassOdometry;
     SubscriptionPtr<RawOdometryType>     m_subRawOdometry;
+    SubscriptionPtr<SensorCombinedType>  m_subImuCombined;
     PublisherPtr<PointCloudType>         m_pubPointCloud;
     std::shared_ptr<SyncType>            m_sync;
     SPSC_FrameQueue                      m_slamQueue{60};
     std::thread                          m_slamThread;
     std::atomic<bool>                    m_exitSlam{false};
+    std::unique_ptr<ov_msckf::VioManager> m_vioManager;
 };

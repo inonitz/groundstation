@@ -32,6 +32,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly \
     gstreamer1.0-libav \
+    libceres-dev \
+    libgoogle-glog-dev \
+    libsuitesparse-dev \
+    libeigen3-dev \
+    libopencv-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Cache Gazebo apt packages

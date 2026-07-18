@@ -18,6 +18,7 @@ include(cmake/WorkspaceOptions.cmake)
 include(cmake/BuildDiagnostics.cmake)
 include(cmake/FetchLLamaCPP.cmake)
 include(cmake/FindGStreamer.cmake)
+include(cmake/FetchOpenVINS.cmake)
 include_cpm()
 
 
@@ -42,10 +43,6 @@ endif()
 declare_optional_interface_library_different_sanitizers()
 declare_optional_interface_library_lto()
 declare_optional_interface_default_project_configuration()
-define_library_fetch_of_llama_cpp_with_external_project()
-define_library_fetch_of_gstreamer()
-
-# ROS 2 Dependencies
 find_package(rclcpp          REQUIRED)
 find_package(geometry_msgs   REQUIRED)
 find_package(sensor_msgs     REQUIRED)
@@ -53,6 +50,13 @@ find_package(nav_msgs        REQUIRED)
 find_package(cv_bridge       REQUIRED)
 find_package(px4_msgs        REQUIRED)
 find_package(message_filters REQUIRED)
+# Required Dependency for OpenVINS
+find_package(Eigen3          REQUIRED)
+find_package(OpenCV          REQUIRED)
+define_library_fetch_of_llama_cpp_with_external_project()
+define_library_fetch_of_gstreamer()
+define_library_fetch_of_openvins_with_external_project()
+
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -150,6 +154,16 @@ safe_cpm_add_package(
     GIT_TAG        v1.0.7
     GIT_SHALLOW    TRUE
 )
+
+# # SLAM Implementation
+# safe_cpm_add_package(
+#     NAME open_vins
+#     GIT_REPOSITORY https://github.com/rpng/open_vins.git
+#     GIT_TAG        master
+#     GIT_SHALLOW    TRUE
+#     OPTIONS
+#         "ENABLE_ROS OFF"
+# )
 
 # safe_cpm_add_package(
 #     NAME llama_cpp

@@ -34,14 +34,25 @@ set(ODOMETRY_NODE_SOURCES
    px4_odom.cpp
 )
 
+message(WARNING "OpenCV Libraries Are ==> ${OpenCV_LIBRARIES}\nOpenCV Bridge Libraries are ==> ${cv_bridge_LIBRARIES}\n")
 
 define_ros2_node(odometry "${ODOMETRY_NODE_SOURCES}")
-target_include_directories(${PROJECT_NAME}_odometry PRIVATE ${moodycamel_readerwriterqueue_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME}_odometry PRIVATE 
+   ${moodycamel_readerwriterqueue_SOURCE_DIR}
+   ${cv_bridge_INCLUDE_DIRS}
+)
 target_link_libraries(${PROJECT_NAME}_odometry PRIVATE
    px4_msgs::px4_msgs__rosidl_typesupport_cpp
    sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
    geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
    message_filters::message_filters
    nav_msgs::nav_msgs
+   open_vins::ov_msckf_lib
+   Eigen3::Eigen
+   opencv_core
+   opencv_imgcodecs
+   opencv_imgproc
+   cv_bridge::cv_bridge
+   ${cv_bridge_LIBRARIES}
 )
 
