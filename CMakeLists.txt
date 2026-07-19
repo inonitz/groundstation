@@ -18,7 +18,8 @@ include(cmake/WorkspaceOptions.cmake)
 include(cmake/BuildDiagnostics.cmake)
 include(cmake/FetchLLamaCPP.cmake)
 include(cmake/FindGStreamer.cmake)
-include(cmake/FetchOpenVINS.cmake)
+# include(cmake/FetchOpenVINS.cmake)
+include(cmake/FetchStellaSLAM.cmake)
 include_cpm()
 
 
@@ -49,14 +50,12 @@ find_package(sensor_msgs     REQUIRED)
 find_package(nav_msgs        REQUIRED)
 find_package(cv_bridge       REQUIRED)
 find_package(px4_msgs        REQUIRED)
-find_package(message_filters REQUIRED)
 # Required Dependency for OpenVINS
 find_package(Eigen3          REQUIRED)
 find_package(OpenCV          REQUIRED)
 define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
-define_library_fetch_of_openvins_with_external_project()
-
+define_library_fetch_of_stella_vslam_with_external_project()
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -96,30 +95,6 @@ safe_cpm_add_package(
 )
 
 
-# ---------------------------------------------------------------------------
-# Migrated VLMNav CPM Remote Dependencies
-# ---------------------------------------------------------------------------
-# This would be required on a system without ROS2.
-# Since this is meant for a ROS2 Distribution, this isn't relevant for now
-# safe_cpm_add_package(
-#     NAME opencv
-#     URL https://github.com/opencv/opencv/archive/refs/tags/4.10.0.zip
-#     OPTIONS
-#         "BUILD_LIST core,imgproc,videoio,imgcodecs,highgui"
-#         "WITH_IPP OFF"
-#         "WITH_GUI OFF"
-#         "WITH_TIFF OFF"
-#         "WITH_OPENEXR OFF"
-#         "BUILD_opencv_apps OFF"
-#         "BUILD_opencv_python2 OFF"
-#         "BUILD_opencv_python3 OFF"
-#         "BUILD_JAVA OFF"
-#         "BUILD_TESTS OFF"
-#         "BUILD_PERF_TESTS OFF"
-#         "BUILD_EXAMPLES OFF"
-# )
-
-
 safe_cpm_add_package(
     NAME cpp-httplib
     GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
@@ -155,38 +130,6 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
-# # SLAM Implementation
-# safe_cpm_add_package(
-#     NAME open_vins
-#     GIT_REPOSITORY https://github.com/rpng/open_vins.git
-#     GIT_TAG        master
-#     GIT_SHALLOW    TRUE
-#     OPTIONS
-#         "ENABLE_ROS OFF"
-# )
-
-# safe_cpm_add_package(
-#     NAME llama_cpp
-#     GIT_REPOSITORY https://github.com/ggerganov/llama.cpp.git
-#     GIT_TAG        master
-#     GIT_SHALLOW    TRUE
-#     OPTIONS
-#         "LLAMA_BUILD_EXAMPLES OFF"
-#         "LLAMA_BUILD_COMMON ON"
-#         "LLAMA_BUILD_SERVER ON"
-#         "LLAMA_BUILD_TOOLS ON"
-#         "LLAMA_BUILD_UI OFF"
-#         "LLAMA_LLGUIDANCE OFF"
-#         "NO_ISA_EXTENSIONS ON"
-#         "GGML_VULKAN ON"
-#         "GGML_CUDA OFF"
-#         "GGML_METAL OFF"
-#         "GGML_MUSA OFF"
-#         "GGML_SYCL OFF"
-#         "BUILD_GMOCK OFF"
-#         "INSTALL_GTEST OFF"
-# )
-
 
 # ---------------------------------------------------------------------------
 # Local Project
@@ -196,5 +139,5 @@ if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(source/gst_rx)
     add_subdirectory(source/nav)
     add_subdirectory(source/speech_to_action)
-    add_subdirectory(source/sensor_fusion)
+    add_subdirectory(source/slam)
 endif()

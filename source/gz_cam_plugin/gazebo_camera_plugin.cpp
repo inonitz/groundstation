@@ -67,12 +67,17 @@ private:
         gst_buffer_pool_set_active(m_pool, TRUE);
 
         std::string pipeline_str = 
-            "appsrc name=mysource format=time is-live=true do-timestamp=true "
+            "appsrc name=mysource format=time is-live=true "
             "caps=video/x-raw,format=BGR,width=" + std::to_string(w) + ",height=" + std::to_string(h) + ",framerate=30/1 ! "
             "videoconvert ! "
             "video/x-raw,format=I420 ! " 
             "x264enc tune=zerolatency speed-preset=ultrafast key-int-max=30 ! " 
-            "rtph264pay ! "
+            /* 
+                timestamp-offset=0 forces the RTP payload to be 0.
+                we inject the correct simulation timestamp, 
+                preventing random offsets from being written. 
+            */
+            "rtph264pay timestamp-offset=0 ! "
             "udpsink host=127.0.0.1 port=11111";
 
         m_pipeline  = gst_parse_launch(pipeline_str.c_str(), nullptr);
@@ -82,16 +87,18 @@ private:
     }
 
 
-    void OnImageCb(const gz::msgs::Image &_msg) {
+    void OnImageCb(const gz::msgs::Image& msg) {
         // std::cerr << "[STATUS] CALLBACK RECEIVED!!!\n";
         GstBufferPoolAcquireParams params;
         GstBuffer*    buffer = nullptr;
         GstFlowReturn ret;
         GstMapInfo    map;
-        guint w = _msg.width();
-        guint h = _msg.height();
+        guint w = msg.width();
+        guint h = msg.height();
         gsize actual_size = w * h * 3;
-
+        const guint64 kSec = msg.header().stamp().sec();
+        const guint64 kNanoSec = msg.header().stamp().nsec();
+        const guint64 kTimestamp_ns = (kSec * 1000000000ULL) + kNanoSec;
 
         if (!m_pipeline) {
             InitializePipeline(w, h);
@@ -111,9 +118,14 @@ private:
             return;
         }
 
+        /* Map the buffer we just retrieved*/
         gst_buffer_map(buffer, &map, GST_MAP_WRITE);
-        std::memcpy(map.data, _msg.data().c_str(), m_frameSize);
+        std::memcpy(map.data, msg.data().c_str(), m_frameSize);
         gst_buffer_unmap(buffer, &map);
+
+        /* Inject The simulation time into the gstreamer buffer manually */
+        GST_BUFFER_PTS(buffer) = kTimestamp_ns;
+        GST_BUFFER_DTS(buffer) = kTimestamp_ns;
 
         gst_buffer_set_size(buffer, m_frameSize);
         gst_app_src_push_buffer(GST_APP_SRC(m_appSource), buffer);

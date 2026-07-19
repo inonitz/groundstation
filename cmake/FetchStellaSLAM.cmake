@@ -1,0 +1,197 @@
+include(ExternalProject)
+
+macro(DEFINE_LIBRARY_FETCH_OF_STELLA_VSLAM_WITH_EXTERNAL_PROJECT)
+    # Fetch Stella SLAM & its internal dependencies since they don't play well 
+    # when fetched one-by-one.
+
+    # Upstream Repositories
+    set(STELLA_UPSTREAM_SOURCE_REPOSITORY              "https://github.com/stella-cv/stella_vslam.git")
+    set(STELLA_TARGET_COMPILATION_BRANCH               "main")
+    set(STELLA_COMPILED_BINARY_BASE_NAME               "stella_vslam")
+    
+    set(G2O_UPSTREAM_SOURCE_REPOSITORY                 "https://github.com/RainerKuemmerle/g2o.git")
+    set(G2O_TARGET_COMPILATION_BRANCH                  "master")
+
+    set(YAML_CPP_UPSTREAM_SOURCE_REPOSITORY            "https://github.com/jbeder/yaml-cpp.git")
+    set(YAML_CPP_TARGET_COMPILATION_BRANCH             "0.8.0")
+
+    # Target Namespaces
+    set(STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING    "stella_vslam::static")
+    set(STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING      "stella_vslam::shared")
+    set(STELLA_TARGET_AGNOSTIC_ALIAS                   "stella_vslam::stella_vslam")
+
+    # External Build Step Orchestrators
+    set(STELLA_INTERNAL_STATIC_BUILD_STEP              "stella_vslam_internal_static")
+    set(STELLA_INTERNAL_SHARED_BUILD_STEP              "stella_vslam_internal_shared")
+    set(G2O_INTERNAL_STATIC_BUILD_STEP                 "g2o_internal_static")
+    set(G2O_INTERNAL_SHARED_BUILD_STEP                 "g2o_internal_shared")
+    set(YAML_CPP_INTERNAL_STATIC_BUILD_STEP            "yaml_cpp_internal_static")
+    set(YAML_CPP_INTERNAL_SHARED_BUILD_STEP            "yaml_cpp_internal_shared")
+
+    # Compilation Output Isolation Roots
+    set(STELLA_STATIC_BUILD_ISOLATION_DIRECTORY        "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/stella_static")
+    set(STELLA_SHARED_BUILD_ISOLATION_DIRECTORY        "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/stella_shared")
+
+    # Artifact Path Resolution
+    set(STELLA_STATIC_COMPILED_LIBRARY_FILE_PATH       "${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${STELLA_COMPILED_BINARY_BASE_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(STELLA_SHARED_COMPILED_LIBRARY_FILE_PATH       "${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${STELLA_COMPILED_BINARY_BASE_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(STELLA_STATIC_HEADERS_DIRECTORY                "${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}/include")
+    set(STELLA_SHARED_HEADERS_DIRECTORY                "${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}/include")
+
+    # Feature Disabling & Hardware Acceleration Flags
+    set(STELLA_OPTIMIZED_COMPILER_FEATURE_FLAGS
+        -DUSE_PANGOLIN_VIEWER=OFF
+        -DUSE_SOCKET_PUBLISHER=OFF
+        -DUSE_STACK_TRACE_LOGGER=OFF
+    )
+
+    if(NOT BUILD_SHARED_LIBS)
+        # 1. Yaml-cpp Static Build
+        ExternalProject_Add(${YAML_CPP_INTERNAL_STATIC_BUILD_STEP}
+            GIT_REPOSITORY ${YAML_CPP_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG        ${YAML_CPP_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW    TRUE
+            PREFIX         "${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}/yaml-cpp"
+            CMAKE_ARGS
+                -DYAML_CPP_BUILD_TESTS=OFF
+                -DYAML_CPP_BUILD_TOOLS=OFF
+                -DBUILD_SHARED_LIBS=OFF
+                -DCMAKE_INSTALL_PREFIX=${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_INSTALL_LIBDIR=lib
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        # 2. G2O Static Build
+        ExternalProject_Add(${G2O_INTERNAL_STATIC_BUILD_STEP}
+            GIT_REPOSITORY ${G2O_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG        ${G2O_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW    TRUE
+            PREFIX         "${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}/g2o"
+            CMAKE_ARGS
+                -DG2O_BUILD_APPS=OFF
+                -DG2O_BUILD_EXAMPLES=OFF
+                -DG2O_USE_OPENGL=OFF
+                -DBUILD_SHARED_LIBS=OFF
+                -DCMAKE_INSTALL_PREFIX=${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_INSTALL_LIBDIR=lib
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        # 3. Stella Static Library Declaration
+        ExternalProject_Add(${STELLA_INTERNAL_STATIC_BUILD_STEP}
+            DEPENDS        ${G2O_INTERNAL_STATIC_BUILD_STEP} ${YAML_CPP_INTERNAL_STATIC_BUILD_STEP}
+            GIT_REPOSITORY ${STELLA_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG        ${STELLA_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW    TRUE
+            PREFIX         "${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}"
+            BUILD_BYPRODUCTS "${STELLA_STATIC_COMPILED_LIBRARY_FILE_PATH}"
+            CMAKE_ARGS
+                ${STELLA_OPTIMIZED_COMPILER_FEATURE_FLAGS}
+                -DBUILD_SHARED_LIBS=OFF
+                -DCMAKE_INSTALL_PREFIX=${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_INSTALL_LIBDIR=lib
+                -DCMAKE_PREFIX_PATH=${STELLA_STATIC_BUILD_ISOLATION_DIRECTORY};${CMAKE_PREFIX_PATH}
+
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        add_library(${STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING} STATIC IMPORTED GLOBAL)
+        file(MAKE_DIRECTORY "${STELLA_STATIC_HEADERS_DIRECTORY}")
+        set_target_properties(${STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING} PROPERTIES
+            IMPORTED_LOCATION             "${STELLA_STATIC_COMPILED_LIBRARY_FILE_PATH}"
+            INTERFACE_INCLUDE_DIRECTORIES "${STELLA_STATIC_HEADERS_DIRECTORY}"
+        )
+        target_link_libraries(${STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING} INTERFACE 
+            nlohmann_json::nlohmann_json
+        )
+        add_dependencies(
+            ${STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING}
+            ${STELLA_INTERNAL_STATIC_BUILD_STEP}
+        )
+
+    else()
+        # 1. Yaml-cpp Shared Build
+        ExternalProject_Add(${YAML_CPP_INTERNAL_SHARED_BUILD_STEP}
+            GIT_REPOSITORY ${YAML_CPP_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG        ${YAML_CPP_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW    TRUE
+            PREFIX         "${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}/yaml-cpp"
+            CMAKE_ARGS
+                -DYAML_CPP_BUILD_TESTS=OFF
+                -DYAML_CPP_BUILD_TOOLS=OFF
+                -DBUILD_SHARED_LIBS=ON
+                -DCMAKE_INSTALL_PREFIX=${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_INSTALL_LIBDIR=lib
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        # 2. G2O Shared Build
+        ExternalProject_Add(${G2O_INTERNAL_SHARED_BUILD_STEP}
+            GIT_REPOSITORY ${G2O_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG        ${G2O_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW    TRUE
+            PREFIX         "${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}/g2o"
+            CMAKE_ARGS
+                -DG2O_BUILD_APPS=OFF
+                -DG2O_BUILD_EXAMPLES=OFF
+                -DG2O_USE_OPENGL=OFF
+                -DBUILD_SHARED_LIBS=ON
+                -DCMAKE_INSTALL_PREFIX=${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_INSTALL_LIBDIR=lib
+                -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        # 3. Stella Shared Library Declaration
+        ExternalProject_Add(${STELLA_INTERNAL_SHARED_BUILD_STEP}
+            DEPENDS          ${G2O_INTERNAL_SHARED_BUILD_STEP} ${YAML_CPP_INTERNAL_SHARED_BUILD_STEP}
+            GIT_REPOSITORY   ${STELLA_UPSTREAM_SOURCE_REPOSITORY}
+            GIT_TAG          ${STELLA_TARGET_COMPILATION_BRANCH}
+            GIT_SHALLOW      TRUE
+            PREFIX           "${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}"
+            BUILD_BYPRODUCTS "${STELLA_SHARED_COMPILED_LIBRARY_FILE_PATH}"
+            CMAKE_ARGS
+                ${STELLA_OPTIMIZED_COMPILER_FEATURE_FLAGS}
+                -DBUILD_SHARED_LIBS=ON
+                -DCMAKE_INSTALL_PREFIX=${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY}
+                -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON
+                -DCMAKE_INSTALL_LIBDIR=lib
+                -DCMAKE_PREFIX_PATH=${STELLA_SHARED_BUILD_ISOLATION_DIRECTORY};${CMAKE_PREFIX_PATH}
+                
+            USES_TERMINAL_CONFIGURE ON
+            USES_TERMINAL_BUILD     ON
+            USES_TERMINAL_INSTALL   ON
+        )
+
+        add_library(${STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING} SHARED IMPORTED GLOBAL)
+        file(MAKE_DIRECTORY "${STELLA_SHARED_HEADERS_DIRECTORY}")
+        set_target_properties(${STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING} PROPERTIES
+            IMPORTED_LOCATION             "${STELLA_SHARED_COMPILED_LIBRARY_FILE_PATH}"
+            INTERFACE_INCLUDE_DIRECTORIES "${STELLA_SHARED_HEADERS_DIRECTORY}"
+        )
+        target_link_libraries(${STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING} INTERFACE 
+            nlohmann_json::nlohmann_json
+        )
+        add_dependencies(
+            ${STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING} 
+            ${STELLA_INTERNAL_SHARED_BUILD_STEP}
+        )
+    endif()
+
+    # 4. Finally, the build artifact agnostic definition
+    if(BUILD_SHARED_LIBS)
+        add_library(${STELLA_TARGET_AGNOSTIC_ALIAS} ALIAS ${STELLA_TARGET_FOR_SHARED_ISOLATED_LINKING})
+    else()
+        add_library(${STELLA_TARGET_AGNOSTIC_ALIAS} ALIAS ${STELLA_TARGET_FOR_STATIC_MONOLITHIC_LINKING})
+    endif()
+endmacro()

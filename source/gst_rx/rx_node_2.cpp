@@ -16,11 +16,18 @@ public:
 
         m_publisher = this->create_publisher<sensor_msgs::msg::Image>(cameraTopic(), 10);
 
-        // emit-signals=true removed. Push-callbacks disabled.
+        /* 
+            max-buffers=1 & drop=true: 
+                Creates a size-1 circular queue. 
+                Drops stale frames if Receiving is slow.
+            sync=false: 
+                Disables GStreamer's internal wall-clock pacing. 
+                Forces frames to pass through instantly regardless of their timestamp.
+        */ 
         std::string pipeline_str = 
             "udpsrc port=11111 caps=\"application/x-rtp, media=video, clock-rate=90000, encoding-name=H264\" ! "
             "rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw, format=BGR ! "
-            "appsink name=mysink max-buffers=1 drop=true";
+            "appsink name=mysink max-buffers=1 drop=true sync=false";
 
         m_pipeline = gst_parse_launch(pipeline_str.c_str(), nullptr);
         m_sink     = gst_bin_get_by_name(GST_BIN(m_pipeline), "mysink");
@@ -58,6 +65,7 @@ private:
         GstVideoInfo info;
         GstMapInfo map;
         sensor_msgs::msg::Image msg;
+        guint64 presentTimestamp = 0;
 
         // Non-blocking attempt to pull frame. Timeout = 0.
         sample = gst_app_sink_try_pull_sample(GST_APP_SINK(m_sink), 0);
@@ -78,6 +86,18 @@ private:
             RCLCPP_ERROR(this->get_logger(), "Failed to map GstBuffer");
             gst_sample_unref(sample);
             return;
+        }
+
+        presentTimestamp = GST_BUFFER_PTS(buffer);
+        if (GST_CLOCK_TIME_IS_VALID(presentTimestamp) && presentTimestamp > 0) {
+            // Reconstruct the ROS 2 timestamp using the exact simulation math.
+            msg.header.stamp.sec = presentTimestamp / 1000000000ULL;
+            msg.header.stamp.nanosec = presentTimestamp % 1000000000ULL;
+        } else {
+            /*  Physical drones fallback: streams raw UDP without embedded timestamps. 
+                If PTS is 0/invalid, we must use the current ROS wall-clock.
+            */
+            msg.header.stamp = this->now();
         }
 
         msg.header.stamp = this->now();

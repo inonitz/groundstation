@@ -91,7 +91,7 @@ ASR_FLAGS=(
 CMD_TERMINAL_5="$BUILD_BINARY_DIR/ros2_speech_to_action_asr_server ${ASR_FLAGS[*]}; echo 'CRASHED.'; read"
 CMD_TERMINAL_6="$BUILD_BINARY_DIR/ros2_speech_to_action_offboard_mode; echo 'CRASHED.'; read"
 
-CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/llama_shared/bin:$LD_LIBRARY_PATH && \
+CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/llama_shared/bin:$BUILD_BINARY_DIR/stella_shared/bin$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama_shared/bin/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
