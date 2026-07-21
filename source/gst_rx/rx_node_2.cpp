@@ -100,7 +100,6 @@ private:
             msg.header.stamp = this->now();
         }
 
-        msg.header.stamp = this->now();
         msg.header.frame_id = frameId();
         msg.height = info.height;
         msg.width = info.width;

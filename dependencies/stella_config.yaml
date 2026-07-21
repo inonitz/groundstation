@@ -1,20 +1,23 @@
-Camera.name: "Gazebo_Sim_Camera"
-Camera.setup: "monocular"
-Camera.model: "perspective"
+Camera:
+  name: "Gazebo_Sim_Camera"
+  setup: "monocular"
+  model: "perspective"
+  fx: 410.94
+  fy: 410.94
+  cx: 640.0
+  cy: 360.0
+  k1: 0.0
+  k2: 0.0
+  p1: 0.0
+  p2: 0.0
+  k3: 0.0
+  fps: 30.0
+  cols: 1280
+  rows: 720
+  color_order: "RGB"
 
-Camera.fx: 410.94
-Camera.fy: 410.94
-Camera.cx: 640.0
-Camera.cy: 360.0
-
-Camera.k1: 0.0
-Camera.k2: 0.0
-Camera.p1: 0.0
-Camera.p2: 0.0
-Camera.k3: 0.0
-
-Camera.fps: 30.0
-Camera.cols: 1280
-Camera.rows: 720
-
-Camera.color_order: "RGB"
+FeatureExtractor:
+  name: "default"
+  num_keypoints: 2500
+  ini_fast_threshold: 10
+  min_fast_threshold: 7

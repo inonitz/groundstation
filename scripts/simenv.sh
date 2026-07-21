@@ -76,7 +76,7 @@ CMD_TERMINAL_3="\
     make px4_sitl gz_x500_gimbal; \
     echo 'CRASHED. Press enter to exit...'; read"
 
-CMD_TERMINAL_4="$BUILD_BINARY_DIR/ros2_speech_to_action_keyboard_input; echo 'CRASHED.'; read"
+CMD_TERMINAL_4="$BUILD_BINARY_DIR/ros2_speech_to_action_keyboard_input; echo 'Process Stopped'; read"
 
 ASR_FLAGS=(
     "--backend=whisper-parakeet"
@@ -85,13 +85,15 @@ ASR_FLAGS=(
     "--language=en"
     "--threads=1"
     "--gid=0"
-    "--captureid=1"
+    "--captureid=4"
 )
 
-CMD_TERMINAL_5="$BUILD_BINARY_DIR/ros2_speech_to_action_asr_server ${ASR_FLAGS[*]}; echo 'CRASHED.'; read"
-CMD_TERMINAL_6="$BUILD_BINARY_DIR/ros2_speech_to_action_offboard_mode; echo 'CRASHED.'; read"
+CMD_TERMINAL_5="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/bin:$LD_LIBRARY_PATH && \
+    $BUILD_BINARY_DIR/ros2_speech_to_action_asr_server ${ASR_FLAGS[*]}; echo 'Process Stopped'; read"
 
-CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/llama_shared/bin:$BUILD_BINARY_DIR/stella_shared/bin$LD_LIBRARY_PATH && \
+CMD_TERMINAL_6="$BUILD_BINARY_DIR/ros2_speech_to_action_offboard_mode; echo 'Process Stopped'; read"
+
+CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/bin:$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama_shared/bin/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
@@ -103,7 +105,7 @@ CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/llama_shared/bin:$BUILD
     --temp 0.2 \
     --host 0.0.0.0 \
     --port 8080 \
-    --threads 2; echo 'CRASHED.'; read"
+    --threads 2; echo 'Process Stopped'; read"
 
 CMD_TERMINAL_8="ros2 run ros_gz_bridge parameter_bridge \
     /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image[gz.msgs.Image; echo 'CRASHED.'; read"
@@ -149,7 +151,7 @@ tmux split-window -h -t "$SESSION_NAME:0" "$CMD_TERMINAL_4"
 # 3. Split each of the 3 columns to create 2 rows (Total 6 panes)
 tmux split-window -v -t "$SESSION_NAME:0.0" "sleep $DELAY_KEYBOARD && $CMD_TERMINAL_5"
 tmux split-window -v -t "$SESSION_NAME:0.2" "sleep $DELAY_ASR && $CMD_TERMINAL_6"
-tmux split-window -v -t "$SESSION_NAME:0.4" "sleep $DELAY_OFFBOARD && $CMD_TERMINAL_7"
+# tmux split-window -v -t "$SESSION_NAME:0.4" "sleep $DELAY_OFFBOARD && $CMD_TERMINAL_7"
 
 # 4. Final Tiling
 tmux select-layout -t "$SESSION_NAME:0" tiled
