@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.16)
 project(ros2_speech_to_action C CXX)
 
 
+set(IS_WSL_ENV
+)
+detect_wsl_env(IS_WSL_ENV)
+
+
+
 macro(define_ros2_node EXE_NAME FILE_SOURCES)
    set(FULL_EXE_NAME ${PROJECT_NAME}_${EXE_NAME})
 
@@ -11,6 +17,9 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
       c_std_11
       cxx_std_17
    )
+   target_compile_definitions(${FULL_EXE_NAME} PRIVATE
+      $<$<BOOL:${IS_WSL_ENV}>:__WSL__=1>
+   )
    target_link_libraries(${FULL_EXE_NAME} PRIVATE 
       UTIL2::util2
       cxxopts::cxxopts
@@ -19,6 +28,8 @@ macro(define_ros2_node EXE_NAME FILE_SOURCES)
       geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
       # WORKSPACE_CONFIG::ProjectDefaultConfig
    )
+
+
 
 
    add_custom_target(run_${FULL_EXE_NAME}
@@ -55,7 +66,15 @@ set(ASR_SERVER_NODE_SOURCES
 
 
 define_ros2_node(keyboard_input "${KEYBOARD_NODE_SOURCES}")
+target_link_libraries(${PROJECT_NAME}_keyboard_input PRIVATE
+   $<$<BOOL:${IS_WSL_ENV}>:${X11_LIBRARIES} ${X11_Xi_LIB}>
+)
+target_include_directories(${PROJECT_NAME}_keyboard_input PRIVATE 
+   $<$<BOOL:${IS_WSL_ENV}>:${X11_INCLUDE_DIR}>
+)
+
 define_ros2_node(offboard_mode "${OFFBOARD_CONTROL_NODE_SOURCES}")
+
 define_ros2_node(asr_server "${ASR_SERVER_NODE_SOURCES}")
 target_link_libraries(${PROJECT_NAME}_asr_server PRIVATE
    STTSERVER::SpeechToTextServer

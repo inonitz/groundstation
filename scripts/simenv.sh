@@ -72,6 +72,7 @@ CMD_TERMINAL_3="\
     export PX4_GZ_MODEL_POSE=0,7,3 && \
     export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH && \
     export PX4_GZ_WORLD=rubicon && \
+    export PX4_NET_INTERFACE=eth0 && \
     cd $PX4_DIRECTORY && \
     make px4_sitl gz_x500_gimbal; \
     echo 'CRASHED. Press enter to exit...'; read"
@@ -85,15 +86,15 @@ ASR_FLAGS=(
     "--language=en"
     "--threads=1"
     "--gid=0"
-    "--captureid=4"
+    "--captureid=1"
 )
 
-CMD_TERMINAL_5="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/bin:$LD_LIBRARY_PATH && \
+CMD_TERMINAL_5="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/ros2_speech_to_action_asr_server ${ASR_FLAGS[*]}; echo 'Process Stopped'; read"
 
 CMD_TERMINAL_6="$BUILD_BINARY_DIR/ros2_speech_to_action_offboard_mode; echo 'Process Stopped'; read"
 
-CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/bin:$LD_LIBRARY_PATH && \
+CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama_shared/bin/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
@@ -109,6 +110,9 @@ CMD_TERMINAL_7="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR/bin:$LD_LIBRARY_PATH &&
 
 CMD_TERMINAL_8="ros2 run ros_gz_bridge parameter_bridge \
     /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image[gz.msgs.Image; echo 'CRASHED.'; read"
+
+
+
 
 # ==============================================================================
 # 4. EXECUTION BLOCK
@@ -152,6 +156,8 @@ tmux split-window -h -t "$SESSION_NAME:0" "$CMD_TERMINAL_4"
 tmux split-window -v -t "$SESSION_NAME:0.0" "sleep $DELAY_KEYBOARD && $CMD_TERMINAL_5"
 tmux split-window -v -t "$SESSION_NAME:0.2" "sleep $DELAY_ASR && $CMD_TERMINAL_6"
 # tmux split-window -v -t "$SESSION_NAME:0.4" "sleep $DELAY_OFFBOARD && $CMD_TERMINAL_7"
+
+tmux split-window -v -t "$SESSION_NAME:0.4" "socat UDP4-LISTEN:14550,reuseaddr,fork UDP4-SENDTO:$PX4_SIM_HOST_ADDR:14550"
 
 # 4. Final Tiling
 tmux select-layout -t "$SESSION_NAME:0" tiled

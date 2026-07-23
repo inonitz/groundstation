@@ -21,7 +21,7 @@
 
 class AsyncKeyHook {
 public:
-    using Callback = std::function<void(KeyCode, KeyAction)>;
+    using Callback = std::function<void(KeyCodeEnum, KeyAction)>;
 
 #if defined(UTIL2_OS_WINDOWS)
     using ThreadID = DWORD;
@@ -50,10 +50,10 @@ public:
 
     // Register a callback invoked (on the consumer thread) when `key` is pressed.
     // Replaces any existing callback for the same key.
-    void bindKey(KeyCode key, Callback cb);
+    void bindKey(KeyCodeEnum key, Callback cb);
 
     // Remove a previously registered callback (no-op if not bound).
-    void unbindKey(KeyCode key);
+    void unbindKey(KeyCodeEnum key);
 
 
 private:
@@ -71,7 +71,7 @@ private:
 
     void producerThread();
     void consumerThread();
-    void dispatch(KeyCode key, KeyAction pressType);
+    void dispatch(KeyCodeEnum key, KeyAction pressType);
 
 #if defined(UTIL2_OS_WINDOWS)
     static LRESULT CALLBACK keyboardCallback(int nCode, WPARAM wParam, LPARAM lParam);
@@ -84,6 +84,7 @@ private:
     // Singleton pointer used from the Windows low-level hook callback,
     // which has a C-style signature without user-data.
     static AsyncKeyHook* s_instance;
+    static std::atomic_flag s_instanceGuard;
 
     std::thread             m_producer;
     std::thread             m_consumer;
@@ -92,11 +93,13 @@ private:
     std::condition_variable m_cv;
     std::atomic<bool>       m_exit{false};
     std::atomic<bool>       m_running{false};
+    std::atomic<bool>       m_startupSuccess{false};
+    std::atomic<bool>       m_startupComplete{false};
     std::atomic<ThreadID>   m_producerID{0xFFFFFFFF};
     std::atomic<ThreadID>   m_consumerID{0xFFFFFFFF};
 
     std::mutex                            m_bindingsMtx;
-    std::unordered_map<KeyCode, Callback> m_bindings;
+    std::unordered_map<KeyCodeEnum, Callback> m_bindings;
 
 #if defined(UTIL2_OS_WINDOWS)
     HHOOK m_keyHook{nullptr};

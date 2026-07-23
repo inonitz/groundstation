@@ -217,7 +217,7 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
                 parse_msg_for_drone_topics(out_msg.data);
 
                 // transcript_time_ns = transcript_time_ns / (1000 * 1000) + (transcript_time_ns % (1000 * 1000)) > 0;
-                transcript_time_ns = ( transcript_time_ns / 1000'000 ) + (transcript_time_ns % 1000'000 > 0);
+                transcript_time_ns = ( transcript_time_ns / 1'000'000 ) + (transcript_time_ns % 1'000'000 > 0);
                 // RCLCPP_INFO(this->get_logger(), "[WORKER] >>> TRANSCRIBED (%ld ms, cf=%3.3f): \"%s\"", 
                 //     transcript_time_ns, 
                 //     get_transcription_confidence(m_backend.m_state.parakeet->ctx),
@@ -227,10 +227,10 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
                     transcript_time_ns, 
                     out_msg.data.c_str()
                 );
-                // WavWriter d{};
-                // d.open("audio_transcript_" + std::to_string(m_recordTimeMs) + ".wav", 1, 16000);
-                // d.write(resampledBuf.data(), framesToWrite64);
-                // d.close();
+                WavWriter d{};
+                d.open("audio_transcript_" + std::to_string(m_recordTimeMs) + ".wav", 1, 16000);
+                d.write(resampledBuf.data(), framesToWrite64);
+                d.close();
                 m_backend.print_timings();
             }
         }

@@ -6,6 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
+    iproute2 \
+    dos2unix \
+    netcat-openbsd \
+    pulseaudio-utils \
     git \
     wget \
     curl \
@@ -87,9 +91,11 @@ RUN git clone --depth 1 https://github.com/PX4/px4_msgs.git src/px4_msgs \
 
 # 8. Setup Bash environment
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc \
-    && echo "source /opt/px4_ws/install/setup.bash" >> /root/.bashrc
+    && echo "source /opt/px4_ws/install/setup.bash" >> /root/.bashrc \
+    && echo 'export PX4_SIM_HOST_ADDR=$(ip route show | awk "/default/ {print \$3}")' >> /root/.bashrc
 
 WORKDIR /root
 
+RUN git config --global --add safe.directory '*'
 RUN git config --global --add safe.directory /root/groundstation
 RUN git config --global --add safe.directory /root/groundstation/dependencies

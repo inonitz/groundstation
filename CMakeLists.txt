@@ -9,6 +9,7 @@ endif()
 
 # 1. Include Utility Headers
 include(ExternalProject)
+include(cmake/DetectWSL.cmake)
 include(cmake/FetchCPM.cmake)
 include(cmake/SubmoduleUpdate.cmake)
 include(cmake/UseCCache.cmake)
@@ -53,6 +54,10 @@ find_package(px4_msgs        REQUIRED)
 # Required Dependency for OpenVINS
 find_package(Eigen3          REQUIRED)
 find_package(OpenCV          REQUIRED)
+if(${GLOBAL_WORKSPACE_LINUX_IS_WSL})
+    find_package(X11 REQUIRED)
+endif()
+
 define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
 define_library_fetch_of_stella_vslam_with_external_project()

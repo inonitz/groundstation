@@ -11,7 +11,7 @@
 #endif
 
 
-enum class KeyCode : std::uint16_t {
+enum class KeyCodeEnum : std::uint16_t {
 #if defined(UTIL2_OS_WINDOWS)
     Escape        = VK_ESCAPE,
     Enter         = VK_RETURN,
@@ -211,13 +211,13 @@ enum class KeyAction : std::uint16_t {
 
 
 
-constexpr std::uint16_t keyCodeToInteger(KeyCode k) noexcept {
+constexpr std::uint16_t keyCodeToInteger(KeyCodeEnum k) noexcept {
     return static_cast<std::uint16_t>(k);
 }
 
-const char* keyCodeToString(KeyCode key) noexcept;
+const char* keyCodeToString(KeyCodeEnum key) noexcept;
 bool        keyCodeIsDigit(
-    KeyCode key, 
+    KeyCodeEnum key, 
     bool    numPad = false
 ) noexcept;
 

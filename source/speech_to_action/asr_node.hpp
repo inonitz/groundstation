@@ -56,11 +56,11 @@ public:
                     return;
                 }
 
-                auto key = static_cast<KeyCode>(msg->data[0]);
+                auto key = static_cast<KeyCodeEnum>(msg->data[0]);
                 auto action = static_cast<KeyAction>(msg->data[1]);
 
                 /* Early Exit - We Listen to the Key H for recording */
-                if (key != KeyCode::H) {
+                if (key != KeyCodeEnum::H) {
                     return;
                 }
 
