@@ -8,53 +8,78 @@ ContainerPathASRModelPath="/root/models/asr"
 HostPathVLMModel="$HOME/models/vlm"
 ContainerPathVLMModelPath="/root/models/vlm"
 
-# Clear existing positional parameters
+# Clear parameters
 set --
 
-# Run interactive, clean up after, grant privileges
+# Run interactive, clean up, privileges
 set -- "$@" -it --rm --privileged
 
-# GUI and Display mapping
+# GUI mapping
 set -- "$@" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw"
 set -- "$@" -e "DISPLAY"
 set -- "$@" -e "QT_X11_NO_MITSHM=1"
-# Fix IPC crash
 set -- "$@" -e "XDG_RUNTIME_DIR=/tmp"
 
-# GPU passthrough
-set -- "$@" -e "NVIDIA_DRIVER_CAPABILITIES=all"
-set -- "$@" -e "NVIDIA_VISIBLE_DEVICES=all"
-set -- "$@" --gpus=all
-
-# Use host network
+# Host network
 set -- "$@" --net=host
 
-# Local Devenv Folder Mount
+# Folder Mounts
 set -- "$@" -v "${HostPathProjectPath}:${ContainerPathProjectPath}"
-
-# Mount the Audio Device (For ASR Testing, Native Linux)
 set -- "$@" -v "/run/user/$(id -u)/pulse/native:/tmp/pulse-socket"
 set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
-
-# Mount the ASR Model Path
 set -- "$@" -v "${HostPathASRModel}:${ContainerPathASRModelPath}"
-
-# Mount the VLM Model Path
 set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
-
-# Mount GPU Direct Rendering Infrastructure (DRI) nodes
-set -- "$@" --device "/dev/dri"
-
-# Mount NVIDIA Vulkan Driver description file (Surgical fix for Vulkan loader)
-set -- "$@" -v "/usr/share/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json:ro"
-# Mount NVIDIA EGL Driver description file (Surgical fix for EGL loader)
-set -- "$@" -v "/usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json:ro"
-
-# VSCode Extensions
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
 
+# DRI for Intel/AMD/Generic
+if [ -d "/dev/dri" ]; then
+    set -- "$@" --device "/dev/dri"
+fi
+
+# AMD ROCm Compute & Vulkan Fix
+if [ -e "/dev/kfd" ]; then
+    set -- "$@" --device "/dev/kfd"
+    set -- "$@" --security-opt seccomp=unconfined
+    
+    # Surgical fix Vulkan AMD JSON. Added radeon_icd.json.
+    for icd in "/usr/share/vulkan/icd.d/radeon_icd.json" "/etc/vulkan/icd.d/radeon_icd.json" "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json" "/usr/share/vulkan/icd.d/amd_icd64.json"; do
+        if [ -f "$icd" ]; then
+            set -- "$@" -v "$icd:$icd:ro"
+        fi
+    done
+
+    # Surgical fix Vulkan AMD Shared Library.
+    for so in "/lib/x86_64-linux-gnu/libvulkan_radeon.so" "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so" "/usr/lib64/libvulkan_radeon.so" "/usr/lib/libvulkan_radeon.so"; do
+        if [ -f "$so" ]; then
+            set -- "$@" -v "$so:$so:ro"
+        fi
+    done
+fi
+
+# NVIDIA Check & Dynamic Path Loop
+if command -v nvidia-smi >/dev/null 2>&1; then
+    set -- "$@" -e "NVIDIA_DRIVER_CAPABILITIES=all"
+    set -- "$@" -e "NVIDIA_VISIBLE_DEVICES=all"
+    set -- "$@" --gpus=all
+
+    # Surgical fix Vulkan. Loop through common host paths.
+    for icd in "/usr/share/vulkan/icd.d/nvidia_icd.json" "/etc/vulkan/icd.d/nvidia_icd.json" "/usr/local/share/vulkan/icd.d/nvidia_icd.json"; do
+        if [ -f "$icd" ]; then
+            set -- "$@" -v "$icd:/etc/vulkan/icd.d/nvidia_icd.json:ro"
+            break
+        fi
+    done
+    
+    # Surgical fix EGL. Loop through common host paths.
+    for egl in "/usr/share/glvnd/egl_vendor.d/10_nvidia.json" "/etc/glvnd/egl_vendor.d/10_nvidia.json" "/usr/local/share/glvnd/egl_vendor.d/10_nvidia.json"; do
+        if [ -f "$egl" ]; then
+            set -- "$@" -v "$egl:/usr/share/glvnd/egl_vendor.d/10_nvidia.json:ro"
+            break
+        fi
+    done
+fi
+
 # Execute
-# Allow local X11 connections
 xhost +local:root
 docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && exec bash"

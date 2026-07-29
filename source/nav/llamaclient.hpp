@@ -51,8 +51,8 @@ public:
             initialSystemPrompt;
         m_temperature  = temperature;
         m_maxTokens    = max_tokens;
-        m_client.create();
 
+        m_client.create();
         m_jsonRequest["temperature"] = m_temperature;
         m_jsonRequest["max_tokens"]  = m_maxTokens;
         return;

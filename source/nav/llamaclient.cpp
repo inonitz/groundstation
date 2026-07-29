@@ -17,7 +17,7 @@ void llamaClient::destroy() {
 }
 
 void llamaClient::submit(
-    nlohmann::json const&  payload, 
+    nlohmann::json const&      payload, 
     httpRequestCallback const& callback
 ) {
     if(!m_cli) { // Prevent segfault if not initialized 

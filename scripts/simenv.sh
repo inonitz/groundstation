@@ -86,7 +86,7 @@ ASR_FLAGS=(
     "--language=en"
     "--threads=1"
     "--gid=0"
-    "--captureid=1"
+    "--captureid=-1"
 )
 
 CMD_TERMINAL_5="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$LD_LIBRARY_PATH && \
