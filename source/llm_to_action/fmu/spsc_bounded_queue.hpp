@@ -1,5 +1,4 @@
 #pragma once
-
 #include <atomic>
 #include <utility>
 #include <type_traits>
@@ -8,7 +7,7 @@
 
 
 
-// Compiler ABI fallback for cache line
+/* Compiler ABI fallback for cache line */
 #ifdef __cpp_lib_hardware_interference_size
     inline constexpr size_t kCacheLineBytes = std::hardware_destructive_interference_size;
 #else

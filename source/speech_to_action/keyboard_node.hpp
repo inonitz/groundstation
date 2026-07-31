@@ -20,7 +20,7 @@ public:
         // https://docs.ros2.org/latest/api/rclcpp/classrclcpp_1_1TimerBase.html
         m_twist  = this->create_publisher<KeyboardTwistType>(kOutKeyboardTwistTopic, 10);
         m_arming = this->create_publisher<KeyboardArmType>(kOutKeyboardArmStateTopic, 10);
-        m_raw    = this->create_publisher<KeyboardRawInputType>(kOutKeyboardRawTopic, 10);
+        m_rawKeyEvent    = this->create_publisher<KeyboardRawInputType>(kOutKeyboardRawTopic, 10);
         m_timer = this->create_wall_timer(
             std::chrono::milliseconds(50), 
             std::bind(&KeyboardTeleop::timerCallback, this)
@@ -63,7 +63,7 @@ private:
         KeyboardRawInputType _;
         _.data.push_back(static_cast<int32_t>(k));
         _.data.push_back(static_cast<int32_t>(action));
-        m_raw->publish(_);
+        m_rawKeyEvent->publish(_);
 
         // 2. Handle Inputs for Px4 Drone
         if (action == KeyAction::UNKNOWN) {
@@ -115,7 +115,7 @@ private:
 
     PublisherPtr<KeyboardTwistType>    m_twist;
     PublisherPtr<KeyboardArmType>      m_arming;
-    PublisherPtr<KeyboardRawInputType> m_raw;
+    PublisherPtr<KeyboardRawInputType> m_rawKeyEvent;
     rclcpp::TimerBase::SharedPtr          m_timer;
     AsyncKeyHook                          m_keyHook;
     KeyboardTwistType                  m_velcmd;

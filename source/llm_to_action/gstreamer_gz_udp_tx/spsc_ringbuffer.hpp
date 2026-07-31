@@ -1,11 +1,9 @@
 #pragma once
-
 #include <atomic>
 #include <utility>
 #include <type_traits>
 #include <memory>
 #include <cstring>
-
 
 
 // Compiler ABI fallback for cache line

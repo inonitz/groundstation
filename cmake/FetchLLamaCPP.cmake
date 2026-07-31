@@ -14,7 +14,7 @@ macro(DEFINE_LIBRARY_FETCH_OF_LLAMA_CPP_WITH_EXTERNAL_PROJECT)
     # creates target collisions in the CMake global namespace if fetched together
     # =============================================================================
     set(LLAMA_UPSTREAM_SOURCE_REPOSITORY              "https://github.com/ggerganov/llama.cpp.git")
-    set(LLAMA_TARGET_COMPILATION_BRANCH               "master")
+    set(LLAMA_TARGET_COMPILATION_BRANCH               "b10206") # Set this to the most-stable curently latest release
     set(LLAMA_COMPILED_BINARY_BASE_NAME               "llama")
 
     # Target Namespaces Describing Linking Intent
@@ -73,7 +73,8 @@ macro(DEFINE_LIBRARY_FETCH_OF_LLAMA_CPP_WITH_EXTERNAL_PROJECT)
                 -DCMAKE_INSTALL_INCLUDEDIR=include
 
             INSTALL_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/lib" "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}"
+                # COMMAND ${CMAKE_COMMAND} -E make_directory "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/lib"
+                # COMMAND ${CMAKE_COMMAND} -E copy_directory "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/lib" "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}"
 
             USES_TERMINAL_CONFIGURE ON
             USES_TERMINAL_BUILD     ON
@@ -106,7 +107,7 @@ macro(DEFINE_LIBRARY_FETCH_OF_LLAMA_CPP_WITH_EXTERNAL_PROJECT)
                 -DCMAKE_INSTALL_INCLUDEDIR=include
 
             INSTALL_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/lib" "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}"
+                # COMMAND ${CMAKE_COMMAND} -E copy_directory "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}/lib" "${WORKSPACE_GLOBAL_CUSTOM_BUILD_OUTPUT_DIRECTORY}"
                 
             USES_TERMINAL_CONFIGURE ON
             USES_TERMINAL_BUILD     ON

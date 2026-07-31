@@ -20,7 +20,7 @@ include(cmake/BuildDiagnostics.cmake)
 include(cmake/FetchLLamaCPP.cmake)
 include(cmake/FindGStreamer.cmake)
 # include(cmake/FetchOpenVINS.cmake)
-include(cmake/FetchStellaSLAM.cmake)
+# include(cmake/FetchStellaSLAM.cmake)
 include_cpm()
 
 
@@ -60,7 +60,7 @@ endif()
 
 define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
-define_library_fetch_of_stella_vslam_with_external_project()
+# define_library_fetch_of_stella_vslam_with_external_project()
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -140,9 +140,7 @@ safe_cpm_add_package(
 # Local Project
 # ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_EXECUTABLE)
-    add_subdirectory(source/gz_cam_plugin)
-    add_subdirectory(source/gst_rx)
-    add_subdirectory(source/nav)
+    add_subdirectory(source/llm_to_action)
     add_subdirectory(source/speech_to_action)
-    add_subdirectory(source/slam)
+    add_subdirectory(source/nav)
 endif()

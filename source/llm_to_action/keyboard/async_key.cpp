@@ -160,7 +160,6 @@ void AsyncKeyHook::dispatch(KeyCodeEnum key, KeyAction pressType) {
 		cb 	  = (it != m_bindings.end())    ? it->second    : nullptr;
 		anycb = (anyit != m_bindings.end()) ? anyit->second : nullptr;
 	}
-
 	fprintf(stderr, "[HOOK_DBG] Invoking Callback for KeyCode %d...\n", 
 		static_cast<int>(key)
 	);
