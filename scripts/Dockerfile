@@ -13,6 +13,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     git \
     wget \
     curl \
+    ripgrep \
+    jq \
     sudo \
     cmake \
     build-essential \
@@ -52,6 +54,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
        ros-jazzy-ros-gz \
        gz-harmonic \
     && rm -rf /var/lib/apt/lists/*
+
+# 1.5 Install RTK and move to PATH
+RUN curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh \
+    && mv /root/.local/bin/rtk /usr/local/bin/rtk
 
 # 3. Define VS Code Environment Variables
 ENV VSCodeClangdAbsPath=/usr/bin/clangd

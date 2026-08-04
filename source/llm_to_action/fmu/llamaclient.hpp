@@ -38,7 +38,12 @@ private:
 };
 
 
-class llamaConnection {
+/* 
+    This one is less primitive than the first.
+    If granular control is required use the llamaClient.
+    If you just want to send user-queries & receive responses from the model use this instead.
+*/
+class llamaClientConnection {
 public:
     __force_inline void create(
         std::string const& initialSystemPrompt,
@@ -65,9 +70,9 @@ public:
     }
 
     auto send(
-        std::string_view const& systemPrompt, 
-        std::string_view const& userPrompt, 
-        std::string_view const& imageB64Blob
+        std::string_view systemPrompt, 
+        std::string_view userPrompt, 
+        std::string_view imageB64Blob
     ) {
         std::string sys_prompt = systemPrompt.empty() ? m_systemPrompt : std::string(systemPrompt);
 

@@ -38,7 +38,7 @@ private:
 };
 
 
-class llamaConnection {
+class llamaClientConnection {
 public:
     __force_inline void create(
         std::string const& initialSystemPrompt,

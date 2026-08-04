@@ -19,6 +19,7 @@ set -- "$@" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw"
 set -- "$@" -e "DISPLAY"
 set -- "$@" -e "QT_X11_NO_MITSHM=1"
 set -- "$@" -e "XDG_RUNTIME_DIR=/tmp"
+set -- "$@" -e "RTK_TELEMETRY_DISABLED=1"
 
 # Host network
 set -- "$@" --net=host
@@ -31,6 +32,7 @@ set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
 set -- "$@" -v "${HostPathASRModel}:${ContainerPathASRModelPath}"
 set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
+set -- "$@" -v "$HOME/.claude:/root/.claude"
 
 # DRI for Intel/AMD/Generic
 if [ -d "/dev/dri" ]; then
@@ -45,14 +47,14 @@ if [ -e "/dev/kfd" ]; then
     # Surgical fix Vulkan AMD JSON. Added radeon_icd.json.
     for icd in "/usr/share/vulkan/icd.d/radeon_icd.json" "/etc/vulkan/icd.d/radeon_icd.json" "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json" "/usr/share/vulkan/icd.d/amd_icd64.json"; do
         if [ -f "$icd" ]; then
-            set -- "$@" -v "$icd:$icd:ro"
+            set -- "$@" -v "$icd:$icd"
         fi
     done
 
     # Surgical fix Vulkan AMD Shared Library.
     for so in "/lib/x86_64-linux-gnu/libvulkan_radeon.so" "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so" "/usr/lib64/libvulkan_radeon.so" "/usr/lib/libvulkan_radeon.so"; do
         if [ -f "$so" ]; then
-            set -- "$@" -v "$so:$so:ro"
+            set -- "$@" -v "$so:$so"
         fi
     done
 fi
@@ -66,7 +68,7 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     # Surgical fix Vulkan. Loop through common host paths.
     for icd in "/usr/share/vulkan/icd.d/nvidia_icd.json" "/etc/vulkan/icd.d/nvidia_icd.json" "/usr/local/share/vulkan/icd.d/nvidia_icd.json"; do
         if [ -f "$icd" ]; then
-            set -- "$@" -v "$icd:/etc/vulkan/icd.d/nvidia_icd.json:ro"
+            set -- "$@" -v "$icd:/etc/vulkan/icd.d/nvidia_icd.json"
             break
         fi
     done
@@ -74,12 +76,13 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     # Surgical fix EGL. Loop through common host paths.
     for egl in "/usr/share/glvnd/egl_vendor.d/10_nvidia.json" "/etc/glvnd/egl_vendor.d/10_nvidia.json" "/usr/local/share/glvnd/egl_vendor.d/10_nvidia.json"; do
         if [ -f "$egl" ]; then
-            set -- "$@" -v "$egl:/usr/share/glvnd/egl_vendor.d/10_nvidia.json:ro"
+            set -- "$@" -v "$egl:/usr/share/glvnd/egl_vendor.d/10_nvidia.json"
             break
         fi
     done
 fi
 
 # Execute
+# Execute
 xhost +local:root
-docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && exec bash"
+docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "mkdir -p ~/.claude && rtk init -g >/dev/null 2>&1 && echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && exec bash"

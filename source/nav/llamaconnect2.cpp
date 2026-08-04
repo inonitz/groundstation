@@ -14,7 +14,7 @@ int main()
     const cv::Mat frame(1280, 720, CV_8UC3, cv::Scalar(255, 0, 128));
     
     
-    llamaConnection cli{};  
+    llamaClientConnection cli{};  
     std::string     b64_image = mat_to_base64(frame);
 
 

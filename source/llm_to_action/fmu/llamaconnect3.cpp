@@ -1,5 +1,4 @@
 #include "llamaclient.hpp"
-#include "llamaconnect3.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -14,7 +13,7 @@ int main()
     const cv::Mat frame(1280, 720, CV_8UC3, cv::Scalar(255, 0, 128));
     
     
-    llamaConnection cli{};  
+    llamaClientConnection cli{};  
     std::string     b64_image = mat_to_base64(frame);
 
 
@@ -23,9 +22,9 @@ int main()
         256
     );
 
+    const auto k_start_time = std::chrono::steady_clock::now();
     auto result = cli.send("", "Describe this camera frame", b64_image);
     if(result.has_value()) {
-        const auto k_start_time = std::chrono::steady_clock::now();
         
         const auto& res = result->get();
         if(res && res->status == 200) {

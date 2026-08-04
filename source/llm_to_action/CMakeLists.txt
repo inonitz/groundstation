@@ -62,10 +62,11 @@ target_include_directories(util_base_header INTERFACE
 # ---------------------------------------------------------------------------
 set(FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX fmu)
 set(FLIGHT_MANAGEMENT_UNIT_NODE_SOURCES
+    fmu/fmu_node_base.hpp
+    fmu/fmu_node.cpp
+    fmu/fmu_node.hpp
     fmu/llamaclient.cpp
     fmu/llamaclient.hpp
-    fmu/llamaconnect3.cpp
-    fmu/llamaconnect3.hpp
     fmu/spsc_bounded_queue.hpp
     fmu/threadpool.hpp
 )
@@ -110,6 +111,7 @@ ros2_node_add_library(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
     util_base_header
     BASE64::base64
     nlohmann_json::nlohmann_json
+    cv_bridge::cv_bridge
     llama::llama
     opencv_core
     opencv_imgcodecs
@@ -120,6 +122,7 @@ ros2_node_add_library(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
     sensor_msgs::sensor_msgs__rosidl_generator_cpp
 )
 ros2_node_add_include_directory(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX} 
+    ${cv_bridge_INCLUDE_DIRS}
     ${moodycamel_readerwriterqueue_SOURCE_DIR}
 )
 
