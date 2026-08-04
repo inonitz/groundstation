@@ -1,51 +1,66 @@
 #pragma once
 #include <atomic>
+#include <cstring>
+#include <cmath>
 #include <string>
 #include <vector>
-#include <array>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <readerwriterqueue.h>
 #include <util2/C/macro.h>
 #include <util2/time.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include "gstreamer_udp_cam_rx/rx_node_base.hpp"
-#include "fmu_node_base.hpp"
-#include "llm_base.hpp"
-#include "llamaclient.hpp"
-
+#include <px4_msgs/msg/vehicle_odometry.hpp>
+#include <px4_msgs/msg/vehicle_status.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <cv_bridge/cv_bridge.hpp>
 #include <base64.h>
 
+#include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* UDPCamMsgType, khUDPCamMsgType, camera topic */
+#include "fmu_node_base.hpp"
+#include "llm_base.hpp"
+#include "llamaclient.hpp"
+#include "offboard_translator.hpp"
+
+
+using OdomMsgType   = px4_msgs::msg::VehicleOdometry;
+using StatusMsgType = px4_msgs::msg::VehicleStatus;
 
 typedef char FixedStringType[32];
 typedef char LargeFixedStringType[128];
 
-constexpr FixedStringType kEmptyFixedString = "\0";
 
-enum class TaskState { 
-    PENDING, 
-    RUNNING, 
-    PAUSED, 
-    FINISHED_SUCCESS, 
-    FINISHED_FAIL, 
-    STOPPED 
+enum class TaskState {
+    PENDING,
+    RUNNING,
+    PAUSED,
+    FINISHED_SUCCESS,
+    FINISHED_FAIL,
+    STOPPED
 };
 
 enum class CommandID : u8 {
-    TAKEOFF  = 0, 
-    LAND     = 1, 
-    STOP     = 2, 
-    GO       = 3, 
+    TAKEOFF  = 0,
+    LAND     = 1,
+    STOP     = 2,
+    GO       = 3,
     CURVE    = 4,
-    ROTATE   = 5, 
-    ORBIT    = 6, 
-    SEARCH   = 7, 
-    REASSESS = 8, 
+    ROTATE   = 5,
+    ORBIT    = 6,
+    SEARCH   = 7,
+    REASSESS = 8,
     MAX_ID   = 10
+};
+
+/* FMU-owned flight state machine (was baked into the old offboard node). */
+enum class FlightState : u8 {
+    STANDBY,
+    TAKEOFF,
+    FLIGHT,
+    LANDING
 };
 
 struct CmdTakeoff {};
@@ -112,10 +127,10 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     };
 
     GenericCommand() : m_rawBytes{__scast(u8, CommandID::MAX_ID), {0}, {0}} {}
-    GenericCommand(CmdTakeoff cmd) : m_rawBytes{__scast(u8, CommandID::TAKEOFF), {0}, {0}} {}
-    GenericCommand(CmdLand cmd) : m_rawBytes{__scast(u8, CommandID::LAND), {0}, {0}} {}
-    GenericCommand(CmdStop cmd) : m_rawBytes{__scast(u8, CommandID::STOP), {0}, {0}} {}
-    
+    GenericCommand(CmdTakeoff) : m_rawBytes{__scast(u8, CommandID::TAKEOFF), {0}, {0}} {}
+    GenericCommand(CmdLand)    : m_rawBytes{__scast(u8, CommandID::LAND), {0}, {0}} {}
+    GenericCommand(CmdStop)    : m_rawBytes{__scast(u8, CommandID::STOP), {0}, {0}} {}
+
     GenericCommand(CmdGo const& cmd) : m_rawBytes{__scast(u8, CommandID::GO), {0}, {0}} {
         memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdGo));
     }
@@ -135,12 +150,10 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
         memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdReassess));
     }
 
-    GenericCommand& operator=(GenericCommand const& other) {
-        if (this != &other) m_rawBytes = other.m_rawBytes;
-        return *this;
-    }
+    /* Defaulted -> trivially copyable -> the queue keeps the fast POD path. */
+    GenericCommand& operator=(GenericCommand const& other) = default;
 
-    [[nodiscard]] u8 id() const { return m_rawBytes.m_rawId; }
+    [[nodiscard]] CommandID id() const { return __scast(CommandID, m_rawBytes.m_rawId); }
 };
 
 struct ActiveTask {
@@ -151,21 +164,17 @@ struct ActiveTask {
     LargeFixedStringType m_thought = "\0";
 };
 
+/* Perception + telemetry are STUBBED for Phase 1 (no real YOLO yet). */
 struct TargetDetection {
     FixedStringType label{"\0"};
-    i32             bbox_xmin{0};
-    i32             bbox_ymin{0};
-    i32             bbox_xmax{0};
-    i32             bbox_ymax{0};
+    i32             bbox_xmin{0}, bbox_ymin{0}, bbox_xmax{0}, bbox_ymax{0};
     f32             median_depth_cm{0.0f};
 };
 
 struct VehicleTelemetry {
     f32 altitude_cm{0.0f};
-    f32 vx_cm_s{0.0f};
-    f32 vy_cm_s{0.0f};
-    f32 vz_cm_s{0.0f};
-    i32 battery_pct{0};
+    f32 vx_cm_s{0.0f}, vy_cm_s{0.0f}, vz_cm_s{0.0f};
+    i32 battery_pct{100};
 };
 
 struct HistoryBuffer {
@@ -173,39 +182,53 @@ struct HistoryBuffer {
     std::vector<ActiveTask> m_completedTasks;
 };
 
+
 class FlightManagementUnitNode : public rclcpp::Node {
 public:
     FlightManagementUnitNode() : rclcpp::Node("high_level_navigation_node") {
-        rclcpp::SubscriptionOptions sub_opts;
+        rclcpp::SubscriptionOptions subOpts;
+        /* NOTE (Phase 2): the PX4-specific QoS + publishers below move into a  */
+        /* per-platform DroneBackend (PX4Backend / TelloBackend). Hardcoded     */
+        /* here only for the Phase-1 PX4 SITL smoke test.                       */
+        rclcpp::QoS px4Qos(10);
 
-        m_cbGroupTimers = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-        sub_opts.callback_group = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive
-        );
+        px4Qos.best_effort();
+        px4Qos.transient_local();
+
+        m_cbGroup = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+        subOpts.callback_group = m_cbGroup;
+
+        m_taskQueue = std::make_unique<spsc_queue<ActiveTask>>(3 * kControlLoopRateHz);
 
         m_subImg = this->create_subscription<UDPCamMsgType>(
-            "udp_camera_topic", 30,
+            kOutUDPCameraRawFrameTopic, 10,
             std::bind(&FlightManagementUnitNode::imgCallback, this, std::placeholders::_1),
-            sub_opts
+            subOpts
+        );
+        m_subOdom = this->create_subscription<OdomMsgType>(
+            kInOdometryTopic, rclcpp::SensorDataQoS(),
+            std::bind(&FlightManagementUnitNode::odomCallback, this, std::placeholders::_1),
+            subOpts
+        );
+        m_subStatus = this->create_subscription<StatusMsgType>(
+            kInVehicleStatusTopic, rclcpp::SensorDataQoS(),
+            std::bind(&FlightManagementUnitNode::statusCallback, this, std::placeholders::_1),
+            subOpts
         );
 
-        m_vlmTimer = this->create_wall_timer(
-            std::chrono::milliseconds{kVlmReassessmentRateMs},
-            std::bind(&FlightManagementUnitNode::vlmTimerCallback, this),
-            m_cbGroupTimers
-        );
+        m_pubTraj = this->create_publisher<OffboardTranslator::TrajectorySetpoint>(
+            "/fmu/in/trajectory_setpoint", px4Qos);
+        m_pubMode = this->create_publisher<OffboardTranslator::OffboardControlMode>(
+            "/fmu/in/offboard_control_mode", px4Qos);
+        m_pubCmd  = this->create_publisher<OffboardTranslator::VehicleCommand>(
+            "/fmu/in/vehicle_command", px4Qos);
 
-        m_yoloTimer = this->create_wall_timer(
-            std::chrono::milliseconds{kYoLoSegmentRefreshRateMs},
-            std::bind(&FlightManagementUnitNode::yoloTimerCallback, this),
-            m_cbGroupTimers
-        );
-
-        m_cmdQueueTimer = this->create_wall_timer(
-            std::chrono::milliseconds{kCmdQueueUpdateRateMs},
-            std::bind(&FlightManagementUnitNode::cmdQueueTimerCallback, this),
-            m_cbGroupTimers
-        );
+        m_controlTimer = this->create_wall_timer(
+            std::chrono::milliseconds{kControlLoopPeriodMs},
+            std::bind(&FlightManagementUnitNode::controlLoop, this), m_cbGroup);
+        m_offboardTimer = this->create_wall_timer(
+            std::chrono::milliseconds{kOffboardPublishPeriodMs},
+            std::bind(&FlightManagementUnitNode::offboardPublishLoop, this), m_cbGroup);
 
         m_vlmClient.create(kSystemPrompt, 0.4f, 1024);
         m_chat.m_completedTasks.reserve(kDefaultPromptHistorySize);
@@ -213,230 +236,382 @@ public:
         RCLCPP_INFO(this->get_logger(), "Flight Management Unit Active.");
     }
 
-    ~FlightManagementUnitNode() override = default;
+    ~FlightManagementUnitNode() override { m_vlmClient.destroy(); }
 
-    void start(std::string_view initialObjective) {
-        khUDPCamMsgType imgCopy;
-        
-        m_chat.m_initialCommand = initialObjective;
-        imgCopy = std::atomic_load(&m_currImg);
-
-        if (!imgCopy) {
-            RCLCPP_INFO(this->get_logger(), "No Initial Frame delivered to VLM.\n");
+    /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
+    void start(std::string_view objective, bool useCannedPlan = false) {
+        m_chat.m_initialCommand = objective;
+        m_missionActive.store(true, std::memory_order_release);
+        if (useCannedPlan) {
+            injectCannedPlan();
         }
+        RCLCPP_INFO(this->get_logger(),
+            "[DIAG] Mission started (canned=%d). queued~=%zu. objective: %.*s",
+            __scast(int, useCannedPlan), m_taskQueue->size_approx(),
+            __scast(int, objective.size()), objective.data());
     }
 
 private:
     template <typename T>
     using spsc_queue = moodycamel::ReaderWriterQueue<T, sizeof(T)>;
 
-    void imgCallback(khUDPCamMsgType msg) {
-        std::atomic_store(&m_currImg, msg);
-    }
+    /* ---- Subscriptions --------------------------------------------------- */
+    void imgCallback(khUDPCamMsgType msg) { std::atomic_store(&m_currImg, msg); }
 
-    void vlmTimerCallback() {
-        khUDPCamMsgType latestImg;
-        std::string     responseStr;
-        
-        latestImg = std::atomic_load(&m_currImg);
-        if (!latestImg) return;
+    void odomCallback(const OdomMsgType::ConstSharedPtr msg) {
+        f32 qw, qx, qy, qz, yaw;
 
-        callLlamaServer(m_chat.m_initialCommand, latestImg, responseStr);
-        if (!responseStr.empty()) {
-            translateToBaseCommands(responseStr);
+        m_posN.store(msg->position[0], std::memory_order_relaxed);
+        m_posE.store(msg->position[1], std::memory_order_relaxed);
+        m_posD.store(msg->position[2], std::memory_order_relaxed);
+
+        /* PX4 quaternion order is [w, x, y, z]. Extract yaw (Z). */
+        qw = msg->q[0]; qx = msg->q[1]; qy = msg->q[2]; qz = msg->q[3];
+        yaw = std::atan2(2.0f * (qw * qz + qx * qy),
+                         1.0f - 2.0f * (qy * qy + qz * qz));
+        m_yaw.store(yaw, std::memory_order_relaxed);
+
+        if (!m_gotFirstOdom.load(std::memory_order_relaxed)) {
+            m_gotFirstOdom.store(true, std::memory_order_relaxed);
+            RCLCPP_INFO(this->get_logger(),
+                "[DIAG] FIRST ODOM received. altNED=%.2f yaw=%.2f", msg->position[2], yaw);
         }
     }
 
-    void yoloTimerCallback() {}
-    void cmdQueueTimerCallback() {}
+    /* PX4 arming/nav-state feedback -> drives the confirmed offboard handshake. */
+    void statusCallback(const StatusMsgType::ConstSharedPtr msg) {
+        m_navState.store(msg->nav_state, std::memory_order_relaxed);
+        m_armingState.store(msg->arming_state, std::memory_order_relaxed);
+    }
 
+    /* ---- 20Hz control + deterministic completion ------------------------- */
+    void controlLoop() {
+        f32         n, e, d, dx, dy, dz, dist, sp;
+        ActiveTask  next;
+        FlightState st;
+        CommandID   id;
+
+        n  = m_posN.load(std::memory_order_relaxed);
+        e  = m_posE.load(std::memory_order_relaxed);
+        d  = m_posD.load(std::memory_order_relaxed);
+        st = m_flightState.load(std::memory_order_relaxed);
+
+        /* State transitions driven by odometry. */
+        if (st == FlightState::TAKEOFF && d <= kTakeoffTargetAltNed) {
+            m_flightState.store(FlightState::FLIGHT, std::memory_order_relaxed);
+            RCLCPP_INFO(this->get_logger(), "[DIAG] TAKEOFF->FLIGHT altNED=%.2f", d);
+            completeCurrent("takeoff_ok");
+            return;
+        }
+        if (st == FlightState::LANDING && d >= kGroundContactAltNed) {
+            m_pubCmd->publish(OffboardTranslator::force_disarm(nowUs()));
+            m_flightState.store(FlightState::STANDBY, std::memory_order_relaxed);
+            m_offboardEngaged.store(false, std::memory_order_relaxed);
+            RCLCPP_INFO(this->get_logger(), "[DIAG] LANDING->STANDBY altNED=%.2f", d);
+            completeCurrent("land_ok");
+            return;
+        }
+        if (st == FlightState::TAKEOFF || st == FlightState::LANDING) {
+            return; /* offboard loop is executing the maneuver. */
+        }
+
+        /* FLIGHT / STANDBY: run the active movement task or pull the next. */
+        if (m_hasActive) {
+            id = m_currTask.m_cmd.id();
+            if (id == CommandID::GO) {
+                dx   = m_targetN - n;
+                dy   = m_targetE - e;
+                dz   = m_targetD - d;
+                dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+                if (dist < kGoCompletionRadiusM) {
+                    setActiveVel({0.0f, 0.0f, 0.0f}, 0.0f);
+                    completeCurrent("go_ok");
+                } else {
+                    sp = m_activeSpeed / dist; /* normalize * speed (m/s). */
+                    setActiveVel({dx * sp, dy * sp, dz * sp}, 0.0f);
+                }
+            } else {
+                /* Non-GO movement not yet implemented in Phase 1: auto-complete. */
+                completeCurrent("noop_ok");
+            }
+            return;
+        }
+
+        if (m_taskQueue->try_dequeue(next)) {
+            activateTask(next);
+        }
+    }
+
+    /* ---- ~30Hz offboard streaming (PX4 watchdog) ------------------------- */
+    /* TODO (Phase 2): move this into the DroneBackend; the FMU should not      */
+    /* drive a platform-specific publish loop directly.                        */
+    void offboardPublishLoop() {
+        Vec3        vel{0.0f, 0.0f, 0.0f};
+        f32         yawspeed = 0.0f;
+        FlightState st;
+        u64         ts, cnt;
+        u8          nav, armSt;
+
+        ts  = nowUs();
+        st  = m_flightState.load(std::memory_order_relaxed);
+        cnt = m_setpointCount.fetch_add(1, std::memory_order_relaxed) + 1;
+
+        switch (st) {
+        case FlightState::STANDBY:  break;                       /* zero vel.   */
+        case FlightState::TAKEOFF:  vel.z = kTakeoffClimbVelNed; break;
+        case FlightState::LANDING:  vel.z = kLandDescendVelNed;  break;
+        case FlightState::FLIGHT:
+            vel.x    = m_activeVx.load(std::memory_order_relaxed);
+            vel.y    = m_activeVy.load(std::memory_order_relaxed);
+            vel.z    = m_activeVz.load(std::memory_order_relaxed);
+            yawspeed = m_activeYaw.load(std::memory_order_relaxed);
+            break;
+        }
+
+        /* Stream mode + setpoint FIRST so PX4 sees an active offboard signal. */
+        m_pubMode->publish(OffboardTranslator::mode_velocity(ts));
+        m_pubTraj->publish(OffboardTranslator::velocity_setpoint(ts, vel, yawspeed));
+
+        /* PX4 offboard handshake. Proven order (speech_to_action): arm first,   */
+        /* then request OFFBOARD — but never fire blind. Gate on first odometry   */
+        /* (estimator ready) + warmup, then RETRY every tick until VehicleStatus  */
+        /* confirms ARMED + OFFBOARD. Arming before the estimator was ready spun   */
+        /* the motors with no valid velocity estimate -> no climb -> auto-disarm. */
+        if (st == FlightState::TAKEOFF
+            && !m_offboardEngaged.load(std::memory_order_relaxed)
+            && m_gotFirstOdom.load(std::memory_order_relaxed)
+            && (cnt - m_takeoffWarmupStart.load(std::memory_order_relaxed))
+                >= kOffboardWarmupSetpoints)
+        {
+            nav   = m_navState.load(std::memory_order_relaxed);
+            armSt = m_armingState.load(std::memory_order_relaxed);
+
+            if (armSt != StatusMsgType::ARMING_STATE_ARMED) {
+                m_pubCmd->publish(OffboardTranslator::arm(ts, true));
+            }
+            if (nav != StatusMsgType::NAVIGATION_STATE_OFFBOARD) {
+                m_pubCmd->publish(OffboardTranslator::set_offboard(ts));
+            }
+            if (armSt == StatusMsgType::ARMING_STATE_ARMED
+                && nav == StatusMsgType::NAVIGATION_STATE_OFFBOARD) {
+                m_offboardEngaged.store(true, std::memory_order_relaxed);
+                RCLCPP_INFO(this->get_logger(),
+                    "[DIAG] OFFBOARD+ARM CONFIRMED at setpoints=%lu",
+                    __scast(unsigned long, cnt));
+            }
+        }
+
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
+            "[DIAG] publishing: state=%d setpoints=%lu engaged=%d nav=%d arm=%d altNED=%.2f velz=%.2f",
+            __scast(int, st), __scast(unsigned long, cnt),
+            __scast(int, m_offboardEngaged.load(std::memory_order_relaxed)),
+            __scast(int, m_navState.load(std::memory_order_relaxed)),
+            __scast(int, m_armingState.load(std::memory_order_relaxed)),
+            m_posD.load(std::memory_order_relaxed), vel.z);
+    }
+
+    /* ---- Task lifecycle helpers ------------------------------------------ */
+    void activateTask(ActiveTask const& task) {
+        f32       n, e, d, yaw;
+        Vec3      relFlu, relNed;
+        CmdGo     g;
+        CommandID id;
+
+        m_currTask = task;
+        m_currTask.m_state = TaskState::RUNNING;
+        m_hasActive = true;
+        id = m_currTask.m_cmd.id();
+
+        switch (id) {
+        case CommandID::TAKEOFF:
+            /* Do NOT arm here — the offboard loop engages after warmup. */
+            m_takeoffWarmupStart.store(m_setpointCount.load(std::memory_order_relaxed),
+                                       std::memory_order_relaxed);
+            m_flightState.store(FlightState::TAKEOFF, std::memory_order_relaxed);
+            RCLCPP_INFO(this->get_logger(),
+                "[DIAG] TAKEOFF: warming up offboard stream before arm (start=%lu).",
+                __scast(unsigned long, m_takeoffWarmupStart.load(std::memory_order_relaxed)));
+            break;
+        case CommandID::LAND:
+            m_flightState.store(FlightState::LANDING, std::memory_order_relaxed);
+            RCLCPP_INFO(this->get_logger(), "[DIAG] LAND activated.");
+            break;
+        case CommandID::GO:
+            g   = m_currTask.m_cmd.m_extractCmd.m_goto;
+            n   = m_posN.load(std::memory_order_relaxed);
+            e   = m_posE.load(std::memory_order_relaxed);
+            d   = m_posD.load(std::memory_order_relaxed);
+            yaw = m_yaw.load(std::memory_order_relaxed);
+            /* VLM gives relative FLU in cm -> world-NED target. */
+            relFlu = { g.x / 100.0f, g.y / 100.0f, g.z / 100.0f };
+            relNed = OffboardTranslator::flu_to_ned(relFlu, yaw);
+            m_targetN = n + relNed.x;
+            m_targetE = e + relNed.y;
+            m_targetD = d + relNed.z;
+            m_activeSpeed = (g.speed > 0.0f ? g.speed : kDefaultGoSpeedCmS) / 100.0f;
+            RCLCPP_INFO(this->get_logger(),
+                "[DIAG] GO activated. targetNED=(%.2f,%.2f,%.2f) speed=%.2f",
+                m_targetN, m_targetE, m_targetD, m_activeSpeed);
+            break;
+        default:
+            RCLCPP_INFO(this->get_logger(), "[DIAG] task id=%d auto-completes.",
+                __scast(int, id));
+            break; /* STOP / others auto-complete in controlLoop. */
+        }
+    }
+
+    void completeCurrent(const char* status) {
+        strncpy(m_currTask.m_status, status, sizeof(m_currTask.m_status) - 1);
+        m_currTask.m_state = TaskState::FINISHED_SUCCESS;
+        m_chat.m_completedTasks.push_back(m_currTask);
+        m_hasActive = false;
+        setActiveVel({0.0f, 0.0f, 0.0f}, 0.0f);
+    }
+
+    void setActiveVel(Vec3 const& v, f32 yawspeed) {
+        m_activeVx.store(v.x, std::memory_order_relaxed);
+        m_activeVy.store(v.y, std::memory_order_relaxed);
+        m_activeVz.store(v.z, std::memory_order_relaxed);
+        m_activeYaw.store(yawspeed, std::memory_order_relaxed);
+    }
+
+    __force_inline u64 nowUs() { return this->get_clock()->now().nanoseconds() / 1000; }
+
+    /* ---- VLM plumbing (invoked by the Phase-2 event-driven wake, not a poll) ---- */
     std::string buildDynamicPrompt() {
         std::string prompt;
         char        buf[256];
         size_t      i;
-        
-        prompt = std::string(kSystemPrompt) + "\n\n";
+
+        prompt  = std::string(kSystemPrompt) + "\n\n";
         prompt += "[COORDINATE FRAME]\nFLU (+X Forward, +Y Left, +Z Up)\n\n";
         prompt += "[MISSION OBJECTIVE]\n" + m_chat.m_initialCommand + "\n\n";
-
-        snprintf(buf, sizeof(buf), 
-            "[VEHICLE STATE]\nAlt: %.1f cm, Vx: %.1f, Vy: %.1f, Vz: %.1f, Bat: %d%%\n\n",
-            m_telemetry.altitude_cm, m_telemetry.vx_cm_s, m_telemetry.vy_cm_s, 
-            m_telemetry.vz_cm_s, m_telemetry.battery_pct);
-        prompt += buf;
-
-        prompt += "[PERCEPTION DATA]\n";
-        for (i = 0; i < m_targets.size(); ++i) {
-            snprintf(buf, sizeof(buf), 
-                "{\"label\":\"%s\", \"bbox\":[%d,%d,%d,%d], \"depth_cm\":%.1f}\n",
-                m_targets[i].label, m_targets[i].bbox_xmin, m_targets[i].bbox_ymin,
-                m_targets[i].bbox_xmax, m_targets[i].bbox_ymax, 
-                m_targets[i].median_depth_cm);
-            prompt += buf;
-        }
-        prompt += "\n";
-
         prompt += "[EXECUTED COMMAND HISTORY]\n";
         for (i = 0; i < m_chat.m_completedTasks.size(); ++i) {
-            snprintf(buf, sizeof(buf), 
-                "{\"status\":\"%s\", \"thought\":\"%s\", \"action_id\":%d}\n",
-                m_chat.m_completedTasks[i].m_status, 
-                m_chat.m_completedTasks[i].m_thought, 
-                m_chat.m_completedTasks[i].m_cmd.id());
+            snprintf(buf, sizeof(buf), "{\"status\":\"%s\", \"thought\":\"%s\", \"id\":%d}\n",
+                m_chat.m_completedTasks[i].m_status,
+                m_chat.m_completedTasks[i].m_thought,
+                __scast(int, m_chat.m_completedTasks[i].m_cmd.id()));
             prompt += buf;
         }
-
         return prompt;
     }
 
-    void callLlamaServer(
-        std::string_view       userQuery,
-        khUDPCamMsgType const& latestImg,
-        std::string&           responseString
-    ) {
-        std::string               b64Str;
-        std::string               systemResponseStr;
-        std::string               dynamicPrompt;
-        OptionalHttpRequestFuture serverResponse;
-        nlohmann::json            response_json;
-        bool                      serverGood;
-        cv::Mat                   frame;
-        cv::Mat                   frameResized;
+    void callLlamaServer(std::string_view userQuery, khUDPCamMsgType const& img,
+                         std::string& out) {
+        std::string               b64, content, dyn;
+        OptionalHttpRequestFuture  fut;
+        nlohmann::json            j;
+        cv::Mat                   frame, resized;
         std::vector<uchar>        buffer;
-        int                       encodeParams[2];
-        
-        encodeParams[0] = cv::IMWRITE_JPEG_QUALITY;
-        encodeParams[1] = 75;
+        std::vector<int>          params;
 
-        m_timer.begin();
-        
-        frame = cv_bridge::toCvShare(latestImg, "bgr8")->image;
+        params = { cv::IMWRITE_JPEG_QUALITY, 75 };
+        frame  = cv_bridge::toCvShare(img, "bgr8")->image;
         if (!frame.empty()) {
-            cv::resize(frame, frameResized, cv::Size{640, 640}, 0, 0, cv::INTER_LINEAR);
-            cv::imencode(".jpg", frameResized, buffer, 
-                std::vector<int>(encodeParams, encodeParams + 2));
-            b64Str = base64_encode(buffer.data(), buffer.size());
+            cv::resize(frame, resized, cv::Size{640, 640}, 0, 0, cv::INTER_LINEAR);
+            cv::imencode(".jpg", resized, buffer, params);
+            b64 = base64_encode(buffer.data(), buffer.size());
         }
 
-        dynamicPrompt = buildDynamicPrompt();
-        serverResponse = m_vlmClient.send(dynamicPrompt, userQuery, b64Str);
-
-        if (serverResponse.has_value()) {
-            auto res = serverResponse->get();
-            serverGood = (res && res->status == 200);
-
-            if (serverGood) {
-                response_json = nlohmann::json::parse(res->body, nullptr, false);
-                if (!response_json.is_discarded()) {
-                    systemResponseStr = response_json["choices"][0]["message"]["content"];
+        dyn = buildDynamicPrompt();
+        fut = m_vlmClient.send(dyn, userQuery, b64);
+        if (fut.has_value()) {
+            auto res = fut->get();
+            if (res && res->status == 200) {
+                j = nlohmann::json::parse(res->body, nullptr, false);
+                if (!j.is_discarded()) {
+                    content = j["choices"][0]["message"]["content"];
                 }
             }
         }
-
-        m_timer.end();
-        responseString = systemResponseStr;
+        out = content;
     }
 
     void translateToBaseCommands(std::string_view flightPlan) {
-        nlohmann::json plan_json;
-        std::string    action;
-        std::string    tmpStr;
-        std::string    thoughtStr;
+        nlohmann::json plan;
+        std::string    action, thought;
         GenericCommand cmd;
         ActiveTask     task;
-        CommandID      id;
-        CmdGo          c_go;
-        CmdCurve       c_curve;
-        CmdRotate      c_rot;
-        CmdOrbit       c_orb;
-        CmdSearch      c_srch;
-        CmdReassess    c_rea;
+        CmdGo          go;
 
-        plan_json = nlohmann::json::parse(flightPlan, nullptr, false);
-        if (plan_json.is_discarded() || !plan_json.is_array()) return;
+        plan = nlohmann::json::parse(flightPlan, nullptr, false);
+        if (plan.is_discarded() || !plan.is_array()) {
+            RCLCPP_WARN(this->get_logger(), "[DIAG] plan JSON parse failed / not array.");
+            return;
+        }
 
-        for (const auto& item : plan_json) {
+        for (const auto& item : plan) {
             if (!item.contains("action")) continue;
+            action  = item["action"].get<std::string>();
+            thought = item.value("thought", "");
 
-            action = item["action"].get<std::string>();
-            thoughtStr = item.value("thought", "");
-            
-            id = CommandID::MAX_ID;
-            id = (action == "takeoff")   ? CommandID::TAKEOFF : id;
-            id = (action == "land")      ? CommandID::LAND : id;
-            id = (action == "stop")      ? CommandID::STOP : id;
-            id = (action == "go")        ? CommandID::GO : id;
-            id = (action == "curve")     ? CommandID::CURVE : id;
-            id = (action == "rotate")    ? CommandID::ROTATE : id;
-            id = (action == "orbit")     ? CommandID::ORBIT : id;
-            id = (action == "search")    ? CommandID::SEARCH : id;
-            id = (action == "re-assess") ? CommandID::REASSESS : id;
-
-            switch (id) {
-            case CommandID::TAKEOFF: cmd = GenericCommand(CmdTakeoff{}); break;
-            case CommandID::LAND:    cmd = GenericCommand(CmdLand{}); break;
-            case CommandID::STOP:    cmd = GenericCommand(CmdStop{}); break;
-            case CommandID::GO:
-                c_go = {item.value("x", 0.0f), item.value("y", 0.0f), 
-                        item.value("z", 0.0f), item.value("speed", 0.0f)};
-                cmd = GenericCommand(c_go);
-                break;
-            case CommandID::CURVE:
-                c_curve = {item.value("x1", 0.0f), item.value("y1", 0.0f), 
-                           item.value("z1", 0.0f), item.value("x2", 0.0f), 
-                           item.value("y2", 0.0f), item.value("z2", 0.0f),
-                           item.value("speed", 0.0f), 0};
-                cmd = GenericCommand(c_curve);
-                break;
-            case CommandID::ROTATE:
-                c_rot = {item.value("angle_deg", 0), 
-                         (item.value("direction", "cw") == "cw"), 0};
-                cmd = GenericCommand(c_rot);
-                break;
-            case CommandID::ORBIT:
-                c_orb = {{"\0"}, item.value("radius_cm", 0.0f), 
-                         item.value("angle_deg", 0.0f), item.value("speed", 0.0f), 
-                         (item.value("direction", "cw") == "cw")};
-                tmpStr = item.value("target_object", "");
-                strncpy(c_orb.target, tmpStr.c_str(), sizeof(c_orb.target) - 1);
-                cmd = GenericCommand(c_orb);
-                break;
-            case CommandID::SEARCH:
-                c_srch = {{"\0"}, item.value("expected_search_time_sec", 0), 
-                          item.value("timeout_sec", 0)};
-                tmpStr = item.value("target_object", "");
-                strncpy(c_srch.target, tmpStr.c_str(), sizeof(c_srch.target) - 1);
-                cmd = GenericCommand(c_srch);
-                break;
-            case CommandID::REASSESS:
-                c_rea = {{"\0"}};
-                tmpStr = item.value("reason", "");
-                strncpy(c_rea.reason, tmpStr.c_str(), sizeof(c_rea.reason) - 1);
-                cmd = GenericCommand(c_rea);
-                break;
-            default: continue;
+            if (action == "takeoff") {
+                cmd = GenericCommand(CmdTakeoff{});
+            } else if (action == "land") {
+                cmd = GenericCommand(CmdLand{});
+            } else if (action == "stop") {
+                cmd = GenericCommand(CmdStop{});
+            } else if (action == "go") {
+                go  = { item.value("x", 0.0f), item.value("y", 0.0f),
+                        item.value("z", 0.0f), item.value("speed", 0.0f) };
+                cmd = GenericCommand(go);
+            } else {
+                continue; /* Phase 1: only takeoff/land/stop/go executed. */
             }
 
+            task = ActiveTask{};
             task.m_cmd   = cmd;
             task.m_state = TaskState::PENDING;
-            strncpy(task.m_thought, thoughtStr.c_str(), sizeof(task.m_thought) - 1);
-            m_taskQueue.enqueue(task);
+            strncpy(task.m_thought, thought.c_str(), sizeof(task.m_thought) - 1);
+            m_taskQueue->enqueue(task); /* TODO: handle backpressure. */
         }
     }
 
-private:
-    rclcpp::CallbackGroup::SharedPtr               m_cbGroupTimers;
-    rclcpp::Subscription<UDPCamMsgType>::SharedPtr m_subImg;
-    rclcpp::TimerBase::SharedPtr                   m_vlmTimer;
-    rclcpp::TimerBase::SharedPtr                   m_yoloTimer;
-    rclcpp::TimerBase::SharedPtr                   m_cmdQueueTimer;
+    /* Canned plan is the SAME JSON the VLM emits, routed through the real       */
+    /* translate path — no inverse function needed.                             */
+    void injectCannedPlan() {
+        static const char* kCannedPlanJson = R"([
+            {"thought":"canned takeoff",    "action":"takeoff"},
+            {"thought":"canned go forward", "action":"go", "x":100, "y":0, "z":0, "speed":30},
+            {"thought":"canned land",       "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedPlanJson);
+    }
 
-    spsc_queue<ActiveTask>                         m_taskQueue{3 * 20};
-    ActiveTask                                     m_currTask;
-    llamaClientConnection                          m_vlmClient;
-    khUDPCamMsgType                                m_currImg;
-    HistoryBuffer                                  m_chat;
-    util2::Time::Timestamp                         m_timer;
-    VehicleTelemetry                               m_telemetry;
-    std::vector<TargetDetection>                   m_targets;
+private:
+    rclcpp::CallbackGroup::SharedPtr                m_cbGroup;
+    rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
+    rclcpp::Subscription<OdomMsgType>::SharedPtr    m_subOdom;
+    rclcpp::Subscription<StatusMsgType>::SharedPtr  m_subStatus;
+    rclcpp::Publisher<OffboardTranslator::TrajectorySetpoint>::SharedPtr  m_pubTraj;
+    rclcpp::Publisher<OffboardTranslator::OffboardControlMode>::SharedPtr m_pubMode;
+    rclcpp::Publisher<OffboardTranslator::VehicleCommand>::SharedPtr      m_pubCmd;
+    rclcpp::TimerBase::SharedPtr                    m_controlTimer;
+    rclcpp::TimerBase::SharedPtr                    m_offboardTimer;
+
+    std::unique_ptr<spsc_queue<ActiveTask>>         m_taskQueue;
+    ActiveTask                                      m_currTask;
+    bool                                            m_hasActive{false};
+    std::atomic<bool>                               m_gotFirstOdom{false};
+
+    llamaClientConnection                           m_vlmClient;
+    khUDPCamMsgType                                 m_currImg;
+    HistoryBuffer                                   m_chat;
+    VehicleTelemetry                                m_telemetry;
+    std::vector<TargetDetection>                    m_targets;
+
+    /* Shared pose (odom thread -> control/offboard threads). */
+    std::atomic<f32>          m_posN{0.0f}, m_posE{0.0f}, m_posD{0.0f}, m_yaw{0.0f};
+    /* Active setpoint (control thread -> offboard thread). */
+    std::atomic<f32>          m_activeVx{0.0f}, m_activeVy{0.0f}, m_activeVz{0.0f}, m_activeYaw{0.0f};
+    std::atomic<FlightState>  m_flightState{FlightState::STANDBY};
+    std::atomic<bool>         m_missionActive{false};
+    std::atomic<bool>         m_offboardEngaged{false};
+    std::atomic<u64>          m_setpointCount{0};
+    std::atomic<u64>          m_takeoffWarmupStart{0};
+    std::atomic<u8>           m_navState{0}, m_armingState{0};
+
+    /* GO world-NED target + speed (control thread only). */
+    f32 m_targetN{0.0f}, m_targetE{0.0f}, m_targetD{0.0f}, m_activeSpeed{0.3f};
 };

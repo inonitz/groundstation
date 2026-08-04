@@ -10,14 +10,14 @@ function(define_ros2_node EXE_NAME FILE_SOURCES)
 
    add_executable(${FULL_EXE_NAME})
    target_sources(${FULL_EXE_NAME} PRIVATE ${FILE_SOURCES})
-   target_compile_features(${FULL_EXE_NAME} PRIVATE 
+   target_compile_features(${FULL_EXE_NAME} PRIVATE
       c_std_11
       cxx_std_17
    )
    target_compile_definitions(${FULL_EXE_NAME} PRIVATE
       $<$<BOOL:${IS_WSL_ENV}>:__WSL__=1>
    )
-   target_link_libraries(${FULL_EXE_NAME} PRIVATE 
+   target_link_libraries(${FULL_EXE_NAME} PRIVATE
       UTIL2::util2
       cxxopts::cxxopts
       rclcpp::rclcpp
@@ -53,7 +53,7 @@ endfunction()
 # Header-Only Target
 # ---------------------------------------------------------------------------
 add_library(util_base_header INTERFACE)
-target_include_directories(util_base_header INTERFACE 
+target_include_directories(util_base_header INTERFACE
    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -65,6 +65,8 @@ set(FLIGHT_MANAGEMENT_UNIT_NODE_SOURCES
     fmu/fmu_node_base.hpp
     fmu/fmu_node.cpp
     fmu/fmu_node.hpp
+    fmu/llm_base.hpp
+    fmu/offboard_translator.hpp
     fmu/llamaclient.cpp
     fmu/llamaclient.hpp
     fmu/spsc_bounded_queue.hpp
@@ -121,7 +123,7 @@ ros2_node_add_library(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
     sensor_msgs::sensor_msgs__rosidl_generator_c
     sensor_msgs::sensor_msgs__rosidl_generator_cpp
 )
-ros2_node_add_include_directory(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX} 
+ros2_node_add_include_directory(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
     ${cv_bridge_INCLUDE_DIRS}
     ${moodycamel_readerwriterqueue_SOURCE_DIR}
 )
@@ -132,7 +134,7 @@ ros2_node_add_library(${KEYBOARD_NODE_NAME_POSTFIX}
     "$<$<BOOL:${IS_WSL_ENV}>:${X11_LIBRARIES};${X11_Xi_LIB}>"
     util_base_header
 )
-ros2_node_add_include_directory(${KEYBOARD_NODE_NAME_POSTFIX} 
+ros2_node_add_include_directory(${KEYBOARD_NODE_NAME_POSTFIX}
     "$<$<BOOL:${IS_WSL_ENV}>:${X11_INCLUDE_DIR}>"
 )
 
@@ -162,5 +164,5 @@ target_deploy_gstreamer(${PROJECT_NAME}_${GSTREAMER_RECEIVER_NAME_POSTFIX})
 
 
 add_subdirectory(gstreamer_gz_udp_tx)
-# There shouldn't be a need for a tello udp transmitter since the tello already sends the Packets 
+# There shouldn't be a need for a tello udp transmitter since the tello already sends the Packets
 # add_subdirectory(gstreamer_tello_udp_tx)
