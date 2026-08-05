@@ -74,7 +74,7 @@ source/llm_to_action/vision/
 - Create (outside the repo, not committed): `/root/models/vision/yolo26n-seg.onnx`,
   `yolo26n-seg.int8.onnx`, `yolo26n-seg.int4.onnx`, `yolo26n-depth.onnx`,
   `yolo26n-depth.int8.onnx`, `yolo26n-depth.int4.onnx`
-- Create (scratch, not committed): `/tmp/vision-export/export_models.py`
+- Create (committed, reusable): `scripts/export_vision_models.py`
 
 **Interfaces:**
 - Produces: the 6 `.onnx` files under `/root/models/vision/` that every later task's tests load by
@@ -104,7 +104,7 @@ Expected: prints the confirmation line, no `AssertionError`.
 - [ ] **Step 2: Write the export/quantize script**
 
 ```python
-# /tmp/vision-export/export_models.py
+# scripts/export_vision_models.py
 import pathlib
 from ultralytics import YOLO
 from onnxruntime.quantization import quantize_dynamic, QuantType
@@ -147,8 +147,8 @@ print("done")
 - [ ] **Step 3: Run it**
 
 ```bash
-cd /tmp/vision-export
-PYTHONPATH=/root/.local/vision-export-tools python3 export_models.py
+cd /root/groundstation
+PYTHONPATH=/root/.local/vision-export-tools python3 scripts/export_vision_models.py
 ```
 
 Expected: `--- exporting yolo26n-seg.pt ---` ... `fp32 ->` / `int8 ->` / `int4 -> (or a printed
@@ -165,7 +165,8 @@ Expected: at minimum `yolo26n-seg.onnx`, `yolo26n-seg.int8.onnx`, `yolo26n-depth
 `yolo26n-depth.int8.onnx` present and non-empty (int4 variants best-effort — note in the final
 report whether they landed).
 
-No commit for this task — model files live outside the repo under `/root/models/vision/`.
+Commit `scripts/export_vision_models.py` (the model files themselves stay outside the repo
+under `/root/models/vision/` — do not commit those).
 
 ---
 
