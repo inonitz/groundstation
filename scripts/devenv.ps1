@@ -9,18 +9,21 @@ $HostModelFolderPathRaw    = [System.Environment]::GetEnvironmentVariable("ML_MO
 $HostModelFolderPathFilter = $HostModelFolderPathRaw -replace '\\', '/'
 $HostModelFolderPath       = (wsl wslpath -a "$HostModelFolderPathFilter").Trim()
 
-$HostPathASRModel = "$HostModelFolderPath/ASR"
-$HostPathVLMModel = "$HostModelFolderPath/VLM"
+$HostPathASRModel    = "$HostModelFolderPath/ASR"
+$HostPathVLMModel    = "$HostModelFolderPath/VLM"
+$HostPathVisionModel = "$HostModelFolderPath/VISION"
 
-$ContainerPath             = "/root/groundstation"
-$ContainerPathASRModelPath = "/root/models/asr"
-$ContainerPathVLMModelPath = "/root/models/vlm"
-$HostIP                    = (Get-NetIPAddress -InterfaceAlias 'vEthernet (WSL)' -AddressFamily IPv4).IPAddress
+$ContainerPath                = "/root/groundstation"
+$ContainerPathASRModelPath    = "/root/models/asr"
+$ContainerPathVLMModelPath    = "/root/models/vlm"
+$ContainerPathVisionModelPath = "/root/models/vision"
+$HostIP                       = (Get-NetIPAddress -InterfaceAlias 'vEthernet (WSL)' -AddressFamily IPv4).IPAddress
 
 Write-Host "HostPath:             $HostPath"
 Write-Host "HostModelFolderPath:  $HostModelFolderPath"
 Write-Host "HostPathASRModel:     $HostPathASRModel"
 Write-Host "HostPathVLMModel:     $HostPathVLMModel"
+Write-Host "HostPathVisionModel:  $HostPathVisionModel"
 Write-Host "HostIP:               $HostIP"
 
 Write-Host "`n=== [2/4] Building Docker Args ===" -ForegroundColor Yellow
@@ -39,6 +42,7 @@ $dockerArguments = @(
     "-v ${HostPath}:${ContainerPath}",
     "-v ${HostPathASRModel}:${ContainerPathASRModelPath}",
     "-v ${HostPathVLMModel}:${ContainerPathVLMModelPath}",
+    "-v ${HostPathVisionModel}:${ContainerPathVisionModelPath}",
     "-v vscode_server_cache:/root/.vscode-server"
 )
 

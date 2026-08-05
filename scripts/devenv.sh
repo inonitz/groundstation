@@ -8,6 +8,9 @@ ContainerPathASRModelPath="/root/models/asr"
 HostPathVLMModel="$HOME/models/vlm"
 ContainerPathVLMModelPath="/root/models/vlm"
 
+HostPathVisionModel="$HOME/models/vision"
+ContainerPathVisionModelPath="/root/models/vision"
+
 # Clear parameters
 set --
 
@@ -31,6 +34,7 @@ set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
 set -- "$@" -v "${HostPathASRModel}:${ContainerPathASRModelPath}"
 set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
+set -- "$@" -v "${HostPathVisionModel}:${ContainerPathVisionModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
 set -- "$@" -v "$HOME/.claude:/root/.claude"
 
@@ -43,7 +47,7 @@ fi
 if [ -e "/dev/kfd" ]; then
     set -- "$@" --device "/dev/kfd"
     set -- "$@" --security-opt seccomp=unconfined
-    
+
     # Surgical fix Vulkan AMD JSON. Added radeon_icd.json.
     for icd in "/usr/share/vulkan/icd.d/radeon_icd.json" "/etc/vulkan/icd.d/radeon_icd.json" "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json" "/usr/share/vulkan/icd.d/amd_icd64.json"; do
         if [ -f "$icd" ]; then
@@ -72,7 +76,7 @@ if command -v nvidia-smi >/dev/null 2>&1; then
             break
         fi
     done
-    
+
     # Surgical fix EGL. Loop through common host paths.
     for egl in "/usr/share/glvnd/egl_vendor.d/10_nvidia.json" "/etc/glvnd/egl_vendor.d/10_nvidia.json" "/usr/local/share/glvnd/egl_vendor.d/10_nvidia.json"; do
         if [ -f "$egl" ]; then
@@ -82,7 +86,6 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     done
 fi
 
-# Execute
 # Execute
 xhost +local:root
 docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "mkdir -p ~/.claude && rtk init -g >/dev/null 2>&1 && echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && exec bash"
