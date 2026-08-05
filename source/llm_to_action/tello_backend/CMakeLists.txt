@@ -17,9 +17,8 @@ set(TELLO_BACKEND_LIBRARY_HEADERS
 
 
 add_library(${PROJECT_NAME} STATIC
-    tello_backend.cpp
-    tello_backend.hpp
-    tello_backend_base.hpp
+    ${TELLO_BACKEND_LIBRARY_SOURCES}
+    ${TELLO_BACKEND_LIBRARY_HEADERS}
 )
 add_library(Drone::tello_backend ALIAS ${PROJECT_NAME})
 

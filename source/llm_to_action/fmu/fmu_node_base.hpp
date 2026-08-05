@@ -22,6 +22,14 @@ constexpr f32 kDefaultGoSpeedCmS     = 30.0f;   /* fallback cruise speed.      *
 constexpr f32 kGoApproachGainHz      = 0.5f;    /* position gain (1/s): decel begins at cruise/gain m from target. */
 constexpr f32 kGoCrossTrackGainHz    = 1.0f;    /* pulls back toward the start->target line; corrects drift without rotating the forward command. */
 
+/* ---- Takeoff / land profile (ENU, Up+) -- the FMU state machine owns these.
+   Backend-neutral: the FMU streams these ENU setpoints; each backend converts
+   to its own wire frame (PX4: ENU->NED in px4_backend.cpp). */
+constexpr f32 kTakeoffTargetAltEnu = 2.0f;    /* climb target ~2m up (Up+).     */
+constexpr f32 kTakeoffClimbVelEnu  = 2.0f;    /* climb at 2 m/s (Up+).          */
+constexpr f32 kLandDescendVelEnu   = -0.5f;   /* descend at 0.5 m/s (Down=-Up). */
+constexpr f32 kGroundContactEnu    = 0.1f;    /* landed when Up <= ~0.1.        */
+
 /* Momentum-settle dwell between tasks: a just-completed leg leaves real
    residual velocity (worst right after TAKEOFF's climb) that a zero-velocity
    COMMAND doesn't instantly cancel. Holding zero for a short window before the

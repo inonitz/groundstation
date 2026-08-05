@@ -43,18 +43,13 @@ constexpr u32 kOffboardPublishPeriodMs  = kMsInOneSecond / kOffboardPublishRateH
 /* 40 @ 30Hz ~= 1.33s of warmup before arm + set_offboard.                      */
 constexpr u64 kOffboardWarmupSetpoints  = 40;
 
-/* ---- NED tuning constants (Tasks 1-3; ENU equivalents added in Task 4) ---- */
+/* ---- NED tuning constants (PX4 wire-internal). The ENU constants the FMU
+   state machine uses now live in fmu/fmu_node_base.hpp. --------------------- */
 /* NED: down is positive. Proven takeoff profile from speech_to_action.         */
 constexpr f32 kTakeoffTargetAltNed = -2.0f;   /* climb target ~2m up.          */
 constexpr f32 kTakeoffClimbVelNed  = -2.0f;   /* climb at 2 m/s (weak -1.0 tipped on uneven terrain). */
 constexpr f32 kLandDescendVelNed   =  0.5f;   /* descend at 0.5 m/s.           */
 constexpr f32 kGroundContactAltNed = -0.1f;   /* consider landed near ~0.      */
-
-/* ENU equivalents — canonical seam constants the FMU uses (Task 4). Up is +Z. */
-constexpr f32 kTakeoffTargetAltEnu = 2.0f;    /* climb target ~2m up (Up+).     */
-constexpr f32 kTakeoffClimbVelEnu  = 2.0f;    /* climb at 2 m/s (Up+).          */
-constexpr f32 kLandDescendVelEnu   = -0.5f;   /* descend at 0.5 m/s (Down=-Up). */
-constexpr f32 kGroundContactEnu    = 0.1f;    /* landed when Up <= ~0.1.        */
 
 
 /* ---- QoS profiles -------------------------------------------------------- */
