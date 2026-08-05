@@ -24,9 +24,9 @@
 #include <cstdio>
 #include <opencv2/opencv.hpp>
 
-#include "../tello_backend.hpp"
-#include "../../keyboard/async_key.hpp"
-#include "../../keyboard/key_codes.hpp"
+#include "tello_backend/tello_backend.hpp"
+#include "keyboard/async_key.hpp"
+#include "keyboard/key_codes.hpp"
 
 
 /* Fixed teleop magnitudes (m/s and rad/s). Deliberately gentle for indoor test. */

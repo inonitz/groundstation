@@ -69,7 +69,8 @@ $CMAKE_ROOT_BUILD_DIR = "build"
 $CMAKE_ARGLIST = @(
     "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
     "-DGROUNDSTATION_BUILD_EXECUTABLE=ON",
-    "-DGROUNDSTATION_BUILD_TESTS=ON"
+    "-DGROUNDSTATION_BUILD_TESTS=ON",
+    "-DGROUNDSTATION_BUILD_BACKEND_PX4=ON"
 )
 
 # "-DCMAKE_C_COMPILER=clang",
@@ -177,7 +178,10 @@ if ($Action -eq "configure" -or $Action -eq "cleanbuild") {
 
 
 # 3. Build
-if ($Action -eq "build") {
+if ($Action -eq "build" -or $Action -eq "buildpx4" -or $Action -eq "buildtello") {
+    if ($BUILD_FMU_DEFS.Count -gt 0) {
+        Run-Command "CMake reconfigure ($FMU_BUILD_TARGET)" { cmake -S . -B $CMAKE_FINAL_BUILD_DIR -G "Ninja" $CMAKE_ARGLIST $BUILD_FMU_DEFS }
+    }
     if (-not $DryRun) { Push-Location $CMAKE_FINAL_BUILD_DIR }
 
     # Sync compile_commands.json as per original script
@@ -185,7 +189,7 @@ if ($Action -eq "build") {
         Run-Command "Update compile_commands.json" { Copy-Item "compile_commands.json" "../../compile_commands.json" -Force }
     }
 
-    Run-Command "Ninja Build" { ninja $PROJECT_NAME -j(($env:NUMBER_OF_PROCESSORS)/2)}
+    Run-Command "Ninja Build" { ninja $FMU_BUILD_TARGET -j(($env:NUMBER_OF_PROCESSORS)/2)}
     if (-not $DryRun) { Pop-Location }
 }
 

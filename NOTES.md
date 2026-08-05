@@ -353,3 +353,37 @@
   H264, not RTP -- existing rx_node's rtph264depay won't work; needs
   `udpsrc port=11111 ! h264parse ! avdec_h264 ! videoconvert ! appsink`);
   hardware calibration of the stick<->m/s constant.
+
+## GenericBackend CRTP seam — PX4 & Tello interchangeable (2026-08-05)
+
+- **Problem:** FMU was hard-wired to `unique_ptr<PX4Backend>`; `BackendStatus`/`IOState`/`Odometry`
+  were defined twice (px4 + tello) and had already diverged (IOState 4 vs 3 values; Odometry
+  yawrate). No shared interface.
+- **Mechanism (locked with user):** CRTP, **no virtual**, force-inlined. `template<class Derived>
+  struct GenericBackend` in new `source/llm_to_action/generic_backend/`. Nine seam verbs
+  (start/stop/takeoff/land/set_velocity/disarm/force_disarm/odometry/state) forward to `*_impl` on
+  the derived backend. Missing an `*_impl` = clean compile error at the forwarder, not template spew.
+- **Shared types promoted** to `generic_backend/generic_backend_types.hpp` (single definition,
+  reconciled to the SUPERSET: IOState keeps PX4's HANDSHAKING; Odometry keeps yawrate — Tello leaves
+  it 0). `Vec3` stays single-source in `frame/frame_convert.hpp` (not promoted).
+- **FMU stays NON-templated** (explicit user constraint — no `FmuNode<T>`). `active_backend.hpp`
+  selects `using ActiveBackend = …` from one macro. Backend chosen at **CMake configure time** via
+  three boolean `OPTION`s in the **top-level** CMakeLists.txt — `FMU_BACKEND_PX4` /
+  `FMU_BACKEND_TELLO` / `FMU_BACKEND_ALL` — of which **exactly one** must be ON (top-level counts
+  them; !=1 ⇒ config error, so no default). The FMU subdir only consumes them (ALL⇒`px4 tello`),
+  emitting one `llm_to_action_fmu_<be>` target each with the matching `FMU_BACKEND_<BE>` compile
+  def; tello links `Drone::tello_backend`. The old single `llm_to_action_fmu` target is gone.
+  build.sh / build.ps1 gained `buildpx4` / `buildtello` actions that pass the full
+  `-DFMU_BACKEND_*` triple (resetting the others OFF so switching backends can't leave two ON).
+- **Ctor asymmetry** (PX4 needs `Node*`+cbGroup; Tello is ROS-free, needs nothing) hidden behind
+  `make_active_backend(Node*, cbg)` in active_backend.hpp — a per-build factory, NOT an `if
+  constexpr` (which in the non-templated FMU would fully compile the dead, wrong-arity branch and
+  fail). active_backend.hpp is FMU-only glue so it may name ROS types; **TelloBackend itself stays
+  ROS-free**.
+- **Off-seam (kept, not promoted):** Tello `set_body_velocity` (teleop), `gotFirstState()` /
+  PX4 `gotFirstOdom()` — liveness is already uniform via `Odometry.valid`.
+- **Deferred wart:** the factory still special-cases construction per backend; a uniform
+  backend-construction contract is a later cleanup (user: "figure it out later").
+- **Verification:** static checks green (single type def, verbs renamed). Full compile gate
+  (`-DFMU_BACKEND=PX4/TELLO/ALL` build, unset FATAL_ERROR, standalone backends + tests) pending —
+  user builds manually.

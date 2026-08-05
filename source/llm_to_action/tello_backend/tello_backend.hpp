@@ -26,6 +26,7 @@
 #include <mutex>
 #include <thread>
 #include "tello_backend_base.hpp"
+#include "generic_backend/generic_backend.hpp"  /* GenericBackend CRTP base */
 
 
 /* Kept opaque so ctello.h (and its spdlog/OpenCV pull) stays out of consumers'
@@ -33,7 +34,7 @@
 namespace ctello { class Tello; }
 
 
-class TelloBackend {
+class TelloBackend : public GenericBackend<TelloBackend> {
 public:
     TelloBackend();
     ~TelloBackend();
@@ -41,27 +42,28 @@ public:
     TelloBackend(const TelloBackend&)            = delete;
     TelloBackend& operator=(const TelloBackend&) = delete;
 
-    /* Bind the SDK, enter command mode + streamon, launch state/stream threads.
+    /* ---- seam impls (invoked through GenericBackend<TelloBackend>) ---------
+       Bind the SDK, enter command mode + streamon, launch state/stream threads.
        Returns false if the initial bind/handshake fails. */
-    bool start();
+    bool start_impl();
     /* Stop streaming, land (safety), join threads. Idempotent; dtor calls it. */
-    void stop();
+    void stop_impl();
 
-    /* ---- semantic verbs (non-blocking; progress observed via state()) ------ */
-    BackendStatus takeoff();
-    BackendStatus land();
+    BackendStatus takeoff_impl();
+    BackendStatus land_impl();
     /* Stream this ENU world velocity (m/s) + yaw rate (rad/s, CCW+). */
-    void          set_velocity(Vec3 worldVelEnu, f32 yawspeed);
-    /* Teleop-direct: body FLU velocity (m/s) + yaw rate (rad/s, CCW+); no
+    void          set_velocity_impl(Vec3 worldVelEnu, f32 yawspeed);
+    void          disarm_impl();        /* graceful: land.      */
+    void          force_disarm_impl();  /* emergency: motors off. */
+
+    Odometry odometry_impl() const;
+    IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
+
+    /* ---- backend-specific (off-seam) --------------------------------------
+       Teleop-direct: body FLU velocity (m/s) + yaw rate (rad/s, CCW+); no
        dependence on the drifting yaw estimate. W = +forward. */
     void          set_body_velocity(Vec3 flu, f32 yawspeed);
-    void          disarm();        /* graceful: land.      */
-    void          force_disarm();  /* emergency: motors off. */
-
-    /* ---- telemetry / observable state -------------------------------------- */
-    Odometry odometry() const;
-    IOState  state() const { return m_ioState.load(std::memory_order_relaxed); }
-    bool     gotFirstState() const { return m_gotFirstState.load(std::memory_order_relaxed); }
+    bool          gotFirstState() const { return m_gotFirstState.load(std::memory_order_relaxed); }
 
 private:
     void stateLoop();

@@ -12,7 +12,7 @@ using namespace std::chrono;
 TelloBackend::TelloBackend() = default;
 
 TelloBackend::~TelloBackend() {
-    stop();
+    stop_impl();
 }
 
 
@@ -38,7 +38,7 @@ bool TelloBackend::sendCmd(const char* cmd, bool awaitAck) {
 }
 
 
-bool TelloBackend::start() {
+bool TelloBackend::start_impl() {
     if (m_running.load(std::memory_order_relaxed)) return true;
 
     m_tello = std::make_unique<ctello::Tello>();
@@ -57,7 +57,7 @@ bool TelloBackend::start() {
 }
 
 
-void TelloBackend::stop() {
+void TelloBackend::stop_impl() {
     if (!m_running.exchange(false, std::memory_order_relaxed)) {
         /* Never fully started (or already stopped): join anything dangling. */
         if (m_streamThread.joinable()) m_streamThread.join();
@@ -93,21 +93,21 @@ f32 TelloBackend::currentYawRad() const {
 }
 
 
-BackendStatus TelloBackend::takeoff() {
+BackendStatus TelloBackend::takeoff_impl() {
     setRc({});
     bool ok = sendCmd("takeoff", true);
     if (ok) m_ioState.store(IOState::FLIGHT, std::memory_order_relaxed);
     return { ok ? BackendStatus::Code::OK : BackendStatus::Code::REJECTED };
 }
 
-BackendStatus TelloBackend::land() {
+BackendStatus TelloBackend::land_impl() {
     setRc({});
     bool ok = sendCmd("land", true);
     m_ioState.store(IOState::STANDBY, std::memory_order_relaxed);
     return { ok ? BackendStatus::Code::OK : BackendStatus::Code::REJECTED };
 }
 
-void TelloBackend::set_velocity(Vec3 worldVelEnu, f32 yawspeed) {
+void TelloBackend::set_velocity_impl(Vec3 worldVelEnu, f32 yawspeed) {
     Vec3 flu = enu_to_flu(worldVelEnu, currentYawRad());
     setRc(flu_to_rc(flu, yawrate_to_stick(yawspeed)));
 }
@@ -116,11 +116,11 @@ void TelloBackend::set_body_velocity(Vec3 flu, f32 yawspeed) {
     setRc(flu_to_rc(flu, yawrate_to_stick(yawspeed)));
 }
 
-void TelloBackend::disarm()       { land(); }
-void TelloBackend::force_disarm() { sendCmd("emergency", false); }
+void TelloBackend::disarm_impl()       { land_impl(); }
+void TelloBackend::force_disarm_impl() { sendCmd("emergency", false); }
 
 
-Odometry TelloBackend::odometry() const {
+Odometry TelloBackend::odometry_impl() const {
     Odometry od;
     od.pos = { 0.0f, 0.0f, __scast(f32, m_heightCm.load(std::memory_order_relaxed)) / 100.0f };
     od.vel = { __scast(f32, m_vgx.load(std::memory_order_relaxed)) / 100.0f,

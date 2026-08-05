@@ -12,23 +12,22 @@ CMAKE_ARGLIST="\
     -DGROUNDSTATION_BUILD_EXECUTABLE=ON \
     -DGROUNDSTATION_BUILD_TESTS=OFF \
     -DGROUNDSTATION_BUILD_BENCHMARKS=OFF \
+    -DGROUNDSTATION_BUILD_BACKEND_PX4=ON \
     \
 
     "
-
-
 
 
 CMAKE_ORIGINAL_SCRIPT_PATH="$PWD" # Assuming that build.sh is in the same dir as the Root CMakeLists.txt
 CMAKE_ROOT_BUILD_DIR="build"
 CMAKE_INTRMD_BUILD_DIR=""
 
-
 CLEAN_CURRENT_ROOT_BUILD_DIR="false"
 CONFIGURE_CMAKE_FLAG="false"
 BUILD_BINARIES_FLAG="false"
 RUN_GROUNDSTATION_FLAG="false"
 RUN_DOCKER_SIMULATION_FLAG="false"
+
 
 if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
     cat << EOF
@@ -89,15 +88,20 @@ fi
 
 if [[ "$3" == "cleanbuild" ]]; then
     CLEAN_CURRENT_ROOT_BUILD_DIR="true"
+
 elif [[ "$3" == "configure" ]]; then
     CONFIGURE_CMAKE_FLAG="true"
     CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON"
+
 elif [[ "$3" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"
+
 elif [[ "$3" == "rungs" ]]; then
     RUN_GROUNDSTATION_FLAG="true"
+
 elif [[ "$3" == "runsim" ]]; then
     RUN_DOCKER_SIMULATION_FLAG="true"
+
 else
     printf "Unknown Argument %s - valid values are: cleanbuild, configure, build, rungs, runsim\nExiting...\n" "$3"
     exit 1

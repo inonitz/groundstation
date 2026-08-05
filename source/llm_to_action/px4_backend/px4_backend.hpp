@@ -21,50 +21,36 @@
 #include <px4_msgs/msg/vehicle_status.hpp>
 
 #include "px4_backend_base.hpp"   /* topics, QoS, tuning, OffboardTranslator, Vec3 */
+#include "generic_backend/generic_backend.hpp"  /* GenericBackend + shared BackendStatus/IOState/Odometry */
 
 
 using OdomMsgType   = px4_msgs::msg::VehicleOdometry;
 using StatusMsgType = px4_msgs::msg::VehicleStatus;
 
 
-/* Verb result. Minimal set; grow only when a caller branches on a new code. */
-struct BackendStatus {
-    enum class Code : u8 { OK, PENDING, REJECTED, FAULT };
-    Code code{Code::OK};
-};
-
-/* Backend-owned wire I/O state machine (replaces the old m_offboardEngaged bool). */
-enum class IOState : u8 { STANDBY, HANDSHAKING, FLIGHT, FAULT };
-
-/* Platform-neutral telemetry snapshot handed to the FMU (world frame; NED now). */
-struct Odometry {
-    Vec3 pos;                 /* world position ENU (x=East, y=North, z=Up).      */
-    Vec3 vel;                 /* world velocity ENU — measured, for debug/LAND.     */
-    f32  yaw{0.0f};           /* heading ENU (CCW+ from East, radians).             */
-    f32  yawrate{0.0f};       /* body yaw-rate (rad/s) — measured, for debug.        */
-    u64  host_stamp_us{0};    /* HOST clock at receipt (kept for M3 staleness).     */
-    bool valid{false};        /* false until first odom ever received.             */
-};
+/* BackendStatus / IOState / Odometry now live in generic_backend_types.hpp
+   (single definition shared with every backend across the seam). */
 
 
-class PX4Backend {
+class PX4Backend : public GenericBackend<PX4Backend> {
 public:
     PX4Backend(rclcpp::Node* node, rclcpp::CallbackGroup::SharedPtr cbg);
     ~PX4Backend();
 
-    void start();   /* create pubs/subs + stream timer. Call once after construction. */
-    void stop();    /* cancel the stream timer (dtor also calls this).                */
+    /* ---- seam impls (invoked through GenericBackend<PX4Backend>) ----------- */
+    bool start_impl();   /* create pubs/subs + stream timer. Call once after construction. */
+    void stop_impl();    /* cancel the stream timer (dtor also calls this).                */
 
-    /* ---- semantic verbs (non-blocking; progress observed via state()) ------ */
-    BackendStatus takeoff();                          /* STANDBY->HANDSHAKING, else REJECTED. */
-    BackendStatus land();                             /* no-op OK; FMU streams the descent.   */
-    void          set_velocity(Vec3 worldVel, f32 yawspeed);  /* stream this ENU vel.         */
-    void          disarm();
-    void          force_disarm();
+    BackendStatus takeoff_impl();                          /* STANDBY->HANDSHAKING, else REJECTED. */
+    BackendStatus land_impl();                             /* no-op OK; FMU streams the descent.   */
+    void          set_velocity_impl(Vec3 worldVel, f32 yawspeed);  /* stream this ENU vel.         */
+    void          disarm_impl();
+    void          force_disarm_impl();
 
-    /* ---- telemetry / observable state -------------------------------------- */
-    Odometry odometry() const;
-    IOState  state() const { return m_ioState.load(std::memory_order_relaxed); }
+    Odometry odometry_impl() const;
+    IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
+
+    /* ---- backend-specific (off-seam) --------------------------------------- */
     bool     gotFirstOdom() const { return m_gotFirstOdom.load(std::memory_order_relaxed); }
 
 private:

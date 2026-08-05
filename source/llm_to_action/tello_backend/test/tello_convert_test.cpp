@@ -6,8 +6,8 @@
     Build: g++ -std=c++17 -I <util2-include> tello_convert_test.cpp -o /tmp/tct && /tmp/tct
     No ROS, no ctello, no hardware -- runs on any host.
 */
-#include "../../frame/frame_convert.hpp"
-#include "../tello_backend_base.hpp"
+#include "frame/frame_convert.hpp"
+#include "tello_backend/tello_backend_base.hpp"
 #include <cmath>
 #include <initializer_list>
 #include <cstdio>

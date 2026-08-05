@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.16)
 project(tello_backend C CXX)
 
-# ---------------------------------------------------------------------------
-# TelloBackend library (ROS-free). The FMU/consumers drive it through the same
-# semantic verbs as PX4Backend; ctello stays an implementation detail.
-#
+
 # ctello's source is fetched DOWNLOAD_ONLY at the workspace root, so we compile
-# its single translation unit straight into this library. That deliberately
-# bypasses ctello's own CMake -- which builds example executables and hard-
-# requires find_package(OpenCV) -- since we only want the command/state client.
-# ---------------------------------------------------------------------------
+# its single translation unit straight into this library. Bypasses ctellos CMakeLists.txt
+# which builds a lot of BULLSHIT
+set(TELLO_BACKEND_LIBRARY_SOURCES
+    tello_backend.cpp
+    ${ctello_SOURCE_DIR}/src/ctello.cpp
+)
+
+set(TELLO_BACKEND_LIBRARY_HEADERS
+    tello_backend.hpp
+    tello_backend_base.hpp
+)
+
+
 add_library(${PROJECT_NAME} STATIC
     tello_backend.cpp
     tello_backend.hpp
     tello_backend_base.hpp
-    ${ctello_SOURCE_DIR}/src/ctello.cpp
 )
 add_library(Drone::tello_backend ALIAS ${PROJECT_NAME})
 
@@ -22,11 +27,10 @@ add_library(Drone::tello_backend ALIAS ${PROJECT_NAME})
 # Private: ctello.h and spdlog are only needed to compile the .cpp files; the
 # public header forward-declares ctello::Tello, so consumers never see them.
 target_include_directories(${PROJECT_NAME}
-    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE ${ctello_SOURCE_DIR}/include
 )
 target_link_libraries(${PROJECT_NAME}
-    PUBLIC  UTIL2::util2
+    PUBLIC  UTIL2::util2 util_base_header
     PRIVATE spdlog::spdlog_header_only
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -36,7 +40,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 # parser, the stick mapping). No ctello, no OpenCV, no ROS -- runs anywhere.
 # ---------------------------------------------------------------------------
 add_executable(tello_convert_test test/tello_convert_test.cpp)
-target_link_libraries(tello_convert_test PRIVATE UTIL2::util2)
+target_link_libraries(tello_convert_test PRIVATE UTIL2::util2 util_base_header)
 target_compile_features(tello_convert_test PRIVATE cxx_std_17)
 add_custom_target(run_tello_convert_test
     COMMAND tello_convert_test
@@ -53,8 +57,8 @@ find_package(OpenCV QUIET COMPONENTS core imgproc highgui videoio)
 if(OpenCV_FOUND)
     add_executable(tello_teleop
         test/tello_teleop.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../keyboard/async_key.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../keyboard/key_codes.cpp
+        ${LLM_TO_ACTION_DIR}/keyboard/async_key.cpp
+        ${LLM_TO_ACTION_DIR}/keyboard/key_codes.cpp
     )
     target_link_libraries(tello_teleop PRIVATE
         Drone::tello_backend

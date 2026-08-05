@@ -22,7 +22,7 @@
 #include <px4_msgs/msg/vehicle_command.hpp>
 #include <util2/C/base_type.h>
 #include <util2/C/macro.h>
-#include "../frame/frame_convert.hpp"
+#include "frame/frame_convert.hpp"
 
 
 /* ---- ROS 2 topic names (PX4 uXRCE-DDS bridge) ---------------------------- */

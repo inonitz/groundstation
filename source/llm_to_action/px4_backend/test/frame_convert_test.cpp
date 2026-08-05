@@ -4,7 +4,7 @@
     This exercises the riskiest part of the ENU migration (sign conventions) with
     zero ROS/px4_msgs dependencies, so it runs on any host.
 */
-#include "../../frame/frame_convert.hpp"
+#include "frame/frame_convert.hpp"
 #include <cmath>
 #include <cstdio>
 #include <cassert>

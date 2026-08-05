@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
 project(llm_to_action C CXX)
 
+# Root of this module; subdirectories reference sibling sources through this
+# instead of relative path-walking.
+set(LLM_TO_ACTION_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 set(IS_WSL_ENV)
 detect_wsl_env(IS_WSL_ENV)
 
 
+# ---------------------------------------------------------------------------
+# Shared ROS2 node helpers. Defined here (global scope) so every node
+# subdirectory added below can call them without redefinition.
+# ---------------------------------------------------------------------------
 function(define_ros2_node EXE_NAME FILE_SOURCES)
    set(FULL_EXE_NAME ${PROJECT_NAME}_${EXE_NAME})
 
@@ -50,123 +58,27 @@ endfunction()
 
 
 # ---------------------------------------------------------------------------
-# Header-Only Target
+# Header-Only Target -- single include root for the whole module. Every target
+# links this to get root-relative includes (no relative path-walking).
 # ---------------------------------------------------------------------------
 add_library(util_base_header INTERFACE)
 target_include_directories(util_base_header INTERFACE
    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# ---------------------------------------------------------------------------
-# Source Definitions
-# ---------------------------------------------------------------------------
-set(FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX fmu)
-set(FLIGHT_MANAGEMENT_UNIT_NODE_SOURCES
-    frame/frame_convert.hpp
-    px4_backend/px4_backend_base.hpp
-    px4_backend/px4_backend.hpp
-    px4_backend/px4_backend.cpp
-    fmu/fmu_node_base.hpp
-    fmu/fmu_node.cpp
-    fmu/fmu_node.hpp
-    fmu/llm_base.hpp
-    fmu/llamaclient.cpp
-    fmu/llamaclient.hpp
-    fmu/spsc_bounded_queue.hpp
-    fmu/threadpool.hpp
-)
-
-set(KEYBOARD_NODE_NAME_POSTFIX keyboard_hook)
-set(KEYBOARD_NODE_SOURCES
-    keyboard/async_key.hpp
-    keyboard/async_key.cpp
-    keyboard/key_codes.hpp
-    keyboard/key_codes.cpp
-    keyboard/keyboard_node.hpp
-    keyboard/keyboard_node.cpp
-    keyboard/keyboard_node_base.hpp
-)
-
-set(ASR_SERVER_NODE_NAME_POSTFIX asr_server)
-set(ASR_SERVER_NODE_SOURCES
-    asr/asr_node_base.hpp
-    asr/asr_node.hpp
-    asr/asr_node.cpp
-)
-
-set(OFFBOARD_CONTROL_MODE_NAME_POSTFIX offboard_mode)
-set(OFFBOARD_CONTROL_NODE_SOURCES
-    offboard_ctrl/px4_offboard_node_base.hpp
-    offboard_ctrl/px4_offboard_node.hpp
-    offboard_ctrl/px4_offboard_node.cpp
-)
-
-set(GSTREAMER_RECEIVER_NAME_POSTFIX gstreamer_rx)
-set(GSTREAMER_RECEIVER_SOURCES
-    gstreamer_udp_cam_rx/rx_node.cpp
-    gstreamer_udp_cam_rx/rx_node.hpp
-    gstreamer_udp_cam_rx/rx_node_base.hpp
-)
 
 # ---------------------------------------------------------------------------
-# Targets
+# Nodes -- each lives in its own folder with its own CMakeLists.txt. Backends
+# come before the FMU so its Drone::tello_backend link target exists.
 # ---------------------------------------------------------------------------
-define_ros2_node(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX} "${FLIGHT_MANAGEMENT_UNIT_NODE_SOURCES}")
-ros2_node_add_library(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
-    util_base_header
-    BASE64::base64
-    nlohmann_json::nlohmann_json
-    cv_bridge::cv_bridge
-    llama::llama
-    opencv_core
-    opencv_imgcodecs
-    opencv_imgproc
-    opencv_highgui
-    httplib::httplib
-    sensor_msgs::sensor_msgs__rosidl_generator_c
-    sensor_msgs::sensor_msgs__rosidl_generator_cpp
-)
-ros2_node_add_include_directory(${FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX}
-    ${cv_bridge_INCLUDE_DIRS}
-    ${moodycamel_readerwriterqueue_SOURCE_DIR}
-)
-
-
-define_ros2_node(${KEYBOARD_NODE_NAME_POSTFIX} "${KEYBOARD_NODE_SOURCES}")
-ros2_node_add_library(${KEYBOARD_NODE_NAME_POSTFIX}
-    "$<$<BOOL:${IS_WSL_ENV}>:${X11_LIBRARIES};${X11_Xi_LIB}>"
-    util_base_header
-)
-ros2_node_add_include_directory(${KEYBOARD_NODE_NAME_POSTFIX}
-    "$<$<BOOL:${IS_WSL_ENV}>:${X11_INCLUDE_DIR}>"
-)
-
-define_ros2_node(${ASR_SERVER_NODE_NAME_POSTFIX} "${ASR_SERVER_NODE_SOURCES}")
-ros2_node_add_library(${ASR_SERVER_NODE_NAME_POSTFIX}
-    STTSERVER::SpeechToTextServer
-    util_base_header
-)
-
-define_ros2_node(${OFFBOARD_CONTROL_MODE_NAME_POSTFIX} "${OFFBOARD_CONTROL_NODE_SOURCES}")
-ros2_node_add_library(${OFFBOARD_CONTROL_MODE_NAME_POSTFIX}
-    util_base_header
-)
-ros2_node_add_include_directory(${OFFBOARD_CONTROL_MODE_NAME_POSTFIX}
-    "$<$<BOOL:${IS_WSL_ENV}>:${X11_INCLUDE_DIR}>"
-)
-
-define_ros2_node(${GSTREAMER_RECEIVER_NAME_POSTFIX} "${GSTREAMER_RECEIVER_SOURCES}")
-ros2_node_add_library(${GSTREAMER_RECEIVER_NAME_POSTFIX}
-    util_base_header
-    GSTREAMER::gstreamer
-    CameraPlugin::GazeboGstCameraLibrary
-    sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
-)
-target_deploy_gstreamer(${PROJECT_NAME}_${GSTREAMER_RECEIVER_NAME_POSTFIX})
-
-
-
-add_subdirectory(gstreamer_gz_udp_tx)
+add_subdirectory(px4_backend)
 add_subdirectory(tello_backend)
+add_subdirectory(gstreamer_gz_udp_tx)
+
+add_subdirectory(fmu)
+add_subdirectory(keyboard)
+add_subdirectory(asr)
+add_subdirectory(offboard_ctrl)
+add_subdirectory(gstreamer_udp_cam_rx)
 # There shouldn't be a need for a tello udp transmitter since the tello already sends the Packets
 # add_subdirectory(gstreamer_tello_udp_tx)

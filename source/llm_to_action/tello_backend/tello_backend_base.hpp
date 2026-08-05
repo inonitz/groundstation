@@ -21,7 +21,8 @@
 #include <cstdio>
 #include <util2/C/base_type.h>
 #include <util2/C/macro.h>
-#include "../frame/frame_convert.hpp"
+#include "frame/frame_convert.hpp"
+#include "generic_backend/generic_backend_types.hpp"  /* BackendStatus, IOState, Odometry */
 
 
 /* ---- Tello SDK 2.0 UDP endpoints (ctello binds cmd + state internally) ----- */
@@ -114,21 +115,8 @@ static inline bool parse_tello_state_branchless(const char* buffer, TelloState& 
 }
 
 
-/* ---- Platform-neutral seam types (match px4_backend.hpp) ------------------- */
-struct BackendStatus {
-    enum class Code : u8 { OK, PENDING, REJECTED, FAULT };
-    Code code{Code::OK};
-};
-
-/* Minimal wire/flight state (no arm/offboard handshake on Tello).              */
-enum class IOState : u8 { STANDBY, FLIGHT, FAULT };
-
-/* World-frame telemetry handed to the FMU. Tello has NO absolute horizontal
-   position estimate, so pos is height-only (x=y=0, z=Up meters).               */
-struct Odometry {
-    Vec3 pos;                 /* ENU; only z (height) is meaningful on Tello.     */
-    Vec3 vel;                 /* body velocity in m/s (vgx/vgy/vgz / 100).        */
-    f32  yaw{0.0f};           /* heading, radians (from state.yaw, drifts).       */
-    u64  host_stamp_us{0};    /* host clock at state receipt (staleness).         */
-    bool valid{false};        /* false until first state ever parsed.             */
-};
+/* ---- Platform-neutral seam types --------------------------------------------
+   BackendStatus / IOState / Odometry are defined once in
+   generic_backend_types.hpp (included above) and shared with every backend.
+   Tello uses the IOState subset {STANDBY, FLIGHT, FAULT} and leaves
+   Odometry.yawrate at 0 (no yaw-rate estimate). --------------------------------*/

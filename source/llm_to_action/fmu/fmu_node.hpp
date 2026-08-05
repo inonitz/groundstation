@@ -23,7 +23,7 @@
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
-#include "px4_backend/px4_backend.hpp"  /* PX4Backend, BackendStatus, IOState, Odometry, Vec3 */
+#include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 
 
 /* Shared-scalar access order (matches the proven baseline). */
@@ -199,8 +199,11 @@ public:
             subOpts
         );
 
-        /* All PX4 wire I/O (pubs/subs/handshake/stream loop) lives in the backend. */
-        m_backend = std::make_unique<PX4Backend>(this, m_cbGroup);
+        /* All platform wire I/O lives in the backend. make_active_backend hides
+           the per-backend ctor asymmetry (PX4 needs this Node + callback group;
+           Tello, being ROS-free, ignores them) behind one uniform call, so the
+           FMU stays non-templated and no ROS leaks into a ROS-free backend. */
+        m_backend = make_active_backend(this, m_cbGroup);
         m_backend->start();
 
         m_controlTimer = this->create_wall_timer(
@@ -677,7 +680,7 @@ private:
     rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
     rclcpp::TimerBase::SharedPtr                    m_controlTimer;
 
-    std::unique_ptr<PX4Backend>                     m_backend;
+    std::unique_ptr<ActiveBackend>                  m_backend;
 
     std::unique_ptr<spsc_queue<ActiveTask>>         m_taskQueue;
     ActiveTask                                      m_currTask;

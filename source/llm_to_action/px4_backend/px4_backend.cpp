@@ -9,10 +9,10 @@ static constexpr std::memory_order rlx = std::memory_order_relaxed;
 PX4Backend::PX4Backend(rclcpp::Node* node, rclcpp::CallbackGroup::SharedPtr cbg)
     : m_node(node), m_cbg(std::move(cbg)) {}
 
-PX4Backend::~PX4Backend() { stop(); }
+PX4Backend::~PX4Backend() { stop_impl(); }
 
 
-void PX4Backend::start() {
+bool PX4Backend::start_impl() {
     rclcpp::SubscriptionOptions subOpts;
     subOpts.callback_group = m_cbg;
 
@@ -36,9 +36,10 @@ void PX4Backend::start() {
 
     RCLCPP_INFO(m_node->get_logger(), "[PX4_BACKEND_DEBUG] started (stream %uHz).",
         kOffboardPublishRateHz);
+    return true;   /* PX4 start has no failure path today; seam contract is bool. */
 }
 
-void PX4Backend::stop() {
+void PX4Backend::stop_impl() {
     if (m_streamTimer) m_streamTimer->cancel();
 }
 
@@ -127,7 +128,7 @@ void PX4Backend::streamTick() {
 
 
 /* ---- Semantic verbs ------------------------------------------------------ */
-BackendStatus PX4Backend::takeoff() {
+BackendStatus PX4Backend::takeoff_impl() {
     if (m_ioState.load(rlx) != IOState::STANDBY) {
         return { BackendStatus::Code::REJECTED };
     }
@@ -140,30 +141,30 @@ BackendStatus PX4Backend::takeoff() {
     return { BackendStatus::Code::PENDING };
 }
 
-BackendStatus PX4Backend::land() {
+BackendStatus PX4Backend::land_impl() {
     return { BackendStatus::Code::OK };  /* PX4: FMU streams the descent; nothing to do here. */
 }
 
-void PX4Backend::set_velocity(Vec3 worldVel, f32 yawspeed) {
+void PX4Backend::set_velocity_impl(Vec3 worldVel, f32 yawspeed) {
     m_vx.store(worldVel.x, rlx);
     m_vy.store(worldVel.y, rlx);
     m_vz.store(worldVel.z, rlx);
     m_yawsp.store(yawspeed, rlx);
 }
 
-void PX4Backend::disarm() {
+void PX4Backend::disarm_impl() {
     m_pubCmd->publish(OffboardTranslator::arm(nowUs(), false));
     m_ioState.store(IOState::STANDBY, rlx);
 }
 
-void PX4Backend::force_disarm() {
+void PX4Backend::force_disarm_impl() {
     m_pubCmd->publish(OffboardTranslator::force_disarm(nowUs()));
     m_ioState.store(IOState::STANDBY, rlx);
 }
 
 
 /* ---- Telemetry ----------------------------------------------------------- */
-Odometry PX4Backend::odometry() const {
+Odometry PX4Backend::odometry_impl() const {
     Odometry o;
     o.pos          = { m_posN.load(rlx), m_posE.load(rlx), m_posD.load(rlx) };
     o.vel          = { m_velN.load(rlx), m_velE.load(rlx), m_velD.load(rlx) };
