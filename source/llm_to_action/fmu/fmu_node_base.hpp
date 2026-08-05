@@ -1,6 +1,12 @@
 #pragma once
 #include <util2/C/base_type.h>
 
+/*
+    FMU-only tuning. Everything PX4/ROS-wire (topic names, QoS, offboard stream
+    rate/warmup, NED setpoint constants) now lives in px4_backend/px4_backend_base.hpp,
+    the single source of truth for platform-specific config. Do NOT redefine those
+    here — the FMU pulls them in transitively via px4_backend.hpp.
+*/
 
 /* ---- Loop rates ---------------------------------------------------------- */
 constexpr u32 kMillisecondsInOneSecond = 1000;
@@ -8,40 +14,32 @@ constexpr u32 kMillisecondsInOneSecond = 1000;
 constexpr u32 kControlLoopRateHz       = 20;
 constexpr u32 kControlLoopPeriodMs     = kMillisecondsInOneSecond / kControlLoopRateHz;
 
-/* DJI Tello cannot ingest setpoints above ~20Hz; publish at 30Hz for margin.  */
-/* NOTE (Phase 2): this publish loop moves into the per-platform DroneBackend.  */
-constexpr u32 kOffboardPublishRateHz   = 30;
-constexpr u32 kOffboardPublishPeriodMs = kMillisecondsInOneSecond / kOffboardPublishRateHz;
 
-/* PX4 rejects an OFFBOARD switch unless setpoints have been streaming for ~1s. */
-/* Stream this many before sending set_mode(OFFBOARD)+arm. 40 @ 30Hz ~= 1.33s.  */
-constexpr u64 kOffboardWarmupSetpoints = 40;
-
-
-/* ---- Topics -------------------------------------------------------------- */
-/* Camera type + topic (camera/stream) come from rx_node_base.hpp — do not     */
-/* redefine here. Odometry is PX4-specific for now.                            */
-/* TODO (Phase 2): make the odom topic per-platform — the Tello will NOT       */
-/* publish /fmu/out/vehicle_odometry; its driver republishes nav_msgs/Odometry.*/
-constexpr const char* kInOdometryTopic     = "/fmu/out/vehicle_odometry";
-/* PX4 arming/nav-state feedback — the engage handshake retries until this      */
-/* confirms ARMED + OFFBOARD. Firing blind on a timer armed the vehicle before  */
-/* the estimator was ready -> motors spun, no climb, auto-disarm.               */
-/* NOTE: PX4 message versioning appends _vN (VehicleStatus.msg MESSAGE_VERSION=4) */
-/* -> the real topic is vehicle_status_v4, NOT vehicle_status. Odometry is v0 so   */
-/* it has no suffix. Bump this if px4_msgs VehicleStatus version changes.          */
-constexpr const char* kInVehicleStatusTopic = "/fmu/out/vehicle_status_v4";
-
-
-/* ---- Completion / flight tuning (all sim-tunable) ------------------------ */
+/* ---- Completion / flight tuning (planner-side; frame-neutral) ------------ */
 constexpr f32 kGoCompletionRadiusM   = 0.20f;   /* GO done when within 20cm.   */
 constexpr f32 kRotateCompletionDeg   = 5.0f;    /* ROTATE done within 5 deg.   */
 constexpr f32 kDefaultGoSpeedCmS     = 30.0f;   /* fallback cruise speed.      */
+constexpr f32 kGoApproachGainHz      = 0.5f;    /* position gain (1/s): decel begins at cruise/gain m from target. */
+constexpr f32 kGoCrossTrackGainHz    = 1.0f;    /* pulls back toward the start->target line; corrects drift without rotating the forward command. */
 
-/* NED: down is positive, so "up 1.5m" is -1.5. Reconcile vs old 2m default.  */
-constexpr f32 kTakeoffTargetAltNed   = -2.0f;   /* match proven speech_to_action profile (was -1.5). */
-constexpr f32 kTakeoffClimbVelNed    = -2.0f;   /* climb at 2 m/s. Weak -1.0 lingered in ground effect -> tipped on uneven terrain before gaining height. Matches speech_to_action. */
-constexpr f32 kLandDescendVelNed     =  0.5f;   /* descend at 0.5 m/s.         */
-constexpr f32 kGroundContactAltNed   = -0.1f;   /* consider landed near ~0.    */
+/* Momentum-settle dwell between tasks: a just-completed leg leaves real
+   residual velocity (worst right after TAKEOFF's climb) that a zero-velocity
+   COMMAND doesn't instantly cancel. Holding zero for a short window before the
+   next leg locks in its fixed direction keeps that residual out of the next
+   leg's line/cross-track math. */
+constexpr u32 kGoSettleMs    = 500;
+constexpr u32 kGoSettleTicks = kGoSettleMs / kControlLoopPeriodMs;
 
 constexpr u32 kDefaultPromptHistorySize = 256;
+
+/* Event-driven VLM wake: minimum spacing between planning cycles. Prevents the
+   queue-empty trigger from hammering the server when the VLM returns an empty or
+   unparseable plan (idle re-plan poll). */
+constexpr u32 kPlanCooldownMs = 2000;
+constexpr u64 kPlanCooldownUs = static_cast<u64>(kPlanCooldownMs) * 1000ULL;
+
+/* Grace period for the camera to start delivering frames before the VLM planner
+   falls back to a text-only prompt. Keeps a dead/absent camera from bricking the
+   drone while still preferring a vision-grounded plan when one is available. */
+constexpr u32 kVisionWarmupMs = 25000;   /* first camera frame lands ~15s after FMU start (DDS+gst+keyframe); wait past that. Once a frame arrives the plan fires immediately -- this is only the dead-camera fallback ceiling. */
+constexpr u64 kVisionWarmupUs = static_cast<u64>(kVisionWarmupMs) * 1000ULL;

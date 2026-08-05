@@ -5,14 +5,13 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <future>
 #include <nlohmann/json.hpp>
 #include <readerwriterqueue.h>
 #include <util2/C/macro.h>
 #include <util2/time.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include <px4_msgs/msg/vehicle_odometry.hpp>
-#include <px4_msgs/msg/vehicle_status.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -23,11 +22,12 @@
 #include "fmu_node_base.hpp"
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
-#include "offboard_translator.hpp"
+#include "plan_parse.hpp"
+#include "px4_backend/px4_backend.hpp"  /* PX4Backend, BackendStatus, IOState, Odometry, Vec3 */
 
 
-using OdomMsgType   = px4_msgs::msg::VehicleOdometry;
-using StatusMsgType = px4_msgs::msg::VehicleStatus;
+/* Shared-scalar access order (matches the proven baseline). */
+static constexpr std::memory_order rlx = std::memory_order_relaxed;
 
 typedef char FixedStringType[32];
 typedef char LargeFixedStringType[128];
@@ -55,7 +55,7 @@ enum class CommandID : u8 {
     MAX_ID   = 10
 };
 
-/* FMU-owned flight state machine (was baked into the old offboard node). */
+/* FMU-owned flight state machine (platform-neutral; drives the backend via verbs). */
 enum class FlightState : u8 {
     STANDBY,
     TAKEOFF,
@@ -187,13 +187,6 @@ class FlightManagementUnitNode : public rclcpp::Node {
 public:
     FlightManagementUnitNode() : rclcpp::Node("high_level_navigation_node") {
         rclcpp::SubscriptionOptions subOpts;
-        /* NOTE (Phase 2): the PX4-specific QoS + publishers below move into a  */
-        /* per-platform DroneBackend (PX4Backend / TelloBackend). Hardcoded     */
-        /* here only for the Phase-1 PX4 SITL smoke test.                       */
-        rclcpp::QoS px4Qos(10);
-
-        px4Qos.best_effort();
-        px4Qos.transient_local();
 
         m_cbGroup = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
         subOpts.callback_group = m_cbGroup;
@@ -205,50 +198,54 @@ public:
             std::bind(&FlightManagementUnitNode::imgCallback, this, std::placeholders::_1),
             subOpts
         );
-        m_subOdom = this->create_subscription<OdomMsgType>(
-            kInOdometryTopic, rclcpp::SensorDataQoS(),
-            std::bind(&FlightManagementUnitNode::odomCallback, this, std::placeholders::_1),
-            subOpts
-        );
-        m_subStatus = this->create_subscription<StatusMsgType>(
-            kInVehicleStatusTopic, rclcpp::SensorDataQoS(),
-            std::bind(&FlightManagementUnitNode::statusCallback, this, std::placeholders::_1),
-            subOpts
-        );
 
-        m_pubTraj = this->create_publisher<OffboardTranslator::TrajectorySetpoint>(
-            "/fmu/in/trajectory_setpoint", px4Qos);
-        m_pubMode = this->create_publisher<OffboardTranslator::OffboardControlMode>(
-            "/fmu/in/offboard_control_mode", px4Qos);
-        m_pubCmd  = this->create_publisher<OffboardTranslator::VehicleCommand>(
-            "/fmu/in/vehicle_command", px4Qos);
+        /* All PX4 wire I/O (pubs/subs/handshake/stream loop) lives in the backend. */
+        m_backend = std::make_unique<PX4Backend>(this, m_cbGroup);
+        m_backend->start();
 
         m_controlTimer = this->create_wall_timer(
             std::chrono::milliseconds{kControlLoopPeriodMs},
             std::bind(&FlightManagementUnitNode::controlLoop, this), m_cbGroup);
-        m_offboardTimer = this->create_wall_timer(
-            std::chrono::milliseconds{kOffboardPublishPeriodMs},
-            std::bind(&FlightManagementUnitNode::offboardPublishLoop, this), m_cbGroup);
 
-        m_vlmClient.create(kSystemPrompt, 0.4f, 1024);
+        /* max_tokens caps generation. A plan is ~200 tokens; the old 32768 (65536/2)
+           let a no-EOS runaway ramble for minutes and wedge the planner. 512 bounds
+           it to ~4s. temp 0.2 matches the server and reduces degenerate loops. */
+        m_vlmClient.create(kSystemPrompt, 0.2f, 512);
         m_chat.m_completedTasks.reserve(kDefaultPromptHistorySize);
 
-        RCLCPP_INFO(this->get_logger(), "Flight Management Unit Active.");
+        RCLCPP_INFO(this->get_logger(),
+            "[FMU_NODE_DEBUG] Flight Management Unit Active (control %uHz, backend owns wire).",
+            kControlLoopRateHz);
     }
 
-    ~FlightManagementUnitNode() override { m_vlmClient.destroy(); }
+    ~FlightManagementUnitNode() override {
+        m_missionActive.store(false, std::memory_order_release);
+        if (m_planFuture.valid()) m_planFuture.wait();  /* no VLM call touching a dead client. */
+        m_vlmClient.destroy();
+    }
 
     /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
-    void start(std::string_view objective, bool useCannedPlan = false) {
+    void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
+               bool useSpeedPlan = false) {
         m_chat.m_initialCommand = objective;
-        m_missionActive.store(true, std::memory_order_release);
-        if (useCannedPlan) {
+        m_missionStartUs = nowUs();
+        /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
+           must NOT poll a (possibly absent) VLM server after they drain. */
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan;
+        m_missionActive.store(!cannedRun, std::memory_order_release);
+        if (useCrossPlan) {
+            injectCannedCrossPlan();
+        } else if (useSpeedPlan) {
+            injectCannedSpeedPlan();
+        } else if (useCannedPlan) {
             injectCannedPlan();
         }
         RCLCPP_INFO(this->get_logger(),
-            "[DIAG] Mission started (canned=%d). queued~=%zu. objective: %.*s",
-            __scast(int, useCannedPlan), m_taskQueue->size_approx(),
-            __scast(int, objective.size()), objective.data());
+            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d). queued~=%zu. objective: %.*s",
+            __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
+            m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
+        );
+        return;
     }
 
 private:
@@ -256,63 +253,70 @@ private:
     using spsc_queue = moodycamel::ReaderWriterQueue<T, sizeof(T)>;
 
     /* ---- Subscriptions --------------------------------------------------- */
-    void imgCallback(khUDPCamMsgType msg) { std::atomic_store(&m_currImg, msg); }
-
-    void odomCallback(const OdomMsgType::ConstSharedPtr msg) {
-        f32 qw, qx, qy, qz, yaw;
-
-        m_posN.store(msg->position[0], std::memory_order_relaxed);
-        m_posE.store(msg->position[1], std::memory_order_relaxed);
-        m_posD.store(msg->position[2], std::memory_order_relaxed);
-
-        /* PX4 quaternion order is [w, x, y, z]. Extract yaw (Z). */
-        qw = msg->q[0]; qx = msg->q[1]; qy = msg->q[2]; qz = msg->q[3];
-        yaw = std::atan2(2.0f * (qw * qz + qx * qy),
-                         1.0f - 2.0f * (qy * qy + qz * qz));
-        m_yaw.store(yaw, std::memory_order_relaxed);
-
-        if (!m_gotFirstOdom.load(std::memory_order_relaxed)) {
-            m_gotFirstOdom.store(true, std::memory_order_relaxed);
-            RCLCPP_INFO(this->get_logger(),
-                "[DIAG] FIRST ODOM received. altNED=%.2f yaw=%.2f", msg->position[2], yaw);
-        }
-    }
-
-    /* PX4 arming/nav-state feedback -> drives the confirmed offboard handshake. */
-    void statusCallback(const StatusMsgType::ConstSharedPtr msg) {
-        m_navState.store(msg->nav_state, std::memory_order_relaxed);
-        m_armingState.store(msg->arming_state, std::memory_order_relaxed);
+    void imgCallback(khUDPCamMsgType msg) {
+        std::atomic_store(&m_currImg, msg);
+        u64 c = m_frameCount.fetch_add(1, rlx) + 1;
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+            "[FMU_NODE_DEBUG] camera frame rx: %ux%u encoding=%s count=%lu",
+            msg->width, msg->height, msg->encoding.c_str(), (unsigned long)c);
     }
 
     /* ---- 20Hz control + deterministic completion ------------------------- */
+    /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.   */
+    /* Frame is canonical ENU (East, North, Up+); backend converts NED at wire. */
     void controlLoop() {
-        f32         n, e, d, dx, dy, dz, dist, sp;
+        Odometry    od;
+        f32         n, e, d, dx, dy, dz, dist, sp, vN, vE, vD;
+        f32         alN, alE, alD, along, remain, crN, crE, crD, mag;
         ActiveTask  next;
         FlightState st;
         CommandID   id;
 
-        n  = m_posN.load(std::memory_order_relaxed);
-        e  = m_posE.load(std::memory_order_relaxed);
-        d  = m_posD.load(std::memory_order_relaxed);
-        st = m_flightState.load(std::memory_order_relaxed);
+        od = m_backend->odometry();
+        n  = od.pos.x;
+        e  = od.pos.y;
+        d  = od.pos.z;
+        st = m_flightState.load(rlx);
 
-        /* State transitions driven by odometry. */
-        if (st == FlightState::TAKEOFF && d <= kTakeoffTargetAltNed) {
-            m_flightState.store(FlightState::FLIGHT, std::memory_order_relaxed);
-            RCLCPP_INFO(this->get_logger(), "[DIAG] TAKEOFF->FLIGHT altNED=%.2f", d);
-            completeCurrent("takeoff_ok");
+        /* HIGH-verbosity heartbeat (every 500ms) — one glance shows the whole rig. */
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500,
+            "[FMU_NODE_DIAGNOSTICS] fs=%d io=%d posENU=(%.2f,%.2f,%.2f) measVelENU=(%.2f,%.2f,%.2f) yaw=%.2f yawrate=%.2f active=%d qsize=%zu",
+            __scast(int, st), __scast(int, m_backend->state()),
+            n, e, d, od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate,
+            __scast(int, m_hasActive), m_taskQueue->size_approx());
+
+        if (st == FlightState::TAKEOFF) {
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, kTakeoffClimbVelEnu}, 0.0f);  /* stream the climb (Up+) */
+            if (m_backend->state() == IOState::FAULT) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] TAKEOFF faulted (backend IOState=FAULT). Aborting task.");
+                m_flightState.store(FlightState::STANDBY, rlx);
+                completeCurrent("takeoff_faulted");
+                return;
+            }
+            if (d >= kTakeoffTargetAltEnu) {
+                RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=%.2f", d);
+                m_flightState.store(FlightState::FLIGHT, rlx);
+                completeCurrent("takeoff_ok");
+            }
             return;
         }
-        if (st == FlightState::LANDING && d >= kGroundContactAltNed) {
-            m_pubCmd->publish(OffboardTranslator::force_disarm(nowUs()));
-            m_flightState.store(FlightState::STANDBY, std::memory_order_relaxed);
-            m_offboardEngaged.store(false, std::memory_order_relaxed);
-            RCLCPP_INFO(this->get_logger(), "[DIAG] LANDING->STANDBY altNED=%.2f", d);
-            completeCurrent("land_ok");
+
+        if (st == FlightState::LANDING) {
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, kLandDescendVelEnu}, 0.0f);  /* stream the descent (Down) */
+            if (d <= kGroundContactEnu) {
+                m_backend->force_disarm();
+                RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LANDING->STANDBY altENU=%.2f (force_disarm)", d);
+                m_flightState.store(FlightState::STANDBY, rlx);
+                completeCurrent("land_ok");
+                /* LAND is the mission's terminal intent: stop waking the VLM. Anything
+                   already queued still runs; we just stop soliciting NEW plans, so the
+                   server goes idle instead of re-planning a landed, disarmed drone. */
+                m_missionActive.store(false, std::memory_order_release);
+                RCLCPP_INFO(this->get_logger(),
+                    "[FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.");
+            }
             return;
-        }
-        if (st == FlightState::TAKEOFF || st == FlightState::LANDING) {
-            return; /* offboard loop is executing the maneuver. */
         }
 
         /* FLIGHT / STANDBY: run the active movement task or pull the next. */
@@ -324,98 +328,115 @@ private:
                 dz   = m_targetD - d;
                 dist = std::sqrt(dx * dx + dy * dy + dz * dz);
                 if (dist < kGoCompletionRadiusM) {
-                    setActiveVel({0.0f, 0.0f, 0.0f}, 0.0f);
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] GO complete dist=%.2f", dist);
                     completeCurrent("go_ok");
                 } else {
-                    sp = m_activeSpeed / dist; /* normalize * speed (m/s). */
-                    setActiveVel({dx * sp, dy * sp, dz * sp}, 0.0f);
+                    /* Cross-track guidance: dir/total frozen at activation (the
+                       start->target line). Forward speed decays with remaining
+                       progress ALONG that fixed line; a separate term pulls back
+                       any drift PERPENDICULAR to it. The commanded direction only
+                       ever gets nudged by the (bounded, small) cross-track term --
+                       never fully recomputed from bearing-to-target -- so neither
+                       the pure-pursuit spiral nor the dead-reckoning runaway can
+                       happen here. */
+                    alN    = n - m_goStartN;
+                    alE    = e - m_goStartE;
+                    alD    = d - m_goStartD;
+                    along  = alN * m_goDirN + alE * m_goDirE + alD * m_goDirD;
+                    remain = m_goTotalDist - along;
+                    if (remain < 0.0f) remain = 0.0f;
+                    crN = alN - along * m_goDirN;
+                    crE = alE - along * m_goDirE;
+                    crD = alD - along * m_goDirD;
+
+                    sp = kGoApproachGainHz * remain;
+                    if (sp > m_activeSpeed) sp = m_activeSpeed;
+
+                    vN = m_goDirN * sp - kGoCrossTrackGainHz * crN;
+                    vE = m_goDirE * sp - kGoCrossTrackGainHz * crE;
+                    vD = m_goDirD * sp - kGoCrossTrackGainHz * crD;
+                    mag = std::sqrt(vN * vN + vE * vE + vD * vD);
+                    if (mag > m_activeSpeed) {
+                        sp  = m_activeSpeed / mag;
+                        vN *= sp;
+                        vE *= sp;
+                        vD *= sp;
+                    }
+                    m_backend->set_velocity(Vec3{vN, vE, vD}, 0.0f);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] GO dist=%.2f cmdVelENU=(%.2f,%.2f,%.2f) measVelENU=(%.2f,%.2f,%.2f) yaw=%.2f yawrate=%.2f",
+                        dist, vN, vE, vD,
+                        od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate);
                 }
             } else {
-                /* Non-GO movement not yet implemented in Phase 1: auto-complete. */
+                RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d not movement -> auto-complete.",
+                    __scast(int, id));
                 completeCurrent("noop_ok");
             }
             return;
         }
 
+        if (m_settleTicksRemaining > 0) {
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f); /* hold while residual momentum decays. */
+            --m_settleTicksRemaining;
+            return;
+        }
+
         if (m_taskQueue->try_dequeue(next)) {
             activateTask(next);
+        } else {
+            maybePlan();  /* queue drained -> ask the VLM for the next plan. */
         }
     }
 
-    /* ---- ~30Hz offboard streaming (PX4 watchdog) ------------------------- */
-    /* TODO (Phase 2): move this into the DroneBackend; the FMU should not      */
-    /* drive a platform-specific publish loop directly.                        */
-    void offboardPublishLoop() {
-        Vec3        vel{0.0f, 0.0f, 0.0f};
-        f32         yawspeed = 0.0f;
-        FlightState st;
-        u64         ts, cnt;
-        u8          nav, armSt;
+    /* Event-driven VLM wake (ARCH sec 5): queue empty + mission active -> plan.
+       Blocking inference runs OFF the control thread via std::async, so the
+       20Hz loop + the backend stream watchdog never stall. m_planning is the
+       single-flight guard; the async task is the queue's ONLY producer, so the
+       SPSC contract holds. Planning only fires in the idle gap (no active task,
+       queue empty), so it never races completeCurrent()'s history writes. */
+    void maybePlan() {
+        khUDPCamMsgType img;
+        u64             now;
 
-        ts  = nowUs();
-        st  = m_flightState.load(std::memory_order_relaxed);
-        cnt = m_setpointCount.fetch_add(1, std::memory_order_relaxed) + 1;
-
-        switch (st) {
-        case FlightState::STANDBY:  break;                       /* zero vel.   */
-        case FlightState::TAKEOFF:  vel.z = kTakeoffClimbVelNed; break;
-        case FlightState::LANDING:  vel.z = kLandDescendVelNed;  break;
-        case FlightState::FLIGHT:
-            vel.x    = m_activeVx.load(std::memory_order_relaxed);
-            vel.y    = m_activeVy.load(std::memory_order_relaxed);
-            vel.z    = m_activeVz.load(std::memory_order_relaxed);
-            yawspeed = m_activeYaw.load(std::memory_order_relaxed);
-            break;
+        if (!m_missionActive.load(std::memory_order_acquire)) return;
+        if (m_planning.load(rlx)) return;
+        now = nowUs();
+        if (now - m_lastPlanUs < kPlanCooldownUs) return;
+        img = std::atomic_load(&m_currImg);
+        /* Prefer planning WITH vision, but never let an absent/dead camera brick the
+           drone: wait up to kVisionWarmupUs for the first frame, then plan text-only.
+           As soon as a frame arrives (img non-null) this passes and plans immediately. */
+        if (!img && (now - m_missionStartUs) < kVisionWarmupUs) {
+            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+                "[FMU_NODE_DEBUG] waiting for first camera frame before planning...");
+            return;
         }
 
-        /* Stream mode + setpoint FIRST so PX4 sees an active offboard signal. */
-        m_pubMode->publish(OffboardTranslator::mode_velocity(ts));
-        m_pubTraj->publish(OffboardTranslator::velocity_setpoint(ts, vel, yawspeed));
-
-        /* PX4 offboard handshake. Proven order (speech_to_action): arm first,   */
-        /* then request OFFBOARD — but never fire blind. Gate on first odometry   */
-        /* (estimator ready) + warmup, then RETRY every tick until VehicleStatus  */
-        /* confirms ARMED + OFFBOARD. Arming before the estimator was ready spun   */
-        /* the motors with no valid velocity estimate -> no climb -> auto-disarm. */
-        if (st == FlightState::TAKEOFF
-            && !m_offboardEngaged.load(std::memory_order_relaxed)
-            && m_gotFirstOdom.load(std::memory_order_relaxed)
-            && (cnt - m_takeoffWarmupStart.load(std::memory_order_relaxed))
-                >= kOffboardWarmupSetpoints)
-        {
-            nav   = m_navState.load(std::memory_order_relaxed);
-            armSt = m_armingState.load(std::memory_order_relaxed);
-
-            if (armSt != StatusMsgType::ARMING_STATE_ARMED) {
-                m_pubCmd->publish(OffboardTranslator::arm(ts, true));
-            }
-            if (nav != StatusMsgType::NAVIGATION_STATE_OFFBOARD) {
-                m_pubCmd->publish(OffboardTranslator::set_offboard(ts));
-            }
-            if (armSt == StatusMsgType::ARMING_STATE_ARMED
-                && nav == StatusMsgType::NAVIGATION_STATE_OFFBOARD) {
-                m_offboardEngaged.store(true, std::memory_order_relaxed);
-                RCLCPP_INFO(this->get_logger(),
-                    "[DIAG] OFFBOARD+ARM CONFIRMED at setpoints=%lu",
-                    __scast(unsigned long, cnt));
-            }
-        }
-
-        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
-            "[DIAG] publishing: state=%d setpoints=%lu engaged=%d nav=%d arm=%d altNED=%.2f velz=%.2f",
-            __scast(int, st), __scast(unsigned long, cnt),
-            __scast(int, m_offboardEngaged.load(std::memory_order_relaxed)),
-            __scast(int, m_navState.load(std::memory_order_relaxed)),
-            __scast(int, m_armingState.load(std::memory_order_relaxed)),
-            m_posD.load(std::memory_order_relaxed), vel.z);
+        m_planning.store(true, rlx);
+        RCLCPP_INFO(this->get_logger(),
+            "[FMU_NODE_DEBUG] VLM wake: requesting plan (vision=%d).", static_cast<int>(static_cast<bool>(img)));
+        m_planFuture = std::async(std::launch::async, [this, img]() {
+            std::string plan;
+            callLlamaServer(m_chat.m_initialCommand, img, plan);
+            RCLCPP_INFO(this->get_logger(),
+                "[FMU_NODE_DEBUG] VLM plan received (%zu chars).", plan.size());
+            translateToBaseCommands(plan);
+            m_lastPlanUs = nowUs();
+            m_planning.store(false, rlx);
+        });
     }
+
+    u64 nowUs() const { return __scast(u64, this->get_clock()->now().nanoseconds() / 1000); }
 
     /* ---- Task lifecycle helpers ------------------------------------------ */
     void activateTask(ActiveTask const& task) {
-        f32       n, e, d, yaw;
-        Vec3      relFlu, relNed;
-        CmdGo     g;
-        CommandID id;
+        Odometry      od;
+        Vec3          relFlu, relEnu;
+        CmdGo         g;
+        CommandID     id;
+        BackendStatus s;
 
         m_currTask = task;
         m_currTask.m_state = TaskState::RUNNING;
@@ -424,37 +445,52 @@ private:
 
         switch (id) {
         case CommandID::TAKEOFF:
-            /* Do NOT arm here — the offboard loop engages after warmup. */
-            m_takeoffWarmupStart.store(m_setpointCount.load(std::memory_order_relaxed),
-                                       std::memory_order_relaxed);
-            m_flightState.store(FlightState::TAKEOFF, std::memory_order_relaxed);
+            s = m_backend->takeoff();  /* non-blocking; backend goes STANDBY->HANDSHAKING. */
+            if (s.code == BackendStatus::Code::REJECTED) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] TAKEOFF rejected (backend not STANDBY, io=%d).",
+                    __scast(int, m_backend->state()));
+                completeCurrent("takeoff_rejected");
+                break;
+            }
+            m_flightState.store(FlightState::TAKEOFF, rlx);
             RCLCPP_INFO(this->get_logger(),
-                "[DIAG] TAKEOFF: warming up offboard stream before arm (start=%lu).",
-                __scast(unsigned long, m_takeoffWarmupStart.load(std::memory_order_relaxed)));
+                "[FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.");
             break;
         case CommandID::LAND:
-            m_flightState.store(FlightState::LANDING, std::memory_order_relaxed);
-            RCLCPP_INFO(this->get_logger(), "[DIAG] LAND activated.");
+            m_backend->land();  /* PX4: no-op; FMU streams the descent. */
+            m_flightState.store(FlightState::LANDING, rlx);
+            RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LAND activated; FMU streaming descent.");
             break;
         case CommandID::GO:
             g   = m_currTask.m_cmd.m_extractCmd.m_goto;
-            n   = m_posN.load(std::memory_order_relaxed);
-            e   = m_posE.load(std::memory_order_relaxed);
-            d   = m_posD.load(std::memory_order_relaxed);
-            yaw = m_yaw.load(std::memory_order_relaxed);
-            /* VLM gives relative FLU in cm -> world-NED target. */
+            od  = m_backend->odometry();
+            /* VLM gives relative FLU in cm -> world-ENU target. */
             relFlu = { g.x / 100.0f, g.y / 100.0f, g.z / 100.0f };
-            relNed = OffboardTranslator::flu_to_ned(relFlu, yaw);
-            m_targetN = n + relNed.x;
-            m_targetE = e + relNed.y;
-            m_targetD = d + relNed.z;
+            relEnu = flu_to_enu(relFlu, od.yaw);
+            m_goStartN = od.pos.x;
+            m_goStartE = od.pos.y;
+            m_goStartD = od.pos.z;
+            m_targetN  = od.pos.x + relEnu.x;
+            m_targetE  = od.pos.y + relEnu.y;
+            m_targetD  = od.pos.z + relEnu.z;
+            /* Freeze the start->target line for cross-track guidance. */
+            m_goTotalDist = std::sqrt(relEnu.x * relEnu.x + relEnu.y * relEnu.y + relEnu.z * relEnu.z);
+            if (m_goTotalDist > kGoCompletionRadiusM) {
+                m_goDirN = relEnu.x / m_goTotalDist;
+                m_goDirE = relEnu.y / m_goTotalDist;
+                m_goDirD = relEnu.z / m_goTotalDist;
+            } else {
+                m_goDirN = m_goDirE = m_goDirD = 0.0f;
+            }
             m_activeSpeed = (g.speed > 0.0f ? g.speed : kDefaultGoSpeedCmS) / 100.0f;
             RCLCPP_INFO(this->get_logger(),
-                "[DIAG] GO activated. targetNED=(%.2f,%.2f,%.2f) speed=%.2f",
-                m_targetN, m_targetE, m_targetD, m_activeSpeed);
+                "[FMU_NODE_DEBUG] GO activated. relFLU=(%.2f,%.2f,%.2f) targetENU=(%.2f,%.2f,%.2f) dirENU=(%.2f,%.2f,%.2f) speed=%.2f",
+                relFlu.x, relFlu.y, relFlu.z, m_targetN, m_targetE, m_targetD,
+                m_goDirN, m_goDirE, m_goDirD, m_activeSpeed);
             break;
         default:
-            RCLCPP_INFO(this->get_logger(), "[DIAG] task id=%d auto-completes.",
+            RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d auto-completes.",
                 __scast(int, id));
             break; /* STOP / others auto-complete in controlLoop. */
         }
@@ -465,17 +501,11 @@ private:
         m_currTask.m_state = TaskState::FINISHED_SUCCESS;
         m_chat.m_completedTasks.push_back(m_currTask);
         m_hasActive = false;
-        setActiveVel({0.0f, 0.0f, 0.0f}, 0.0f);
+        m_settleTicksRemaining = kGoSettleTicks;
+        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task complete status=%s total=%zu",
+            status, m_chat.m_completedTasks.size());
     }
-
-    void setActiveVel(Vec3 const& v, f32 yawspeed) {
-        m_activeVx.store(v.x, std::memory_order_relaxed);
-        m_activeVy.store(v.y, std::memory_order_relaxed);
-        m_activeVz.store(v.z, std::memory_order_relaxed);
-        m_activeYaw.store(yawspeed, std::memory_order_relaxed);
-    }
-
-    __force_inline u64 nowUs() { return this->get_clock()->now().nanoseconds() / 1000; }
 
     /* ---- VLM plumbing (invoked by the Phase-2 event-driven wake, not a poll) ---- */
     std::string buildDynamicPrompt() {
@@ -486,6 +516,12 @@ private:
         prompt  = std::string(kSystemPrompt) + "\n\n";
         prompt += "[COORDINATE FRAME]\nFLU (+X Forward, +Y Left, +Z Up)\n\n";
         prompt += "[MISSION OBJECTIVE]\n" + m_chat.m_initialCommand + "\n\n";
+
+        Odometry od = m_backend->odometry();
+        snprintf(buf, sizeof(buf),
+            "[VEHICLE STATE]\nalt_up_m=%.2f speed_mps=%.2f\n\n",
+            od.pos.z, std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y));
+        prompt += buf;
         prompt += "[EXECUTED COMMAND HISTORY]\n";
         for (i = 0; i < m_chat.m_completedTasks.size(); ++i) {
             snprintf(buf, sizeof(buf), "{\"status\":\"%s\", \"thought\":\"%s\", \"id\":%d}\n",
@@ -507,22 +543,40 @@ private:
         std::vector<int>          params;
 
         params = { cv::IMWRITE_JPEG_QUALITY, 75 };
-        frame  = cv_bridge::toCvShare(img, "bgr8")->image;
-        if (!frame.empty()) {
-            cv::resize(frame, resized, cv::Size{640, 640}, 0, 0, cv::INTER_LINEAR);
-            cv::imencode(".jpg", resized, buffer, params);
-            b64 = base64_encode(buffer.data(), buffer.size());
+        if (img) {                               /* text-only plan when no camera frame yet. */
+            frame = cv_bridge::toCvShare(img, "bgr8")->image;
+            if (!frame.empty()) {
+                cv::resize(frame, resized, cv::Size{640, 640}, 0, 0, cv::INTER_LINEAR);
+                cv::imencode(".jpg", resized, buffer, params);
+                b64 = base64_encode(buffer.data(), buffer.size());
+            }
         }
 
         dyn = buildDynamicPrompt();
+        RCLCPP_INFO(this->get_logger(),
+            "[FMU_NODE_DEBUG] VLM request: image=%s b64Bytes=%zu promptChars=%zu",
+            (img && !b64.empty()) ? "yes" : "no", b64.size(), dyn.size());
         fut = m_vlmClient.send(dyn, userQuery, b64);
-        if (fut.has_value()) {
-            auto res = fut->get();
-            if (res && res->status == 200) {
-                j = nlohmann::json::parse(res->body, nullptr, false);
-                if (!j.is_discarded()) {
-                    content = j["choices"][0]["message"]["content"];
-                }
+        if (!fut.has_value()) {
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] VLM submit returned nullopt (HTTP client not ready).");
+            out = content;
+            return;
+        }
+        auto res = fut->get();
+        if (!res) {
+            RCLCPP_WARN(this->get_logger(), "[FMU_NODE_DEBUG] VLM HTTP error: %s",
+                httplib::to_string(res.error()).c_str());
+        } else if (res->status != 200) {
+            RCLCPP_WARN(this->get_logger(), "[FMU_NODE_DEBUG] VLM HTTP status=%d body=%.240s",
+                res->status, res->body.c_str());
+        } else {
+            j = nlohmann::json::parse(res->body, nullptr, false);
+            if (j.is_discarded() || !j.contains("choices")) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] VLM 200 but body not as expected: %.240s", res->body.c_str());
+            } else {
+                content = j["choices"][0]["message"]["content"];
             }
         }
         out = content;
@@ -530,14 +584,15 @@ private:
 
     void translateToBaseCommands(std::string_view flightPlan) {
         nlohmann::json plan;
-        std::string    action, thought;
+        std::string    action, thought, arr;
         GenericCommand cmd;
         ActiveTask     task;
         CmdGo          go;
 
-        plan = nlohmann::json::parse(flightPlan, nullptr, false);
+        arr  = extractJsonArray(flightPlan);  /* strip ```json fences / prose from the VLM. */
+        plan = nlohmann::json::parse(arr, nullptr, false);
         if (plan.is_discarded() || !plan.is_array()) {
-            RCLCPP_WARN(this->get_logger(), "[DIAG] plan JSON parse failed / not array.");
+            RCLCPP_WARN(this->get_logger(), "[FMU_NODE_DEBUG] plan JSON parse failed / not array.");
             return;
         }
 
@@ -579,21 +634,55 @@ private:
         translateToBaseCommands(kCannedPlanJson);
     }
 
+    /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
+       then immediately UNDONE, one axis at a time, before the next axis starts.
+       Every "return" leg re-anchors from fresh od.yaw + od.pos at that leg's own
+       activation (not an assumed prior target) -- isolates flu_to_ned correctness
+       from GO controller error, and isolates each axis's error from the others
+       since a bad return doesn't carry into the next axis's outbound leg. */
+    void injectCannedCrossPlan() {
+        static const char* kCannedCrossPlanJson = R"([
+            {"thought":"canned takeoff",             "action":"takeoff"},
+            {"thought":"canned go forward",          "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
+            {"thought":"canned return to start",     "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
+            {"thought":"canned go left",             "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
+            {"thought":"canned return to start",     "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
+            {"thought":"canned go back",             "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
+            {"thought":"canned return to start",     "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
+            {"thought":"canned go right",            "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
+            {"thought":"canned return to start",     "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
+            {"thought":"canned land",                "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedCrossPlanJson);
+    }
+
+    /* Low vs high commanded speed, forward+return, back to back. Same guidance
+       law, same axis, only m_activeSpeed differs -- isolates whether curvature
+       scales with commanded speed (actuator-lag/overshoot signature) or is
+       roughly constant regardless (points elsewhere, e.g. the settle window). */
+    void injectCannedSpeedPlan() {
+        static const char* kCannedSpeedPlanJson = R"([
+            {"thought":"canned takeoff",              "action":"takeoff"},
+            {"thought":"canned go forward LOW speed",  "action":"go", "x":100,  "y":0, "z":0, "speed":15},
+            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":15},
+            {"thought":"canned go forward HIGH speed", "action":"go", "x":100,  "y":0, "z":0, "speed":80},
+            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":80},
+            {"thought":"canned land",                  "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedSpeedPlanJson);
+    }
+
 private:
     rclcpp::CallbackGroup::SharedPtr                m_cbGroup;
     rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
-    rclcpp::Subscription<OdomMsgType>::SharedPtr    m_subOdom;
-    rclcpp::Subscription<StatusMsgType>::SharedPtr  m_subStatus;
-    rclcpp::Publisher<OffboardTranslator::TrajectorySetpoint>::SharedPtr  m_pubTraj;
-    rclcpp::Publisher<OffboardTranslator::OffboardControlMode>::SharedPtr m_pubMode;
-    rclcpp::Publisher<OffboardTranslator::VehicleCommand>::SharedPtr      m_pubCmd;
     rclcpp::TimerBase::SharedPtr                    m_controlTimer;
-    rclcpp::TimerBase::SharedPtr                    m_offboardTimer;
+
+    std::unique_ptr<PX4Backend>                     m_backend;
 
     std::unique_ptr<spsc_queue<ActiveTask>>         m_taskQueue;
     ActiveTask                                      m_currTask;
     bool                                            m_hasActive{false};
-    std::atomic<bool>                               m_gotFirstOdom{false};
+    u32                                             m_settleTicksRemaining{0};
 
     llamaClientConnection                           m_vlmClient;
     khUDPCamMsgType                                 m_currImg;
@@ -601,17 +690,19 @@ private:
     VehicleTelemetry                                m_telemetry;
     std::vector<TargetDetection>                    m_targets;
 
-    /* Shared pose (odom thread -> control/offboard threads). */
-    std::atomic<f32>          m_posN{0.0f}, m_posE{0.0f}, m_posD{0.0f}, m_yaw{0.0f};
-    /* Active setpoint (control thread -> offboard thread). */
-    std::atomic<f32>          m_activeVx{0.0f}, m_activeVy{0.0f}, m_activeVz{0.0f}, m_activeYaw{0.0f};
     std::atomic<FlightState>  m_flightState{FlightState::STANDBY};
     std::atomic<bool>         m_missionActive{false};
-    std::atomic<bool>         m_offboardEngaged{false};
-    std::atomic<u64>          m_setpointCount{0};
-    std::atomic<u64>          m_takeoffWarmupStart{0};
-    std::atomic<u8>           m_navState{0}, m_armingState{0};
+    std::atomic<bool>         m_planning{false};
+    std::future<void>         m_planFuture;
+    u64                       m_lastPlanUs{0};
+    u64                       m_missionStartUs{0};
+    std::atomic<u64>          m_frameCount{0};
 
-    /* GO world-NED target + speed (control thread only). */
+    /* GO world-ENU target + speed (control thread only). Cross-track guidance:
+       dir/total frozen at activation define the start->target line; controlLoop
+       decays speed along it and pulls back perpendicular drift, without ever
+       rotating the commanded forward direction. */
     f32 m_targetN{0.0f}, m_targetE{0.0f}, m_targetD{0.0f}, m_activeSpeed{0.3f};
+    f32 m_goStartN{0.0f}, m_goStartE{0.0f}, m_goStartD{0.0f};
+    f32 m_goDirN{0.0f}, m_goDirE{0.0f}, m_goDirD{0.0f}, m_goTotalDist{0.0f};
 };

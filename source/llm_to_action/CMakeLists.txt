@@ -62,11 +62,14 @@ target_include_directories(util_base_header INTERFACE
 # ---------------------------------------------------------------------------
 set(FLIGHT_MANAGEMENT_UNIT_NODE_NAME_POSTFIX fmu)
 set(FLIGHT_MANAGEMENT_UNIT_NODE_SOURCES
+    frame/frame_convert.hpp
+    px4_backend/px4_backend_base.hpp
+    px4_backend/px4_backend.hpp
+    px4_backend/px4_backend.cpp
     fmu/fmu_node_base.hpp
     fmu/fmu_node.cpp
     fmu/fmu_node.hpp
     fmu/llm_base.hpp
-    fmu/offboard_translator.hpp
     fmu/llamaclient.cpp
     fmu/llamaclient.hpp
     fmu/spsc_bounded_queue.hpp
@@ -164,5 +167,6 @@ target_deploy_gstreamer(${PROJECT_NAME}_${GSTREAMER_RECEIVER_NAME_POSTFIX})
 
 
 add_subdirectory(gstreamer_gz_udp_tx)
+add_subdirectory(tello_backend)
 # There shouldn't be a need for a tello udp transmitter since the tello already sends the Packets
 # add_subdirectory(gstreamer_tello_udp_tx)

@@ -135,6 +135,23 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
+safe_cpm_add_package(
+    NAME spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG        v1.14.1
+    GIT_SHALLOW    TRUE
+)
+
+# ctello: DOWNLOAD_ONLY so we compile only its client .cpp (see
+# source/llm_to_action/tello_backend/CMakeLists.txt) and skip its examples.
+safe_cpm_add_package(
+    NAME ctello
+    GIT_REPOSITORY https://github.com/carlospzlz/ctello.git
+    GIT_TAG        master
+    GIT_SHALLOW    TRUE
+    DOWNLOAD_ONLY  YES
+)
+
 
 # ---------------------------------------------------------------------------
 # Local Project

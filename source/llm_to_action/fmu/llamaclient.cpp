@@ -6,6 +6,15 @@ void llamaClient::create(const std::string& host, uint16_t port) {
     mk_host    = host;
     mk_Headers = { {"Origin", "http://" + host} };
     m_cli      = std::make_unique<httplib::Client>(host, port);
+    /* One shared client, used sequentially (single-flight planning). Keep-alive OFF
+       so each infrequent plan gets a fresh connection -- a stale/half-closed
+       keep-alive socket was hanging the SECOND request forever with no read timeout.
+       Read timeout is generous because VLM inference is slow; a hang now returns an
+       error instead of wedging the planner. */
+    m_cli->set_keep_alive(false);
+    m_cli->set_connection_timeout(5, 0);
+    m_cli->set_write_timeout(10, 0);
+    m_cli->set_read_timeout(45, 0);
     m_pool.create(2);
     return;
 }

@@ -76,12 +76,18 @@ public:
     ) {
         std::string sys_prompt = systemPrompt.empty() ? m_systemPrompt : std::string(systemPrompt);
 
+        /* Text block always; image block ONLY when we actually have a frame.
+           An image_url with an empty base64 payload makes the VLM server reject
+           the request (fast 400) -- that is the text-only / no-camera path. */
+        nlohmann::json userContent = nlohmann::json::array();
+        userContent.push_back({ {"type", "text"}, {"text", std::string(userPrompt)} });
+        if (!imageB64Blob.empty()) {
+            userContent.push_back({ {"type", "image_url"},
+                {"image_url", {{ "url", "data:image/jpeg;base64," + std::string(imageB64Blob) }}} });
+        }
         m_jsonRequest["messages"] = nlohmann::json::array({
             { {"role", "system"}, { "content", sys_prompt } },
-            { {"role", "user"  }, { "content", {
-                {{"type", "text"}, {"text", std::string(userPrompt) }},
-                {{"type", "image_url"}, {"image_url", {{ "url", "data:image/jpeg;base64," + std::string(imageB64Blob) }}}}
-            }}}
+            { {"role", "user"  }, { "content", userContent } }
         });
 
         return m_client.submit(m_jsonRequest);

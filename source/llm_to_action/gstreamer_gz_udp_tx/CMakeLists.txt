@@ -32,6 +32,9 @@ set(HEADERS
 # Gazebo plugins must be shared libraries
 add_library(${PROJECT_NAME} SHARED)
 add_library(CameraPlugin::GazeboGstCameraPlugin ALIAS ${PROJECT_NAME})
+# The gz SDF (see scripts/simenv*.sh) loads the plugin by filename
+# `libGazeboGstCameraPlugin.so`; emit that name (target/alias names are unchanged).
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GazeboGstCameraPlugin)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 target_sources(${PROJECT_NAME} PRIVATE ${HEADERS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
