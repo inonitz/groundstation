@@ -2,196 +2,195 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `source/llm_to_action/vision/` — a ROS-free C++17 library that wraps YOLOs-CPP's
-YOLO26 instance segmentation + monocular metric depth, fuses them into a `PerceptionSnapshot`, and
-ships as `Perception::vision` via CMake — plus a standalone (no ROS/sim) correctness + latency
-benchmark test.
+**Goal:** Build `vision/` — a standalone C++17 library, its own repository (mirroring the shape of
+`inonitz/sttserv`, not nested inside `groundstation`) — that wraps YOLOs-CPP's YOLO26 instance
+segmentation + monocular metric depth, fuses them into a `PerceptionSnapshot`, and ships as
+`Perception::vision` via CMake — plus a standalone correctness + latency benchmark test. A later,
+separate session consumes it from `groundstation` the same way `groundstation` already consumes
+`sttserver` (`safe_cpm_add_package(NAME vision GIT_REPOSITORY ...)`); that consumption step is
+**not** part of this plan.
 
-**Architecture:** `vision/CMakeLists.txt` is a **self-sufficient CMake project** (its own
-`project()`, its own CPM include) so it can be configured and built completely on its own —
-`cmake -S source/llm_to_action/vision -B <dir>` — with zero ROS packages in scope, and *also*
-composes cleanly via `add_subdirectory(vision)` when the full ROS workspace builds it. It depends
-on: YOLOs-CPP (fetched headers-only via CPM, `DOWNLOAD_ONLY`, pinned to the exact commit
-`nurmilkov/BUILD_YOLO` validated YOLO26 support against), a prebuilt ONNX Runtime tarball (fetched
-+ extracted by our own `cmake/FetchYOLOsCPP.cmake`), and OpenCV. Two upstream gaps get patched
-**in place, in CMake** (`string(REPLACE)` on the CPM-fetched source, not hand-vendored copies):
-YOLOs-CPP's seg/depth constructors don't forward a thread count to ONNX Runtime, and don't disable
-ORT's busy-wait spinning — both matter because this will run in-process with a 20 Hz control loop
-on shared cores. `YoloSegEngine`/`YoloDepthEngine` wrap the two patched YOLOs-CPP classes behind a
-non-throwing API (YOLOs-CPP throws internally; this library's boundary does not); `fuse()` runs
-both on one frame and samples the depth map over each detection's mask to fill
-`PerceptionSnapshot`.
+**Architecture:** Workspace root is `/root/build_yolo` (local git repo, not yet pushed to a
+remote). It mirrors `inonitz/sttserv`'s shape exactly: a top-level `CMakeLists.txt`
+(`project(vision_workspace ...)`, its own copy of the generic `cmake/` scaffolding — `FetchCPM`,
+`SubmoduleUpdate`, `UseCCache`, `ColouredOutput`, `OutputDir`, `WorkspaceOptions`,
+`BuildDiagnostics` — already copied from `groundstation/cmake/` as setup, not a task here) plus a
+`vision/` subdirectory holding the actual library (`vision/CMakeLists.txt`,
+`vision/include/vision/*.hpp`, `vision/source/*.cpp`, `vision/test/`), the same
+`<repo>/<libname>/{include,source}` split `sttserv/sttserv/` uses.
+
+It depends on: YOLOs-CPP (fetched headers-only via CPM, `DOWNLOAD_ONLY`, pinned to the exact
+commit `nurmilkov/BUILD_YOLO` validated YOLO26 support against), a prebuilt ONNX Runtime tarball
+(fetched + extracted by `cmake/FetchYOLOsCPP.cmake`), and OpenCV. Two upstream gaps get patched
+**in place, in CMake** (`string(REPLACE)` on the CPM-fetched source, not a fork, not a hand-vendored
+copy — this was a deliberate choice over forking `inonitz/YOLOs-CPP`, made explicitly in this
+session: forking would mean maintaining a second dependency and manually re-syncing upstream fixes,
+for no real benefit — the unused YOLOs-CPP task headers (pose/obb/classification/yoloe) are never
+`#include`d by our seg/depth path either way, so a fork's "strip dead code" appeal is moot): YOLOs-
+CPP's seg/depth constructors don't forward a thread count to ONNX Runtime, and don't disable ORT's
+busy-wait spinning — both matter because this will eventually run in-process with a 20 Hz control
+loop on shared cores once `groundstation` consumes it. `YoloSegEngine`/`YoloDepthEngine` wrap the
+two patched YOLOs-CPP classes behind a non-throwing API (YOLOs-CPP throws internally; this
+library's boundary does not); `fuse()` runs both on one frame and samples the depth map over each
+detection's mask to fill `PerceptionSnapshot`.
 
 **Tech Stack:** C++17, OpenCV 4.6 (`opencv_core`/`imgproc`/`imgcodecs`), ONNX Runtime 1.20.1 (CPU),
-YOLOs-CPP (`Geekgineer/YOLOs-CPP` @ `2b3b2f640a085c2be8e62d3566117c84d623cee0`), CMake 3.16+, CPM
-(`cmake/FetchCPM.cmake`, already in this repo), `util2/C/base_type.h` fixed-width types.
+YOLOs-CPP (`Geekgineer/YOLOs-CPP` @ `2b3b2f640a085c2be8e62d3566117c84d623cee0`), CMake 3.16+, CPM,
+`util2/C/base_type.h` fixed-width types (fetched the same way `groundstation` and `sttserv` both
+already fetch `util2`).
 
 ## Global Constraints
 
+- **This is its own repository at `/root/build_yolo`, not part of `groundstation`.** Nothing in
+  this plan touches the `groundstation` checkout. The future step where `groundstation`'s root
+  `CMakeLists.txt` gains a `safe_cpm_add_package(NAME vision ...)` block (mirroring its existing
+  `sttserver` block) and links `Perception::vision` into the FMU is explicitly **out of scope**.
 - **No exceptions cross the `vision/` public API.** YOLOs-CPP throws (`std::runtime_error`,
   `std::invalid_argument`) internally — every engine wrapper catches at its own boundary and
   exposes `bool ok()` instead. Internal `try`/`catch` is fine; nothing propagates out.
 - **C++17. `util2/C/base_type.h` fixed-width types** (`f32/i32/u32/u64`) for the two canonical seam
-  structs. `FixedStringType` = `char[32]`, matching `fmu/fmu_node.hpp`'s existing stub exactly.
+  structs. `FixedStringType` = `char[32]`, matching `groundstation`'s
+  `source/llm_to_action/fmu/fmu_node.hpp` stub exactly (that repo will drop its own copy in favor
+  of this library's version when it later consumes this).
 - **Concrete structs only — no `virtual`, no `std::variant`.**
-- **Do not edit** `source/llm_to_action/fmu/*`, the control loop, the backend, VLM plumbing, or any
-  sim script. Blast radius is `source/llm_to_action/vision/` + `cmake/FetchYOLOsCPP.cmake` + the
-  minimal wiring lines in the root `CMakeLists.txt` and `source/llm_to_action/CMakeLists.txt`
-  (one `include()`, one `add_subdirectory()`).
 - **Every engine takes a `numThreads` budget at construction** (small default: 2) and every ONNX
   Runtime session must have spinning disabled. This is a correctness requirement, not a nice-to-have
   — unpatched YOLOs-CPP silently ignores thread caps (verified: BUILD_YOLO's own
   `DepthEstimatorConfig::intraOpThreads` is dropped on the YOLO26 path too).
-- **CPU inference only.** No GPU/CUDA code paths need to work; `useGPU` stays `false` everywhere
+- **CPU inference only.** No GPU/CUDA code paths need to work; `useGPU` stays `false` everywhere.
   fp32/int8/int4 model variants are selected purely by file path suffix (`""`, `.int8`, `.int4`).
-- Full spec: `docs/superpowers/specs/2026-08-05-perception-library-design.md`. Read it before
-  starting — this plan implements it exactly, including the two later addenda (verified CMake
-  mechanics, constexpr label table).
+- Full spec: `groundstation`'s `docs/superpowers/specs/2026-08-05-perception-library-design.md`
+  (read-only reference — do not edit that repo). This plan implements it, adapted mid-flight to the
+  standalone-repo structure decided in this session.
 
 ---
 
 ## File Structure
 
 ```
-cmake/FetchYOLOsCPP.cmake                          # NEW — ORT tarball fetch, YOLOs-CPP CPM fetch, in-place patch macro
-CMakeLists.txt                                     # MODIFIED — include(cmake/FetchYOLOsCPP.cmake)
-source/llm_to_action/CMakeLists.txt                # MODIFIED — add_subdirectory(vision)
-source/llm_to_action/vision/
-  CMakeLists.txt                                   # NEW — self-sufficient CMake project, Perception::vision
-  perception_types.hpp                             # NEW — TargetDetection, PerceptionSnapshot (canonical seam types)
-  coco_labels.hpp                                  # NEW — constexpr COCO-80 classId -> label
-  yolo_seg_engine.hpp / .cpp                        # NEW — thread-capped wrapper over yolos::seg::YOLOSegDetector
-  yolo_depth_engine.hpp / .cpp                      # NEW — thread-capped wrapper over yolos::depth::YOLODepthEstimator
-  perception_fusion.hpp / .cpp                      # NEW — fuse(): seg + depth -> PerceptionSnapshot
-  test/perception_test.cpp                          # NEW — standalone correctness + benchmark (no ROS)
+/root/build_yolo/                                   # repo root (git init'd, not yet pushed)
+  CMakeLists.txt                                     # ALREADY WRITTEN (setup, not a task) — mirrors sttserv's root CMakeLists.txt
+  cmake/
+    FetchCPM.cmake                                   # ALREADY COPIED from groundstation/cmake/ (setup)
+    SubmoduleUpdate.cmake / UseCCache.cmake / ColouredOutput.cmake /
+    OutputDir.cmake / WorkspaceOptions.cmake / BuildDiagnostics.cmake / DetectWSL.cmake
+                                                       # ALREADY COPIED (setup, generic workspace boilerplate)
+    FetchYOLOsCPP.cmake                               # NEW — Task 2
+  vision/
+    CMakeLists.txt                                   # NEW — Task 8
+    include/vision/
+      perception_types.hpp                            # NEW — Task 4
+      coco_labels.hpp                                  # NEW — Task 3
+      yolo_seg_engine.hpp                              # NEW — Task 5
+      yolo_depth_engine.hpp                             # NEW — Task 6
+      perception_fusion.hpp                             # NEW — Task 7
+    source/
+      yolo_seg_engine.cpp                              # NEW — Task 5
+      yolo_depth_engine.cpp                             # NEW — Task 6
+      perception_fusion.cpp                             # NEW — Task 7
+    test/
+      perception_test.cpp                              # NEW — Task 9
 ```
+
+The root `CMakeLists.txt` and the generic `cmake/*.cmake` files (everything except
+`FetchYOLOsCPP.cmake`) already exist — copied from `groundstation/cmake/` and hand-written to
+mirror `sttserv`'s root `CMakeLists.txt` as setup for this plan, not a task an implementer needs to
+redo. Task 2 only needs to **write `cmake/FetchYOLOsCPP.cmake`** — the root file already
+`include()`s it and calls `define_library_fetch_of_yolos_cpp()`.
 
 ---
 
-### Task 1: Fetch + export + quantize the YOLO26 models
+### Task 1: Fetch + export + quantize the YOLO26 models — DONE (handled directly, not via subagent)
 
-**Files:**
-- Create (outside the repo, not committed): `/root/models/vision/yolo26n-seg.onnx`,
-  `yolo26n-seg.int8.onnx`, `yolo26n-seg.int4.onnx`, `yolo26n-depth.onnx`,
-  `yolo26n-depth.int8.onnx`, `yolo26n-depth.int4.onnx`
-- Create (committed, reusable): `scripts/export_vision_models.py`
-
-**Interfaces:**
-- Produces: the 6 `.onnx` files under `/root/models/vision/` that every later task's tests load by
-  path. No code interface — this is a data-prep task.
-
-- [ ] **Step 1: Install the export toolchain in an isolated location (not the repo, not system
-      packages)**
-
-```bash
-pip3 install --break-system-packages --target /root/.local/vision-export-tools ultralytics onnxruntime
-```
-
-Confirm it landed and YOLO26 checkpoints are real (already verified in this session — restate the
-check so the executing agent doesn't skip it):
-
-```bash
-PYTHONPATH=/root/.local/vision-export-tools python3 -c "
-from ultralytics.utils.downloads import GITHUB_ASSETS_NAMES
-assert 'yolo26n-seg.pt' in GITHUB_ASSETS_NAMES
-assert 'yolo26n-depth.pt' in GITHUB_ASSETS_NAMES
-print('yolo26n-seg.pt and yolo26n-depth.pt confirmed in ultralytics asset list')
-"
-```
-
-Expected: prints the confirmation line, no `AssertionError`.
-
-- [ ] **Step 2: Write the export/quantize script**
-
-```python
-# scripts/export_vision_models.py
-import pathlib
-from ultralytics import YOLO
-from onnxruntime.quantization import quantize_dynamic, QuantType
-
-OUT_DIR = pathlib.Path("/root/models/vision")
-OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-CHECKPOINTS = {
-    "yolo26n-seg": "yolo26n-seg.pt",
-    "yolo26n-depth": "yolo26n-depth.pt",
-}
-
-for stem, checkpoint in CHECKPOINTS.items():
-    print(f"--- exporting {checkpoint} ---")
-    model = YOLO(checkpoint)
-    exported_path = model.export(format="onnx", dynamic=True)
-    fp32_path = OUT_DIR / f"{stem}.onnx"
-    pathlib.Path(exported_path).rename(fp32_path)
-    print(f"fp32 -> {fp32_path}")
-
-    int8_path = OUT_DIR / f"{stem}.int8.onnx"
-    quantize_dynamic(str(fp32_path), str(int8_path), weight_type=QuantType.QInt8)
-    print(f"int8 -> {int8_path}")
-
-    try:
-        import onnx
-        from onnxruntime.quantization.matmul_4bits_quantizer import MatMul4BitsQuantizer
-
-        int4_path = OUT_DIR / f"{stem}.int4.onnx"
-        q = MatMul4BitsQuantizer(onnx.load(str(fp32_path)), block_size=32, is_symmetric=True)
-        q.process()
-        q.model.save_model_to_file(str(int4_path), use_external_data_format=False)
-        print(f"int4 -> {int4_path}")
-    except Exception as exc:  # noqa: BLE001 - best-effort per spec, report and move on
-        print(f"int4 quantization failed for {stem}: {exc}")
-
-print("done")
-```
-
-- [ ] **Step 3: Run it**
-
-```bash
-cd /root/groundstation
-PYTHONPATH=/root/.local/vision-export-tools python3 scripts/export_vision_models.py
-```
-
-Expected: `--- exporting yolo26n-seg.pt ---` ... `fp32 ->` / `int8 ->` / `int4 -> (or a printed
-failure, that's fine — report it, don't block on it)`, same for `yolo26n-depth.pt`, ending in
-`done`.
-
-- [ ] **Step 4: Verify the files landed**
-
-```bash
-ls -la /root/models/vision/
-```
-
-Expected: at minimum `yolo26n-seg.onnx`, `yolo26n-seg.int8.onnx`, `yolo26n-depth.onnx`,
-`yolo26n-depth.int8.onnx` present and non-empty (int4 variants best-effort — note in the final
-report whether they landed).
-
-Commit `scripts/export_vision_models.py` (the model files themselves stay outside the repo
-under `/root/models/vision/` — do not commit those).
+Handled by the human partner directly outside this plan's subagent flow. `scripts/` in this
+context meant `groundstation/scripts/export_vision_models.py` (a `groundstation`-repo script,
+since the model files themselves are consumed from `/root/models/vision/` regardless of which
+repo's code loads them — that path is shared/absolute, not repo-relative). No action needed here;
+Task 9 loads `/root/models/vision/*.onnx` same as originally planned.
 
 ---
 
 ### Task 2: `cmake/FetchYOLOsCPP.cmake` — fetch YOLOs-CPP + ONNX Runtime, patch the thread cap
 
 **Files:**
-- Create: `cmake/FetchYOLOsCPP.cmake`
-- Modify: `CMakeLists.txt:20` (add `include(cmake/FetchYOLOsCPP.cmake)` next to the existing
-  `include(cmake/FetchLLamaCPP.cmake)` line)
+- Create: `/root/build_yolo/cmake/FetchYOLOsCPP.cmake`
 
 **Interfaces:**
-- Produces: a macro `define_library_fetch_of_yolos_cpp()` that, when called, sets up two things
-  any later `vision/CMakeLists.txt` consumes:
-  - `safe_cpm_add_package(NAME yolos-cpp ...)` → CMake variable `${yolos-cpp_SOURCE_DIR}`
-    (CPM's standard convention, same as `${moodycamel_readerwriterqueue_SOURCE_DIR}` used
-    elsewhere in this repo) pointing at the patched YOLOs-CPP header tree.
+- Consumes: nothing from earlier tasks (first real code task).
+- Produces: a macro `define_library_fetch_of_yolos_cpp()` — already called from
+  `/root/build_yolo/CMakeLists.txt` (existing, do not edit that file) — that sets up two things
+  Task 8's `vision/CMakeLists.txt` consumes:
+  - `safe_cpm_add_package(NAME yolos-cpp ...)` -> CMake variable `${yolos-cpp_SOURCE_DIR}` (CPM's
+    standard convention) pointing at the patched YOLOs-CPP header tree.
   - An `IMPORTED` target `ONNXRuntime::onnxruntime` (include dir + `.so`) from the extracted
-    tarball.
+    tarball, and a variable `ORT_INSTALL_DIR` (set inside the macro, and — because CMake macros
+    don't create a new variable scope — still visible to whatever calls the macro) pointing at the
+    extracted ONNX Runtime directory, needed later for `BUILD_RPATH`.
 
-- [ ] **Step 1: Write the macro — ONNX Runtime tarball fetch**
+- [ ] **Step 1: Write the patch functions FIRST in the file (CMake needs functions defined before
+      they're called — the macro that calls them, `define_library_fetch_of_yolos_cpp`, must come
+      after these in the same file)**
 
 ```cmake
-# cmake/FetchYOLOsCPP.cmake
+# /root/build_yolo/cmake/FetchYOLOsCPP.cmake
 include(ExternalProject)
 
+function(yolos_cpp_patch_file FILE_PATH OLD_TEXT NEW_TEXT LABEL)
+    file(READ "${FILE_PATH}" FILE_CONTENT)
+    string(FIND "${FILE_CONTENT}" "${OLD_TEXT}" MATCH_POS)
+    if(MATCH_POS EQUAL -1)
+        # Either already patched (idempotent re-configure) or upstream shifted.
+        string(FIND "${FILE_CONTENT}" "${NEW_TEXT}" ALREADY_PATCHED_POS)
+        if(ALREADY_PATCHED_POS EQUAL -1)
+            message(FATAL_ERROR
+                "[FetchYOLOsCPP] Patch target for '${LABEL}' not found in ${FILE_PATH}. "
+                "Upstream YOLOs-CPP API likely changed — update cmake/FetchYOLOsCPP.cmake.")
+        endif()
+        return()
+    endif()
+    string(REPLACE "${OLD_TEXT}" "${NEW_TEXT}" PATCHED_CONTENT "${FILE_CONTENT}")
+    file(WRITE "${FILE_PATH}" "${PATCHED_CONTENT}")
+    message(STATUS "[FetchYOLOsCPP] Patched ${LABEL}")
+endfunction()
+
+function(yolos_cpp_patch_for_thread_cap SOURCE_DIR)
+    # --- session_base.hpp: include the spin-disable config key header ---
+    yolos_cpp_patch_file(
+        "${SOURCE_DIR}/include/yolos/core/session_base.hpp"
+        "#include <onnxruntime_cxx_api.h>\n#include <opencv2/opencv.hpp>"
+        "#include <onnxruntime_cxx_api.h>\n#include <onnxruntime_session_options_config_keys.h>\n#include <opencv2/opencv.hpp>"
+        "session_base.hpp includes"
+    )
+
+    # --- session_base.hpp: disable ORT intra-op spinning, cap inter-op threads too ---
+    yolos_cpp_patch_file(
+        "${SOURCE_DIR}/include/yolos/core/session_base.hpp"
+        "        sessionOptions_.SetIntraOpNumThreads(threads);\n        sessionOptions_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);"
+        "        sessionOptions_.SetIntraOpNumThreads(threads);\n        sessionOptions_.SetInterOpNumThreads(threads);\n        sessionOptions_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, \"0\");\n        sessionOptions_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);"
+        "session_base.hpp thread config"
+    )
+
+    # --- segmentation.hpp: forward numThreads, allow empty labelsPath (ONNX metadata fallback) ---
+    yolos_cpp_patch_file(
+        "${SOURCE_DIR}/include/yolos/tasks/segmentation.hpp"
+        "    YOLOSegDetector(const std::string& modelPath,\n                    const std::string& labelsPath,\n                    bool useGPU = false)\n        : OrtSessionBase(modelPath, useGPU) {\n        \n        // Validate output count for segmentation models\n        if (numOutputNodes_ != 2) {\n            throw std::runtime_error(\"Expected 2 output nodes for segmentation model (output0 and output1)\");\n        }\n        \n        classNames_ = utils::getClassNames(labelsPath);"
+        "    YOLOSegDetector(const std::string& modelPath,\n                    const std::string& labelsPath,\n                    bool useGPU = false,\n                    int numThreads = 0)\n        : OrtSessionBase(modelPath, useGPU, numThreads) {\n        \n        // Validate output count for segmentation models\n        if (numOutputNodes_ != 2) {\n            throw std::runtime_error(\"Expected 2 output nodes for segmentation model (output0 and output1)\");\n        }\n        \n        classNames_ = labelsPath.empty() ? getExportedClassNamesFromMetadata() : utils::getClassNames(labelsPath);"
+        "segmentation.hpp constructor"
+    )
+
+    # --- depth.hpp: forward numThreads ---
+    yolos_cpp_patch_file(
+        "${SOURCE_DIR}/include/yolos/tasks/depth.hpp"
+        "    explicit YOLODepthEstimator(const std::string& modelPath, bool useGPU = false)\n        : OrtSessionBase(modelPath, useGPU) {"
+        "    explicit YOLODepthEstimator(const std::string& modelPath, bool useGPU = false, int numThreads = 0)\n        : OrtSessionBase(modelPath, useGPU, numThreads) {"
+        "depth.hpp constructor"
+    )
+endfunction()
+```
+
+- [ ] **Step 2: Write the fetch macro (appended below the functions in the same file)**
+
+```cmake
 macro(DEFINE_LIBRARY_FETCH_OF_YOLOS_CPP)
     # -------------------------------------------------------------------
     # 1. ONNX Runtime — prebuilt CPU tarball (Linux x86_64). No upstream
@@ -249,131 +248,57 @@ macro(DEFINE_LIBRARY_FETCH_OF_YOLOS_CPP)
 endmacro()
 ```
 
-- [ ] **Step 2: Write the in-place patch macro (exact byte-for-byte strings — verified against the
-      pinned commit in this session)**
-
-```cmake
-# Appended to cmake/FetchYOLOsCPP.cmake, above DEFINE_LIBRARY_FETCH_OF_YOLOS_CPP
-# (macros must be defined before use in the same file — put this one first)
-
-function(yolos_cpp_patch_file FILE_PATH OLD_TEXT NEW_TEXT LABEL)
-    file(READ "${FILE_PATH}" FILE_CONTENT)
-    string(FIND "${FILE_CONTENT}" "${OLD_TEXT}" MATCH_POS)
-    if(MATCH_POS EQUAL -1)
-        # Either already patched (idempotent re-configure) or upstream shifted.
-        string(FIND "${FILE_CONTENT}" "${NEW_TEXT}" ALREADY_PATCHED_POS)
-        if(ALREADY_PATCHED_POS EQUAL -1)
-            message(FATAL_ERROR
-                "[FetchYOLOsCPP] Patch target for '${LABEL}' not found in ${FILE_PATH}. "
-                "Upstream YOLOs-CPP API likely changed — update cmake/FetchYOLOsCPP.cmake.")
-        endif()
-        return()
-    endif()
-    string(REPLACE "${OLD_TEXT}" "${NEW_TEXT}" PATCHED_CONTENT "${FILE_CONTENT}")
-    file(WRITE "${FILE_PATH}" "${PATCHED_CONTENT}")
-    message(STATUS "[FetchYOLOsCPP] Patched ${LABEL}")
-endfunction()
-
-function(yolos_cpp_patch_for_thread_cap SOURCE_DIR)
-    # --- session_base.hpp: include the spin-disable config key header ---
-    yolos_cpp_patch_file(
-        "${SOURCE_DIR}/include/yolos/core/session_base.hpp"
-        "#include <onnxruntime_cxx_api.h>\n#include <opencv2/opencv.hpp>"
-        "#include <onnxruntime_cxx_api.h>\n#include <onnxruntime_session_options_config_keys.h>\n#include <opencv2/opencv.hpp>"
-        "session_base.hpp includes"
-    )
-
-    # --- session_base.hpp: disable ORT intra-op spinning, cap inter-op threads too ---
-    yolos_cpp_patch_file(
-        "${SOURCE_DIR}/include/yolos/core/session_base.hpp"
-        "        sessionOptions_.SetIntraOpNumThreads(threads);\n        sessionOptions_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);"
-        "        sessionOptions_.SetIntraOpNumThreads(threads);\n        sessionOptions_.SetInterOpNumThreads(threads);\n        sessionOptions_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, \"0\");\n        sessionOptions_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);"
-        "session_base.hpp thread config"
-    )
-
-    # --- segmentation.hpp: forward numThreads, allow empty labelsPath (ONNX metadata fallback) ---
-    yolos_cpp_patch_file(
-        "${SOURCE_DIR}/include/yolos/tasks/segmentation.hpp"
-        "    YOLOSegDetector(const std::string& modelPath,\n                    const std::string& labelsPath,\n                    bool useGPU = false)\n        : OrtSessionBase(modelPath, useGPU) {\n        \n        // Validate output count for segmentation models\n        if (numOutputNodes_ != 2) {\n            throw std::runtime_error(\"Expected 2 output nodes for segmentation model (output0 and output1)\");\n        }\n        \n        classNames_ = utils::getClassNames(labelsPath);"
-        "    YOLOSegDetector(const std::string& modelPath,\n                    const std::string& labelsPath,\n                    bool useGPU = false,\n                    int numThreads = 0)\n        : OrtSessionBase(modelPath, useGPU, numThreads) {\n        \n        // Validate output count for segmentation models\n        if (numOutputNodes_ != 2) {\n            throw std::runtime_error(\"Expected 2 output nodes for segmentation model (output0 and output1)\");\n        }\n        \n        classNames_ = labelsPath.empty() ? getExportedClassNamesFromMetadata() : utils::getClassNames(labelsPath);"
-        "segmentation.hpp constructor"
-    )
-
-    # --- depth.hpp: forward numThreads ---
-    yolos_cpp_patch_file(
-        "${SOURCE_DIR}/include/yolos/tasks/depth.hpp"
-        "    explicit YOLODepthEstimator(const std::string& modelPath, bool useGPU = false)\n        : OrtSessionBase(modelPath, useGPU) {"
-        "    explicit YOLODepthEstimator(const std::string& modelPath, bool useGPU = false, int numThreads = 0)\n        : OrtSessionBase(modelPath, useGPU, numThreads) {"
-        "depth.hpp constructor"
-    )
-endfunction()
-```
-
-Put both functions **above** `DEFINE_LIBRARY_FETCH_OF_YOLOS_CPP` in the file (CMake needs
-functions defined before they're called — reorder Step 1's macro to come after Step 2's functions
-in the actual file).
-
-- [ ] **Step 3: Wire it into the root `CMakeLists.txt`**
-
-Add one line next to the existing `include(cmake/FetchLLamaCPP.cmake)`:
-
-```cmake
-include(cmake/FetchLLamaCPP.cmake)
-include(cmake/FetchYOLOsCPP.cmake)
-```
-
-(Only the `include()` — do **not** call `define_library_fetch_of_yolos_cpp()` from the root
-`CMakeLists.txt`. `vision/CMakeLists.txt` calls it itself, so `vision/` stays self-sufficient
-whether it's configured standalone or via `add_subdirectory`.)
-
-- [ ] **Step 4: Smoke-test the fetch + patch in isolation**
+- [ ] **Step 3: Configure the workspace root and confirm the patch runs**
 
 ```bash
-mkdir -p /tmp/yolos-fetch-test
-cat > /tmp/yolos-fetch-test/CMakeLists.txt <<'EOF'
-cmake_minimum_required(VERSION 3.16)
-project(yolos_fetch_smoke_test LANGUAGES CXX)
-include(${CMAKE_CURRENT_LIST_DIR}/../../root/groundstation/cmake/FetchCPM.cmake)
-include_cpm()
-include(${CMAKE_CURRENT_LIST_DIR}/../../root/groundstation/cmake/FetchYOLOsCPP.cmake)
-define_library_fetch_of_yolos_cpp()
-message(STATUS "yolos-cpp source dir: ${yolos-cpp_SOURCE_DIR}")
-EOF
-cmake -S /tmp/yolos-fetch-test -B /tmp/yolos-fetch-test/build 2>&1 | tail -30
+cd /root/build_yolo
+cmake -S . -B build -DVISION_BUILD_LIBRARY=OFF 2>&1 | tail -40
 ```
 
-Expected: configure succeeds, prints `[FetchYOLOsCPP] Patched session_base.hpp includes`,
+(`-DVISION_BUILD_LIBRARY=OFF` because `vision/CMakeLists.txt` doesn't exist until Task 8 — this
+step only proves the fetch+patch macro itself works.)
+
+Expected: configure succeeds, prints `[FetchYOLOsCPP] Downloading ONNX Runtime 1.20.1...`,
+`[FetchYOLOsCPP] Extracting ONNX Runtime...`, then
+`[FetchYOLOsCPP] Patched session_base.hpp includes`,
 `[FetchYOLOsCPP] Patched session_base.hpp thread config`,
 `[FetchYOLOsCPP] Patched segmentation.hpp constructor`,
-`[FetchYOLOsCPP] Patched depth.hpp constructor`, then `yolos-cpp source dir: ...`.
+`[FetchYOLOsCPP] Patched depth.hpp constructor`.
 
-- [ ] **Step 5: Verify the patched files actually compile against the constructor signatures we
-      rely on**
+- [ ] **Step 4: Verify the patch actually landed in the fetched source**
 
 ```bash
-grep -n "int numThreads = 0" $(cmake --build /tmp/yolos-fetch-test/build 2>&1 >/dev/null; \
-  find /tmp/yolos-fetch-test/build -path "*_deps/yolos-cpp-src/include/yolos/tasks/segmentation.hpp") \
-  || find / -path "*yolos-cpp-src/include/yolos/tasks/segmentation.hpp" -exec grep -n "int numThreads = 0" {} \;
+grep -n "int numThreads = 0" build/_deps/yolos-cpp-src/include/yolos/tasks/segmentation.hpp
+grep -n "int numThreads = 0" build/_deps/yolos-cpp-src/include/yolos/tasks/depth.hpp
+grep -n "kOrtSessionOptionsConfigAllowIntraOpSpinning" build/_deps/yolos-cpp-src/include/yolos/core/session_base.hpp
 ```
 
-Expected: at least one match (`YOLOSegDetector(...` with the new `int numThreads = 0` parameter
-visible).
+Expected: one match each.
+
+- [ ] **Step 5: Re-run configure to confirm idempotency (the patch must not double-apply or
+      FATAL_ERROR on a second run)**
+
+```bash
+cd /root/build_yolo && cmake -S . -B build -DVISION_BUILD_LIBRARY=OFF 2>&1 | tail -15
+```
+
+Expected: succeeds again, no `FATAL_ERROR`, no duplicated patch text (the `ALREADY_PATCHED_POS`
+branch in `yolos_cpp_patch_file` takes over silently).
 
 - [ ] **Step 6: Commit**
 
 ```bash
-rtk git add cmake/FetchYOLOsCPP.cmake CMakeLists.txt
-rtk git commit -m "vision: fetch YOLOs-CPP + ONNX Runtime, patch thread-cap in place"
+cd /root/build_yolo
+git add cmake/FetchYOLOsCPP.cmake
+git commit -m "Fetch YOLOs-CPP + ONNX Runtime, patch thread-cap in place"
 ```
 
 ---
 
-### Task 3: `vision/coco_labels.hpp` — constexpr classId → label table
+### Task 3: `vision/include/vision/coco_labels.hpp` — constexpr classId to label table
 
 **Files:**
-- Create: `source/llm_to_action/vision/coco_labels.hpp`
-- Test: inline `static_assert`s in the same header (header-only, no separate test binary needed —
-  it's exercised for real by Task 9's integration test)
+- Create: `/root/build_yolo/vision/include/vision/coco_labels.hpp`
 
 **Interfaces:**
 - Produces: `vision::coco_class_name(int classId) noexcept -> const char*` and
@@ -382,7 +307,7 @@ rtk git commit -m "vision: fetch YOLOs-CPP + ONNX Runtime, patch thread-cap in p
 - [ ] **Step 1: Write the header**
 
 ```cpp
-// source/llm_to_action/vision/coco_labels.hpp
+// vision/include/vision/coco_labels.hpp
 #pragma once
 
 #include <array>
@@ -425,7 +350,7 @@ inline std::vector<std::string> coco_class_names_vector() {
 
 ```cpp
 // /tmp/coco_labels_check.cpp
-#include "coco_labels.hpp"
+#include "vision/coco_labels.hpp"
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -445,7 +370,7 @@ int main() {
 ```
 
 ```bash
-g++ -std=c++17 -I source/llm_to_action/vision /tmp/coco_labels_check.cpp -o /tmp/coco_labels_check \
+g++ -std=c++17 -I /root/build_yolo/vision/include /tmp/coco_labels_check.cpp -o /tmp/coco_labels_check \
     && /tmp/coco_labels_check
 ```
 
@@ -454,28 +379,28 @@ Expected: `coco_labels_check OK`.
 - [ ] **Step 3: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/coco_labels.hpp
-rtk git commit -m "vision: constexpr COCO-80 classId->label table"
+cd /root/build_yolo
+git add vision/include/vision/coco_labels.hpp
+git commit -m "vision: constexpr COCO-80 classId->label table"
 ```
 
 ---
 
-### Task 4: `vision/perception_types.hpp` — canonical seam types
+### Task 4: `vision/include/vision/perception_types.hpp` — canonical seam types
 
 **Files:**
-- Create: `source/llm_to_action/vision/perception_types.hpp`
+- Create: `/root/build_yolo/vision/include/vision/perception_types.hpp`
 
 **Interfaces:**
-- Consumes: `util2/C/base_type.h` (`f32/i32/u32/u64`) — fetched via CPM at the workspace level;
-  for the standalone compile check in this task, point `-I` at wherever CPM caches it (see Step 2).
-- Produces: global (no namespace — matches the existing stub in `fmu/fmu_node.hpp` exactly, so a
-  future `#include` swap is a drop-in) `TargetDetection` and `PerceptionSnapshot`, used by Tasks
-  5–7.
+- Consumes: `util2/C/base_type.h` (`f32/i32/u32/u64`).
+- Produces: global (no namespace — matches `groundstation`'s existing
+  `source/llm_to_action/fmu/fmu_node.hpp` stub exactly, so that repo's future `#include` swap is a
+  drop-in) `TargetDetection` and `PerceptionSnapshot`, used by Tasks 5-7.
 
 - [ ] **Step 1: Write the header**
 
 ```cpp
-// source/llm_to_action/vision/perception_types.hpp
+// vision/include/vision/perception_types.hpp
 #pragma once
 
 #include <util2/C/base_type.h>
@@ -503,16 +428,13 @@ struct PerceptionSnapshot {
 
 - [ ] **Step 2: Compile-check it standalone**
 
-First locate where CPM cached `util2` from a prior configure (Task 2's smoke test already pulled
-CPM machinery; if `util2` isn't cached yet, fetch it directly):
-
 ```bash
 git clone --depth 1 https://github.com/inonitz/util2.git /tmp/util2-check
 ```
 
 ```cpp
 // /tmp/perception_types_check.cpp
-#include "perception_types.hpp"
+#include "vision/perception_types.hpp"
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -534,7 +456,7 @@ int main() {
 ```
 
 ```bash
-g++ -std=c++17 -I source/llm_to_action/vision -I /tmp/util2-check \
+g++ -std=c++17 -I /root/build_yolo/vision/include -I /tmp/util2-check \
     /tmp/perception_types_check.cpp -o /tmp/perception_types_check \
     && /tmp/perception_types_check
 ```
@@ -544,17 +466,18 @@ Expected: `perception_types_check OK`.
 - [ ] **Step 3: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/perception_types.hpp
-rtk git commit -m "vision: canonical TargetDetection/PerceptionSnapshot types"
+cd /root/build_yolo
+git add vision/include/vision/perception_types.hpp
+git commit -m "vision: canonical TargetDetection/PerceptionSnapshot types"
 ```
 
 ---
 
-### Task 5: `vision/yolo_seg_engine.hpp` / `.cpp` — thread-capped segmentation wrapper
+### Task 5: `vision/include/vision/yolo_seg_engine.hpp` + `vision/source/yolo_seg_engine.cpp`
 
 **Files:**
-- Create: `source/llm_to_action/vision/yolo_seg_engine.hpp`
-- Create: `source/llm_to_action/vision/yolo_seg_engine.cpp`
+- Create: `/root/build_yolo/vision/include/vision/yolo_seg_engine.hpp`
+- Create: `/root/build_yolo/vision/source/yolo_seg_engine.cpp`
 
 **Interfaces:**
 - Consumes: `vision::coco_class_names_vector()` (Task 3), patched
@@ -579,7 +502,7 @@ rtk git commit -m "vision: canonical TargetDetection/PerceptionSnapshot types"
 - [ ] **Step 1: Write the header**
 
 ```cpp
-// source/llm_to_action/vision/yolo_seg_engine.hpp
+// vision/include/vision/yolo_seg_engine.hpp
 #pragma once
 
 #include <opencv2/core.hpp>
@@ -622,9 +545,9 @@ private:
 - [ ] **Step 2: Write the implementation**
 
 ```cpp
-// source/llm_to_action/vision/yolo_seg_engine.cpp
-#include "yolo_seg_engine.hpp"
-#include "coco_labels.hpp"
+// vision/source/yolo_seg_engine.cpp
+#include "vision/yolo_seg_engine.hpp"
+#include "vision/coco_labels.hpp"
 
 #include "yolos/tasks/segmentation.hpp"
 
@@ -680,32 +603,29 @@ std::vector<SegDetection> YoloSegEngine::segment(const cv::Mat& frame,
 ```
 
 Note: `labelsPath = ""` triggers the Task 2 patch's `getExportedClassNamesFromMetadata()`
-fallback — no `coco.names` file needed. `YoloSegEngine` never reads `detector`'s own
+fallback — no `coco.names` file needed. `YoloSegEngine` never reads the detector's own
 `classNames_`; `SegDetection::classId` is enough, `vision::coco_class_name()` (Task 3) does the
 label lookup at fusion time (Task 7).
 
-- [ ] **Step 3: Compile-check it links (real correctness test happens in Task 9 once models
-      exist — this step just proves the wrapper compiles and constructs/fails predictably)**
-
-This can't fully link standalone without `libonnxruntime.so` + OpenCV `-l` flags. Defer the actual
-build+run to Task 9's CMake target, which has all the include/link flags already assembled. Mark
-this step done once Task 9's build succeeds and exercises `YoloSegEngine` (cross-reference: Task
-9, Step 4).
+- [ ] **Step 3: Defer link-verification to Task 9** (can't fully link standalone without
+      `libonnxruntime.so`/OpenCV `-l` flags assembled — Task 9's CMake target has them). Mark this
+      step done once Task 9's build succeeds and exercises `YoloSegEngine`.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/yolo_seg_engine.hpp source/llm_to_action/vision/yolo_seg_engine.cpp
-rtk git commit -m "vision: thread-capped YoloSegEngine wrapper"
+cd /root/build_yolo
+git add vision/include/vision/yolo_seg_engine.hpp vision/source/yolo_seg_engine.cpp
+git commit -m "vision: thread-capped YoloSegEngine wrapper"
 ```
 
 ---
 
-### Task 6: `vision/yolo_depth_engine.hpp` / `.cpp` — thread-capped depth wrapper
+### Task 6: `vision/include/vision/yolo_depth_engine.hpp` + `vision/source/yolo_depth_engine.cpp`
 
 **Files:**
-- Create: `source/llm_to_action/vision/yolo_depth_engine.hpp`
-- Create: `source/llm_to_action/vision/yolo_depth_engine.cpp`
+- Create: `/root/build_yolo/vision/include/vision/yolo_depth_engine.hpp`
+- Create: `/root/build_yolo/vision/source/yolo_depth_engine.cpp`
 
 **Interfaces:**
 - Consumes: patched `yolos::depth::YOLODepthEstimator(modelPath, useGpu, numThreads)` (Task 2).
@@ -726,7 +646,7 @@ rtk git commit -m "vision: thread-capped YoloSegEngine wrapper"
 - [ ] **Step 1: Write the header**
 
 ```cpp
-// source/llm_to_action/vision/yolo_depth_engine.hpp
+// vision/include/vision/yolo_depth_engine.hpp
 #pragma once
 
 #include <opencv2/core.hpp>
@@ -760,8 +680,8 @@ private:
 - [ ] **Step 2: Write the implementation**
 
 ```cpp
-// source/llm_to_action/vision/yolo_depth_engine.cpp
-#include "yolo_depth_engine.hpp"
+// vision/source/yolo_depth_engine.cpp
+#include "vision/yolo_depth_engine.hpp"
 
 #include "yolos/tasks/depth.hpp"
 
@@ -802,23 +722,23 @@ cv::Mat YoloDepthEngine::estimate(const cv::Mat& frame) {
 } // namespace vision
 ```
 
-- [ ] **Step 3: Defer link-verification to Task 9** (same reasoning as Task 5, Step 3 — cross-
-      reference: Task 9, Step 4).
+- [ ] **Step 3: Defer link-verification to Task 9** (same reasoning as Task 5, Step 3).
 
 - [ ] **Step 4: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/yolo_depth_engine.hpp source/llm_to_action/vision/yolo_depth_engine.cpp
-rtk git commit -m "vision: thread-capped YoloDepthEngine wrapper"
+cd /root/build_yolo
+git add vision/include/vision/yolo_depth_engine.hpp vision/source/yolo_depth_engine.cpp
+git commit -m "vision: thread-capped YoloDepthEngine wrapper"
 ```
 
 ---
 
-### Task 7: `vision/perception_fusion.hpp` / `.cpp` — fuse seg + depth into `PerceptionSnapshot`
+### Task 7: `vision/include/vision/perception_fusion.hpp` + `vision/source/perception_fusion.cpp`
 
 **Files:**
-- Create: `source/llm_to_action/vision/perception_fusion.hpp`
-- Create: `source/llm_to_action/vision/perception_fusion.cpp`
+- Create: `/root/build_yolo/vision/include/vision/perception_fusion.hpp`
+- Create: `/root/build_yolo/vision/source/perception_fusion.cpp`
 
 **Interfaces:**
 - Consumes: `vision::YoloSegEngine::segment()` (Task 5), `vision::YoloDepthEngine::estimate()`
@@ -829,12 +749,12 @@ rtk git commit -m "vision: thread-capped YoloDepthEngine wrapper"
 - [ ] **Step 1: Write the header**
 
 ```cpp
-// source/llm_to_action/vision/perception_fusion.hpp
+// vision/include/vision/perception_fusion.hpp
 #pragma once
 
-#include "perception_types.hpp"
-#include "yolo_depth_engine.hpp"
-#include "yolo_seg_engine.hpp"
+#include "vision/perception_types.hpp"
+#include "vision/yolo_depth_engine.hpp"
+#include "vision/yolo_seg_engine.hpp"
 
 #include <opencv2/core.hpp>
 
@@ -856,13 +776,14 @@ PerceptionSnapshot fuse(YoloSegEngine& segEngine,
 - [ ] **Step 2: Write the implementation**
 
 ```cpp
-// source/llm_to_action/vision/perception_fusion.cpp
-#include "perception_fusion.hpp"
-#include "coco_labels.hpp"
+// vision/source/perception_fusion.cpp
+#include "vision/perception_fusion.hpp"
+#include "vision/coco_labels.hpp"
 
 #include <algorithm>
 #include <chrono>
-#include <cstring>
+#include <cstdio>
+#include <cmath>
 #include <vector>
 
 namespace vision {
@@ -958,75 +879,56 @@ PerceptionSnapshot fuse(YoloSegEngine& segEngine,
 - [ ] **Step 4: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/perception_fusion.hpp source/llm_to_action/vision/perception_fusion.cpp
-rtk git commit -m "vision: fuse() seg+depth into PerceptionSnapshot"
+cd /root/build_yolo
+git add vision/include/vision/perception_fusion.hpp vision/source/perception_fusion.cpp
+git commit -m "vision: fuse() seg+depth into PerceptionSnapshot"
 ```
 
 ---
 
-### Task 8: `vision/CMakeLists.txt` — self-sufficient `Perception::vision` target
+### Task 8: `vision/CMakeLists.txt` — the `Perception::vision` library target
 
 **Files:**
-- Create: `source/llm_to_action/vision/CMakeLists.txt`
-- Modify: `source/llm_to_action/CMakeLists.txt` (add `add_subdirectory(vision)` next to the
-  existing `add_subdirectory(gstreamer_gz_udp_tx)`)
+- Create: `/root/build_yolo/vision/CMakeLists.txt`
 
 **Interfaces:**
-- Produces: target alias `Perception::vision` (links `coco_labels.hpp`, `perception_types.hpp`,
-  `yolo_seg_engine.*`, `yolo_depth_engine.*`, `perception_fusion.*`, YOLOs-CPP headers, ONNX
-  Runtime, OpenCV). Consumed later by the FMU (out of scope for this plan) and by Task 9's test
-  target in this same file.
+- Consumes: `define_library_fetch_of_yolos_cpp()` (Task 2, already called from the repo root
+  `CMakeLists.txt` before `add_subdirectory(vision)` runs — do not call it again here),
+  `UTIL2::util2` (already CPM-fetched by the repo root), `find_package(OpenCV REQUIRED)` (already
+  called by the repo root).
+- Produces: target alias `Perception::vision`. Consumed by Task 9's test target in this same file,
+  and — later, out of scope for this plan — by `groundstation` once it starts consuming this repo.
 
 - [ ] **Step 1: Write the CMakeLists**
 
 ```cmake
-# source/llm_to_action/vision/CMakeLists.txt
-cmake_minimum_required(VERSION 3.16)
-project(vision LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Self-sufficient: works whether configured standalone (no ROS in scope,
-# satisfies the "build/test without ROS or the simulator" requirement) or
-# nested via add_subdirectory() from the full workspace.
-if(NOT COMMAND safe_cpm_add_package)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/FetchCPM.cmake)
-    include_cpm()
-endif()
-if(NOT COMMAND define_library_fetch_of_yolos_cpp)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/FetchYOLOsCPP.cmake)
-endif()
-
-define_library_fetch_of_yolos_cpp()
-
-safe_cpm_add_package(
-    NAME           util2
-    GIT_REPOSITORY https://github.com/inonitz/util2.git
-    GIT_TAG        main
-    GIT_SHALLOW    TRUE
+# vision/CMakeLists.txt
+project(vision
+    VERSION 0.1.0
+    DESCRIPTION "YOLO26 segmentation + metric depth perception library"
+    LANGUAGES CXX
 )
 
-find_package(OpenCV REQUIRED)
-
-add_library(vision STATIC
-    coco_labels.hpp
-    perception_types.hpp
-    yolo_seg_engine.hpp
-    yolo_seg_engine.cpp
-    yolo_depth_engine.hpp
-    yolo_depth_engine.cpp
-    perception_fusion.hpp
-    perception_fusion.cpp
+add_library(${PROJECT_NAME} STATIC
+    include/vision/coco_labels.hpp
+    include/vision/perception_types.hpp
+    include/vision/yolo_seg_engine.hpp
+    source/yolo_seg_engine.cpp
+    include/vision/yolo_depth_engine.hpp
+    source/yolo_depth_engine.cpp
+    include/vision/perception_fusion.hpp
+    source/perception_fusion.cpp
 )
-add_library(Perception::vision ALIAS vision)
+add_library(Perception::vision ALIAS ${PROJECT_NAME})
 
-target_include_directories(vision PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${yolos-cpp_SOURCE_DIR}/include
 )
 
-target_link_libraries(vision PUBLIC
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
     UTIL2::util2
     ONNXRuntime::onnxruntime
     opencv_core
@@ -1034,11 +936,10 @@ target_link_libraries(vision PUBLIC
     opencv_imgcodecs
 )
 
-set_target_properties(vision PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
     BUILD_RPATH "${ORT_INSTALL_DIR}/lib"
 )
 
-option(VISION_BUILD_TESTS "Build the vision/ standalone correctness+benchmark test" ${GROUNDSTATION_IS_TOP_LEVEL})
 if(VISION_BUILD_TESTS)
     add_executable(perception_test test/perception_test.cpp)
     target_link_libraries(perception_test PRIVATE Perception::vision)
@@ -1053,68 +954,58 @@ if(VISION_BUILD_TESTS)
 endif()
 ```
 
-`GROUNDSTATION_IS_TOP_LEVEL` won't exist when this is configured standalone (it's set in the root
-`CMakeLists.txt`) — CMake treats an undefined variable in a boolean `option()` default as `OFF`.
-That's fine here: standalone runs should pass `-DVISION_BUILD_TESTS=ON` explicitly (Task 9 does).
-
-- [ ] **Step 2: Wire it into `source/llm_to_action/CMakeLists.txt`**
-
-Add next to the existing `add_subdirectory(gstreamer_gz_udp_tx)`:
-
-```cmake
-add_subdirectory(gstreamer_gz_udp_tx)
-add_subdirectory(vision)
-```
-
-- [ ] **Step 3: Configure standalone and confirm the target exists (no test executable yet — Task
-      9 adds `test/perception_test.cpp`, so this will fail until then; expected failure, not a
-      bug)**
+- [ ] **Step 2: Configure and build from the repo root (this is the first time the whole workspace
+      composes: root `CMakeLists.txt` -> `FetchYOLOsCPP` -> this file)**
 
 ```bash
-cmake -S source/llm_to_action/vision -B /tmp/vision_build -DVISION_BUILD_TESTS=OFF 2>&1 | tail -30
-cmake --build /tmp/vision_build -j 2>&1 | tail -40
+cd /root/build_yolo
+cmake -S . -B build -DVISION_BUILD_TESTS=OFF 2>&1 | tail -40
+cmake --build build -j 2>&1 | tail -60
 ```
 
-Expected: configure succeeds (prints the `[FetchYOLOsCPP]` patch lines again — idempotent, no
-`FATAL_ERROR`), `vision` static library builds with no errors.
+Expected: configure succeeds (prints the `[FetchYOLOsCPP]` lines again — idempotent), `vision`
+static library builds with no errors. (`VISION_BUILD_TESTS=OFF` here because `test/perception_test.cpp`
+doesn't exist until Task 9 — expected, not a bug.)
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/CMakeLists.txt source/llm_to_action/CMakeLists.txt
-rtk git commit -m "vision: Perception::vision CMake target, standalone-buildable"
+cd /root/build_yolo
+git add vision/CMakeLists.txt
+git commit -m "vision: Perception::vision CMake target"
 ```
 
 ---
 
-### Task 9: Standalone correctness test + fp32/int8/int4 × 1/2/4-thread benchmark
+### Task 9: Standalone correctness test + fp32/int8/int4 x 1/2/4-thread benchmark
 
 **Files:**
-- Create: `source/llm_to_action/vision/test/perception_test.cpp`
+- Create: `/root/build_yolo/vision/test/perception_test.cpp`
 
 **Interfaces:**
-- Consumes: everything from Tasks 3–7 (`vision::fuse`, `vision::YoloSegEngine`,
+- Consumes: everything from Tasks 3-7 (`vision::fuse`, `vision::YoloSegEngine`,
   `vision::YoloDepthEngine`, `vision::coco_class_name`, `TargetDetection`, `PerceptionSnapshot`).
 - Produces: nothing further downstream — this is the leaf verification task.
 
 - [ ] **Step 1: Write the test**
 
 ```cpp
-// source/llm_to_action/vision/test/perception_test.cpp
+// vision/test/perception_test.cpp
 /*
-    Standalone, ROS-free correctness + latency/thread benchmark for the vision/
-    perception library. Build:
-        cmake -S source/llm_to_action/vision -B /tmp/vision_build -DVISION_BUILD_TESTS=ON
-        cmake --build /tmp/vision_build -j
-        /tmp/vision_build/perception_test /root/models/vision
-    (test image is copied to ${CMAKE_CURRENT_BINARY_DIR}/dog.jpg by CMake — no arg needed
+    Correctness + latency/thread benchmark for the vision/ perception library.
+    Build:
+        cd /root/build_yolo
+        cmake -S . -B build -DVISION_BUILD_TESTS=ON
+        cmake --build build -j
+        ./build/vision/perception_test /root/models/vision
+    (test image is copied to the same directory as the binary by CMake — no arg needed
     unless you want a different image as argv[2])
 */
-#include "../coco_labels.hpp"
-#include "../perception_fusion.hpp"
-#include "../perception_types.hpp"
-#include "../yolo_depth_engine.hpp"
-#include "../yolo_seg_engine.hpp"
+#include "vision/coco_labels.hpp"
+#include "vision/perception_fusion.hpp"
+#include "vision/perception_types.hpp"
+#include "vision/yolo_depth_engine.hpp"
+#include "vision/yolo_seg_engine.hpp"
 
 #include <opencv2/imgcodecs.hpp>
 
@@ -1266,8 +1157,9 @@ int main(int argc, char** argv) {
 - [ ] **Step 2: Build**
 
 ```bash
-cmake -S source/llm_to_action/vision -B /tmp/vision_build -DVISION_BUILD_TESTS=ON 2>&1 | tail -30
-cmake --build /tmp/vision_build -j 2>&1 | tail -60
+cd /root/build_yolo
+cmake -S . -B build -DVISION_BUILD_TESTS=ON 2>&1 | tail -30
+cmake --build build -j 2>&1 | tail -60
 ```
 
 Expected: builds `vision` and `perception_test` with no errors. (This is also where Task 5 Step 3
@@ -1277,7 +1169,9 @@ signature mismatch against the patched YOLOs-CPP headers, it fails here.)
 - [ ] **Step 3: Run the correctness portion, confirm it passes before looking at the benchmark**
 
 ```bash
-cd /tmp/vision_build && LD_LIBRARY_PATH=$(find /tmp/vision_build/_deps/onnxruntime -name lib -type d | head -1):$LD_LIBRARY_PATH ./perception_test /root/models/vision
+cd /root/build_yolo/build/vision
+LD_LIBRARY_PATH=$(find /root/build_yolo/build/_deps/onnxruntime -name lib -type d | head -1):$LD_LIBRARY_PATH \
+./perception_test /root/models/vision
 ```
 
 Expected: `Loaded test image dog.jpg (...)`, three `Correctness: ...` lines, then
@@ -1293,11 +1187,11 @@ variant+thread-count call (lowest mean_ms that still `MEETS`, or if none `MEETS`
 reassess rather than over-optimize).
 
 - [ ] **Step 5: Confirm the thread cap actually bounds cores used (not spawning a thread per
-      core)** — run once at `threads=1` under `taskset`/monitoring:
+      core)** — run once under monitoring:
 
 ```bash
-cd /tmp/vision_build && \
-LD_LIBRARY_PATH=$(find /tmp/vision_build/_deps/onnxruntime -name lib -type d | head -1):$LD_LIBRARY_PATH \
+cd /root/build_yolo/build/vision && \
+LD_LIBRARY_PATH=$(find /root/build_yolo/build/_deps/onnxruntime -name lib -type d | head -1):$LD_LIBRARY_PATH \
 ./perception_test /root/models/vision & PID=$!; sleep 2; \
 grep Threads /proc/$PID/status; ps -o pid,nlwp,psr,comm -p $PID; wait $PID
 ```
@@ -1309,41 +1203,44 @@ table — it's the empirical check that `SetIntraOpNumThreads`/spin-disable actu
 - [ ] **Step 6: Commit**
 
 ```bash
-rtk git add source/llm_to_action/vision/test/perception_test.cpp
-rtk git commit -m "vision: standalone correctness test + fp32/int8/int4 x 1/2/4-thread benchmark"
+cd /root/build_yolo
+git add vision/test/perception_test.cpp
+git commit -m "vision: standalone correctness test + fp32/int8/int4 x 1/2/4-thread benchmark"
 ```
 
 ---
 
-### Task 10: Bounded full-workspace integration check
+### Task 10: Full-workspace top-level build check
 
 **Files:** none created/modified — verification only.
 
 **Interfaces:** none new.
 
-- [ ] **Step 1: Configure the full workspace** (ROS Jazzy + px4_msgs + gz-sim8 confirmed present
-      in this environment)
+- [ ] **Step 1: Confirm a completely clean top-level configure+build works end to end** (proves
+      someone who clones this repo fresh, with nothing pre-fetched, gets a working library+test
+      purely from `cmake -S . -B build`)
 
 ```bash
-source /opt/ros/jazzy/setup.bash
-cmake -S . -B /tmp/full_ws_build -DGROUNDSTATION_BUILD_EXECUTABLE=ON 2>&1 | tail -60
+rm -rf /root/build_yolo/build
+cd /root/build_yolo
+cmake -S . -B build 2>&1 | tail -60
+cmake --build build -j 2>&1 | tail -60
 ```
 
-Expected: configure succeeds (or fails for reasons **unrelated** to `vision/` — e.g. an in-flight
-edit elsewhere on this branch to `fmu_node.cpp`/`llamaclient.cpp` per current `git status`; if so,
-note the unrelated failure in the report and move to Step 2's narrower check instead of trying to
-fix it — out of this task's blast radius).
+Expected: succeeds top to bottom — ONNX Runtime download+extract, YOLOs-CPP fetch+patch, util2
+fetch, `vision` library, `perception_test` executable, no manual intervention. `VISION_BUILD_TESTS`
+defaults to `ON` here (top-level build), so this also rebuilds the test target from Task 9.
 
-- [ ] **Step 2: Build only the vision target, not the FMU/keyboard/ASR/offboard/gstreamer nodes**
+- [ ] **Step 2: Run the test once more from this clean build to confirm nothing about the fresh
+      configure changed behavior**
 
 ```bash
-cmake --build /tmp/full_ws_build --target vision -j 2>&1 | tail -60
+cd /root/build_yolo/build/vision
+LD_LIBRARY_PATH=$(find /root/build_yolo/build/_deps/onnxruntime -name lib -type d | head -1):$LD_LIBRARY_PATH \
+./perception_test /root/models/vision
 ```
 
-Expected: `vision` builds cleanly inside the full workspace tree (proves `add_subdirectory(vision)`
-composes correctly with the rest of `source/llm_to_action/CMakeLists.txt` and the root fetch
-wiring), regardless of whether sibling targets (fmu, keyboard, etc.) currently build — do not
-attempt to fix those; they're outside this plan's scope.
+Expected: same `ALL CORRECTNESS CHECKS PASSED` result as Task 9.
 
 - [ ] **Step 3: No commit** — this task only verifies; nothing here should have been modified.
 
@@ -1352,11 +1249,15 @@ attempt to fix those; they're outside this plan's scope.
 ## Handoff Report (fill in from Task 9's actual output, not before)
 
 When all 10 tasks are done, report:
-1. Exact build/run commands (Task 9, Steps 2–3).
+1. Exact build/run commands (Task 9, Steps 2-3).
 2. Correctness test result (pass/fail, from Task 9 Step 3's actual terminal output).
 3. Full benchmark table (Task 9 Step 4's actual terminal output, verbatim).
 4. Thread-cap verification observation (Task 9 Step 5).
 5. Recommended variant + thread count, stated plainly against the ~25 ms depth / ~33 ms seg
    targets — including if neither is met.
-6. Task 1's int4 quantization outcome (succeeded or failed, and why if it failed).
-7. Task 10's full-workspace integration result.
+6. Task 1's int4 quantization outcome (succeeded or failed, and why if it failed) — from the
+   human partner's manual run.
+7. Task 10's clean top-level build result.
+8. **Not done, and intentionally out of scope:** consuming this repo from `groundstation` (the
+   `safe_cpm_add_package(NAME vision ...)` block + linking `Perception::vision` into the FMU).
+   That's a separate future step.
