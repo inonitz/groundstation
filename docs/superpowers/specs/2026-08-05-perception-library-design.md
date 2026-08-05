@@ -73,11 +73,15 @@ of `modular-vision-api`, which is what ARCHITECTURE.md §9 calls "BUILD_YOLO mod
   false)` — no thread arg forwarded); it only reaches their own unrelated `MidasSmallEngine`. Same
   gap confirmed directly in upstream: `OrtSessionBase` takes `numThreads`, but
   `YOLOSegDetector`/`YOLODepthEstimator` constructors hardcode `OrtSessionBase(modelPath, useGPU)`
-  without forwarding it, and no spin-disable is set anywhere. **Vendor patched copies** of just
-  `yolos/tasks/segmentation.hpp` + `yolos/tasks/depth.hpp` under
-  `vision/third_party/yolos_patched/`, include-path-shadowed ahead of the fetched upstream tree,
-  forwarding a `numThreads` ctor param and adding
-  `sessionOptions_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, "0")`.
+  without forwarding it, and no spin-disable is set anywhere. **Patch in place, in CMake, after
+  the CPM fetch** — not a hand-vendored copy of the (552 + 174 line) upstream files. A
+  `patch_yolos_cpp_for_thread_cap(<source_dir>)` macro in `cmake/FetchYOLOsCPP.cmake` does
+  `file(READ)` → `string(FIND)` (assert the exact old text is still there, `FATAL_ERROR` loudly if
+  upstream shifts) → `string(REPLACE)` → `file(WRITE)` on exactly 3 files: add a `numThreads`
+  parameter forwarded into `OrtSessionBase(modelPath, useGPU, numThreads)` in
+  `yolos/tasks/segmentation.hpp` and `yolos/tasks/depth.hpp`, and add
+  `sessionOptions_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, "0")` in
+  `yolos/core/session_base.hpp`'s `configureSessionOptions`. Runs once per fresh CPM fetch.
 
 ### YOLOs-CPP API (verified from the repo — use these exactly)
 - Include `yolos/yolos.hpp` (all tasks), or per-task `yolos/tasks/{segmentation,depth}.hpp`.
