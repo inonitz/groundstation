@@ -282,14 +282,21 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
 (`llm_to_action_fmu_px4` / `_tello`).
 
 **Remaining gap (what this spec still describes but the repo does not yet do):**
-- **Perception integration** — real detections/metric depth (§9). The YOLO26 library is built in
-  the standalone `/root/build_yolo` repo but not yet wired into the FMU; `TargetDetection` in
-  `fmu_node.hpp` is still a stub.
-- **APPROACH / visual-servo GO** — specced
-  (`specs/2026-08-05-visual-servoing-approach-design.md`), gated on perception.
+- **APPROACH's "reached" has no motion sanity check** (ROADMAP 6.4) — a real SITL collision
+  (2026-08-06, live VLM run) produced a false `approach_ok`: the range reading was taken
+  during/after a physical impact (yawrate 6.9 rad/s vs commanded ~-0.10) and happened to pass
+  the standoff check. No check exists that "reached" coincides with nominal vehicle motion.
+- **live-YOLO GO** (ROADMAP 5.2) — APPROACH recomputes per-tick off a live detection; plain GO
+  is still a one-shot dead-reckoned waypoint. Visual-servo GO redesign not started
+  (`docs/active/2026-08-05-go-controller-visual-servo.md`).
 - **Emergency boundary + battery/failsafe supervisor** (§10/§11) — designed, not implemented.
-- **Tello hardware bring-up** — backend built + unit-tested; real gstreamer H264 camera RX
-  (`udpsrc port=11111 ! h264parse ! avdec_h264`) still to do.
+- **Tello hardware bring-up** — backend flight-verified on real hardware 2026-08-06 (telemetry,
+  odometry, camera all confirmed live); stick-to-m/s calibration, Simpson-rule odometry
+  integration, and wind/prop-wash stability correction still open (ROADMAP 2.3.1/2.3.2/2.3.5).
+
+Resolved since this section was last written: perception (real YOLO seg+depth) IS wired into
+the FMU and confirmed working end-to-end against a real object with a live VLM planning off it
+(2026-08-06) -- see ROADMAP 4.2 and 5.1.5.
 
 ---
 

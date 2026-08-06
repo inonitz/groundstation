@@ -201,6 +201,5 @@ safe_cpm_add_package(
 # ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(source/llm_to_action)
-    # add_subdirectory(source/speech_to_action)
     # add_subdirectory(source/nav)
 endif()

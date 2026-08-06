@@ -635,3 +635,18 @@ firmware flash is possible or needed (`docs/tello_backend_notes.md` updated, was
 SDK 2.0). ROADMAP 2.3 updated: telemetry/odometry/camera now verified live on real hardware;
 2.3.4/2.3.5/2.3.6 added for wind-sensitivity speed control, active stability correction, and
 latency benchmarking -- all carried forward, none implemented yet.
+
+## docs/ lifecycle re-triage: two "active" docs were already done (2026-08-06)
+
+Renamed the task buckets (`tasks_todo/active/closed` -> `scheduled/active/closed`) and
+re-checked every doc's bucket against *current* truth instead of trusting each doc's own
+frozen text. Found: `2026-08-04-px4-backend-extraction.md` (plan) and
+`2026-08-05-px4-backend-extraction.md` (handoff) both still said "Task 4 (ENU seam) NOT
+started" -- true when written, but `ARCHITECTURE.md` §15's own Implementation Status already
+listed "the ENU convention (Task 4)" as committed, and the GO-spiral fix the same handoffs
+call open is confirmed fixed in the sibling `go-controller-visual-servo.md` handoff. Moved
+both to `closed/`. Also closed: `fmu-perception-integration.md` (block 4.2, done well before
+today, then further exercised by today's real-perception/VLM work) and the docs-reorg ticket
+itself (its two placement caveats + the SDK-1.3 fold-in are resolved). Lesson: a task doc's
+bucket should track ROADMAP/ARCHITECTURE, not get frozen at whatever the doc said the day it
+was written -- cross-check both before trusting one in isolation.
