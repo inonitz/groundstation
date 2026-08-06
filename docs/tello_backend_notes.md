@@ -1,6 +1,12 @@
-# TelloBackend — SDK 2.0 verified notes (Phase 2)
+# TelloBackend — notes (Phase 2)
 
-Verified against the Ryze Tello SDK 2.0 User Guide (2018.11). Source of truth for the
+Ports/commands verified against the Ryze Tello SDK 2.0 User Guide (2018.11) and confirmed
+1.3-compatible. **The physical drone is a standard Tello on SDK 1.3, not an EDU** (replies
+`unknown command` to `sn?`/`sdk?`, both SDK-2.0-only queries; confirmed 2026-08-06 hardware
+bring-up, see `tasks_closed/2026-08-06-tello-real-world-bringup-telemetry-hardening.md`). SDK
+2.0 is hardware-locked to the EDU model and cannot be flashed onto this unit -- its only
+relevant feature (video-stream tuning: `setfps`/`setresolution`/`setbitrate`) is a
+hardware-purchase decision if ever needed, not a firmware one. Source of truth for the
 `TelloBackend` (DroneBackend impl) that pairs with `PX4Backend`.
 
 ## Ports / init (prototype correct)

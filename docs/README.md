@@ -14,12 +14,21 @@ Project documentation, organized by purpose.
 
 ## Folders
 
+Session/task artifacts are filed by lifecycle state:
+
+- **`tasks_todo/`** — not-yet-started work: implementation plans (the step-by-step "how" derived from
+  a spec) and ready-to-paste handoff prompts for the next session.
+- **`tasks_wip/`** — in-progress work: handoffs for tasks that are partially done with pending items
+  (e.g. PX4Backend extraction Task 4 / ENU seam, visual-servoing redesign).
+- **`tasks_closed/`** — finished work: completed session handoffs, git ledgers, and closed-out
+  reports kept as archive.
 - **`specs/`** — durable design specifications (the "what and why" of a subsystem, approved before
-  implementation).
-- **`plans/`** — implementation plans (the step-by-step "how" derived from a spec).
-- **`handoffs/`** — dated session artifacts: context handoffs between working sessions, ready-to-paste
-  prompts, and git ledgers. The newest handoff is the live starting point; older ones are archive.
-- **`reference/`** — miscellaneous durable reference notes (e.g. hardware SDK notes).
+  implementation). These are not task state; they outlive any single task.
+
+## Loose reference notes
+
+- **[tello_backend_notes.md](tello_backend_notes.md)** — Tello SDK notes (ports, state-string
+  parser, video pipeline, frame decision) backing the `TelloBackend`.
 
 ## `ARCHITECTURE.md`
 

@@ -16,7 +16,7 @@ You are continuing work on `groundstation`, an off-board VLM-driven autonomous d
 
 Orient first, in this order:
   1. docs/ROADMAP.md               — the full recursive objective tree + status (start here)
-  2. docs/handoffs/2026-08-06-fmu-perception-integration.md  — this handoff (context + task)
+  2. docs/tasks_todo/2026-08-06-fmu-perception-integration.md — this handoff (context + task)
   3. docs/specs/2026-08-05-perception-library-design.md      — the vision lib design
   4. /root/build_yolo/vision/                                — the finished vision library
 
@@ -130,4 +130,4 @@ downstream emergency boundary (block 6.1) must tolerate a stale-ish depth signal
 - `docs/ROADMAP.md` — objective tree + status + time estimate (the index).
 - `../ARCHITECTURE.md` — FMU architecture spec (sections 6 perception prompt, 9 perception seam).
 - `docs/NOTES.md` — running dev log (SITL debugging, control-law iteration, decisions).
-- `docs/specs/` — durable design specs; `docs/plans/` — implementation plans.
+- `docs/specs/` — durable design specs; `docs/tasks_todo/` — implementation plans not yet started.

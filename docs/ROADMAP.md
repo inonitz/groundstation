@@ -36,10 +36,26 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 2. Backend abstraction                                           [x]
    2.1 GenericBackend interface (CRTP, builds both backends)     [x]
    2.2 PX4Backend (flies in SITL)                                [x]
-   2.3 TelloBackend                                              [~]  built + unit-tested
+   2.3 TelloBackend                                              [~]  first real-hardware
+       flight verified 2026-08-06 -- telemetry, odometry, camera all confirmed live
+       (see tasks_closed/2026-08-06-tello-real-world-bringup-telemetry-hardening.md)
        2.3.1 stick to m/s calibration (real hardware)            [ ]  (human, hardware-bound)
-       2.3.2 Simpson-rule odometry in the driver                 [ ]
-       2.3.3 real gstreamer H264 RX (udpsrc 11111, h264parse)    [ ]
+       2.3.2 Simpson-rule odometry in the driver                 [ ]  data now flows live;
+             integration method itself still unverified
+       2.3.3 real gstreamer H264 RX (udpsrc 11111, h264parse)    [x]  confirmed working on
+             hardware via cv::VideoCapture/FFMPEG; no gstreamer swap needed
+       2.3.4 runtime speed control (tello_teleop "more/less speed" [ ]  clamped min<=v<=max;
+             keys, clamped)                                            low speed = practical
+             indoor wind/prop-wash mitigation (found 2026-08-06)
+       2.3.5 active stability correction against wind/prop-wash  [ ]  Tello drifts far more
+             than SITL; control path must monitor + correct, not fly open-loop. Ties into
+             GO/visual-servo work now that odometry is live.
+       2.3.6 latency benchmarks + self-contained I/O tests        [ ]  no measurement exists
+             for keypress->drone-response latency. Plan: record a real flight's input/command
+             sequence + timestamps to disk, replay as a deterministic test fixture (no
+             re-flying). Also: independent end-to-end latency tests for odometry (wire->parsed
+             Odometry) and camera (drone frame->decoded frame). Not blocking, matters for
+             trusting the control loop.
    2.4 Per-node CMake split                                      [x]
    2.5 Uniform backend-construction contract (kill factory wart) [DEFER]
 

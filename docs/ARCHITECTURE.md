@@ -305,6 +305,30 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
 - [ ] Rephrase kSystemPrompt interruption text → Appendix A (+ compress for FORK-A).
 - [ ] `simenv.sh` migration to FMU + `llm_to_action` binaries.
 
+## 17. Dev Environment Networking (real-hardware bring-up, 2026-08-06)
+
+Two machines: **`swapgs`** (dev box — editing/git/this session) and **`mint0`** (laptop joined
+to the Tello's Wi-Fi AP — builds and flies the drone code). Edits on swapgs need push+pull to
+reach mint0; a fix living in `devenv.sh` applies automatically once mint0 pulls and relaunches.
+
+The dev container launches `--net=host --privileged`, so it shares the host's netfilter
+tables 1:1 — `iptables` run inside the container edits the real host kernel tables.
+**`ufw`'s apply mechanism is broken in this container image**: `ufw allow` reports success and
+`ufw status verbose` shows the rule active, but the ACCEPT never lands in the actual
+`ufw-user-input` chain (confirmed via `iptables -L`), and the `INPUT` chain's jump to
+`ufw-user-input` can itself go missing after a `ufw` uninstall/reinstall mid-session. Tello
+state telemetry (unsolicited inbound UDP 8890) was silently dropped this way for an entire
+session even though the command channel (UDP 8889, outbound-initiated) worked fine.
+**Fix: bypass ufw, insert raw netfilter rules directly, inside the container (root, no
+`sudo`):**
+```bash
+iptables -I INPUT 1 -p udp --dport 8890 -j ACCEPT
+iptables -I INPUT 1 -p udp --dport 11111 -j ACCEPT
+```
+This now lives in `devenv.sh`'s container startup. Do not add these to the host's iptables —
+every working command that session ran inside the container, and the host may not even have
+`iptables`.
+
 ---
 
 ## Appendix A — kSystemPrompt "Execution Model" (ROADMAP 3.6)

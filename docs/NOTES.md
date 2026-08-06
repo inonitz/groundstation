@@ -399,7 +399,7 @@
   same pattern as `sttserver` — OPTIONS turn its own tests/benchmarks/sanitizers off so only
   `Perception::vision` builds. Linked into `llm_to_action_fmu_<backend>` in
   `fmu/CMakeLists.txt`. Pinned to a **branch**, not a tag/commit, on purpose: see
-  `docs/handoffs/2026-08-06-build-yolo-vision-generic-backend-refactor.md` for a planned CRTP
+  `docs/tasks_todo/2026-08-06-build-yolo-vision-generic-backend-refactor.md` for a planned CRTP
   backend-boundary refactor on that same branch that has **not** landed yet (confirmed against
   `origin/feature-vision-api` HEAD at integration time) — this session wired against the current
   `YoloSegEngine`/`YoloDepthEngine`/non-template `fuse()` API deliberately, deferring the
@@ -613,3 +613,25 @@ object -- the Fuel "Rubicon" asset is a house, not a vehicle, despite the name).
   **Logged, not fixed (ROADMAP 6.4):** APPROACH's "reached" check has no motion sanity
   check at all -- it trusts a single range reading regardless of what the vehicle is
   actually doing that instant. This is the real gap, not a tuning number.
+
+## Tello real-world bring-up: telemetry was 100% dead, ufw is broken in this container (2026-08-06)
+
+First real-hardware flight. State telemetry (UDP 8890, unsolicited inbound) was silently
+dropped by the host firewall's default-deny INPUT policy -- confirmed via `tcpdump` (585 real
+Tello state packets on the wire, zero reaching the app). The command channel (UDP 8889) worked
+only because our own outbound sends create a conntrack ESTABLISHED entry; state traffic has no
+such flow. `ufw allow 8890/udp` reported success and `ufw status verbose` showed it active, but
+the ACCEPT never actually landed in the kernel's `ufw-user-input` chain -- ufw's apply
+mechanism is broken in this container image (worse after a mid-session ufw uninstall/reinstall
+desynced its rule files from live netfilter). **Fixed: bypass ufw, insert raw `iptables` rules
+directly in the container startup** (`devenv.sh` -- container runs `--net=host --privileged`,
+so this edits the real host tables). Full detail: `docs/ARCHITECTURE.md` §17,
+`docs/tasks_closed/2026-08-06-tello-real-world-bringup-telemetry-hardening.md`.
+
+Also resolved this session: camera stream was never actually broken (early misread -- H264
+`no frame!` errors are normal before the first keyframe, then stop); confirmed the physical
+drone is a standard Tello on **SDK 1.3, not an EDU** (`sn?`/`sdk?` -> `unknown command`), so no
+firmware flash is possible or needed (`docs/tello_backend_notes.md` updated, was mislabeled
+SDK 2.0). ROADMAP 2.3 updated: telemetry/odometry/camera now verified live on real hardware;
+2.3.4/2.3.5/2.3.6 added for wind-sensitivity speed control, active stability correction, and
+latency benchmarking -- all carried forward, none implemented yet.
