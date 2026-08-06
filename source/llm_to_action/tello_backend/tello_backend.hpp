@@ -92,4 +92,9 @@ private:
     std::atomic<IOState> m_ioState{IOState::STANDBY};
 
     std::mutex m_cmdMtx;  /* serialises the single command socket. */
+
+    /* Diagnostics only (not control-path): cross-thread visibility for the
+       [rc]/[hb] logs in streamLoop() and the [state] logs in stateLoop(). */
+    std::atomic<u32> m_rcFailStreak{0};
+    std::atomic<u32> m_stateConsecutiveMisses{0};
 };

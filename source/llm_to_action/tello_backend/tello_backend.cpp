@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <optional>
 #include <string>
 #include <ctello.h>
@@ -22,11 +23,24 @@ u64 TelloBackend::nowUs() {
 
 
 bool TelloBackend::sendCmd(const char* cmd, bool awaitAck) {
+    /* rc is 20Hz from streamLoop -- never trace it here (streamLoop does its own
+       throttled [rc]/[hb] logging). Every other command is rare, so trace it in
+       full: send result, ack result, ack latency. */
+    const bool isRc = std::strncmp(cmd, "rc ", 3) == 0;
+    bool sendOk;
     {
         std::lock_guard<std::mutex> lk(m_cmdMtx);
-        if (!m_tello) return false;
-        if (!m_tello->SendCommand(cmd)) return false;
+        if (!m_tello) {
+            if (!isRc) std::fprintf(stderr, "[cmd] \"%s\" FAILED -- backend not started (m_tello null)\n", cmd);
+            return false;
+        }
+        sendOk = m_tello->SendCommand(cmd);
     }
+    if (!sendOk) {
+        if (!isRc) std::fprintf(stderr, "[cmd] \"%s\" SendCommand() returned false\n", cmd);
+        return false;
+    }
+    if (!isRc) std::fprintf(stderr, "[cmd] \"%s\" sent OK, awaitAck=%d\n", cmd, __scast(int, awaitAck));
     if (!awaitAck) return true;
 
     /* Ack wait happens OUTSIDE m_cmdMtx: this mutex only guards SendCommand(),
@@ -36,11 +50,17 @@ bool TelloBackend::sendCmd(const char* cmd, bool awaitAck) {
        right after every takeoff/land while the ack was pending.
        ctello ReceiveResponse() is a non-blocking poll; bound the wait so a lost
        ack can never hang the caller (Gemini's `while(!ReceiveResponse())` could). */
-    const auto deadline = steady_clock::now() + seconds(7);
+    const auto ackStart = steady_clock::now();
+    const auto deadline = ackStart + seconds(7);
     while (steady_clock::now() < deadline) {
-        if (m_tello->ReceiveResponse()) return true;
+        if (m_tello->ReceiveResponse()) {
+            auto ms = duration_cast<milliseconds>(steady_clock::now() - ackStart).count();
+            std::fprintf(stderr, "[cmd] \"%s\" ACK OK after %lldms\n", cmd, (long long)ms);
+            return true;
+        }
         std::this_thread::sleep_for(milliseconds(10));
     }
+    std::fprintf(stderr, "[cmd] \"%s\" ACK TIMEOUT after 7000ms -- drone may not have executed it\n", cmd);
     return false;
 }
 
@@ -50,9 +70,11 @@ bool TelloBackend::start_impl() {
 
     m_tello = std::make_unique<ctello::Tello>();
     if (!m_tello->Bind()) {
+        std::fprintf(stderr, "[start] Tello::Bind() FAILED -- command/state socket setup failed\n");
         m_tello.reset();
         return false;
     }
+    std::fprintf(stderr, "[start] Tello::Bind() OK\n");
     /* Enter SDK mode and start the video stream before anything flies. */
     if (!sendCmd("command", true)) { m_tello.reset(); return false; }
     sendCmd("streamon", true);
@@ -158,12 +180,15 @@ void TelloBackend::stateLoop() {
                 if (!m_gotFirstState.exchange(true, std::memory_order_relaxed))
                     std::fprintf(stderr, "[state] first valid GetState() parsed OK (line=\"%s\")\n", s->c_str());
                 consecutiveMisses = 0;
+                m_stateConsecutiveMisses.store(0, std::memory_order_relaxed);
             } else if (++unparsable == 1 || unparsable % kTelloStatePollHz == 0) {
                 std::fprintf(stderr, "[state] GetState() line failed to parse (#%u): \"%s\"\n", unparsable, s->c_str());
             }
-        } else if (++consecutiveMisses % kTelloStatePollHz == 0) {
-            std::fprintf(stderr, "[state] no GetState() response for %u polls (~%us) -- state socket may be dead\n",
-                         consecutiveMisses, consecutiveMisses / kTelloStatePollHz);
+        } else {
+            m_stateConsecutiveMisses.store(++consecutiveMisses, std::memory_order_relaxed);
+            if (consecutiveMisses % kTelloStatePollHz == 0)
+                std::fprintf(stderr, "[state] no GetState() response for %u polls (~%us) -- state socket may be dead\n",
+                             consecutiveMisses, consecutiveMisses / kTelloStatePollHz);
         }
         std::this_thread::sleep_for(period);
     }
@@ -172,14 +197,32 @@ void TelloBackend::stateLoop() {
 
 void TelloBackend::streamLoop() {
     const auto period = milliseconds(1000 / kTelloStreamRateHz);
+    u32 tick = 0;
     while (m_running.load(std::memory_order_relaxed)) {
         char buf[48];
-        std::snprintf(buf, sizeof(buf), "rc %d %d %d %d",
-                      m_rcA.load(std::memory_order_relaxed),
-                      m_rcB.load(std::memory_order_relaxed),
-                      m_rcC.load(std::memory_order_relaxed),
-                      m_rcD.load(std::memory_order_relaxed));
-        sendCmd(buf, false);   /* Tello does not ack `rc`. */
+        i32 a = m_rcA.load(std::memory_order_relaxed);
+        i32 b = m_rcB.load(std::memory_order_relaxed);
+        i32 c = m_rcC.load(std::memory_order_relaxed);
+        i32 d = m_rcD.load(std::memory_order_relaxed);
+        std::snprintf(buf, sizeof(buf), "rc %d %d %d %d", a, b, c, d);
+        bool ok = sendCmd(buf, false);   /* Tello does not ack `rc`. */
+        if (!ok) {
+            u32 streak = m_rcFailStreak.fetch_add(1, std::memory_order_relaxed) + 1;
+            /* Throttled: log the 1st failure immediately, then once/sec while it persists. */
+            if (streak == 1 || streak % kTelloStreamRateHz == 0)
+                std::fprintf(stderr, "[rc] SendCommand(\"%s\") failed x%u consecutive -- drone getting NO stick updates\n",
+                             buf, streak);
+        } else {
+            m_rcFailStreak.store(0, std::memory_order_relaxed);
+        }
+        /* ~1Hz heartbeat: cheap enough to always run, gives one line/sec correlating
+           what we're commanding against what the command+state sockets are doing. */
+        if (++tick % kTelloStreamRateHz == 0) {
+            std::fprintf(stderr, "[hb] rc(%d,%d,%d,%d) rcFailStreak=%u stateMisses=%u\n",
+                         a, b, c, d,
+                         m_rcFailStreak.load(std::memory_order_relaxed),
+                         m_stateConsecutiveMisses.load(std::memory_order_relaxed));
+        }
         std::this_thread::sleep_for(period);
     }
 }

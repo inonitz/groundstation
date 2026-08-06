@@ -125,7 +125,7 @@ int main() {
     if (!cap.isOpened())
         std::printf("[teleop] camera stream not open yet (continuing without video).\n");
 
-    u64 lastTelemetryUs = 0;
+    u64 lastTelemetryMs = 0;
     cv::Mat frame;
     while (g_running.load()) {
         if (cap.isOpened() && cap.read(frame) && !frame.empty()) {
@@ -133,15 +133,20 @@ int main() {
             if (cv::waitKey(1) == 27) g_running.store(false);   /* Esc in window too */
         }
 
-        /* Throttle telemetry to ~2 Hz so the console stays readable. */
+        /* Throttle to ~2 Hz. Fires whether or not telemetry is valid -- if it's
+           NOT valid, that's exactly the signal we need to see (state socket dead)
+           instead of the print silently never firing for the whole flight. */
         Odometry od = drone.odometry();
-        u64 now = od.host_stamp_us;
-        if (od.valid && now - lastTelemetryUs > 500000ULL) {
-            lastTelemetryUs = now;
-            std::printf("[tele] alt=%.2fm  vel(F,L,U)=(%.2f,%.2f,%.2f) m/s  yaw=%.1f deg  state=%d\n",
-                        od.pos.z, od.vel.x, od.vel.y, od.vel.z,
+        auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+        if (__scast(u64, nowMs) - lastTelemetryMs > 500ULL) {
+            lastTelemetryMs = __scast(u64, nowMs);
+            std::printf("[tele] valid=%d alt=%.2fm  vel(F,L,U)=(%.2f,%.2f,%.2f) m/s  yaw=%.1f deg  "
+                        "state=%d  cmd(fwd=%.2f lat=%.2f vert=%.2f yaw=%.2f)\n",
+                        __scast(int, od.valid), od.pos.z, od.vel.x, od.vel.y, od.vel.z,
                         od.yaw * 180.0f / __scast(f32, M_PI),
-                        __scast(int, drone.state()));
+                        __scast(int, drone.state()),
+                        teleop.fwd.load(), teleop.lat.load(), teleop.vert.load(), teleop.yaw.load());
         }
         if (!cap.isOpened())
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
