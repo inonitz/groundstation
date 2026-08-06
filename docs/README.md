@@ -21,8 +21,8 @@ Project documentation, organized by purpose.
   prompts, and git ledgers. The newest handoff is the live starting point; older ones are archive.
 - **`reference/`** — miscellaneous durable reference notes (e.g. hardware SDK notes).
 
-## The top-level `ARCHITECTURE.md`
+## `ARCHITECTURE.md`
 
-`../ARCHITECTURE.md` (repo root, alongside `README.md`) is the FMU architecture specification and
-remains the source of truth for the FMU's internal design. `ROADMAP.md` and `NOTES.md` track status
-and history; `ARCHITECTURE.md` tracks structure.
+[ARCHITECTURE.md](ARCHITECTURE.md) is the FMU architecture specification and the source of truth for
+the FMU's internal design. `ROADMAP.md` and `NOTES.md` track status and history; `ARCHITECTURE.md`
+tracks structure.

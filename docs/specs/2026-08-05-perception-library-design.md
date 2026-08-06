@@ -13,7 +13,7 @@
 ## 0. Where this fits (read this first)
 
 `groundstation` is an off-board **"VLM plans, deterministic math executes"** drone FMU
-(`source/llm_to_action/`, see [ARCHITECTURE.md](../../../ARCHITECTURE.md)). It already flies
+(`source/llm_to_action/`, see [ARCHITECTURE.md](../ARCHITECTURE.md)). It already flies
 end-to-end off a VLM in PX4 SITL: camera → VLM plan → deterministic ENU control loop → PX4. But
 the VLM today sees only a **raw JPEG** — there is **no structured perception**, so the drone can
 only do blind geometric moves (`takeoff/go/land`). It cannot find or approach an object, which is

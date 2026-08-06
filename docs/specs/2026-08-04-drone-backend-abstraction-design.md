@@ -18,7 +18,7 @@
 ## 0. Why this exists (link to the top-level objective)
 
 `groundstation` is an off-board **"VLM plans, deterministic math executes"** FMU
-([ARCHITECTURE.md](../../../ARCHITECTURE.md) §1). Two goals from that doc drive this slice:
+([ARCHITECTURE.md](../ARCHITECTURE.md) §1). Two goals from that doc drive this slice:
 
 - **Hardware-agnostic** (§1, §7, §8): "Tello primary, PX4 SITL fallback. One generic
   setpoint + one odometry abstraction." Today the FMU is welded to PX4 — it streams

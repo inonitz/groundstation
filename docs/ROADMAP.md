@@ -2,7 +2,7 @@
 
 Living, consolidated list of every goal for the project, recursively, with status. This is the
 single place the whole objective set lives; it was previously scattered across `NOTES.md`,
-`../ARCHITECTURE.md`, and the specs under `specs/`. Keep it updated as reality moves.
+`ARCHITECTURE.md`, and the specs under `specs/`. Keep it updated as reality moves.
 
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.

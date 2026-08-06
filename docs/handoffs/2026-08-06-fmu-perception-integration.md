@@ -100,6 +100,6 @@ downstream emergency boundary (block 6.1) must tolerate a stale-ish depth signal
 
 ## Durable pointers
 - `docs/ROADMAP.md` — objective tree + status + time estimate (the index).
-- `ARCHITECTURE.md` — FMU architecture spec (sections 6 perception prompt, 9 perception seam).
+- `../ARCHITECTURE.md` — FMU architecture spec (sections 6 perception prompt, 9 perception seam).
 - `docs/NOTES.md` — running dev log (SITL debugging, control-law iteration, decisions).
 - `docs/specs/` — durable design specs; `docs/plans/` — implementation plans.
