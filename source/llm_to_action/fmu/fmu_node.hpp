@@ -54,8 +54,7 @@ enum class CommandID : u8 {
     ORBIT    = 6,
     SEARCH   = 7,
     REASSESS = 8,
-    APPROACH = 9,   /* parsed + queueable (3.6); servo control law is block 5.1, not yet built --
-                       auto-completes via activateTask's default case, same as ORBIT/SEARCH today. */
+    APPROACH = 9,
     MAX_ID   = 10
 };
 
@@ -291,12 +290,9 @@ private:
             msg->width, msg->height, msg->encoding.c_str(), (unsigned long)c);
     }
 
-    /* ---- 20Hz control + deterministic completion ------------------------- */
-    /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.   */
-    /* Frame is canonical ENU (East, North, Up+); backend converts NED at wire. */
-    /* Perpendicular component of measVel relative to forwardUnit (assumed unit length).
-       Subtracting a fraction of this from the commanded ENU velocity damps the pursuit-arc
-       residual left after switching to a measured (not dead-reckoned) bearing (spec §9 R1). */
+    /* ---- APPROACH helpers ------------------------------------------------- */
+    /* Perpendicular component of measVel relative to forwardUnit (assumed unit length);
+       damps the pursuit-arc residual left after switching to a measured bearing (spec §9 R1). */
     static Vec3 lateralComponent(Vec3 measVel, Vec3 forwardUnit) {
         f32 along = measVel.x * forwardUnit.x + measVel.y * forwardUnit.y + measVel.z * forwardUnit.z;
         return { measVel.x - along * forwardUnit.x,
@@ -357,6 +353,9 @@ private:
         m_perception->injectSynthetic(synth);
     }
 
+    /* ---- 20Hz control + deterministic completion ------------------------- */
+    /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.
+       Frame is canonical ENU (East, North, Up+); backend converts NED at wire. */
     void controlLoop() {
         Odometry    od;
         f32         n, e, d, dx, dy, dz, dist, sp, vN, vE, vD;
