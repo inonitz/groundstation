@@ -38,9 +38,37 @@ Do NOT touch the vision lib internals (that lane is done) or start APPROACH/visu
 shared build` (PX4 backend is the hardcoded default). Commit style: ASCII only, topics separated
 by " | ", no arrows, end with the Co-Authored-By trailer. Update docs/ROADMAP.md statuses and
 docs/NOTES.md as you go.
+
+Secondary, time-boxed (only once 4.2 is underway, or while builds run -- must NOT derail 4.2 or
+add scope): read https://github.com/pratikPhadte/LLM-controlled-drone and write a short note in
+docs/NOTES.md covering (a) its architecture, (b) how it differs from / resembles ours, (c) any
+idea cheap to borrow, (d) what it suggests we could SIMPLIFY -- now or deferred until the system
+already works and is tested. Idea-harvest + simplification note, NOT a redesign. We must stay
+finishable in ~2 days.
 ```
 
 ---
+
+## Bonus investigation -- comparison repo (time-boxed, anti-scope-creep)
+
+Repo: **https://github.com/pratikPhadte/LLM-controlled-drone**
+
+This is SECONDARY to block 4.2 and must not derail it or grow scope. Do it only once 4.2 is
+underway, or opportunistically while builds/SITL run. Deliverable is a short `docs/NOTES.md`
+entry (prose, no code changes this pass):
+
+1. **Their architecture** -- how the repo is structured; how the LLM drives the drone; what
+   runs off-board vs on-board; perception, planning, and control split.
+2. **Diff / resemblance to ours** -- where it lines up with our "VLM plans, deterministic math
+   executes" FMU, and where it takes a fundamentally different path.
+3. **Cheap-to-borrow ideas** -- anything we could adopt with low effort and clear payoff.
+4. **Greener-grass simplification check** -- if we resented our current plan and eyed theirs,
+   what would we SIMPLIFY in our own design? Split into (a) simplify NOW (safe, reduces work
+   toward the 2-day finish) and (b) simplify LATER, only after the system works and is tested.
+
+**Guardrail:** the point is to harvest ideas and prune scope, NOT to start a redesign. If a
+"good idea" would add work or risk the 2-day finish, log it under (b) LATER and move on. Nothing
+here outranks landing 4.2.
 
 ## Where the project is right now (committed)
 
