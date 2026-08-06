@@ -3,7 +3,7 @@
     Pure frame-conversion math. NO ROS, NO px4_msgs — depends only on Vec3 and
     <cmath>, so it is unit-testable with a standalone g++ (see test/frame_convert_test.cpp).
 
-    Canonical world frame across the DroneBackend seam is ENU (East, North, Up+);
+    Canonical world frame across the backend interface is the ENU convention (East, North, Up+);
     PX4 speaks NED (North, East, Down+) on the wire. Body-relative VLM commands are
     FLU (Forward, Left, Up+). Every conversion below is a NAMED function so call
     sites document intent instead of carrying bare sign flips.

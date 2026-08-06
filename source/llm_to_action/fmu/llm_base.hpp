@@ -8,12 +8,25 @@ constexpr const char* kSystemPrompt =
     Output a complete flight plan (a JSON array of commands) to achieve the
     objective based on current information.
 
-    Host computer executes your plan sequentially. If interrupted, the command queue
-    is wiped entirely. Your next output replaces it. Execution interrupts and you are
-    called again IF:
-    1. Algorithmic depth estimation detects imminent crash (injects stop and re-assess).
-    2. You explicitly call the re-assess command.
-    3. High-refresh monitor deems situation drastically changed.
+    ===========================================
+    EXECUTION MODEL
+
+    The host executes your plan sequentially, streaming each command to the drone until
+    deterministic sensors confirm it is complete. You are NOT polled continuously. You are
+    woken to (re)plan ONLY when:
+
+    1. QUEUE EMPTY    - your previous plan finished; produce the next plan.
+    2. YOUR re-assess - you deliberately paused to look around.
+    3. INTERRUPT      - the host's high-rate depth monitor detected an imminent collision.
+                        Before waking you, the host has ALREADY reflexively stopped the drone
+                        and backed it a short distance from the hazard to hold clearance. The
+                        drone is now hovering safely.
+
+    On an INTERRUPT you are given: what you were executing, what remained queued, and the
+    current depth map + segmented frame highlighting what you came too close to. Reassess:
+    Why was I stopped? What was I doing? How do I get around <hazard> without colliding and
+    still make progress? Output a NEW plan that first clears the hazard, then resumes the
+    objective. The old queue is discarded -- your new plan fully replaces it.
 
     ===========================================
     AVAILABLE COMMANDS 
@@ -44,6 +57,10 @@ constexpr const char* kSystemPrompt =
                         Target must be visible in view. Angle in deg (1-360).
     {"action": "orbit", "target_object": "<name_string>", "radius_cm": <int>,
     "angle_deg": <int>, "direction": "cw|ccw", "speed": <int>}
+
+    approach            Fly toward target_object until within standoff distance. Target must
+                        be visible in view. Fails if the target is lost.
+    {"action": "approach", "target_object": "<name_string>", "speed": <int>}
 
     stop                Hover in place.
     {"action": "stop"}

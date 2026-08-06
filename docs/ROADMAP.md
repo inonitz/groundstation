@@ -7,7 +7,7 @@ single place the whole objective set lives; it was previously scattered across `
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.
 
-Last synced: 2026-08-06 (after the GenericBackend seam build-verify + the build_yolo perception
+Last synced: 2026-08-06 (after the GenericBackend interface build-verify + the build_yolo perception
 benchmark results landed).
 
 ---
@@ -28,13 +28,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        1.1.6 ORBIT (target-anchored)                             [ ]  [GATE perception]
        1.1.7 SEARCH (2D circle)                                  [ ]  [GATE perception]
        1.1.8 CURVE                                               [dropped for POC]
-   1.2 ENU seam (Task 4)                                         [x]  operator SITL re-gate [ ] (human)
+   1.2 ENU convention (Task 4)                                   [x]  operator SITL re-gate [ ] (human)
    1.3 Offboard streaming ~100 Hz (collapsed into backend)       [x]
    1.4 SPSC task queue (moodycamel) + backpressure               [~]  backpressure path unverified
    1.5 Interrupt + reflexive hold-clearance (ARCH 5.1)           [ ]  [GATE depth]
 
 2. Backend abstraction                                           [x]
-   2.1 GenericBackend CRTP seam (builds both backends)           [x]
+   2.1 GenericBackend interface (CRTP, builds both backends)     [x]
    2.2 PX4Backend (flies in SITL)                                [x]
    2.3 TelloBackend                                              [~]  built + unit-tested
        2.3.1 stick to m/s calibration (real hardware)            [ ]  (human, hardware-bound)
@@ -47,12 +47,12 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    3.1 Event-driven wake (queue-empty / reassess)                [x]
    3.2 Async off the control thread + single-flight guard        [x]
    3.3 Tolerant plan extraction (extractJsonArray)               [x]
-   3.4 Dynamic prompt (state + history + perception JSON)        [~]  perception JSON still a stub
+   3.4 Dynamic prompt (state + history + perception JSON)        [x]  fed by PerceptionRuntime (4.2)
    3.5 Context budget FORK-A (-c 4096, max_tokens 512)           [x]
-   3.6 System-prompt: APPROACH entry + interrupt text            [ ]
+   3.6 System-prompt: APPROACH entry + interrupt text            [x]
    3.7 Multi-takeoff / VLM-signalled mission end                 [DEFER]  (POC: LAND = end)
 
-4. Perception                                                    [~]  two lanes
+4. Perception                                                    [~]  vision lib done + FMU-integrated; APPROACH (5) next
    4.1 Vision lib (/root/build_yolo, vision/)                    [~]  mostly built
        4.1.1 YoloSegEngine (wraps yolos::seg)                    [x]
        4.1.2 YoloDepthEngine (wraps yolos::depth)                [x]
@@ -67,14 +67,16 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              4.1.8a decouple depth onto its own slower loop      [ ]  accepted interim fix
              4.1.8b depth backbone swap decision                 [DEFER]  only after real-world obs
              4.1.8c re-measure on AVX2 laptop (cannot rely on)   [ ]
-   4.2 FMU-side integration (contract now known)                 [ ]
-       4.2.1 vendor/link vision lib (CPM, like sttserv)          [ ]
-       4.2.2 perception thread(s): seg loop + DECOUPLED depth    [ ]
-       4.2.3 atomic PerceptionSnapshot to prompt JSON            [ ]
+   4.2 FMU-side integration (PerceptionRuntime)                  [x]
+       4.2.1 vendor/link vision lib (CPM, like sttserv)          [x]
+       4.2.2 perception thread(s): seg loop + DECOUPLED depth    [x]
+       4.2.3 atomic PerceptionSnapshot to prompt JSON            [x]
              (label / bbox / median_depth_cm per ARCH 6)
-       4.2.4 drop FMU stub TargetDetection (fmu_node.hpp:168);   [ ]
+       4.2.4 drop FMU stub TargetDetection (fmu_node.hpp:168);   [x]
              name-clashes with the vision lib's global type
-       4.2.5 thread / affinity budget vs the 20 Hz loop          [ ]
+       4.2.5 thread / affinity budget vs the 20 Hz loop          [x]
+             (kVisionSegThreads/kVisionDepthThreads ORT intra-op cap)
+             Human follow-up open: build verify + SITL smoke test (not run by this session).
 
 5. Visual servoing (the navigation pivot)                        [ ]  [GATE perception]
    5.1 APPROACH <label>  (spec: specs/2026-08-05-visual-servoing-approach-design.md) [ ]
@@ -87,7 +89,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 
 6. Safety / failsafe (designed, unimplemented)                   [ ]
    6.1 Emergency boundary (velocity-scaled trigger distance)     [ ]  [GATE depth]
-   6.2 Battery / failsafe supervisor + user override (ARCH 11)   [ ]  needs battery field in seam
+   6.2 Battery / failsafe supervisor + user override (ARCH 11)   [ ]  needs battery field in the backend interface
    6.3 Interrupt hysteresis + max-retries then land/abort        [ ]
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
@@ -158,7 +160,7 @@ hardware iteration, model retraining. Those are flagged.
 | 5.2 live-YOLO GO | 0.5-1 d | shares APPROACH substrate |
 | 5.3 safe-landing servo | ~0.5 d | downstream of 5.1/5.2 |
 | 1.1.6/1.1.7 ORBIT + SEARCH | ~1 d | + SITL tuning |
-| 6 safety/failsafe (6.1-6.3) | 1-2 d | needs battery in seam; **SITL tuning** of constants |
+| 6 safety/failsafe (6.1-6.3) | 1-2 d | needs battery in the backend interface; **SITL tuning** of constants |
 | 3.6 prompt refinements | ~0.5 d | |
 | 2.3 Tello hardware bring-up | 1-2 d code | **hardware-bound**: real flights, calibration, you-in-loop |
 | 4.1.8 depth speed (decouple now / swap later) | 0.5 d now | backbone swap is its own multi-day research if taken |

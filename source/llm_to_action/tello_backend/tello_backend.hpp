@@ -5,7 +5,7 @@
     Owns EVERYTHING platform-specific: the ctello command/state client, the state
     poll thread, and the ~20Hz `rc` stream thread. A caller drives it through the
     same semantic verbs as PX4Backend (takeoff/land/set_velocity/disarm/odometry/
-    state) so the two are interchangeable at the seam. It never speaks the Tello
+    state) so the two are interchangeable at the backend interface. It never speaks the Tello
     SDK strings to the outside world.
 
     ROS-free by construction: no rclcpp, no ROS timers. Its own std::thread loops
@@ -42,7 +42,7 @@ public:
     TelloBackend(const TelloBackend&)            = delete;
     TelloBackend& operator=(const TelloBackend&) = delete;
 
-    /* ---- seam impls (invoked through GenericBackend<TelloBackend>) ---------
+    /* ---- backend-interface impls (invoked through GenericBackend<TelloBackend>) ----
        Bind the SDK, enter command mode + streamon, launch state/stream threads.
        Returns false if the initial bind/handshake fails. */
     bool start_impl();
@@ -59,7 +59,7 @@ public:
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
 
-    /* ---- backend-specific (off-seam) --------------------------------------
+    /* ---- backend-specific (not part of the backend interface) --------------
        Teleop-direct: body FLU velocity (m/s) + yaw rate (rad/s, CCW+); no
        dependence on the drifting yaw estimate. W = +forward. */
     void          set_body_velocity(Vec3 flu, f32 yawspeed);

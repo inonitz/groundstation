@@ -24,6 +24,7 @@
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
+#include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 
 
 /* Shared-scalar access order (matches the proven baseline). */
@@ -52,6 +53,8 @@ enum class CommandID : u8 {
     ORBIT    = 6,
     SEARCH   = 7,
     REASSESS = 8,
+    APPROACH = 9,   /* parsed + queueable (3.6); servo control law is block 5.1, not yet built --
+                       auto-completes via activateTask's default case, same as ORBIT/SEARCH today. */
     MAX_ID   = 10
 };
 
@@ -102,6 +105,14 @@ struct CmdReassess {
     FixedStringType reason{"\0"};
 };
 
+/* Command definition only (ROADMAP 3.6 / spec 2026-08-05-visual-servoing-approach-design.md §4c).
+   No control-law branch yet -- that is block 5.1 (detectionByLabel + the yaw-center/range-decel
+   servo). Until then this auto-completes via activateTask's default case, same as ORBIT/SEARCH. */
+struct CmdApproach {
+    FixedStringType target{"\0"};
+    f32             speed{0.0f};
+};
+
 struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     union {
         struct alignpk(CACHE_LINE_BYTES) {
@@ -122,6 +133,7 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
                 CmdOrbit    m_orbitTarget;
                 CmdSearch   m_SearchTarget;
                 CmdReassess m_Reassess;
+                CmdApproach m_approach;
             };
         } m_extractCmd;
     };
@@ -149,6 +161,9 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     GenericCommand(CmdReassess const& cmd) : m_rawBytes{__scast(u8, CommandID::REASSESS), {0}, {0}} {
         memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdReassess));
     }
+    GenericCommand(CmdApproach const& cmd) : m_rawBytes{__scast(u8, CommandID::APPROACH), {0}, {0}} {
+        memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdApproach));
+    }
 
     /* Defaulted -> trivially copyable -> the queue keeps the fast POD path. */
     GenericCommand& operator=(GenericCommand const& other) = default;
@@ -164,13 +179,9 @@ struct ActiveTask {
     LargeFixedStringType m_thought = "\0";
 };
 
-/* Perception + telemetry are STUBBED for Phase 1 (no real YOLO yet). */
-struct TargetDetection {
-    FixedStringType label{"\0"};
-    i32             bbox_xmin{0}, bbox_ymin{0}, bbox_xmax{0}, bbox_ymax{0};
-    f32             median_depth_cm{0.0f};
-};
-
+/* TargetDetection / PerceptionSnapshot now come from the vision lib (global
+   namespace, vision/perception_types.hpp via perception_runtime.hpp) --
+   telemetry stays the only stub left here. */
 struct VehicleTelemetry {
     f32 altitude_cm{0.0f};
     f32 vx_cm_s{0.0f}, vy_cm_s{0.0f}, vz_cm_s{0.0f};
@@ -206,6 +217,17 @@ public:
         m_backend = make_active_backend(this, m_cbGroup);
         m_backend->start();
 
+        /* Two-rate perception (ARCH sec 9): PerceptionRuntime owns its own seg/depth
+           threads and publishes an atomic PerceptionSnapshot; buildDynamicPrompt()
+           reads it. Thread counts are capped (fmu_node_base.hpp) so ORT cannot starve
+           this control loop. */
+        m_perception = std::make_unique<PerceptionRuntime>(
+            kVisionSegModelPath, kVisionDepthModelPath,
+            kVisionSegThreads, kVisionDepthThreads,
+            kVisionSegLoopMs, kVisionDepthLoopMs,
+            [this]() { return std::atomic_load(&m_currImg); });
+        m_perception->start();
+
         m_controlTimer = this->create_wall_timer(
             std::chrono::milliseconds{kControlLoopPeriodMs},
             std::bind(&FlightManagementUnitNode::controlLoop, this), m_cbGroup);
@@ -224,6 +246,7 @@ public:
     ~FlightManagementUnitNode() override {
         m_missionActive.store(false, std::memory_order_release);
         if (m_planFuture.valid()) m_planFuture.wait();  /* no VLM call touching a dead client. */
+        m_perception->stop();
         m_vlmClient.destroy();
     }
 
@@ -525,6 +548,26 @@ private:
             "[VEHICLE STATE]\nalt_up_m=%.2f speed_mps=%.2f\n\n",
             od.pos.z, std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y));
         prompt += buf;
+
+        /* Perception JSON (ARCH sec 6): label/bbox/median_depth from the latest
+           PerceptionSnapshot. median_depth_cm can lag bbox by up to one depth
+           cycle (PerceptionRuntime is two-rate) -- closes ROADMAP 3.4. */
+        prompt += "[PERCEPTION]\n";
+        std::shared_ptr<PerceptionSnapshot> snap = m_perception->snapshot();
+        if (snap && snap->valid && snap->count > 0) {
+            for (u32 t = 0; t < snap->count; ++t) {
+                const TargetDetection& det = snap->dets[t];
+                snprintf(buf, sizeof(buf),
+                    "{\"label\":\"%s\", \"bbox\":[%d,%d,%d,%d], \"confidence\":%.2f, \"median_depth_cm\":%.1f}\n",
+                    det.label, det.bbox_xmin, det.bbox_ymin, det.bbox_xmax, det.bbox_ymax,
+                    det.confidence, det.median_depth_cm);
+                prompt += buf;
+            }
+        } else {
+            prompt += "(no detections)\n";
+        }
+        prompt += "\n";
+
         prompt += "[EXECUTED COMMAND HISTORY]\n";
         for (i = 0; i < m_chat.m_completedTasks.size(); ++i) {
             snprintf(buf, sizeof(buf), "{\"status\":\"%s\", \"thought\":\"%s\", \"id\":%d}\n",
@@ -591,6 +634,7 @@ private:
         GenericCommand cmd;
         ActiveTask     task;
         CmdGo          go;
+        CmdApproach    approach;
 
         arr  = extractJsonArray(flightPlan);  /* strip ```json fences / prose from the VLM. */
         plan = nlohmann::json::parse(arr, nullptr, false);
@@ -614,8 +658,16 @@ private:
                 go  = { item.value("x", 0.0f), item.value("y", 0.0f),
                         item.value("z", 0.0f), item.value("speed", 0.0f) };
                 cmd = GenericCommand(go);
+            } else if (action == "approach") {
+                approach = CmdApproach{};
+                strncpy(approach.target, item.value("target_object", "").c_str(),
+                    sizeof(approach.target) - 1);
+                approach.speed = item.value("speed", 0.0f);
+                cmd = GenericCommand(approach);
+                /* Queueable now (3.6); no control-law branch yet -- auto-completes like
+                   ORBIT/SEARCH until block 5.1 lands the real servo. */
             } else {
-                continue; /* Phase 1: only takeoff/land/stop/go executed. */
+                continue; /* Phase 1: only takeoff/land/stop/go/approach executed. */
             }
 
             task = ActiveTask{};
@@ -691,7 +743,7 @@ private:
     khUDPCamMsgType                                 m_currImg;
     HistoryBuffer                                   m_chat;
     VehicleTelemetry                                m_telemetry;
-    std::vector<TargetDetection>                    m_targets;
+    std::unique_ptr<PerceptionRuntime>               m_perception;
 
     std::atomic<FlightState>  m_flightState{FlightState::STANDBY};
     std::atomic<bool>         m_missionActive{false};

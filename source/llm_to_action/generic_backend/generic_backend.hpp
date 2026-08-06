@@ -1,12 +1,12 @@
 #pragma once
 /*
-    GenericBackend<Derived> -- the CRTP seam every concrete drone backend derives
+    GenericBackend<Derived> -- the backend interface every concrete drone backend derives
     from. It is the "template header to populate" when adding a new flight system:
     give the derived class the nine *_impl methods below and it plugs into the FMU
     unchanged.
 
     No virtual, no vtable: dispatch is static, resolved at compile time and
-    force-inlined, so the seam costs nothing over calling the concrete method
+    force-inlined, so the interface costs nothing over calling the concrete method
     directly. Callers keep the plain verb names (start/takeoff/set_velocity/...);
     each backend implements the matching *_impl. A backend missing an *_impl fails
     to compile at the forwarder line -- a clear contract error, not template spew.

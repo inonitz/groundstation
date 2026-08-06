@@ -51,3 +51,16 @@ constexpr u64 kPlanCooldownUs = static_cast<u64>(kPlanCooldownMs) * 1000ULL;
    drone while still preferring a vision-grounded plan when one is available. */
 constexpr u32 kVisionWarmupMs = 25000;   /* first camera frame lands ~15s after FMU start (DDS+gst+keyframe); wait past that. Once a frame arrives the plan fires immediately -- this is only the dead-camera fallback ceiling. */
 constexpr u64 kVisionWarmupUs = static_cast<u64>(kVisionWarmupMs) * 1000ULL;
+
+/* ---- Perception (vision lib) integration ----------------------------------
+   Two-rate by design (docs/ROADMAP.md 4.1.8): depth measures ~3x over its
+   real-time target on this class of CPU while segmentation meets its target,
+   so PerceptionRuntime runs them as two independently-paced loops rather
+   than one blocking call. Thread counts are capped so ORT cannot starve the
+   20Hz control loop / other llm_to_action nodes sharing this process. */
+constexpr const char* kVisionSegModelPath   = "/root/models/vision/yolo26n-seg.onnx";
+constexpr const char* kVisionDepthModelPath = "/root/models/vision/yolo26n-depth.onnx";
+constexpr int kVisionSegThreads   = 2;
+constexpr int kVisionDepthThreads = 2;
+constexpr u32 kVisionSegLoopMs    = 33;   /* ~30 Hz target; measured: meets it. */
+constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40Hz refresh. */

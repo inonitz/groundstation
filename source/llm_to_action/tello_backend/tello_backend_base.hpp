@@ -3,7 +3,7 @@
     TelloBackend I/O contract -- the SINGLE source of truth for everything
     Tello-specific: SDK ports, the stream rate, the on-wire state schema, the
     velocity<->stick mapping, and the platform-neutral verb result / telemetry
-    shapes shared with the FMU seam.
+    shapes shared with the FMU's backend interface.
 
     Mirrors px4_backend_base.hpp's role for PX4: nothing Tello-specific should be
     hardcoded inside tello_backend.cpp; it all lives here so a reviewer retargets
@@ -13,7 +13,7 @@
     the parser and the frame/stick math stay unit-testable in isolation
     (see test/tello_convert_test.cpp).
 
-    Frame: canonical world frame across the DroneBackend seam is ENU (East, North,
+    Frame: canonical world frame across the backend interface is the ENU convention (East, North,
     Up+). Tello's `rc a b c d` is body FLU-ish (right, forward, up, yaw-CW). The
     ENU->FLU conversion is the single edge; see enu_to_flu in frame_convert.hpp.
 */
@@ -115,7 +115,7 @@ static inline bool parse_tello_state_branchless(const char* buffer, TelloState& 
 }
 
 
-/* ---- Platform-neutral seam types --------------------------------------------
+/* ---- Platform-neutral backend-interface types ---------------------------------
    BackendStatus / IOState / Odometry are defined once in
    generic_backend_types.hpp (included above) and shared with every backend.
    Tello uses the IOState subset {STANDBY, FLIGHT, FAULT} and leaves

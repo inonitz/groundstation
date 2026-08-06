@@ -9,7 +9,7 @@
 # Cross-folder sources are referenced through ${LLM_TO_ACTION_DIR}.
 # ---------------------------------------------------------------------------
 
-# Backend-agnostic FMU sources (the seam headers + the node itself).
+# Backend-agnostic FMU sources (the backend-interface headers + the node itself).
 set(FLIGHT_MANAGEMENT_UNIT_COMMON_SOURCES
     ${LLM_TO_ACTION_DIR}/frame/frame_convert.hpp
     ${LLM_TO_ACTION_DIR}/generic_backend/generic_backend_types.hpp
@@ -18,6 +18,7 @@ set(FLIGHT_MANAGEMENT_UNIT_COMMON_SOURCES
     fmu_node_base.hpp
     fmu_node.cpp
     fmu_node.hpp
+    perception_runtime.hpp
     llm_base.hpp
     llamaclient.cpp
     llamaclient.hpp
@@ -57,6 +58,7 @@ foreach(backend_name IN LISTS FMU_SELECTED_BACKENDS)
        opencv_highgui
        httplib::httplib
        sensor_msgs::sensor_msgs
+       Perception::vision
        $<$<STREQUAL:${backend_name},px4>:Drone::px4_backend>
        $<$<STREQUAL:${backend_name},tello>:Drone::tello_backend>
    )

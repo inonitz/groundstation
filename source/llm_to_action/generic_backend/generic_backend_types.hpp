@@ -1,7 +1,7 @@
 #pragma once
 /*
-    Generic backend seam types -- the SINGLE definition of the platform-neutral
-    shapes every drone backend exposes across the FMU seam. Previously these were
+    Generic backend-interface types -- the SINGLE definition of the platform-neutral
+    shapes every drone backend exposes across the backend interface. Previously these were
     duplicated in px4_backend.hpp and tello_backend_base.hpp and had already
     drifted apart (IOState 4- vs 3-valued; Odometry with/without yawrate). Both
     concrete backends now include this file so there is exactly one definition.
@@ -10,7 +10,7 @@
     PX4's HANDSHAKING (Tello simply never emits it), and Odometry carries PX4's
     yawrate (Tello leaves it 0).
 
-    Frame: canonical world frame across the seam is ENU (East, North, Up+).
+    Frame: canonical world frame across the backend interface is the ENU convention (East, North, Up+).
 */
 #include <util2/C/base_type.h>
 #include "frame/frame_convert.hpp"   /* Vec3 */

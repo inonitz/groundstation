@@ -1,7 +1,7 @@
 # Groundstation — FMU Architecture Specification
 
 > **Status:** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
-> (20 Hz control loop, odometry, event-driven VLM, ENU seam, GenericBackend seam, canned test
+> (20 Hz control loop, odometry, event-driven VLM, ENU convention, GenericBackend interface, canned test
 > rigs). `NOTES.md` is the running change log. Sections below are annotated where reality has
 > moved past the original plan; the remaining gap is perception integration + the APPROACH
 > servo + the emergency/failsafe supervisor (§15).
@@ -16,7 +16,7 @@
 
 > **Update:** since this spec was written the FMU was implemented and several forks closed.
 > FORK-A tuned (`-c 4096`, client `max_tokens 512`); FORK-B realized as the GenericBackend
-> `Odometry` ENU seam; FORK-C collapsed into the concrete backends (no separate offboard node).
+> `Odometry` ENU convention; FORK-C collapsed into the concrete backends (no separate offboard node).
 > The bullets below keep the original reasoning for history.
 
 - **[FORK-A] VLM context — TUNED.** Strategy confirmed: manual context, zero-shot
@@ -24,7 +24,7 @@
   one shot:** `kSystemPrompt` alone ≈ 1.2–1.6k tokens, + image (~256–1024) + output.
   Resolution → raise `-c` to ~4096 (VRAM permitting, measure) **and/or** compress hard
   (trim system prompt ~60–70%, downscale image, 1–2 line history summary, small output cap).
-- **[FORK-B] Odometry — RESOLVED (seam abstraction realized).** Consume `px4_msgs/VehicleOdometry` (NED) **directly**
+- **[FORK-B] Odometry — RESOLVED (backend interface realized).** Consume `px4_msgs/VehicleOdometry` (NED) **directly**
   for sim. **⚠ MUST be migrated to a cross-hardware odometry abstraction** — the Tello does
   not publish `VehicleOdometry`; its driver dead-reckons `nav_msgs/Odometry` (§8).
 - **[FORK-C] Offboard collapse — RESOLVED.** (a) Phase 1 reuses the existing
@@ -88,8 +88,8 @@ The FMU owns the flight **state machine** (STANDBY/TAKEOFF/FLIGHT/LANDING); the 
 
 **20 Hz streaming contract:** active task → setpoint; queue empty → Hover. Never send once.
 
-> **Frame (realized):** completion predicates + setpoints are evaluated in the canonical **ENU**
-> seam frame (Task 4 done): TAKEOFF climbs to `+kTakeoffTargetAltEnu`, LAND descends to
+> **Frame (realized):** completion predicates + setpoints are evaluated under the canonical
+> **ENU convention** (Task 4 done): TAKEOFF climbs to `+kTakeoffTargetAltEnu`, LAND descends to
 > `≤ kGroundContactEnu`, GO uses `flu_to_enu(relFlu, yaw)`. NED exists only on the PX4 wire.
 
 ---
@@ -127,7 +127,7 @@ Sections: system config · FLU coordinate frame · mission objective · vehicle 
 
 > **STATUS (realized):** collapsed. The translation this section specced now lives inside the
 > concrete backend (`PX4Backend` → PX4 wire; `TelloBackend` → `rc`/`go`), selected at compile
-> time via the `GenericBackend` seam. No separate offboard node/process; the FMU owns the flight
+> time via the `GenericBackend` interface. No separate offboard node/process; the FMU owns the flight
 > state machine and calls `backend->set_velocity(...)` in the canonical ENU frame.
 
 **Target (points 3 & 5):** the offboard controller is a **dumb `OffboardTranslator` struct**
@@ -146,8 +146,9 @@ a **~100 Hz publisher thread inside the FMU process**. No separate ROS node/proc
 
 ## 8. Odometry & Position Estimation
 
-> **STATUS (realized):** the seam `Odometry{pos,vel,yaw,yawrate,valid}` (ENU) is the FORK-B
-> abstraction. ENU is canonical across the seam; NED exists only on the PX4 wire, converted at
+> **STATUS (realized):** the backend interface's `Odometry{pos,vel,yaw,yawrate,valid}` (ENU) is
+> the FORK-B abstraction. ENU is the canonical convention across it; NED exists only on the PX4
+> wire, converted at
 > two isolated points in `px4_backend.cpp`. The Tello Simpson-rule integration remains open.
 
 **FORK-B: direct `px4_msgs/VehicleOdometry` (NED) for sim; ⚠ MUST migrate to a cross-hardware
@@ -163,27 +164,35 @@ odometry abstraction.** FMU stores X/Y/Z + yaw in `std::atomic`, `SensorDataQoS`
 
 ---
 
-## 9. Perception Ingestion (engine seam)
+## 9. Perception Ingestion (vision engine interface)
 
-FMU designed against two concrete, stubbed engine structs; real models drop in with zero FMU
-changes.
+> **STATUS (realized):** `PerceptionRuntime` (`fmu/perception_runtime.hpp`) owns the two
+> concrete engines below and publishes an atomic `PerceptionSnapshot` `buildDynamicPrompt()`
+> reads (§6). Block 4.2 (ROADMAP) closed this out; block 5 (APPROACH) is next, gated on it.
+
+Concrete engines (not virtual), from the vendored `Perception::vision` library
+(`safe_cpm_add_package`, `nurmilkov/BUILD_YOLO` `feature-vision-api`, top-level `CMakeLists.txt`):
 
 ```cpp
-struct YoloDetectionEngine { size_t detect(const cv::Mat&, TargetDetection*, size_t); }; // Model-S 25Hz
-struct YoloDepthEngine     { void   estimate(const cv::Mat&, DepthResult&); };            // Model-D 30Hz+
+vision::YoloSegEngine   { bool ok(); std::vector<SegDetection> segment(cv::Mat, conf, iou); };  // ~30Hz
+vision::YoloDepthEngine { bool ok(); cv::Mat estimate(cv::Mat); };                               // ~13Hz measured
 ```
-- Concrete structs (not virtual). **Atomic perception snapshot:** fuse Model-S + Model-D for
-  the **same frame** (align via header PTS from `rx_node`) → coherent perception.
-- **Reuse, don't rewrite (`BUILD_YOLO`):** adapt the **`modular-vision-api`** branch
-  (`ObjectDetector` + `DepthEstimator`/`midas_small_engine` + `vision_fusion` + `VisionResult`
-  — already the seam architecture) behind these structs. **Shelve `ggml-depth-experiment`**
-  (unfinished YOLO26-depth→GGUF metric spike, validated only to layer 0–1) as the future
-  metric-depth track.
+- **Two-rate, decoupled loops, not one fused call.** `PerceptionRuntime` runs a fast
+  segmentation loop (near the seg engine's ~30Hz ceiling) and a slower, independent depth loop
+  (measured ~75ms/frame vs a 40Hz/25ms target — see ROADMAP 4.1.8) as two `std::thread`s. It
+  calls `segment()`/`estimate()` directly rather than the library's `vision::fuse()` helper,
+  which runs both models back-to-back in one blocking call and would collapse the two rates back
+  into one. Each seg tick re-samples median depth over the freshest bbox against whatever depth
+  map the depth loop last produced — median_depth_cm can therefore lag bbox by up to one depth
+  cycle. §10's emergency boundary must tolerate that staleness (ROADMAP 4.1.8a).
+- **Atomic perception snapshot:** published via the same atomic-`shared_ptr` idiom the FMU
+  already uses for `m_currImg` (`std::atomic_load`/`store`), not a mutex.
 - **POC depth = YOLO26n METRIC depth (SUPERSEDES MiDaS Small relative).** The perception-library
-  design (`specs/2026-08-05-perception-library-design.md`) selects YOLO26n metric
-  depth; the earlier MiDaS-relative plan is dropped. With metric cm available, §10's emergency
-  boundary can use absolute distance directly (relative-depth time-to-contact no longer required).
-  The engine seam is real, built in the standalone `/root/build_yolo` repo, pending FMU integration.
+  design (`specs/2026-08-05-perception-library-design.md`) selects YOLO26n metric depth. With
+  metric cm available, §10's emergency boundary can use absolute distance directly
+  (relative-depth time-to-contact is not needed).
+- Thread counts (`kVisionSegThreads`/`kVisionDepthThreads`, `fmu_node_base.hpp`) cap ORT
+  intra-op parallelism so perception cannot starve the 20Hz control loop.
 
 ---
 
@@ -226,7 +235,7 @@ time-to-contact / looming threshold until metric depth exists.
 | 7 | Odometry: direct `VehicleOdometry` (sim) — **migrate to cross-hw abstraction** (FORK-B). |
 | 8 | Velocity-scaled emergency boundary, `a_max` per-drone (§10). |
 | 9 | Battery/failsafe + user override (§11). |
-| 10 | Perception: **refactor `BUILD_YOLO` modular-vision-api behind the seam**; shelve ggml-depth-experiment; POC depth = MiDaS relative (§9). |
+| 10 | Perception: **refactor `BUILD_YOLO` modular-vision-api behind the perception contract**; shelve ggml-depth-experiment; POC depth = MiDaS relative (§9). |
 
 ---
 
@@ -257,7 +266,7 @@ time-to-contact / looming threshold until metric depth exists.
   the control chain without the VLM first (recommended first bring-up).
 - Battery/failsafe supervisor. Perception **stubbed**; emergency path **disabled**.
 
-**Phase 2:** refactor BUILD_YOLO modular-vision-api behind the seam (MiDaS relative), snapshot
+**Phase 2:** refactor BUILD_YOLO modular-vision-api behind the perception contract (MiDaS relative), snapshot
 fusion, relative-depth emergency + interrupt/reassess, ORBIT/SEARCH controllers, Tello backend +
 Simpson odom, offboard collapse (if not done), context/prompt final form.
 
@@ -267,8 +276,8 @@ Simpson odom, offboard collapse (if not done), context/prompt final form.
 
 The committed FMU now implements the core of this spec: the 20 Hz control loop with GO
 (carrot-chasing cross-track guidance) / ROTATE / TAKEOFF / LAND / STOP, odometry + pose via the
-GenericBackend seam, event-driven VLM planning (async, off the control thread), tolerant plan
-extraction, the ENU seam (Task 4), canned test rigs (`--canned-cross` / `--canned-speed`), and
+GenericBackend interface, event-driven VLM planning (async, off the control thread), tolerant plan
+extraction, the ENU convention (Task 4), canned test rigs (`--canned-cross` / `--canned-speed`), and
 the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU binaries build
 (`llm_to_action_fmu_px4` / `_tello`).
 
@@ -287,18 +296,25 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
 ## 16. Open Items
 
 - [x] **FORK-A:** DONE — `-c 4096`, client `max_tokens 512` (bounds runaway ~4 s).
-- [x] **FORK-C:** DONE — collapsed into the concrete backends via the GenericBackend seam.
+- [x] **FORK-C:** DONE — collapsed into the concrete backends via the GenericBackend interface.
 - [ ] Reconcile takeoff climb height (2 m node default vs FMU target).
-- [x] Cross-hw odometry abstraction — realized as the GenericBackend `Odometry` ENU seam (Tello Simpson integ. remains).
+- [x] Cross-hw odometry abstraction — realized as the GenericBackend `Odometry` under the ENU convention (Tello Simpson integ. remains).
 - [ ] Interrupt hysteresis + max-retries → land/abort; relative-depth time-to-contact model.
 - [ ] Tune §10/§11 constants in sim. `start()` bootstrap.
-- [ ] Adapt BUILD_YOLO `modular-vision-api` behind the seam.
+- [ ] Adapt BUILD_YOLO `modular-vision-api` behind the perception contract.
 - [ ] Rephrase kSystemPrompt interruption text → Appendix A (+ compress for FORK-A).
 - [ ] `simenv.sh` migration to FMU + `llm_to_action` binaries.
 
 ---
 
-## Appendix A — Draft kSystemPrompt "Execution Model" (replaces old interrupt text)
+## Appendix A — kSystemPrompt "Execution Model" (ROADMAP 3.6)
+
+> **STATUS (integrated):** installed in `llm_base.hpp`'s `kSystemPrompt`, replacing the old
+> interrupt paragraph. **Describes intended behavior, not yet built** — QUEUE EMPTY and YOUR
+> re-assess are real (ARCH §5); INTERRUPT (the host's depth-triggered reflexive hold-clearance,
+> ARCH §5.1) is still open (ROADMAP 1.5, gated on depth — depth itself landed in 4.2, the
+> interrupt/hold-clearance control logic has not). Same forward-declared-ahead-of-implementation
+> pattern already used for `orbit`/`search`/`rotate`/`re-assess` in the prompt.
 
 ```
 EXECUTION MODEL
@@ -318,5 +334,4 @@ current depth map + segmented frame highlighting what you came too close to. Rea
 Why was I stopped? What was I doing? How do I get around <hazard> without colliding and
 still make progress? Output a NEW plan that first clears the hazard, then resumes the
 objective. The old queue is discarded — your new plan fully replaces it.
-```
 ```

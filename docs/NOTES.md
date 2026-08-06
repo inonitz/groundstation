@@ -387,3 +387,121 @@
 - **Verification:** static checks green (single type def, verbs renamed). Full compile gate
   (`-DFMU_BACKEND=PX4/TELLO/ALL` build, unset FATAL_ERROR, standalone backends + tests) pending —
   user builds manually.
+
+## PerceptionRuntime — vision lib integrated into the FMU (2026-08-06)
+
+- **Problem:** the vision lib (`/root/build_yolo`, `vision::YoloSegEngine`/`YoloDepthEngine`/
+  `fuse()`) was built and benchmarked standalone (block 4.1) but not reachable from the FMU; the
+  FMU still carried a stub `struct TargetDetection` (fmu_node.hpp:168) that name-clashed with the
+  library's global type of the same name.
+- **Vendoring:** added a `safe_cpm_add_package(NAME vision GIT_REPOSITORY
+  nurmilkov/BUILD_YOLO GIT_TAG feature-vision-api ...)` block to the top-level CMakeLists.txt,
+  same pattern as `sttserver` — OPTIONS turn its own tests/benchmarks/sanitizers off so only
+  `Perception::vision` builds. Linked into `llm_to_action_fmu_<backend>` in
+  `fmu/CMakeLists.txt`. Pinned to a **branch**, not a tag/commit, on purpose: see
+  `docs/handoffs/2026-08-06-build-yolo-vision-generic-backend-refactor.md` for a planned CRTP
+  backend-boundary refactor on that same branch that has **not** landed yet (confirmed against
+  `origin/feature-vision-api` HEAD at integration time) — this session wired against the current
+  `YoloSegEngine`/`YoloDepthEngine`/non-template `fuse()` API deliberately, deferring the
+  refactor rather than doing both in one pass (human call, asked directly).
+- **Two-rate thread design (not `vision::fuse()` in a loop):** `PerceptionRuntime`
+  (`fmu/perception_runtime.hpp`, new) runs two independent `std::thread` loops — segmentation
+  near its measured ~30Hz ceiling, depth on its own measured ~13Hz ceiling (depth is ~3x over its
+  40Hz target on this CPU, block 4.1.8) — calling `segment()`/`estimate()` directly rather than
+  `fuse()`, which bundles both models into one blocking call and would force segmentation to wait
+  on depth every cycle, collapsing the two rates into one. Each seg tick re-samples median depth
+  over the freshest bbox against whichever depth map the depth loop last produced (own ~15-line
+  median-over-bbox/mask sampling, mirroring `perception_fusion.cpp`'s private helper — reimplemented
+  because splitting the two engines onto separate cadences means fusing across two
+  independently-timed calls instead of one `fuse()` call on a single frame; nothing in
+  `/root/build_yolo` was touched). Accepted consequence: `median_depth_cm` can lag the current
+  bbox by up to one depth cycle — ARCH §10's emergency boundary must tolerate that.
+- **Atomic snapshot:** published with the same atomic-`shared_ptr` idiom the FMU already used for
+  `m_currImg` (`std::atomic_load`/`std::atomic_store`), not a mutex.
+- **Stub removal:** deleted `struct TargetDetection` + unused `m_targets` from `fmu_node.hpp`;
+  the global `TargetDetection`/`PerceptionSnapshot` now come from `vision/perception_types.hpp`
+  via `perception_runtime.hpp`.
+- **Prompt wiring:** `buildDynamicPrompt()` now emits a `[PERCEPTION]` JSON block
+  (label/bbox/confidence/median_depth_cm per detection) from `PerceptionRuntime::snapshot()` —
+  closes ROADMAP 3.4 (was a stub).
+- **Thread budget:** `kVisionSegThreads`/`kVisionDepthThreads` (`fmu_node_base.hpp`, default 2
+  each) cap ORT intra-op threads so perception can't starve the 20Hz control loop; model paths
+  (`kVisionSegModelPath`/`kVisionDepthModelPath`) point at `/root/models/vision/`, mounted or
+  produced separately (not this session's concern).
+- **Naming (round 2 — first pass was still an alias-swap, called out and redone):** "seam" was
+  doing three unrelated jobs project-wide (GenericBackend's CRTP dispatch, the ENU/NED coordinate
+  agreement, and the perception-engine contract) — one vague word standing in for three different
+  mechanisms, and swapping it for another catch-all ("interface"/"boundary") in just one heading
+  didn't fix that. Replaced with three separate, mechanism-specific terms, applied consistently
+  across ARCHITECTURE.md/ROADMAP.md/project_overview.md and the current backend/frame source
+  comments (historical dated docs under handoffs/plans/specs left as point-in-time record, not
+  rewritten):
+  - **backend interface** — the `GenericBackend<Derived>` CRTP verb set PX4Backend/TelloBackend
+    implement (was "CRTP seam" / "backend seam" / "FMU seam").
+  - **ENU convention** — the project-wide agreement that ENU is the canonical world frame
+    everywhere except the PX4 wire; a convention, not an API object (was "ENU seam").
+  - **perception contract** — the `TargetDetection`/`PerceptionSnapshot`/`YoloSegEngine`/
+    `YoloDepthEngine` types `PerceptionRuntime` is built on (was "engine seam"/"perception seam";
+    ARCHITECTURE.md §9 heading now "vision engine interface" implemented by `PerceptionRuntime`).
+- **Scope respected:** no edits inside `/root/build_yolo` (vision lib internals untouched, per
+  the handoff's explicit boundary); block 5 (APPROACH) not started.
+
+## Comparison repo: pratikPhadte/LLM-controlled-drone (2026-08-06, time-boxed idea-harvest)
+
+Cloned to `/root/llm_drone` (not part of this repo). Read `README.md`, `brain_node.py`,
+`llm_client.py`, `yolo_detector.py`, `command_translator.py`.
+
+- **Their architecture:** 3 ROS2 (Jazzy) Python nodes in one workspace — `brain_node`
+  (orchestrator: PX4 telemetry subs, 10Hz offboard `TrajectorySetpoint` publisher, LLM call every
+  7s **or** on YOLO detection-class change), `yolo_detector` (Ultralytics YOLOv8 in Python,
+  frame-skip param, publishes JSON detections), `ros_gz_bridge` (Gazebo camera → ROS2 Image).
+  LLM is Ollama-local (mistral/llama3.2/qwen2.5) or Gemini-cloud; PX4 SITL + Gazebo, same
+  target as our PX4 fallback. All Python, no C++.
+- **Diff/resemblance:** resembles us on PX4/Gazebo/offboard-streaming and on decoupling the LLM
+  call from the control loop's cadence. Differs sharply on where "thinking" stops: their system
+  prompt hands the LLM the **GPS→NED conversion formula and expects it to do the arithmetic**
+  inline; our "VLM plans, deterministic math executes" tenet (ARCH) keeps all arithmetic off the
+  LLM by design — theirs is a correctness/reliability risk we deliberately avoided. Their
+  "found target while orbiting" handling (`_target_found`) is a one-off hardcoded callback (fixed
+  descend-to-40%-altitude, fixed move distance, bearing from `bbox_center` x-offset + FOV) bolted
+  onto the ROS callback, not a reusable primitive — our planned APPROACH (block 5.1, recomputed
+  every tick) is the same core idea done as a real, testable servo. They have **no metric depth**
+  at all (bbox position only, no distance) and throttle perception with a blunt frame-skip
+  counter, vs. our measured two-rate seg/depth threads with an ORT thread cap — our extra
+  perception complexity (4.1/4.2) buys something they don't have, not gold-plating.
+- **Cheap-to-borrow:** their bearing formula `bearing_offset = (bbox_cx - 0.5) * FOV_rad` is the
+  same math our planned APPROACH yaw-center servo (5.1.2) needs — cheap sanity-check reference for
+  when we implement it. Their second LLM-wake trigger ("detection class set changed since last
+  prompt", in addition to a fixed timer) is a cheap complementary condition to our
+  queue-empty/reassess wake (3.1) — LATER, once perception is actually feeding the prompt and we
+  can tell if queue-empty alone is reactive enough.
+- **Simplify NOW:** none found. Their system reads simpler mainly because it *drops* capability we
+  specifically need (metric depth for the emergency boundary, deterministic-math servo) — not a
+  legitimate simplification to borrow; our current design isn't over-built relative to a working
+  reference.
+- **Simplify LATER (only after the system flies and is tested):** (1) a fixed-interval LLM
+  re-plan as a fallback wake condition alongside the event-driven one, cheap insurance against a
+  stuck queue-empty/reassess state; (2) detection-class-change as a second prompt-retrigger
+  condition (see above).
+- Guardrail respected: idea-harvest only, no scope change to 4.2 or block 5.
+
+## System-prompt: APPROACH entry + EXECUTION MODEL text (2026-08-06, ROADMAP 3.6)
+
+- **APPROACH command scaffolding (spec `2026-08-05-visual-servoing-approach-design.md` §4c/§8):**
+  added `CommandID::APPROACH=9`, `struct CmdApproach{target, speed}`, its `GenericCommand` ctor,
+  and a `translateToBaseCommands` case parsing `{"action":"approach", "target_object", "speed"}`.
+  **No control-law branch** — `activateTask`'s `default:` case auto-completes it immediately,
+  exactly like `ORBIT`/`SEARCH`/`ROTATE`/`REASSESS` already do today (none of those have a real
+  branch either; only TAKEOFF/LAND/GO do). The actual yaw-center + range-decel servo is block
+  5.1 (`detectionByLabel`, per-tick recompute), explicitly not this task — spec §8 says so
+  directly ("the servo does not depend on this").
+- **Prompt entry:** added the `approach` block to `kSystemPrompt` (`llm_base.hpp`), alongside
+  `orbit`/`search`, matching their `target_object` style.
+- **Interrupt text replaced:** swapped the old ad-hoc interrupt paragraph for the
+  "EXECUTION MODEL" text drafted in `ARCHITECTURE.md` Appendix A (QUEUE EMPTY / YOUR re-assess /
+  INTERRUPT). **Caveat surfaced, not hidden:** INTERRUPT describes the depth-triggered reflexive
+  hold-clearance from ARCH §5.1 — that control logic (ROADMAP 1.5) is not built yet, only
+  QUEUE EMPTY and re-assess are real today. Same already-established pattern as the unwired
+  `orbit`/`search`/`rotate` prompt entries; flagged in ARCHITECTURE.md's Appendix A status line
+  so it is not mistaken for a shipped guarantee.
+

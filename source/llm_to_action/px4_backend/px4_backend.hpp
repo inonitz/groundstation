@@ -11,7 +11,7 @@
     with std::atomic scalar sharing (odom callback -> control/stream loops). No
     mutex is introduced (see design spec Future-Milestone M1).
 
-    Frame: canonical ENU (East, North, Up+) across the seam. NED exists ONLY on the
+    Frame: canonical ENU convention (East, North, Up+) across the backend interface. NED exists ONLY on the
     PX4 wire; odomCallback converts NED->ENU on ingest and streamTick converts
     ENU->NED on egress -- the two isolated conversion points.
 */
@@ -29,7 +29,7 @@ using StatusMsgType = px4_msgs::msg::VehicleStatus;
 
 
 /* BackendStatus / IOState / Odometry now live in generic_backend_types.hpp
-   (single definition shared with every backend across the seam). */
+   (single definition shared with every backend across the backend interface). */
 
 
 class PX4Backend : public GenericBackend<PX4Backend> {
@@ -37,7 +37,7 @@ public:
     PX4Backend(rclcpp::Node* node, rclcpp::CallbackGroup::SharedPtr cbg);
     ~PX4Backend();
 
-    /* ---- seam impls (invoked through GenericBackend<PX4Backend>) ----------- */
+    /* ---- backend-interface impls (invoked through GenericBackend<PX4Backend>) ---- */
     bool start_impl();   /* create pubs/subs + stream timer. Call once after construction. */
     void stop_impl();    /* cancel the stream timer (dtor also calls this).                */
 
@@ -50,7 +50,7 @@ public:
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
 
-    /* ---- backend-specific (off-seam) --------------------------------------- */
+    /* ---- backend-specific (not part of the backend interface) --------------- */
     bool     gotFirstOdom() const { return m_gotFirstOdom.load(std::memory_order_relaxed); }
 
 private:

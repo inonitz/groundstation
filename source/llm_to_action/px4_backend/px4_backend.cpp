@@ -36,7 +36,7 @@ bool PX4Backend::start_impl() {
 
     RCLCPP_INFO(m_node->get_logger(), "[PX4_BACKEND_DEBUG] started (stream %uHz).",
         kOffboardPublishRateHz);
-    return true;   /* PX4 start has no failure path today; seam contract is bool. */
+    return true;   /* PX4 start has no failure path today; backend interface contract is bool. */
 }
 
 void PX4Backend::stop_impl() {
@@ -52,7 +52,7 @@ void PX4Backend::odomCallback(const OdomMsgType::ConstSharedPtr msg) {
                             1.0f - 2.0f * (qy * qy + qz * qz));
 
     /* Convert the PX4 NED sample to canonical ENU here -- the ONLY place NED
-       enters the seam. The atomics named *N/*E/*D now hold ENU (x=East, y=North,
+       enters the backend interface. The atomics named *N/*E/*D now hold ENU (x=East, y=North,
        z=Up); odometry() returns them as a proper ENU Vec3. */
     Vec3 posEnu = ned_to_enu({ msg->position[0], msg->position[1], msg->position[2] });
     Vec3 velEnu = ned_to_enu({ msg->velocity[0], msg->velocity[1], msg->velocity[2] });

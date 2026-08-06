@@ -42,10 +42,11 @@ The control philosophy is **"the VLM plans, deterministic math executes."**
 
 ### Backend abstraction
 
-The two flight controllers are hidden behind a **compile-time CRTP seam** (`GenericBackend<Derived>`):
-a single set of verbs (`start/takeoff/land/set_velocity/odometry/state/...`) with no virtual
-dispatch. One backend is selected at configure time and produces one FMU binary. Across the
-seam the canonical world frame is **ENU**; PX4 speaks **NED** on the wire and the Tello uses
+The two flight controllers are hidden behind a **compile-time backend interface** (CRTP,
+`GenericBackend<Derived>`): a single set of verbs (`start/takeoff/land/set_velocity/odometry/
+state/...`) with no virtual dispatch. One backend is selected at configure time and produces one
+FMU binary. Across that interface the canonical world frame follows the **ENU convention**; PX4
+speaks **NED** on the wire and the Tello uses
 **FLU** stick commands, and each backend converts internally.
 
 ---
@@ -131,7 +132,7 @@ Being B (target):  VLM plan ─► goal in a global metric frame ─► A* path 
                               SLAM/VIO pose                     occupancy from SLAM cloud + depth
 ```
 
-Being A and Being B share the same **planner (VLM), backend seam, and 20 Hz executor**. The
+Being A and Being B share the same **planner (VLM), backend interface, and 20 Hz executor**. The
 swap is confined to *what the motion commands are computed against*: a stale dead-reckoned
 waypoint (A) versus a planned path in a SLAM-anchored map (B). The visual-servoing work in A
 is not wasted — a live, re-anchored error signal is complementary to, and a stepping stone
@@ -166,7 +167,7 @@ toward, the map-based approach.
    line + smooth deceleration + altitude hold) the right fix, or does committing to
    position-mode setpoints undercut the hardware-agnostic velocity abstraction we need for
    the Tello?
-8. How should we think about **frame consistency** (ENU seam / NED wire / FLU body) as we add
+8. How should we think about **frame consistency** (ENU convention / NED wire / FLU body) as we add
    a SLAM frame — one more transform, or a source of subtle bugs to design against up front?
 
 **On sequencing / best next steps:**
@@ -185,7 +186,7 @@ toward, the map-based approach.
   SITL demo.
 - **Medium term (bridge):** bring up **SLAM/VIO for pose only** (`source/slam/`), publish a
   global pose, and let the FMU consume it as an *optional, better* odometry source behind the
-  existing backend seam — no mapping or planning yet.
+  existing backend interface — no mapping or planning yet.
 - **Long term (Being B):** add OctoMap from the SLAM cloud + depth, then A* global planning
   with dynamic replanning, and route VLM goals through the planner instead of dead reckoning.
 

@@ -121,6 +121,27 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
+# Perception library (YOLO26 seg + metric depth). Vendored as a full nested
+# project, same pattern as sttserver above: OPTIONS turn off its own
+# tests/benchmarks/sanitizers so only Perception::vision (vision/CMakeLists.txt)
+# gets built here. Pins to a branch (not a tag) deliberately -- see
+# docs/handoffs/2026-08-06-build-yolo-vision-generic-backend-refactor.md for the
+# planned follow-up API change on this same branch.
+safe_cpm_add_package(
+    NAME vision
+    GIT_REPOSITORY https://github.com/nurmilkov/BUILD_YOLO.git
+    GIT_TAG        feature-vision-api
+    GIT_SHALLOW    TRUE
+    OPTIONS
+        "VISION_ENABLE_SANITIZER_ADDRESS OFF"
+        "VISION_ENABLE_SANITIZER_UNDEFINED OFF"
+        "VISION_ENABLE_SANITIZER_MEMORY OFF"
+        "VISION_ENABLE_LINK_TIME_OPTIMIZATION OFF"
+        "VISION_BUILD_LIBRARY ON"
+        "VISION_BUILD_TESTS OFF"
+        "VISION_BUILD_BENCHMARKS OFF"
+)
+
 
 safe_cpm_add_package(
     NAME cpp-httplib
