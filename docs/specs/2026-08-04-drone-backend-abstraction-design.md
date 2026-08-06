@@ -1,6 +1,11 @@
 # DroneBackend Abstraction — Design Spec
 
-> **Status:** DESIGN / APPROVED-FOR-REVIEW. Phase-2 sub-project **A** of four
+> **Status:** SHIPPED, then superseded -- this slice (A) landed, and its own §10 Future
+> Milestones have since fired for real: M1 (`MultiThreadedExecutor` + atomics), M2 (CRTP,
+> `GenericBackend<Derived>`), M4 (`TelloBackend`). The Day-1-scoped statements below ("no
+> CRTP", "single-threaded", "no TelloBackend") describe this slice's original scope only --
+> see the M1/M2/M4 notes in §10 for what actually shipped and where.
+> Phase-2 sub-project **A** of four
 > (A: this doc · B: TelloBackend · C: perception/YOLO26 · D: event-driven VLM).
 > **Scope of this slice:** extract a concrete `PX4Backend` seam + rewire the FMU to
 > drive it through semantic verbs. **No** TelloBackend, perception, or VLM changes ship here.
@@ -42,11 +47,15 @@ that no longer cares what drone is underneath.
 
 - **No abstraction machinery yet.** One concrete `PX4Backend`. No CRTP, no base class, no
   compile-time backend selection — there is exactly one backend today (see §10.M2 for when).
+  **[Since fired]** M2 shipped: `GenericBackend<Derived>` (CRTP) now exists.
 - **No cross-thread concurrency primitive.** The FMU runs on a **single-threaded executor**;
   all callbacks are serialized, so plain members need no mutex/atomics (see §10.M1).
+  **[Since fired]** M1 shipped: the FMU runs on `MultiThreadedExecutor`, and `fmu_node.hpp`
+  uses `std::atomic` throughout (`m_flightState`, `m_missionActive`, `m_currImg`, ...).
 - **No mid-flight odom-loss failsafe.** The known-good reference has none and flies; it is
   real-hardware hardening, not a tomorrow blocker (see §10.M3 — full contract preserved).
 - No `TelloBackend`, perception, VLM, or new command types. No TF2/SLAM/metric depth.
+  **[Since fired]** M4 shipped: `TelloBackend` exists (`tello_backend/tello_backend.hpp`).
 
 ---
 
@@ -56,7 +65,7 @@ that no longer cares what drone is underneath.
 |---|----------|-----|
 | D1 | **Thick backend, semantic verbs**: `takeoff/land/set_velocity/disarm/force_disarm` | Tello has native `takeoff`/`land`; forcing streamed-velocity takeoff is the exact fragility we just debugged in SITL. Thin translator rejected. |
 | D2 | **One concrete `PX4Backend` class** (no polymorphism) | With a single backend there is nothing to dispatch. Direct calls, zero indirection. Extract an interface later, from *two* real backends (§10.M2). |
-| D3 | **Single-threaded `rclcpp` executor; plain member state** | Control timer, stream timer, and odom sub all run on one thread, serialized by the executor — no data races, so no mutex/atomics. Matches the known-good `speech_to_action` node. |
+| D3 | **Single-threaded `rclcpp` executor; plain member state** | Control timer, stream timer, and odom sub all run on one thread, serialized by the executor — no data races, so no mutex/atomics. Matches the known-good `speech_to_action` node. **[Since fired, §10.M1]** now `MultiThreadedExecutor` + `std::atomic` members. |
 | D4 | **Backend owns its high-rate publish loop** (wall-timer on the *shared* FMU node) | Encapsulates the PX4 setpoint-watchdog at its native rate. One process, one node, one executor — not a separate node/process. |
 | D5 | **Canonical ENU across the seam**; backend converts NED↔ENU | PX4's NED must not be the "generic" frame. Matches VLM/ROS ENU. *(User-directed: do ENU now; its sign-correctness is the LAST review gate, §8/§9 — isolated so structural extraction is proven flying first. NED-native is the fallback if ENU signs bite.)* |
 | D6 | **Status-code POD returns, no exceptions** | C++17, deterministic control flow. Start **minimal** (`OK/PENDING/REJECTED/FAULT`); add a code only when a caller actually branches on it. |
@@ -80,10 +89,19 @@ source/llm_to_action/
 The canonical `Vec3`/`Odometry`/`BackendStatus`/`IOState` types live in `px4_backend.hpp`
 for now; **when M2 introduces a second backend they move up into a `drone_backend/` folder**
 (the future home noted in §10.M2). Keeping them local today avoids a folder that holds one file.
+**[Since fired]** M2 shipped; the folder is named `generic_backend/`, not `drone_backend/`.
 
 ---
 
-## 4. The interface (concrete — no CRTP yet)
+## 4. The interface (concrete — no CRTP yet, as scoped for this slice)
+
+**[Since fired, §10.M2]** The interface below is this slice's Day-1 scope, not the shipped
+API. `GenericBackend<Derived>` (`generic_backend/generic_backend.hpp`) now fronts both
+`PX4Backend` and `TelloBackend` via CRTP. Concrete deltas from the code block just below:
+`takeoff()`/`land()` are no-arg (not `takeoff(f32 altEnu)`); `stop()`, `disarm()`,
+`force_disarm()`, and `set_velocity()` return `void`, not `BackendStatus` (only `start()`,
+`takeoff()`, `land()` still do); `engaged()` does not exist as a method — callers compare
+`state() == IOState::FLIGHT` directly.
 
 ```cpp
 // px4_backend/px4_backend.hpp  — canonical, platform-neutral, ENU.
@@ -268,7 +286,7 @@ of it on one thread.
 |----------|-----------------|----------------|-----------------------------|
 | position | (E, N, U) | (N, E, D) | `enu_to_ned`: `(enu.y, enu.x, -enu.z)` |
 | velocity | (vE, vN, vU) | (vN, vE, vD) | same swap+negate-z |
-| yaw | CCW from East | CW from North | `enu_yaw_from_ned_quat` / `enu_yawrate_to_ned`: `pi/2 - yaw` (wrap -pi..pi), rate negated |
+| yaw | CCW from East | CW from North | `enu_yaw_from_ned_quat` / `enu_yawrate_to_ned`: `pi/2 - yaw` (wrap -pi..pi), rate negated. **[Since fired]** shipped as scalar-only `enu_yaw_from_ned(f32)` in `frame/frame_convert.hpp`, not a quat-taking function. |
 
 Every conversion is a **named function** so the call site documents intent — no bare `-` on a
 sign flip. VLM body-relative commands stay **FLU**; the FMU converts FLU->ENU with `odom.yaw`
@@ -311,7 +329,10 @@ User compiles/runs (per workflow); I diff the new DIAG log against the baseline.
 These were fully reasoned through during design. They are **not** deleted — they are sequenced
 behind the specific event that makes each one *necessary*, so the Day-1 core stays simple.
 
-### M1 — Cross-thread concurrency primitive · **Trigger:** we move the stream loop to a background `std::thread` or a `MultiThreadedExecutor`
+### M1 — Cross-thread concurrency primitive · **Trigger:** we move the stream loop to a background `std::thread` or a `MultiThreadedExecutor` · **[FIRED, shipped]**
+The FMU now runs on `MultiThreadedExecutor`; `fmu_node.hpp` uses `std::atomic` for
+`m_flightState`, `m_missionActive`, `m_planning`, `m_frameCount`, and `m_currImg`
+(`std::atomic_load`/`store`, not a plain scalar atomic -- a shared_ptr swap under the hood).
 Only needed if we abandon the single-threaded executor (D3). Then plain members race and we
 need guards. **Design ready:** scalars (`IOState`, `m_gotFirstOdom`) -> `std::atomic`; composite
 structs (setpoint, odometry) -> a `Shared<T>` = `std::mutex` + `try_lock`-with-cache — writers
@@ -320,7 +341,11 @@ priority inversion / executor starvation; a component-wise `atomic<f32> x,y,z` w
 fenced seqlock is not human-maintainable). **Do NOT add this while single-threaded** — it would
 be a mutex guarding a race that cannot happen.
 
-### M2 — Backend abstraction (CRTP + compile-time selection) · **Trigger:** `TelloBackend` exists (sub-project B)
+### M2 — Backend abstraction (CRTP + compile-time selection) · **Trigger:** `TelloBackend` exists (sub-project B) · **[FIRED, shipped]**
+Shipped as `generic_backend/generic_backend.hpp`: `template<class Derived> GenericBackend`
+(this doc's `drone_backend/DroneBackendBase` naming did not survive -- folder and class are
+both `generic_backend`/`GenericBackend`), with `PX4Backend`/`TelloBackend` as the two CRTP
+derived classes.
 With a *second* real backend we finally know the true shared shape. Then: promote the canonical
 types into a new `drone_backend/` folder; introduce `template<class Derived> DroneBackendBase`
 (CRTP — static polymorphism, **no vtables**, per the "either/or per binary" requirement — a
@@ -352,7 +377,9 @@ with its own acceptance test**, not four lines smeared across the control loop.
   the prior cruise), the vehicle reaches a non-flying state, and feeding frozen/garbage odom
   after the cut changes nothing.
 
-### M4 — `TelloBackend` (sub-project B) · **Days 2-3**
+### M4 — `TelloBackend` (sub-project B) · **Days 2-3** · **[FIRED, shipped]**
+`tello_backend/tello_backend.hpp` exists and has flown on real hardware (2026-08-06,
+telemetry/odometry/camera live).
 Bench then flight. **[ANNOTATED: needs additional review/testing]**; imperfect-but-noted is
 acceptable per the 3-day deadline. Forces M1 (its UDP driver runs off-executor) and M2.
 

@@ -18,12 +18,23 @@
 > FORK-A tuned (`-c 4096`, client `max_tokens 512`); FORK-B realized as the GenericBackend
 > `Odometry` ENU convention; FORK-C collapsed into the concrete backends (no separate offboard node).
 > The bullets below keep the original reasoning for history.
+>
+> **Update (2026-08-06):** the live launch script (`scripts/simenv_llm.sh`) invokes
+> `llama-server` with `-c 65536`, not the `-c 4096` this doc and §16 originally marked DONE.
+> This is a deliberate temporary overshoot (user-confirmed) -- generous headroom to avoid
+> context-blowup failures while the rest of the stack (perception, APPROACH) is still under
+> active test, not a tuned value. **Still open:** properly measure real per-call token usage
+> and right-size `-c` for the actual target hardware (a low-end machine, not the dev box this
+> was tuned against) -- 65536 is not the intended shipping number.
 
 - **[FORK-A] VLM context — TUNED.** Strategy confirmed: manual context, zero-shot
   every call (KV never grows past `-c`; ~2.5–3 GB fits ~3 GiB). **But `-c 1024` cannot hold
   one shot:** `kSystemPrompt` alone ≈ 1.2–1.6k tokens, + image (~256–1024) + output.
   Resolution → raise `-c` to ~4096 (VRAM permitting, measure) **and/or** compress hard
   (trim system prompt ~60–70%, downscale image, 1–2 line history summary, small output cap).
+  **Live script currently uses `-c 65536`** (deliberate temporary headroom during testing,
+  not tuned -- see the Update note at the top of §0). Right-sizing `-c` for the real target
+  hardware is still open.
 - **[FORK-B] Odometry — RESOLVED (backend interface realized).** Consume `px4_msgs/VehicleOdometry` (NED) **directly**
   for sim. **⚠ MUST be migrated to a cross-hardware odometry abstraction** — the Tello does
   not publish `VehicleOdometry`; its driver dead-reckons `nav_msgs/Odometry` (§8).
@@ -48,10 +59,13 @@
 
 ## 2. Thread Architecture
 
-`MultiThreadedExecutor` + callback groups. Threads: **Depth (Model-D ≥30 Hz)**,
-**YOLO-Seg (Model-S 25 Hz)**, **VLM (async, event-driven)**, **Control (20 Hz)**, and the
-**Offboard publisher (~100 Hz)** streaming setpoints via the translator (§7). Shared state is
-`std::atomic`: `m_emergencyStop`, failsafe state, user-override, latest pose, perception snapshot.
+`MultiThreadedExecutor` + callback groups. Threads: **YOLO-Seg (Model-S, ~30 Hz, meets
+target)**, **Depth (Model-D, ~13 Hz measured -- the slow one, not a real 40Hz refresh)**,
+**VLM (async, event-driven)**, **Control (20 Hz)**, and the **Offboard publisher (30 Hz PX4 /
+20 Hz Tello)** streaming setpoints via the backend (§7). Shared state is `std::atomic`:
+`m_flightState`, `m_missionActive`, `m_planning`, `m_frameCount`, `m_currImg`, latest pose,
+perception snapshot. **No `m_emergencyStop`** -- the emergency boundary (§10) and
+failsafe/battery supervisor (§11) are designed, not implemented (§15).
 
 ---
 
@@ -63,7 +77,7 @@ VLM plan (JSON) ── translateToBaseCommands() [VLM thread = PRODUCER]
 m_taskQueue (moodycamel::ReaderWriterQueue<ActiveTask>, FIFO, SPSC) ── pending
    ▼ try_dequeue() [20Hz loop = CONSUMER]
 m_currTask (active) ── completion (§4) ──► m_completedTasks (history §6)
-                    └─► setpoint ──► 100Hz offboard thread ──► drone
+                    └─► setpoint ──► offboard thread (30Hz PX4 / 20Hz Tello) ──► drone
 ```
 - No "ReadyToPublish" queue. Strictly SPSC (VLM produces, 20 Hz consumes). Interrupt drain
   is consumer-side (§5.1). Handle enqueue backpressure.
@@ -77,14 +91,15 @@ The FMU owns the flight **state machine** (STANDBY/TAKEOFF/FLIGHT/LANDING); the 
 
 | Cmd | Predicate | Notes |
 |-----|-----------|-------|
-| **GO** | 3-D Euclidean dist < **0.20 m** | **Two impls — `go_vel` and `go_pos` — both built, chosen per-drone/empirically.** `go_vel`: velocity-toward-waypoint (`vel = dir·speed`), robust to drift. `go_pos`: discrete XYZ (Tello `go`/PX4 position setpoint), drift-prone. |
-| **ROTATE** | \|yaw − target\| < **5°** | yawspeed (vel) or discrete. |
+| **GO** | 3-D Euclidean dist < **0.20 m** | **One law, shipped:** carrot-chasing cross-track guidance -- line-of-sight direction frozen at activation + a cross-track PID pulling back onto the line (`vel = dir·speed`). Neither `go_vel` nor `go_pos` exists as a name; there is no separate discrete-XYZ impl. |
+| **APPROACH** | `range < kApproachStandoffM` (2.0 m) | **Shipped and SITL-verified (ROADMAP 5.1).** Anchored to a live YOLO detection, recomputed every tick (no world point stored): yaw-to-center + range-decel forward + vertical match + lateral damp. Two-threshold fresh/lost model (§9/spec) coasts on a stale detection, FAILs on a fully lost one past `kApproachLostTimeoutMs`. |
+| **ROTATE** | \|yaw − target\| < **5°** | yawspeed (vel) or discrete. **Not parsed from the VLM plan** -- `translateToBaseCommands` only recognizes `takeoff/land/stop/go/approach`; a `"rotate"` action is silently dropped (`continue`) before it is ever enqueued, despite `CommandID::ROTATE` and a switch dispatch existing. |
 | **TAKEOFF** | FMU state machine: arm → climb to target → FLIGHT | Completion = odom altitude ≥ target. Reconcile climb height (offboard node hardcodes 2 m). Stall guard (ceiling-blind). |
 | **LAND** | FMU state machine: descend → force-disarm near ground | Odom alt≈0 ∧ vz≈0. **Depth estimator gated OFF only in final 10–30 cm**, after clear-to-land. WHERE-to-land = planning, separate. |
 | **STOP** | one hover cycle → instant | Near-redundant; kept for VLM expressiveness. |
-| **ORBIT** | ≥360° accumulated (default 1 rev) OR time limit | **Anchor to a detected target in-frame only** (no SLAM = no reliable global anchor). Visual servo: bbox in frame, `median_depth ≈ radius`, small steps. Target lost → abort → re-assess. Future: pinhole-model 3D target point (§9) as a better anchor. |
-| **SEARCH** | success = detected; fail = timeout | **2-D horizontal circle.** 360° step-rotate-settle-detect, expand outward. Record pre-search **anchor**; fail → `GO anchor` + FAILED. post-search → re-assess. |
-| **CURVE** | — | Dropped for POC. |
+| **ORBIT** | ≥360° accumulated (default 1 rev) OR time limit | **Not parsed from the VLM plan** (see ROTATE note) -- same `continue`-and-drop. Design intent preserved below for when it lands: anchor to a detected target in-frame only (no SLAM = no reliable global anchor). Visual servo: bbox in frame, `median_depth ≈ radius`, small steps. Target lost → abort → re-assess. |
+| **SEARCH** | success = detected; fail = timeout | **Not parsed from the VLM plan** (see ROTATE note) -- same `continue`-and-drop. Design intent preserved below: 2-D horizontal circle, 360° step-rotate-settle-detect, expand outward. Record pre-search **anchor**; fail → `GO anchor` + FAILED. post-search → re-assess. |
+| **CURVE** | — | Dropped for POC. Also not parsed from the VLM plan (see ROTATE note), on top of being scoped out. |
 
 **20 Hz streaming contract:** active task → setpoint; queue empty → Hover. Never send once.
 
@@ -96,10 +111,19 @@ The FMU owns the flight **state machine** (STANDBY/TAKEOFF/FLIGHT/LANDING); the 
 
 ## 5. VLM: Event-Driven
 
-Timer removed. Triggers: queue empty, `re-assess`, `m_emergencyStop`. Wake via
-`condition_variable::notify_one()`.
+Triggers: queue empty, `re-assess`. **No `condition_variable`; no `m_emergencyStop`** (that
+trigger describes the unimplemented emergency boundary, §10/§15). Wake is poll-based: every
+20Hz `controlLoop()` tick, if the task queue is empty, calls `maybePlan()`, which checks a
+cooldown + an `m_planning` single-flight atomic guard, then fires the VLM call on
+`std::async` (off the control thread) so the 20Hz loop never blocks on inference.
 
 ### 5.1 Interrupt & Reassessment (deterministic-first)
+
+**⚠ Not implemented (§15 remaining gap).** The steps below describe the designed-but-not-built
+emergency/interrupt path; none of it exists in `fmu_node.hpp` yet. `TaskState::STOPPED` is
+declared in the enum but never assigned anywhere in the tree -- it is dead code reserved for
+step 2 below, once built.
+
 1. **Reflexive hold-clearance (control loop, no VLM).** `target = pos + reverse_vec·backoff`,
    `reverse_vec = -normalize(recent velocity)`, `backoff ≈ 20–30 cm`. Actively holds clearance
    vs hover overshoot. **Requires internal state:** short last-velocity history (also feeds §8).
@@ -114,11 +138,15 @@ Timer removed. Triggers: queue empty, `re-assess`, `m_emergencyStop`. Wake via
 > **⚠ Governed by FORK-A.** At `-c 1024` the prompt must be compressed hard; history is a
 > short summary, not the full log, unless `-c` is raised.
 
-Sections: system config · FLU coordinate frame · mission objective · vehicle state
-(telemetry) · perception JSON (label/bbox/median_depth from snapshot §9) · executed history
-(`{status,thought,action}`) · active pending queue.
+Sections, as actually built in `buildDynamicPrompt()`: system prompt · FLU coordinate frame ·
+mission objective · vehicle state (`alt_up_m`/`speed_mps`/`airborne`) · perception JSON
+(label/bbox/confidence/median_depth from snapshot §9) · executed command history
+(`{status,thought,id}`). **No active-pending-queue section exists** -- the queue is drained
+before the VLM is ever woken (§5), so there is nothing pending to list.
 
-- **Send both** marked image AND perception JSON. Preserve `thought`
+- **Send the raw, unmarked camera frame** (JPEG-encoded, resized to 640x640) AND the
+  perception JSON as text -- there is no bbox/label drawing onto the image; "marked image"
+  describes a future annotated-frame option, not what ships. Preserve `thought`
   (`LargeFixedStringType m_thought`, `status`-prefixed). Targets addressed by `label`/`id`.
 
 ---
@@ -132,11 +160,13 @@ Sections: system config · FLU coordinate frame · mission objective · vehicle 
 
 **Target (points 3 & 5):** the offboard controller is a **dumb `OffboardTranslator` struct**
 (generic setpoint → PX4 `VehicleCommand`/`TrajectorySetpoint`, or Tello `rc`/`go`), driven by
-a **~100 Hz publisher thread inside the FMU process**. No separate ROS node/process. The
-**flight state machine lives in the FMU**, not the translator.
+a publisher thread inside the FMU process, at **30Hz for PX4** (`kOffboardPublishRateHz`,
+`px4_backend_base.hpp`) and **20Hz for Tello** (`kTelloStreamRateHz`, Tello can't reliably
+ingest setpoints above ~20Hz). No separate ROS node/process. The **flight state machine lives
+in the FMU**, not the translator.
 
 - Translation reference already exists in `px4_offboard_node`: ENU/FLU→NED flip
-  (`external_velocity_callback`), OFFBOARD mode set, arming, ~100 Hz velocity streaming, PX4
+  (`external_velocity_callback`), OFFBOARD mode set, arming, high-rate velocity streaming, PX4
   best-effort/transient-local QoS. Extract this logic into the translator.
 - **FORK-C sequencing:** Phase 1 *may* keep the existing node (re-enable its Twist+Bool subs,
   FMU publishes to them) to fly fastest; collapse into the translator in Phase 2.
@@ -168,7 +198,8 @@ odometry abstraction.** FMU stores X/Y/Z + yaw in `std::atomic`, `SensorDataQoS`
 
 > **STATUS (realized):** `PerceptionRuntime` (`fmu/perception_runtime.hpp`) owns the two
 > concrete engines below and publishes an atomic `PerceptionSnapshot` `buildDynamicPrompt()`
-> reads (§6). Block 4.2 (ROADMAP) closed this out; block 5 (APPROACH) is next, gated on it.
+> reads (§6). Block 4.2 (ROADMAP) closed this out; **block 5 (APPROACH) has since shipped and
+> is SITL-verified (ROADMAP 5.1, 5.1.5) -- see §15, no longer gated/pending.**
 
 Concrete engines (not virtual), from the vendored `Perception::vision` library
 (`safe_cpm_add_package`, `nurmilkov/BUILD_YOLO` `feature-vision-api`, top-level `CMakeLists.txt`):
@@ -227,9 +258,9 @@ time-to-contact / looming threshold until metric depth exists.
 | # | Decision |
 |---|----------|
 | 1 | pending → active → completed; no ReadyToPublish. Queue = `moodycamel::ReaderWriterQueue`. `operator= = default`. |
-| 2 | `start()` bootstrap: first frame → perception → one VLM call → release task-thread CV. |
-| 3 | Offboard = in-process `OffboardTranslator` struct + 100 Hz thread; **state machine in FMU** (§7). FORK-C sequences the collapse. |
-| 4 | GO = both `go_vel` + `go_pos`, chosen empirically. STOP instant. ORBIT target-anchored only. SEARCH 2-D circle. CURVE dropped. |
+| 2 | `start()` bootstrap: `m_missionActive` atomic flips true; `maybePlan()` waits up to `kVisionWarmupUs` for a first camera frame (else plans text-only) then fires the first VLM call. **No condition_variable** -- gated by an atomic flag + timeout, checked each 20Hz poll (§5). |
+| 3 | Offboard = in-process backend publish loop (30Hz PX4 / 20Hz Tello); **state machine in FMU** (§7). FORK-C collapse done -- concrete backends, no separate node. |
+| 4 | GO = one carrot-chasing cross-track law (no `go_vel`/`go_pos` split). STOP instant. APPROACH shipped, target-anchored (§4). ORBIT/SEARCH/ROTATE/CURVE designed but not parsed from the VLM plan yet (§4). |
 | 5 | Interrupt = reflexive hold-clearance → consumer drain → VLM reassess (§5.1). |
 | 6 | Camera: FMU subscribes **`camera/stream`** (rx_node output), PTS-timestamped. |
 | 7 | Odometry: direct `VehicleOdometry` (sim) — **migrate to cross-hw abstraction** (FORK-B). |
@@ -241,27 +272,35 @@ time-to-contact / looming threshold until metric depth exists.
 
 ## 13. Known Risks
 
-- **[FORK-A] 1024-token context** vs prompt size — top blocker; needs compression or larger `-c`.
+- **[FORK-A] context size** — resolved directionally (raised well past 1024) but not finally
+  tuned: the live script runs `-c 65536` as deliberate testing headroom (§0), and still needs
+  proper per-call measurement + right-sizing for the actual (low-end) target hardware.
 - **Depth is now metric (YOLO26n, §9)** — the emergency boundary (§10) can use absolute cm. (An earlier MiDaS-relative POC would have needed time-to-contact.)
 - **Cross-hw odometry migration** debt (§8).
 - Reassess latency window (1–2 s) on drifting odom; interrupt oscillation (needs hysteresis +
   max-retries → land/abort); odom drift vs 0.20 m bar; ceiling-blind takeoff; SEARCH 2-D off-plane blindness.
-- **Sim integration debt:** binaries named `ros2_speech_to_action_*`; llama-server + FMU panes
-  need adding to `simenv.sh`; camera topic wiring.
+- **Sim integration debt: resolved.** The live launch script is `scripts/simenv_llm.sh`, not
+  `simenv.sh` (which still exists but is the deprecated predecessor) -- it already runs
+  `llm_to_action_*` binaries, an FMU pane, a `llama-server` pane, and camera (`rx_node`)
+  wiring end-to-end (used for the 2026-08-06 real-hardware Tello flight).
 
 ---
 
 ## 14. POC Build Slice — usable today, PX4 Gazebo sim
 
-**Prereqs in `simenv.sh`:** add an FMU pane + enable the llama-server pane; switch binaries to
-`llm_to_action_*`; ensure `rx_node` (camera/stream) runs. **Resolve FORK-A** so the prompt fits.
+> **STATUS (realized):** this section describes the original Phase-1 bring-up plan.
+> **Prereqs done** -- `scripts/simenv_llm.sh` (not `simenv.sh`) already runs the FMU pane,
+> llama-server pane, `llm_to_action_*` binaries, and `rx_node`. **FORK-A** raised to `-c 65536`
+> as deliberate testing headroom, real tuning still open (§0); **FORK-C** collapsed into the
+> concrete backends, no retained `px4_offboard_node` (§7).
 
 **Phase 1 (today, NO real perception):**
 - Odom sub → atomic pose/yaw, `SensorDataQoS` (direct `VehicleOdometry`).
 - `moodycamel` queue + `translateToBaseCommands` (+ backpressure). `operator= = default`.
 - 20 Hz loop: `go_vel` + ROTATE + Hover default; TAKEOFF/LAND via FMU state machine.
 - FMU subscribes camera at **`camera/stream`**.
-- Setpoint output: **FORK-C** — reuse `px4_offboard_node` (re-enable subs) *or* in-process translator.
+- Setpoint output: **FORK-C resolved** — in-process translator inside the concrete backend
+  (`PX4Backend`/`TelloBackend`); `px4_offboard_node` not retained.
 - Event-driven VLM (queue empty, `re-assess`) — or **canned/hardcoded plan injection** to test
   the control chain without the VLM first (recommended first bring-up).
 - Battery/failsafe supervisor. Perception **stubbed**; emergency path **disabled**.
@@ -308,9 +347,13 @@ the FMU and confirmed working end-to-end against a real object with a live VLM p
 - [x] Cross-hw odometry abstraction — realized as the GenericBackend `Odometry` under the ENU convention (Tello Simpson integ. remains).
 - [ ] Interrupt hysteresis + max-retries → land/abort; relative-depth time-to-contact model.
 - [ ] Tune §10/§11 constants in sim. `start()` bootstrap.
-- [ ] Adapt BUILD_YOLO `modular-vision-api` behind the perception contract.
-- [ ] Rephrase kSystemPrompt interruption text → Appendix A (+ compress for FORK-A).
-- [ ] `simenv.sh` migration to FMU + `llm_to_action` binaries.
+- [x] Adapt BUILD_YOLO `modular-vision-api` behind the perception contract -- vendored via
+      `nurmilkov/BUILD_YOLO` `feature-vision-api` (`CMakeLists.txt`), consumed as
+      `Perception::vision` by `PerceptionRuntime` (§9).
+- [x] Rephrase kSystemPrompt interruption text → Appendix A -- installed in `llm_base.hpp`
+      (see Appendix A below; the INTERRUPT behavior it describes is still unbuilt, §5.1).
+- [x] Sim launch migrated to FMU + `llm_to_action` binaries -- as `scripts/simenv_llm.sh`
+      (not a `simenv.sh` in-place edit; `simenv.sh` remains as the deprecated predecessor).
 
 ## 17. Dev Environment Networking (real-hardware bring-up, 2026-08-06)
 

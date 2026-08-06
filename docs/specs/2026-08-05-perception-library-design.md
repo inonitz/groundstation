@@ -143,6 +143,14 @@ Keep the FMU-facing shape aligned to ARCHITECTURE.md §9 (`YoloDetectionEngine` 
      keep masks) → `median_depth_cm = median_meters * 100`.
   4. Fill up to `kMaxDetections`, set `host_stamp_us` (host steady clock), `valid = true`.
 
+  **[Shipped differently]** the actual signature is `vision::fuse(seg, depth, frame, conf, iou)`
+  -- takes both already-constructed engines plus conf/iou thresholds, not a bare frame. More to
+  the point, **the FMU never calls it.** `PerceptionRuntime` (`fmu/perception_runtime.hpp`)
+  reimplements fusion itself, by design: it runs seg and depth as two independent `std::thread`s
+  at two different rates (§6 below) and re-samples median depth per seg tick against whichever
+  depth map the depth loop last produced. A single blocking `fuse()` call would collapse both
+  engines back onto one shared rate, defeating the two-rate split.
+
 Both engines take their **model path** at construction (fp32 / int8 / int4 selected by path) plus
 a **thread budget** (see §6).
 
@@ -209,6 +217,12 @@ Under `/root/models/vision/`: `yolo26n-seg.onnx` + `.int8.onnx` (+ `.int4.onnx`)
 from the `constexpr` COCO-80 table in `vision/coco_labels.hpp` (see §4). (`yolo26n-seg.pt` is at `ultralytics/assets` v8.4.0; `yolo26n-depth.pt` is the
 YOLO26-depth nano checkpoint — the depth variant exists across n/s/m/l/x. INT4 on CNN heads may be
 partial; attempt it and report accuracy vs speed.)
+
+**[Shipped differently]** the paths this spec lays out (flat under `/root/models/vision/`) are
+not what's wired into the FMU. `fmu_node_base.hpp`'s `kVisionSegModelPath` /
+`kVisionDepthModelPath` point at a **nested** `vision/vision/` directory, and a `-384` suffix
+(the input-resolution variant) neither name here mentions:
+`/root/models/vision/vision/yolo26n-seg-384.onnx` and `.../yolo26n-depth-384.onnx`.
 
 ## 8. Testing & benchmark (do it properly — nothing to prove)
 

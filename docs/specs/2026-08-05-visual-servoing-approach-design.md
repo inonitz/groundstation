@@ -236,18 +236,29 @@ this; it is here so a plan can name the command once perception exists.
 
 ## 10. Tunables (all in `fmu_node_base.hpp` unless noted)
 
+As shipped (2026-08-06, tuned against real seg+depth inference in SITL, not just the canned
+rig this table originally targeted):
+
 ```cpp
-constexpr f32 kApproachStandoffM     = 0.50f;   // stop this far from the target
-constexpr f32 kApproachSpeedDefault  = 30.0f;   // cm/s, if CmdApproach.speed == 0
-constexpr f32 kApproachFwdGainHz     = 0.5f;    // (range-standoff) -> forward speed
+constexpr f32 kApproachStandoffM     = 2.00f;   // stop this far from the target (slack against
+                                                 // jittery real depth, not just a stop point)
+constexpr f32 kApproachSpeedDefault  = 80.0f;   // cm/s, if CmdApproach.speed == 0
+constexpr f32 kApproachFwdGainHz     = 0.35f;   // (range-standoff) -> forward speed
 constexpr f32 kApproachYawGain       = 1.0f;    // horiz bbox error -> yaw-rate
 constexpr f32 kApproachVertGain      = 0.5f;    // vert bbox error -> vertical velocity
 constexpr f32 kApproachLateralDamp   = 0.5f;    // perpendicular measured-velocity damping (R1)
-constexpr u32 kApproachLostTimeoutMs = 500;     // coast window before FAIL on lost target
+constexpr f32 kApproachCoastSpeedMps = 0.15f;   // speed while coasting on a stale-or-lost target
+constexpr u32 kApproachLostTimeoutMs = 3000;    // coast window before FAIL on lost target
+constexpr u32 kApproachFreshMs       = 200;     // detection older than this is untrusted for
+                                                 // closing speed; falls back to coast
 // CameraIntrinsics live in perception/detection_query.hpp (consumed there).
 ```
-All first-guess values, to be swept in SITL. Gains reuse the "Hz" (1/s) convention of the
-existing GO tunables.
+All values SITL-tuned, not first-guess -- real depth inference on this CPU can freeze for 1s+
+under load, so the single "lost" threshold this section originally specced was replaced by a
+**two-threshold fresh-vs-lost model**: a detection older than `kApproachFreshMs` is stale (not
+trusted for closing speed -- acting on a frozen range means never decelerating) and the servo
+coasts at `kApproachCoastSpeedMps`; only past `kApproachLostTimeoutMs` with no detection at all
+does the task FAIL. Gains reuse the "Hz" (1/s) convention of the existing GO tunables.
 
 ## 11. Definition of done (this slice)
 

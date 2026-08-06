@@ -13,7 +13,8 @@ Groundstation is an **off-board autonomous flight stack** for small drones (prim
 DJI Tello; PX4 software-in-the-loop in Gazebo as the simulation fallback). The guiding
 principle is **off-board compute**: the aircraft is a dumb peripheral that only streams
 H.264 video and telemetry over the local network. All perception, planning, and control run
-on a ground-station computer.
+on a ground-station computer. As of 2026-08-06 the Tello has flown on real hardware with
+telemetry, odometry, and camera all live (first real-hardware milestone, ROADMAP 2.3).
 
 The control philosophy is **"the VLM plans, deterministic math executes."**
 
@@ -21,7 +22,8 @@ The control philosophy is **"the VLM plans, deterministic math executes."**
   event-driven planner. When the task queue drains, it is shown the current camera frame,
   a compact vehicle-state summary, a perception JSON (YOLO detections + metric depth), and
   the executed-command history, and it returns a **plan**: a JSON array of discrete verbs
-  (`takeoff`, `go`, `rotate`, `land`, `stop`, and — specced — `approach`, `orbit`, `search`).
+  (`takeoff`, `go`, `rotate`, `land`, `stop`, `approach` — built and SITL-verified — and,
+  still specced only, `orbit`, `search`).
   It is never in the per-command completion loop; inference runs off the control thread.
 - A **deterministic 20 Hz control loop** consumes that plan one task at a time, owns the
   flight state machine (STANDBY / TAKEOFF / FLIGHT / LANDING), and streams setpoints to the
@@ -81,9 +83,9 @@ plan is to drive `go`-style motion from a **continuously re-computed visual erro
 recompute the direction vector to a **YOLO-detected target every tick** and nudge toward it,
 so the control is **re-anchored to ground truth (the object in frame) every cycle** instead
 of dead-reckoning from a stale estimate. This sidesteps the drift problem without a map, and
-is the substrate for the specced `approach` / `orbit` / `search` behaviors — all of which are
-explicitly **anchored to an in-frame target only**, precisely because there is no reliable
-global anchor yet.
+is the substrate for `approach` — now built and SITL-verified — plus the still-specced
+`orbit` / `search` behaviors. All three are explicitly **anchored to an in-frame target
+only**, precisely because there is no reliable global anchor yet.
 
 **In one sentence:** *home-relative dead reckoning plus in-frame visual servoing — no world
 model, no obstacle awareness, good enough to demo, brittle over distance and time.*
