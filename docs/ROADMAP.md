@@ -2,7 +2,7 @@
 
 Living, consolidated list of every goal for the project, recursively, with status. This is the
 single place the whole objective set lives; it was previously scattered across `NOTES.md`,
-`ARCHITECTURE.md`, and the specs under `docs/superpowers/specs/`. Keep it updated as reality moves.
+`../ARCHITECTURE.md`, and the specs under `specs/`. Keep it updated as reality moves.
 
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.
@@ -77,7 +77,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        4.2.5 thread / affinity budget vs the 20 Hz loop          [ ]
 
 5. Visual servoing (the navigation pivot)                        [ ]  [GATE perception]
-   5.1 APPROACH <label>  (spec: visual-servoing-approach-design) [ ]
+   5.1 APPROACH <label>  (spec: specs/2026-08-05-visual-servoing-approach-design.md) [ ]
        5.1.1 detectionByLabel lookup (ROS-free)                  [ ]
        5.1.2 yaw-center + range-decel servo, recomputed per tick [ ]
        5.1.3 done at standoff / lost = FAIL                      [ ]

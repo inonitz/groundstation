@@ -2,7 +2,7 @@
 
 > **Status:** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
 > (20 Hz control loop, odometry, event-driven VLM, ENU seam, GenericBackend seam, canned test
-> rigs). `NOTES.md` is the running change log. Sections below are annotated where reality has
+> rigs). `docs/NOTES.md` is the running change log. Sections below are annotated where reality has
 > moved past the original plan; the remaining gap is perception integration + the APPROACH
 > servo + the emergency/failsafe supervisor (§15).
 >
@@ -180,7 +180,7 @@ struct YoloDepthEngine     { void   estimate(const cv::Mat&, DepthResult&); };  
   (unfinished YOLO26-depth→GGUF metric spike, validated only to layer 0–1) as the future
   metric-depth track.
 - **POC depth = YOLO26n METRIC depth (SUPERSEDES MiDaS Small relative).** The perception-library
-  design (`docs/superpowers/specs/2026-08-05-perception-library-design.md`) selects YOLO26n metric
+  design (`docs/specs/2026-08-05-perception-library-design.md`) selects YOLO26n metric
   depth; the earlier MiDaS-relative plan is dropped. With metric cm available, §10's emergency
   boundary can use absolute distance directly (relative-depth time-to-contact no longer required).
   The engine seam is real, built in the standalone `/root/build_yolo` repo, pending FMU integration.
@@ -277,7 +277,7 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
   the standalone `/root/build_yolo` repo but not yet wired into the FMU; `TargetDetection` in
   `fmu_node.hpp` is still a stub.
 - **APPROACH / visual-servo GO** — specced
-  (`docs/superpowers/specs/2026-08-05-visual-servoing-approach-design.md`), gated on perception.
+  (`docs/specs/2026-08-05-visual-servoing-approach-design.md`), gated on perception.
 - **Emergency boundary + battery/failsafe supervisor** (§10/§11) — designed, not implemented.
 - **Tello hardware bring-up** — backend built + unit-tested; real gstreamer H264 camera RX
   (`udpsrc port=11111 ! h264parse ! avdec_h264`) still to do.

@@ -14,7 +14,7 @@ Always perform file reads, directory listings, and searches via the Bash tool us
 # Execution Rules
 
 - **Git Commit Workflow**: After completing a working feature or fix, stage and commit changes using concise commit messages.
-- **Architectural Notes**: If a major design decision is made, document it briefly in `NOTES.md` in bullet points.
+- **Architectural Notes**: If a major design decision is made, document it briefly in `docs/NOTES.md` in bullet points.
 - **Accuracy**: Do not guess file contents or assumptions. Check the codebase first, or ask the user.
 
 

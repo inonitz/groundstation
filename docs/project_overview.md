@@ -191,6 +191,6 @@ toward, the map-based approach.
 
 ---
 
-*Repository references: `ARCHITECTURE.md` (FMU spec), `NOTES.md` (SITL debugging log and
+*Repository references: `../ARCHITECTURE.md` (FMU spec), `NOTES.md` (SITL debugging log and
 control-law iteration history), `source/llm_to_action/` (FMU, backends, perception glue),
 `source/slam/` (VSLAM/VIO scaffolding).*
