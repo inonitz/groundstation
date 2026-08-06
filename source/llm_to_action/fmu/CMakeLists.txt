@@ -77,4 +77,14 @@ if(GROUNDSTATION_BUILD_TESTS)
     target_link_libraries(plan_parse_test PRIVATE util_base_header)
     target_compile_features(plan_parse_test PRIVATE cxx_std_17)
     add_custom_target(run_plan_parse_test COMMAND plan_parse_test DEPENDS plan_parse_test)
+
+    # ROS-free unit test for perception/detection_query.hpp (block 5.1). perception_types.hpp
+    # has zero heavy deps (util2 base types only), so point at the vendored build_yolo repo's
+    # include dir directly instead of linking Perception::vision (which would drag in
+    # OpenCV/ONNXRuntime for a pure-math, no-YOLO-needed test).
+    add_executable(detection_query_test test/detection_query_test.cpp)
+    target_link_libraries(detection_query_test PRIVATE util_base_header UTIL2::util2)
+    target_include_directories(detection_query_test PRIVATE ${vision_SOURCE_DIR}/vision/include)
+    target_compile_features(detection_query_test PRIVATE cxx_std_17)
+    add_custom_target(run_detection_query_test COMMAND detection_query_test DEPENDS detection_query_test)
 endif()

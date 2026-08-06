@@ -251,16 +251,19 @@ existing GO tunables.
 
 ## 11. Definition of done (this slice)
 
-- [ ] `perception/detection_query.hpp` + unit test pass (`g++`, geometry asserts).
-- [ ] `CmdApproach` + `CommandID::APPROACH` + `GenericCommand` ctor added; blind `GO` unchanged.
-- [ ] `PerceptionSnapshot` type + atomic handoff in the FMU (producer stubbed).
-- [ ] APPROACH control branch: yaw-to-center + range-decel forward + vertical match + lateral
+- [x] `perception/detection_query.hpp` + unit test pass (`g++`, geometry asserts).
+- [x] `CmdApproach` + `CommandID::APPROACH` + `GenericCommand` ctor added; blind `GO` unchanged.
+- [x] `PerceptionSnapshot` type + atomic handoff in the FMU -- REAL, not stubbed: block 4.2
+      landed `PerceptionRuntime` before this slice started (see plan deviation note above §11).
+- [x] APPROACH control branch: yaw-to-center + range-decel forward + vertical match + lateral
       damp; recomputes aim every tick, stores no world point.
-- [ ] Standoff done rule; coast-then-FAIL lost rule.
-- [ ] `injectCannedApproachPlan` rig + `scripts/simenv_llm.sh approach`; operator confirms
-      turn-face-approach-stop and lost→FAIL in SITL.
-- [ ] `approach` entry in `llm_base.hpp` + `translateToBaseCommands` case.
-- [ ] Runs on the existing Reentrant + atomics model; no new mutex.
+- [x] Standoff done rule; coast-then-FAIL lost rule.
+- [x] `injectCannedApproachPlan` rig + `scripts/simenv_llm.sh approach` -- built and compiles;
+      **operator SITL confirmation of turn-face-approach-stop and lost→FAIL is still open**
+      (human check, not run by this session, same status as the ENU convention's SITL re-gate).
+- [x] `approach` entry in `llm_base.hpp` + `translateToBaseCommands` case (landed earlier as
+      ROADMAP 3.6, before this slice).
+- [x] Runs on the existing Reentrant + atomics model; no new mutex.
 
 ## 12. Sequencing
 

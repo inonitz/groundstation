@@ -505,3 +505,37 @@ Cloned to `/root/llm_drone` (not part of this repo). Read `README.md`, `brain_no
   `orbit`/`search`/`rotate` prompt entries; flagged in ARCHITECTURE.md's Appendix A status line
   so it is not mistaken for a shipped guarantee.
 
+## APPROACH visual servo implemented (2026-08-06, ROADMAP 5.1)
+
+- **detectionByLabel** (`source/llm_to_action/perception/detection_query.hpp`, new folder,
+  header-only -- mirrors `frame/`, no CMakeLists of its own): ROS-free pinhole back-projection,
+  unit-tested without YOLO (`fmu/test/detection_query_test.cpp`, built from `fmu/CMakeLists.txt`
+  alongside `plan_parse_test` -- **not** a new per-folder CMake project; first pass wrongly gave
+  `perception/` its own `project()`+CMakeLists, caught and fixed). Reconciled against block 4.2:
+  consumes the real vendored `vision/perception_types.hpp` directly, not the stub the spec was
+  written against.
+- **Camera intrinsics are real, not guessed, and defined exactly once:** derived from
+  PX4-Autopilot's own `Tools/simulation/gz/models/gimbal/model.sdf` (`horizontal_fov=2.0`,
+  1280x720) -- the exact sim camera the FMU flies against, addressing spec §9 R4 directly. The
+  concrete constant (`kGzX500GimbalCam`) lives once in `detection_query.hpp`; `fmu_node_base.hpp`
+  (`kApproachCamera`) and the unit test both reference it instead of repeating the literal
+  numbers -- first pass duplicated the literal in two places, caught and fixed.
+- **Control branch** (`fmu_node.hpp` `controlLoop`): per-tick yaw-center + range-decel + lateral
+  damping, per spec §5/§9 R1. No stored world point (spec D4) -- every tick re-reads
+  `PerceptionRuntime::snapshot()` via `detectionByLabel`.
+- **Canned rig deviation:** spec §7 left the "operator kills the detection mid-approach" step
+  interactive/unspecified. Implemented deterministically instead --
+  `kCannedApproachRigKillAfterMs` stops the synthetic detection a fixed time after activation --
+  since this system has no mid-flight interactive control channel. `PerceptionRuntime` gained
+  `injectSynthetic()` for this, reusing the existing atomic-publish path; safe because the real
+  engines only publish when `ok()`, so a canned run (no models mounted) never races it.
+- **Build verification:** `GROUNDSTATION_BUILD_TESTS` is `OFF` by default in `build.sh`; flipped
+  to `ON` temporarily via `build.sh` (not a raw `cmake` cache edit) to run
+  `detection_query_test`/`plan_parse_test`/`frame_convert_test` (all pass), then reverted --
+  `git diff build.sh` is clean. Logged the cost: verifying one new test forced a full ~1min
+  all-targets rebuild (ROADMAP 9.10 -- build.sh has no per-target selection yet, noted not
+  implemented).
+- **Still open:** SITL re-gate (`./scripts/simenv_llm.sh approach`) is a human check, same as
+  the ENU convention's SITL re-gate before it -- not run by this session. Block 5.2 (live-YOLO
+  GO) reuses `detectionByLabel` next.
+

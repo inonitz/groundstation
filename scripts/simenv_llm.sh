@@ -14,6 +14,11 @@
 #   speed              -> takeoff, go forward 1m + return at LOW speed
 #                          (15cm/s), same at HIGH speed (80cm/s), land --
 #                          checks whether path curvature scales with speed.
+#   approach           -> takeoff, closed-loop APPROACH toward a synthesized (no-YOLO)
+#                          detection 3m north / 1m up of spawn, land. Verifies the servo
+#                          reaches kApproachStandoffM and FAILs cleanly if the detection
+#                          is killed mid-approach (see fmu_node_base.hpp
+#                          kCannedApproachRigKillAfterMs).
 #   vlm                -> launch the Qwen3-VL llama-server + drive the FMU from
 #                          the VLM (no canned plan). Needs the model at
 #                          /root/models/vlm and a Vulkan device.
@@ -38,6 +43,9 @@ if [ "$PLAN_MODE" = "cross" ]; then
 elif [ "$PLAN_MODE" = "speed" ]; then
     FMU_OBJECTIVE="Fly forward 1m + return at low then high speed, then land."
     FMU_CANNED_FLAG="--canned-speed"
+elif [ "$PLAN_MODE" = "approach" ]; then
+    FMU_OBJECTIVE="Approach the canned target, then land."
+    FMU_CANNED_FLAG="--canned-approach"
 elif [ "$PLAN_MODE" = "vlm" ]; then
     FMU_OBJECTIVE="Take off, fly forward 1 meter, then land."
     FMU_CANNED_FLAG=""

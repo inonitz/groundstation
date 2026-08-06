@@ -25,6 +25,7 @@
 #include "plan_parse.hpp"
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
+#include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
 
 
 /* Shared-scalar access order (matches the proven baseline). */
@@ -252,23 +253,26 @@ public:
 
     /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
     void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
-               bool useSpeedPlan = false) {
+               bool useSpeedPlan = false, bool useApproachPlan = false) {
         m_chat.m_initialCommand = objective;
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan;
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan;
         m_missionActive.store(!cannedRun, std::memory_order_release);
         if (useCrossPlan) {
             injectCannedCrossPlan();
         } else if (useSpeedPlan) {
             injectCannedSpeedPlan();
+        } else if (useApproachPlan) {
+            injectCannedApproachPlan();
         } else if (useCannedPlan) {
             injectCannedPlan();
         }
         RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d). queued~=%zu. objective: %.*s",
+            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d). queued~=%zu. objective: %.*s",
             __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
+            __scast(int, useApproachPlan),
             m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
         );
         return;
@@ -290,6 +294,69 @@ private:
     /* ---- 20Hz control + deterministic completion ------------------------- */
     /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.   */
     /* Frame is canonical ENU (East, North, Up+); backend converts NED at wire. */
+    /* Perpendicular component of measVel relative to forwardUnit (assumed unit length).
+       Subtracting a fraction of this from the commanded ENU velocity damps the pursuit-arc
+       residual left after switching to a measured (not dead-reckoned) bearing (spec §9 R1). */
+    static Vec3 lateralComponent(Vec3 measVel, Vec3 forwardUnit) {
+        f32 along = measVel.x * forwardUnit.x + measVel.y * forwardUnit.y + measVel.z * forwardUnit.z;
+        return { measVel.x - along * forwardUnit.x,
+                 measVel.y - along * forwardUnit.y,
+                 measVel.z - along * forwardUnit.z };
+    }
+
+    /* Projects kCannedApproachTargetEnu through the drone's live pose into a synthetic
+       PerceptionSnapshot and publishes it via PerceptionRuntime::injectSynthetic. Forward-
+       projection inverse of detectionByLabel's back-projection: world point -> body-FLU
+       vector -> pixel. Not visible (behind the camera or outside the frame) -> publish a
+       valid-but-empty snapshot, exactly what a real camera reports when nothing matches. */
+    void updateCannedApproachRig(Odometry const& od) {
+        Vec3               relEnu, relFlu;
+        f32                u, v, camX, camY;
+        PerceptionSnapshot synth;
+        u64                now;
+
+        now = nowUs();
+        synth.host_stamp_us = now;
+        synth.valid = true;   /* the "camera" is alive; count==0 means "nothing detected". */
+
+        if ((now - m_cannedApproachActivateUs) > kCannedApproachRigKillAfterUs) {
+            m_perception->injectSynthetic(synth);   /* rig "kill": simulate the target leaving frame. */
+            return;
+        }
+
+        relEnu = { kCannedApproachTargetEnu.x - od.pos.x,
+                   kCannedApproachTargetEnu.y - od.pos.y,
+                   kCannedApproachTargetEnu.z - od.pos.z };
+        relFlu = enu_to_flu(relEnu, od.yaw);
+
+        if (relFlu.x <= 0.05f) {   /* behind (or at) the camera plane -- not visible. */
+            m_perception->injectSynthetic(synth);
+            return;
+        }
+
+        camX = -relFlu.y / relFlu.x;
+        camY = -relFlu.z / relFlu.x;
+        u    = kApproachCamera.cx + kApproachCamera.fx * camX;
+        v    = kApproachCamera.cy + kApproachCamera.fy * camY;
+
+        if (u < 0.0f || u > static_cast<f32>(kApproachCamera.width) ||
+            v < 0.0f || v > static_cast<f32>(kApproachCamera.height)) {
+            m_perception->injectSynthetic(synth);   /* projected outside the frame. */
+            return;
+        }
+
+        synth.count = 1;
+        std::snprintf(synth.dets[0].label, sizeof(FixedStringType), "%s", kCannedApproachTargetLabel);
+        synth.dets[0].bbox_xmin = static_cast<i32>(u - 20.0f);   /* synthetic 40x40px bbox.   */
+        synth.dets[0].bbox_ymin = static_cast<i32>(v - 20.0f);
+        synth.dets[0].bbox_xmax = static_cast<i32>(u + 20.0f);
+        synth.dets[0].bbox_ymax = static_cast<i32>(v + 20.0f);
+        synth.dets[0].confidence = 1.0f;
+        synth.dets[0].median_depth_cm =
+            std::sqrt(relFlu.x * relFlu.x + relFlu.y * relFlu.y + relFlu.z * relFlu.z) * 100.0f;
+        m_perception->injectSynthetic(synth);
+    }
+
     void controlLoop() {
         Odometry    od;
         f32         n, e, d, dx, dy, dz, dist, sp, vN, vE, vD;
@@ -297,6 +364,12 @@ private:
         ActiveTask  next;
         FlightState st;
         CommandID   id;
+        CmdApproach appr;
+        TargetRelative tr;
+        std::shared_ptr<PerceptionSnapshot> snap;
+        Vec3        velEnu, aimFlu, fwdDir, lat;
+        f32         speedCeil, spF, yawRate, vUp, magV;
+        u64         tnow;
 
         od = m_backend->odometry();
         n  = od.pos.x;
@@ -394,6 +467,71 @@ private:
                         "[FMU_NODE_DIAGNOSTICS] GO dist=%.2f cmdVelENU=(%.2f,%.2f,%.2f) measVelENU=(%.2f,%.2f,%.2f) yaw=%.2f yawrate=%.2f",
                         dist, vN, vE, vD,
                         od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate);
+                }
+            } else if (id == CommandID::APPROACH) {
+                if (m_useCannedApproachRig) updateCannedApproachRig(od);
+
+                appr = m_currTask.m_cmd.m_extractCmd.m_approach;
+                tnow = nowUs();
+                snap = m_perception->snapshot();
+                tr   = (snap) ? detectionByLabel(*snap, appr.target, kApproachCamera, tnow)
+                              : TargetRelative{};
+
+                if (!tr.found || tr.age_us > kApproachLostTimeoutUs) {
+                    if (m_approachHaveLastAim &&
+                        (tnow - m_approachLastAimUs) <= kApproachLostTimeoutUs) {
+                        aimFlu = { m_approachLastAimFlu.x * kApproachCoastSpeedMps,
+                                   m_approachLastAimFlu.y * kApproachCoastSpeedMps,
+                                   m_approachLastAimFlu.z * kApproachCoastSpeedMps };
+                        velEnu = flu_to_enu(aimFlu, od.yaw);
+                        m_backend->set_velocity(velEnu, 0.0f);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] APPROACH coasting target=%s (lost).", appr.target);
+                    } else {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_WARN(this->get_logger(),
+                            "[FMU_NODE_DEBUG] APPROACH lost target=%s past coast window -> FAIL.",
+                            appr.target);
+                        completeCurrent("approach_lost_failed");
+                    }
+                } else {
+                    m_approachLastAimFlu  = tr.dirFlu;
+                    m_approachLastAimUs   = tnow;
+                    m_approachHaveLastAim = true;
+
+                    if (tr.range < kApproachStandoffM) {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] APPROACH reached target=%s range=%.2f",
+                            appr.target, tr.range);
+                        completeCurrent("approach_ok");
+                    } else {
+                        speedCeil = (appr.speed > 0.0f ? appr.speed : kApproachSpeedDefault) / 100.0f;
+                        spF       = kApproachFwdGainHz * (tr.range - kApproachStandoffM);
+                        if (spF < 0.0f) spF = 0.0f;
+                        if (spF > speedCeil) spF = speedCeil;
+                        yawRate = -kApproachYawGain * tr.errX;
+                        vUp     = -kApproachVertGain * tr.errY;
+                        aimFlu  = { spF, 0.0f, vUp };
+                        velEnu  = flu_to_enu(aimFlu, od.yaw);
+                        fwdDir  = flu_to_enu(Vec3{1.0f, 0.0f, 0.0f}, od.yaw);
+                        lat     = lateralComponent(od.vel, fwdDir);
+                        velEnu.x -= kApproachLateralDamp * lat.x;
+                        velEnu.y -= kApproachLateralDamp * lat.y;
+                        velEnu.z -= kApproachLateralDamp * lat.z;
+                        magV = std::sqrt(velEnu.x * velEnu.x + velEnu.y * velEnu.y + velEnu.z * velEnu.z);
+                        if (magV > speedCeil && magV > 0.0f) {
+                            velEnu.x *= speedCeil / magV;
+                            velEnu.y *= speedCeil / magV;
+                            velEnu.z *= speedCeil / magV;
+                        }
+                        m_backend->set_velocity(velEnu, yawRate);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] APPROACH target=%s range=%.2f errX=%.2f errY=%.2f "
+                            "cmdVelENU=(%.2f,%.2f,%.2f) yawRate=%.2f",
+                            appr.target, tr.range, tr.errX, tr.errY,
+                            velEnu.x, velEnu.y, velEnu.z, yawRate);
+                    }
                 }
             } else {
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d not movement -> auto-complete.",
@@ -514,6 +652,12 @@ private:
                 "[FMU_NODE_DEBUG] GO activated. relFLU=(%.2f,%.2f,%.2f) targetENU=(%.2f,%.2f,%.2f) dirENU=(%.2f,%.2f,%.2f) speed=%.2f",
                 relFlu.x, relFlu.y, relFlu.z, m_targetN, m_targetE, m_targetD,
                 m_goDirN, m_goDirE, m_goDirD, m_activeSpeed);
+            break;
+        case CommandID::APPROACH:
+            m_approachHaveLastAim      = false;
+            m_cannedApproachActivateUs = nowUs();
+            RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] APPROACH activated target=%s.",
+                m_currTask.m_cmd.m_extractCmd.m_approach.target);
             break;
         default:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d auto-completes.",
@@ -689,6 +833,19 @@ private:
         translateToBaseCommands(kCannedPlanJson);
     }
 
+    /* Canned, no-YOLO closed-loop APPROACH test (ROADMAP 5.1 verification, spec §7): enables
+       the synthetic detection rig, then runs the SAME translate path the VLM uses. */
+    void injectCannedApproachPlan() {
+        static const char* kCannedApproachPlanJson = R"([
+            {"thought":"canned takeoff",  "action":"takeoff"},
+            {"thought":"canned approach", "action":"approach",
+             "target_object":"canned_target", "speed":30},
+            {"thought":"canned land",     "action":"land"}
+        ])";
+        m_useCannedApproachRig = true;
+        translateToBaseCommands(kCannedApproachPlanJson);
+    }
+
     /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
        then immediately UNDONE, one axis at a time, before the next axis starts.
        Every "return" leg re-anchors from fresh od.yaw + od.pos at that leg's own
@@ -760,4 +917,17 @@ private:
     f32 m_targetN{0.0f}, m_targetE{0.0f}, m_targetD{0.0f}, m_activeSpeed{0.3f};
     f32 m_goStartN{0.0f}, m_goStartE{0.0f}, m_goStartD{0.0f};
     f32 m_goDirN{0.0f}, m_goDirE{0.0f}, m_goDirD{0.0f}, m_goTotalDist{0.0f};
+
+    /* APPROACH coast state (control thread only): last known good aim direction + its
+       timestamp, so one briefly-lost detection doesn't immediately FAIL the task
+       (spec 2026-08-05-visual-servoing-approach-design.md §6). Reset at activation. */
+    Vec3 m_approachLastAimFlu{0.0f, 0.0f, 0.0f};
+    u64  m_approachLastAimUs{0};
+    bool m_approachHaveLastAim{false};
+
+    /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
+       controlLoop synthesizes a PerceptionSnapshot for a fixed world point instead of
+       reading the real vision engines. */
+    bool m_useCannedApproachRig{false};
+    u64  m_cannedApproachActivateUs{0};
 };

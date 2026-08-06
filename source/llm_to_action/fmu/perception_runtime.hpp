@@ -73,6 +73,15 @@ public:
         return std::atomic_load(&m_snapshot);
     }
 
+    /* Test-only: publish a synthesized snapshot through the same atomic path the real seg
+       loop uses. Safe to call even while the real engines are running -- if the vision
+       models aren't loaded (engine.ok() == false, e.g. no models mounted), the real loops
+       never call publish(), so this is the only writer and nothing races it. Used by the
+       canned APPROACH rig (ROADMAP 5.1 verification, no YOLO needed). */
+    void injectSynthetic(PerceptionSnapshot const& snap) {
+        std::atomic_store(&m_snapshot, std::make_shared<PerceptionSnapshot>(snap));
+    }
+
 private:
     void segLoop() {
         while (m_running.load(std::memory_order_relaxed)) {

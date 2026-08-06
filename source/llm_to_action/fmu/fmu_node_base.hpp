@@ -1,5 +1,6 @@
 #pragma once
 #include <util2/C/base_type.h>
+#include "perception/detection_query.hpp"   /* CameraIntrinsics */
 
 /*
     FMU-only tuning. Everything PX4/ROS-wire (topic names, QoS, offboard stream
@@ -64,3 +65,35 @@ constexpr int kVisionSegThreads   = 2;
 constexpr int kVisionDepthThreads = 2;
 constexpr u32 kVisionSegLoopMs    = 33;   /* ~30 Hz target; measured: meets it. */
 constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40Hz refresh. */
+
+/* ---- APPROACH visual servo (ROADMAP 5.1, spec 2026-08-05-visual-servoing-approach-design.md) --
+   Recomputed every control tick from the live camera detection; no world point is stored, so
+   nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
+   tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
+constexpr f32 kApproachStandoffM     = 0.50f;   /* stop this far from the target.               */
+constexpr f32 kApproachSpeedDefault  = 30.0f;   /* cm/s, if CmdApproach.speed == 0.              */
+constexpr f32 kApproachFwdGainHz     = 0.5f;    /* (range-standoff) -> forward speed.            */
+constexpr f32 kApproachYawGain       = 1.0f;    /* horiz bbox error -> yaw-rate.                 */
+constexpr f32 kApproachVertGain      = 0.5f;    /* vert bbox error -> vertical velocity.         */
+constexpr f32 kApproachLateralDamp   = 0.5f;    /* perpendicular measured-velocity damping (R1). */
+constexpr f32 kApproachCoastSpeedMps = 0.15f;   /* speed while coasting on a briefly-lost target
+                                                    (not in the spec's tunable table -- same
+                                                    first-guess/SITL-tune status as the rest). */
+constexpr u32 kApproachLostTimeoutMs = 500;     /* coast window before FAIL on lost target.      */
+constexpr u64 kApproachLostTimeoutUs = static_cast<u64>(kApproachLostTimeoutMs) * 1000ULL;
+
+/* Camera profile used by the APPROACH servo -- the concrete constant lives once in
+   detection_query.hpp (kGzX500GimbalCam) so it is not repeated here and in the unit test. */
+constexpr CameraIntrinsics kApproachCamera = kGzX500GimbalCam;
+
+/* ---- Canned APPROACH detection rig (ROADMAP 5.1 verification, spec §7) -------------------
+   No-YOLO closed-loop test: synthesizes a PerceptionSnapshot by projecting a known static ENU
+   point through the drone's live pose. kCannedApproachRigKillAfterMs is this session's concrete
+   choice for the spec's underspecified "operator kills the detection mid-approach" step --
+   deterministic and scriptable instead of interactive (this system has no mid-flight
+   interactive control channel). */
+constexpr Vec3        kCannedApproachTargetEnu    = { 0.0f, 3.0f, 1.0f };  /* 3m north, 1m up. */
+constexpr const char* kCannedApproachTargetLabel  = "canned_target";
+constexpr u32         kCannedApproachRigKillAfterMs = 6000;
+constexpr u64         kCannedApproachRigKillAfterUs =
+    static_cast<u64>(kCannedApproachRigKillAfterMs) * 1000ULL;

@@ -78,12 +78,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              (kVisionSegThreads/kVisionDepthThreads ORT intra-op cap)
              Human follow-up open: build verify + SITL smoke test (not run by this session).
 
-5. Visual servoing (the navigation pivot)                        [ ]  [GATE perception]
-   5.1 APPROACH <label>  (spec: specs/2026-08-05-visual-servoing-approach-design.md) [ ]
-       5.1.1 detectionByLabel lookup (ROS-free)                  [ ]
-       5.1.2 yaw-center + range-decel servo, recomputed per tick [ ]
-       5.1.3 done at standoff / lost = FAIL                      [ ]
-       5.1.4 tests (no YOLO needed)                              [ ]
+5. Visual servoing (the navigation pivot)                        [~]  APPROACH done, SITL re-gate pending (human)
+   5.1 APPROACH <label>  (spec: specs/2026-08-05-visual-servoing-approach-design.md) [x]
+       5.1.1 detectionByLabel lookup (ROS-free)                  [x]
+       5.1.2 yaw-center + range-decel servo, recomputed per tick [x]
+       5.1.3 done at standoff / lost = FAIL                      [x]
+       5.1.4 tests (no YOLO needed)                              [x]  detection_query_test +
+             canned rig (--canned-approach / simenv_llm.sh approach); SITL run itself pending
    5.2 live-YOLO GO (recompute direction per tick, drift-free)   [ ]
    5.3 landmark-relative safe landing ("go over spot", land)     [ ]
 
@@ -115,6 +116,12 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    9.7 reconcile takeoff climb height (2 m node vs FMU)          [ ]  maybe moot post-ENU
    9.8 investigate ~20 s first-odometry handshake latency        [ ]  low priority
    9.9 reduce ~15 s first-frame latency (QoS/DDS/keyframe)       [ ]  low priority
+   9.10 build.sh has no target selection -- "build" always builds ALL     [ ]
+        (llama.cpp, every test, everything). Cost seen directly: verifying
+        detection_query_test (5.1) required a full ~1min all-target rebuild.
+        Proposal (not yet implemented): ./build.sh <cfg> <lib> configure/build
+        [all/tests/bench], default "all", so a test-only iteration doesn't
+        pay for the whole workspace. Touches build.sh AND build.ps1 (9.6).
 ```
 
 ---
