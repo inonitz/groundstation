@@ -78,13 +78,14 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              (kVisionSegThreads/kVisionDepthThreads ORT intra-op cap)
              Human follow-up open: build verify + SITL smoke test (not run by this session).
 
-5. Visual servoing (the navigation pivot)                        [~]  APPROACH done, SITL re-gate pending (human)
+5. Visual servoing (the navigation pivot)                        [~]  APPROACH SITL-verified
    5.1 APPROACH <label>  (spec: specs/2026-08-05-visual-servoing-approach-design.md) [x]
        5.1.1 detectionByLabel lookup (ROS-free)                  [x]
        5.1.2 yaw-center + range-decel servo, recomputed per tick [x]
        5.1.3 done at standoff / lost = FAIL                      [x]
        5.1.4 tests (no YOLO needed)                              [x]  detection_query_test +
-             canned rig (--canned-approach / simenv_llm.sh approach); SITL run itself pending
+             canned rig (--canned-approach / simenv_llm.sh approach); SITL-verified both
+             paths -- lost-target FAIL and reached-standoff approach_ok (2026-08-06)
    5.2 live-YOLO GO (recompute direction per tick, drift-free)   [ ]
    5.3 landmark-relative safe landing ("go over spot", land)     [ ]
 
@@ -122,6 +123,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
         Proposal (not yet implemented): ./build.sh <cfg> <lib> configure/build
         [all/tests/bench], default "all", so a test-only iteration doesn't
         pay for the whole workspace. Touches build.sh AND build.ps1 (9.6).
+   9.11 LAND has no flare -- constant kLandDescendVelEnu (-0.5 m/s) all the [ ]
+        way to ground contact, no deceleration near touchdown. Seen in SITL
+        (5.1 APPROACH verification, both the FAIL-path and approach_ok-path
+        runs): odometry shows a velocity/yaw spike right after force_disarm,
+        consistent with a hard-ish touchdown. Pre-existing, not caused by
+        APPROACH. Fix (not yet implemented): taper descent speed as altitude
+        nears kGroundContactEnu instead of a constant rate.
 ```
 
 ---

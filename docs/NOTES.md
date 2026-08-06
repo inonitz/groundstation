@@ -539,3 +539,35 @@ Cloned to `/root/llm_drone` (not part of this repo). Read `README.md`, `brain_no
   the ENU convention's SITL re-gate before it -- not run by this session. Block 5.2 (live-YOLO
   GO) reuses `detectionByLabel` next.
 
+## APPROACH SITL-verified: two stale-environment bugs, one design bug, one pre-existing finding (2026-08-06)
+
+First `./scripts/simenv_llm.sh approach` runs surfaced problems -- none in the servo math itself:
+
+- **Stale binary:** `simenv_llm.sh` launched `llm_to_action_fmu` (no backend suffix), a leftover
+  from before the per-backend rename to `llm_to_action_fmu_<backend>`. Confirmed by the running
+  binary's own log format string missing the `approach=%d` field entirely -- it predated
+  CommandID::APPROACH existing at all. Fixed: launch `llm_to_action_fmu_px4`.
+- **Missing onnxruntime lib:** binary loads `libonnxruntime.so.1` from
+  `build/release/shared/_deps/onnxruntime/.../lib`, never installed into the bin dir alongside
+  everything else. Fixed: added that dir to the FMU pane's `LD_LIBRARY_PATH` in `simenv_llm.sh`.
+  Verified clean with `ldd` before re-running.
+- **Canned target could land behind the camera:** `kCannedApproachTargetEnu` was a fixed
+  absolute ENU point ("3m north"), but SITL spawn heading isn't North (~-0.3 rad observed) --
+  so the target sat behind the drone at APPROACH activation on the very first tick, and the
+  "not found, no prior aim" path correctly FAILed instantly. Every downstream piece
+  (behind-camera check, detectionByLabel, instant-FAIL-with-no-coast-on-first-tick) was working
+  correctly on a wrong input. Fixed: target is now computed once at activation, body-relative
+  to wherever the drone is actually facing at that moment (`fmu_node.hpp` activateTask,
+  same `flu_to_enu(relFlu, od.yaw)` pattern GO already uses) --
+  `kCannedApproachTargetFwdM`/`kCannedApproachTargetUpM` replace the fixed ENU constant.
+- **Both control paths now confirmed in SITL:** first real run (6s kill timer) exercised the
+  lost-target coast-then-FAIL path -- target was still 0.98m out (standoff 0.5m) when the rig's
+  timer cut the detection, coasted, FAILed correctly. User then raised
+  `kCannedApproachRigKillAfterMs` to 15s to also see the happy path: `APPROACH reached
+  target=canned_target range=0.50` -> `approach_ok`, range converged 3.16m -> 0.50m monotonically
+  the whole way. Both paths verified working from real SITL flight, not just unit tests.
+- **Pre-existing finding, logged not fixed (ROADMAP 9.11):** LAND has no flare -- constant
+  `kLandDescendVelEnu` (-0.5 m/s) all the way to ground contact. Odometry shows a velocity/yaw
+  spike right after `force_disarm` in both approach runs (FAIL-path landing and approach_ok-path
+  landing alike), consistent with a hard-ish touchdown. Not caused by APPROACH; out of this
+  block's scope.

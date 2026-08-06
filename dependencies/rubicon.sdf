@@ -28,9 +28,40 @@
       <sky></sky>
     </scene>
 
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>200 200</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>200 200</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Detection target for APPROACH (real perception): flat ground so
+         terrain height is known, car placed forward of PX4_GZ_MODEL_POSE
+         spawn (0,7,3). Forward at yaw=0 is +X (flu_to_enu: forward=(cos,sin)
+         -> +X at yaw 0), not +Y -- +Y is body-LEFT, first placement was wrong. -->
     <include>
-      <name>Rubicon</name>
-      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Rubicon</uri>
+      <name>hatchback_blue_1</name>
+      <pose>6 7 0.3 0 0 0</pose>
+      <uri>model://hatchback_blue</uri>
     </include>
 
   </world>

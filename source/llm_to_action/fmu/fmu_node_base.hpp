@@ -59,8 +59,8 @@ constexpr u64 kVisionWarmupUs = static_cast<u64>(kVisionWarmupMs) * 1000ULL;
    so PerceptionRuntime runs them as two independently-paced loops rather
    than one blocking call. Thread counts are capped so ORT cannot starve the
    20Hz control loop / other llm_to_action nodes sharing this process. */
-constexpr const char* kVisionSegModelPath   = "/root/models/vision/yolo26n-seg.onnx";
-constexpr const char* kVisionDepthModelPath = "/root/models/vision/yolo26n-depth.onnx";
+constexpr const char* kVisionSegModelPath   = "/root/models/vision/vision/yolo26n-seg-384.onnx";
+constexpr const char* kVisionDepthModelPath = "/root/models/vision/vision/yolo26n-depth-384.onnx";
 constexpr int kVisionSegThreads   = 2;
 constexpr int kVisionDepthThreads = 2;
 constexpr u32 kVisionSegLoopMs    = 33;   /* ~30 Hz target; measured: meets it. */
@@ -70,30 +70,54 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
    tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
-constexpr f32 kApproachStandoffM     = 0.50f;   /* stop this far from the target.               */
-constexpr f32 kApproachSpeedDefault  = 30.0f;   /* cm/s, if CmdApproach.speed == 0.              */
-constexpr f32 kApproachFwdGainHz     = 0.5f;    /* (range-standoff) -> forward speed.            */
+constexpr f32 kApproachStandoffM     = 1.00f;   /* stop this far from the target. Bigger than the
+                                                    servo law strictly needs -- real depth readings
+                                                    jitter/freeze on this CPU (SITL, real YOLO), so
+                                                    this is slack against a misjudged range, not just
+                                                    a stopping point. */
+constexpr f32 kApproachSpeedDefault  = 80.0f;   /* cm/s, if CmdApproach.speed == 0. Faster cruise so
+                                                    the brake ramp below is actually visible against
+                                                    it (30cm/s cruise vs near-zero at the end reads as
+                                                    "flying slow the whole time", not "decelerating"). */
+constexpr f32 kApproachFwdGainHz     = 0.35f;   /* (range-standoff) -> forward speed. Lower than cruise
+                                                    speed needs, on purpose: crossover (where this starts
+                                                    undercutting the speed ceiling) lands ~2.8m out instead
+                                                    of ~1m, so braking is a visible ramp, not a last-instant
+                                                    snap -- and gives noisy real depth more distance to
+                                                    self-correct before standoff. */
 constexpr f32 kApproachYawGain       = 1.0f;    /* horiz bbox error -> yaw-rate.                 */
 constexpr f32 kApproachVertGain      = 0.5f;    /* vert bbox error -> vertical velocity.         */
 constexpr f32 kApproachLateralDamp   = 0.5f;    /* perpendicular measured-velocity damping (R1). */
 constexpr f32 kApproachCoastSpeedMps = 0.15f;   /* speed while coasting on a briefly-lost target
                                                     (not in the spec's tunable table -- same
                                                     first-guess/SITL-tune status as the rest). */
-constexpr u32 kApproachLostTimeoutMs = 500;     /* coast window before FAIL on lost target.      */
+constexpr u32 kApproachLostTimeoutMs = 3000;    /* coast window before FAIL on lost target; real
+                                                    seg/depth inference on this CPU lags the 500ms
+                                                    canned-rig tuning by seconds, not ms. */
 constexpr u64 kApproachLostTimeoutUs = static_cast<u64>(kApproachLostTimeoutMs) * 1000ULL;
+constexpr u32 kApproachFreshMs        = 200;    /* a detection older than this is not trusted for
+                                                    closing speed -- real depth readings on this CPU
+                                                    can freeze for 1s+ under load; acting on a frozen
+                                                    range means never decelerating -> collision (seen
+                                                    in SITL). Stale-but-not-yet-lost falls back to the
+                                                    same slow coast as a fully lost target. */
+constexpr u64 kApproachFreshUs        = static_cast<u64>(kApproachFreshMs) * 1000ULL;
 
 /* Camera profile used by the APPROACH servo -- the concrete constant lives once in
    detection_query.hpp (kGzX500GimbalCam) so it is not repeated here and in the unit test. */
 constexpr CameraIntrinsics kApproachCamera = kGzX500GimbalCam;
 
 /* ---- Canned APPROACH detection rig (ROADMAP 5.1 verification, spec §7) -------------------
-   No-YOLO closed-loop test: synthesizes a PerceptionSnapshot by projecting a known static ENU
-   point through the drone's live pose. kCannedApproachRigKillAfterMs is this session's concrete
-   choice for the spec's underspecified "operator kills the detection mid-approach" step --
-   deterministic and scriptable instead of interactive (this system has no mid-flight
-   interactive control channel). */
-constexpr Vec3        kCannedApproachTargetEnu    = { 0.0f, 3.0f, 1.0f };  /* 3m north, 1m up. */
+   No-YOLO closed-loop test: synthesizes a PerceptionSnapshot by projecting a target through
+   the drone's live pose. The target itself is body-relative, fixed at APPROACH activation
+   (not a hardcoded world point) -- SITL spawn heading is not exactly North, so a fixed ENU
+   point can land behind the camera depending on that heading. kCannedApproachRigKillAfterMs
+   is this session's concrete choice for the spec's underspecified "operator kills the
+   detection mid-approach" step -- deterministic and scriptable instead of interactive (this
+   system has no mid-flight interactive control channel). */
+constexpr f32          kCannedApproachTargetFwdM   = 3.0f;   /* body-forward offset at activation. */
+constexpr f32          kCannedApproachTargetUpM    = -1.0f;  /* relative to activation altitude.   */
 constexpr const char* kCannedApproachTargetLabel  = "canned_target";
-constexpr u32         kCannedApproachRigKillAfterMs = 6000;
+constexpr u32         kCannedApproachRigKillAfterMs = 15 * kMillisecondsInOneSecond;
 constexpr u64         kCannedApproachRigKillAfterUs =
     static_cast<u64>(kCannedApproachRigKillAfterMs) * 1000ULL;

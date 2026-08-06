@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <chrono>
 #include <cstring>
 #include <cmath>
 #include <string>
@@ -252,26 +253,28 @@ public:
 
     /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
     void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
-               bool useSpeedPlan = false, bool useApproachPlan = false) {
+               bool useSpeedPlan = false, bool useApproachPlan = false, bool useApproachRealPlan = false) {
         m_chat.m_initialCommand = objective;
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan;
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan;
         m_missionActive.store(!cannedRun, std::memory_order_release);
         if (useCrossPlan) {
             injectCannedCrossPlan();
         } else if (useSpeedPlan) {
             injectCannedSpeedPlan();
+        } else if (useApproachRealPlan) {
+            injectCannedApproachRealPlan();
         } else if (useApproachPlan) {
             injectCannedApproachPlan();
         } else if (useCannedPlan) {
             injectCannedPlan();
         }
         RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d). queued~=%zu. objective: %.*s",
+            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d approach_real=%d). queued~=%zu. objective: %.*s",
             __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
-            __scast(int, useApproachPlan),
+            __scast(int, useApproachPlan), __scast(int, useApproachRealPlan),
             m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
         );
         return;
@@ -300,11 +303,12 @@ private:
                  measVel.z - along * forwardUnit.z };
     }
 
-    /* Projects kCannedApproachTargetEnu through the drone's live pose into a synthetic
-       PerceptionSnapshot and publishes it via PerceptionRuntime::injectSynthetic. Forward-
-       projection inverse of detectionByLabel's back-projection: world point -> body-FLU
-       vector -> pixel. Not visible (behind the camera or outside the frame) -> publish a
-       valid-but-empty snapshot, exactly what a real camera reports when nothing matches. */
+    /* Projects m_cannedApproachTargetEnu (fixed at APPROACH activation, see activateTask)
+       through the drone's live pose into a synthetic PerceptionSnapshot and publishes it via
+       PerceptionRuntime::injectSynthetic. Forward-projection inverse of detectionByLabel's
+       back-projection: world point -> body-FLU vector -> pixel. Not visible (behind the
+       camera or outside the frame) -> publish a valid-but-empty snapshot, exactly what a
+       real camera reports when nothing matches. */
     void updateCannedApproachRig(Odometry const& od) {
         Vec3               relEnu, relFlu;
         f32                u, v, camX, camY;
@@ -320,9 +324,9 @@ private:
             return;
         }
 
-        relEnu = { kCannedApproachTargetEnu.x - od.pos.x,
-                   kCannedApproachTargetEnu.y - od.pos.y,
-                   kCannedApproachTargetEnu.z - od.pos.z };
+        relEnu = { m_cannedApproachTargetEnu.x - od.pos.x,
+                   m_cannedApproachTargetEnu.y - od.pos.y,
+                   m_cannedApproachTargetEnu.z - od.pos.z };
         relFlu = enu_to_flu(relEnu, od.yaw);
 
         if (relFlu.x <= 0.05f) {   /* behind (or at) the camera plane -- not visible. */
@@ -476,7 +480,7 @@ private:
                 tr   = (snap) ? detectionByLabel(*snap, appr.target, kApproachCamera, tnow)
                               : TargetRelative{};
 
-                if (!tr.found || tr.age_us > kApproachLostTimeoutUs) {
+                if (!tr.found || tr.age_us > kApproachFreshUs) {
                     if (m_approachHaveLastAim &&
                         (tnow - m_approachLastAimUs) <= kApproachLostTimeoutUs) {
                         aimFlu = { m_approachLastAimFlu.x * kApproachCoastSpeedMps,
@@ -491,6 +495,11 @@ private:
                         RCLCPP_WARN(this->get_logger(),
                             "[FMU_NODE_DEBUG] APPROACH lost target=%s past coast window -> FAIL.",
                             appr.target);
+                        if (snap && snap->count > 0) {
+                            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                                "[FMU_NODE_DEBUG] APPROACH sees %u detection(s), first label=%s age_ms=%.0f",
+                                snap->count, snap->dets[0].label, tr.age_us / 1000.0);
+                        }
                         completeCurrent("approach_lost_failed");
                     }
                 } else {
@@ -591,7 +600,14 @@ private:
         });
     }
 
-    u64 nowUs() const { return __scast(u64, this->get_clock()->now().nanoseconds() / 1000); }
+    /* steady_clock, not ROS clock -- must share an epoch with PerceptionRuntime::nowUs()
+       (perception_runtime.hpp) since APPROACH diffs a detection's host_stamp_us against
+       this. Mixing epochs (ROS wall time vs steady_clock) produced a garbage multi-hour
+       "age" on the very first real-perception run. */
+    u64 nowUs() const {
+        return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count());
+    }
 
     /* ---- Task lifecycle helpers ------------------------------------------ */
     void activateTask(ActiveTask const& task) {
@@ -655,6 +671,10 @@ private:
         case CommandID::APPROACH:
             m_approachHaveLastAim      = false;
             m_cannedApproachActivateUs = nowUs();
+            od     = m_backend->odometry();
+            relFlu = { kCannedApproachTargetFwdM, 0.0f, kCannedApproachTargetUpM };
+            relEnu = flu_to_enu(relFlu, od.yaw);
+            m_cannedApproachTargetEnu = { od.pos.x + relEnu.x, od.pos.y + relEnu.y, od.pos.z + relEnu.z };
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] APPROACH activated target=%s.",
                 m_currTask.m_cmd.m_extractCmd.m_approach.target);
             break;
@@ -845,6 +865,19 @@ private:
         translateToBaseCommands(kCannedApproachPlanJson);
     }
 
+    /* Skips the VLM planner but NOT perception -- real PerceptionRuntime (real ONNX
+       models) supplies the detection, same query path a VLM-driven run would use.
+       Targets "car" (COCO label) since the SITL world has a Rubicon jeep at spawn. */
+    void injectCannedApproachRealPlan() {
+        static const char* kCannedApproachRealPlanJson = R"([
+            {"thought":"canned takeoff",  "action":"takeoff"},
+            {"thought":"canned approach", "action":"approach",
+             "target_object":"car", "speed":30},
+            {"thought":"canned land",     "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedApproachRealPlanJson);
+    }
+
     /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
        then immediately UNDONE, one axis at a time, before the next axis starts.
        Every "return" leg re-anchors from fresh od.yaw + od.pos at that leg's own
@@ -925,8 +958,10 @@ private:
     bool m_approachHaveLastAim{false};
 
     /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
-       controlLoop synthesizes a PerceptionSnapshot for a fixed world point instead of
-       reading the real vision engines. */
+       controlLoop synthesizes a PerceptionSnapshot for a point fixed relative to the
+       drone's pose at APPROACH activation (see activateTask), instead of reading the
+       real vision engines. */
     bool m_useCannedApproachRig{false};
     u64  m_cannedApproachActivateUs{0};
+    Vec3 m_cannedApproachTargetEnu{0.0f, 0.0f, 0.0f};
 };

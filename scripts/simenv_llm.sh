@@ -19,6 +19,10 @@
 #                          reaches kApproachStandoffM and FAILs cleanly if the detection
 #                          is killed mid-approach (see fmu_node_base.hpp
 #                          kCannedApproachRigKillAfterMs).
+#   approach-real      -> same servo, but real perception: real ONNX seg+depth models,
+#                          target "car" (COCO label) against the Rubicon jeep already in
+#                          the SITL world. No synthetic detection. Skips only the VLM
+#                          planner, not vision.
 #   vlm                -> launch the Qwen3-VL llama-server + drive the FMU from
 #                          the VLM (no canned plan). Needs the model at
 #                          /root/models/vlm and a Vulkan device.
@@ -36,6 +40,8 @@ GZ_GIMBAL_SDF_FILE="$PX4_DIRECTORY/Tools/simulation/gz/models/gimbal/model.sdf"
 TARGET_WORLD_DIR="$PX4_DIRECTORY/Tools/simulation/gz/worlds"
 
 GZ_SIM_SYSTEM_PLUGIN_PATH="$BUILD_BINARY_DIR:$GZ_SIM_SYSTEM_PLUGIN_PATH"
+ONNXRUNTIME_LIB_DIR="/root/groundstation/build/release/shared/_deps/onnxruntime/onnxruntime-linux-x64-1.20.1/lib"
+GZ_SIM_RESOURCE_PATH="/root/groundstation/dependencies/gz_models:$GZ_SIM_RESOURCE_PATH"
 
 if [ "$PLAN_MODE" = "cross" ]; then
     FMU_OBJECTIVE="Fly forward/left/back/right 1m, returning to start after each, then land."
@@ -46,6 +52,9 @@ elif [ "$PLAN_MODE" = "speed" ]; then
 elif [ "$PLAN_MODE" = "approach" ]; then
     FMU_OBJECTIVE="Approach the canned target, then land."
     FMU_CANNED_FLAG="--canned-approach"
+elif [ "$PLAN_MODE" = "approach-real" ]; then
+    FMU_OBJECTIVE="Approach the car, then land."
+    FMU_CANNED_FLAG="--canned-approach-real"
 elif [ "$PLAN_MODE" = "vlm" ]; then
     FMU_OBJECTIVE="Take off, fly forward 1 meter, then land."
     FMU_CANNED_FLAG=""
@@ -100,6 +109,7 @@ CMD_AGENT="MicroXRCEAgent udp4 -p 8888"
 CMD_PX4="\
     export PX4_GZ_MODEL_POSE=0,7,3 && \
     export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH && \
+    export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH && \
     export PX4_GZ_WORLD=rubicon && \
     export PX4_NET_INTERFACE=eth0 && \
     cd $PX4_DIRECTORY && \
@@ -110,9 +120,9 @@ CMD_RX="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_RX && $BUILD_BINARY_DIR/llm_to_action_gstreamer_rx; \
     echo 'RX stopped'; read"
 
-CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
+CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_FMU && \
-    $BUILD_BINARY_DIR/llm_to_action_fmu \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG; \
+    $BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG; \
     echo 'FMU stopped'; read"
 
 # Phase 2: VLM server (Qwen3-VL). Launched only in `vlm` plan mode.
