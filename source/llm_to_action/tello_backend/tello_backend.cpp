@@ -135,6 +135,7 @@ Odometry TelloBackend::odometry_impl() const {
 
 void TelloBackend::stateLoop() {
     const auto period = milliseconds(1000 / kTelloStatePollHz);
+    u32 consecutiveMisses = 0, unparsable = 0;
     while (m_running.load(std::memory_order_relaxed)) {
         std::optional<std::string> s = m_tello->GetState();  /* separate socket from cmd. */
         if (s) {
@@ -147,8 +148,15 @@ void TelloBackend::stateLoop() {
                 m_vgy.store(st.vgy, std::memory_order_relaxed);
                 m_vgz.store(st.vgz, std::memory_order_relaxed);
                 m_hostStampUs.store(nowUs(), std::memory_order_relaxed);
-                m_gotFirstState.store(true, std::memory_order_relaxed);
+                if (!m_gotFirstState.exchange(true, std::memory_order_relaxed))
+                    std::fprintf(stderr, "[state] first valid GetState() parsed OK (line=\"%s\")\n", s->c_str());
+                consecutiveMisses = 0;
+            } else if (++unparsable == 1 || unparsable % kTelloStatePollHz == 0) {
+                std::fprintf(stderr, "[state] GetState() line failed to parse (#%u): \"%s\"\n", unparsable, s->c_str());
             }
+        } else if (++consecutiveMisses % kTelloStatePollHz == 0) {
+            std::fprintf(stderr, "[state] no GetState() response for %u polls (~%us) -- state socket may be dead\n",
+                         consecutiveMisses, consecutiveMisses / kTelloStatePollHz);
         }
         std::this_thread::sleep_for(period);
     }

@@ -21,6 +21,7 @@
     Build: part of the tello_backend CMake (target: tello_teleop).
 */
 #include <atomic>
+#include <chrono>
 #include <cstdio>
 #include <opencv2/opencv.hpp>
 
@@ -48,6 +49,19 @@ struct TeleopState {
         drone.set_body_velocity({ fwd.load(), lat.load(), vert.load() }, yaw.load());
     }
 
+    /* Diagnostic: setpoint we're commanding + telemetry validity at the moment
+       T/L is pressed. Distinguishes "no state feedback yet" (state socket dead,
+       see stateLoop's [state] logs) from "state fine, drone just drifting". */
+    void logKeyEvent(const char* label) {
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+        Odometry od = drone.odometry();
+        std::printf("[TIME %lld ms] %s pressed. cmd(fwd=%.2f lat=%.2f vert=%.2f yaw=%.2f) "
+                    "telemetry(valid=%d vel=%.2f,%.2f,%.2f alt=%.2fm)\n",
+                    (long long)ms, label, fwd.load(), lat.load(), vert.load(), yaw.load(),
+                    __scast(int, od.valid), od.vel.x, od.vel.y, od.vel.z, od.pos.z);
+    }
+
     void onKey(KeyCodeEnum key, KeyAction action) {
         const bool down = (action == KeyAction::PRESSED || action == KeyAction::REPEATED);
         const f32  v = kMoveSpeedMps;
@@ -64,8 +78,13 @@ struct TeleopState {
             case KeyCodeEnum::Space:
                 fwd.store(0.0f); lat.store(0.0f); vert.store(0.0f); yaw.store(0.0f);
                 break;
-            case KeyCodeEnum::T: if (down) drone.takeoff(); return;
-            case KeyCodeEnum::L: if (down) drone.land();    return;
+            case KeyCodeEnum::T:
+                if (down) { logKeyEvent("T/takeoff"); drone.takeoff(); }
+                return;
+            case KeyCodeEnum::L:
+                if (down) { logKeyEvent("L/land"); }
+                drone.land();
+                return;
             case KeyCodeEnum::Escape: if (down) g_running.store(false); return;
             default: return;
         }
