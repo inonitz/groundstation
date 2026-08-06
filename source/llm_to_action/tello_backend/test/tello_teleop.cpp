@@ -79,11 +79,16 @@ struct TeleopState {
                 fwd.store(0.0f); lat.store(0.0f); vert.store(0.0f); yaw.store(0.0f);
                 break;
             case KeyCodeEnum::T:
-                if (down) { logKeyEvent("T/takeoff"); drone.takeoff(); }
+                if (down) {
+                    logKeyEvent("T/takeoff");
+                    std::thread([this]{ drone.takeoff(); }).detach();
+                }
                 return;
             case KeyCodeEnum::L:
-                if (down) { logKeyEvent("L/land"); }
-                drone.land();
+                if (down) {
+                    logKeyEvent("L/land");
+                    std::thread([this]{ drone.land(); }).detach();
+                }
                 return;
             case KeyCodeEnum::Escape: if (down) g_running.store(false); return;
             default: return;
