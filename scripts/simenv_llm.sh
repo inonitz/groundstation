@@ -56,7 +56,7 @@ elif [ "$PLAN_MODE" = "approach-real" ]; then
     FMU_OBJECTIVE="Approach the car, then land."
     FMU_CANNED_FLAG="--canned-approach-real"
 elif [ "$PLAN_MODE" = "vlm" ]; then
-    FMU_OBJECTIVE="Take off, fly forward 1 meter, then land."
+    FMU_OBJECTIVE="Take off, find the car, approach it, then land."
     FMU_CANNED_FLAG=""
 else
     FMU_OBJECTIVE="Fly forward 1m then land."

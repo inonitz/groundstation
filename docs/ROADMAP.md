@@ -86,6 +86,14 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        5.1.4 tests (no YOLO needed)                              [x]  detection_query_test +
              canned rig (--canned-approach / simenv_llm.sh approach); SITL-verified both
              paths -- lost-target FAIL and reached-standoff approach_ok (2026-08-06)
+       5.1.5 real-perception + VLM-driven end-to-end SITL         [~]  2026-08-06: real
+             YOLO seg+depth (model paths were wrong since 4.2, never actually loaded
+             until today -- fixed), real Qwen3-VL-2B planning, real detected object
+             (vendored hatchback gz model). Servo itself works and completes; found +
+             fixed along the way: FMU/PerceptionRuntime clock-epoch mismatch (bogus
+             detection "age"), no motion-freshness gate on trusting a detection, class
+             label drift on the real model ("car"->"boat" on the same object), cruise/
+             standoff tuned for real depth noise. Outstanding: 6.4 (no collision check).
    5.2 live-YOLO GO (recompute direction per tick, drift-free)   [ ]
    5.3 landmark-relative safe landing ("go over spot", land)     [ ]
 
@@ -93,6 +101,14 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    6.1 Emergency boundary (velocity-scaled trigger distance)     [ ]  [GATE depth]
    6.2 Battery / failsafe supervisor + user override (ARCH 11)   [ ]  needs battery field in the backend interface
    6.3 Interrupt hysteresis + max-retries then land/abort        [ ]
+   6.4 APPROACH "reached" has no motion sanity check             [ ]  real SITL collision
+       (2026-08-06, live VLM run): a physical hit produced yawrate=6.9 rad/s and
+       vertical vel -1.75 m/s (vs commanded ~-0.10 yawrate) and altitude collapsed
+       0.99m -> 0.02m in ~1s -- APPROACH read range=1.83m off a frame taken during/
+       after that impact and declared approach_ok. No check exists that a "reached"
+       determination coincides with nominal (commanded-ish) vehicle motion. Fix (not
+       yet implemented): reject "reached" if IMU/odometry is out of nominal range
+       that tick; treat as INTERRUPT-worthy instead of silent success.
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
    7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  scaffolding only

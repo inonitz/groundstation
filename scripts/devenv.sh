@@ -86,6 +86,15 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     done
 fi
 
+# Container startup command (kept as a variable so it stays readable, multi-line)
+ContainerStartupCmd="\
+    mkdir -p ~/.claude && \
+    rtk init -g >/dev/null 2>&1 && \
+    echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && \
+    (iptables -C INPUT -p udp --dport 8890 -j ACCEPT 2>/dev/null || iptables -I INPUT 1 -p udp --dport 8890 -j ACCEPT) && \
+    (iptables -C INPUT -p udp --dport 11111 -j ACCEPT 2>/dev/null || iptables -I INPUT 1 -p udp --dport 11111 -j ACCEPT) && \
+    exec bash"
+
 # Execute
 xhost +local:root
-docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "mkdir -p ~/.claude && rtk init -g >/dev/null 2>&1 && echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && exec bash"
+docker run "$@" px4_gazebo-lts-2028_ros2-lts-2029 bash -c "$ContainerStartupCmd"

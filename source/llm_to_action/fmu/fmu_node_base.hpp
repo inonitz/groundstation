@@ -70,11 +70,14 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
    tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
-constexpr f32 kApproachStandoffM     = 1.00f;   /* stop this far from the target. Bigger than the
+constexpr f32 kApproachStandoffM     = 2.00f;   /* stop this far from the target. Bigger than the
                                                     servo law strictly needs -- real depth readings
                                                     jitter/freeze on this CPU (SITL, real YOLO), so
                                                     this is slack against a misjudged range, not just
-                                                    a stopping point. */
+                                                    a stopping point. 1.0m still let range hover right
+                                                    at the threshold without a clean below-standoff
+                                                    reading, so the drone sat close-range yaw-chasing
+                                                    instead of stopping -- clipped the target (SITL). */
 constexpr f32 kApproachSpeedDefault  = 80.0f;   /* cm/s, if CmdApproach.speed == 0. Faster cruise so
                                                     the brake ramp below is actually visible against
                                                     it (30cm/s cruise vs near-zero at the end reads as

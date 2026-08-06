@@ -571,3 +571,45 @@ First `./scripts/simenv_llm.sh approach` runs surfaced problems -- none in the s
   spike right after `force_disarm` in both approach runs (FAIL-path landing and approach_ok-path
   landing alike), consistent with a hard-ish touchdown. Not caused by APPROACH; out of this
   block's scope.
+
+
+## Real perception + live VLM, end-to-end: worked, but hit the target (2026-08-06)
+
+Same-day follow-up: pushed past the canned rig to real seg/depth ONNX models and a real
+VLM (Qwen3-VL-2B) planning live off actual detections. Target: a hatchback gz model
+vendored from github.com/monemati/PX4-ROS2-Gazebo-YOLOv8 (SITL world had no usable
+object -- the Fuel "Rubicon" asset is a house, not a vehicle, despite the name).
+
+- **4.2's model paths were wrong, silently, since it was written:** `kVisionSegModelPath`/
+  `kVisionDepthModelPath` pointed at `/root/models/vision/*.onnx`; real files landed at
+  `/root/models/vision/vision/*.onnx` (nested) once actually mounted today. Real inference
+  had never run before today -- not caught earlier because models didn't exist yet to catch
+  it against. Fixed: paths corrected, switched to the `-384` input-res variant (matches the
+  perf number already recorded in ROADMAP 4.1.8).
+- **Clock-epoch mismatch:** `FlightManagementUnitNode::nowUs()` used the ROS clock;
+  `PerceptionRuntime::nowUs()` used `steady_clock`. Diffing the two for a detection's "age"
+  produced garbage (49.6 real hours between two ticks 50ms apart) -- APPROACH instantly
+  treated every real detection as infinitely stale. Fixed: both now `steady_clock`.
+- **No freshness gate:** APPROACH only checked total staleness (3s) before giving up, with
+  no check that a detection was fresh enough to trust for closing speed. Real depth froze
+  for 1s+ stretches under this CPU's load; the servo kept commanding a range-based speed off
+  a frozen number. Added `kApproachFreshUs` (200ms) -- anything staler falls back to slow
+  coast instead of confidently closing distance on old data.
+- **Label drift:** the real model reclassified the same object mid-approach ("car" -> "boat")
+  at closer range/angle -- a real model-accuracy limitation on this synthetic mesh, not a
+  logic bug. Added a narrow fallback: if the exact label misses but exactly one detection is
+  in frame, track it anyway (nothing else it could be). Does not touch `detectionByLabel`'s
+  tested exact-match behavior.
+- **Standoff tuned twice for real depth noise:** 0.5m (canned-rig value) -> 1.0m -> 2.0m.
+  Real range readings routinely jittered 3-7m tick to tick even when "fresh." First hit
+  happened with 1.0m standoff: range hovered right at the threshold without a clean
+  below-standoff reading, so the drone sat close-range yaw-chasing (errX ~0.3, yawRate
+  ~-0.3 rad/s) instead of committing to stop, and clipped the target.
+- **Second collision, this time with a live VLM plan (slower cruise, VLM chose its own
+  `speed`):** confirmed by raw odometry, not inferred -- yawrate spiked to 6.9 rad/s
+  (commanded ~-0.10), vertical velocity hit -1.75 m/s, altitude collapsed 0.99m -> 0.02m in
+  ~1s, all in the same tick APPROACH read `range=1.83` and declared `approach_ok`. That
+  reading was taken during/after the impact; the code has no way to know the difference.
+  **Logged, not fixed (ROADMAP 6.4):** APPROACH's "reached" check has no motion sanity
+  check at all -- it trusts a single range reading regardless of what the vehicle is
+  actually doing that instant. This is the real gap, not a tuning number.

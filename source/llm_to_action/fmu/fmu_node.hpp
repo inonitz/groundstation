@@ -479,6 +479,13 @@ private:
                 snap = m_perception->snapshot();
                 tr   = (snap) ? detectionByLabel(*snap, appr.target, kApproachCamera, tnow)
                               : TargetRelative{};
+                /* Real YOLO on an unfamiliar mesh can flip class mid-approach (seen in SITL:
+                   "car" -> "boat" at closer range, same object). If the exact label match
+                   missed but exactly one thing is in frame, there is nothing else it could be
+                   -- track it by presence, not by a label the model itself is unstable on. */
+                if (!tr.found && snap && snap->count == 1) {
+                    tr = detectionByLabel(*snap, snap->dets[0].label, kApproachCamera, tnow);
+                }
 
                 if (!tr.found || tr.age_us > kApproachFreshUs) {
                     if (m_approachHaveLastAim &&
@@ -707,9 +714,12 @@ private:
         prompt += "[MISSION OBJECTIVE]\n" + m_chat.m_initialCommand + "\n\n";
 
         Odometry od = m_backend->odometry();
+        bool      airborne = od.pos.z > 0.3f;
         snprintf(buf, sizeof(buf),
-            "[VEHICLE STATE]\nalt_up_m=%.2f speed_mps=%.2f\n\n",
-            od.pos.z, std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y));
+            "[VEHICLE STATE]\nalt_up_m=%.2f speed_mps=%.2f airborne=%s\n%s\n\n",
+            od.pos.z, std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y),
+            airborne ? "true" : "false",
+            airborne ? "" : "NOT AIRBORNE -- your plan MUST start with {\"action\":\"takeoff\"}.");
         prompt += buf;
 
         /* Perception JSON (ARCH sec 6): label/bbox/median_depth from the latest
