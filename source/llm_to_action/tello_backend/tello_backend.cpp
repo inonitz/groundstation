@@ -22,12 +22,19 @@ u64 TelloBackend::nowUs() {
 
 
 bool TelloBackend::sendCmd(const char* cmd, bool awaitAck) {
-    std::lock_guard<std::mutex> lk(m_cmdMtx);
-    if (!m_tello) return false;
-    if (!m_tello->SendCommand(cmd)) return false;
+    {
+        std::lock_guard<std::mutex> lk(m_cmdMtx);
+        if (!m_tello) return false;
+        if (!m_tello->SendCommand(cmd)) return false;
+    }
     if (!awaitAck) return true;
 
-    /* ctello ReceiveResponse() is a non-blocking poll; bound the wait so a lost
+    /* Ack wait happens OUTSIDE m_cmdMtx: this mutex only guards SendCommand(),
+       not ReceiveResponse(). Otherwise a slow ack (up to 7s below) blocks
+       streamLoop()'s rc keepalive from acquiring the lock, starving the drone
+       of stick updates for the whole wait -- observed as drift/unresponsiveness
+       right after every takeoff/land while the ack was pending.
+       ctello ReceiveResponse() is a non-blocking poll; bound the wait so a lost
        ack can never hang the caller (Gemini's `while(!ReceiveResponse())` could). */
     const auto deadline = steady_clock::now() + seconds(7);
     while (steady_clock::now() < deadline) {
