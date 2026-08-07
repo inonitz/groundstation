@@ -19,6 +19,10 @@ constexpr u32 kControlLoopPeriodMs     = kMillisecondsInOneSecond / kControlLoop
 /* ---- Completion / flight tuning (planner-side; frame-neutral) ------------ */
 constexpr f32 kGoCompletionRadiusM   = 0.20f;   /* GO done when within 20cm.   */
 constexpr f32 kRotateCompletionDeg   = 5.0f;    /* ROTATE done within 5 deg.   */
+constexpr f32 kPi                    = 3.14159265358979f;
+constexpr f32 kRotateCompletionRad   = kRotateCompletionDeg * kPi / 180.0f;
+constexpr f32 kRotateYawGainHz       = 1.5f;    /* P gain: yawrate = gain * yawErr (rad/s per rad). */
+constexpr f32 kRotateMaxYawRate      = 0.8f;    /* clamp commanded yawrate (rad/s); gentle turn.     */
 constexpr f32 kDefaultGoSpeedCmS     = 30.0f;   /* fallback cruise speed.      */
 constexpr f32 kGoApproachGainHz      = 0.5f;    /* position gain (1/s): decel begins at cruise/gain m from target. */
 constexpr f32 kGoCrossTrackGainHz    = 1.0f;    /* pulls back toward the start->target line; corrects drift without rotating the forward command. */
@@ -30,6 +34,8 @@ constexpr f32 kTakeoffTargetAltEnu = 2.0f;    /* climb target ~2m up (Up+).     
 constexpr f32 kTakeoffClimbVelEnu  = 2.0f;    /* climb at 2 m/s (Up+).          */
 constexpr f32 kLandDescendVelEnu   = -0.5f;   /* descend at 0.5 m/s (Down=-Up). */
 constexpr f32 kGroundContactEnu    = 0.1f;    /* landed when Up <= ~0.1.        */
+constexpr f32 kFlareStartAltEnu     = 0.6f;   /* begin the landing flare (decel) below this Up alt. */
+constexpr f32 kFlareTouchdownVelEnu = -0.12f; /* min descent speed at contact (Down=-Up); soft touch. */
 
 /* Momentum-settle dwell between tasks: a just-completed leg leaves real
    residual velocity (worst right after TAKEOFF's climb) that a zero-velocity

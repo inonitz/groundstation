@@ -407,7 +407,14 @@ private:
         }
 
         if (st == FlightState::LANDING) {
-            m_backend->set_velocity(Vec3{0.0f, 0.0f, kLandDescendVelEnu}, 0.0f);  /* stream the descent (Down) */
+            /* slow-descent from full-speed to slow-touchdown as altitude nears the ground */
+            f32 vLand = kLandDescendVelEnu;
+            if (d < kFlareStartAltEnu) {
+                f32 t = (d - kGroundContactEnu) / (kFlareStartAltEnu - kGroundContactEnu);
+                if (t < 0.0f) t = 0.0f; else if (t > 1.0f) t = 1.0f;  /* 1 at flare start, 0 at contact */
+                vLand = kFlareTouchdownVelEnu + t * (kLandDescendVelEnu - kFlareTouchdownVelEnu);
+            }
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, vLand}, 0.0f);  /* stream the (flared) descent (Down) */
             if (d <= kGroundContactEnu) {
                 m_backend->force_disarm();
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LANDING->STANDBY altENU=%.2f (force_disarm)", d);
@@ -472,6 +479,25 @@ private:
                         "[FMU_NODE_DIAGNOSTICS] GO dist=%.2f cmdVelENU=(%.2f,%.2f,%.2f) measVelENU=(%.2f,%.2f,%.2f) yaw=%.2f yawrate=%.2f",
                         dist, vN, vE, vD,
                         od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate);
+                }
+            } else if (id == CommandID::ROTATE) {
+                /* Yaw-only turn toward the frozen heading; done within kRotateCompletionRad,
+                   else command a clamped P yawrate (ROADMAP 1.1.2). */
+                f32 yawErr = m_targetYaw - od.yaw;
+                while (yawErr >  kPi) yawErr -= 2.0f * kPi;  /* wrap to [-pi, pi] */
+                while (yawErr < -kPi) yawErr += 2.0f * kPi;
+                if (std::fabs(yawErr) < kRotateCompletionRad) {
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] ROTATE complete yawErr=%.3f", yawErr);
+                    completeCurrent("rotate_ok");
+                } else {
+                    f32 yawRate = kRotateYawGainHz * yawErr;
+                    if (yawRate >  kRotateMaxYawRate) yawRate =  kRotateMaxYawRate;
+                    else if (yawRate < -kRotateMaxYawRate) yawRate = -kRotateMaxYawRate;
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, yawRate);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] ROTATE yawErr=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
+                        yawErr, yawRate, od.yaw, od.yawrate);
                 }
             } else if (id == CommandID::APPROACH) {
                 if (m_useCannedApproachRig) updateCannedApproachRig(od);
@@ -623,6 +649,7 @@ private:
         Odometry      od;
         Vec3          relFlu, relEnu;
         CmdGo         g;
+        CmdRotate     r;
         CommandID     id;
         BackendStatus s;
 
@@ -676,6 +703,15 @@ private:
                 "[FMU_NODE_DEBUG] GO activated. relFLU=(%.2f,%.2f,%.2f) targetENU=(%.2f,%.2f,%.2f) dirENU=(%.2f,%.2f,%.2f) speed=%.2f",
                 relFlu.x, relFlu.y, relFlu.z, m_targetN, m_targetE, m_targetD,
                 m_goDirN, m_goDirE, m_goDirD, m_activeSpeed);
+            break;
+        case CommandID::ROTATE:
+            r   = m_currTask.m_cmd.m_extractCmd.m_rotateInPlace;
+            od  = m_backend->odometry();
+            /* Freeze absolute target heading; cw (clockwise) decreases yaw (ENU is CCW+). */
+            m_targetYaw = od.yaw + (r.cw_or_ccw ? -1.0f : 1.0f) * (r.angle_deg * kPi / 180.0f);
+            RCLCPP_INFO(this->get_logger(),
+                "[FMU_NODE_DEBUG] ROTATE activated. angle_deg=%d dir=%s startYaw=%.2f targetYaw=%.2f",
+                r.angle_deg, r.cw_or_ccw ? "cw" : "ccw", od.yaw, m_targetYaw);
             break;
         case CommandID::APPROACH:
             m_approachHaveLastAim      = false;
@@ -810,6 +846,7 @@ private:
         ActiveTask     task;
         CmdGo          go;
         CmdApproach    approach;
+        CmdRotate      rot;
 
         arr  = extractJsonArray(flightPlan);  /* strip ```json fences / prose from the VLM. */
         plan = nlohmann::json::parse(arr, nullptr, false);
@@ -833,6 +870,11 @@ private:
                 go  = { item.value("x", 0.0f), item.value("y", 0.0f),
                         item.value("z", 0.0f), item.value("speed", 0.0f) };
                 cmd = GenericCommand(go);
+            } else if (action == "rotate") {
+                rot = CmdRotate{};
+                rot.angle_deg = item.value("angle_deg", 0);
+                rot.cw_or_ccw = (item.value("direction", std::string("cw")) == "cw");
+                cmd = GenericCommand(rot);
             } else if (action == "approach") {
                 approach = CmdApproach{};
                 strncpy(approach.target, item.value("target_object", "").c_str(),
@@ -842,7 +884,7 @@ private:
                 /* Queueable now (3.6); no control-law branch yet -- auto-completes like
                    ORBIT/SEARCH until block 5.1 lands the real servo. */
             } else {
-                continue; /* Phase 1: only takeoff/land/stop/go/approach executed. */
+                continue; /* Phase 1: takeoff/land/stop/go/rotate/approach executed. */
             }
 
             task = ActiveTask{};
@@ -959,6 +1001,7 @@ private:
        decays speed along it and pulls back perpendicular drift, without ever
        rotating the commanded forward direction. */
     f32 m_targetN{0.0f}, m_targetE{0.0f}, m_targetD{0.0f}, m_activeSpeed{0.3f};
+    f32 m_targetYaw{0.0f};  /* ROTATE: frozen absolute target heading (rad, ENU CCW+). */
     f32 m_goStartN{0.0f}, m_goStartE{0.0f}, m_goStartD{0.0f};
     f32 m_goDirN{0.0f}, m_goDirE{0.0f}, m_goDirD{0.0f}, m_goTotalDist{0.0f};
 

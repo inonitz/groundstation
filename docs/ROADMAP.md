@@ -21,11 +21,11 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 1. Flight core / FMU                                              [~]
    1.1 20 Hz deterministic control loop                          [x]
        1.1.1 GO guidance (carrot-chasing cross-track)            [x]  further tuning [DEFER, visual servo]
-       1.1.2 ROTATE                                              [ ]  scaffolding only --
-             CmdRotate + CommandID::ROTATE exist and it's advertised to the VLM
-             (llm_base.hpp:53), but there is NO parser branch (translateToBaseCommands)
-             and NO exec case, so a {"action":"rotate"} is silently dropped. Needs a
-             parser branch + yaw control-law + FlightState. (corrected 2026-08-07)
+       1.1.2 ROTATE                                              [~]  parser + yaw law LANDED
+             2026-08-07 (was scaffolding-only / silently dropped): added a rotate parse branch
+             (direction + angle_deg), a CommandID::ROTATE dispatch that freezes the target
+             heading, and a clamped-P-yawrate movement branch done within kRotateCompletionDeg.
+             Code landed, SITL-verify pending (human).
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
@@ -163,13 +163,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
         Proposal (not yet implemented): ./build.sh <cfg> <lib> configure/build
         [all/tests/bench], default "all", so a test-only iteration doesn't
         pay for the whole workspace. Touches build.sh AND build.ps1 (9.6).
-   9.11 LAND has no flare -- constant kLandDescendVelEnu (-0.5 m/s) all the [ ]
+   9.11 LAND has no flare -- constant kLandDescendVelEnu (-0.5 m/s) all the [~]
         way to ground contact, no deceleration near touchdown. Seen in SITL
         (5.1 APPROACH verification, both the FAIL-path and approach_ok-path
         runs): odometry shows a velocity/yaw spike right after force_disarm,
         consistent with a hard-ish touchdown. Pre-existing, not caused by
-        APPROACH. Fix (not yet implemented): taper descent speed as altitude
-        nears kGroundContactEnu instead of a constant rate.
+        APPROACH. Fix LANDED 2026-08-07: descent tapers from kLandDescendVelEnu to
+        kFlareTouchdownVelEnu below kFlareStartAltEnu (soft touch). SITL-verify pending.
 ```
 
 ---
