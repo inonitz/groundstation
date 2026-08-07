@@ -157,6 +157,16 @@ else if(
 - For repeated near-identical targets (multiple ROS2 node executables in one CMakeLists), define a local `macro()`/`function()` once and call it per target, rather than copy-pasting `add_executable` blocks.
 - **Public/private header separation (CMake ≥ 3.24 only):** `tree`'s leaf CMakeLists splits `PUBLIC_HEADERS` (flat list, `target_sources(... PUBLIC ...)`) from `PRIVATE_HEADERS` (internal template impl details, attached via `target_sources(... INTERFACE FILE_SET project_internal_headers TYPE HEADERS BASE_DIRS include FILES ...)`, plus `VERIFY_INTERFACE_HEADER_SETS ON`). This is a newer, stricter convention than the flat `HEADERS` list used in `sttserv`/`util2`/groundstation. Use `FILE_SET` in new projects that can commit to CMake 3.24+; otherwise match the flat-list convention already in use.
 
+## Review & commits
+
+All code must be peer-reviewed by a human before it's committed — this includes code
+written by an agent. An agent producing code is not a substitute for that review.
+
+If an agent must generate the commit message itself, keep it short: 2-4 sentences,
+resized down further for a small change. Describe the general idea/pattern of the
+change, not a line-by-line recap — the diff is right there for anyone who wants to dig
+deeper. Nobody needs a commit message to restate what the code already says.
+
 ## When unsure
 
 If a file doesn't clearly match one of these patterns, don't force it — ask, or match
