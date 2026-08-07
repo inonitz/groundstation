@@ -37,7 +37,6 @@ OPTION(GROUNDSTATION_ENABLE_LINK_TIME_OPTIMIZATION "Enable Link-Time/Interproced
 OPTION(GROUNDSTATION_BUILD_EXECUTABLE              "Build The GroundStation Server"                OFF)
 OPTION(GROUNDSTATION_BUILD_TESTS                   "Testing Correct functionality of the project"  ${GROUNDSTATION_IS_TOP_LEVEL})
 OPTION(GROUNDSTATION_BUILD_BENCHMARKS              "Testing Performance/Accuracy Metrics"          ${GROUNDSTATION_IS_TOP_LEVEL})
-OPTION(GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE     "Testing Performance/Accuracy Metrics"          "PX4")
 # FMU drone backend selection: exactly one of these must be ON (checked below).
 OPTION(GROUNDSTATION_BUILD_BACKEND_PX4   "Build the Groundstation against the PX4 backend"        OFF)
 OPTION(GROUNDSTATION_BUILD_BACKEND_TELLO "Build the Groundstation against the Tello backend"      OFF)

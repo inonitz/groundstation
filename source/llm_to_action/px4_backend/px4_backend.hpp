@@ -49,6 +49,8 @@ public:
 
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
+    /* TODO: SITL battery topic not subscribed; sentinel until wired */
+    i32      battery_pct_impl() const { return -1; }
 
     /* ---- backend-specific (not part of the backend interface) --------------- */
     bool     gotFirstOdom() const { return m_gotFirstOdom.load(std::memory_order_relaxed); }

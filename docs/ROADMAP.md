@@ -21,7 +21,11 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 1. Flight core / FMU                                              [~]
    1.1 20 Hz deterministic control loop                          [x]
        1.1.1 GO guidance (carrot-chasing cross-track)            [x]  further tuning [DEFER, visual servo]
-       1.1.2 ROTATE                                              [x]
+       1.1.2 ROTATE                                              [ ]  scaffolding only --
+             CmdRotate + CommandID::ROTATE exist and it's advertised to the VLM
+             (llm_base.hpp:53), but there is NO parser branch (translateToBaseCommands)
+             and NO exec case, so a {"action":"rotate"} is silently dropped. Needs a
+             parser branch + yaw control-law + FlightState. (corrected 2026-08-07)
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
@@ -83,6 +87,9 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              for current numbers and methodology (not duplicated here).
              4.1.8a decouple depth onto its own slower loop      [ ]  accepted interim fix
              4.1.8b depth backbone swap decision                 [DEFER]  only after real-world obs
+             4.1.8d survey alternative monocular-depth models    [ ]  scheduled ~2026-08-08;
+                    both seg+depth miss target -- evaluate faster depth backbones as input to
+                    4.1.8b and to the emergency-boundary (6.1) refresh-rate budget.
              4.1.8c re-measure on AVX2 laptop (cannot rely on)   [ ]
    4.2 FMU-side integration (PerceptionRuntime)                  [x]
        4.2.1 vendor/link vision lib (CPM, like sttserv)          [x]
@@ -141,7 +148,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    8.5 --image-min-tokens 1024 for grounding                     [ ]  hold until vision confirmed
 
 9. Housekeeping / debt                                           [~]
-   9.1 branch push (rev-list = 0 ahead; appears synced)          [?]
+   9.1 branch push (feature-llm-driver synced to origin, 0 ahead/behind) [x]
    9.2 zero ../ includes                                         [x]
    9.3 ARCHITECTURE.md refreshed to reality                      [x]
    9.4 rename backend atomics m_posN/E/D (hold ENU now)          [DEFER]  cosmetic

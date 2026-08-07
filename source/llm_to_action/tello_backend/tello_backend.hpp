@@ -58,6 +58,7 @@ public:
 
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
+    i32      battery_pct_impl() const { return m_batPct.load(std::memory_order_relaxed); }
 
     /* ---- backend-specific (not part of the backend interface) --------------
        Teleop-direct: body FLU velocity (m/s) + yaw rate (rad/s, CCW+); no

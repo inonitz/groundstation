@@ -30,7 +30,7 @@
 
 
 /* Shared-scalar access order (matches the proven baseline). */
-static constexpr std::memory_order rlx = std::memory_order_relaxed;
+static constexpr std::memory_order kMemOrderRelax = std::memory_order_relaxed;
 
 typedef char FixedStringType[32];
 typedef char LargeFixedStringType[128];
@@ -123,7 +123,8 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
         } m_rawBytes;
 
         struct {
-            u64 m_reserved;
+            CommandID m_id;
+            u8        m_reserved[sizeof(uint64_t) - sizeof(u8)];
             union {
                 CmdTakeoff  m_takeoff;
                 CmdLand     m_land;
@@ -287,7 +288,7 @@ private:
     /* ---- Subscriptions --------------------------------------------------- */
     void imgCallback(khUDPCamMsgType msg) {
         std::atomic_store(&m_currImg, msg);
-        u64 c = m_frameCount.fetch_add(1, rlx) + 1;
+        u64 c = m_frameCount.fetch_add(1, kMemOrderRelax) + 1;
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
             "[FMU_NODE_DEBUG] camera frame rx: %ux%u encoding=%s count=%lu",
             msg->width, msg->height, msg->encoding.c_str(), (unsigned long)c);
@@ -375,10 +376,11 @@ private:
         u64         tnow;
 
         od = m_backend->odometry();
+        m_telemetry.battery_pct = m_backend->battery_pct();  /* battery from backend, not the stub default */
         n  = od.pos.x;
         e  = od.pos.y;
         d  = od.pos.z;
-        st = m_flightState.load(rlx);
+        st = m_flightState.load(kMemOrderRelax);
 
         /* HIGH-verbosity heartbeat (every 500ms) — one glance shows the whole rig. */
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500,
@@ -392,13 +394,13 @@ private:
             if (m_backend->state() == IOState::FAULT) {
                 RCLCPP_WARN(this->get_logger(),
                     "[FMU_NODE_DEBUG] TAKEOFF faulted (backend IOState=FAULT). Aborting task.");
-                m_flightState.store(FlightState::STANDBY, rlx);
+                m_flightState.store(FlightState::STANDBY, kMemOrderRelax);
                 completeCurrent("takeoff_faulted");
                 return;
             }
             if (d >= kTakeoffTargetAltEnu) {
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=%.2f", d);
-                m_flightState.store(FlightState::FLIGHT, rlx);
+                m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
                 completeCurrent("takeoff_ok");
             }
             return;
@@ -409,7 +411,7 @@ private:
             if (d <= kGroundContactEnu) {
                 m_backend->force_disarm();
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LANDING->STANDBY altENU=%.2f (force_disarm)", d);
-                m_flightState.store(FlightState::STANDBY, rlx);
+                m_flightState.store(FlightState::STANDBY, kMemOrderRelax);
                 completeCurrent("land_ok");
                 /* LAND is the mission's terminal intent: stop waking the VLM. Anything
                    already queued still runs; we just stop soliciting NEW plans, so the
@@ -580,7 +582,7 @@ private:
         u64             now;
 
         if (!m_missionActive.load(std::memory_order_acquire)) return;
-        if (m_planning.load(rlx)) return;
+        if (m_planning.load(kMemOrderRelax)) return;
         now = nowUs();
         if (now - m_lastPlanUs < kPlanCooldownUs) return;
         img = std::atomic_load(&m_currImg);
@@ -593,7 +595,7 @@ private:
             return;
         }
 
-        m_planning.store(true, rlx);
+        m_planning.store(true, kMemOrderRelax);
         RCLCPP_INFO(this->get_logger(),
             "[FMU_NODE_DEBUG] VLM wake: requesting plan (vision=%d).", static_cast<int>(static_cast<bool>(img)));
         m_planFuture = std::async(std::launch::async, [this, img]() {
@@ -603,7 +605,7 @@ private:
                 "[FMU_NODE_DEBUG] VLM plan received (%zu chars).", plan.size());
             translateToBaseCommands(plan);
             m_lastPlanUs = nowUs();
-            m_planning.store(false, rlx);
+            m_planning.store(false, kMemOrderRelax);
         });
     }
 
@@ -639,13 +641,13 @@ private:
                 completeCurrent("takeoff_rejected");
                 break;
             }
-            m_flightState.store(FlightState::TAKEOFF, rlx);
+            m_flightState.store(FlightState::TAKEOFF, kMemOrderRelax);
             RCLCPP_INFO(this->get_logger(),
                 "[FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.");
             break;
         case CommandID::LAND:
             m_backend->land();  /* PX4: no-op; FMU streams the descent. */
-            m_flightState.store(FlightState::LANDING, rlx);
+            m_flightState.store(FlightState::LANDING, kMemOrderRelax);
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LAND activated; FMU streaming descent.");
             break;
         case CommandID::GO:

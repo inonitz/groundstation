@@ -34,6 +34,7 @@ struct GenericBackend {
     /* ---- telemetry / observable state -------------------------------------- */
     __force_inline Odometry      odometry() const            { return d().odometry_impl(); }
     __force_inline IOState       state()    const            { return d().state_impl(); }
+    __force_inline i32           battery_pct() const         { return d().battery_pct_impl(); }
 
 private:
     __force_inline Derived&       d()       { return *static_cast<Derived*>(this); }

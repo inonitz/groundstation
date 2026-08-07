@@ -25,8 +25,6 @@ CMAKE_INTRMD_BUILD_DIR=""
 CLEAN_CURRENT_ROOT_BUILD_DIR="false"
 CONFIGURE_CMAKE_FLAG="false"
 BUILD_BINARIES_FLAG="false"
-RUN_GROUNDSTATION_FLAG="false"
-RUN_DOCKER_SIMULATION_FLAG="false"
 
 
 if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
@@ -36,7 +34,7 @@ Usage: $0 <build_type> <library_type> <action>
 Arguments:
   build_type   - Type of build: debug, release, release_dbginfo, debug_perf, release_perf
   library_type - Type of library: shared (.dll/.so), static (.lib/.a)
-  action       - Action to take: cleanbuild, configure, build, rungs, runsim
+  action       - Action to take: cleanbuild, configure, build
 
 Options:
   help         - Display this help message
@@ -59,7 +57,7 @@ if [[ "$1" == "debug" ]]; then
     CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Debug"
     CMAKE_INTRMD_BUILD_DIR+="debug/"
 elif [[ "$1" == "debug_perf" ]]; then
-    CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Debug -DMEASURE_PERFORMANCE_TIMEOUT=1"
+    CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Debug"
     CMAKE_INTRMD_BUILD_DIR+="debug_perf/"
 elif [[ "$1" == "release" ]]; then
     CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Release"
@@ -68,7 +66,7 @@ elif [[ "$1" == "release_dbginfo" ]]; then
     CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=RelWithDbgInfo"
     CMAKE_INTRMD_BUILD_DIR+="release_dbginfo/"
 elif [[ "$1" == "release_perf" ]]; then
-    CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Release -DMEASURE_PERFORMANCE_TIMEOUT=1"
+    CMAKE_ARGLIST+=" -DCMAKE_BUILD_TYPE=Release"
     CMAKE_INTRMD_BUILD_DIR+="release_perf/"
 else
     printf "Unknown Argument %s - valid values are: debug, release, release_dbginfo, debug_perf, release_perf\nExiting...\n" "$1"
@@ -96,14 +94,8 @@ elif [[ "$3" == "configure" ]]; then
 elif [[ "$3" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"
 
-elif [[ "$3" == "rungs" ]]; then
-    RUN_GROUNDSTATION_FLAG="true"
-
-elif [[ "$3" == "runsim" ]]; then
-    RUN_DOCKER_SIMULATION_FLAG="true"
-
 else
-    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build, rungs, runsim\nExiting...\n" "$3"
+    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build\nExiting...\n" "$3"
     exit 1
 fi
 
@@ -139,14 +131,4 @@ if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     
     # ninja "$PROJECT_NAME" -j$JOBS
     time cmake --build . --target "$PROJECT_NAME" -- -j$JOBS
-fi
-
-if [[ "$RUN_GROUNDSTATION_FLAG" == "true" ]]; then
-    cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    ninja run_mavlink_example
-fi
-
-if [[ "$RUN_DOCKER_SIMULATION_FLAG" == "true" ]]; then
-    cd "$CMAKE_ORIGINAL_SCRIPT_PATH" || exit 1
-    ./dockerfiles/gazebo.sh
 fi
