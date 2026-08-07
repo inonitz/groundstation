@@ -23,6 +23,7 @@ constexpr f32 kPi                    = 3.14159265358979f;
 constexpr f32 kRotateCompletionRad   = kRotateCompletionDeg * kPi / 180.0f;
 constexpr f32 kRotateYawGainHz       = 1.5f;    /* P gain: yawrate = gain * yawErr (rad/s per rad). */
 constexpr f32 kRotateMaxYawRate      = 0.8f;    /* clamp commanded yawrate (rad/s); gentle turn.     */
+constexpr f32 kRotateMaxAngleRad     = 720.0f * kPi / 180.0f;  /* cap a single ROTATE's magnitude. */
 constexpr f32 kDefaultGoSpeedCmS     = 30.0f;   /* fallback cruise speed.      */
 constexpr f32 kGoApproachGainHz      = 0.5f;    /* position gain (1/s): decel begins at cruise/gain m from target. */
 constexpr f32 kGoCrossTrackGainHz    = 1.0f;    /* pulls back toward the start->target line; corrects drift without rotating the forward command. */

@@ -12,6 +12,8 @@ Specs 1 & 2 (whoever lands first owns the harness; others extend it).
 > `GenericCommand` byte layout.** No full builds; human does build + SITL.
 
 ## Part A — ROTATE granularity fix
+> **DONE 2026-08-07 by the overseeing session — implemented directly (accumulated-angle law now
+> in `fmu_node.hpp`). SKIP Part A; do Part B (tests) only.** Design retained below for reference.
 **Bug:** the current ROTATE law (landed 2026-08-07) turns to a *target heading* by the *shortest*
 path. Angles `< 180°` are correct/granular; `>= 180°` go the wrong way (`270° cw` → `90° ccw`) and
 `360°` completes instantly. **Fix:** integrate actual rotation in the commanded direction, stop at the

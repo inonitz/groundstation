@@ -22,10 +22,11 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    1.1 20 Hz deterministic control loop                          [x]
        1.1.1 GO guidance (carrot-chasing cross-track)            [x]  further tuning [DEFER, visual servo]
        1.1.2 ROTATE                                              [~]  parser + yaw law LANDED
-             2026-08-07 (was scaffolding-only / silently dropped): added a rotate parse branch
-             (direction + angle_deg), a CommandID::ROTATE dispatch that freezes the target
-             heading, and a clamped-P-yawrate movement branch done within kRotateCompletionDeg.
-             Code landed, SITL-verify pending (human).
+             2026-08-07 (was scaffolding-only / silently dropped): rotate parse branch
+             (direction + angle_deg), a CommandID::ROTATE dispatch, and an accumulated-angle
+             movement branch that integrates yaw progress in the commanded direction until the
+             full magnitude is swept -- granular incl. >=180 deg (270 cw really turns 270 cw;
+             360 = full turn), not shortest-path. Code landed, SITL-verify pending (human).
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]

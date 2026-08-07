@@ -481,23 +481,25 @@ private:
                         od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate);
                 }
             } else if (id == CommandID::ROTATE) {
-                /* Yaw-only turn toward the frozen heading; done within kRotateCompletionRad,
-                   else command a clamped P yawrate (ROADMAP 1.1.2). */
-                f32 yawErr = m_targetYaw - od.yaw;
-                while (yawErr >  kPi) yawErr -= 2.0f * kPi;  /* wrap to [-pi, pi] */
-                while (yawErr < -kPi) yawErr += 2.0f * kPi;
-                if (std::fabs(yawErr) < kRotateCompletionRad) {
+                /* Integrate yaw progress in the commanded direction; complete once the full
+                   requested magnitude is swept -- granular incl. >=180 deg (ROADMAP 1.1.2). */
+                f32 dYaw = od.yaw - m_rotatePrevYaw;
+                while (dYaw >  kPi) dYaw -= 2.0f * kPi;  /* wrap per-tick delta to [-pi, pi] */
+                while (dYaw < -kPi) dYaw += 2.0f * kPi;
+                m_rotatePrevYaw = od.yaw;
+                m_rotateRemainingRad -= m_rotateDir * dYaw;  /* subtract in-direction progress */
+                if (m_rotateRemainingRad <= kRotateCompletionRad) {
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                    RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] ROTATE complete yawErr=%.3f", yawErr);
+                    RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] ROTATE complete remainRad=%.3f", m_rotateRemainingRad);
                     completeCurrent("rotate_ok");
                 } else {
-                    f32 yawRate = kRotateYawGainHz * yawErr;
+                    f32 yawRate = m_rotateDir * kRotateYawGainHz * m_rotateRemainingRad;
                     if (yawRate >  kRotateMaxYawRate) yawRate =  kRotateMaxYawRate;
                     else if (yawRate < -kRotateMaxYawRate) yawRate = -kRotateMaxYawRate;
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, yawRate);
                     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                        "[FMU_NODE_DIAGNOSTICS] ROTATE yawErr=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
-                        yawErr, yawRate, od.yaw, od.yawrate);
+                        "[FMU_NODE_DIAGNOSTICS] ROTATE remainRad=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
+                        m_rotateRemainingRad, yawRate, od.yaw, od.yawrate);
                 }
             } else if (id == CommandID::APPROACH) {
                 if (m_useCannedApproachRig) updateCannedApproachRig(od);
@@ -707,11 +709,15 @@ private:
         case CommandID::ROTATE:
             r   = m_currTask.m_cmd.m_extractCmd.m_rotateInPlace;
             od  = m_backend->odometry();
-            /* Freeze absolute target heading; cw (clockwise) decreases yaw (ENU is CCW+). */
-            m_targetYaw = od.yaw + (r.cw_or_ccw ? -1.0f : 1.0f) * (r.angle_deg * kPi / 180.0f);
+            /* Integrate actual rotation in the commanded direction until the full magnitude is
+               swept -- so 270 cw really turns 270 cw and 360 does a full turn (not shortest-path). */
+            m_rotateRemainingRad = std::fabs(__scast(f32, r.angle_deg)) * kPi / 180.0f;
+            if (m_rotateRemainingRad > kRotateMaxAngleRad) m_rotateRemainingRad = kRotateMaxAngleRad;
+            m_rotateDir     = r.cw_or_ccw ? -1.0f : 1.0f;  /* cw decreases yaw (ENU CCW+) */
+            m_rotatePrevYaw = od.yaw;
             RCLCPP_INFO(this->get_logger(),
-                "[FMU_NODE_DEBUG] ROTATE activated. angle_deg=%d dir=%s startYaw=%.2f targetYaw=%.2f",
-                r.angle_deg, r.cw_or_ccw ? "cw" : "ccw", od.yaw, m_targetYaw);
+                "[FMU_NODE_DEBUG] ROTATE activated. angle_deg=%d dir=%s startYaw=%.2f remainRad=%.2f",
+                r.angle_deg, r.cw_or_ccw ? "cw" : "ccw", od.yaw, m_rotateRemainingRad);
             break;
         case CommandID::APPROACH:
             m_approachHaveLastAim      = false;
@@ -1001,7 +1007,9 @@ private:
        decays speed along it and pulls back perpendicular drift, without ever
        rotating the commanded forward direction. */
     f32 m_targetN{0.0f}, m_targetE{0.0f}, m_targetD{0.0f}, m_activeSpeed{0.3f};
-    f32 m_targetYaw{0.0f};  /* ROTATE: frozen absolute target heading (rad, ENU CCW+). */
+    f32 m_rotateRemainingRad{0.0f};  /* ROTATE: rotation still owed in the commanded dir (rad). */
+    f32 m_rotatePrevYaw{0.0f};       /* ROTATE: yaw last tick, to integrate progress.          */
+    f32 m_rotateDir{1.0f};           /* ROTATE: +1 = ccw, -1 = cw (ENU CCW+).                  */
     f32 m_goStartN{0.0f}, m_goStartE{0.0f}, m_goStartD{0.0f};
     f32 m_goDirN{0.0f}, m_goDirE{0.0f}, m_goDirD{0.0f}, m_goTotalDist{0.0f};
 
