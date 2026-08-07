@@ -6,6 +6,23 @@ branch), `sttserv`, `util2`, `inonitz/tree` (github repo), CPU thread/core manag
 CMakeLists.txt. `inonitz/tree` ships `.clang-format`/`.clang-tidy` — used as ground
 truth below, not guesswork.
 
+## Design priorities
+
+Every design/implementation decision should target, in this order of concern:
+**simplicity, human readability, performance.** All three matter — performance isn't an
+excuse to sacrifice the first two, and simplicity isn't an excuse to leave performance
+on the table where it's cheap to have.
+
+A concrete consequence: keep code units small enough that a human can actually hold
+them in working memory. Working memory holds roughly 3-7 discrete "chunks" at once
+(the revised "magical number" range from cognitive load research), and this limit
+doesn't budge just because the artifact is code. Practically:
+
+- **~2000 LOC in one file is beyond what anyone can reason about as a single unit** — at that size you're not reading it, you're spot-checking it.
+- **~400 LOC is roughly the practical ceiling** for reviewing/understanding a chunk of code in one sitting with good defect/issue detection. This isn't a guess — it's backed by the SmartBear/Cisco code review study (~2,500 reviews, ~3.2M LOC, one of the largest published studies on the subject): review effectiveness (70-90% defect discovery) held at 200-400 LOC reviewed at under ~300-500 LOC/hour; effectiveness drops sharply past that.
+- **150-200 LOC is the preferred target** for a single file/unit that captures one general pattern — small enough to hold entirely in working memory, not just skim.
+- This isn't a hard rule — some things (a generated header, a big enum/lookup table, a single cohesive algorithm) legitimately don't split cleanly. Use judgment; the goal is comprehension, not hitting a line count.
+
 ## Naming
 
 - Types/classes: `PascalCase` (`AsyncKeyHook`, `CaptureDevice`, `ModelBackend`, `LogicalProcessor`).
