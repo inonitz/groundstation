@@ -1,0 +1,343 @@
+<title>Groundstation — Remaining Work Map</title>
+<style>
+  :root {
+    --bg: #eef1f6; --surface: #ffffff; --surface-2: #dde3ed;
+    --text: #10141f; --text-dim: #454e63; --border: #b9c2d1;
+    --accent: #1c4a99; --accent-soft: #d3e0fa;
+    --tier0-fill:#c3cbdb; --tier0-stroke:#5c6883; --tier0-text:#1c2130;
+    --tier1-fill:#8fdcab; --tier1-stroke:#1f8a4c; --tier1-text:#0a2e17;
+    --tier2-fill:#f4c26b; --tier2-stroke:#a8710a; --tier2-text:#3d2500;
+    --tier3-fill:#aab2f2; --tier3-stroke:#4650c9; --tier3-text:#141a5c;
+    --tier4-fill:#f0a3a3; --tier4-stroke:#b83a3a; --tier4-text:#4d0d0d;
+    --tier5-fill:#c3cbdb; --tier5-stroke:#545e72; --tier5-text:#1c2130;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0d15; --surface: #131826; --surface-2: #1b2233;
+      --text: #eef1f8; --text-dim: #a7b0c4; --border: #303a52;
+      --accent: #7fa8f2; --accent-soft: #182849;
+      --tier0-fill:#3a4157; --tier0-stroke:#8891a8; --tier0-text:#eef1f8;
+      --tier1-fill:#1c5233; --tier1-stroke:#5fd897; --tier1-text:#c9f5da;
+      --tier2-fill:#5c3f0c; --tier2-stroke:#e0a53f; --tier2-text:#fbe6c2;
+      --tier3-fill:#2b2f66; --tier3-stroke:#8f98ec; --tier3-text:#dde0fb;
+      --tier4-fill:#5c2222; --tier4-stroke:#e17a7a; --tier4-text:#fbdada;
+      --tier5-fill:#3a4157; --tier5-stroke:#8891a8; --tier5-text:#dde1eb;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0d15; --surface: #131826; --surface-2: #1b2233;
+    --text: #eef1f8; --text-dim: #a7b0c4; --border: #303a52;
+    --accent: #7fa8f2; --accent-soft: #182849;
+    --tier0-fill:#3a4157; --tier0-stroke:#8891a8; --tier0-text:#eef1f8;
+    --tier1-fill:#1c5233; --tier1-stroke:#5fd897; --tier1-text:#c9f5da;
+    --tier2-fill:#5c3f0c; --tier2-stroke:#e0a53f; --tier2-text:#fbe6c2;
+    --tier3-fill:#2b2f66; --tier3-stroke:#8f98ec; --tier3-text:#dde0fb;
+    --tier4-fill:#5c2222; --tier4-stroke:#e17a7a; --tier4-text:#fbdada;
+    --tier5-fill:#3a4157; --tier5-stroke:#8891a8; --tier5-text:#dde1eb;
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1f6; --surface: #ffffff; --surface-2: #dde3ed;
+    --text: #10141f; --text-dim: #454e63; --border: #b9c2d1;
+    --accent: #1c4a99; --accent-soft: #d3e0fa;
+    --tier0-fill:#c3cbdb; --tier0-stroke:#5c6883; --tier0-text:#1c2130;
+    --tier1-fill:#8fdcab; --tier1-stroke:#1f8a4c; --tier1-text:#0a2e17;
+    --tier2-fill:#f4c26b; --tier2-stroke:#a8710a; --tier2-text:#3d2500;
+    --tier3-fill:#aab2f2; --tier3-stroke:#4650c9; --tier3-text:#141a5c;
+    --tier4-fill:#f0a3a3; --tier4-stroke:#b83a3a; --tier4-text:#4d0d0d;
+    --tier5-fill:#c3cbdb; --tier5-stroke:#545e72; --tier5-text:#1c2130;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .mono { font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 80px; display: flex; flex-direction: column; gap: 36px; }
+
+  header { display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  .eyebrow { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  h1 { margin: 0; font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace; font-size: clamp(24px, 3vw, 32px); font-weight: 600; text-wrap: balance; letter-spacing: -0.01em; }
+  .subtitle { color: var(--text-dim); font-size: 15px; max-width: 65ch; }
+
+  .clockstrip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .clockcell { background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .clockcell .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .clockcell .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .clockcell .v.accent { color: var(--accent); }
+
+  section h2 { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin: 0 0 14px; }
+
+  .diagram-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; overflow-x: auto; }
+  figure.diagram-figure { margin: 0; }
+  figure.diagram-figure svg { display: block; width: 100%; height: auto; min-width: 900px; }
+  figcaption { color: var(--text-dim); font-size: 12.5px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px 6px 10px; font-size: 13px; }
+  .chip .swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+  .chip .desc { color: var(--text-dim); font-size: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); background: var(--surface-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.id { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--accent); white-space: nowrap; }
+  .tier-pill { display: inline-block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; }
+  .t1 { background: #1f8a4c; color: #ffffff; }
+  .t2 { background: #a8710a; color: #ffffff; }
+  .t3 { background: #4650c9; color: #ffffff; }
+  .t4 { background: #b83a3a; color: #ffffff; }
+  .t5 { background: #545e72; color: #ffffff; }
+  .t0 { background: #6b7484; color: #ffffff; }
+
+  .callout { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .callout .k { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); }
+  .callout p { margin: 0; font-size: 14.5px; }
+
+  footer { color: var(--text-dim); font-size: 12.5px; border-top: 1px solid var(--border); padding-top: 20px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">groundstation · feature-llm-driver</div>
+    <h1>What's left, and what blocks what</h1>
+    <div class="subtitle">
+      A dependency map of every open item from <span class="mono">docs/ROADMAP.md</span> and the
+      two active planning docs, so the next stretch of work can be picked by what it actually
+      unlocks — not just a flat priority list.
+    </div>
+  </header>
+
+  <div class="clockstrip">
+    <div class="clockcell"><span class="k">Sprint 1</span><span class="v accent">~1.5 days</span></div>
+    <div class="clockcell"><span class="k">Sprint 2 (after checklist)</span><span class="v">~3 days</span></div>
+    <div class="clockcell"><span class="k">Full POC estimate (roadmap)</span><span class="v">6–10 focused days</span></div>
+  </div>
+
+  <section>
+    <h2>Dependency map</h2>
+    <div class="diagram-card">
+      <figure class="diagram-figure">
+        <svg viewBox="0 0 1380 570" role="img" aria-label="Task dependency map across six rows: shipped context, then Tier 1 through Tier 5, with arrows showing which tasks block or share substrate with others.">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" style="fill:var(--text-dim)"/>
+            </marker>
+          </defs>
+
+          <!-- row headers -->
+          <g class="mono" font-size="11" font-weight="600">
+            <text x="20" y="65" fill="var(--tier0-stroke)">CONTEXT</text>
+            <text x="20" y="80" fill="var(--text-dim)" font-size="9.5" font-weight="400">done / shipped</text>
+            <text x="20" y="157" fill="var(--tier1-stroke)">TIER 1</text>
+            <text x="20" y="172" fill="var(--text-dim)" font-size="9.5" font-weight="400">quick, no blocker</text>
+            <text x="20" y="249" fill="var(--tier2-stroke)">TIER 2</text>
+            <text x="20" y="264" fill="var(--text-dim)" font-size="9.5" font-weight="400">needs your call</text>
+            <text x="20" y="341" fill="var(--tier3-stroke)">TIER 3</text>
+            <text x="20" y="356" fill="var(--text-dim)" font-size="9.5" font-weight="400">SITL tuning loop</text>
+            <text x="20" y="433" fill="var(--tier4-stroke)">TIER 4</text>
+            <text x="20" y="448" fill="var(--text-dim)" font-size="9.5" font-weight="400">hardware-bound</text>
+            <text x="20" y="525" fill="var(--tier5-stroke)">TIER 5</text>
+            <text x="20" y="540" fill="var(--text-dim)" font-size="9.5" font-weight="400">likely out of scope</text>
+          </g>
+
+          <!-- connectors (drawn before nodes so arrowheads sit under box edges cleanly) -->
+          <g fill="none" style="stroke:var(--text-dim)" stroke-width="1.5">
+            <path d="M 658,61 H1315 V486 H424 V498" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+            <path d="M 498,149 H1327 V478 H744 V498" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+            <path d="M 498,157 H1339 V470 H904 V498" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+            <path d="M 264,498 V462 H1064 V498" marker-end="url(#arrow)"/>
+            <path d="M 264,406 V394 H744 V406" marker-end="url(#arrow)"/>
+            <path d="M 424,406 V386 H744 V406" marker-end="url(#arrow)"/>
+            <path d="M 498,521 H510" marker-end="url(#arrow)"/>
+            <path d="M 498,337 H510" marker-end="url(#arrow)"/>
+          </g>
+          <g class="mono" font-size="9.5" fill="var(--text-dim)">
+            <rect x="850" y="475" width="88" height="13" fill="var(--surface)"/>
+            <text x="894" y="484" text-anchor="middle">substrate</text>
+            <rect x="1260" y="140" width="100" height="13" fill="var(--surface)"/>
+            <text x="1310" y="149" text-anchor="middle">same parser gap</text>
+            <rect x="620" y="448" width="46" height="13" fill="var(--surface)"/>
+            <text x="643" y="457" text-anchor="middle">blocks</text>
+            <rect x="470" y="378" width="42" height="13" fill="var(--surface)"/>
+            <text x="491" y="387" text-anchor="middle">feeds</text>
+          </g>
+
+          <!-- node rows: rect x,y,148,46 rx8; two-line mono label centered -->
+          <g font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.3" text-anchor="middle">
+            <!-- row0: context -->
+            <g>
+              <rect x="190" y="38" width="148" height="46" rx="8" style="fill:var(--tier0-fill);stroke:var(--tier0-stroke)" stroke-width="1.3"/>
+              <text x="264" y="57" style="fill:var(--tier0-text)">README + docs</text>
+              <text x="264" y="70" style="fill:var(--tier0-text)">sync</text>
+              <rect x="350" y="38" width="148" height="46" rx="8" style="fill:var(--tier0-fill);stroke:var(--tier0-stroke)" stroke-width="1.3"/>
+              <text x="424" y="57" style="fill:var(--tier0-text)">seg/depth bench</text>
+              <text x="424" y="70" style="fill:var(--tier0-text)">corrected</text>
+              <rect x="510" y="38" width="148" height="46" rx="8" style="fill:var(--tier0-fill);stroke:var(--tier0-stroke)" stroke-width="1.3"/>
+              <text x="584" y="57" style="fill:var(--tier0-text)">APPROACH servo</text>
+              <text x="584" y="70" style="fill:var(--tier0-text)">(5.1)</text>
+              <rect x="670" y="38" width="148" height="46" rx="8" style="fill:var(--tier0-fill);stroke:var(--tier0-stroke)" stroke-width="1.3"/>
+              <text x="744" y="57" style="fill:var(--tier0-text)">perception FMU</text>
+              <text x="744" y="70" style="fill:var(--tier0-text)">(4.2)</text>
+            </g>
+            <!-- row1: tier 1 -->
+            <g>
+              <rect x="190" y="130" width="148" height="46" rx="8" style="fill:var(--tier1-fill);stroke:var(--tier1-stroke)" stroke-width="1.3"/>
+              <text x="264" y="149" style="fill:var(--tier1-text)">LAND flare</text>
+              <text x="264" y="162" style="fill:var(--tier1-text)">(9.11)</text>
+              <rect x="350" y="130" width="148" height="46" rx="8" style="fill:var(--tier1-fill);stroke:var(--tier1-stroke)" stroke-width="1.3"/>
+              <text x="424" y="149" style="fill:var(--tier1-text)">wire ROTATE</text>
+              <text x="424" y="162" style="fill:var(--tier1-text)">into parser</text>
+              <rect x="510" y="130" width="148" height="46" rx="8" style="fill:var(--tier1-fill);stroke:var(--tier1-stroke)" stroke-width="1.3"/>
+              <text x="584" y="149" style="fill:var(--tier1-text)">drop dead</text>
+              <text x="584" y="162" style="fill:var(--tier1-text)">CMake opt (9.5)</text>
+              <rect x="670" y="130" width="148" height="46" rx="8" style="fill:var(--tier1-fill);stroke:var(--tier1-stroke)" stroke-width="1.3"/>
+              <text x="744" y="149" style="fill:var(--tier1-text)">reconcile climb</text>
+              <text x="744" y="162" style="fill:var(--tier1-text)">height (9.7)</text>
+              <rect x="830" y="130" width="148" height="46" rx="8" style="fill:var(--tier1-fill);stroke:var(--tier1-stroke)" stroke-width="1.3"/>
+              <text x="904" y="149" style="fill:var(--tier1-text)">verify branch</text>
+              <text x="904" y="162" style="fill:var(--tier1-text)">push (9.1)</text>
+            </g>
+            <!-- row2: tier 2 -->
+            <g>
+              <rect x="190" y="222" width="148" height="46" rx="8" style="fill:var(--tier2-fill);stroke:var(--tier2-stroke)" stroke-width="1.3"/>
+              <text x="264" y="241" style="fill:var(--tier2-text)">APPROACH false-</text>
+              <text x="264" y="254" style="fill:var(--tier2-text)">positive fix (6.4)</text>
+              <rect x="350" y="222" width="148" height="46" rx="8" style="fill:var(--tier2-fill);stroke:var(--tier2-stroke)" stroke-width="1.3"/>
+              <text x="424" y="241" style="fill:var(--tier2-text)">build.sh/.ps1</text>
+              <text x="424" y="254" style="fill:var(--tier2-text)">reconcile</text>
+            </g>
+            <!-- row3: tier 3 -->
+            <g>
+              <rect x="190" y="314" width="148" height="46" rx="8" style="fill:var(--tier3-fill);stroke:var(--tier3-stroke)" stroke-width="1.3"/>
+              <text x="264" y="333" style="fill:var(--tier3-text)">emergency</text>
+              <text x="264" y="346" style="fill:var(--tier3-text)">boundary (6.1)</text>
+              <rect x="350" y="314" width="148" height="46" rx="8" style="fill:var(--tier3-fill);stroke:var(--tier3-stroke)" stroke-width="1.3"/>
+              <text x="424" y="333" style="fill:var(--tier3-text)">interrupt + hold-</text>
+              <text x="424" y="346" style="fill:var(--tier3-text)">clearance (5.1)</text>
+              <rect x="510" y="314" width="148" height="46" rx="8" style="fill:var(--tier3-fill);stroke:var(--tier3-stroke)" stroke-width="1.3"/>
+              <text x="584" y="333" style="fill:var(--tier3-text)">interrupt hyster-</text>
+              <text x="584" y="346" style="fill:var(--tier3-text)">esis+retries (6.3)</text>
+              <rect x="670" y="314" width="148" height="46" rx="8" style="fill:var(--tier3-fill);stroke:var(--tier3-stroke)" stroke-width="1.3"/>
+              <text x="744" y="333" style="fill:var(--tier3-text)">verify SPSC</text>
+              <text x="744" y="346" style="fill:var(--tier3-text)">backpressure (1.4)</text>
+            </g>
+            <!-- row4: tier 4 -->
+            <g>
+              <rect x="190" y="406" width="148" height="46" rx="8" style="fill:var(--tier4-fill);stroke:var(--tier4-stroke)" stroke-width="1.3"/>
+              <text x="264" y="425" style="fill:var(--tier4-text)">stick↔m/s</text>
+              <text x="264" y="438" style="fill:var(--tier4-text)">calib. (2.3.1)</text>
+              <rect x="350" y="406" width="148" height="46" rx="8" style="fill:var(--tier4-fill);stroke:var(--tier4-stroke)" stroke-width="1.3"/>
+              <text x="424" y="425" style="fill:var(--tier4-text)">Simpson odom</text>
+              <text x="424" y="438" style="fill:var(--tier4-text)">verify (2.3.2)</text>
+              <rect x="510" y="406" width="148" height="46" rx="8" style="fill:var(--tier4-fill);stroke:var(--tier4-stroke)" stroke-width="1.3"/>
+              <text x="584" y="425" style="fill:var(--tier4-text)">teleop speed</text>
+              <text x="584" y="438" style="fill:var(--tier4-text)">control (2.3.4)</text>
+              <rect x="670" y="406" width="148" height="46" rx="8" style="fill:var(--tier4-fill);stroke:var(--tier4-stroke)" stroke-width="1.3"/>
+              <text x="744" y="425" style="fill:var(--tier4-text)">wind/prop-wash</text>
+              <text x="744" y="438" style="fill:var(--tier4-text)">correction (2.3.5)</text>
+              <rect x="830" y="406" width="148" height="46" rx="8" style="fill:var(--tier4-fill);stroke:var(--tier4-stroke)" stroke-width="1.3"/>
+              <text x="904" y="425" style="fill:var(--tier4-text)">latency+I/O</text>
+              <text x="904" y="438" style="fill:var(--tier4-text)">tests (2.3.6)</text>
+            </g>
+            <!-- row5: tier 5 -->
+            <g>
+              <rect x="190" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="264" y="517" style="fill:var(--tier5-text)">battery field in</text>
+              <text x="264" y="530" style="fill:var(--tier5-text)">GenericBackend</text>
+              <rect x="350" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="424" y="517" style="fill:var(--tier5-text)">live-YOLO GO</text>
+              <text x="424" y="530" style="fill:var(--tier5-text)">redesign (5.2)</text>
+              <rect x="510" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="584" y="517" style="fill:var(--tier5-text)">safe-landing</text>
+              <text x="584" y="530" style="fill:var(--tier5-text)">servo (5.3)</text>
+              <rect x="670" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="744" y="517" style="fill:var(--tier5-text)">ORBIT</text>
+              <text x="744" y="530" style="fill:var(--tier5-text)">controller (1.1.6)</text>
+              <rect x="830" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="904" y="517" style="fill:var(--tier5-text)">SEARCH</text>
+              <text x="904" y="530" style="fill:var(--tier5-text)">controller (1.1.7)</text>
+              <rect x="990" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="1064" y="517" style="fill:var(--tier5-text)">battery/failsafe</text>
+              <text x="1064" y="530" style="fill:var(--tier5-text)">supervisor (6.2)</text>
+              <rect x="1150" y="498" width="148" height="46" rx="8" style="fill:var(--tier5-fill);stroke:var(--tier5-stroke)" stroke-width="1.3"/>
+              <text x="1224" y="517" style="fill:var(--tier5-text)">Being B: SLAM+</text>
+              <text x="1224" y="530" style="fill:var(--tier5-text)">OctoMap+A* (wks)</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          Dashed arrows = shared substrate or shared root cause (not a strict order). Solid
+          arrows = hard blocker. Two short same-row arrows aren't individually labeled for space:
+          <span class="mono">live-YOLO GO → safe-landing servo</span> (shares servo core) and
+          <span class="mono">interrupt+hold-clearance → hysteresis/retries</span> (must exist
+          first).
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tier key</h2>
+    <div class="legend">
+      <span class="chip"><span class="swatch" style="background:#6b7484"></span>Done / shipped <span class="desc">— context only</span></span>
+      <span class="chip"><span class="swatch" style="background:#1f8a4c"></span>Tier 1 <span class="desc">— hours, no blocker</span></span>
+      <span class="chip"><span class="swatch" style="background:#a8710a"></span>Tier 2 <span class="desc">— needs one decision first</span></span>
+      <span class="chip"><span class="swatch" style="background:#4650c9"></span>Tier 3 <span class="desc">— SITL tuning loop</span></span>
+      <span class="chip"><span class="swatch" style="background:#b83a3a"></span>Tier 4 <span class="desc">— hardware-bound</span></span>
+      <span class="chip"><span class="swatch" style="background:#545e72"></span>Tier 5 <span class="desc">— big / likely out of scope</span></span>
+    </div>
+  </section>
+
+  <div class="callout">
+    <span class="k">Reality check</span>
+    <p>
+      ROADMAP's own estimate puts full POC completion at 6–10 focused engineering-days — Tiers 3–5
+      don't fit in 1.5 days as a whole. A defensible cut: all of Tier 1, Tier 2's <span class="mono">6.4</span>
+      once you give it thresholds, and a first-guess-and-tune pass at Tier 3's <span class="mono">6.1</span>.
+      Everything else is realistically Sprint 2 (the ~3-day pass) or later.
+    </p>
+  </div>
+
+  <section>
+    <h2>Full reference</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Task</th><th>Tier</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td class="id">R1</td><td>LAND flare (taper descent near touchdown)</td><td><span class="tier-pill t1">TIER 1</span></td><td>ROADMAP 9.11. No design ambiguity.</td></tr>
+          <tr><td class="id">R2</td><td>Wire ROTATE into <span class="mono">translateToBaseCommands</span></td><td><span class="tier-pill t1">TIER 1</span></td><td>Dispatch already exists; verb is silently dropped before the queue.</td></tr>
+          <tr><td class="id">R3</td><td>Remove dead CMake option</td><td><span class="tier-pill t1">TIER 1</span></td><td>ROADMAP 9.5, <span class="mono">GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE</span>.</td></tr>
+          <tr><td class="id">R4</td><td>Reconcile takeoff climb height</td><td><span class="tier-pill t1">TIER 1</span></td><td>ROADMAP 9.7. Likely moot post-ENU, quick to confirm.</td></tr>
+          <tr><td class="id">R5</td><td>Verify branch push status</td><td><span class="tier-pill t1">TIER 1</span></td><td>ROADMAP 9.1, marked <span class="mono">[?]</span>.</td></tr>
+          <tr><td class="id">D1</td><td>APPROACH false-<span class="mono">approach_ok</span> fix</td><td><span class="tier-pill t2">TIER 2</span></td><td>ROADMAP 6.4. Needs a numeric nominal-motion gate + trip behavior from you first.</td></tr>
+          <tr><td class="id">D2</td><td>build.sh / build.ps1 reconciliation</td><td><span class="tier-pill t2">TIER 2</span></td><td>ROADMAP 9.6, 9.10. Needs your call on TESTS/BENCHMARKS defaults + per-target build.</td></tr>
+          <tr><td class="id">S1</td><td>Emergency boundary (velocity-scaled)</td><td><span class="tier-pill t3">TIER 3</span></td><td>ROADMAP 6.1. Depth gate is clear; needs first-guess constants + sim tuning.</td></tr>
+          <tr><td class="id">S2</td><td>Interrupt + reflexive hold-clearance</td><td><span class="tier-pill t3">TIER 3</span></td><td>ARCH §5.1. Zero code today — <span class="mono">TaskState::STOPPED</span> is dead.</td></tr>
+          <tr><td class="id">S3</td><td>Interrupt hysteresis + max-retries → land/abort</td><td><span class="tier-pill t3">TIER 3</span></td><td>ROADMAP 6.3. Blocked on S2 existing.</td></tr>
+          <tr><td class="id">S4</td><td>Verify SPSC backpressure path</td><td><span class="tier-pill t3">TIER 3</span></td><td>ROADMAP 1.4, currently unverified.</td></tr>
+          <tr><td class="id">H1</td><td>Stick↔m/s calibration</td><td><span class="tier-pill t4">TIER 4</span></td><td>ROADMAP 2.3.1. Needs real Tello flight time.</td></tr>
+          <tr><td class="id">H2</td><td>Simpson-rule odometry verification</td><td><span class="tier-pill t4">TIER 4</span></td><td>ROADMAP 2.3.2. Data flows live; integration itself unverified.</td></tr>
+          <tr><td class="id">H3</td><td>Runtime speed control (teleop)</td><td><span class="tier-pill t4">TIER 4</span></td><td>ROADMAP 2.3.4.</td></tr>
+          <tr><td class="id">H4</td><td>Wind / prop-wash stability correction</td><td><span class="tier-pill t4">TIER 4</span></td><td>ROADMAP 2.3.5. Wants H1+H2 landed first to correct against.</td></tr>
+          <tr><td class="id">H5</td><td>Latency benchmarks + I/O test fixtures</td><td><span class="tier-pill t4">TIER 4</span></td><td>ROADMAP 2.3.6. No measurement exists yet.</td></tr>
+          <tr><td class="id">B1</td><td>live-YOLO GO redesign</td><td><span class="tier-pill t5">TIER 5</span></td><td>ROADMAP 5.2, the drift-fix pivot. Not started; reuses APPROACH's substrate.</td></tr>
+          <tr><td class="id">B2</td><td>Landmark-relative safe landing</td><td><span class="tier-pill t5">TIER 5</span></td><td>ROADMAP 5.3. Downstream of B1.</td></tr>
+          <tr><td class="id">B3</td><td>ORBIT controller</td><td><span class="tier-pill t5">TIER 5</span></td><td>ROADMAP 1.1.6. Needs parser fix (R2's gap, same bug class) + a real visual-anchor design.</td></tr>
+          <tr><td class="id">B4</td><td>SEARCH controller</td><td><span class="tier-pill t5">TIER 5</span></td><td>ROADMAP 1.1.7. Same parser gap as B3, own controller design.</td></tr>
+          <tr><td class="id">P1</td><td>Add battery field to <span class="mono">GenericBackend</span></td><td><span class="tier-pill t5">TIER 5</span></td><td>Touches the CRTP contract both backends satisfy — real prerequisite, not busywork.</td></tr>
+          <tr><td class="id">B5</td><td>Battery / failsafe supervisor</td><td><span class="tier-pill t5">TIER 5</span></td><td>ROADMAP 6.2. Blocked on P1.</td></tr>
+          <tr><td class="id">DEFER</td><td>Being B — SLAM + OctoMap + A*</td><td><span class="tier-pill t0">DEFER</span></td><td>ROADMAP block 7. Explicitly deferred, 2–4 weeks. Not a candidate for either sprint.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Sources: <span class="mono">docs/ROADMAP.md</span>, <span class="mono">docs/ARCHITECTURE.md</span> §5.1/§10/§11,
+    <span class="mono">docs/active/2026-08-06-safety-and-housekeeping-planning.md</span>. Generated 2026-08-07.
+  </footer>
+</div>

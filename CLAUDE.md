@@ -16,6 +16,15 @@ Always perform file reads, directory listings, and searches via the Bash tool us
 - **Git Commit Workflow**: After completing a working feature or fix, stage and commit changes using concise commit messages.
 - **Architectural Notes**: If a major design decision is made, document it briefly in `docs/NOTES.md` in bullet points.
 - **Accuracy**: Do not guess file contents or assumptions. Check the codebase first, or ask the user.
+- **Economy**: minimize your token usage - 
+    - Do not make tool-calls OR file reads/writes individually unless you have a small-singular task to perform.  
+    - Batch your work to a couple of tool calls AT MOST
+- **Figure of Speech**: Keep your Explanations brief, concise and clear - 
+    - If a technical explanation is required, don't drown the user with technical jargon.
+    - Use precise domain terms when needed, but explain them simply.
+    - Speak like senior expert to peer: clear, direct, zero fluff.
+    - Do not use jargon when simple words work.
+    - use the "/caveman:caveman ultra" skill to keep yourself concise if available.
 
 
 <!-- rtk-instructions v2 -->

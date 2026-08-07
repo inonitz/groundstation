@@ -7,29 +7,60 @@
 <div align="center">
 <h3 align="center">Groundstation</h3>
   <p align="center">
-    Off-Board Drone Control and Speech-to-Action Pipeline
+    Off-Board, VLM-Driven Autonomous Drone Control
   </p>
 </div>
 
 ## About The Project
 
-Groundstation is a C++ and ROS2 based control system designed to provide almost fully autonomous navigation and control for DJI Tello drones. The core architectural principle of this project is off-board compute: the drone acts strictly as a peripheral, transmitting H.264 video and telemetry over a local network. All intensive processing, including Automatic Speech Recognition (ASR) inference, computer vision, and flight trajectory calculations, executes on the groundstation computer with high performance.
+Groundstation is a C++17 / ROS 2 off-board autonomous flight stack for small drones (primary
+target: DJI Tello; PX4 software-in-the-loop in Gazebo as the simulation fallback). The aircraft is
+a dumb peripheral — it only streams H.264 video and telemetry over the local network. All
+perception, planning, and control run on a ground-station computer.
 
-The primary capability demonstrated in the current iteration is a "Speech-To-Action" pipeline. The groundstation captures local microphone audio, processes it through local state-of-the-art AI models (such as Whisper/Sherpa), and translates the transcribed intent into explicit flight control commands. 
+The control philosophy is **"the VLM plans, deterministic math executes."** A local
+Vision-Language Model (Qwen3-VL, served by `llama-server`) acts as a high-level, event-driven
+planner: when the task queue drains it is shown the current camera frame, vehicle state, a YOLO
+perception JSON (detections + metric depth), and the executed-command history, and it returns a
+plan — a JSON array of discrete verbs (`takeoff`, `go`, `land`, `stop`, `approach`, plus
+`rotate`/`orbit`/`search` still specced-only). A deterministic **20 Hz control loop** consumes
+that plan one task at a time, owns the flight state machine, and streams setpoints to the flight
+controller.
 
-Additionally, the project integrates PX4 software-in-the-loop (SITL). PX4 is used strictly for simulation purposes in Gazebo, allowing the system's logic and commands to be safely tested and validated in a virtual environment before deployment to physical hardware.
+The two flight controllers are hidden behind a compile-time backend interface (CRTP,
+`GenericBackend<Derived>`) so the same FMU logic drives either PX4 (SITL) or a real Tello. See
+[docs/project_overview.md](docs/project_overview.md) for the full architectural framing and
+[docs/ROADMAP.md](docs/ROADMAP.md) for current status of every objective.
 
 <br></br>
 
 ### Project Structure
 
-The project is structured around ROS2 nodes that communicate via standard topics:
+The project is structured around ROS 2 nodes that communicate via standard topics, under
+`source/llm_to_action/`:
 
-* `source/speech_to_action/`: Contains the core logic for the working demo. Includes the `offboard_node`, which is responsible for taking parsed ASR commands (such as arming states and velocity twists) and converting them into PX4 compatible setpoints for simulation and eventual translation to real drone commands.
-* `source/llm_to_action/asr/`: Contains the ASR server node. It manages asynchronous audio capture via a local audio driver and performs speech-to-text inference.
-* `source/llm_to_action/keyboard/`: Contains the keyboard hook node utilizing X11. It serves as a push-to-talk trigger (listening for the 'H' key) for the ASR server, and handles W/A/S/D/Arrow inputs for manual override.
-* `source/slam/`: Contains work-in-progress implementations for monocular VSLAM (Stella-VSLAM) and OctoMap integration. This module will eventually enable dynamic, GPS-denied localization and autonomous obstacle avoidance.
-* `scripts/` & `cmake/`: Build utilities, CMake configurations, and dependency management files (using CPM).
+* `fmu/`: The Flight Management Unit — the VLM planner + 20 Hz deterministic control loop and
+  flight state machine. The core of the system.
+* `generic_backend/`, `px4_backend/`, `tello_backend/`: The compile-time backend abstraction and
+  its two concrete implementations (PX4 SITL, DJI Tello).
+* `perception/`: YOLO segmentation + metric depth integration (`PerceptionRuntime`), feeding the
+  VLM's prompt and the `approach` servo.
+* `asr/`: Whisper/Sherpa speech-to-text server node (retained as a component; not the primary
+  demonstrated pipeline — see below).
+* `keyboard/`: X11 push-to-talk / manual-override keyboard hook.
+* `frame/`, `offboard_ctrl/`, `gstreamer_gz_udp_tx/`, `gstreamer_tello_udp_tx/`,
+  `gstreamer_udp_cam_rx/`, `util/`: camera transport, offboard streaming, and shared utilities.
+
+Outside `llm_to_action/`:
+
+* `source/slam/`: work-in-progress monocular VSLAM/VIO (Stella-VSLAM / OpenVINS) and OctoMap
+  scaffolding for the longer-horizon SLAM + A* navigation plan ("Being B" in
+  [docs/project_overview.md](docs/project_overview.md)).
+* `scripts/` & `cmake/`: build utilities, CMake configurations, and CPM dependency management.
+
+> This branch (`feature-llm-driver`) is intentionally self-contained: the earlier
+> `speech_to_action`/`nav` pipeline has been removed from it to keep scope focused on the
+> VLM-driven `llm_to_action` stack described above.
 
 <br></br>
 
@@ -37,64 +68,67 @@ The project is structured around ROS2 nodes that communicate via standard topics
 
 ### Prerequisites
 
-* ROS2 (Humble recommended)
+* ROS 2 (Humble recommended)
 * CMake 3.16 or higher
 * A working C++17 compiler toolchain (e.g., Clang or GCC)
-* Core Dependencies: Eigen3, OpenCV, GStreamer, X11 (if building in a WSL environment)
+* Core dependencies: Eigen3, OpenCV, GStreamer, ONNX Runtime, X11 (if building in a WSL
+  environment)
+* PX4-Autopilot + Gazebo (for SITL) and/or a DJI Tello on the same network (for real hardware)
 
-### Building the Project
-
-#### Downloading the Source
+### Downloading the Source
 
 ```sh
 git clone https://github.com/inonitz/groundstation.git
 cd groundstation
 ```
 
-#### Configuring & Building
+### Configuring & Building
 
-A `build.sh` script is provided to abstract the CMake configuration and Ninja build processes. 
-
-Usage syntax:
-`./build.sh <build_type> <library_type> <action>`
-
-Linux / WSL Build Example:
+`build.sh` (Linux/WSL) / `build.ps1` (Windows) abstract the CMake configure + Ninja build steps.
 
 ```sh
-# Configure the project (includes fetching submodules)
-./build.sh release static configure
+./build.sh <build_type> <library_type> <action>
+```
 
-# Compile the binaries using all available CPU cores
+- `build_type`: `debug`, `release`, `release_dbginfo`, `debug_perf`, `release_perf`
+- `library_type`: `shared`, `static`
+- `action`: `configure`, `build`, `cleanbuild`, `rungs`, `runsim`
+
+```sh
+./build.sh release static configure
 ./build.sh release static build
 ```
+
+Backend selection (PX4, Tello, or both) is a CMake option
+(`GROUNDSTATION_BUILD_BACKEND_PX4` / `_TELLO` / `_ALL`); see `CMakeLists.txt`.
 
 <br></br>
 
 ## Usage
 
-Once compiled, execute the primary ROS2 nodes required for the Speech-To-Action pipeline.
+The fastest way to see the stack fly is the PX4 SITL rig:
 
 ```sh
-# 1. Initialize the Keyboard Hook Node
-./llm_to_action_keyboard_hook
-
-# 2. Initialize the ASR Server Node
-./llm_to_action_asr_server
-
-# 3. Initialize the Offboard Control Node
-./llm_to_action_offboard_mode
+./scripts/simenv_llm.sh              # canned plan: takeoff -> forward 1m -> land, no VLM
+./scripts/simenv_llm.sh cross        # per-axis FLU sanity check
+./scripts/simenv_llm.sh approach     # closed-loop APPROACH against a synthesized detection
+./scripts/simenv_llm.sh approach-real # APPROACH against real YOLO seg+depth in-sim
+./scripts/simenv_llm.sh vlm          # full stack: Qwen3-VL plans, no canned commands
 ```
 
-**Operation:**
-To issue a command, hold the **H** key, speak the desired instruction, and release the key. The ASR node processes the audio, and the offboard control node will parse the resulting text to execute the flight maneuver.
+Each mode launches PX4 + Gazebo + the FMU (and, for `vlm`, `llama-server`) in a tmux session; tear
+it down with `Ctrl+B` then `:kill-session`. See the script header for full details and
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for what each FMU verb actually does.
+
+For real-hardware (Tello) bring-up notes, see
+[docs/tello_backend_notes.md](docs/tello_backend_notes.md).
 
 <br></br>
 
-## Roadmap & TODO
+## Documentation
 
-* **Dynamic Navigation**: Finalize the transition from semantic action scripts to calculated local coordinate vectors.
-* **GPS-Free Localization**: Complete the integration of the Stella-VSLAM pipeline and A* algorithm over an OctoMap for dynamic obstacle avoidance.
-* **VLM Integration**: Integrate a Vision-Language Model to act as a global semantic supervisor based on the video feed.
+Start in [docs/README.md](docs/README.md) — it indexes the roadmap, architecture spec,
+development log, and task docs.
 
 <br></br>
 

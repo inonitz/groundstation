@@ -78,8 +78,9 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        4.1.5 export + quantization fp32/int8/int4                [x]  see findings below
        4.1.6 ORT thread cap (numThreads patched into YOLOs-CPP)  [x]
        4.1.7 benchmark sweep (py + C++)                          [x]
-       4.1.8 PERF GAP: depth ~3x over 40 Hz target               [~]  OPEN
-             (74-76 ms @384/4thr vs 25 ms; seg MEETS at 30.5 ms)
+       4.1.8 PERF GAP: seg AND depth both miss target              [~]  OPEN
+             corrected 2026-08-07 -- see Perception findings below + BUILD_YOLO/README.md
+             for current numbers and methodology (not duplicated here).
              4.1.8a decouple depth onto its own slower loop      [ ]  accepted interim fix
              4.1.8b depth backbone swap decision                 [DEFER]  only after real-world obs
              4.1.8c re-measure on AVX2 laptop (cannot rely on)   [ ]
@@ -166,25 +167,23 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 
 ---
 
-## Perception findings (build_yolo, 2026-08-05/06)
+## Perception findings (build_yolo)
 
-Measured on a 16-core dev container CPU with no AVX512-VNNI. Targets: seg <= 33 ms (30 Hz),
-depth <= 25 ms (40 Hz).
+Full benchmark methodology, numbers, and analysis live in `/root/BUILD_YOLO/README.md`'s
+`## Benchmarks` section (separate, intentionally modularized repo) -- not duplicated here. Targets:
+seg <= 33 ms (30 Hz), depth <= 25 ms (40 Hz).
 
-- **Segmentation MEETS target** at 384x384, 4 threads: 30.5 ms (fp32) / 30.1 ms (int4). Recommended
-  seg config is fp32 at 384x384 (int4 buys nothing here, same file size for this model).
-- **Depth misses by ~3x**: 74-76 ms at 384x384, 4 threads, any variant, vs the 25 ms target. This is
-  the number the user hit (~3.3x). Dropping resolution helped (was 6-8x over at 640) but not enough.
-  It is a backbone-compute problem, not a quantization or input-size one.
-- **int8 dynamic quant is consistently SLOWER than fp32** on this CPU (no VNNI fused u8s8 kernel;
-  pays for DynamicQuantizeLinear/DequantizeLinear around every MatMul). Do not ship int8 on non-VNNI
-  hardware.
-- **int4 (MatMulNBits) roughly matches fp32** with no meaningful win: both models are compute-bound
-  on the conv backbone, so weight-only quant does not move the needle.
-- **Accepted plan:** integrate as-is and run depth on its own slower loop, decoupled from the seg
-  loop, rather than blocking on it. Observe real-world performance once wired into the FMU, then
-  decide whether the depth backbone needs replacing. AVX2 on the user's laptop may improve numbers
-  but the design must not rely on it.
+- **Current status: both seg and depth MISS target** at the best config found (static-384, 4
+  threads, fp32). Measured seg roughly 50-70 ms (~1.5-2.1x over), depth roughly 87-116 ms
+  (~3.5-4.6x over) -- separate reruns of the identical config disagree by more than expected noise
+  (open question, see BUILD_YOLO/README.md), so treat these as ranges pending that being pinned
+  down, not precise figures.
+- **int8 (dynamic) fails to load entirely** in the C++ engine, both models, every thread count --
+  not yet root-caused. Do not ship it.
+- **Accepted plan (unchanged):** integrate as-is, depth runs on its own slower loop decoupled from
+  seg (shipped, see 4.2.2). Seg needs the same scrutiny now that it's also confirmed missing
+  target. Decide on a backbone swap once observed against real-world FMU load, not just synthetic
+  benchmarks.
 
 Implication for the FMU integration (4.2): the perception thread design is **two rates** from the
 start (seg near 30 Hz, depth on a slower cadence), and the emergency boundary (6.1) must tolerate a

@@ -120,13 +120,14 @@ scripts, and whether per-target build selection (9.10) is worth doing now or sta
 
 ## 3. README.md staleness (found during the ROADMAP reassessment, not part of G1-G6)
 
-`README.md` still describes "Speech-To-Action" as the primary demonstrated capability and
-documents `source/speech_to_action/` as a real directory. Per this branch's own git log
-("removed speech_to_action & nav folders to keep this self contained"), that directory is
-gone. First thing anyone reading the repo sees is describing a deleted subsystem instead of
-the actual VLM/APPROACH/Tello work. Needs a rewrite pass against the current
-`docs/project_overview.md` framing, not just a patch — **not started**, flagged for review
-alongside everything else here.
+**DONE (2026-08-07).** `README.md` rewritten against the current `docs/project_overview.md`
+framing: VLM-plans/deterministic-executes, the `GenericBackend` PX4/Tello split, actual
+`source/llm_to_action/` subdirectory layout, `build.sh`/`build.ps1` usage, and
+`scripts/simenv_llm.sh` plan modes (`forward`/`cross`/`approach`/`approach-real`/`vlm`)
+replace the old Speech-To-Action-primary description and the references to the deleted
+`source/speech_to_action/`/`source/nav/` directories. `docs/README.md`'s `active/` folder
+blurb was also fixed — it still named the now-deleted
+`2026-08-06-docs-code-discrepancy-remediation.md` task file.
 
 ---
 

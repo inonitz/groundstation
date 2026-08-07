@@ -650,3 +650,13 @@ today, then further exercised by today's real-perception/VLM work) and the docs-
 itself (its two placement caveats + the SDK-1.3 fold-in are resolved). Lesson: a task doc's
 bucket should track ROADMAP/ARCHITECTURE, not get frozen at whatever the doc said the day it
 was written -- cross-check both before trusting one in isolation.
+
+## Session note (2026-08-07)
+
+- Perception seg/depth benchmarks re-run and reconciled in `/root/BUILD_YOLO` (separate,
+  intentionally modularized repo). Full numbers, methodology, and run instructions live in
+  `BUILD_YOLO/README.md`'s `## Benchmarks` section -- not duplicated here. `ROADMAP.md`'s
+  perception status updated to match: still misses both targets. `perception_test`'s run friction
+  was root-caused (a global RPATH setting silently ignored the per-target fix; onnxruntime's .so
+  needed copying next to the binary, not just pointing at) and fixed via a plain `./test.sh` in
+  BUILD_YOLO -- mechanism not documented here, see that repo.
