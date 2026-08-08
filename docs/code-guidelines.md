@@ -13,6 +13,11 @@ Every design/implementation decision should target, in this order of concern:
 excuse to sacrifice the first two, and simplicity isn't an excuse to leave performance
 on the table where it's cheap to have.
 
+Follow the **KISS** and **YAGNI** principles when writing the code:
+
+- **KISS (Keep It Simple):** pick the simplest design that solves the *actual* problem. The fewest moving parts a reader must hold at once beats a clever, general one.
+- **YAGNI (You Aren't Gonna Need It):** implement only what a current requirement needs, not what it *might* need later. Speculative abstraction is a real cost paid now for a maybe.
+
 A concrete consequence: keep code units small enough that a human can actually hold
 them in working memory. Working memory holds roughly 3-7 discrete "chunks" at once
 (the revised "magical number" range from cognitive load research), and this limit
@@ -46,6 +51,8 @@ doesn't budge just because the artifact is code. Practically:
 - Singleton-via-atomic-pointer + `std::atomic_flag` guard, used specifically for OS callback contexts needing a global instance (Windows hook callback, etc).
 - Platform branching via `#if defined(UTIL2_OS_WINDOWS) / UTIL2_OS_LINUX` (or `_WIN32` / `__linux__` in projects without util2) inline, both implementations live side by side in the same file/function rather than separate per-platform files.
 - Manual init-state tracking via bitmask (`setInitState`/`isInit`) to allow partial-construction teardown in `destroy()` — this is the RAII substitute used instead of exceptions/smart-pointer chains for multi-step C-API resource setup.
+- **No exceptions.** Propagate errors via status/error codes (or the init-state bitmask above), never `throw`. `try`/`catch` is allowed *only* to wrap a third-party API that throws — catch at that boundary and convert to a status code. Fatal config/invariant failures log (`RCLCPP_FATAL`/`fprintf`) then `std::abort()`; they do not throw.
+- **No virtual calls.** No `virtual`/dynamic dispatch in the runtime path — prefer static polymorphism (templates/CRTP) or explicit tagged dispatch (the `GenericCommand` `id()` + `switch` pattern). Keeps dispatch predictable and vtable-free.
 - `[[nodiscard]]` + `noexcept` used selectively on init-step / accessor functions that return `bool`/a computed value.
 - Manual single-block allocation (`util2_aligned_malloc` sized to fit multiple sub-structs, sliced by offset) for cache-line-aligned, single-free resource groups — used in performance-sensitive audio/capture code, not the general default.
 - Custom cast macros `__rcast`/`__scast` wrap `reinterpret_cast`/`static_cast`; `__carraysize` for array length; `__force_inline` wraps `__forceinline`/`__attribute__((always_inline))` per compiler. Use these instead of raw casts/inline keywords inside util2-adjacent code.

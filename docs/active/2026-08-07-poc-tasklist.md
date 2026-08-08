@@ -14,17 +14,44 @@ objective tree; this is the near-term work queue drawn from it. Visual companion
 
 ## Done this session (2026-08-07)
 - **Battery through GenericBackend** (6.2 dependency) — Tello returns real telemetry `bat`; PX4
-  returns sentinel `-1` (no battery topic subscribed); FMU reads it per-loop instead of the stub. `[DONE]`
+  now subscribes `/fmu/out/battery_status_v1` (real, wired by Spec 3 — was a `-1` stub); FMU reads it per-loop instead of the stub. `[DONE]`
 - **build.sh / build.ps1** reconciled to clean/configure/build only; `.ps1` rewritten to mirror
   `.sh`; run/sim actions dropped (belong in `scripts/`). (9.6) `[DONE]`
 - **Dead CMake option** `GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE` removed. (9.5) `[DONE]`
 - **Branch push** — `feature-llm-driver` synced to origin, 0 ahead/behind. (9.1) `[DONE]`
 - **LAND flare** (9.11) — descent tapers from `kLandDescendVelEnu` to `kFlareTouchdownVelEnu`
-  below `kFlareStartAltEnu`. Code landed; **SITL-verify pending.** `[AUTO → HW verify]`
+  below `kFlareStartAltEnu`. **SITL-verified 2026-08-08** (Spec 4): `vLand` tapers −0.500 → −0.139 to STANDBY; regression `scripts/test/land-flare/`. `[DONE]`
 - **ROTATE end-to-end** (1.1.2) — was scaffolding-only + silently dropped. Added: rotate parse
-  branch (`direction` + `angle_deg`), `CommandID::ROTATE` dispatch that freezes target heading,
-  clamped-P-yawrate movement branch completing within `kRotateCompletionDeg`. Code landed;
-  **SITL-verify pending.** `[AUTO → HW verify]`
+  branch (`direction` + `angle_deg`), `CommandID::ROTATE` dispatch + accumulated-angle yaw law (swept-angle integration in the commanded direction),
+  granular + correct for ≥180°/360° (not shortest-path), completing within `kRotateCompletionDeg`.
+  **SITL-verified 2026-08-08** (Spec 4: 90° cw swept −86°, 200° ccw swept +195° the long way;
+  `scripts/test/rotate-land/`). `[DONE]`
+
+
+## Done this session (2026-08-08) — Spec 3 (failsafe supervisor + override + backpressure)
+Implemented + **SITL-verified end-to-end** (6-test suite, all PASS); 8 defects found and fixed HITL.
+Full report at the bottom of `docs/active/2026-08-07-spec-3-failsafe-supervisor-backpressure.md`.
+- **6.2 Battery / failsafe supervisor** — real PX4 battery bridge; `≤20% → RTH then land`,
+  `≤10% → land-in-place`, both latched; `battery_pct == -1` = UNKNOWN (skipped). `[DONE]`
+- **6.2 User override (ARCH 11)** — reversible manual takeover: Bool `/fmu/in/override` + keyboard
+  `/keyboard/in/raw`; handback re-plans; failsafe outranks manual. `[DONE]`
+- **1.4 SPSC backpressure** — bounded `try_enqueue` + reject-newest, every drop logged; proven under
+  a startup storm and an in-air command storm (queue bounded, maneuver not hijacked). `[DONE]`
+- **Test suite** `scripts/test/{battery,battery-rth,battery-landnow,flood,flood-airborne,override}/`
+  + new flat world `dependencies/empty.sdf`. `[DONE]`
+- **Deferred (documented):** smart energy/terrain RTH → `docs/scheduled/2026-08-07-battery-rth-energy-terrain-subsystem.md`. `[DEFER]`
+
+## Done this session (2026-08-08) — Spec 4 (ROTATE granularity + LAND/ROTATE verification tests)
+Implemented + **SITL-verified**. Report at the bottom of `docs/active/2026-08-07-spec-4-verification-rotate-granularity.md`.
+- **1.1.2 ROTATE** — accumulated-angle law confirmed granular + correct for ≥180°/360° (Part A by
+  the overseer); 90° cw swept −86°, 200° ccw swept +195° the long way. `[DONE]`
+- **9.11 LAND flare** — `vLand` taper confirmed from the log stream (not a constant −0.5). `[DONE]`
+- **Log-based SITL harness** — canned `--canned-rotate` / `--canned-land-flare` plans +
+  `scripts/test/{rotate-land,land-flare}/filter.sh` assert swept-angle direction/magnitude and the
+  flare taper. `[DONE]`
+- **Terrain-land AGL finding** — landing keys on `od.pos.z` (height above takeoff origin, not AGL);
+  over uneven terrain the flare mis-triggers. `--canned-terrain-land` + the Rubicon world expose it
+  (ROADMAP 9.12). Rangefinder / terrain-relative altitude is a follow-up. `[DONE test, fix open]`
 
 ## Resolved / parked
 - **Legacy offboard node** (9.7-related) — **KEEP** (user decision 2026-08-07). Retain
@@ -35,10 +62,12 @@ objective tree; this is the near-term work queue drawn from it. Visual companion
 The review items below are decomposed into 4 work-packages, each with its own spec file; a spawned
 session owns one file and appends its report at the bottom. Merge/review of overlapping edits to
 `fmu_node.hpp` is done by the overseeing session, not the workers.
-- Spec 1 — `2026-08-07-spec-1-interrupt-reactive-safety.md` (1.5, 6.1, 6.4)
-- Spec 2 — `2026-08-07-spec-2-movement-command-laws.md` (5.2, 1.1.6, 1.1.7, 5.3)
-- Spec 3 — `2026-08-07-spec-3-failsafe-supervisor-backpressure.md` (6.2, 1.4)
-- Spec 4 — `2026-08-07-spec-4-verification-rotate-granularity.md` (ROTATE fix, LAND/ROTATE tests)
+- Spec 1 — `2026-08-07-spec-1-interrupt-reactive-safety.md` (1.5, 6.1, 6.4) — **NOT STARTED**: design
+  approved (rev 2), shelved, no source edited; session handoff at the spec's bottom. Ready to spawn.
+- Spec 2 — `2026-08-07-spec-2-movement-command-laws.md` (5.2, 1.1.6, 1.1.7, 5.3) — **NOT STARTED**: no
+  source edited; spec ready to spawn.
+- Spec 3 — `2026-08-07-spec-3-failsafe-supervisor-backpressure.md` (6.2, 1.4) — **[DONE 2026-08-08, SITL-verified; report at the spec's bottom]**
+- Spec 4 — `2026-08-07-spec-4-verification-rotate-granularity.md` (ROTATE fix, LAND/ROTATE tests) — **[DONE 2026-08-08, SITL-verified; report at the spec's bottom]**
 
 ---
 
@@ -55,9 +84,7 @@ session owns one file and appends its report at the bottom. Merge/review of over
 - **Emergency boundary** (6.1) — velocity-scaled trigger distance vs nearest depth → hold; must
   tolerate a slow depth refresh. Survey faster monocular-depth backbones ~2026-08-08 (ROADMAP
   4.1.8d) as an input. `[REVIEW → HW]`
-- **SPSC backpressure** (1.4) — empirical: drive the FMU task queue with real VLM plan output,
-  observe growth/behaviour, mitigate directly in the queue (bounded `try_enqueue` + drop/reject
-  policy). Not a paper exercise. `[REVIEW → HW]`
+- ~~**SPSC backpressure** (1.4)~~ — **[DONE 2026-08-08]** bounded `try_enqueue` + reject-newest, every drop logged; SITL-verified under a startup storm and an in-air storm. `scripts/test/flood`, `flood-airborne`.
 - ~~Interrupt hysteresis + retries (6.3)~~ — **dropped** as overcomplicated; stop-and-reassess covers it.
 
 ## Tier 4 — Tello / measurement
@@ -78,7 +105,7 @@ session owns one file and appends its report at the bottom. Merge/review of over
   the spot; the servo does the precise go-over-and-descend. `[REVIEW]`
 - **ORBIT** (1.1.6) — target-anchored. `[REVIEW]`
 - **SEARCH** (1.1.7) — 2D circle. `[REVIEW]`
-- **Failsafe supervisor** (6.2) — now unblocked by the battery field. `[REVIEW]`
+- ~~**Failsafe supervisor** (6.2)~~ — **[DONE 2026-08-08]** real PX4 battery; 20%->RTH / 10%->land-in-place (latched) + reversible manual override; SITL-verified. `scripts/test/battery*`, `override/`. Smart RTH deferred to `docs/scheduled/`.
 - **Being B** (SLAM / OctoMap / A*) — backburner. `[DEFER]`
 
 ---
@@ -88,7 +115,9 @@ session owns one file and appends its report at the bottom. Merge/review of over
 2. APPROACH motion-gate — approve concept + thresholds (6.4).
 3. Interrupt / stop-and-reassess design — incl. moving-vs-static evade (1.5).
 4. Emergency boundary — safety-critical spec (6.1).
-5. Backpressure — needs a real VLM run to observe (1.4).
-6. GO redesign, Safe-landing, ORBIT, SEARCH, Failsafe supervisor — each design → review (5.2/5.3/1.1.6/1.1.7/6.2).
+5. ~~Backpressure (1.4)~~ — **DONE 2026-08-08** (SITL-verified, `scripts/test/flood*`).
+6. GO redesign, Safe-landing, ORBIT, SEARCH — each design → review (5.2/5.3/1.1.6/1.1.7). (~~Failsafe supervisor 6.2~~ — **DONE 2026-08-08**.)
 
-Autonomous items already picked up: LAND flare + ROTATE (both code-landed, awaiting your build + SITL).
+Autonomous items already picked up: LAND flare + ROTATE — **both SITL-verified (Spec 4, 2026-08-08).**
+Still to spawn: Spec 1 (interrupt / boundary / APPROACH motion-gate) and Spec 2 (GO redesign /
+safe-land / ORBIT / SEARCH) — both specced, not started.

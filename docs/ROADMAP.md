@@ -7,7 +7,7 @@ single place the whole objective set lives; it was previously scattered across `
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.
 
-Last synced: 2026-08-06 (after the GenericBackend interface build-verify + the build_yolo perception
+Last synced: 2026-08-08 (spec-3 failsafe supervisor + user override + SPSC backpressure landed and SITL-verified; earlier: 2026-08-06 GenericBackend build-verify + build_yolo benchmark).
 benchmark results landed).
 
 ---
@@ -21,12 +21,15 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 1. Flight core / FMU                                              [~]
    1.1 20 Hz deterministic control loop                          [x]
        1.1.1 GO guidance (carrot-chasing cross-track)            [x]  further tuning [DEFER, visual servo]
-       1.1.2 ROTATE                                              [~]  parser + yaw law LANDED
+       1.1.2 ROTATE                                              [x]  parser + yaw law, SITL-verified
              2026-08-07 (was scaffolding-only / silently dropped): rotate parse branch
              (direction + angle_deg), a CommandID::ROTATE dispatch, and an accumulated-angle
              movement branch that integrates yaw progress in the commanded direction until the
              full magnitude is swept -- granular incl. >=180 deg (270 cw really turns 270 cw;
-             360 = full turn), not shortest-path. Code landed, SITL-verify pending (human).
+             360 = full turn), not shortest-path. SITL-verified 2026-08-07: 90 cw swept -86 deg,
+             200 ccw swept +195 deg (long way CCW, not shortest-path).
+             Regression test: `scripts/test/rotate-land/filter.sh` captures all sim panes and
+             asserts the swept angle/direction of the canned 90 cw + 200 ccw turns.
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
@@ -35,7 +38,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        1.1.8 CURVE                                               [dropped for POC]
    1.2 ENU convention (Task 4)                                   [x]  operator SITL re-gate [ ] (human)
    1.3 Offboard streaming ~100 Hz (collapsed into backend)       [x]
-   1.4 SPSC task queue (moodycamel) + backpressure               [~]  backpressure path unverified
+   1.4 SPSC task queue (moodycamel) + backpressure               [x]  bounded try_enqueue + reject-newest, every drop logged; SITL-verified (flood + flood-airborne)
    1.5 Interrupt + reflexive hold-clearance (ARCH 5.1)           [ ]  [GATE depth]
 
 2. Backend abstraction                                           [x]
@@ -109,7 +112,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        5.1.2 yaw-center + range-decel servo, recomputed per tick [x]
        5.1.3 done at standoff / lost = FAIL                      [x]
        5.1.4 tests (no YOLO needed)                              [x]  detection_query_test +
-             canned rig (--canned-approach / simenv_llm.sh approach); SITL-verified both
+             canned rig (--canned-approach / scripts/test/approach/run.sh); SITL-verified both
              paths -- lost-target FAIL and reached-standoff approach_ok (2026-08-06)
        5.1.5 real-perception + VLM-driven end-to-end SITL         [~]  2026-08-06: real
              YOLO seg+depth (model paths were wrong since 4.2, never actually loaded
@@ -119,12 +122,18 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              detection "age"), no motion-freshness gate on trusting a detection, class
              label drift on the real model ("car"->"boat" on the same object), cruise/
              standoff tuned for real depth noise. Outstanding: 6.4 (no collision check).
+       5.1.6 APPROACH stop still trusts the depth backstop                [ ]  2026-08-08: the
+             odometry travel-budget added this session is only a FAILSAFE -- in practice the depth
+             backstop (median range < standoff) trips first, so stop distance is still governed by
+             noisy depth (same car read 1.6-6.5 m tick to tick) and ends conservatively far. Once
+             depth improves (4.1.8d) or 6.4's motion-check lands, make the travel budget primary
+             and gate/drop the backstop for a tight, deterministic stop.
    5.2 live-YOLO GO (recompute direction per tick, drift-free)   [ ]
    5.3 landmark-relative safe landing ("go over spot", land)     [ ]
 
-6. Safety / failsafe (designed, unimplemented)                   [ ]
+6. Safety / failsafe                                             [~]  6.2 done (SITL-verified); 6.1/6.3/6.4 open
    6.1 Emergency boundary (velocity-scaled trigger distance)     [ ]  [GATE depth]
-   6.2 Battery / failsafe supervisor + user override (ARCH 11)   [ ]  needs battery field in the backend interface
+   6.2 Battery / failsafe supervisor + user override (ARCH 11)   [x]  real PX4 battery bridge; 20%->RTH / 10%->land-in-place (latched); reversible manual override; SITL-verified 2026-08-08. Smart RTH deferred -> docs/scheduled/2026-08-07-battery-rth-energy-terrain-subsystem.md
    6.3 Interrupt hysteresis + max-retries then land/abort        [ ]
    6.4 APPROACH "reached" has no motion sanity check             [ ]  real SITL collision
        (2026-08-06, live VLM run): a physical hit produced yawrate=6.9 rad/s and
@@ -134,6 +143,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        determination coincides with nominal (commanded-ish) vehicle motion. Fix (not
        yet implemented): reject "reached" if IMU/odometry is out of nominal range
        that tick; treat as INTERRUPT-worthy instead of silent success.
+       Update 2026-08-08: the APPROACH servo now brakes on odometry, not depth -- it latches an
+       early range as a fixed travel budget and dead-reckons the stop point, so a noisy depth
+       frame can no longer re-accelerate into the target (docs/NOTES.md). Standoff also raised
+       2.0 -> 3.0 m for margin against target parts protruding past the measured point. This is a
+       PARTIAL mitigation only: it reconfirmed the range=1.83 hit on the pre-3.0 build, and the
+       motion-sanity-check above is still unimplemented -- "reached" is still declared off a depth
+       frame, so 6.4 stays OPEN.
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
    7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  scaffolding only
@@ -142,7 +158,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    7.4 local-to-global tf2 anchor                                [ ]
 
 8. Sim / tooling                                                 [~]
-   8.1 PX4 Gazebo SITL (simenv_llm.sh vlm/canned)                [x]
+   8.1 PX4 Gazebo SITL (scripts/test/*/run.sh)                [x]
    8.2 camera TX to RX to FMU proven                             [x]
    8.3 simenv.sh migration to llm_to_action binaries            [ ]  (ARCH 14/16)
    8.4 canned rigs (cross/speed)                                 [x]
@@ -164,13 +180,23 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
         Proposal (not yet implemented): ./build.sh <cfg> <lib> configure/build
         [all/tests/bench], default "all", so a test-only iteration doesn't
         pay for the whole workspace. Touches build.sh AND build.ps1 (9.6).
-   9.11 LAND has no flare -- constant kLandDescendVelEnu (-0.5 m/s) all the [~]
+   9.11 LAND has no flare -- constant kLandDescendVelEnu (-0.5 m/s) all the [x]
         way to ground contact, no deceleration near touchdown. Seen in SITL
         (5.1 APPROACH verification, both the FAIL-path and approach_ok-path
         runs): odometry shows a velocity/yaw spike right after force_disarm,
         consistent with a hard-ish touchdown. Pre-existing, not caused by
         APPROACH. Fix LANDED 2026-08-07: descent tapers from kLandDescendVelEnu to
-        kFlareTouchdownVelEnu below kFlareStartAltEnu (soft touch). SITL-verify pending.
+        kFlareTouchdownVelEnu below kFlareStartAltEnu (soft touch). SITL-verified 2026-08-07:
+        vLand tapered -0.500 -> -0.139 toward touchdown as altitude dropped, reached STANDBY.
+        Regression test: `scripts/test/land-flare/filter.sh` captures all sim panes and asserts
+        vLand tapers toward touchdown (not a constant -0.5).
+   9.12 GO/forward travels off-commanded-heading in SITL          [ ]  2026-08-07 terrain-land:
+        takeoff -> GO forward -> land, the drone tracked ~10-30 deg clockwise off the commanded
+        forward axis ("not forward whatsoever") and, with the pre-flare hard descent, landed
+        violently ~5 m short. Flare (9.11) softened touchdown and SafeLand (spec-2 / 5.3) will own
+        the "land gently on a spot" symptom, but the heading drift on a plain GO is a separate,
+        un-root-caused issue (SITL yaw/heading hold, or GO acting on a stale bearing). Not yet
+        investigated.
 ```
 
 ---

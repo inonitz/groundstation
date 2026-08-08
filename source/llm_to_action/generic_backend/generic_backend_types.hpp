@@ -16,6 +16,10 @@
 #include "frame/frame_convert.hpp"   /* Vec3 */
 
 
+/* Battery percentage sentinel: no trustworthy reading yet (sensor absent /
+   disconnected / NaN). Distinct from a real 0% -- the supervisor skips it. */
+constexpr i32 kBatteryReadingUnknown = -1;
+
 /* Verb result. Minimal set; grow only when a caller branches on a new code. */
 struct BackendStatus {
     enum class Code : u8 { OK, PENDING, REJECTED, FAULT };

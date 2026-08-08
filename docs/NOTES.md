@@ -85,8 +85,7 @@
      (forward: 56.5 deg -> 42.3 deg; most other legs also improved).
 - Built two canned test rigs to interrogate this without a VLM in the loop
   (`fmu_node.hpp`: `injectCannedCrossPlan()`, `injectCannedSpeedPlan()`;
-  `fmu_node.cpp`: `--canned-cross` / `--canned-speed`; `scripts/simenv_llm.sh
-  [forward|cross|speed]`):
+  `fmu_node.cpp`: `--canned-cross` / `--canned-speed`; `scripts/test/{forward,cross,speed}/run.sh`):
   - `cross`: forward/left/back/right 1m, each immediately UNDONE (return to
     start) before the next axis, so per-axis error doesn't chain into the next
     axis's start point. Confirms `flu_to_ned` is NOT the bug (spread trends down
@@ -157,7 +156,7 @@
   test `fmu/test/plan_parse_test.cpp` passes (`g++`, no ROS).
 - **Prompt now carries live vehicle state** (`alt_up_m`, `speed_mps`) from backend
   odometry, ahead of the executed-history block.
-- **`./scripts/simenv_llm.sh vlm`** new mode: launches the Qwen3-VL llama-server
+- **`scripts/test/vlm/run.sh`** mode: launches the Qwen3-VL llama-server
   pane (`-c 4096`) + runs the FMU with no canned flag (VLM-driven). Objective:
   "Take off, fly forward 1 meter, then land."
 - Known risks to watch in the first run: llama-server must be up on :8080 before
@@ -660,3 +659,86 @@ was written -- cross-check both before trusting one in isolation.
   was root-caused (a global RPATH setting silently ignored the per-target fix; onnxruntime's .so
   needed copying next to the binary, not just pointing at) and fixed via a plain `./test.sh` in
   BUILD_YOLO -- mechanism not documented here, see that repo.
+
+## Battery failsafe + manual operator override + queue backpressure (Spec 3, 2026-08-07)
+
+- **Real PX4 battery.** `px4_backend` now subscribes `/fmu/out/battery_status_v1`
+  (`px4_msgs::msg::BatteryStatus`) and publishes `int(remaining*100)`; disconnected/NaN maps to
+  `kBatteryReadingUnknown = -1` (new, in `generic_backend_types.hpp`). Was a hard `-1` stub.
+- **Failsafe supervisor** (`batteryFailsafeTick`, control thread, before dispatch): `-1` skipped
+  (no false alarm; a real 0% still fires). `<=kBatteryReturnPct (20)` latches return-to-origin —
+  a synthetic GO to ENU origin reusing the GO law + `enu_to_flu`, then the dispatch site lands.
+  `<=kBatteryLandPct (10)` latches land-in-place. Latched RTH is not overridden by the 10% rule.
+  **No mid-air force_disarm** (only at ground contact). The smart version (energy models, 10–15%
+  window, terrain flat-site) is deferred: `docs/scheduled/2026-08-07-battery-rth-energy-terrain-subsystem.md`.
+- **Manual operator override (ARCH 11):** Bool `/fmu/in/override` toggles an atomic; while engaged,
+  raw keys from `/keyboard/in/raw` map to a constant body-FLU velocity (`kManualTeleopVelCmS`,
+  TUNE) streamed as ENU. Handback abandons the stale task and forces a fresh VLM re-plan (it lost
+  positional context while disengaged — true context recovery is future fusion/map work). Failsafe
+  outranks manual. Also fixed a latent bug: `keyboard_node` never constructed its publisher.
+- **SPSC backpressure (1.4):** producer switched from `enqueue` (unbounded growth) to `try_enqueue`
+  against the fixed cap (60) — reject-newest, every drop logged (`m_taskDropCount`). Draining on the
+  control thread is consumer-side only; the control thread never enqueues (keeps SPSC valid).
+- Thresholds/manual speed/queue policy are SITL-tunable; `scripts/test/battery/run.sh`
+  drains PX4 SITL to exercise the failsafe without the `pxh>` console.
+
+
+## Test harness migration (2026-08-07)
+- SITL tests moved to per-feature folders `scripts/test/<feature>/`: `run.sh` sources the shared
+  `scripts/test/lib/sim_core.sh` engine; a self-contained `filter.sh` captures panes + asserts/greps.
+- `scripts/simenv_llm.sh` (monolithic PLAN_MODE launcher) and `scripts/debug_sim_logs.sh` (later
+  renamed `test_filter_rotate_land_logs.sh`) were REMOVED — every mode is now a folder. Add a feature
+  = copy a folder + set knobs in `run.sh`; no launch code to duplicate.
+
+- **Spec-3 HITL fix (2026-08-08):** battery RTH could fire *during* TAKEOFF (weak battery never hit `kTakeoffTargetAltEnu`). `returnToOrigin()` queued a GO but the control loop stayed in the TAKEOFF branch (which streams climb + ignores active tasks), so the drone hung with motors armed and never disarmed. Fix: `returnToOrigin()` forces `FlightState::FLIGHT` before the GO, so it executes, completes at origin, then hands off to LANDING+`force_disarm`. Also: flood test asserts the real moodycamel bound (cap 60 -> 63 usable slots), not a magic 60/40 split.
+
+- **Spec-3 airborne backpressure test (2026-08-08):** `--canned-cross-flood` flies the canned cross, then ~5s after reaching FLIGHT injects a 100-action flood from a producer-role `std::async` (mirrors the VLM path) so SPSC holds (control thread only launches it). Proves an in-air command storm is absorbed: queue bounded (63 usable), excess dropped, and the live maneuver is not hijacked (FIFO queues the storm behind the running plan). Test: `scripts/test/flood-airborne/`. Also: battery `SIM_BAT_DRAIN` is seconds-to-empty-from-arm, not %/s (2.0 killed it on the pad) -> retuned to 45.
+
+## Vision model path + fail-loud on load (2026-08-08)
+- **Bug:** `kVisionSegModelPath`/`kVisionDepthModelPath` (fmu_node_base.hpp) pointed at
+  `/root/models/vision/vision/...` — a **doubled `vision/` dir**. The models actually live at
+  `/root/models/vision/...`. Wrong path -> `YoloSegEngine::ok()==false` -> the seg loop emitted
+  **zero detections silently** -> every real APPROACH (`approach-real`, `vlm`) FAILed ~50ms in.
+  Cost hours because nothing warned. Fixed both paths.
+- **Guard added:** `PerceptionRuntime::ready()` (`m_seg.ok() && m_depth.ok()`) is checked at FMU
+  startup; a failed model load now logs `RCLCPP_FATAL` then `std::abort()` (no exception, per the
+  no-exceptions rule) instead of flying blind. A mispathed/missing model can never silently pass again.
+
+
+- **Spec-3 battery behaviour tests (2026-08-08):** the cross+drain `battery/` test can't show real RTH (drone sits at origin) or land-in-place (gradual drain latches 20%-RTH before 10% can fire). Added a test-only battery override in the FMU (`m_batteryForce`, -2=off) fired ~15s into FLIGHT: `--canned-battery-rth` flies ~8m out then forces 18% -> RTH all the way home; `--canned-battery-landnow` forces a discrete 8% -> land-in-place far from home. Filters assert via posENU distance (flew out >3m; RTH ends <1.5m from origin, land-now ends >2m). `battery/` retained as the real-PX4-bridge smoke test. Tests: `scripts/test/battery{,-rth,-landnow}/`.
+
+- **Spec-3 land-vs-RTH latch fix (2026-08-08):** `batteryFailsafeTick` short-circuited only on `mb_batteryReturn`, so after a <=10% land-in-place latched (`mb_batteryLand`), the next tick's <=20% branch still fired RETURN-to-origin and overrode it; the RTH->LANDING handoff (`mb_batteryReturn && !mb_batteryLand`) was then skipped -> drone flew home and hovered, never disarmed. Fix: guard is now `if (mb_batteryReturn || mb_batteryLand) return false` — once EITHER latches we're committed to a landing. Caught by scripts/test/battery-landnow.
+
+- **Spec-3 real-drain battery test fix (2026-08-08):** the old cross+drain `battery/` test was invalid -- (a) cross returned to origin so RTH was a no-op, and (b) PX4's OWN low-battery failsafe entered Hold at 'Critical battery', froze our LANDING descent at ~0.34m and dropped the drone (PX4, not us, ended the flight). Rebuilt as a real-drain PATROL: `--canned-patrol` flies a box 6-10m out; `COM_LOW_BAT_ACT=0` disables PX4's action so OUR FMU is the sole authority; RTH speed raised to 0.8 m/s (returnToOrigin) so it gets home before the pack empties. Filter asserts flew-out + our-RTH + home + disarm + NO PX4 Hold. `scripts/test/battery/`.
+
+- **Spec-3 battery test polish (2026-08-08):** (1) land-in-place now drains the task queue so the outbound plan's leftover `land` can't re-run after touchdown (was double-disarming). (2) battery behaviour tests moved to a new flat empty world `dependencies/empty.sdf` -- in `default_car` the car sits at world 6,7, right on the +8m outbound path, and land-in-place (no obstacle awareness -- deferred subsystem) dropped onto it. (3) battery filters infer 'airborne' from maxDist>3m, since a ~2.5min real-drain run overflows tmux's 2000-line pane scrollback and evicts the early TAKEOFF->FLIGHT line (false-failed an otherwise-perfect run).
+- **Spec-3 randomized real drain (2026-08-08):** fixed `SIM_BAT_DRAIN` made the real-drain `battery/`
+  failsafe fire at the SAME patrol spot every run. `run.sh` now randomizes it per run
+  (`140 + RANDOM % 61` = 140..200 s-to-empty, `${VAR:-...}` so an exported value pins it for repro),
+  so the 20% crossing -- and the RTH break-off point -- lands at a different spot each run.
+- **Spec-3 COMPLETE + SITL-verified (2026-08-08):** ROADMAP 6.2 (battery/failsafe supervisor +
+  reversible user override) and 1.4 (SPSC backpressure) are done and verified end-to-end across a
+  6-test suite (`scripts/test/{battery,battery-rth,battery-landnow,flood,flood-airborne,override}/`),
+  all PASS. Final laws: `≤20% -> RTH then land`, `≤10% -> land-in-place` (both latched, either latch
+  commits to a landing); bounded `try_enqueue` reject-newest; failsafe > manual override > autonomy.
+  Full narrative + the 8 HITL defect fixes: bottom of the spec-3 file. Uncommitted (manager review).
+
+## APPROACH servo: brake on odometry, not depth (2026-08-08)
+- **Problem:** the depth range to the target is too noisy near it to brake on -- in SITL the same
+  parked car read 1.6-6.5 m tick to tick. The old servo set forward speed from `(range - standoff)`,
+  so every noisy-high read re-accelerated the drone. It crept forward until a fluke low read tripped
+  `reached`, by which point it had hit the car ("push, halt, push, crash").
+- **Fix (fmu_node.hpp):** once a stable early range estimate exists (>= median-window samples, target
+  still far), latch the drone position + a fixed travel budget = `R0 - standoff`. From then on the stop
+  point is dead-reckoned from odometry travel, which is exact, so a noisy high depth read can no longer
+  re-accelerate into the target. Depth is kept only as a backstop (median `range < standoff` also
+  stops). Whichever fires first wins, so both failure directions are safe: depth-high-all-the-way ->
+  travel budget stops you (no overshoot); depth-low fluke -> backstop stops you early (short, never
+  late). Lost-target handling is travel-aware: complete by travel if past the stop point, HOLD if near
+  it, coast only while still far.
+- **Standoff (fmu_node_base.hpp):** `kApproachStandoffM` 2.0 -> 3.0 m. Depth ranges to the target's
+  centroid; a closer-protruding part (car mid-back) sat inside 2 m and got clipped. 3 m clears it.
+- **Observed:** in practice the depth backstop trips before the travel budget is consumed (median dips
+  under standoff first), so the budget acts as the failsafe. The stop is conservative (can end a bit
+  far); tightening it needs better depth, not servo logic. Adequate + safe for the POC.
+- Removed the temporary `[PERCEPTION_DEBUG]` stderr logging from perception_runtime.hpp (ship-clean).

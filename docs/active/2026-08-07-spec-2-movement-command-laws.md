@@ -69,3 +69,131 @@ Collision avoidance during these maneuvers (Spec 1 owns the boundary/interrupt).
 
 ## Implementation report (session: append below, do not edit above)
 <!-- files changed, the shared aim-unit's interface, schema additions, what was/wasn't SITL-tested -->
+
+### Session handoff (2026-08-08) — design frozen, NOT implemented
+
+**Status:** design complete, no code written. Two blockers (below) gate all implementation. Written to
+be picked up by a fresh session that re-syncs with the codebase first.
+
+#### Resume checklist — DO THESE FIRST (the tree moved under this design)
+1. **Re-read `fmu_node.hpp` APPROACH branch (~L504-580) fresh.** Agent 2 landed a median-depth-to-target
+   fix for APPROACH during this design. The STALE/recovery behavior below may already partly exist —
+   Step 0's job is to *compose what exists* into the helper, not reinvent it. Diff before coding.
+2. **LOCKS is a HARD REQUIREMENT.** Before touching ANY file: read its LOCKS entry, set yourself as
+   holder + UTC time, save LOCKS first, edit, then set holder=FREE with a note. Every file, every time.
+3. **Confirm both blockers cleared** — nothing builds or tunes until they are.
+4. Re-read this spec + `docs/code-guidelines.md`; check ROADMAP for status drift.
+
+#### Blockers (owned by other agents)
+1. **Constants runtime loader** — codebase can't distinguish DJI-Tello vs PX4-SITL constants. Every
+   Step-5 tunable is meaningless until this exists.
+2. **Depth-map accessor** — `PerceptionRuntime` keeps the metric depth map (`m_depthMap`, cv::Mat,
+   meters) private; `snapshot()` exposes only per-detection `median_depth_cm`. safe_land needs a depth
+   *region*, so the perception owner must add `depthMap()` / `groundFlatness(roi)` first.
+
+#### Guardrails
+rtk only. Heredoc edits with `assert s.count(old)==1`. **Never change the `GenericCommand` 64-byte
+union layout.** Match `docs/code-guidelines.md`. Files edited (`source/llm_to_action/fmu/`):
+`fmu_node.hpp`, `fmu_node_base.hpp`, `llm_base.hpp`.
+
+#### Coordinate systems — every file that crosses a frame
+Frames: **FLU** (body F/L/U), **ENU** (world E/N/Up+), **NED** (PX4 wire N/E/Down+), **pixel** (u,v).
+**Keep coordinate suffixes on variable names, and keep conversions explicitly named** (state from->to at
+the call site — the existing frame_convert.hpp philosophy; do not drop it).
+
+| File | Edited? | Frames touched | Converts (from -> to) | Internal convention |
+|------|---------|----------------|-----------------------|---------------------|
+| `frame/frame_convert.hpp` | no (used) | FLU, ENU, NED, yaw CW/CCW | the named conversions (FLU<->NED, NED<->ENU, FLU<->ENU, yaw CW<->CCW) | none — it *is* the converter; world target = ENU |
+| `perception/detection_query.hpp` | no (used) | pixel, FLU | pixel(u,v)+depth -> body-FLU dir + range | body-FLU out |
+| `fmu/llm_base.hpp` | yes | FLU (semantics only) | none — prompt tells the VLM its commands are body-FLU (cm/deg) | FLU (to VLM) |
+| `fmu/fmu_node.hpp` | yes | FLU (VLM cmd + perception aim), ENU (odometry, control, backend I/O) | body-FLU -> ENU via `flu_to_enu` at activation + per aim tick | ENU |
+| `fmu/fmu_node_base.hpp` | yes | ENU-referenced constants (altitudes, climb/descend vels — Up+); rest frame-neutral scalars (gains 1/s, timeouts, loop rates) | none (constants) | ENU for altitude/velocity constants; N/A for scalars |
+| `backend px4_backend.*` | no (boundary) | ENU (from FMU), NED (wire) | ENU -> NED at the wire | NED |
+
+**Follow-ups (not Spec 2 — flag to overseer):**
+- Control-loop locals `n/e/d` are mislabeled (`n = pos.x`, which is *East*). Codebase-wide rename.
+- **Tello device-coordinate frame is unknown/unverified** — must measure what frame the Tello backend
+  reports odometry in (PX4 is NED->ENU; Tello TBD). Blocks correct frame handling on the Tello path.
+- **Document this table in the codebase** (a `docs/` frames page or a `frame_convert.hpp` header comment).
+
+#### Step 0 — Shared aim helper (do FIRST; APPROACH + ORBIT use it)
+Compose APPROACH's existing detection+recovery logic into one helper:
+```cpp
+enum class AimStatus : u8 { TRACKING, STALE, LOST };
+struct AimSample { AimStatus status; TargetRelative tr; Vec3 holdVelEnu; };  // tr valid iff TRACKING
+AimSample resolveLiveAim(char const* label, u64 tnow);
+void      resetAim();  // at each command activation
+```
+- **TRACKING** — fresh detection this frame (`found && age <= kApproachFreshUs = 200ms`); `tr` = live aim.
+- **STALE** — had a lock, but this frame's detection is missing or older than 200ms, and last-good aim is
+  `<= kApproachLostTimeoutUs = 3000ms` old. Fly the last-known bearing briefly
+  (`holdVelEnu` = last bearing x `kApproachCoastSpeedMps`), distrusting it as current truth — just not
+  failing on one dropped frame (real YOLO/depth stalls ~1s under load).
+- **LOST** — last-good aim older than 3000ms -> caller FAILs.
+Keep the single-detection fallback. Rename shared members `m_approachLastAim*` -> `m_aimLast*`. Rewrite
+APPROACH to call the helper; behavior identical (incl. Agent 2's median-depth fix).
+
+#### Step 1 — GO: no change
+GO-to-target = APPROACH with ~0 standoff, a duplicate servo. VLM emits APPROACH for targets; GO stays
+relative-offset. No struct/schema change. APPROACH (via Step 0) already delivers 5.2's drift-free
+re-grounding.
+
+#### Step 2 — ORBIT (target-anchored)
+`CmdOrbit` + schema exist. Parser fills radius/angle_deg/speed/cw_or_ccw/target.
+- Dispatch freezes radius, speed, dir(+1 ccw/-1 cw), targetRad, sweptRad=0, prevBearing unseeded, resetAim.
+- Movement: `resolveLiveAim(target)` -> LOST=`"orbit_lost_failed"`, STALE=hold on `holdVelEnu`.
+  TRACKING: aimEnu=`flu_to_enu(tr.dirFlu,yaw)`; radialUnit=normalize(aimEnu.xy); tangent=`dir*(-ry,rx)`;
+  radial speed=`kOrbitRadialGainHz*(range-radius)` (continuous P, tight tol); tangential=`speed`; combine
+  (hold altitude), yaw-center on `errX`, clamp. **Swept = closed-loop:** accumulate
+  `|wrap_pi(bearing - prevBearing)|` from measured target bearing (not `speed/radius*dt`) so error can't
+  accumulate. `swept >= targetRad -> "orbit_ok"`.
+
+#### Step 3 — SEARCH (zig-zag inside a circle, fixed altitude, no target lock)
+`CmdSearch` + schema exist. Parser fills target/expected_time/timeout.
+- Pattern: **zig-zag/boustrophedon bounded by a circle of radius R, constant altitude**, with **~30deg
+  between each zig and zag leg**. **Before turning from a zig leg to the next zag leg, do a full 360deg
+  yaw rotation and scan the surroundings** so nothing is missed by only looking forward. R is a wide,
+  tunable default (support wide scans).
+- Detection: each tick check `detectionByLabel(snap, target).found`.
+- **On success:** `completeCurrent("search_ok")` AND **notify the user of the detection**, posting the
+  **full diagnostics — label, confidence, depth, bbox** — so the operator can judge whether the search
+  genuinely succeeded (guard against a low-confidence false positive).
+- Exhausted (pattern done OR elapsed>timeout) -> `completeCurrent("search_exhausted")`.
+
+#### Step 4 — safe_land (depth-uniformity, no target, three steps)
+Reuses the existing descend/flare; does NOT reimplement landing. Blocked on the depth accessor.
+- `CommandID`: add `SAFE_LAND`, bump `MAX_ID`. `struct CmdSafeLand{}`, union member,
+  `GenericCommand(CmdSafeLand)` ctor (copy CmdStop's) — 64-byte layout unchanged.
+- `llm_base.hpp`: add `{"action":"safe_land"}` schema + one system-prompt line.
+- Parser `"safe_land"` -> `CmdSafeLand`.
+- Movement: (1) **Assess** — sample a depth ROI (lower-center = ground ahead/below), mean+variance.
+  (2) **Decide** — flat if `variance < kSafeLandDepthVarTol` AND close if `mean < kSafeLandGroundNearM`
+  (not a 5m drop); else `completeCurrent("safe_land_no_spot")`. (3) **Descend** — center over the patch,
+  then `m_flightState = LANDING` + `completeCurrent("safe_land_handoff")`; existing flare finishes.
+
+#### Step 5 — Constants (fmu_node_base.hpp) — all `/* SITL-tune, pending constants loader */`
+```
+Orbit:  kOrbitRadiusToleranceM = 0.05f;   // was 0.30f — 30cm let the circle drift
+        kOrbitRadialGainHz     = 0.5f;
+        kOrbitTangentialGainHz = 0.2f;     // small
+Search: kSearchSweepSpeed   = 40.0f;       // cm/s
+        kSearchCircleRadiusM = 10.0f;      // wide; ideally a command param
+        kSearchZigStepDeg    = 30.0f;      // ~30 deg between zig and zag legs
+Safe:   kSafeLandDepthVarTol = <tune>;  kSafeLandGroundNearM = <tune>;  kSafeLandCenterGainHz = 0.3f;
+```
+
+#### Testing — REQUIRED, at least one per command (+ edge cases)
+Rig: `scripts/test/<name>/{run.sh,filter.sh,README.md}`, sharing `lib/sim_core.sh`; `approach/` (canned
+rig) is the reference; `land-flare/` + `terrain-land/` are the safe-land relatives. Add:
+- `scripts/test/orbit/` — assert `orbit_ok`; edge: lost mid-orbit -> `orbit_lost_failed`; STALE frame ->
+  holds, doesn't fail; sweep count reaches `angle_deg`.
+- `scripts/test/search/` — assert `search_ok` + the diagnostic notification fires; edge: object never
+  appears -> `search_exhausted`; timeout path; the 360deg scan actually runs between legs.
+- `scripts/test/safe-land/` — assert `safe_land_handoff` over flat ground; edge: non-flat ->
+  `safe_land_no_spot`; too-high (mean depth large) -> no descend.
+These `scripts/test/*` dirs are new and Spec-2-owned -> no LOCKS entry needed, but confirm before creating.
+
+#### Open questions for next session
+- Is adding the `depthMap()` accessor to `PerceptionRuntime` Spec 2's job, or the perception owner's?
+- Search radius R: constant, or a new schema field on `search`?
+- Where should the coordinate table live in the codebase?

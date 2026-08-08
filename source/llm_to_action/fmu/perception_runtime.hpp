@@ -30,6 +30,7 @@
 
 #include <opencv2/core.hpp>
 #include <cv_bridge/cv_bridge.hpp>
+#include <cstdio>            /* fprintf/stderr -- approach-real perception debug */
 
 #include <util2/C/base_type.h>
 #include <vision/perception_types.hpp>
@@ -72,6 +73,11 @@ public:
     std::shared_ptr<PerceptionSnapshot> snapshot() const {
         return std::atomic_load(&m_snapshot);
     }
+
+    /* Both ONNX engines loaded their model. The FMU aborts startup if this is false:
+       a missing/mispathed model must fail LOUD, not silently emit zero detections
+       (a wrong path once cost hours of "why does approach never see anything"). */
+    bool ready() const { return m_seg.ok() && m_depth.ok(); }
 
     /* Test-only: publish a synthesized snapshot through the same atomic path the real seg
        loop uses. Safe to call even while the real engines are running -- if the vision

@@ -35,8 +35,21 @@ constexpr f32 kTakeoffTargetAltEnu = 2.0f;    /* climb target ~2m up (Up+).     
 constexpr f32 kTakeoffClimbVelEnu  = 2.0f;    /* climb at 2 m/s (Up+).          */
 constexpr f32 kLandDescendVelEnu   = -0.5f;   /* descend at 0.5 m/s (Down=-Up). */
 constexpr f32 kGroundContactEnu    = 0.1f;    /* landed when Up <= ~0.1.        */
-constexpr f32 kFlareStartAltEnu     = 0.6f;   /* begin the landing flare (decel) below this Up alt. */
+constexpr f32 kFlareStartAltEnu     = 1.0f;   /* begin the landing flare (decel) below this Up alt (raised 0.6->1.0: slow sooner). */
 constexpr f32 kFlareTouchdownVelEnu = -0.12f; /* min descent speed at contact (Down=-Up); soft touch. */
+
+/* ---- Battery failsafe (SITL-tuned; kBatteryReadingUnknown==-1 is skipped) --- */
+constexpr i32 kBatteryReturnPct = 20;   /* <= this -> return-to-origin, then land (latched). */
+constexpr i32 kBatteryLandPct   = 10;   /* <= this -> land in place now (latched).           */
+
+/* ---- Manual operator override (ARCH 11) ---------------------------------- */
+constexpr const char* kFmuOverrideTopic = "/fmu/in/override";  /* std_msgs/Bool takeover toggle. */
+constexpr f32 kManualTeleopVelCmS = 50.0f;   /* per-axis manual speed (cm/s); TUNE in sim+real. */
+
+/* ---- Task-queue backpressure --------------------------------------------- */
+/* Bounded try_enqueue vs the fixed queue cap; on full, reject-newest + log every
+   drop (SPSC-safe: the control thread must never enqueue). Cap plan length too. */
+constexpr u32 kMaxPlanActions = 3 * kControlLoopRateHz;   /* == queue capacity. */
 
 /* Momentum-settle dwell between tasks: a just-completed leg leaves real
    residual velocity (worst right after TAKEOFF's climb) that a zero-velocity
@@ -66,8 +79,8 @@ constexpr u64 kVisionWarmupUs = static_cast<u64>(kVisionWarmupMs) * 1000ULL;
    so PerceptionRuntime runs them as two independently-paced loops rather
    than one blocking call. Thread counts are capped so ORT cannot starve the
    20Hz control loop / other llm_to_action nodes sharing this process. */
-constexpr const char* kVisionSegModelPath   = "/root/models/vision/vision/yolo26n-seg-384.onnx";
-constexpr const char* kVisionDepthModelPath = "/root/models/vision/vision/yolo26n-depth-384.onnx";
+constexpr const char* kVisionSegModelPath   = "/root/models/vision/yolo26n-seg-384.onnx";
+constexpr const char* kVisionDepthModelPath = "/root/models/vision/yolo26n-depth-384.onnx";
 constexpr int kVisionSegThreads   = 2;
 constexpr int kVisionDepthThreads = 2;
 constexpr u32 kVisionSegLoopMs    = 33;   /* ~30 Hz target; measured: meets it. */
@@ -77,7 +90,7 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
    tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
-constexpr f32 kApproachStandoffM     = 2.00f;   /* stop this far from the target. Bigger than the
+constexpr f32 kApproachStandoffM     = 3.00f;   /* stop this far from the target. Bigger than the
                                                     servo law strictly needs -- real depth readings
                                                     jitter/freeze on this CPU (SITL, real YOLO), so
                                                     this is slack against a misjudged range, not just
@@ -105,6 +118,10 @@ constexpr u32 kApproachLostTimeoutMs = 3000;    /* coast window before FAIL on l
                                                     seg/depth inference on this CPU lags the 500ms
                                                     canned-rig tuning by seconds, not ms. */
 constexpr u64 kApproachLostTimeoutUs = static_cast<u64>(kApproachLostTimeoutMs) * 1000ULL;
+constexpr u32 kApproachRangeMedianWindow = 5;    /* median-filter depth range over N samples; the
+                                                    depth model is noisy near the target. */
+constexpr f32 kApproachCoastHoldMarginM  = 0.5f; /* if target lost within standoff+this, HOLD
+                                                    instead of coasting blind into it. */
 constexpr u32 kApproachFreshMs        = 200;    /* a detection older than this is not trusted for
                                                     closing speed -- real depth readings on this CPU
                                                     can freeze for 1s+ under load; acting on a frozen

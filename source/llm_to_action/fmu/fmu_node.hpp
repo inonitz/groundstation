@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <future>
+#include <cstdlib>
 #include <nlohmann/json.hpp>
 #include <readerwriterqueue.h>
 #include <util2/C/macro.h>
@@ -27,6 +28,10 @@
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 #include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
+#include <std_msgs/msg/bool.hpp>
+#include "keyboard/keyboard_node_base.hpp"  /* kOutKeyboardRawTopic, KeyboardRawInputType (Int32MultiArray) */
+#include "keyboard/key_codes.hpp"           /* KeyCodeEnum, KeyAction */
+#include "frame/frame_convert.hpp"          /* flu_to_enu / enu_to_flu */
 
 
 /* Shared-scalar access order (matches the proven baseline). */
@@ -212,6 +217,19 @@ public:
             subOpts
         );
 
+        /* Operator manual-override toggle (std_msgs/Bool) + the raw keylog stream
+           (movement keys act only while override is engaged). ARCH 11. */
+        m_subOverride = this->create_subscription<std_msgs::msg::Bool>(
+            kFmuOverrideTopic, 10,
+            std::bind(&FlightManagementUnitNode::overrideCallback, this, std::placeholders::_1),
+            subOpts
+        );
+        m_subKey = this->create_subscription<KeyboardRawInputType>(
+            kOutKeyboardRawTopic, 10,
+            std::bind(&FlightManagementUnitNode::keyCallback, this, std::placeholders::_1),
+            subOpts
+        );
+
         /* All platform wire I/O lives in the backend. make_active_backend hides
            the per-backend ctor asymmetry (PX4 needs this Node + callback group;
            Tello, being ROS-free, ignores them) behind one uniform call, so the
@@ -228,6 +246,13 @@ public:
             kVisionSegThreads, kVisionDepthThreads,
             kVisionSegLoopMs, kVisionDepthLoopMs,
             [this]() { return std::atomic_load(&m_currImg); });
+        if (!m_perception->ready()) {
+            RCLCPP_FATAL(this->get_logger(),
+                "[FMU_NODE_FATAL] vision model(s) failed to load -- seg=%s depth=%s. "
+                "Path missing/unreadable; aborting instead of flying blind (zero detections).",
+                kVisionSegModelPath, kVisionDepthModelPath);
+            std::abort();   /* no exceptions in this codebase -- fail fast on a fatal misconfig. */
+        }
         m_perception->start();
 
         m_controlTimer = this->create_wall_timer(
@@ -254,12 +279,16 @@ public:
 
     /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
     void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
-               bool useSpeedPlan = false, bool useApproachPlan = false, bool useApproachRealPlan = false) {
+               bool useSpeedPlan = false, bool useApproachPlan = false, bool useApproachRealPlan = false,
+               bool useRotatePlan = false, bool useLandFlarePlan = false,
+               bool useTerrainLandPlan = false, bool useFloodPlan = false,
+               bool useCrossFloodPlan = false, bool useBatteryRthPlan = false,
+               bool useBatteryLandNowPlan = false, bool usePatrolPlan = false) {
         m_chat.m_initialCommand = objective;
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan;
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan;
         m_missionActive.store(!cannedRun, std::memory_order_release);
         if (useCrossPlan) {
             injectCannedCrossPlan();
@@ -269,13 +298,30 @@ public:
             injectCannedApproachRealPlan();
         } else if (useApproachPlan) {
             injectCannedApproachPlan();
+        } else if (useRotatePlan) {
+            injectCannedRotatePlan();
+        } else if (useLandFlarePlan) {
+            injectCannedLandFlarePlan();
+        } else if (useTerrainLandPlan) {
+            injectCannedTerrainLandPlan();
+        } else if (useFloodPlan) {
+            injectCannedFloodPlan();
+        } else if (useCrossFloodPlan) {
+            injectCannedCrossFloodPlan();
+        } else if (useBatteryRthPlan) {
+            injectCannedBatteryRthPlan();
+        } else if (useBatteryLandNowPlan) {
+            injectCannedBatteryLandNowPlan();
+        } else if (usePatrolPlan) {
+            injectCannedPatrolPlan();
         } else if (useCannedPlan) {
             injectCannedPlan();
         }
         RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d approach_real=%d). queued~=%zu. objective: %.*s",
+            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d approach_real=%d rotate=%d land_flare=%d terrain_land=%d). queued~=%zu. objective: %.*s",
             __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
             __scast(int, useApproachPlan), __scast(int, useApproachRealPlan),
+            __scast(int, useRotatePlan), __scast(int, useLandFlarePlan), __scast(int, useTerrainLandPlan),
             m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
         );
         return;
@@ -372,15 +418,32 @@ private:
         TargetRelative tr;
         std::shared_ptr<PerceptionSnapshot> snap;
         Vec3        velEnu, aimFlu, fwdDir, lat;
-        f32         speedCeil, spF, yawRate, vUp, magV;
+        f32         speedCeil, spF, yawRate, vUp, magV, appTrav, appRem;
         u64         tnow;
 
         od = m_backend->odometry();
-        m_telemetry.battery_pct = m_backend->battery_pct();  /* battery from backend, not the stub default */
+        {
+            i32 bf = m_batteryForce.load(kMemOrderRelax);   /* test-only fault injection; -2 = off */
+            m_telemetry.battery_pct = (bf >= -1) ? bf : m_backend->battery_pct();
+        }
         n  = od.pos.x;
         e  = od.pos.y;
         d  = od.pos.z;
         st = m_flightState.load(kMemOrderRelax);
+
+        /* Battery failsafe = ultimate safety net: pre-empts the plan AND the pilot. */
+        if (batteryFailsafeTick()) return;
+
+        /* Manual operator override: pilot flies (body-FLU keys -> world ENU); autonomy
+           paused. Disabled once a battery failsafe has latched (failsafe wins). */
+        if (m_manualOverride.load(kMemOrderRelax) && !mb_batteryReturn && !mb_batteryLand) {
+            Vec3 manEnu = flu_to_enu(
+                Vec3{ m_manualFwd.load(kMemOrderRelax),
+                      m_manualLeft.load(kMemOrderRelax),
+                      m_manualUp.load(kMemOrderRelax) }, od.yaw);
+            m_backend->set_velocity(manEnu, m_manualYaw.load(kMemOrderRelax));
+            return;
+        }
 
         /* HIGH-verbosity heartbeat (every 500ms) — one glance shows the whole rig. */
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500,
@@ -388,6 +451,30 @@ private:
             __scast(int, st), __scast(int, m_backend->state()),
             n, e, d, od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate,
             __scast(int, m_hasActive), m_taskQueue->size_approx());
+
+        /* Airborne command-storm (spec-3): once we've been in FLIGHT ~5s, inject the flood
+           from a producer-role async (mirrors the VLM's std::async path) so the SPSC contract
+           holds -- the control thread only LAUNCHES it here, it never enqueues. */
+        if (m_floodArmed && !m_floodFired && st == FlightState::FLIGHT) {
+            if (m_floodAtUs == 0)             m_floodAtUs = nowUs() + 5ULL * 1000000ULL;
+            else if (nowUs() >= m_floodAtUs) {
+                m_floodFired  = true;
+                m_floodFuture = std::async(std::launch::async, [this]() { injectCannedFloodPlan(); });
+            }
+        }
+
+        /* Test-only battery fault injection: once ~15s into FLIGHT (drone is out ~6m), force the
+           scripted low reading so the failsafe law fires deterministically, far from home. */
+        if (m_batForceArmed && !m_batForceFired && st == FlightState::FLIGHT) {
+            if (m_batForceAtUs == 0)             m_batForceAtUs = nowUs() + 15ULL * 1000000ULL;
+            else if (nowUs() >= m_batForceAtUs) {
+                m_batForceFired = true;
+                m_batteryForce.store(m_batForceValue, kMemOrderRelax);
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] TEST battery fault injected -> forcing %d%% (real was %d%%).",
+                    m_batForceValue, m_backend->battery_pct());
+            }
+        }
 
         if (st == FlightState::TAKEOFF) {
             m_backend->set_velocity(Vec3{0.0f, 0.0f, kTakeoffClimbVelEnu}, 0.0f);  /* stream the climb (Up+) */
@@ -414,6 +501,9 @@ private:
                 if (t < 0.0f) t = 0.0f; else if (t > 1.0f) t = 1.0f;  /* 1 at flare start, 0 at contact */
                 vLand = kFlareTouchdownVelEnu + t * (kLandDescendVelEnu - kFlareTouchdownVelEnu);
             }
+            /* stream vLand so the flare taper is verifiable from the log (spec-4 Part B). */
+            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                "[FMU_NODE_DIAGNOSTICS] LAND altENU=%.2f vLand=%.3f", d, vLand);
             m_backend->set_velocity(Vec3{0.0f, 0.0f, vLand}, 0.0f);  /* stream the (flared) descent (Down) */
             if (d <= kGroundContactEnu) {
                 m_backend->force_disarm();
@@ -520,13 +610,47 @@ private:
                 if (!tr.found || tr.age_us > kApproachFreshUs) {
                     if (m_approachHaveLastAim &&
                         (tnow - m_approachLastAimUs) <= kApproachLostTimeoutUs) {
-                        aimFlu = { m_approachLastAimFlu.x * kApproachCoastSpeedMps,
-                                   m_approachLastAimFlu.y * kApproachCoastSpeedMps,
-                                   m_approachLastAimFlu.z * kApproachCoastSpeedMps };
-                        velEnu = flu_to_enu(aimFlu, od.yaw);
-                        m_backend->set_velocity(velEnu, 0.0f);
+                        appTrav = 0.0f;
+                        appRem  = kApproachStandoffM;   /* until latched, treat the stop point as far */
+                        if (m_approachBudgetLatched) {
+                            dx      = od.pos.x - m_approachStartPos.x;
+                            dy      = od.pos.y - m_approachStartPos.y;
+                            dz      = od.pos.z - m_approachStartPos.z;
+                            appTrav = std::sqrt(dx * dx + dy * dy + dz * dz);
+                            appRem  = m_approachTravelBudget - appTrav;
+                        }
+                        if (m_approachBudgetLatched && appRem <= 0.0f) {
+                            /* Reached the dead-reckoned stop point with the target briefly lost.
+                               Odometry says we are there, so stop -- don't wait for a re-lock. */
+                            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                            RCLCPP_INFO(this->get_logger(),
+                                "[FMU_NODE_DEBUG] APPROACH reached target=%s traveled=%.2f/%.2f (lost at stop)",
+                                appr.target, appTrav, m_approachTravelBudget);
+                            completeCurrent("approach_ok");
+                        } else if (appRem <= kApproachCoastHoldMarginM) {
+                            /* Lost the target while already near the stop point: HOLD, do not coast
+                               forward -- coasting blind into a close target is how it hits it. */
+                            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                                "[FMU_NODE_DIAGNOSTICS] APPROACH hold near stop point target=%s (lost, rem~%.2f).",
+                                appr.target, appRem);
+                        } else {
+                            aimFlu = { m_approachLastAimFlu.x * kApproachCoastSpeedMps,
+                                       m_approachLastAimFlu.y * kApproachCoastSpeedMps,
+                                       m_approachLastAimFlu.z * kApproachCoastSpeedMps };
+                            velEnu = flu_to_enu(aimFlu, od.yaw);
+                            m_backend->set_velocity(velEnu, 0.0f);
+                            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                                "[FMU_NODE_DIAGNOSTICS] APPROACH coasting target=%s (lost).", appr.target);
+                        }
+                    } else if (!m_approachHaveLastAim &&
+                               (tnow - m_approachActivateUs) <= kApproachLostTimeoutUs) {
+                        /* Initial acquisition: the target may not be framed on the exact tick
+                           APPROACH activates (detection is intermittent). Hover and wait for the
+                           first lock instead of failing on tick one -- only then can coast apply. */
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] APPROACH coasting target=%s (lost).", appr.target);
+                            "[FMU_NODE_DIAGNOSTICS] APPROACH acquiring target=%s (no lock yet).", appr.target);
                     } else {
                         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                         RCLCPP_WARN(this->get_logger(),
@@ -543,16 +667,51 @@ private:
                     m_approachLastAimFlu  = tr.dirFlu;
                     m_approachLastAimUs   = tnow;
                     m_approachHaveLastAim = true;
+                    pushApproachRange(tr.range);
+                    m_approachLastRange   = medianApproachRange();   /* median-filtered; rejects depth spikes */
 
-                    if (tr.range < kApproachStandoffM) {
+                    /* Depth range is too noisy near the target to brake on directly: in SITL the
+                       same parked car reads anywhere from 1.6 m to 6.5 m tick to tick. Braking on
+                       that noise makes the drone creep forward until a fluke low read fires, by
+                       which point it has already hit the car. So brake on odometry, not depth.
+                       Once a stable early range estimate exists, latch the drone position and a
+                       fixed travel budget = range - standoff. The stop point is then dead-reckoned
+                       from how far the drone has actually moved, which is exact, so a noisy high
+                       depth read can no longer re-accelerate us into the target. */
+                    if (!m_approachBudgetLatched &&
+                        m_approachRangeCount >= kApproachRangeMedianWindow) {
+                        m_approachStartPos      = od.pos;
+                        m_approachTravelBudget  = m_approachLastRange - kApproachStandoffM;
+                        if (m_approachTravelBudget < 0.0f) m_approachTravelBudget = 0.0f;
+                        m_approachBudgetLatched = true;
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] APPROACH range locked R0=%.2f travelBudget=%.2f",
+                            m_approachLastRange, m_approachTravelBudget);
+                    }
+                    appTrav = 0.0f;
+                    appRem  = kApproachStandoffM;   /* until latched, treat the stop point as far */
+                    if (m_approachBudgetLatched) {
+                        dx      = od.pos.x - m_approachStartPos.x;
+                        dy      = od.pos.y - m_approachStartPos.y;
+                        dz      = od.pos.z - m_approachStartPos.z;
+                        appTrav = std::sqrt(dx * dx + dy * dy + dz * dz);
+                        appRem  = m_approachTravelBudget - appTrav;
+                    }
+
+                    if ((m_approachBudgetLatched && appRem <= 0.0f) ||
+                        (m_approachLastRange > 0.0f && m_approachLastRange < kApproachStandoffM)) {
                         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                         RCLCPP_INFO(this->get_logger(),
-                            "[FMU_NODE_DEBUG] APPROACH reached target=%s range=%.2f",
-                            appr.target, tr.range);
+                            "[FMU_NODE_DEBUG] APPROACH reached target=%s traveled=%.2f/%.2f range=%.2f",
+                            appr.target, appTrav, m_approachTravelBudget, m_approachLastRange);
                         completeCurrent("approach_ok");
                     } else {
                         speedCeil = (appr.speed > 0.0f ? appr.speed : kApproachSpeedDefault) / 100.0f;
-                        spF       = kApproachFwdGainHz * (tr.range - kApproachStandoffM);
+                        /* Brake on remaining dead-reckoned travel once latched; before the latch,
+                           creep slowly forward while collecting range samples for R0. */
+                        spF       = m_approachBudgetLatched
+                                        ? kApproachFwdGainHz * appRem
+                                        : kApproachCoastSpeedMps;
                         if (spF < 0.0f) spF = 0.0f;
                         if (spF > speedCeil) spF = speedCeil;
                         yawRate = -kApproachYawGain * tr.errX;
@@ -589,6 +748,14 @@ private:
         if (m_settleTicksRemaining > 0) {
             m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f); /* hold while residual momentum decays. */
             --m_settleTicksRemaining;
+            return;
+        }
+
+        /* RTH handoff: the return-to-origin GO has finished (no active task) ->
+           land at the origin, once. */
+        if (mb_batteryReturn && !mb_batteryLand) {
+            mb_batteryLand = true;
+            m_flightState.store(FlightState::LANDING, kMemOrderRelax);
             return;
         }
 
@@ -646,7 +813,146 @@ private:
             std::chrono::steady_clock::now().time_since_epoch()).count());
     }
 
+    /* ---- Battery failsafe + manual override ------------------------------ */
+    /* Returns true if the failsafe pre-empted this tick. battery_pct < 0
+       (kBatteryReadingUnknown) means no trustworthy reading -> skip; a real 0 is
+       empty and triggers. Latches so a wobbling reading can't oscillate the state. */
+    bool batteryFailsafeTick() {
+        i32 pct = m_telemetry.battery_pct;
+        if (pct < 0)          return false;   /* UNKNOWN sentinel: never a false alarm. */
+        if (mb_batteryReturn || mb_batteryLand) return false;   /* EITHER failsafe latched -> committed to a landing; don't re-evaluate (land-in-place must not then escalate to RTH). */
+
+        if (pct <= kBatteryLandPct && !mb_batteryLand) {      /* critical -> land where we are. */
+            mb_batteryLand = true;
+            m_hasActive    = false;
+            { ActiveTask stale; while (m_taskQueue->try_dequeue(stale)) { } }  /* drop the rest of the plan (consumer side); leftover actions must not run after we land. */
+            m_flightState.store(FlightState::LANDING, kMemOrderRelax);
+            m_missionActive.store(false, std::memory_order_release);
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] FAILSAFE battery %d%% -> LAND in place.", pct);
+            return true;
+        }
+        if (pct <= kBatteryReturnPct && !mb_batteryReturn) {  /* low -> return to origin, then land. */
+            mb_batteryReturn = true;
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] FAILSAFE battery %d%% -> RETURN to origin.", pct);
+            returnToOrigin();
+            return true;
+        }
+        return false;
+    }
+
+    /* Pre-empt the plan and fly a straight GO back to the takeoff point (ENU origin);
+       the dispatch site then lands us there. Control-thread only; SPSC-safe -- we
+       drain as the consumer and NEVER enqueue here. */
+    void returnToOrigin() {
+        Odometry   od = m_backend->odometry();
+        ActiveTask stale;
+        Vec3       homeFlu = enu_to_flu(Vec3{ -od.pos.x, -od.pos.y, 0.0f }, od.yaw);  /* hold altitude. */
+
+        while (m_taskQueue->try_dequeue(stale)) { /* drop the stale VLM plan (consumer side). */ }
+        m_missionActive.store(false, std::memory_order_release);   /* stop soliciting new plans. */
+
+        CmdGo g{};
+        g.x     = homeFlu.x * 100.0f;   /* CmdGo is body-FLU centimetres. */
+        g.y     = homeFlu.y * 100.0f;
+        g.z     = 0.0f;
+        g.speed = 80.0f;                /* brisk 0.8 m/s return -- low battery, get home promptly. */
+
+        ActiveTask home{};
+        home.m_cmd   = GenericCommand(g);
+        home.m_state = TaskState::PENDING;
+        strncpy(home.m_thought, "battery failsafe: return to origin", sizeof(home.m_thought) - 1);
+
+        /* A movement task only runs in the FLIGHT/STANDBY dispatch path. The failsafe can fire
+           mid-TAKEOFF (weak battery never reached kTakeoffTargetAltEnu): that branch streams a
+           climb and ignores the active task, so the RTH GO would never execute and the drone
+           would hang forever with motors armed. Force FLIGHT so the GO runs -- and since we are
+           still at the origin it completes at once, and the dispatch-site handoff lands us. */
+        m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
+        activateTask(home);
+    }
+
+    /* Operator override toggle (std_msgs/Bool). true = take manual control (pause
+       autonomy); false = hand control back to the VLM, which re-plans from the
+       current pose (it lost positional context while disengaged). */
+    void overrideCallback(const std_msgs::msg::Bool::SharedPtr msg) {
+        bool prev = m_manualOverride.exchange(msg->data, kMemOrderRelax);
+        if (prev == msg->data) return;
+        zeroManualVel();
+
+        if (msg->data) {
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] MANUAL OVERRIDE engaged -> autonomy paused, operator in control.");
+            return;
+        }
+        /* Handback: abandon any active/queued task, resume autonomy, force a re-plan
+           (the VLM lost positional context while disengaged -> plan fresh from here). */
+        ActiveTask stale;
+        while (m_taskQueue->try_dequeue(stale)) { }
+        m_hasActive            = false;
+        m_settleTicksRemaining = 0;
+        m_lastPlanUs           = 0;   /* clear cooldown so maybePlan re-plans now. */
+        m_missionActive.store(true, std::memory_order_release);
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] MANUAL OVERRIDE released -> autonomy resumes, VLM will re-plan.");
+    }
+
+    void zeroManualVel() {
+        m_manualFwd.store(0.0f, kMemOrderRelax);
+        m_manualLeft.store(0.0f, kMemOrderRelax);
+        m_manualUp.store(0.0f, kMemOrderRelax);
+        m_manualYaw.store(0.0f, kMemOrderRelax);
+    }
+
+    /* Raw keylog [keycode, action]. While override is engaged, movement keys map to
+       a constant body-FLU velocity (converted to ENU in controlLoop). WASD=plane,
+       arrows=alt/yaw, Space=hover. Ignored when not overridden. */
+    void keyCallback(const KeyboardRawInputType::SharedPtr msg) {
+        if (msg->data.size() < 2 || !m_manualOverride.load(kMemOrderRelax)) return;
+
+        constexpr f32 kV   = kManualTeleopVelCmS / 100.0f;   /* m/s per axis. */
+        constexpr f32 kYaw = 0.6f;                           /* rad/s; TUNE in sim+real. */
+        int  key  = msg->data[0];
+        bool down = (msg->data[1] == __scast(int, KeyAction::PRESSED));
+        bool up   = (msg->data[1] == __scast(int, KeyAction::RELEASED));
+        if (!down && !up) return;                            /* ignore auto-repeat, etc. */
+        f32 on = down ? 1.0f : 0.0f;
+
+        if      (key == __scast(int, KeyCodeEnum::W))          m_manualFwd.store(  kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::S))          m_manualFwd.store( -kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::A))          m_manualLeft.store( kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::D))          m_manualLeft.store(-kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::UpArrow))    m_manualUp.store(   kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::DownArrow))  m_manualUp.store(  -kV  * on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::LeftArrow))  m_manualYaw.store(  kYaw* on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::RightArrow)) m_manualYaw.store( -kYaw* on, kMemOrderRelax);
+        else if (key == __scast(int, KeyCodeEnum::Space))      zeroManualVel();   /* hover. */
+    }
+
     /* ---- Task lifecycle helpers ------------------------------------------ */
+    /* Median-filter the approach range. The depth model is noisy (SITL: bounces 2-7m near the
+       target); a single high spike would hold approach speed high and overshoot INTO the target.
+       Median over the last few readings rejects those spikes. */
+    void pushApproachRange(f32 r) {
+        m_approachRangeHist[m_approachRangeCount % kApproachRangeMedianWindow] = r;
+        ++m_approachRangeCount;
+    }
+    f32 medianApproachRange() const {
+        u32 n = (m_approachRangeCount < kApproachRangeMedianWindow)
+                    ? m_approachRangeCount : kApproachRangeMedianWindow;
+        if (n == 0u) return 0.0f;
+        f32 tmp[kApproachRangeMedianWindow];
+        for (u32 i = 0u; i < n; ++i) tmp[i] = m_approachRangeHist[i];
+        for (u32 i = 1u; i < n; ++i) {              /* insertion sort; n <= window (5) */
+            f32 key = tmp[i];
+            i32 j   = __scast(i32, i) - 1;
+            while (j >= 0 && tmp[j] > key) { tmp[j + 1] = tmp[j]; --j; }
+            tmp[j + 1] = key;
+        }
+        return tmp[n / 2u];
+    }
+
     void activateTask(ActiveTask const& task) {
         Odometry      od;
         Vec3          relFlu, relEnu;
@@ -721,6 +1027,10 @@ private:
             break;
         case CommandID::APPROACH:
             m_approachHaveLastAim      = false;
+            m_approachActivateUs       = nowUs();
+            m_approachRangeCount       = 0;
+            m_approachBudgetLatched    = false;
+            m_approachTravelBudget     = 0.0f;
             m_cannedApproachActivateUs = nowUs();
             od     = m_backend->odometry();
             relFlu = { kCannedApproachTargetFwdM, 0.0f, kCannedApproachTargetUpM };
@@ -861,6 +1171,12 @@ private:
             return;
         }
 
+        if (plan.size() > kMaxPlanActions) {
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] VLM plan has %zu actions (cap=%u); overflow dropped by backpressure.",
+                plan.size(), kMaxPlanActions);
+        }
+
         for (const auto& item : plan) {
             if (!item.contains("action")) continue;
             action  = item["action"].get<std::string>();
@@ -897,12 +1213,35 @@ private:
             task.m_cmd   = cmd;
             task.m_state = TaskState::PENDING;
             strncpy(task.m_thought, thought.c_str(), sizeof(task.m_thought) - 1);
-            m_taskQueue->enqueue(task); /* TODO: handle backpressure. */
+            if (!m_taskQueue->try_enqueue(task)) {   /* bounded: reject-newest on full. */
+                ++m_taskDropCount;
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] BACKPRESSURE queue full (cap=%u) -> dropped task (total=%llu).",
+                    3u * kControlLoopRateHz, __scast(unsigned long long, m_taskDropCount));
+            }
         }
     }
 
     /* Canned plan is the SAME JSON the VLM emits, routed through the real       */
     /* translate path — no inverse function needed.                             */
+    /* Backpressure stress (1.4): enqueue far more actions than the queue cap in ONE
+       plan -- the worst-case oversized-plan storm (a verbose/hallucinating VLM). Expect
+       qsize to cap at the queue size and exactly (N - cap) BACKPRESSURE drops. Uses
+       'stop' (hover) actions: the test is about the queue, not the flight. */
+    void injectCannedFloodPlan() {
+        constexpr u32 kFloodActions = 100;
+        std::string plan = "[";
+        for (u32 i = 0; i < kFloodActions; ++i) {
+            if (i) plan += ",";
+            plan += "{\"thought\":\"flood\",\"action\":\"stop\"}";
+        }
+        plan += "]";
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] FLOOD test: injecting %u actions vs queue cap %u.",
+            kFloodActions, 3u * kControlLoopRateHz);
+        translateToBaseCommands(plan);
+    }
+
     void injectCannedPlan() {
         static const char* kCannedPlanJson = R"([
             {"thought":"canned takeoff",    "action":"takeoff"},
@@ -910,6 +1249,44 @@ private:
             {"thought":"canned land",       "action":"land"}
         ])";
         translateToBaseCommands(kCannedPlanJson);
+    }
+
+    /* Canned ROTATE regression (spec-4 Part B): a <180 turn then a >=180 turn, opposite
+       directions -- proves the accumulated-angle law sweeps the FULL commanded magnitude in
+       the commanded direction (200 ccw does NOT collapse to a shortest-path 160 cw). Runs the
+       SAME translate path the VLM uses. */
+    void injectCannedRotatePlan() {
+        static const char* kCannedRotatePlanJson = R"([
+            {"thought":"canned takeoff",    "action":"takeoff"},
+            {"thought":"canned rotate cw",  "action":"rotate", "direction":"cw",  "angle_deg":90},
+            {"thought":"canned rotate ccw", "action":"rotate", "direction":"ccw", "angle_deg":200},
+            {"thought":"canned land",       "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedRotatePlanJson);
+    }
+
+    /* Canned LAND-flare regression (spec-4 Part B): climb to ~2m then land, so the LANDING
+       branch runs its full flare taper -- vLand must ramp from kLandDescendVelEnu toward
+       kFlareTouchdownVelEnu as altitude drops, not sit at a constant -0.5. */
+    void injectCannedLandFlarePlan() {
+        static const char* kCannedLandFlarePlanJson = R"([
+            {"thought":"canned takeoff", "action":"takeoff"},
+            {"thought":"canned land",    "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedLandFlarePlanJson);
+    }
+
+    /* Canned terrain-land test: fly laterally over the real Rubicon TERRAIN world then land, so the
+       takeoff-origin height differs from the ground height at the landing spot. Exposes that
+       landing keys on od.pos.z (height above the EKF/takeoff origin), not above-ground-level --
+       a flat world hides it because there origin height == ground height everywhere. */
+    void injectCannedTerrainLandPlan() {
+        static const char* kCannedTerrainLandPlanJson = R"([
+            {"thought":"canned takeoff",        "action":"takeoff"},
+            {"thought":"canned go forward 2m",  "action":"go", "x":200,  "y":0, "z":0, "speed":30},
+            {"thought":"canned land",           "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedTerrainLandPlanJson);
     }
 
     /* Canned, no-YOLO closed-loop APPROACH test (ROADMAP 5.1 verification, spec §7): enables
@@ -960,6 +1337,68 @@ private:
         translateToBaseCommands(kCannedCrossPlanJson);
     }
 
+    /* Airborne backpressure test (spec-3, ROADMAP 1.4): fly the canned cross, then ~5s after
+       reaching FLIGHT a 100-action flood is injected mid-air (see controlLoop). Proves an
+       in-flight command storm is absorbed safely -- the queue stays bounded, excess is
+       dropped, and the maneuver in progress is NOT hijacked (FIFO: the storm queues BEHIND
+       the live plan, so the drone finishes its legs + lands before the no-op stops run). */
+    void injectCannedCrossFloodPlan() {
+        injectCannedCrossPlan();   /* takeoff + cross legs + land, enqueued at startup. */
+        m_floodArmed = true;       /* controlLoop fires the flood once airborne. */
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] AIRBORNE FLOOD armed: flooding ~5s after reaching FLIGHT.");
+    }
+
+    /* Outbound excursion for the battery-behaviour tests: takeoff, fly ~8m straight out (so RTH
+       has a real distance to cover and land-in-place is genuinely far from home), then land. */
+    void injectCannedOutboundPlan() {
+        static const char* kCannedOutboundPlanJson = R"([
+            {"thought":"canned takeoff",    "action":"takeoff"},
+            {"thought":"canned fly out 8m", "action":"go", "x":800, "y":0, "z":0, "speed":40},
+            {"thought":"canned land",       "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedOutboundPlanJson);
+    }
+
+    /* Battery RTH behaviour test (spec-3, ROADMAP 6.2): fly out, then force a drop to 18% far
+       from home -> the <=20% law returns the drone to origin, where it lands and disarms. */
+    void injectCannedBatteryRthPlan() {
+        injectCannedOutboundPlan();
+        m_batForceArmed = true; m_batForceValue = 18;
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] BATTERY-RTH armed: forcing 18%% ~15s after reaching FLIGHT.");
+    }
+
+    /* Battery land-in-place test (spec-3, ROADMAP 6.2): fly out, then force a sudden crash to
+       8% far from home -> the <=10% law lands the drone WHERE IT IS (no return to origin). */
+    void injectCannedBatteryLandNowPlan() {
+        injectCannedOutboundPlan();
+        m_batForceArmed = true; m_batForceValue = 8;
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] BATTERY-LANDNOW armed: forcing 8%% ~15s after reaching FLIGHT.");
+    }
+
+    /* Real-drain battery test (spec-3, ROADMAP 6.2): fly out ~6m then loop a 4m box (stays
+       6-10m from origin, never sitting at home), while the PX4 pack drains for real. Whenever
+       OUR <=20% failsafe fires -- a drain-dependent, "random" point along the patrol -- RTH
+       brings it home. Many legs; the failsafe pre-empts and drains the rest. Run with PX4's own
+       low-battery action DISABLED (COM_LOW_BAT_ACT=0) so it can't hijack the descent. */
+    void injectCannedPatrolPlan() {
+        std::string plan = "[";
+        plan += R"({"thought":"canned takeoff","action":"takeoff"},)";
+        plan += R"({"thought":"fly out 6m","action":"go","x":600,"y":0,"z":0,"speed":40},)";
+        for (int i = 0; i < 5; ++i) {   /* 5 loops of a 4m box, keeps it ~6-10m out for ~200s */
+            plan += R"({"thought":"patrol","action":"go","x":0,"y":400,"z":0,"speed":40},)";
+            plan += R"({"thought":"patrol","action":"go","x":400,"y":0,"z":0,"speed":40},)";
+            plan += R"({"thought":"patrol","action":"go","x":0,"y":-400,"z":0,"speed":40},)";
+            plan += R"({"thought":"patrol","action":"go","x":-400,"y":0,"z":0,"speed":40},)";
+        }
+        plan += R"({"thought":"canned land","action":"land"}])";
+        RCLCPP_INFO(this->get_logger(),
+            "[FMU_NODE_DEBUG] PATROL plan: fly out + box loops; real battery drain drives the failsafe.");
+        translateToBaseCommands(plan);
+    }
+
     /* Low vs high commanded speed, forward+return, back to back. Same guidance
        law, same axis, only m_activeSpeed differs -- isolates whether curvature
        scales with commanded speed (actuator-lag/overshoot signature) or is
@@ -979,6 +1418,14 @@ private:
 private:
     rclcpp::CallbackGroup::SharedPtr                m_cbGroup;
     rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr    m_subOverride;  /* operator override toggle. */
+    rclcpp::Subscription<KeyboardRawInputType>::SharedPtr   m_subKey;       /* raw keylog for manual flight. */
+    /* Battery failsafe + manual-override state (control-thread latches + cross-thread atomics). */
+    bool              mb_batteryReturn{false};   /* RTH latched: fly home, then land.     */
+    bool              mb_batteryLand{false};     /* land latched (in-place or after RTH). */
+    u64               m_taskDropCount{0};        /* backpressure drops (diagnostics).     */
+    std::atomic<bool> m_manualOverride{false};
+    std::atomic<f32>  m_manualFwd{0.0f}, m_manualLeft{0.0f}, m_manualUp{0.0f}, m_manualYaw{0.0f};
     rclcpp::TimerBase::SharedPtr                    m_controlTimer;
 
     std::unique_ptr<ActiveBackend>                  m_backend;
@@ -998,6 +1445,20 @@ private:
     std::atomic<bool>         m_missionActive{false};
     std::atomic<bool>         m_planning{false};
     std::future<void>         m_planFuture;
+    /* Airborne command-storm test (--canned-cross-flood): a canned cross flight, then a
+       100-action flood injected from a producer-role async ~5s after reaching FLIGHT. */
+    bool                      m_floodArmed{false};
+    bool                      m_floodFired{false};
+    u64                       m_floodAtUs{0};
+    std::future<void>         m_floodFuture;
+    /* Test-only battery fault injection (--canned-battery-rth / -landnow): ~15s into FLIGHT,
+       force a discrete reading (18% -> RTH, 8% -> land-in-place) to exercise the failsafe laws
+       deterministically, far from home. m_batteryForce: -2 = inactive, else the forced %. */
+    std::atomic<i32>          m_batteryForce{-2};
+    bool                      m_batForceArmed{false};
+    bool                      m_batForceFired{false};
+    i32                       m_batForceValue{0};
+    u64                       m_batForceAtUs{0};
     u64                       m_lastPlanUs{0};
     u64                       m_missionStartUs{0};
     std::atomic<u64>          m_frameCount{0};
@@ -1018,7 +1479,14 @@ private:
        (spec 2026-08-05-visual-servoing-approach-design.md §6). Reset at activation. */
     Vec3 m_approachLastAimFlu{0.0f, 0.0f, 0.0f};
     u64  m_approachLastAimUs{0};
+    u64  m_approachActivateUs{0};
     bool m_approachHaveLastAim{false};
+    f32  m_approachRangeHist[kApproachRangeMedianWindow]{};
+    u32  m_approachRangeCount{0};
+    f32  m_approachLastRange{0.0f};
+    Vec3 m_approachStartPos{0.0f, 0.0f, 0.0f};   /* drone pose when the travel budget was latched */
+    f32  m_approachTravelBudget{0.0f};           /* range-standoff at latch; dead-reckon stop point */
+    bool m_approachBudgetLatched{false};
 
     /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
        controlLoop synthesizes a PerceptionSnapshot for a point fixed relative to the

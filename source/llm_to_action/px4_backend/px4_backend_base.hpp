@@ -20,6 +20,7 @@
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
 #include <px4_msgs/msg/offboard_control_mode.hpp>
 #include <px4_msgs/msg/vehicle_command.hpp>
+#include <px4_msgs/msg/battery_status.hpp>
 #include <util2/C/base_type.h>
 #include <util2/C/macro.h>
 #include "frame/frame_convert.hpp"
@@ -33,6 +34,7 @@ constexpr const char* kPx4OffboardModeTopic = "/fmu/in/offboard_control_mode";
 constexpr const char* kPx4VehicleCmdTopic   = "/fmu/in/vehicle_command";
 constexpr const char* kPx4OdometryTopic     = "/fmu/out/vehicle_odometry";
 constexpr const char* kPx4VehicleStatusTopic = "/fmu/out/vehicle_status_v4";
+constexpr const char* kPx4BatteryStatusTopic = "/fmu/out/battery_status_v1";  /* MESSAGE_VERSION=1 */
 
 /* ---- Stream loop + handshake tuning -------------------------------------- */
 constexpr u32 kMsInOneSecond            = 1000;

@@ -166,3 +166,8 @@ rtk init --global       # Add RTK to ~/.claude/CLAUDE.md
 
 Overall average: **60-90% token reduction** on common development operations.
 <!-- /rtk-instructions -->
+
+
+# Communication
+
+Follow @docs/writing-style.md for all prose (explanations, reports, messages): short sentences, one idea each, that flow.

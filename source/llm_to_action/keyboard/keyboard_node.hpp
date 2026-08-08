@@ -8,7 +8,9 @@
 // https://docs.ros2.org/latest/api/rclcpp/classrclcpp_1_1Node.html
 class KeyboardTeleop : public rclcpp::Node {
 public:
-    KeyboardTeleop() : Node("px4_keyboard_teleop") {        
+    KeyboardTeleop() : Node("keyboard_teleop") {        
+        /* Construct the raw-key publisher BEFORE binding keys (the callback publishes to it). */
+        m_rawKeyEvent = this->create_publisher<KeyboardRawInputType>(kOutKeyboardRawTopic, 10);
         bool hook_success = m_keyHook.create();
         if (!hook_success) {
             RCLCPP_ERROR(this->get_logger(), "FATAL: AsyncKeyHook failed to create threads/hooks!");
@@ -17,6 +19,9 @@ public:
         }
         auto cb = [this](KeyCodeEnum k, KeyAction a){ this->keyCallback(k, a); };
         
+
+        
+
         m_keyHook.bindKey(KeyCodeEnum::W, cb);
         m_keyHook.bindKey(KeyCodeEnum::S, cb);
         m_keyHook.bindKey(KeyCodeEnum::A, cb);

@@ -29,6 +29,9 @@ bool PX4Backend::start_impl() {
     m_subStatus = m_node->create_subscription<StatusMsgType>(
         kPx4VehicleStatusTopic, px4_sub_qos(),
         std::bind(&PX4Backend::statusCallback, this, std::placeholders::_1), subOpts);
+    m_subBattery = m_node->create_subscription<BatteryMsgType>(
+        kPx4BatteryStatusTopic, px4_sub_qos(),
+        std::bind(&PX4Backend::batteryCallback, this, std::placeholders::_1), subOpts);
 
     m_streamTimer = m_node->create_wall_timer(
         std::chrono::milliseconds{kOffboardPublishPeriodMs},
@@ -78,6 +81,16 @@ void PX4Backend::odomCallback(const OdomMsgType::ConstSharedPtr msg) {
 void PX4Backend::statusCallback(const StatusMsgType::ConstSharedPtr msg) {
     m_navState.store(msg->nav_state, rlx);
     m_armingState.store(msg->arming_state, rlx);
+}
+
+void PX4Backend::batteryCallback(const BatteryMsgType::ConstSharedPtr msg) {
+    /* PX4 'remaining' is 0..1. Disconnected / NaN / negative -> unknown sentinel (the FMU
+       supervisor skips it); a real 0% arrives as 0, not the sentinel. */
+    if (!msg->connected || !std::isfinite(msg->remaining) || msg->remaining < 0.0f) {
+        m_batteryPct.store(kBatteryReadingUnknown, rlx);
+        return;
+    }
+    m_batteryPct.store(__scast(i32, msg->remaining * 100.0f), rlx);
 }
 
 

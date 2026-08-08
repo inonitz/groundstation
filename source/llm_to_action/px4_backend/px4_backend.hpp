@@ -26,6 +26,7 @@
 
 using OdomMsgType   = px4_msgs::msg::VehicleOdometry;
 using StatusMsgType = px4_msgs::msg::VehicleStatus;
+using BatteryMsgType = px4_msgs::msg::BatteryStatus;
 
 
 /* BackendStatus / IOState / Odometry now live in generic_backend_types.hpp
@@ -49,8 +50,7 @@ public:
 
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
-    /* TODO: SITL battery topic not subscribed; sentinel until wired */
-    i32      battery_pct_impl() const { return -1; }
+    i32      battery_pct_impl() const { return m_batteryPct.load(std::memory_order_relaxed); }
 
     /* ---- backend-specific (not part of the backend interface) --------------- */
     bool     gotFirstOdom() const { return m_gotFirstOdom.load(std::memory_order_relaxed); }
@@ -59,6 +59,7 @@ private:
     void streamTick();
     void odomCallback(const OdomMsgType::ConstSharedPtr msg);
     void statusCallback(const StatusMsgType::ConstSharedPtr msg);
+    void batteryCallback(const BatteryMsgType::ConstSharedPtr msg);
     u64  nowUs() const { return __scast(u64, m_node->get_clock()->now().nanoseconds() / 1000); }
 
     rclcpp::Node*                    m_node;
@@ -69,6 +70,7 @@ private:
     rclcpp::Publisher<OffboardTranslator::VehicleCommand>::SharedPtr      m_pubCmd;
     rclcpp::Subscription<OdomMsgType>::SharedPtr                          m_subOdom;
     rclcpp::Subscription<StatusMsgType>::SharedPtr                        m_subStatus;
+    rclcpp::Subscription<BatteryMsgType>::SharedPtr                       m_subBattery;
 
     /* Shared pose (odom cb -> control/stream loops). */
     std::atomic<f32> m_posN{0.0f}, m_posE{0.0f}, m_posD{0.0f}, m_yaw{0.0f};
@@ -81,6 +83,7 @@ private:
     std::atomic<u8>      m_navState{0}, m_armingState{0};
     std::atomic<u64>     m_setpointCount{0}, m_handshakeStart{0};
     std::atomic<bool>    m_gotFirstOdom{false};
+    std::atomic<i32>     m_batteryPct{kBatteryReadingUnknown};  /* -1 until first valid msg */
 
     /* Stream timer LAST -> destroyed FIRST (stops ticking before pubs die). */
     rclcpp::TimerBase::SharedPtr m_streamTimer;
