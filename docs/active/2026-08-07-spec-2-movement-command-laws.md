@@ -12,6 +12,28 @@ merges. Keep each command's code in its own clearly-labelled block.
 > `GenericCommand` byte layout.** Follow the existing APPROACH servo (5.1) and GO cross-track patterns
 > exactly. No full builds; human does build + SITL.
 
+## Overseer update (2026-08-08) -- read before the Session handoff below
+Specs 3 and 4 shipped and moved to `docs/closed/` (spec-3 failsafe + backpressure, spec-4 rotate +
+land). Read their reports before you build on them -- the code under you changed. APPROACH now brakes
+on a dead-reckoned travel budget with a 3.0 m standoff, not a live-depth servo at 2.0 m; your shared
+aim helper (Step 0) composes over that shipped APPROACH, so re-diff the branch first. ROTATE is
+accumulated-angle and LAND has a flare taper -- safe_land (Step 4) hands off to that shipped flare, do
+not reimplement it. Spec 4 is no longer an active co-editor; its shared canned-plan rig is in the tree
+-- reuse it, do not coordinate live.
+
+Your new orbit/search/safe-land gains are runtime-config debt and are NOT yet listed in
+`docs/scheduled/2026-08-08-runtime-drone-config-constants.md` (ROADMAP 9.14) -- add them there when
+you add them to `fmu_node_base.hpp`. One binary must load per-drone profiles; SITL numbers are only
+the fallback.
+
+Your new `scripts/test/{orbit,search,safe-land}/` dirs must also land as rows in the ROADMAP "SITL
+test matrix" (now 15/15 green) once they pass. Creating the dir is not enough -- the matrix is what
+the overseer checks. ROADMAP 9.12-9.14 are taken (AGL, off-heading, runtime-constants); pick fresh
+numbers for new debt.
+
+Commit messages: `docs/code-guidelines.md` "Review & commits" now carries the hard rule --
+intent-first, `|`-separated, ASCII only. Follow it.
+
 ## Reference patterns (already in the tree — copy these, don't invent)
 - **Parser** `translateToBaseCommands` (~line 819): `else if (action == "...")` branches build a
   `Cmd*` and enqueue. Add local `Cmd*` decls near the top with the others.

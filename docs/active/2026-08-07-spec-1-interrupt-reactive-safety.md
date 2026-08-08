@@ -12,6 +12,26 @@ and clearly commented.
 > `m_padToMultipleForCmd` + `union m_rawBytes`) — it is intentionally 8-byte aligned. Match existing
 > style/indentation. Do not run a full build (heavy); leave build + SITL verify to the human.
 
+## Overseer update (2026-08-08) -- read before the SESSION HANDOFF below
+Specs 3 and 4 shipped and moved to `docs/closed/` (spec-3 failsafe + backpressure, spec-4 rotate +
+land). Read their reports before you build on them -- the code under you changed. APPROACH now brakes
+on a dead-reckoned travel budget with a 3.0 m standoff, not a live-depth servo at 2.0 m; your motion-
+gate (6.4) sits on top of that shipped behavior, so re-read the branch before wiring the gate. ROTATE
+is accumulated-angle and LAND has a flare taper. Spec 4 is no longer an active co-editor; the shared
+canned-plan rig it built is in the tree -- reuse it, do not coordinate live.
+
+Your seven new constants are runtime-config debt. They are already pre-listed in
+`docs/scheduled/2026-08-08-runtime-drone-config-constants.md` (ROADMAP 9.14). Whether they land as
+`constexpr` fallbacks or in the loader is the re-sync step-2 decision; either way keep that scheduled
+doc in sync. One binary must load per-drone profiles -- SITL numbers are only the fallback.
+
+Any new SITL test dir must also land as a row in the ROADMAP "SITL test matrix" (now 15/15 green)
+once it passes. Creating the dir is not enough -- the matrix is what the overseer checks. ROADMAP
+9.12-9.14 are taken (AGL, off-heading, runtime-constants); pick fresh numbers for new debt.
+
+Commit messages: `docs/code-guidelines.md` "Review & commits" now carries the hard rule --
+intent-first, `|`-separated, ASCII only. Follow it.
+
 ## Goal
 One reflex shared by three triggers: **detect a problem → STOP → stash the active task → wake the
 VLM to reassess → hold until cleared.** This is the safety spine the other specs lean on.
