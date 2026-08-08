@@ -163,6 +163,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    8.3 simenv.sh migration to llm_to_action binaries            [ ]  (ARCH 14/16)
    8.4 canned rigs (cross/speed)                                 [x]
    8.5 --image-min-tokens 1024 for grounding                     [ ]  hold until vision confirmed
+   8.6 SITL feature test suite (15 tests) -- all green 2026-08-08 -> Test matrix below [x]
 
 9. Housekeeping / debt                                           [~]
    9.1 branch push (feature-llm-driver synced to origin, 0 ahead/behind) [x]
@@ -190,14 +191,55 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
         vLand tapered -0.500 -> -0.139 toward touchdown as altitude dropped, reached STANDBY.
         Regression test: `scripts/test/land-flare/filter.sh` captures all sim panes and asserts
         vLand tapers toward touchdown (not a constant -0.5).
-   9.12 GO/forward travels off-commanded-heading in SITL          [ ]  2026-08-07 terrain-land:
+   9.12 Landing altitude is height-above-origin, not AGL          [ ]  2026-08-07 terrain-land
+        finding (the "AGL gap"): LAND/flare key on `od.pos.z` = height above the takeoff ORIGIN,
+        not height above ground. Over uneven terrain the ground is not at z=0, so the flare taper
+        (9.11) mis-triggers -- starts too early/late and "touchdown" can be declared above the
+        slope or into it. Exposed by `--canned-terrain-land` + the Rubicon world
+        (`scripts/test/terrain-land/`). Fix (open): key landing on a rangefinder / terrain-relative
+        altitude, not origin-relative z.
+   9.13 GO/forward travels off-commanded-heading in SITL          [ ]  2026-08-07 terrain-land:
         takeoff -> GO forward -> land, the drone tracked ~10-30 deg clockwise off the commanded
         forward axis ("not forward whatsoever") and, with the pre-flare hard descent, landed
         violently ~5 m short. Flare (9.11) softened touchdown and SafeLand (spec-2 / 5.3) will own
         the "land gently on a spot" symptom, but the heading drift on a plain GO is a separate,
         un-root-caused issue (SITL yaw/heading hold, or GO acting on a stale bearing). Not yet
         investigated.
+   9.14 tuning constants are compile-time constexpr, not runtime drone config  [ ]  [GATE real-Tello]
+        SITL vs real-Tello values differ; one binary can't serve both without a
+        recompile. Spec: docs/scheduled/2026-08-08-runtime-drone-config-constants.md
 ```
+
+---
+
+## SITL test matrix (2026-08-08)
+
+All 15 `scripts/test/<feature>/` runs green in PX4 Gazebo SITL (operator-run, 2026-08-08). **Type:**
+Auto = `filter.sh` asserts PASS/FAIL from the captured log; Milestone = operator confirms the digest
+against expected behavior. Per-run pane captures are git-ignored (regenerated each run).
+
+| Test | Verifies | ROADMAP | Type | Status |
+|------|----------|---------|------|--------|
+| forward | takeoff -> GO 1m fwd -> land (FLU sanity) | 1.1.1 | Milestone | PASS |
+| cross | 4-axis GO out-and-back 1m (frame sanity) | 1.1.1 | Milestone | PASS |
+| speed | GO fwd+return at 15 vs 80 cm/s | 1.1.1 | Milestone | PASS |
+| rotate-land | ROTATE 90 cw + 200 ccw granularity + land | 1.1.2 | Auto | PASS |
+| land-flare | LAND flare taper (not a constant -0.5) | 9.11 | Auto | PASS |
+| terrain-land | landing over uneven terrain | 9.12 | Diagnostic | PASS* |
+| approach | closed-loop APPROACH on a synthetic detection | 5.1 | Milestone | PASS |
+| approach-real | APPROACH with real ONNX seg+depth vs the car | 5.1.5 | Milestone | PASS |
+| vlm | full Qwen3-VL-driven flight, no canned plan | 3 / 5.1 | Milestone | PASS |
+| flood | startup queue flood stays bounded | 1.4 | Auto | PASS |
+| flood-airborne | mid-air command storm stays bounded | 1.4 | Auto | PASS |
+| battery | real PX4 drain -> our RTH failsafe | 6.2 | Auto | PASS |
+| battery-rth | forced 18% -> RTH home + land | 6.2 | Auto | PASS |
+| battery-landnow | forced 8% -> land-in-place | 6.2 | Auto | PASS |
+| override | reversible manual takeover, failsafe outranks | 6.2 | Auto | PASS |
+
+\* `terrain-land` is a **diagnostic**: it lands over ground at a different height than takeoff to
+expose that landing keys on `od.pos.z` (height above the takeoff origin), not AGL. It behaves as
+designed and confirms the AGL gap (9.12); the rangefinder / terrain-relative-altitude fix is the
+follow-up.
 
 ---
 

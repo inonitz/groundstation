@@ -660,6 +660,16 @@ was written -- cross-check both before trusting one in isolation.
   needed copying next to the binary, not just pointing at) and fixed via a plain `./test.sh` in
   BUILD_YOLO -- mechanism not documented here, see that repo.
 
+## SITL test suite green + runtime-constants gap (2026-08-08)
+- All 15 `scripts/test/<feature>/` runs pass in PX4 Gazebo SITL (operator-run, 2026-08-08). The full
+  per-test matrix (with Auto vs Milestone type) lives in `docs/ROADMAP.md` -> `## SITL test matrix`.
+  Per-run pane captures (`captured_*.txt`) are git-ignored -- each `filter.sh` regenerates them.
+- **Runtime-constants gap flagged.** Every tuning value (takeoff/flare, battery thresholds, manual
+  velocity, GO/ROTATE/APPROACH gains) is a compile-time `constexpr` in `fmu_node_base.hpp`. SITL and
+  the real Tello need different values, and one binary can't serve both without a recompile. They
+  must move to a runtime, drone-selected config before real-Tello flight. Spec:
+  `docs/scheduled/2026-08-08-runtime-drone-config-constants.md`.
+
 ## Battery failsafe + manual operator override + queue backpressure (Spec 3, 2026-08-07)
 
 - **Real PX4 battery.** `px4_backend` now subscribes `/fmu/out/battery_status_v1`
