@@ -169,10 +169,27 @@ else if(
 All code must be peer-reviewed by a human before it's committed — this includes code
 written by an agent. An agent producing code is not a substitute for that review.
 
-If an agent must generate the commit message itself, keep it short: 2-4 sentences,
-resized down further for a small change. Describe the general idea/pattern of the
-change, not a line-by-line recap — the diff is right there for anyone who wants to dig
-deeper. Nobody needs a commit message to restate what the code already says.
+When an agent generates the commit message, write it in the project's house style:
+a single subject line that states **intent** -- what each change is for and what it
+achieves -- never a file-by-file or line-by-line recap. The diff already shows the
+code; the message says *why*.
+
+- **Separate each distinct logical change with ` | `** (space-pipe-space). One clause =
+  one self-contained intent, in the imperative ("Give the drone a failsafe that outranks
+  the pilot", "Move the lock file into docs so the root stays clean"). A commit spanning
+  several concerns reads as several `|`-separated clauses -- not one vague summary, and
+  not a paragraph per file.
+- **ASCII only.** No em-dashes, arrows, `<=`/`>=` glyphs, or smart quotes -- spell them
+  out (`<=`, `->`, plain quotes). Unicode corrupts in some terminals, hooks, and log tools.
+- **Keep each clause tight and concrete.** No multi-paragraph essays, no restating what
+  the code already says, no enumerating changed files.
+- End an agent-written message with the `Co-Authored-By:` trailer on its own line.
+
+Good:
+`Give the drone a battery failsafe that outranks the model and the pilot | Keep a runaway plan from ever growing the command queue unbounded | Prove rotate and landing behave correctly from logs, not by eyeballing`
+
+Bad (recaps the diff, not the intent):
+`Modified fmu_node.hpp to add batteryFailsafeTick() and returnToOrigin(), changed enqueue to try_enqueue, added constants to fmu_node_base.hpp, edited px4_backend.cpp ...`
 
 ## When unsure
 
