@@ -79,8 +79,8 @@ be picked up by a fresh session that re-syncs with the codebase first.
 1. **Re-read `fmu_node.hpp` APPROACH branch (~L504-580) fresh.** Agent 2 landed a median-depth-to-target
    fix for APPROACH during this design. The STALE/recovery behavior below may already partly exist —
    Step 0's job is to *compose what exists* into the helper, not reinvent it. Diff before coding.
-2. **LOCKS is a HARD REQUIREMENT.** Before touching ANY file: read its LOCKS entry, set yourself as
-   holder + UTC time, save LOCKS first, edit, then set holder=FREE with a note. Every file, every time.
+2. **`docs/LOCKS.md` is a HARD REQUIREMENT.** Before touching ANY file: read its `docs/LOCKS.md` entry, set yourself as
+   holder + UTC time, save `docs/LOCKS.md` first, edit, then set holder=FREE with a note. Every file, every time.
 3. **Confirm both blockers cleared** — nothing builds or tunes until they are.
 4. Re-read this spec + `docs/code-guidelines.md`; check ROADMAP for status drift.
 
@@ -191,7 +191,7 @@ rig) is the reference; `land-flare/` + `terrain-land/` are the safe-land relativ
   appears -> `search_exhausted`; timeout path; the 360deg scan actually runs between legs.
 - `scripts/test/safe-land/` — assert `safe_land_handoff` over flat ground; edge: non-flat ->
   `safe_land_no_spot`; too-high (mean depth large) -> no descend.
-These `scripts/test/*` dirs are new and Spec-2-owned -> no LOCKS entry needed, but confirm before creating.
+These `scripts/test/*` dirs are new and Spec-2-owned -> no `docs/LOCKS.md` entry needed, but confirm before creating.
 
 #### Open questions for next session
 - Is adding the `depthMap()` accessor to `PerceptionRuntime` Spec 2's job, or the perception owner's?

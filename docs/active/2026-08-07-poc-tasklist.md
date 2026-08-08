@@ -94,7 +94,8 @@ Full technical detail at the bottom of `docs/NOTES.md`; ROADMAP status in 5.1.5 
 ## Specs for parallel sessions (2026-08-07)
 The review items below are decomposed into 4 work-packages, each with its own spec file; a spawned
 session owns one file and appends its report at the bottom. Merge/review of overlapping edits to
-`fmu_node.hpp` is done by the overseeing session, not the workers.
+`fmu_node.hpp` is done by the overseeing session, not the workers. **Coordination lock lives at
+`docs/LOCKS.md`** — every spawned session reads it before editing a shared FMU file.
 - Spec 1 — `2026-08-07-spec-1-interrupt-reactive-safety.md` (1.5, 6.1, 6.4) — **NOT STARTED**: design
   approved (rev 2), shelved, no source edited; session handoff at the spec's bottom. Ready to spawn.
 - Spec 2 — `2026-08-07-spec-2-movement-command-laws.md` (5.2, 1.1.6, 1.1.7, 5.3) — **NOT STARTED**: no

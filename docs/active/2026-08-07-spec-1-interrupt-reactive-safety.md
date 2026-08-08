@@ -81,14 +81,14 @@ follow-up, hover-and-reassess is the MVP.
 **approved (rev 2)**, then deferred because two other agents (spec-2, spec-4) are still
 working and a **runtime-file-loaded constants restructuring** is landing that my constants
 must fit into. Nothing in `fmu_node.hpp` / `fmu_node_base.hpp` / `detection_query.hpp` has
-been touched. LOCKS.md was all-`FREE` at last check but do NOT trust that — re-read it.
+been touched. docs/LOCKS.md was all-`FREE` at last check but do NOT trust that — re-read it.
 
 ### 0. FIRST, re-sync with the codebase (things likely changed overnight)
 Before writing any code, verify these — several are expected to have moved:
-1. **`rtk read LOCKS.md`** — confirm `fmu_node.hpp` + `fmu_node_base.hpp` are `FREE` (or held
+1. **`rtk read docs/LOCKS.md`** — confirm `fmu_node.hpp` + `fmu_node_base.hpp` are `FREE` (or held
    by you). If held by another agent: **wait or do free work**, never override. Any file you
    edit beyond those two (`detection_query.hpp`, `docs/code-guidelines.md`, `docs/ROADMAP.md`)
-   **must be added as a row in LOCKS.md and held** — overseer was emphatic about this.
+   **must be added as a row in docs/LOCKS.md and held** — overseer was emphatic about this.
 2. **Constants restructuring (BLOCKER):** check whether physical/tunable constants are still
    `constexpr` in `fmu_node_base.hpp` or have moved to a **runtime drone-dependent config file**
    (SITL vs reality values differ and can't be one hardcoded number). `rtk grep` for a new

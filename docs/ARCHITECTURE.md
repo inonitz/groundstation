@@ -3,8 +3,8 @@
 > **Status:** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
 > (20 Hz control loop, odometry, event-driven VLM, ENU convention, GenericBackend interface, canned test
 > rigs). `NOTES.md` is the running change log. Sections below are annotated where reality has
-> moved past the original plan; the remaining gap is perception integration + the APPROACH
-> servo + the emergency/failsafe supervisor (§15).
+> moved past the original plan; the remaining gap is reactive safety (interrupt + emergency boundary, Spec 1), the extra
+> motion verbs (live-YOLO GO / ORBIT / SEARCH / safe-land, Spec 2), and Tello hardware bring-up (§15).
 >
 > **Scope:** `FlightManagementUnitNode` (`source/llm_to_action/fmu/`) — high-level VLM
 > planner + deterministic 20 Hz control loop, plus an in-process offboard translator (§7).
@@ -19,7 +19,7 @@
 > `Odometry` ENU convention; FORK-C collapsed into the concrete backends (no separate offboard node).
 > The bullets below keep the original reasoning for history.
 >
-> **Update (2026-08-06):** the live launch script (`scripts/simenv_llm.sh`) invokes
+> **Update (2026-08-06):** the live launch harness (`scripts/test/*/run.sh` over `scripts/test/lib/sim_core.sh`) invokes
 > `llama-server` with `-c 65536`, not the `-c 4096` this doc and §16 originally marked DONE.
 > This is a deliberate temporary overshoot (user-confirmed) -- generous headroom to avoid
 > context-blowup failures while the rest of the stack (perception, APPROACH) is still under
@@ -64,8 +64,9 @@ target)**, **Depth (Model-D, ~13 Hz measured -- the slow one, not a real 40Hz re
 **VLM (async, event-driven)**, **Control (20 Hz)**, and the **Offboard publisher (30 Hz PX4 /
 20 Hz Tello)** streaming setpoints via the backend (§7). Shared state is `std::atomic`:
 `m_flightState`, `m_missionActive`, `m_planning`, `m_frameCount`, `m_currImg`, latest pose,
-perception snapshot. **No `m_emergencyStop`** -- the emergency boundary (§10) and
-failsafe/battery supervisor (§11) are designed, not implemented (§15).
+perception snapshot. The **battery/failsafe supervisor + manual override (§11) are now
+implemented** (Spec 3, SITL-verified). The emergency boundary (§10) and the interrupt reflex
+(`m_emergencyStop`) remain designed, not implemented (§15).
 
 ---
 
@@ -80,7 +81,8 @@ m_currTask (active) ── completion (§4) ──► m_completedTasks (history 
                     └─► setpoint ──► offboard thread (30Hz PX4 / 20Hz Tello) ──► drone
 ```
 - No "ReadyToPublish" queue. Strictly SPSC (VLM produces, 20 Hz consumes). Interrupt drain
-  is consumer-side (§5.1). Handle enqueue backpressure.
+  is consumer-side (§5.1). **Enqueue backpressure shipped** (Spec 3): bounded `try_enqueue`,
+  reject-newest, every drop logged.
 
 ---
 
@@ -92,14 +94,14 @@ The FMU owns the flight **state machine** (STANDBY/TAKEOFF/FLIGHT/LANDING); the 
 | Cmd | Predicate | Notes |
 |-----|-----------|-------|
 | **GO** | 3-D Euclidean dist < **0.20 m** | **One law, shipped:** carrot-chasing cross-track guidance -- line-of-sight direction frozen at activation + a cross-track PID pulling back onto the line (`vel = dir·speed`). Neither `go_vel` nor `go_pos` exists as a name; there is no separate discrete-XYZ impl. |
-| **APPROACH** | `range < kApproachStandoffM` (2.0 m) | **Shipped and SITL-verified (ROADMAP 5.1).** Anchored to a live YOLO detection, recomputed every tick (no world point stored): yaw-to-center + range-decel forward + vertical match + lateral damp. Two-threshold fresh/lost model (§9/spec) coasts on a stale detection, FAILs on a fully lost one past `kApproachLostTimeoutMs`. |
-| **ROTATE** | \|yaw − target\| < **5°** | yawspeed (vel) or discrete. **Not parsed from the VLM plan** -- `translateToBaseCommands` only recognizes `takeoff/land/stop/go/approach`; a `"rotate"` action is silently dropped (`continue`) before it is ever enqueued, despite `CommandID::ROTATE` and a switch dispatch existing. |
+| **APPROACH** | `range < kApproachStandoffM` (3.0 m) | **Shipped + SITL-verified on real YOLO (ROADMAP 5.1/5.1.5).** Anchored to a live YOLO detection, recomputed every tick (no world point stored): yaw-to-center + range-decel forward + vertical match + lateral damp. Two-threshold fresh/lost model (§9/spec) coasts on a stale detection, FAILs on a fully lost one past `kApproachLostTimeoutMs`. Braking is on a dead-reckoned odometry travel budget (latched from an early median range), not on noisy per-tick depth. |
+| **ROTATE** | \|yaw − target\| < **5°** | **Shipped + SITL-verified (ROADMAP 1.1.2).** Parsed from the VLM plan (`direction`+`angle_deg`); the accumulated-angle law integrates swept angle in the commanded direction, so it is granular and correct for ≥180°/360° (not shortest-path), completing within `kRotateCompletionDeg`≈5°. |
 | **TAKEOFF** | FMU state machine: arm → climb to target → FLIGHT | Completion = odom altitude ≥ target. Reconcile climb height (offboard node hardcodes 2 m). Stall guard (ceiling-blind). |
-| **LAND** | FMU state machine: descend → force-disarm near ground | Odom alt≈0 ∧ vz≈0. **Depth estimator gated OFF only in final 10–30 cm**, after clear-to-land. WHERE-to-land = planning, separate. |
+| **LAND** | FMU state machine: descend → force-disarm near ground | Odom alt≈0 ∧ vz≈0. **Flare shipped (ROADMAP 9.11):** descent tapers from `kLandDescendVelEnu` to `kFlareTouchdownVelEnu` below `kFlareStartAltEnu`. Depth estimator gated OFF only in final 10–30 cm, after clear-to-land. WHERE-to-land = planning, separate. |
 | **STOP** | one hover cycle → instant | Near-redundant; kept for VLM expressiveness. |
-| **ORBIT** | ≥360° accumulated (default 1 rev) OR time limit | **Not parsed from the VLM plan** (see ROTATE note) -- same `continue`-and-drop. Design intent preserved below for when it lands: anchor to a detected target in-frame only (no SLAM = no reliable global anchor). Visual servo: bbox in frame, `median_depth ≈ radius`, small steps. Target lost → abort → re-assess. |
-| **SEARCH** | success = detected; fail = timeout | **Not parsed from the VLM plan** (see ROTATE note) -- same `continue`-and-drop. Design intent preserved below: 2-D horizontal circle, 360° step-rotate-settle-detect, expand outward. Record pre-search **anchor**; fail → `GO anchor` + FAILED. post-search → re-assess. |
-| **CURVE** | — | Dropped for POC. Also not parsed from the VLM plan (see ROTATE note), on top of being scoped out. |
+| **ORBIT** | ≥360° accumulated (default 1 rev) OR time limit | **Not parsed from the VLM plan** (silently dropped before enqueue) -- same `continue`-and-drop. Design intent preserved below for when it lands: anchor to a detected target in-frame only (no SLAM = no reliable global anchor). Visual servo: bbox in frame, `median_depth ≈ radius`, small steps. Target lost → abort → re-assess. |
+| **SEARCH** | success = detected; fail = timeout | **Not parsed from the VLM plan** (silently dropped before enqueue) -- same `continue`-and-drop. Design intent preserved below: 2-D horizontal circle, 360° step-rotate-settle-detect, expand outward. Record pre-search **anchor**; fail → `GO anchor` + FAILED. post-search → re-assess. |
+| **CURVE** | — | Dropped for POC. Also not parsed from the VLM plan (silently dropped before enqueue), on top of being scoped out. |
 
 **20 Hz streaming contract:** active task → setpoint; queue empty → Hover. Never send once.
 
@@ -241,6 +243,13 @@ time-to-contact / looming threshold until metric depth exists.
 
 ## 11. Battery & Failsafe Supervisor (deterministic, atomic, overrides VLM)
 
+> **STATUS (realized — Spec 3, SITL-verified 2026-08-08):** implemented on real PX4 battery
+> (`/fmu/out/battery_status_v1`). Shipped laws: **≤20% -> RTH then land** (latched), **≤10% ->
+> land-in-place** (latched), `-1` = UNKNOWN (skipped). Manual override is a **reversible** takeover
+> and the **failsafe outranks it** (failsafe > pilot > autonomy) — this supersedes the original
+> table's "override yields" row below. Smart energy/terrain RTH deferred
+> (`docs/scheduled/2026-08-07-battery-rth-energy-terrain-subsystem.md`).
+
 `home` = odom anchor; `cost ≈ dist_home/cruise_speed·drain_rate + reserve`.
 
 | Condition | Action |
@@ -266,7 +275,7 @@ time-to-contact / looming threshold until metric depth exists.
 | 7 | Odometry: direct `VehicleOdometry` (sim) — **migrate to cross-hw abstraction** (FORK-B). |
 | 8 | Velocity-scaled emergency boundary, `a_max` per-drone (§10). |
 | 9 | Battery/failsafe + user override (§11). |
-| 10 | Perception: **refactor `BUILD_YOLO` modular-vision-api behind the perception contract**; shelve ggml-depth-experiment; POC depth = MiDaS relative (§9). |
+| 10 | Perception: **refactor `BUILD_YOLO` modular-vision-api behind the perception contract**; shelve ggml-depth-experiment; POC depth = YOLO26n metric (§9). |
 
 ---
 
@@ -279,18 +288,18 @@ time-to-contact / looming threshold until metric depth exists.
 - **Cross-hw odometry migration** debt (§8).
 - Reassess latency window (1–2 s) on drifting odom; interrupt oscillation (needs hysteresis +
   max-retries → land/abort); odom drift vs 0.20 m bar; ceiling-blind takeoff; SEARCH 2-D off-plane blindness.
-- **Sim integration debt: resolved.** The live launch script is `scripts/simenv_llm.sh`, not
-  `simenv.sh` (which still exists but is the deprecated predecessor) -- it already runs
-  `llm_to_action_*` binaries, an FMU pane, a `llama-server` pane, and camera (`rx_node`)
-  wiring end-to-end (used for the 2026-08-06 real-hardware Tello flight).
+- **Sim integration debt: resolved.** The launch harness is now `scripts/test/*/run.sh` over `scripts/test/lib/sim_core.sh` (one
+  folder per feature; `simenv_llm.sh` was removed, its logic folded into `sim_core.sh`). It runs
+  the `llm_to_action_*` binaries, an FMU pane, a `llama-server` pane, and camera (`rx_node`)
+  wiring end-to-end (the 2026-08-06 real-hardware Tello flight + the 15-test SITL suite).
 
 ---
 
 ## 14. POC Build Slice — usable today, PX4 Gazebo sim
 
 > **STATUS (realized):** this section describes the original Phase-1 bring-up plan.
-> **Prereqs done** -- `scripts/simenv_llm.sh` (not `simenv.sh`) already runs the FMU pane,
-> llama-server pane, `llm_to_action_*` binaries, and `rx_node`. **FORK-A** raised to `-c 65536`
+> **Prereqs done** -- `scripts/test/*/run.sh` (over `scripts/test/lib/sim_core.sh`) runs the FMU
+> pane, llama-server pane, `llm_to_action_*` binaries, and `rx_node`. **FORK-A** raised to `-c 65536`
 > as deliberate testing headroom, real tuning still open (§0); **FORK-C** collapsed into the
 > concrete backends, no retained `px4_offboard_node` (§7).
 
@@ -305,7 +314,7 @@ time-to-contact / looming threshold until metric depth exists.
   the control chain without the VLM first (recommended first bring-up).
 - Battery/failsafe supervisor. Perception **stubbed**; emergency path **disabled**.
 
-**Phase 2:** refactor BUILD_YOLO modular-vision-api behind the perception contract (MiDaS relative), snapshot
+**Phase 2:** refactor BUILD_YOLO modular-vision-api behind the perception contract (YOLO26n metric), snapshot
 fusion, relative-depth emergency + interrupt/reassess, ORBIT/SEARCH controllers, Tello backend +
 Simpson odom, offboard collapse (if not done), context/prompt final form.
 
@@ -328,14 +337,18 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
 - **live-YOLO GO** (ROADMAP 5.2) — APPROACH recomputes per-tick off a live detection; plain GO
   is still a one-shot dead-reckoned waypoint. Visual-servo GO redesign not started
   (`docs/active/2026-08-05-go-controller-visual-servo.md`).
-- **Emergency boundary + battery/failsafe supervisor** (§10/§11) — designed, not implemented.
+- **Emergency boundary** (§10, ROADMAP 6.1) — designed, not implemented (Spec 1). *(The
+  battery/failsafe supervisor §11 is now shipped + SITL-verified — see the resolved note below.)*
 - **Tello hardware bring-up** — backend flight-verified on real hardware 2026-08-06 (telemetry,
   odometry, camera all confirmed live); stick-to-m/s calibration, Simpson-rule odometry
   integration, and wind/prop-wash stability correction still open (ROADMAP 2.3.1/2.3.2/2.3.5).
 
 Resolved since this section was last written: perception (real YOLO seg+depth) IS wired into
 the FMU and confirmed working end-to-end against a real object with a live VLM planning off it
-(2026-08-06) -- see ROADMAP 4.2 and 5.1.5.
+(2026-08-06) -- see ROADMAP 4.2 and 5.1.5. Also shipped + SITL-verified 2026-08-08 (Spec 3/4):
+the battery/failsafe supervisor + reversible manual override (§11), bounded SPSC backpressure (§3),
+the ROTATE accumulated-angle law and the LAND flare (§4) — all covered by the 15-test
+`scripts/test/` suite (ROADMAP §SITL test matrix).
 
 ---
 
@@ -352,8 +365,8 @@ the FMU and confirmed working end-to-end against a real object with a live VLM p
       `Perception::vision` by `PerceptionRuntime` (§9).
 - [x] Rephrase kSystemPrompt interruption text → Appendix A -- installed in `llm_base.hpp`
       (see Appendix A below; the INTERRUPT behavior it describes is still unbuilt, §5.1).
-- [x] Sim launch migrated to FMU + `llm_to_action` binaries -- as `scripts/simenv_llm.sh`
-      (not a `simenv.sh` in-place edit; `simenv.sh` remains as the deprecated predecessor).
+- [x] Sim launch migrated to FMU + `llm_to_action` binaries -- now the per-feature
+      `scripts/test/*/run.sh` harness over `scripts/test/lib/sim_core.sh` (`simenv_llm.sh` removed).
 
 ## 17. Dev Environment Networking (real-hardware bring-up, 2026-08-06)
 
