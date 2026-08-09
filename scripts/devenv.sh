@@ -86,13 +86,22 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     done
 fi
 
-# Container startup command (kept as a variable so it stays readable, multi-line)
+# Container startup command (kept as a variable so it stays readable, multi-line).
+# The Tello firewall rules are separated from the && chain and inserted unconditionally.
+# They used to be `iptables -C ... || iptables -I ...` hung off the chain, which failed
+# silently two ways: an earlier command returning non-zero skipped them, and a -C match
+# against rules from a previous session skipped the insert even though ufw later rebuilt
+# INPUT and wiped them. Delete-then-insert is idempotent and cannot be short-circuited,
+# and the printed chain head makes a missing rule visible at launch.
 ContainerStartupCmd="\
     mkdir -p ~/.claude && \
     rtk init -g >/dev/null 2>&1 && \
-    echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc && \
-    (iptables -C INPUT -p udp --dport 8890 -j ACCEPT 2>/dev/null || iptables -I INPUT 1 -p udp --dport 8890 -j ACCEPT) && \
-    (iptables -C INPUT -p udp --dport 11111 -j ACCEPT 2>/dev/null || iptables -I INPUT 1 -p udp --dport 11111 -j ACCEPT) && \
+    echo -e 'pcm.!default { type pulse }\nctl.!default { type pulse }' > ~/.asoundrc; \
+    for TelloUdpPort in 8890 11111; do \
+        while iptables -D INPUT -p udp --dport \$TelloUdpPort -j ACCEPT 2>/dev/null; do :; done; \
+        iptables -I INPUT 1 -p udp --dport \$TelloUdpPort -j ACCEPT; \
+    done; \
+    echo '[devenv] Tello firewall rules:'; iptables -S INPUT | head -3; \
     exec bash"
 
 # Execute
