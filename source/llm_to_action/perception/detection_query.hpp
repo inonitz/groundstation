@@ -79,3 +79,50 @@ static inline TargetRelative detectionByLabel(PerceptionSnapshot const& snap, ch
     out.found  = true;
     return out;
 }
+
+/* Nearest measurable obstacle range (m) across all detections, for the emergency boundary
+   (spec 2026-08-07-spec-1 6.1). Pure/ROS-free so it is unit-testable next to detectionByLabel.
+   Returns 0.0f when nothing is measurable (no valid snapshot, no detections, or every depth is
+   missing from the two-rate lag) -- callers MUST read 0.0f as "unknown", never as an obstacle at
+   zero range, or a depth-starved frame would trip the boundary. Loop locals hoisted per the
+   code-guidelines. */
+static inline f32 nearestDepthM(PerceptionSnapshot const& snap) {
+    f32 nearest = 0.0f;
+    f32 d;
+    u32 i;
+
+    if (!snap.valid) return 0.0f;
+    for (i = 0; i < snap.count; ++i) {
+        d = snap.dets[i].median_depth_cm / 100.0f;
+        if (d <= 0.0f) continue;                       /* skip missing depth (two-rate lag). */
+        if (nearest == 0.0f || d < nearest) nearest = d;
+    }
+    return nearest;
+}
+
+
+/* Depth-independent "looming" cue for the emergency boundary: the largest bounding-box fill
+   fraction (bbox area / image area) across all detections. Close-range SITL depth over-reads
+   badly or drops out (the APPROACH servo in fmu_node brakes on the same range and drove into a
+   parked car in testing), so nearestDepthM alone cannot backstop a drone that has closed on a
+   large object. A box that fills most of the frame means the object is right there, whatever the
+   depth number says. Returns 0.0f when nothing measurable (no valid snapshot, no detections, or
+   zero image area). Area-based: catches large objects (cars) well; a thin object (a standing
+   person) never fills enough area to trip, so those still rely on depth. Loop locals hoisted per
+   the code-guidelines. */
+static inline f32 maxBboxFillFrac(PerceptionSnapshot const& snap, CameraIntrinsics const& cam) {
+    f32 frame = static_cast<f32>(cam.width) * static_cast<f32>(cam.height);
+    f32 best  = 0.0f;
+    f32 w, h, frac;
+    u32 i;
+
+    if (!snap.valid || frame <= 0.0f) return 0.0f;
+    for (i = 0; i < snap.count; ++i) {
+        w = static_cast<f32>(snap.dets[i].bbox_xmax) - static_cast<f32>(snap.dets[i].bbox_xmin);
+        h = static_cast<f32>(snap.dets[i].bbox_ymax) - static_cast<f32>(snap.dets[i].bbox_ymin);
+        if (w <= 0.0f || h <= 0.0f) continue;
+        frac = (w * h) / frame;
+        if (frac > best) best = frac;
+    }
+    return best;
+}

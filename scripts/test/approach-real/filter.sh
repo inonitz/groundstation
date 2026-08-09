@@ -20,7 +20,7 @@ done < <(tmux list-panes -a -t "$SESSION" -F '#{session_name}:#{window_index}.#{
 echo "[capture] all panes -> $OUT"
 
 echo "----- approach-real milestones -----"
-grep -E 'APPROACH activated|APPROACH sees|APPROACH reached|APPROACH lost|LANDING->STANDBY' "$OUT" || echo "  (no matching milestone lines captured — check the FMU pane)"
+grep -E 'APPROACH activated|APPROACH sees|APPROACH reached|APPROACH lost|motion off-nominal|INTERRUPT \(reason=approach_impact\)|INTERRUPT \(reason=emergency_boundary\)|BOUNDARY looming|LANDING->STANDBY' "$OUT" || echo "  (no matching milestone lines captured — check the FMU pane)"
 echo ""
 echo "No PASS/FAIL for this test — confirm against what you observed."
 exit 0

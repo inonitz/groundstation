@@ -17,8 +17,17 @@ The tunables that differ by drone or environment, all currently `constexpr`:
 - Manual override: `kManualTeleopVelCmS` (+ the inline `kManualYaw`).
 - GO: `kDefaultGoSpeedCmS`, `kGoApproachGainHz`, `kGoCrossTrackGainHz`, settle dwell.
 - ROTATE: `kRotateYawGainHz`, `kRotateMaxYawRate`, `kRotateCompletionDeg`.
-- APPROACH: `kApproachStandoffM`, gains, `kApproachRangeMedianWindow`, `kApproachCoastHoldMarginM`.
-- Future emergency boundary (Spec 1): `kBoundaryBaseM`, `kBoundaryVelScale`, etc.
+- APPROACH: `kApproachStandoffM` (raised 3.0->4.0 2026-08-08; SITL depth over-reads close up), gains, `kApproachRangeMedianWindow`, `kApproachCoastHoldMarginM`.
+- ORBIT (Spec 2, shipped 2026-08-08 as `constexpr` fallbacks): `kOrbitDefaultSpeedMps`, `kOrbitRadialGainHz`, `kOrbitYawGain`, `kOrbitAimTrimGain`.
+- SEARCH (Spec 2, shipped 2026-08-08 as `constexpr` fallbacks): `kSearchSweepSpeedMps`, `kSearchLaneLengthM`, `kSearchLaneSpacingM`, `kSearchMaxLanes`, `kSearchLegTimeoutMs`, `kSearchMinConfidence`.
+- Emergency boundary + interrupt safety (Spec 1, shipped 2026-08-08 as `constexpr` fallbacks in
+  `fmu_node_base.hpp`): `kBoundaryBaseM`, `kBoundaryVelScale`, `kBoundaryMaxSnapshotAgeMs`,
+  `kBoundaryLoomFillFrac`, `kBoundaryDiagRangeM`, `kApproachNominalYawrate`,
+  `kApproachNominalVertVel`, `kInterruptMaxRetries`, `kInterruptStormWindowMs`.
+- Free-space boundary cone (Spec 1, shipped 2026-08-08 as `static constexpr` in `perception_runtime.hpp`):
+  `kFreeConeXLo`, `kFreeConeXHi`, `kFreeConeYLo`, `kFreeConeYHi`, `kFreeConePercentile`,
+  `kFreeConeMinSamples` -- the central depth-map cone the emergency boundary reads to catch walls;
+  camera-mount / gimbal-pitch dependent, so these belong in the per-drone profile too.
 
 The Tier-4 Tello work lands here too: stick/velocity calibration (2.3.1) and the environment-keyed
 velocity modes (2.3.4) are just per-drone profiles of the same values.

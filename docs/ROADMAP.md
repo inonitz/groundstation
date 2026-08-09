@@ -33,13 +33,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
-       1.1.6 ORBIT (target-anchored)                             [ ]  [GATE perception]
-       1.1.7 SEARCH (2D circle)                                  [ ]  [GATE perception]
+       1.1.6 ORBIT (target-anchored)                             [x]  odometry circle, SITL PASS 2026-08-08
+       1.1.7 SEARCH (parallel-track lawnmower)                   [x]  SITL PASS 2026-08-08
        1.1.8 CURVE                                               [dropped for POC]
    1.2 ENU convention (Task 4)                                   [x]  operator SITL re-gate [ ] (human)
    1.3 Offboard streaming ~100 Hz (collapsed into backend)       [x]
    1.4 SPSC task queue (moodycamel) + backpressure               [x]  bounded try_enqueue + reject-newest, every drop logged; SITL-verified (flood + flood-airborne)
-   1.5 Interrupt + reflexive hold-clearance (ARCH 5.1)           [ ]  [GATE depth]
+   1.5 Interrupt + reflexive hold-clearance (ARCH 5.1)           [x]  SITL-verified 2026-08-08 (interrupt+stash+hold)
 
 2. Backend abstraction                                           [x]
    2.1 GenericBackend interface (CRTP, builds both backends)     [x]
@@ -131,11 +131,11 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    5.2 live-YOLO GO (recompute direction per tick, drift-free)   [ ]
    5.3 landmark-relative safe landing ("go over spot", land)     [ ]
 
-6. Safety / failsafe                                             [~]  6.2 done (SITL-verified); 6.1/6.3/6.4 open
-   6.1 Emergency boundary (velocity-scaled trigger distance)     [ ]  [GATE depth]
+6. Safety / failsafe                                             [~]  6.2 SITL-verified; 6.1/6.3/6.4 code landed 2026-08-08, build+SITL pending
+   6.1 Emergency boundary (velocity-scaled trigger distance)     [x]  SITL-verified (boundary 37 trips); +free-space depth for walls; thin/edge blind spot -- see spec-1 final review
    6.2 Battery / failsafe supervisor + user override (ARCH 11)   [x]  real PX4 battery bridge; 20%->RTH / 10%->land-in-place (latched); reversible manual override; SITL-verified 2026-08-08. Smart RTH deferred -> docs/scheduled/2026-08-07-battery-rth-energy-terrain-subsystem.md
-   6.3 Interrupt hysteresis + max-retries then land/abort        [ ]
-   6.4 APPROACH "reached" has no motion sanity check             [ ]  real SITL collision
+   6.3 Interrupt storm / max-retries -> escalation prompt        [x]  SITL-verified escalation (escalated=1); VLM recovery model-limited (2B)
+   6.4 APPROACH "reached" motion-gate (reject impact frames)     [x]  SITL-verified (approach-impact); underlying approach quality open (5.1.5/spec-4)
        (2026-08-06, live VLM run): a physical hit produced yawrate=6.9 rad/s and
        vertical vel -1.75 m/s (vs commanded ~-0.10 yawrate) and altitude collapsed
        0.99m -> 0.02m in ~1s -- APPROACH read range=1.83m off a frame taken during/
@@ -214,7 +214,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 
 ## SITL test matrix (2026-08-08)
 
-All 15 `scripts/test/<feature>/` runs green in PX4 Gazebo SITL (operator-run, 2026-08-08). **Type:**
+All 15 baseline `scripts/test/<feature>/` runs green in PX4 Gazebo SITL (operator-run, 2026-08-08); the 3 spec-1 + 2 spec-2 rows at the bottom are NEW: each is wired to a new canned flag in fmu_node.cpp and is runnable after a rebuild, but is unrun (build+SITL pending). **Type:**
 Auto = `filter.sh` asserts PASS/FAIL from the captured log; Milestone = operator confirms the digest
 against expected behavior. Per-run pane captures are git-ignored (regenerated each run).
 
@@ -235,6 +235,11 @@ against expected behavior. Per-run pane captures are git-ignored (regenerated ea
 | battery-rth | forced 18% -> RTH home + land | 6.2 | Auto | PASS |
 | battery-landnow | forced 8% -> land-in-place | 6.2 | Auto | PASS |
 | override | reversible manual takeover, failsafe outranks | 6.2 | Auto | PASS |
+| boundary | emergency boundary trips + interrupts on a close obstacle | 6.1 | Auto | PASS (2026-08-08) |
+| approach-impact | motion-gate rejects approach_ok on a collision | 6.4 | Auto | PASS (2026-08-08) |
+| interrupt-storm | N trips in window -> escalation prompt, then reset | 6.3 | Auto | PASS escalation (2026-08-08); recovery is VLM-limited |
+| orbit | ORBIT traces a full odometry circle around the real car | 1.1.6 | Milestone | PASS (--canned-orbit; SITL 2026-08-08) |
+| search | SEARCH parallel-track lawnmower finds the car + notifies | 1.1.7 | Milestone | PASS (--canned-search; SITL 2026-08-08) |
 
 \* `terrain-land` is a **diagnostic**: it lands over ground at a different height than takeoff to
 expose that landing keys on `od.pos.z` (height above the takeoff origin), not AGL. It behaves as

@@ -74,6 +74,15 @@ public:
         return std::atomic_load(&m_snapshot);
     }
 
+    /* Nearest free-space depth (m) over a central forward cone of the whole depth map -- the
+       obstacle signal the per-detection medians cannot give (a wall has no YOLO box). 0.0f = unknown
+       (no valid samples yet). *stampUs (if non-null) gets the depth cycle time so the caller can
+       treat a stale reading as unknown, the same way it gates the snapshot age. */
+    float nearestFreeDepthM(u64* stampUs = nullptr) const {
+        if (stampUs) *stampUs = m_freeDepthStampUs.load(std::memory_order_relaxed);
+        return m_nearestFreeDepthM.load(std::memory_order_relaxed);
+    }
+
     /* Both ONNX engines loaded their model. The FMU aborts startup if this is false:
        a missing/mispathed model must fail LOUD, not silently emit zero detections
        (a wrong path once cost hours of "why does approach never see anything"). */
@@ -112,6 +121,8 @@ private:
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
                     auto depth = std::make_shared<cv::Mat>(m_depth.estimate(frame));
+                    m_nearestFreeDepthM.store(computeNearestFreeDepthM(*depth), std::memory_order_relaxed);
+                    m_freeDepthStampUs.store(nowUs(), std::memory_order_relaxed);
                     std::atomic_store(&m_depthMap, depth);
                 }
             }
@@ -170,6 +181,36 @@ private:
         return samples[samples.size() / 2] * 100.0f;
     }
 
+    /* Nearest obstacle depth (m) over a central forward cone of the depth map -- for the emergency
+       boundary, which must stop for ANY geometry, not just YOLO-boxed objects (a wall gives no
+       detection). The cone is a central band biased ABOVE the lower frame so level forward flight
+       does not read the ground as an obstacle. A low percentile (not the raw min) is used so a few
+       speckle pixels cannot trip it -- a real close surface fills a good fraction of the cone.
+       Returns 0.0f (unknown) if too few valid samples. Cone/percentile are first guesses -- sweep
+       in SITL against the forward/cross/terrain tests, which must NOT false-trip on ground ahead. */
+    static float computeNearestFreeDepthM(const cv::Mat& depth) {
+        if (depth.empty()) return 0.0f;
+        int x0 = static_cast<int>(depth.cols * kFreeConeXLo);
+        int x1 = static_cast<int>(depth.cols * kFreeConeXHi);
+        int y0 = static_cast<int>(depth.rows * kFreeConeYLo);
+        int y1 = static_cast<int>(depth.rows * kFreeConeYHi);
+        std::vector<float> samples;
+        samples.reserve(static_cast<size_t>(std::max(0, x1 - x0)) *
+                        static_cast<size_t>(std::max(0, y1 - y0)));
+        for (int y = y0; y < y1; ++y) {
+            const float* row = depth.ptr<float>(y);
+            for (int x = x0; x < x1; ++x) {
+                float v = row[x];
+                if (v > 0.0f && std::isfinite(v)) samples.push_back(v);
+            }
+        }
+        if (samples.size() < kFreeConeMinSamples) return 0.0f;
+        size_t k = static_cast<size_t>(samples.size() * kFreeConePercentile);
+        if (k >= samples.size()) k = samples.size() - 1;
+        std::nth_element(samples.begin(), samples.begin() + k, samples.end());
+        return samples[k];
+    }
+
     static void sleepRemainder(std::chrono::steady_clock::time_point tickStart,
                                 std::chrono::milliseconds period) {
         auto elapsed = std::chrono::steady_clock::now() - tickStart;
@@ -193,7 +234,19 @@ private:
 
     std::shared_ptr<cv::Mat>            m_depthMap; /* latest metric depth map, meters. */
     std::shared_ptr<PerceptionSnapshot> m_snapshot; /* published atomically to the FMU. */
+    std::atomic<float> m_nearestFreeDepthM{0.0f};   /* central-cone near-depth (m), 0 = unknown.  */
+    std::atomic<u64>   m_freeDepthStampUs{0};       /* depth cycle time of the reading above.     */
 
     static constexpr float kConf = 0.25f;
     static constexpr float kIou  = 0.45f;
+
+    /* Free-space cone (fractions of frame) for computeNearestFreeDepthM. Central band, biased above
+       the lower frame so level forward flight does not sample the ground. Low percentile + a
+       min-sample floor reject speckle. First guesses -- sweep in SITL (see the helper comment). */
+    static constexpr float  kFreeConeXLo = 0.35f;
+    static constexpr float  kFreeConeXHi = 0.65f;
+    static constexpr float  kFreeConeYLo = 0.28f;
+    static constexpr float  kFreeConeYHi = 0.55f;
+    static constexpr float  kFreeConePercentile = 0.05f;  /* ~nearest, robust to a few speckle pixels. */
+    static constexpr size_t kFreeConeMinSamples = 200;    /* fewer valid pixels than this -> unknown.   */
 };

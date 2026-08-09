@@ -105,6 +105,8 @@ struct CmdSearch {
     FixedStringType target{"\0"};
     i32             expected_time{0};
     i32             timeout{0};
+    i32             start_heading_deg{0};   /* first sweep heading, relative to current facing (deg). */
+    bool            cw_or_ccw{false};       /* fan direction: true=cw, false=ccw. The VLM sets it by context. */
 };
 
 struct CmdReassess {
@@ -200,7 +202,6 @@ struct HistoryBuffer {
     std::vector<ActiveTask> m_completedTasks;
 };
 
-
 class FlightManagementUnitNode : public rclcpp::Node {
 public:
     FlightManagementUnitNode() : rclcpp::Node("high_level_navigation_node") {
@@ -283,12 +284,15 @@ public:
                bool useRotatePlan = false, bool useLandFlarePlan = false,
                bool useTerrainLandPlan = false, bool useFloodPlan = false,
                bool useCrossFloodPlan = false, bool useBatteryRthPlan = false,
-               bool useBatteryLandNowPlan = false, bool usePatrolPlan = false) {
+               bool useBatteryLandNowPlan = false, bool usePatrolPlan = false,
+               bool useBoundaryPlan = false, bool useStormPlan = false,
+               bool useApproachImpactPlan = false, bool useOrbitPlan = false,
+               bool useSearchPlan = false) {
         m_chat.m_initialCommand = objective;
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan;
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan || useBoundaryPlan || useStormPlan || useApproachImpactPlan || useOrbitPlan || useSearchPlan;
         m_missionActive.store(!cannedRun, std::memory_order_release);
         if (useCrossPlan) {
             injectCannedCrossPlan();
@@ -314,6 +318,16 @@ public:
             injectCannedBatteryLandNowPlan();
         } else if (usePatrolPlan) {
             injectCannedPatrolPlan();
+        } else if (useBoundaryPlan) {
+            injectCannedBoundaryPlan();
+        } else if (useStormPlan) {
+            injectCannedStormPlan();
+        } else if (useApproachImpactPlan) {
+            injectCannedApproachImpactPlan();
+        } else if (useOrbitPlan) {
+            injectCannedOrbitPlan();
+        } else if (useSearchPlan) {
+            injectCannedSearchPlan();
         } else if (useCannedPlan) {
             injectCannedPlan();
         }
@@ -348,6 +362,16 @@ private:
         return { measVel.x - along * forwardUnit.x,
                  measVel.y - along * forwardUnit.y,
                  measVel.z - along * forwardUnit.z };
+    }
+
+    /* Motion-gate (spec 1 6.4): "reached" is only trusted when the drone is not in a collision
+       transient. A real impact spikes yaw-rate + vertical velocity while the range still reads
+       plausible off the impact frame (SITL: yawrate 6.9, vertVel -1.75, alt 0.99->0.02 in ~1s).
+       Not nominal -> the APPROACH branch treats "reached" as an impact and interrupts. */
+    bool approachMotionNominal(Odometry const& od) const {
+        if (m_forceApproachImpact) return false;   /* test-only forced impact (--canned-approach-impact). */
+        return std::fabs(od.yawrate) < kApproachNominalYawrate
+            && std::fabs(od.vel.z)  < kApproachNominalVertVel;
     }
 
     /* Projects m_cannedApproachTargetEnu (fixed at APPROACH activation, see activateTask)
@@ -419,7 +443,15 @@ private:
         std::shared_ptr<PerceptionSnapshot> snap;
         Vec3        velEnu, aimFlu, fwdDir, lat;
         f32         speedCeil, spF, yawRate, vUp, magV, appTrav, appRem;
-        u64         tnow;
+        f32         boundSpeed, boundTrig, nearestM, loomFrac, freeM;
+        u64         tnow, fdStamp;
+        CmdOrbit    orb;
+        CmdSearch   srch;
+        TargetDetection const* hit;
+        f32         errX, oDist, oRadErr, oAngle, oPrevAngle, oDesYaw, oMedRange;
+        Vec3        oToDrone, oRadial, oTangent, oDirEnu;
+        f32         distStart, headErr, altErr;
+        u32         di;
 
         od = m_backend->odometry();
         {
@@ -518,6 +550,78 @@ private:
                     "[FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.");
             }
             return;
+        }
+
+        /* Test-only obstacle window (--canned-boundary / --canned-storm): once airborne, open a
+           short burst window; while it is open the emergency boundary below forces a close reading
+           (race-free, bypassing perception) so it trips deterministically with no real obstacle in
+           the world. The window then closes so the hold path can reach maybePlan and wake the VLM
+           (the storm test needs the escalated reassess prompt built). */
+        if (m_obstacleArmed && !m_obstacleFired && st == FlightState::FLIGHT) {
+            m_obstacleUntilUs = nowUs() + 1500ULL * 1000ULL;   /* ~1.5s burst: >> kInterruptMaxRetries. */
+            m_obstacleFired   = true;
+        }
+
+        /* Emergency boundary (spec 1 6.1): velocity-scaled standoff, FLIGHT only so it can't
+           trip while grounded/taking off/landing. Depth is slow and can freeze on this CPU, so a
+           snapshot older than the age cap is treated as unknown -- never a false trip on stale
+           depth. nearestDepthM() returns 0 for "nothing measurable", which is not an obstacle. */
+        if (st == FlightState::FLIGHT) {
+            boundSpeed = std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y + od.vel.z * od.vel.z);
+            boundTrig  = kBoundaryBaseM + kBoundaryVelScale * boundSpeed;
+            loomFrac   = 0.0f;
+            freeM      = 0.0f;
+            if (m_obstacleArmed && m_obstacleFired && nowUs() < m_obstacleUntilUs) {
+                /* Test-only forced obstacle (--canned-boundary / --canned-storm): bypass the
+                   perception snapshot so the trip is deterministic and cannot be lost to a race
+                   with live YOLO in a populated world. 0.4 m is inside kBoundaryBaseM (0.6). */
+                nearestM = 0.4f;
+            } else {
+                snap = m_perception->snapshot();
+                if (snap && snap->valid
+                    && (nowUs() - snap->host_stamp_us) <= __scast(u64, kBoundaryMaxSnapshotAgeMs) * 1000ULL) {
+                    nearestM = nearestDepthM(*snap);
+                    loomFrac = maxBboxFillFrac(*snap, kApproachCamera);
+                } else {
+                    nearestM = 0.0f;
+                }
+                /* Free-space depth over the whole depth map -- catches walls and any geometry YOLO
+                   does not box. Takes over when it reads closer than the detection depth (or when
+                   there is no detection at all). Stale readings are ignored, same as the snapshot. */
+                fdStamp = 0;
+                freeM   = m_perception->nearestFreeDepthM(&fdStamp);
+                if (freeM > 0.0f
+                    && (nowUs() - fdStamp) <= __scast(u64, kBoundaryMaxSnapshotAgeMs) * 1000ULL
+                    && (nearestM == 0.0f || freeM < nearestM)) {
+                    nearestM = freeM;
+                }
+            }
+            /* Stream depth + looming while something is measurable, so log inspection can see why
+               the boundary did or did not trip. Skipped when nothing is in view (nearest=0 and no
+               fill) so a long hover does not flood the pane and flush earlier lines out of the tmux
+               scrollback -- which is what buried the interrupt-storm burst and the override toggle. */
+            if ((nearestM > 0.0f && nearestM < kBoundaryDiagRangeM) || loomFrac > 0.0f) {
+                RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                    "[FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=%.2f free=%.2f trig=%.2f loomFill=%.2f/%.2f speed=%.2f",
+                    nearestM, freeM, boundTrig, loomFrac, kBoundaryLoomFillFrac, boundSpeed);
+            }
+            if (nearestM > 0.0f && nearestM < boundTrig) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] BOUNDARY nearest=%.2f < trig=%.2f (speed=%.2f) -> interrupt.",
+                    nearestM, boundTrig, boundSpeed);
+                raiseInterrupt("emergency_boundary");
+                return;
+            }
+            /* Depth-independent backstop: a detection filling the frame is imminent even when depth
+               over-reads or drops out -- the close-range regime that let the drone drive into a car. */
+            if (loomFrac > kBoundaryLoomFillFrac) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] BOUNDARY looming fill=%.2f > %.2f (depth unreliable close up, "
+                    "speed=%.2f) -> interrupt.",
+                    loomFrac, kBoundaryLoomFillFrac, boundSpeed);
+                raiseInterrupt("emergency_boundary");
+                return;
+            }
         }
 
         /* FLIGHT / STANDBY: run the active movement task or pull the next. */
@@ -620,6 +724,14 @@ private:
                             appRem  = m_approachTravelBudget - appTrav;
                         }
                         if (m_approachBudgetLatched && appRem <= 0.0f) {
+                            if (!approachMotionNominal(od)) {
+                                RCLCPP_WARN(this->get_logger(),
+                                    "[FMU_NODE_DEBUG] APPROACH reached range=%.2f but motion off-nominal "
+                                    "(yawrate=%.2f vertVel=%.2f) -> impact interrupt.",
+                                    m_approachLastRange, od.yawrate, od.vel.z);
+                                raiseInterrupt("approach_impact");
+                                return;
+                            }
                             /* Reached the dead-reckoned stop point with the target briefly lost.
                                Odometry says we are there, so stop -- don't wait for a re-lock. */
                             m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
@@ -700,6 +812,14 @@ private:
 
                     if ((m_approachBudgetLatched && appRem <= 0.0f) ||
                         (m_approachLastRange > 0.0f && m_approachLastRange < kApproachStandoffM)) {
+                        if (!approachMotionNominal(od)) {
+                            RCLCPP_WARN(this->get_logger(),
+                                "[FMU_NODE_DEBUG] APPROACH reached range=%.2f but motion off-nominal "
+                                "(yawrate=%.2f vertVel=%.2f) -> impact interrupt.",
+                                m_approachLastRange, od.yawrate, od.vel.z);
+                            raiseInterrupt("approach_impact");
+                            return;
+                        }
                         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                         RCLCPP_INFO(this->get_logger(),
                             "[FMU_NODE_DEBUG] APPROACH reached target=%s traveled=%.2f/%.2f range=%.2f",
@@ -731,10 +851,191 @@ private:
                         }
                         m_backend->set_velocity(velEnu, yawRate);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] APPROACH target=%s range=%.2f errX=%.2f errY=%.2f "
+                            "[FMU_NODE_DIAGNOSTICS] APPROACH target=%s rawRange=%.2f medRange=%.2f "
+                            "freeDepth=%.2f budget=%.2f trav=%.2f rem=%.2f fill=%.2f errX=%.2f errY=%.2f "
                             "cmdVelENU=(%.2f,%.2f,%.2f) yawRate=%.2f",
-                            appr.target, tr.range, tr.errX, tr.errY,
-                            velEnu.x, velEnu.y, velEnu.z, yawRate);
+                            appr.target, tr.range, m_approachLastRange,
+                            m_perception->nearestFreeDepthM(), m_approachTravelBudget, appTrav, appRem,
+                            (snap ? maxBboxFillFrac(*snap, kApproachCamera) : 0.0f),
+                            tr.errX, tr.errY, velEnu.x, velEnu.y, velEnu.z, yawRate);
+                    }
+                }
+            } else if (id == CommandID::ORBIT) {
+                orb  = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
+                tnow = nowUs();
+                snap = m_perception->snapshot();
+
+                /* Live detection this frame -- seeds the circle center at the start, and keeps the
+                   camera pointed at the real car during the orbit. */
+                hit = nullptr;
+                if (snap && snap->valid) {
+                    for (di = 0; di < snap->count; ++di) {
+                        if (std::strcmp(snap->dets[di].label, orb.target) == 0) { hit = &snap->dets[di]; break; }
+                    }
+                    if (hit == nullptr && snap->count == 1) hit = &snap->dets[0];
+                }
+                errX = 0.0f;
+                if (hit != nullptr) {
+                    m_orbitLastSeenUs = tnow;
+                    errX = (0.5f * __scast(f32, hit->bbox_xmin + hit->bbox_xmax) - kApproachCamera.cx)
+                             / kApproachCamera.cx;
+                }
+
+                if (!m_orbitLatched) {
+                    /* Startup: median a few depth reads into ONE car position so the noisy depth is
+                       filtered before we commit the circle center. Hover, camera on the car, meanwhile. */
+                    if (hit != nullptr && hit->median_depth_cm > 0.0f) {
+                        pushOrbitRange(hit->median_depth_cm / 100.0f);
+                        if (m_orbitRangeCount >= kApproachRangeMedianWindow) {
+                            oMedRange = medianOrbitRange();
+                            oDirEnu   = flu_to_enu(
+                                detectionByLabel(*snap, hit->label, kApproachCamera, tnow).dirFlu, od.yaw);
+                            m_orbitCenterEnu = { od.pos.x + oDirEnu.x * oMedRange,
+                                                 od.pos.y + oDirEnu.y * oMedRange, od.pos.z };
+                            oToDrone         = { od.pos.x - m_orbitCenterEnu.x,
+                                                 od.pos.y - m_orbitCenterEnu.y, 0.0f };
+                            m_orbitRadius    = std::sqrt(oToDrone.x * oToDrone.x + oToDrone.y * oToDrone.y);
+                            m_orbitPrevPos   = od.pos;
+                            m_orbitLatched   = true;
+                            RCLCPP_INFO(this->get_logger(),
+                                "[FMU_NODE_DEBUG] ORBIT center locked target=%s R=%.2f centerENU=(%.2f,%.2f)",
+                                orb.target, m_orbitRadius, m_orbitCenterEnu.x, m_orbitCenterEnu.y);
+                        }
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, -kOrbitYawGain * errX);
+                    } else if ((tnow - m_orbitStartUs) <= kApproachLostTimeoutUs) {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] ORBIT target=%s: waiting for a lock to fix the center.", orb.target);
+                    } else {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_WARN(this->get_logger(),
+                            "[FMU_NODE_DEBUG] ORBIT never locked target=%s -> FAIL.", orb.target);
+                        completeCurrent("orbit_lost_failed");
+                    }
+                } else {
+                    /* Latched: fly a fixed circle around the locked center from ODOMETRY only. The
+                       center never moves and the position is smooth odometry, so the path carries no
+                       depth jitter and cannot wobble. Vision drives ONLY the camera aim below, never
+                       the path -- feeding vision into the geometry is what wrecked the earlier versions,
+                       and a slow "drift correction" did the same (it dragged the center off in SITL,
+                       where there is no real drift to cancel). Odometry drift over one short orbit is
+                       the accepted trade. */
+                    oToDrone = { od.pos.x - m_orbitCenterEnu.x, od.pos.y - m_orbitCenterEnu.y, 0.0f };
+                    oDist    = std::sqrt(oToDrone.x * oToDrone.x + oToDrone.y * oToDrone.y);
+                    if (oDist < 1e-3f) oDist = 1e-3f;
+                    oRadial  = { oToDrone.x / oDist, oToDrone.y / oDist, 0.0f };
+                    oTangent = { -oRadial.y * m_orbitDir, oRadial.x * m_orbitDir, 0.0f };
+                    oRadErr  = m_orbitRadius - oDist;
+                    velEnu.x = oRadial.x * (kOrbitRadialGainHz * oRadErr) + oTangent.x * m_orbitSpeed;
+                    velEnu.y = oRadial.y * (kOrbitRadialGainHz * oRadErr) + oTangent.y * m_orbitSpeed;
+                    velEnu.z = kApproachVertGain * (m_orbitAltEnu - od.pos.z);
+                    /* Aim from odometry: always point at the locked center. The center is fixed
+                       and the position is odometry, so the look-angle drifts slowly and the camera
+                       never chases the noisy bbox -- that chase was the hard, jittery rotation. A
+                       small vision trim nudges onto the real car if the center is slightly off. */
+                    oDesYaw = std::atan2(-oToDrone.y, -oToDrone.x);
+                    yawRate = kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
+                    if (hit != nullptr) yawRate += -kOrbitAimTrimGain * errX;
+                    m_backend->set_velocity(velEnu, yawRate);
+                    /* Swept from odometry: angle change of the drone around the CURRENT center (same
+                       center for both samples), so the slow center correction adds no false sweep. */
+                    oAngle     = std::atan2(od.pos.y - m_orbitCenterEnu.y, od.pos.x - m_orbitCenterEnu.x);
+                    oPrevAngle = std::atan2(m_orbitPrevPos.y - m_orbitCenterEnu.y,
+                                            m_orbitPrevPos.x - m_orbitCenterEnu.x);
+                    m_orbitSweptRad += std::fabs(wrap_pi(oAngle - oPrevAngle));
+                    m_orbitPrevPos   = od.pos;
+                    if (m_orbitSweptRad >= m_orbitTargetRad) {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] ORBIT complete target=%s swept=%.2f/%.2f rad",
+                            orb.target, m_orbitSweptRad, m_orbitTargetRad);
+                        completeCurrent("orbit_ok");
+                    } else {
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] ORBIT target=%s swept=%.2f/%.2f dist=%.2f/%.2f yawRate=%.2f",
+                            orb.target, m_orbitSweptRad, m_orbitTargetRad, oDist, m_orbitRadius, yawRate);
+                    }
+                }
+            } else if (id == CommandID::SEARCH) {
+                srch = m_currTask.m_cmd.m_extractCmd.m_SearchTarget;
+                tnow = nowUs();
+                snap = m_perception->snapshot();
+
+                /* Success: the named target came into view. Log full diagnostics (label/confidence/
+                   depth/bbox) -- that line IS the operator notification -- then finish. */
+                hit = nullptr;
+                if (snap && snap->valid) {
+                    for (di = 0; di < snap->count; ++di) {
+                        if (std::strcmp(snap->dets[di].label, srch.target) == 0) { hit = &snap->dets[di]; break; }
+                    }
+                }
+                if (hit != nullptr && hit->confidence < kSearchMinConfidence) {
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500,
+                        "[FMU_NODE_DIAGNOSTICS] SEARCH ignoring weak %s conf=%.2f (< %.2f) -- still searching.",
+                        srch.target, hit->confidence, kSearchMinConfidence);
+                    hit = nullptr;   /* below the floor: treat as not found and keep the pattern going. */
+                }
+                if (hit != nullptr) {
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_WARN(this->get_logger(),
+                        "[FMU_NODE] SEARCH DETECTED target=%s conf=%.2f depth_cm=%.1f "
+                        "bbox=(%d,%d,%d,%d) -- verify before acting on it.",
+                        srch.target, hit->confidence, hit->median_depth_cm,
+                        hit->bbox_xmin, hit->bbox_ymin, hit->bbox_xmax, hit->bbox_ymax);
+                    completeCurrent("search_ok");
+                } else if ((tnow - m_searchStartUs) > m_searchTimeoutUs ||
+                           m_searchLegCount >= m_searchMaxLegs) {
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO(this->get_logger(),
+                        "[FMU_NODE_DEBUG] SEARCH exhausted target=%s legs=%u elapsed_ms=%.0f",
+                        srch.target, m_searchLegCount, (tnow - m_searchStartUs) / 1000.0);
+                    completeCurrent("search_exhausted");
+                } else if (m_searchCrossing) {
+                    /* Sideways step to the next lane: fly the fixed cross heading for one lane spacing,
+                       then flip the lane heading 180 so the next lane runs back the other way. */
+                    dx        = od.pos.x - m_searchStartPos.x;
+                    dy        = od.pos.y - m_searchStartPos.y;
+                    distStart = std::sqrt(dx * dx + dy * dy);
+                    if (distStart >= kSearchLaneSpacingM ||
+                        (tnow - m_searchLegStartUs) > kSearchLegTimeoutUs) {
+                        m_searchCrossing       = false;
+                        m_searchLaneHeadingRad = wrap_pi(m_searchLaneHeadingRad + kPi);
+                        m_searchStartPos       = od.pos;
+                        m_searchLegStartUs     = tnow;
+                        m_searchLegCount++;
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    } else {
+                        headErr = wrap_pi(m_searchCrossHeadingRad - od.yaw);
+                        altErr  = m_searchAltEnu - od.pos.z;
+                        aimFlu  = { kSearchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
+                        velEnu  = flu_to_enu(aimFlu, od.yaw);
+                        m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] SEARCH cross lane=%u target=%s dist=%.2f/%.2f",
+                            m_searchLegCount, srch.target, distStart, kSearchLaneSpacingM);
+                    }
+                } else {
+                    /* Fly one straight lane at fixed altitude, camera forward. At the lane end, start the
+                       sideways step. A per-phase timeout also advances us (Tello odometry drifts). */
+                    dx        = od.pos.x - m_searchStartPos.x;
+                    dy        = od.pos.y - m_searchStartPos.y;
+                    distStart = std::sqrt(dx * dx + dy * dy);
+                    if (distStart >= kSearchLaneLengthM ||
+                        (tnow - m_searchLegStartUs) > kSearchLegTimeoutUs) {
+                        m_searchCrossing   = true;
+                        m_searchStartPos   = od.pos;
+                        m_searchLegStartUs = tnow;
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    } else {
+                        headErr = wrap_pi(m_searchLaneHeadingRad - od.yaw);
+                        altErr  = m_searchAltEnu - od.pos.z;
+                        aimFlu  = { kSearchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
+                        velEnu  = flu_to_enu(aimFlu, od.yaw);
+                        m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] SEARCH lane=%u target=%s dist=%.2f/%.2f heading=%.2f",
+                            m_searchLegCount, srch.target, distStart, kSearchLaneLengthM,
+                            m_searchLaneHeadingRad);
                     }
                 }
             } else {
@@ -743,6 +1044,13 @@ private:
                 completeCurrent("noop_ok");
             }
             return;
+        }
+
+        /* Interrupt hold (spec 1 1.5): a trigger stashed the task and cleared m_hasActive. Keep
+           streaming hover while we fall through to maybePlan(), which wakes the VLM to reassess.
+           activateTask() clears m_hasStashed when the reassess plan lands; nothing auto-resumes. */
+        if (m_hasStashed) {
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
         }
 
         if (m_settleTicksRemaining > 0) {
@@ -880,6 +1188,11 @@ private:
         bool prev = m_manualOverride.exchange(msg->data, kMemOrderRelax);
         if (prev == msg->data) return;
         zeroManualVel();
+        /* Manual control supersedes the interrupt reflex. Clear it on BOTH transitions so a
+           pre-takeover interrupt cannot leave a stale [INTERRUPT]/[ESCALATION] in the post-handback
+           re-plan (spec 1 x spec-3). Same control-state-from-callback pattern as the m_hasActive
+           reset below (reentrant callback group; pre-existing race, tolerated for these resets). */
+        resetInterruptState();
 
         if (msg->data) {
             RCLCPP_WARN(this->get_logger(),
@@ -903,6 +1216,19 @@ private:
         m_manualLeft.store(0.0f, kMemOrderRelax);
         m_manualUp.store(0.0f, kMemOrderRelax);
         m_manualYaw.store(0.0f, kMemOrderRelax);
+    }
+
+    /* Full interrupt-reflex reset. A manual-override takeover or handback supersedes the reflex, so
+       the post-handback re-plan must not inherit a stale interrupt / stash / storm from before the
+       takeover (spec 1 1.5/6.3). */
+    void resetInterruptState() {
+        m_hasStashed          = false;
+        m_interruptPending    = false;
+        m_interruptEscalated  = false;
+        m_lastInterruptReason = nullptr;
+        m_interruptRingIdx    = 0;
+        for (u32 k = 0; k < kInterruptMaxRetries; ++k) m_interruptTimes[k] = 0;
+        return;
     }
 
     /* Raw keylog [keycode, action]. While override is engaged, movement keys map to
@@ -953,17 +1279,42 @@ private:
         return tmp[n / 2u];
     }
 
+    void pushOrbitRange(f32 r) {
+        m_orbitRangeHist[m_orbitRangeCount % kApproachRangeMedianWindow] = r;
+        ++m_orbitRangeCount;
+    }
+    f32 medianOrbitRange() const {
+        u32 n = (m_orbitRangeCount < kApproachRangeMedianWindow) ? m_orbitRangeCount : kApproachRangeMedianWindow;
+        if (n == 0u) return 0.0f;
+        f32 tmp[kApproachRangeMedianWindow];
+        for (u32 i = 0u; i < n; ++i) tmp[i] = m_orbitRangeHist[i];
+        for (u32 i = 1u; i < n; ++i) {
+            f32 key = tmp[i];
+            i32 j   = __scast(i32, i) - 1;
+            while (j >= 0 && tmp[j] > key) { tmp[j + 1] = tmp[j]; --j; }
+            tmp[j + 1] = key;
+        }
+        return tmp[n / 2u];
+    }
+
     void activateTask(ActiveTask const& task) {
         Odometry      od;
         Vec3          relFlu, relEnu;
         CmdGo         g;
         CmdRotate     r;
+        CmdOrbit      orb;
+        CmdSearch     srch;
         CommandID     id;
         BackendStatus s;
 
         m_currTask = task;
         m_currTask.m_state = TaskState::RUNNING;
         m_hasActive = true;
+        /* A new task landed -> the interrupt reassess is resolved. Storm/escalation state is NOT
+           cleared here; only a clean completion clears it, so a task that lands and immediately
+           re-trips stays escalated (spec 1 1.5/6.3). */
+        m_hasStashed       = false;
+        m_interruptPending = false;
         id = m_currTask.m_cmd.id();
 
         switch (id) {
@@ -1039,6 +1390,41 @@ private:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] APPROACH activated target=%s.",
                 m_currTask.m_cmd.m_extractCmd.m_approach.target);
             break;
+        case CommandID::ORBIT:
+            orb                = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
+            od                 = m_backend->odometry();
+            m_orbitSpeed       = (orb.speed > 0.0f) ? orb.speed / 100.0f : kOrbitDefaultSpeedMps;
+            m_orbitDir         = orb.cw_or_ccw ? -1.0f : 1.0f;   /* ccw = +1 (math positive), cw = -1. SITL-verify. */
+            m_orbitTargetRad   = std::fabs(orb.angle_deg) * kPi / 180.0f;
+            m_orbitSweptRad    = 0.0f;
+            m_orbitLatched     = false;
+            m_orbitRangeCount  = 0;
+            m_orbitAltEnu      = od.pos.z;
+            m_orbitStartUs     = nowUs();
+            m_orbitLastSeenUs  = nowUs();
+            RCLCPP_INFO(this->get_logger(),
+                "[FMU_NODE_DEBUG] ORBIT activated target=%s speed=%.2f angle=%.2f dir=%s (odometry circle, camera on target)",
+                orb.target, m_orbitSpeed, m_orbitTargetRad, orb.cw_or_ccw ? "cw" : "ccw");
+            break;
+        case CommandID::SEARCH:
+            srch                  = m_currTask.m_cmd.m_extractCmd.m_SearchTarget;
+            od                    = m_backend->odometry();
+            m_searchStartPos       = od.pos;
+            m_searchAltEnu         = od.pos.z;
+            m_searchLaneHeadingRad = wrap_pi(od.yaw + __scast(f32, srch.start_heading_deg) * kPi / 180.0f);
+            m_searchDir            = srch.cw_or_ccw ? -1.0f : 1.0f;   /* which side the lanes march. */
+            m_searchCrossHeadingRad= wrap_pi(m_searchLaneHeadingRad + m_searchDir * 0.5f * kPi);
+            m_searchStartUs        = nowUs();
+            m_searchLegStartUs     = m_searchStartUs;
+            m_searchTimeoutUs      = (srch.timeout > 0) ? static_cast<u64>(srch.timeout) * 1000000ULL
+                                                        : 60ULL * 1000000ULL;
+            m_searchCrossing       = false;
+            m_searchLegCount       = 0;
+            m_searchMaxLegs        = kSearchMaxLanes;
+            RCLCPP_INFO(this->get_logger(),
+                "[FMU_NODE_DEBUG] SEARCH activated target=%s alt=%.2f startHeadingDeg=%d dir=%s timeout_s=%d",
+                srch.target, m_searchAltEnu, srch.start_heading_deg, srch.cw_or_ccw ? "cw" : "ccw", srch.timeout);
+            break;
         default:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d auto-completes.",
                 __scast(int, id));
@@ -1051,10 +1437,49 @@ private:
         m_currTask.m_state = TaskState::FINISHED_SUCCESS;
         m_chat.m_completedTasks.push_back(m_currTask);
         m_hasActive = false;
+        /* A task completed cleanly -> the interrupt storm (if any) is resolved. Reset the
+           detector so a later, unrelated trip starts a fresh count (spec 1 6.3). */
+        m_interruptEscalated = false;
+        for (u32 k = 0; k < kInterruptMaxRetries; ++k) m_interruptTimes[k] = 0;
+        m_interruptRingIdx = 0;
         m_settleTicksRemaining = kGoSettleTicks;
         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
         RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task complete status=%s total=%zu",
             status, m_chat.m_completedTasks.size());
+    }
+
+    /* Interrupt core (spec 1 1.5/6.3): the one reflex every trigger shares -- STOP (hover), stash
+       the active task, arm the reassess context, detect an interrupt storm, hold. Resume is
+       implicit: the next VLM plan enqueues normally; the stash is surfaced in the prompt
+       (buildDynamicPrompt), not replayed. Control-thread only. */
+    void raiseInterrupt(const char* reason) {
+        u64 now, oldest;
+
+        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);   /* immediate hover/STOP. */
+        if (m_hasActive) {
+            m_stashedTask = m_currTask;
+            m_hasStashed  = true;
+            m_hasActive   = false;
+        }
+        m_lastInterruptReason = reason;
+        m_interruptPending    = true;
+
+        /* Storm: N interrupts inside the window means hovering and re-planning the same way keeps
+           tripping -- escalate so the reassess reasons about the root cause. O(1): compare now to
+           the time kInterruptMaxRetries interrupts ago (the slot about to be overwritten). */
+        now    = nowUs();
+        oldest = m_interruptTimes[m_interruptRingIdx];
+        m_interruptTimes[m_interruptRingIdx] = now;
+        m_interruptRingIdx = (m_interruptRingIdx + 1) % kInterruptMaxRetries;
+        if (oldest != 0 && (now - oldest) <= __scast(u64, kInterruptStormWindowMs) * 1000ULL) {
+            m_interruptEscalated = true;
+        }
+
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] INTERRUPT (reason=%s): stashed=%s escalated=%d hover+reassess",
+            reason, m_hasStashed ? m_stashedTask.m_thought : "none",
+            __scast(int, m_interruptEscalated));
+        return;
     }
 
     /* ---- VLM plumbing (invoked by the Phase-2 event-driven wake, not a poll) ---- */
@@ -1094,6 +1519,25 @@ private:
             prompt += "(no detections)\n";
         }
         prompt += "\n";
+
+        if (m_interruptPending) {
+            snprintf(buf, sizeof(buf),
+                "[INTERRUPT]\nreason=%s\ninterrupted: %s\n\n",
+                m_lastInterruptReason ? m_lastInterruptReason : "unknown",
+                m_hasStashed ? m_stashedTask.m_thought : "");
+            prompt += buf;
+        }
+        if (m_interruptEscalated) {
+            prompt += "[ESCALATION]\n";
+            prompt += "You have tripped repeated safety interrupts in a short window "
+                      "(interrupt storm). Hovering and re-planning the same way is NOT "
+                      "working. Reason carefully about the ROOT CAUSE of the repeated "
+                      "trips, then produce a creative plan to leave this situation and "
+                      "resume the mission -- do NOT re-issue the action that keeps "
+                      "tripping.\n\n";
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] ESCALATION block added to reassess prompt (interrupt storm).");
+        }
 
         prompt += "[EXECUTED COMMAND HISTORY]\n";
         for (i = 0; i < m_chat.m_completedTasks.size(); ++i) {
@@ -1163,6 +1607,8 @@ private:
         CmdGo          go;
         CmdApproach    approach;
         CmdRotate      rot;
+        CmdOrbit       orbit;
+        CmdSearch      search;
 
         arr  = extractJsonArray(flightPlan);  /* strip ```json fences / prose from the VLM. */
         plan = nlohmann::json::parse(arr, nullptr, false);
@@ -1203,8 +1649,24 @@ private:
                     sizeof(approach.target) - 1);
                 approach.speed = item.value("speed", 0.0f);
                 cmd = GenericCommand(approach);
-                /* Queueable now (3.6); no control-law branch yet -- auto-completes like
-                   ORBIT/SEARCH until block 5.1 lands the real servo. */
+            } else if (action == "orbit") {
+                orbit = CmdOrbit{};
+                strncpy(orbit.target, item.value("target_object", "").c_str(),
+                    sizeof(orbit.target) - 1);
+                orbit.radius    = item.value("radius_cm", 0.0f);   /* raw; dispatch converts cm->m.  */
+                orbit.angle_deg = item.value("angle_deg", 0.0f);   /* raw; dispatch converts deg->rad. */
+                orbit.speed     = item.value("speed", 0.0f);       /* raw; dispatch converts cm/s->m/s. */
+                orbit.cw_or_ccw = (item.value("direction", std::string("ccw")) == "cw");
+                cmd = GenericCommand(orbit);
+            } else if (action == "search") {
+                search = CmdSearch{};
+                strncpy(search.target, item.value("target_object", "").c_str(),
+                    sizeof(search.target) - 1);
+                search.expected_time = item.value("expected_search_time_sec", 0);
+                search.timeout       = item.value("timeout_sec", 0);
+                search.start_heading_deg = item.value("start_heading_deg", 0);
+                search.cw_or_ccw     = (item.value("direction", std::string("ccw")) == "cw");
+                cmd = GenericCommand(search);
             } else {
                 continue; /* Phase 1: takeoff/land/stop/go/rotate/approach executed. */
             }
@@ -1313,6 +1775,64 @@ private:
             {"thought":"canned land",     "action":"land"}
         ])";
         translateToBaseCommands(kCannedApproachRealPlanJson);
+    }
+
+    /* Canned ORBIT test (ROADMAP 1.1.6): real perception (real ONNX, SITL car in view). Orbits the
+       jeep for a full circle, then lands. Skips only the VLM planner. */
+    void injectCannedOrbitPlan() {
+        static const char* kCannedOrbitPlanJson = R"([
+            {"thought":"canned takeoff", "action":"takeoff"},
+            {"thought":"canned orbit",   "action":"orbit",
+             "target_object":"car", "radius_cm":300, "angle_deg":360, "direction":"ccw", "speed":30},
+            {"thought":"canned land",    "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedOrbitPlanJson);
+    }
+
+    /* Canned SEARCH test (ROADMAP 1.1.7): real perception. Targets an object NOT in the world
+       ("person") on purpose, so the pattern runs to its timeout and you can WATCH the full circle
+       get traced (chords + 360 look-arounds) instead of it stopping early on a detection. Sweeps ccw
+       starting ahead. To exercise the found-and-stop path instead, target "car". Skips the VLM. */
+    void injectCannedSearchPlan() {
+        static const char* kCannedSearchPlanJson = R"([
+            {"thought":"canned takeoff", "action":"takeoff"},
+            {"thought":"canned search",  "action":"search",
+             "target_object":"person", "start_heading_deg":0, "direction":"ccw",
+             "expected_search_time_sec":40, "timeout_sec":90},
+            {"thought":"canned land",    "action":"land"}
+        ])";
+        translateToBaseCommands(kCannedSearchPlanJson);
+    }
+
+    /* Emergency-boundary test (spec 1 6.1): takeoff, then a synthetic close obstacle is injected
+       for a short burst once airborne so the velocity-scaled boundary trips deterministically. */
+    void injectCannedBoundaryPlan() {
+        static const char* kCannedBoundaryPlanJson = R"([
+            {"thought":"canned takeoff", "action":"takeoff"}
+        ])";
+        m_obstacleArmed = true;
+        translateToBaseCommands(kCannedBoundaryPlanJson);
+    }
+
+    /* Interrupt-storm test (spec 1 6.3): the same obstacle burst, but VLM-driven (mission kept
+       active) so the escalated reassess prompt is actually built. The burst trips the boundary
+       >= kInterruptMaxRetries times inside the window (escalated=1), then clears so the hold path
+       reaches maybePlan and wakes the VLM, whose next prompt then carries the [ESCALATION] block. */
+    void injectCannedStormPlan() {
+        static const char* kCannedStormPlanJson = R"([
+            {"thought":"canned takeoff", "action":"takeoff"}
+        ])";
+        m_obstacleArmed = true;
+        m_missionActive.store(true, std::memory_order_release);   /* wake the VLM after the burst. */
+        translateToBaseCommands(kCannedStormPlanJson);
+    }
+
+    /* APPROACH motion-gate test (spec 1 6.4): the canned synthetic approach reaches the standoff,
+       but the motion-gate is forced off-nominal so "reached" is treated as an impact -- proves the
+       gate raises approach_impact instead of approach_ok, deterministically and with no collision. */
+    void injectCannedApproachImpactPlan() {
+        m_forceApproachImpact = true;
+        injectCannedApproachPlan();   /* enables the synthetic rig + runs takeoff/approach/land. */
     }
 
     /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
@@ -1435,6 +1955,19 @@ private:
     bool                                            m_hasActive{false};
     u32                                             m_settleTicksRemaining{0};
 
+    /* Interrupt core (spec 1 1.5): the pre-empted task is stashed, not auto-resumed -- the
+       reassess owns whether to re-issue it. Written only on the control thread. */
+    ActiveTask                                      m_stashedTask{};
+    bool                                            m_hasStashed{false};
+    bool                                            m_interruptPending{false};
+    const char*                                     m_lastInterruptReason{nullptr};
+
+    /* Interrupt storm detector (spec 1 6.3): a fixed ring of the last kInterruptMaxRetries
+       interrupt times; N within kInterruptStormWindowMs -> escalate the reassess. O(1). */
+    u64                                             m_interruptTimes[kInterruptMaxRetries]{};
+    u32                                             m_interruptRingIdx{0};
+    bool                                            m_interruptEscalated{false};
+
     llamaClientConnection                           m_vlmClient;
     khUDPCamMsgType                                 m_currImg;
     HistoryBuffer                                   m_chat;
@@ -1459,6 +1992,12 @@ private:
     bool                      m_batForceFired{false};
     i32                       m_batForceValue{0};
     u64                       m_batForceAtUs{0};
+    /* Test-only interrupt-safety injection (spec 1, --canned-boundary / -storm / -approach-impact):
+       a synthetic close-obstacle burst to trip the boundary, and a forced motion-gate fail. */
+    bool                      m_obstacleArmed{false};
+    bool                      m_obstacleFired{false};
+    u64                       m_obstacleUntilUs{0};
+    bool                      m_forceApproachImpact{false};
     u64                       m_lastPlanUs{0};
     u64                       m_missionStartUs{0};
     std::atomic<u64>          m_frameCount{0};
@@ -1487,6 +2026,39 @@ private:
     Vec3 m_approachStartPos{0.0f, 0.0f, 0.0f};   /* drone pose when the travel budget was latched */
     f32  m_approachTravelBudget{0.0f};           /* range-standoff at latch; dead-reckon stop point */
     bool m_approachBudgetLatched{false};
+
+    /* ORBIT state (control thread only). At the start we median a few depth reads into one fixed car
+       position (the circle center); after that the circle is flown from ODOMETRY around that fixed
+       point, so the path carries no depth jitter and cannot wobble. The camera turns separately to
+       keep the real car in view. Reset at activation. */
+    Vec3 m_orbitCenterEnu{0.0f, 0.0f, 0.0f};  /* locked car position, world ENU (the circle center).   */
+    f32  m_orbitRadius{0.0f};                 /* circle radius = distance to the car when locked (m).   */
+    f32  m_orbitSpeed{0.0f};                  /* tangential speed around the circle, m/s.               */
+    f32  m_orbitDir{1.0f};                    /* +1 = ccw, -1 = cw. SITL-verify sign.                   */
+    f32  m_orbitTargetRad{0.0f};              /* total angle to sweep around the car, rad.              */
+    f32  m_orbitSweptRad{0.0f};               /* angle swept so far (from odometry), rad.               */
+    Vec3 m_orbitPrevPos{0.0f, 0.0f, 0.0f};    /* drone position last tick, for swept-angle accounting.  */
+    f32  m_orbitAltEnu{0.0f};                 /* altitude to hold during the orbit (Up+).               */
+    bool m_orbitLatched{false};               /* false until the center is fixed from the median range. */
+    f32  m_orbitRangeHist[kApproachRangeMedianWindow]{};  /* startup range samples, to median.          */
+    u32  m_orbitRangeCount{0};
+    u64  m_orbitStartUs{0};                   /* activation time, for the acquire timeout.              */
+    u64  m_orbitLastSeenUs{0};                /* last tick the target was in view.                      */
+
+    /* SEARCH state (control thread only): a leg/scan sub-FSM at fixed altitude. Legs are straight
+       crossings of a circle about the start pose; a 360 look-around runs at each far edge, then the
+       heading turns ~150 deg so the next crossing fans 30 deg around. Reset at activation. */
+    Vec3 m_searchStartPos{0.0f, 0.0f, 0.0f};  /* pose at the start of the current phase (lane/cross).*/
+    f32  m_searchAltEnu{0.0f};                /* altitude to hold (Up+).                           */
+    f32  m_searchLaneHeadingRad{0.0f};        /* current lane heading, ENU yaw; flips 180 per lane. */
+    f32  m_searchCrossHeadingRad{0.0f};       /* fixed sideways march heading between lanes.        */
+    f32  m_searchDir{1.0f};                   /* +1 / -1: which side the lanes march. VLM-set.      */
+    u64  m_searchStartUs{0};                  /* activation time, for the overall timeout.         */
+    u64  m_searchLegStartUs{0};               /* current phase start, for the per-phase timeout.   */
+    u64  m_searchTimeoutUs{0};                /* overall timeout from the command.                 */
+    u32  m_searchLegCount{0};                 /* lanes flown so far.                               */
+    u32  m_searchMaxLegs{0};                  /* lane cap so the pattern terminates.               */
+    bool m_searchCrossing{false};             /* true = flying the sideways step between two lanes. */
 
     /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
        controlLoop synthesizes a PerceptionSnapshot for a point fixed relative to the

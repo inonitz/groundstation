@@ -90,14 +90,17 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
    tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
-constexpr f32 kApproachStandoffM     = 3.00f;   /* stop this far from the target. Bigger than the
+constexpr f32 kApproachStandoffM     = 4.00f;   /* stop this far from the target. Bigger than the
                                                     servo law strictly needs -- real depth readings
                                                     jitter/freeze on this CPU (SITL, real YOLO), so
                                                     this is slack against a misjudged range, not just
                                                     a stopping point. 1.0m still let range hover right
                                                     at the threshold without a clean below-standoff
                                                     reading, so the drone sat close-range yaw-chasing
-                                                    instead of stopping -- clipped the target (SITL). */
+                                                    instead of stopping -- clipped the target (SITL).
+                                                    Raised 3.0->4.0: depth over-reads ~2m close up, so a
+                                                    3m aim still parked the drone on the car; the boundary
+                                                    looming net backstops any overshoot inside standoff. */
 constexpr f32 kApproachSpeedDefault  = 80.0f;   /* cm/s, if CmdApproach.speed == 0. Faster cruise so
                                                     the brake ramp below is actually visible against
                                                     it (30cm/s cruise vs near-zero at the end reads as
@@ -148,3 +151,47 @@ constexpr const char* kCannedApproachTargetLabel  = "canned_target";
 constexpr u32         kCannedApproachRigKillAfterMs = 15 * kMillisecondsInOneSecond;
 constexpr u64         kCannedApproachRigKillAfterUs =
     static_cast<u64>(kCannedApproachRigKillAfterMs) * 1000ULL;
+
+/* ---- Interrupt & reactive safety (spec 2026-08-07-spec-1; ROADMAP 1.5/6.1/6.3/6.4) ------
+   Emergency boundary is a velocity-scaled standoff: trip = base + scale*speed, so faster
+   closing trips earlier. Depth is slow and can freeze on this CPU, so a snapshot older than
+   the age cap is treated as "unknown" -- never trip on stale depth. APPROACH motion-gate:
+   "reached" is only trusted when yaw-rate + vertical velocity are within nominal -- a real
+   collision spikes both while range still reads plausible off the impact frame. Interrupt
+   storm (6.3): if kInterruptMaxRetries interrupts fire within kInterruptStormWindowMs the
+   drone is stuck in a reflex loop -> escalate the reassess so the model reasons about the
+   root cause instead of re-issuing the same tripping action. First guesses -- sweep in SITL. */
+constexpr f32 kBoundaryBaseM            = 0.6f;   /* base standoff (m) at zero closing speed.    */
+constexpr f32 kBoundaryVelScale         = 0.5f;   /* extra standoff (m) per m/s closing speed.   */
+constexpr u32 kBoundaryMaxSnapshotAgeMs = 500;    /* snapshot older than this -> nearest unknown. */
+constexpr f32 kBoundaryLoomFillFrac     = 0.40f;  /* bbox-area/frame above this = imminent collision
+                                                     regardless of depth (it over-reads/drops out close
+                                                     up). ~0.40 trips a car near 1m, well inside standoff;
+                                                     a car at the 4m standoff fills ~0.05, so a clean
+                                                     approach never trips it. Tune in SITL. */
+constexpr f32 kBoundaryDiagRangeM       = 1.5f;   /* boundary diagnostic logs only when something is within this range (near a trip) or looming. Kept tight: monocular depth hallucinates ~4m of "free space" in a featureless scene, which would otherwise flood the log every tick and scroll the real takeoff/burst lines out of the tmux capture. Tune in SITL. */
+constexpr f32 kApproachNominalYawrate   = 1.0f;   /* rad/s; at/above = off-nominal (impact).      */
+constexpr f32 kApproachNominalVertVel   = 0.6f;   /* m/s; at/above = altitude collapse (impact).  */
+constexpr u32 kInterruptMaxRetries      = 3;      /* N interrupts in the window -> escalate.      */
+constexpr u32 kInterruptStormWindowMs   = 5000;   /* rolling window for the storm detector.       */
+
+/* ---- ORBIT (ROADMAP 1.1.6): circle a tracked target. At the start a few depth reads are medianed
+   into ONE fixed car position (the circle center); the circle is then flown from odometry around that
+   fixed point, so the path carries no depth jitter and cannot wobble. The camera turns separately (a
+   gentle image-centering) to keep the real car in view. SITL-tune; pending loader (ROADMAP 9.14). */
+constexpr f32 kOrbitDefaultSpeedMps = 0.30f;   /* tangential speed around the circle if speed==0 (m/s).  */
+constexpr f32 kOrbitRadialGainHz    = 0.5f;    /* (radius - dist) -> radial speed: hold the circle.      */
+constexpr f32 kOrbitYawGain         = 1.0f;    /* look-angle error (rad) -> turn rate: aim at locked center.*/
+constexpr f32 kOrbitAimTrimGain     = 0.30f;   /* small vision trim on top of the odometry aim (no hard chase).*/
+
+/* ---- SEARCH (ROADMAP 1.1.7): a parallel-track (lawnmower) sweep at fixed altitude. Fly a straight
+   lane, step sideways by the lane spacing, fly the next lane back the other way, repeat -- parallel
+   lanes covering a rectangle. Detection runs every tick. Distances come from odometry (drifts on
+   Tello), so a per-phase timeout also advances the pattern. SITL-tune; pending loader (ROADMAP 9.14). */
+constexpr f32 kSearchSweepSpeedMps  = 0.50f;   /* cruise speed along a lane / cross step (m/s).         */
+constexpr f32 kSearchLaneLengthM    = 6.0f;    /* length of each straight lane.                         */
+constexpr f32 kSearchLaneSpacingM   = 2.0f;    /* sideways step between lanes (keep < camera FOV width).*/
+constexpr u32 kSearchMaxLanes       = 6;       /* lane cap so the pattern always terminates.            */
+constexpr u32 kSearchLegTimeoutMs   = 20000;   /* advance a phase after this even if the distance never registers. */
+constexpr u64 kSearchLegTimeoutUs   = static_cast<u64>(kSearchLegTimeoutMs) * 1000ULL;
+constexpr f32 kSearchMinConfidence  = 0.50f;   /* reject weak/phantom hits; keep searching below this.  */

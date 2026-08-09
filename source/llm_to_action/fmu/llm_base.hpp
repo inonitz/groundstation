@@ -65,10 +65,13 @@ constexpr const char* kSystemPrompt =
     stop                Hover in place.
     {"action": "stop"}
 
-    search              Execute algorithmic forward search pattern for missing/desired object.
-                        If search_time > expected_search_time, drone will abort,
-                        return to initial position BEFORE the search, and mark search as FAILED.
+    search              Sweep a parallel-track (lawnmower) pattern of straight lanes to bring an
+                        object into view. start_heading_deg sets the first lane heading (relative to
+                        current facing: 0=ahead, 90=left, -90=right, 180=behind); direction (cw|ccw)
+                        sets which side the lanes march across. Point the search where you expect the
+                        target based on context. Aborts if not found by timeout_sec.
     {"action": "search", "target_object": "<name_string>",
+    "start_heading_deg": <int>, "direction": "cw|ccw",
     "expected_search_time_sec": <int>, "timeout_sec": <int>}
 
     re-assess           Stop current plan execution. Force host to capture new

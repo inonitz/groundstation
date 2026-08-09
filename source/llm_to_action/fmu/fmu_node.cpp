@@ -17,6 +17,11 @@ int main(int argc, char* argv[]) {
     bool                                      useBatteryRth;
     bool                                      useBatteryLandNow;
     bool                                      usePatrol;
+    bool                                      useBoundary;
+    bool                                      useStorm;
+    bool                                      useApproachImpact;
+    bool                                      useOrbit;
+    bool                                      useSearch;
 
     rclcpp::init(argc, argv);
 
@@ -41,11 +46,17 @@ int main(int argc, char* argv[]) {
     useBatteryRth   = (argc > 2) && (std::string(argv[2]) == "--canned-battery-rth");
     useBatteryLandNow = (argc > 2) && (std::string(argv[2]) == "--canned-battery-landnow");
     usePatrol       = (argc > 2) && (std::string(argv[2]) == "--canned-patrol");
+    useBoundary     = (argc > 2) && (std::string(argv[2]) == "--canned-boundary");
+    useStorm        = (argc > 2) && (std::string(argv[2]) == "--canned-storm");
+    useApproachImpact = (argc > 2) && (std::string(argv[2]) == "--canned-approach-impact");
+    useOrbit        = (argc > 2) && (std::string(argv[2]) == "--canned-orbit");
+    useSearch       = (argc > 2) && (std::string(argv[2]) == "--canned-search");
 
     node = std::make_shared<FlightManagementUnitNode>();
     node->start(objective, useCanned, useCross, useSpeed, useApproach, useApproachReal,
                 useRotate, useLandFlare, useTerrainLand, useFlood, useCrossFlood,
-                useBatteryRth, useBatteryLandNow, usePatrol);
+                useBatteryRth, useBatteryLandNow, usePatrol,
+                useBoundary, useStorm, useApproachImpact, useOrbit, useSearch);
 
     /* MUST be built AFTER rclcpp::init — its ctor creates guard conditions   */
     /* from the global context, which is null until init() runs. Cannot be    */

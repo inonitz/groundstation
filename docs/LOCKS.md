@@ -23,15 +23,17 @@ spec edits; the locks below serialize access to it and the other shared FMU file
 ## Locks
 | file | holder | since (UTC) | notes |
 |------|--------|-------------|-------|
-| source/llm_to_action/fmu/fmu_node.hpp | FREE |  | spec-3 COMPLETE + SITL-verified 2026-08-08 (failsafe laws, RTH, override, backpressure, battery tests) |
-| source/llm_to_action/fmu/fmu_node_base.hpp | FREE |  | kApproachStandoffM 2.0->3.0m: margin for target parts protruding past measured point |
-| source/llm_to_action/fmu/llm_base.hpp | FREE | | VLM action schemas (Spec 2: orbit / search / safe_land) |
+| source/llm_to_action/fmu/fmu_node.hpp | FREE |  | spec-2: orbit back to pure odometry circle; SEARCH now parallel-track lawnmower; needs build |
+| source/llm_to_action/fmu/fmu_node_base.hpp | FREE |  | spec-2: reverted orbit drift consts; SEARCH now parallel-track (lane/spacing/maxlanes); needs build |
+| source/llm_to_action/fmu/llm_base.hpp | FREE | | spec-2: search schema now parallel-track (lawnmower) lanes |
 | source/llm_to_action/keyboard/keyboard_node.hpp | FREE | | spec-3 DONE: construct m_rawKeyEvent publisher |
-| docs/ROADMAP.md | FREE | | 6.4 updated; 5.1.6 depth-backstop; 9.12 terrain-AGL; 9.13 off-heading drift |
-| source/llm_to_action/fmu/fmu_node.cpp | FREE |  | spec-3 COMPLETE (canned test flags) + spec-4 rotate/land args |
+| docs/code-guidelines.md | FREE | | spec-1: loop-local hoisting rule added |
+| source/llm_to_action/perception/detection_query.hpp | FREE | | spec-1: nearestDepthM() + maxBboxFillFrac() (pure, unit-testable) |
+| docs/ROADMAP.md | FREE | | spec-1: 1.5/6.1/6.3/6.4 -> [x] SITL-verified; boundary/approach-impact/interrupt-storm matrix rows PASS |
+| source/llm_to_action/fmu/fmu_node.cpp | FREE |  | spec-2: +2 canned flags (orbit/search); needs build |
 | scripts/simenv_llm.sh | DELETED | | superseded by scripts/test/lib/sim_core.sh + scripts/test/*/run.sh (2026-08-07) |
 | source/llm_to_action/generic_backend/generic_backend_types.hpp | FREE | | spec-3 DONE: kBatteryReadingUnknown added |
 | source/llm_to_action/px4_backend/px4_backend_base.hpp | FREE | | spec-3 DONE: battery topic + include |
 | source/llm_to_action/px4_backend/px4_backend.hpp | FREE | | spec-3 DONE: battery sub member + real battery_pct_impl |
 | source/llm_to_action/px4_backend/px4_backend.cpp | FREE | | spec-3 DONE: battery subscription + callback |
-| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | ready() health check live; temporary PERCEPTION_DEBUG logging removed (shipped clean) |
+| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | spec-1: nearestFreeDepthM() central-cone near-depth from the depth map (walls); needs build |

@@ -68,6 +68,86 @@ int main() {
         assert(!tr.found);
     }
 
+    /* nearestDepthM: single detection -> its depth in metres. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 600, 320, 680, 400, 250.0f);
+        assert(close(nearestDepthM(snap), 2.5f));
+    }
+
+    /* nearestDepthM: returns the MINIMUM depth across detections (the nearest obstacle). */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 600, 320, 680, 400, 500.0f);
+        snap.count = 3;
+        std::snprintf(snap.dets[1].label, sizeof(FixedStringType), "%s", "person");
+        snap.dets[1].median_depth_cm = 120.0f;   /* nearest */
+        std::snprintf(snap.dets[2].label, sizeof(FixedStringType), "%s", "dog");
+        snap.dets[2].median_depth_cm = 300.0f;
+        assert(close(nearestDepthM(snap), 1.2f));
+    }
+
+    /* nearestDepthM: a detection with missing depth (<=0) is skipped, not read as zero range. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 600, 320, 680, 400, 0.0f);   /* missing */
+        snap.count = 2;
+        std::snprintf(snap.dets[1].label, sizeof(FixedStringType), "%s", "person");
+        snap.dets[1].median_depth_cm = 400.0f;   /* the only measurable one */
+        assert(close(nearestDepthM(snap), 4.0f));
+    }
+
+    /* nearestDepthM: nothing measurable -> 0.0f ("unknown"), never a false obstacle at zero range. */
+    {
+        PerceptionSnapshot missing = makeSnapshot("car", 600, 320, 680, 400, 0.0f);
+        assert(close(nearestDepthM(missing), 0.0f));         /* only det has no depth */
+
+        PerceptionSnapshot empty = makeSnapshot("car", 600, 320, 680, 400, 250.0f);
+        empty.count = 0;
+        assert(close(nearestDepthM(empty), 0.0f));           /* no detections */
+
+        PerceptionSnapshot invalid = makeSnapshot("car", 600, 320, 680, 400, 250.0f);
+        invalid.valid = false;
+        assert(close(nearestDepthM(invalid), 0.0f));         /* invalid snapshot */
+    }
+
+    /* maxBboxFillFrac: fill = bbox area / frame area (1280x720). 640x720 -> 0.5. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 320, 0, 960, 720, 150.0f);
+        assert(close(maxBboxFillFrac(snap, cam), 0.5f));
+    }
+
+    /* maxBboxFillFrac: a small far box fills little of the frame. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 600, 320, 680, 400, 800.0f);   /* 80x80 */
+        assert(maxBboxFillFrac(snap, cam) < 0.01f);
+    }
+
+    /* maxBboxFillFrac: returns the LARGEST fill across detections (the closest looming object). */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 600, 320, 680, 400, 500.0f);   /* small */
+        snap.count = 2;
+        std::snprintf(snap.dets[1].label, sizeof(FixedStringType), "%s", "car");
+        snap.dets[1].bbox_xmin = 320; snap.dets[1].bbox_ymin = 0;
+        snap.dets[1].bbox_xmax = 960; snap.dets[1].bbox_ymax = 720;   /* 0.5 -- the looming one */
+        snap.dets[1].median_depth_cm = 90.0f;
+        assert(close(maxBboxFillFrac(snap, cam), 0.5f));
+    }
+
+    /* maxBboxFillFrac: degenerate box (xmax<=xmin) is skipped, not counted as negative area. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("car", 900, 400, 800, 300, 100.0f);   /* inverted */
+        assert(close(maxBboxFillFrac(snap, cam), 0.0f));
+    }
+
+    /* maxBboxFillFrac: invalid and empty snapshots -> 0.0f. */
+    {
+        PerceptionSnapshot invalid = makeSnapshot("car", 320, 0, 960, 720, 150.0f);
+        invalid.valid = false;
+        assert(close(maxBboxFillFrac(invalid, cam), 0.0f));
+
+        PerceptionSnapshot empty = makeSnapshot("car", 320, 0, 960, 720, 150.0f);
+        empty.count = 0;
+        assert(close(maxBboxFillFrac(empty, cam), 0.0f));
+    }
+
     std::printf("detection_query_test OK\n");
     return 0;
 }

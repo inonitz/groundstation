@@ -110,6 +110,10 @@ CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
 
 # --- launch tmux ---
 echo "[INFO] Launching tmux session '$SESSION_NAME'..."
+# Large scrollback: a long hover (interrupt-storm) or the override toggle otherwise flushes the
+# early takeoff/interrupt lines out of tmux's default 2000-line history before filter.sh captures.
+tmux start-server 2>/dev/null || true
+tmux set-option -g history-limit 200000 2>/dev/null || true
 tmux new-session  -d -s "$SESSION_NAME" -n "DevEnv" "$CMD_AGENT"
 tmux split-window -h -t "$SESSION_NAME:0" "$CMD_PX4"
 tmux split-window -v -t "$SESSION_NAME:0.0" "$CMD_RX"
