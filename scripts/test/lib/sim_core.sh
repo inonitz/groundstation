@@ -92,6 +92,16 @@ else
     echo "[INFO] SITL battery floor SIM_BAT_MIN_PCT=$PX4_PARAM_SIM_BAT_MIN_PCT (RTH failsafe won't spuriously fire)."
 fi
 
+# --- pre-flight sanity: fail loud in seconds, not after a silent 320s timeout ---
+# (found the hard way: a stale/missing FMU binary makes PX4 arm-wait time out with zero signal
+# about why -- burned real wall-clock across a multi-trial batch before anyone noticed.)
+for req_bin in llm_to_action_gstreamer_rx llm_to_action_fmu_px4; do
+    if [ ! -x "$BUILD_BINARY_DIR/$req_bin" ]; then
+        echo "[FATAL] $BUILD_BINARY_DIR/$req_bin missing or not executable -- build it first, not a SITL bug." >&2
+        exit 1
+    fi
+done
+
 # --- command definitions ---
 CMD_AGENT="MicroXRCEAgent udp4 -p 8888"
 CMD_PX4="\
