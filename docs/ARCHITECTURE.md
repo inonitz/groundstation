@@ -3,8 +3,9 @@
 > **Status:** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
 > (20 Hz control loop, odometry, event-driven VLM, ENU convention, GenericBackend interface, canned test
 > rigs). `NOTES.md` is the running change log. Sections below are annotated where reality has
-> moved past the original plan; the remaining gap is reactive safety (interrupt + emergency boundary, Spec 1), the extra
-> motion verbs (live-YOLO GO / ORBIT / SEARCH / safe-land, Spec 2), and Tello hardware bring-up (§15).
+> moved past the original plan; the remaining gap is Tello hardware bring-up and SLAM-based position (§15). Reactive safety
+> (interrupt + emergency boundary + APPROACH motion-gate, Spec 1) and the ORBIT / SEARCH motion verbs
+> (Spec 2) shipped and are SITL-verified (2026-08-09); live-YOLO GO and safe-land stay deferred.
 >
 > **Scope:** `FlightManagementUnitNode` (`source/llm_to_action/fmu/`) — high-level VLM
 > planner + deterministic 20 Hz control loop, plus an in-process offboard translator (§7).
@@ -121,7 +122,7 @@ cooldown + an `m_planning` single-flight atomic guard, then fires the VLM call o
 
 ### 5.1 Interrupt & Reassessment (deterministic-first)
 
-**⚠ Not implemented (§15 remaining gap).** The steps below describe the designed-but-not-built
+**✓ Implemented (Spec 1, SITL-verified 2026-08-09).** The steps below describe the (now built)
 emergency/interrupt path; none of it exists in `fmu_node.hpp` yet. `TaskState::STOPPED` is
 declared in the enum but never assigned anywhere in the tree -- it is dead code reserved for
 step 2 below, once built.
@@ -231,6 +232,12 @@ vision::YoloDepthEngine { bool ok(); cv::Mat estimate(cv::Mat); };              
 
 ## 10. Emergency Boundary (velocity-scaled)
 
+> **STATUS (realized — Spec 1, SITL-verified 2026-08-09):** the velocity-scaled boundary shipped
+> (37 trips in the `boundary` scenario), plus a free-space depth cone that catches walls with no
+> detection and a bounding-box looming backstop for close objects depth over-reads. The APPROACH
+> motion-gate (6.4) rejects a false "reached" on off-nominal motion (`approach-impact`). Known limit:
+> the monocular cone misses thin obstacles and frame edges.
+
 ```
 d_trigger = d_hard + v·t_react + v²/(2·a_max)
    d_hard ≈ 0.25 m ; t_react ≈ 0.15–0.20 s ; a_max = per-drone var (Tello ≠ PX4)
@@ -291,7 +298,7 @@ time-to-contact / looming threshold until metric depth exists.
 - **Sim integration debt: resolved.** The launch harness is now `scripts/test/*/run.sh` over `scripts/test/lib/sim_core.sh` (one
   folder per feature; `simenv_llm.sh` was removed, its logic folded into `sim_core.sh`). It runs
   the `llm_to_action_*` binaries, an FMU pane, a `llama-server` pane, and camera (`rx_node`)
-  wiring end-to-end (the 2026-08-06 real-hardware Tello flight + the 15-test SITL suite).
+  wiring end-to-end (the 2026-08-06 real-hardware Tello flight + the 20-test SITL suite).
 
 ---
 

@@ -1,0 +1,327 @@
+<title>Groundstation — POC Status</title>
+<style>
+  :root{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18;
+    --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16;
+    --def:#5b6470; --def-bg:#5b647014;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+      --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+      --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+      --ok:#4cc46a; --ok-bg:#4cc46a1c;
+      --wip:#e0a83e; --wip-bg:#e0a83e1c;
+      --gap:#e5675b; --gap-bg:#e5675b1a;
+      --def:#8f9aa6; --def-bg:#8f9aa614;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18; --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16; --def:#5b6470; --def-bg:#5b647014;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+    --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+    --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+    --ok:#4cc46a; --ok-bg:#4cc46a1c; --wip:#e0a83e; --wip-bg:#e0a83e1c;
+    --gap:#e5675b; --gap-bg:#e5675b1a; --def:#8f9aa6; --def-bg:#8f9aa614;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(18px,4vw,44px)}
+  a{color:var(--sig);text-decoration:none;border-bottom:1px solid var(--sig-soft)}
+  h1,h2,h3{text-wrap:balance;margin:0}
+  .mono{font-family:var(--mono)}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* header */
+  .masthead{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;
+    justify-content:space-between;border-bottom:2px solid var(--sig);padding-bottom:18px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--sig);margin-bottom:8px}
+  h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;font-weight:700}
+  .sub{color:var(--muted);font-size:15px;margin-top:6px;max-width:60ch}
+  .stamp{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.9}
+  .stamp b{color:var(--ink);font-weight:600}
+
+  /* metric strip */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:26px 0}
+  .metric{background:var(--surface);padding:16px 18px}
+  .metric .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;
+    display:flex;align-items:baseline;gap:6px}
+  .metric .n small{font-size:13px;color:var(--muted);font-weight:400}
+  .metric .l{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+
+  section{margin-top:40px}
+  .h-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .h-row h2{font-size:19px;letter-spacing:-.01em}
+  .h-row .idx{font-family:var(--mono);font-size:12px;color:var(--sig);
+    border:1px solid var(--sig-soft);border-radius:5px;padding:2px 7px}
+  .h-row .rule{flex:1;height:1px;background:var(--line)}
+  .lede{color:var(--muted);font-size:14.5px;margin:-6px 0 18px;max-width:74ch}
+
+  /* status chip */
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+    font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%}
+  .ok{color:var(--ok);background:var(--ok-bg)} .ok::before{background:var(--ok)}
+  .wip{color:var(--wip);background:var(--wip-bg)} .wip::before{background:var(--wip)}
+  .gap{color:var(--gap);background:var(--gap-bg)} .gap::before{background:var(--gap)}
+  .def{color:var(--def);background:var(--def-bg)} .def::before{background:var(--def)}
+
+  /* split cards */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .panel>.top{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;
+    align-items:center;justify-content:space-between;gap:12px}
+  .panel>.top h3{font-size:16px}
+  .panel .body{padding:16px 20px}
+  .panel .verdict{font-size:13.5px;color:var(--muted);margin:0 0 12px}
+  .lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .lst li{display:grid;grid-template-columns:16px 1fr;gap:9px;font-size:14px;align-items:start}
+  .lst li .m{font-family:var(--mono);font-weight:700;line-height:1.45}
+  .yes .m{color:var(--ok)} .no .m{color:var(--gap)} .part .m{color:var(--wip)}
+  .lst li span{color:var(--ink)} .lst li em{color:var(--muted);font-style:normal}
+
+  /* capability grid */
+  .caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .cap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    border-left:3px solid var(--line)}
+  .cap.s-ok{border-left-color:var(--ok)} .cap.s-wip{border-left-color:var(--wip)}
+  .cap.s-gap{border-left-color:var(--gap)} .cap.s-def{border-left-color:var(--def)}
+  .cap .ch{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .cap h4{margin:0;font-size:14.5px;font-weight:650}
+  .cap p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+
+  /* table */
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);font-weight:600}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:var(--surface-2)}
+  td.t{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap}
+  td.v{color:var(--muted)} td.r{font-family:var(--mono);color:var(--faint);white-space:nowrap}
+
+  /* demo cards */
+  .demos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .demo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:15px 17px;
+    display:flex;flex-direction:column;gap:8px}
+  .demo .dh{display:flex;align-items:baseline;gap:8px}
+  .demo .num{font-family:var(--mono);font-size:12px;color:var(--sig);font-weight:700}
+  .demo h4{margin:0;font-size:14.5px}
+  .demo p{margin:0;font-size:13px;color:var(--muted)}
+  .demo .flow{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:6px;padding:6px 9px;line-height:1.6}
+
+  /* plan timeline */
+  .plan{display:flex;flex-direction:column;gap:0}
+  .step{display:grid;grid-template-columns:132px 1fr;gap:18px;padding:14px 0;border-top:1px solid var(--line)}
+  .step:first-child{border-top:none}
+  @media(max-width:620px){.step{grid-template-columns:1fr;gap:5px}}
+  .step .when{font-family:var(--mono);font-size:12px;color:var(--sig);font-weight:600;padding-top:2px}
+  .step .what h4{margin:0 0 3px;font-size:14.5px}
+  .step .what p{margin:0;font-size:13px;color:var(--muted)}
+
+  /* debt list */
+  .debt{columns:2;column-gap:26px}
+  @media(max-width:640px){.debt{columns:1}}
+  .debt div{break-inside:avoid;font-size:13px;color:var(--muted);padding:5px 0;display:flex;gap:8px}
+  .debt div b{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:12px}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;
+    justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  /* verdict hero */
+  .hero{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);
+    border-radius:12px;padding:22px 24px;margin:24px 0}
+  .hero .q{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+  .hero .a{font-size:clamp(21px,3.4vw,30px);font-weight:750;letter-spacing:-.02em;margin:7px 0 0}
+  .hero .a b{color:var(--ok)} .hero .a i{color:var(--wip);font-style:normal}
+  .hero p{color:var(--muted);font-size:14px;margin:10px 0 0;max-width:82ch}
+  .hero .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+  @media(max-width:720px){.hero .cols{grid-template-columns:1fr}}
+  .hero h5{margin:0 0 8px;font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+  .hero .flies h5{color:var(--ok)} .hero .not h5{color:var(--gap)}
+
+  /* runbook */
+  .runbook{counter-reset:rb}
+  .rb{display:grid;grid-template-columns:30px 1fr 96px;gap:14px;align-items:start;
+    padding:13px 0;border-top:1px solid var(--line)}
+  .rb:first-child{border-top:none}
+  .rb .n{counter-increment:rb;font-family:var(--mono);font-weight:700;color:var(--sig);font-size:14px}
+  .rb .n::before{content:counter(rb)}
+  .rb h4{margin:0 0 2px;font-size:14.5px} .rb h4 .chip{margin-left:8px;vertical-align:middle}
+  .rb p{margin:0;font-size:13px;color:var(--muted)}
+  .rb .t{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;
+    font-variant-numeric:tabular-nums;padding-top:2px}
+
+  /* urgency tiers */
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:780px){.tiers{grid-template-columns:1fr}}
+  .tier{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .tier>h3{margin:0;padding:11px 15px;font-size:12px;font-family:var(--mono);text-transform:uppercase;
+    letter-spacing:.06em;border-bottom:1px solid var(--line)}
+  .tier.u>h3{color:var(--gap);background:var(--gap-bg)}
+  .tier.w>h3{color:var(--wip);background:var(--wip-bg)}
+  .tier.d>h3{color:var(--def);background:var(--def-bg)}
+  .tier ul{list-style:none;margin:0;padding:12px 15px;display:flex;flex-direction:column;gap:9px}
+  .tier li{font-size:13px;color:var(--ink);padding-left:13px;position:relative;line-height:1.4}
+  .tier li::before{content:"–";position:absolute;left:0;color:var(--muted)}
+  .tier li small{color:var(--muted);display:block;font-size:11.5px;margin-top:1px}
+  td.doc{font-family:var(--mono);font-size:12px;color:var(--ink);white-space:nowrap}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Groundstation · feature-llm-driver · full document review</div>
+      <h1>Where we stand &amp; the road to a Tello flight</h1>
+      <p class="sub">Every project document accounted for, sorted by urgency, with an honest read on flying the real drone tomorrow night.</p>
+    </div>
+    <div class="stamp">
+      <div>report&nbsp; <b>2026-08-09</b></div>
+      <div>SITL suite&nbsp; <b>20 / 20</b></div>
+      <div>fly tomorrow&nbsp; <b>yes*</b></div>
+    </div>
+  </header>
+
+  <!-- VERDICT -->
+  <div class="hero">
+    <div class="q">Can we fly the Tello tomorrow night?</div>
+    <div class="a"><b>Yes</b> &mdash; a position-free VLM demo. <i>Not</i> autonomous movement.</div>
+    <p>The Tello reports no X/Y position, so anything that flies <em>to a place</em> needs SLAM, which is not ready. But everything that doesn't need position is proven on hardware already (telemetry, camera, planning, all confirmed live 2026-08-06). Keep focus on the position-free demo and a real flight tomorrow is realistic. Chase autonomous approach and you will spend the day on SLAM and fly nothing.</p>
+    <div class="cols">
+      <div class="flies">
+        <h5>Flies tomorrow (no position needed)</h5>
+        <ul class="lst">
+          <li class="yes"><span class="m">✓</span><span>Takeoff · hover · yaw-scan · altitude · land</span></li>
+          <li class="yes"><span class="m">✓</span><span>Camera stream → Qwen3-VL describes the scene</span></li>
+          <li class="yes"><span class="m">✓</span><span>Battery failsafe · manual override · emergency stop</span></li>
+        </ul>
+      </div>
+      <div class="not">
+        <h5>Does not fly tomorrow (needs SLAM)</h5>
+        <ul class="lst">
+          <li class="no"><span class="m">✕</span><span>APPROACH / ORBIT / SEARCH — drift without X,Y</span></li>
+          <li class="no"><span class="m">✕</span><span>Return-to-start — no metric origin</span></li>
+          <li class="part"><span class="m">~</span><span>Precise <em>rc</em> velocity — needs stick→m/s calibration</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUNBOOK -->
+  <section>
+    <div class="h-row"><span class="idx">01</span><h2>First thing in the morning — Tello runbook</h2><span class="rule"></span></div>
+    <p class="lede">Ordered because each step gates the next. Step 3 is the real gate: if bring-up is clean, the rest is tuning. Times are hands-on, gremlin budget included.</p>
+    <div class="runbook">
+      <div class="rb"><div class="n"></div><div><h4>Land the two commits</h4><p>Feature + governance, separately. Unblocks the FMU and gives you one binary to flash.</p></div><div class="t">~15 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Build the Tello target + write its run config</h4><p>Fix camera resolution to the real Tello (~960×720), not the sim's 1280×720.</p></div><div class="t">~30 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Bring-up smoke test <span class="chip gap">the gate</span></h4><p>WiFi → <b class="mono">command</b> → <b class="mono">streamon</b>. Confirm the 16-field state parses, a camera frame decodes, and the 30 Hz <b class="mono">rc</b> keepalive stops the 15 s auto-land. Watch for UDP bind collisions (SO_REUSEADDR) and the ReceiveResponse timeout.</p></div><div class="t">45–90 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Takeoff · hover · land through the FMU</h4><p>Confirm the drone holds station on the rc stream and lands cleanly. First real closed-loop moment.</p></div><div class="t">~30 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Camera → VLM planning loop</h4><p>Confirm Qwen3-VL receives frames and emits plans off the live feed.</p></div><div class="t">~30 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Demo T1 — yaw-scan &amp; describe</h4><p>Takeoff, sweep with ROTATE, VLM narrates, land on command. Rough rc is fine; no calibration needed.</p></div><div class="t">~60 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Demo T2 — safety stack on hardware</h4><p>Battery failsafe, manual override handoff, emergency stop. Sanity only, but it is the safest thing to show.</p></div><div class="t">~30 min</div></div>
+    </div>
+    <p class="lede" style="margin-top:14px">Total hands-on <b>≈ 4–5.5 hours</b>. A flight by night is realistic if the morning stays on this line. Buffer for WiFi/UDP gremlins, H264 decode hiccups, indoor prop-wash drift, and battery swaps (~10–13 min each — charge several).</p>
+  </section>
+
+  <!-- URGENCY -->
+  <section>
+    <div class="h-row"><span class="idx">02</span><h2>What's urgent, what waits</h2><span class="rule"></span></div>
+    <div class="tiers">
+      <div class="tier u">
+        <h3>Urgent · blocks the Tello</h3>
+        <ul>
+          <li>Commit feature + governance<small>unblocks the FMU</small></li>
+          <li>Tello binary + run config<small>real camera resolution</small></li>
+          <li>Bring-up smoke test<small>telemetry · camera · keepalive</small></li>
+          <li>Read <b class="mono" style="font-size:11px">tello_backend_notes.md</b><small>ports, init, calibration facts</small></li>
+        </ul>
+      </div>
+      <div class="tier w">
+        <h3>This week · the SLAM path</h3>
+        <ul>
+          <li>stella_vslam SITL bring-up<small>Track 2 — the big prize, risky</small></li>
+          <li>Camera calibration<small>Track 1 — operator, ground</small></li>
+          <li>Sandbox + observability<small>see the VLM view + depth map</small></li>
+          <li>Voice interrupt + completion<small>mission termination</small></li>
+          <li>stick→m/s cal · wind correction<small>2.3.1 / 2.3.5</small></li>
+        </ul>
+      </div>
+      <div class="tier d">
+        <h3>Can wait · post-POC</h3>
+        <ul>
+          <li>Runtime config constants (9.14)<small>separate builds fine for now</small></li>
+          <li>Depth backbone swap (4.1.8)<small>slow but works</small></li>
+          <li>AGL landing (9.12) · GO drift (9.13)<small>SITL polish</small></li>
+          <li>fmu_node.hpp refactor<small>~2044 LOC</small></li>
+          <li>Smart RTH · build-yolo refactor<small>scheduled docs</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENT REGISTER -->
+  <section>
+    <div class="h-row"><span class="idx">03</span><h2>Document register — every doc, its status</h2><span class="rule"></span></div>
+    <p class="lede">ROADMAP.md is the master and is current. Three old HTML companions are now superseded by this one. The stale handoff should be dropped.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Document</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td class="doc">ROADMAP.md</td><td class="v">Master objective tree</td><td><span class="chip ok">Current</span></td><td class="v">Re-stage (edited today: 6.4, flare)</td></tr>
+          <tr><td class="doc">NOTES.md</td><td class="v">Architecture decision log</td><td><span class="chip ok">Current</span></td><td class="v">Re-stage (appended today)</td></tr>
+          <tr><td class="doc">tello_backend_notes.md</td><td class="v">Tello SDK / bring-up facts</td><td><span class="chip ok">Load-bearing</span></td><td class="v">Read before hardware</td></tr>
+          <tr><td class="doc">code-guidelines.md</td><td class="v">House rules + git ownership</td><td><span class="chip wip">Edited</span></td><td class="v">Governance commit</td></tr>
+          <tr><td class="doc">LOCKS.md</td><td class="v">Parallel-agent registry</td><td><span class="chip ok">All FREE</span></td><td class="v">Idle; resets on commit</td></tr>
+          <tr><td class="doc">active/…slam-tello-bringup.md</td><td class="v">SLAM + Tello plan</td><td><span class="chip ok">New</span></td><td class="v">Drives the week</td></tr>
+          <tr><td class="doc">active/…spec-1 · spec-2</td><td class="v">Safety · movement reports</td><td><span class="chip ok">Done</span></td><td class="v">In feature commit → move to closed/</td></tr>
+          <tr><td class="doc">active/…poc-tasklist.md</td><td class="v">Near-term work queue</td><td><span class="chip wip">Superseded</span></td><td class="v">ROADMAP is master; historical</td></tr>
+          <tr><td class="doc">active/…manager-session-handoff.md</td><td class="v">Session handoff</td><td><span class="chip gap">Stale</span></td><td class="v">Delete — superseded by this report</td></tr>
+          <tr><td class="doc">active/*.html ×3</td><td class="v">Old visual companions</td><td><span class="chip gap">Superseded</span></td><td class="v">Replace with this report</td></tr>
+          <tr><td class="doc">closed/…spec-3 · spec-4</td><td class="v">Failsafe · ROTATE (shipped)</td><td><span class="chip ok">Done</span></td><td class="v">Reference</td></tr>
+          <tr><td class="doc">scheduled/ ×3</td><td class="v">Deferred subsystems</td><td><span class="chip def">Deferred</span></td><td class="v">Post-POC (9.14 gates multi-config)</td></tr>
+          <tr><td class="doc">specs/ ×3</td><td class="v">Backend · perception · APPROACH design</td><td><span class="chip ok">Implemented</span></td><td class="v">Reference</td></tr>
+          <tr><td class="doc">ARCHITECTURE.md</td><td class="v">System architecture</td><td><span class="chip def">Out of scope</span></td><td class="v">Revisit later</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CAPABILITY -->
+  <section>
+    <div class="h-row"><span class="idx">04</span><h2>Capability &amp; SITL evidence</h2><span class="rule"></span></div>
+    <div class="caps">
+      <div class="cap s-ok"><div class="ch"><h4>Flight core + APPROACH</h4><span class="chip ok">Done</span></div><p>GO, ROTATE, TAKEOFF, LAND, STOP, ORBIT, SEARCH; APPROACH dead-reckon + motion-gate. 20/20 SITL green.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>Safety + VLM planner</h4><span class="chip ok">Done</span></div><p>Interrupt reflex, boundary, storm escalation, battery failsafe, override. Event-driven Qwen3-VL planning.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>Perception</h4><span class="chip wip">Perf miss</span></div><p>Ships and integrated; seg ~1.5–2×, depth ~3.5–4.6× over target on this CPU. Works, just slow.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>Tello backend</h4><span class="chip wip">Partial</span></div><p>Telemetry, camera, odometry live on hardware. Stick calibration + wind correction open.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>SLAM / pose</h4><span class="chip gap">Scaffold</span></div><p>stella_vslam compiles + links, vocab + config present — not brought up. The one gate on Tello autonomy.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Termination · observability</h4><span class="chip gap">Open</span></div><p>No deterministic "done"; can't see the VLM view or depth map. Both in the this-week tier.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>groundstation · full document review · 2026-08-09</span>
+    <span>VLM plans · deterministic math executes</span>
+  </footer>
+
+</div>
