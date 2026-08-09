@@ -5,7 +5,7 @@
 
 class GstReceiverNode : public rclcpp::Node {
 public:
-    GstReceiverNode();
+    explicit GstReceiverNode(bool bUseTelloPipeline = false);
     ~GstReceiverNode() override;
 
 private:

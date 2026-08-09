@@ -7,7 +7,7 @@
 using namespace std::chrono_literals;
 
 
-GstReceiverNode::GstReceiverNode() : Node("gst_receiver_node") {
+GstReceiverNode::GstReceiverNode(bool bUseTelloPipeline) : Node("gst_receiver_node") {
     gst_init(nullptr, nullptr);
 
     m_pubCamFrames = this->create_publisher<UDPCamMsgType>(kOutUDPCameraRawFrameTopic, 10);
@@ -20,9 +20,16 @@ GstReceiverNode::GstReceiverNode() : Node("gst_receiver_node") {
             Disables GStreamer's internal wall-clock pacing. 
             Forces frames to pass through instantly regardless of their timestamp.
     */ 
-    const std::string kRxPipelineStr = 
-        "udpsrc port=" + std::to_string(kUdpHostPortAddress) + " caps=\"application/x-rtp, media=video, clock-rate=90000, encoding-name=H264\" ! "
-        "rtph264depay ! avdec_h264 ! videoconvert ! video/x-raw, format=BGR ! "
+    /* The real Tello sends raw H.264 over UDP with no RTP framing, so it parses NAL
+       units with h264parse and has no rtph264depay stage. Gazebo's simulated camera
+       sends RTP-framed H.264 and must be depayloaded first. Everything from avdec_h264
+       onward is identical, so only the source+depay stage differs between the two. */
+    const std::string kSourceStage = bUseTelloPipeline
+        ? "udpsrc port=" + std::to_string(kUdpHostPortAddress) + " ! h264parse ! "
+        : "udpsrc port=" + std::to_string(kUdpHostPortAddress) + " caps=\"application/x-rtp, media=video, clock-rate=90000, encoding-name=H264\" ! "
+          "rtph264depay ! ";
+    const std::string kRxPipelineStr = kSourceStage +
+        "avdec_h264 ! videoconvert ! video/x-raw, format=BGR ! "
         "appsink name=" + kOutUDPCameraGstSinkName + " max-buffers=1 drop=true sync=false";
 
     m_pipeline = gst_parse_launch(kRxPipelineStr.c_str(), nullptr);
@@ -40,7 +47,8 @@ GstReceiverNode::GstReceiverNode() : Node("gst_receiver_node") {
         std::bind(&GstReceiverNode::PollBusCb, this)
     );
 
-    RCLCPP_INFO(this->get_logger(), "GStreamer Receiver Node Active. Dual-timer polling on port 11111.");
+    RCLCPP_INFO(this->get_logger(), "GStreamer Receiver Node Active (%s pipeline). Dual-timer polling on port 11111.",
+        bUseTelloPipeline ? "Tello raw-H264" : "PX4/Gazebo RTP");
 }
 
 
@@ -182,7 +190,19 @@ void GstReceiverNode::PollBusCb() {
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<GstReceiverNode>();
+
+    /* --tello selects the raw-H.264 pipeline for the real drone; absent = the RTP
+       pipeline for Gazebo SITL, so the default (no-flag) path is unchanged. This is a
+       runtime flag, not a compile-time #if, because gstreamer_rx is one binary shared
+       by both backends -- no FMU_BACKEND_* definitions reach this target. */
+    bool bUseTelloPipeline = false;
+    for (int i = 1; i < argc; ++i) {
+        if (std::string(argv[i]) == "--tello") {
+            bUseTelloPipeline = true;
+        }
+    }
+
+    auto node = std::make_shared<GstReceiverNode>(bUseTelloPipeline);
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
