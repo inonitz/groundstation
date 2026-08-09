@@ -90,7 +90,7 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
    tunables. All first-guess values -- to be swept in SITL (spec §10, §9 R1). */
-constexpr f32 kApproachStandoffM     = 4.00f;   /* stop this far from the target. Bigger than the
+constexpr f32 kApproachStandoffM     = 2.50f;   /* stop this far from the target. Bigger than the
                                                     servo law strictly needs -- real depth readings
                                                     jitter/freeze on this CPU (SITL, real YOLO), so
                                                     this is slack against a misjudged range, not just
@@ -145,10 +145,10 @@ constexpr CameraIntrinsics kApproachCamera = kGzX500GimbalCam;
    is this session's concrete choice for the spec's underspecified "operator kills the
    detection mid-approach" step -- deterministic and scriptable instead of interactive (this
    system has no mid-flight interactive control channel). */
-constexpr f32          kCannedApproachTargetFwdM   = 3.0f;   /* body-forward offset at activation. */
-constexpr f32          kCannedApproachTargetUpM    = -1.0f;  /* relative to activation altitude.   */
+constexpr f32          kCannedApproachTargetFwdM   = 7.0f;   /* body-forward offset at activation; MUST exceed kApproachStandoffM so the drone flies a real approach, and stay reachable within kCannedApproachRigKillAfterMs at the slow braking approach speed. */
+constexpr f32          kCannedApproachTargetUpM    =  0.0f;  /* level with the drone. A below-target point drops out the bottom of the frame as the drone closes, so the synthetic rig (a point, not a car-sized box) loses it just short of the stop and FAILs. Real YOLO approaches keep the box in frame; the canned point must be level. */
 constexpr const char* kCannedApproachTargetLabel  = "canned_target";
-constexpr u32         kCannedApproachRigKillAfterMs = 15 * kMillisecondsInOneSecond;
+constexpr u32         kCannedApproachRigKillAfterMs = 30 * kMillisecondsInOneSecond;  /* was 15s: the braking approach at ~0.28 m/s needs longer to cross several meters before the target is dropped */
 constexpr u64         kCannedApproachRigKillAfterUs =
     static_cast<u64>(kCannedApproachRigKillAfterMs) * 1000ULL;
 

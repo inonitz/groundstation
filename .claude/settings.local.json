@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk read *)",
+      "WebSearch",
+      "Bash(rtk grep *)",
+      "Bash(rtk find *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk log *)",
+      "Bash(python3 -)",
+      "Bash(rtk proxy *)",
+      "Bash(rtk wc *)",
+      "Bash(rtk sed *)",
+      "Read(//root/build_yolo/**)",
+      "Bash(rtk git *)"
+    ],
+    "deny": [
+      "View",
+      "Read",
+      "Grep",
+      "Glob",
+      "Echo"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}

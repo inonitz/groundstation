@@ -149,7 +149,17 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        2.0 -> 3.0 m for margin against target parts protruding past the measured point. This is a
        PARTIAL mitigation only: it reconfirmed the range=1.83 hit on the pre-3.0 build, and the
        motion-sanity-check above is still unimplemented -- "reached" is still declared off a depth
-       frame, so 6.4 stays OPEN.
+       frame, so 6.4 stayed OPEN pending the motion-gate itself -- now landed and verified, see below.
+       Update 2026-08-09: motion-gate IMPLEMENTED + SITL-verified. approachMotionNominal() checks
+       yaw-rate and vertical velocity at the "reached" tick; off-nominal -> APPROACH raises an
+       approach_impact interrupt instead of approach_ok. The approach-impact test forces the gate
+       off-nominal at the standoff and confirms it fires (impact interrupt, no false approach_ok) -- PASS.
+       Standoff is now 2.5 m (operator-tuned, was 3.0). Also this session: a target lost within the hold
+       margin of the dead-reckoned stop now finishes on odometry instead of holding for a re-lock that may
+       never come (a permanent loss used to deadlock into approach_lost_failed); the two canned approach
+       tests run in the `empty` world so a real obstacle can't trip the boundary before the synthetic stop
+       completes. The gate MECHANISM is proven; whether a real collision drives odometry off-nominal enough
+       to catch is the remaining real-world unknown -> 5.1.5.
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
    7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  scaffolding only
@@ -188,7 +198,9 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
         consistent with a hard-ish touchdown. Pre-existing, not caused by
         APPROACH. Fix LANDED 2026-08-07: descent tapers from kLandDescendVelEnu to
         kFlareTouchdownVelEnu below kFlareStartAltEnu (soft touch). SITL-verified 2026-08-07:
-        vLand tapered -0.500 -> -0.139 toward touchdown as altitude dropped, reached STANDBY.
+        vLand tapered -0.500 -> -0.139 toward touchdown as altitude dropped, reached STANDBY. Refined
+        2026-08-09 to a quadratic (t*t) taper -- brakes harder near the ground than the original linear
+        ramp; operator-confirmed a softer touch.
         Regression test: `scripts/test/land-flare/filter.sh` captures all sim panes and asserts
         vLand tapers toward touchdown (not a constant -0.5).
    9.12 Landing altitude is height-above-origin, not AGL          [ ]  2026-08-07 terrain-land

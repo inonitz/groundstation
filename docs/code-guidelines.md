@@ -77,6 +77,12 @@ doesn't budge just because the artifact is code. Practically:
       }
   }
   ```
+- **Hoist loop-body locals to the top of the function.** A variable used inside a loop is
+  declared at the top of the function implementation, not inside the loop body — this
+  codebase already does it (see `controlLoop`'s hoisted local block). The one exception is a
+  `const&` / `auto&` binding that aliases an existing object: it stays in the loop because it
+  aids readability and can't be hoisted without a pointer indirection or a dynamic allocation.
+  Plain scalars/values do not qualify — hoist them.
 
 ## Formatting
 
@@ -166,7 +172,19 @@ else if(
 
 ## Review & commits
 
-All code must be peer-reviewed by a human before it's committed — this includes code
+**No agent runs git. The human owns the entire git workflow -- staging included.** Do not
+`git add`/stage, commit, push, or otherwise change repo or index state. Staging is delegated
+too, not just committing. Read-only git (`status`, `log`, `diff`, `show`) is fine for
+inspection. When a change is ready, suggest the exact git commands for the human to run, with a
+commit message in the house style below. The human reviews the diff, assesses the result, and
+runs every git write. The absence of a "do not commit" is not permission.
+
+**Prefer few, on-point commits over many near-empty ones.** A human has to read this history,
+and a string of tiny or bookkeeping commits is hard to follow. Aggregate related work into one
+condensed commit that states its combined intent, rather than committing every small step
+separately. Condensed but on-point beats a cluttered log.
+
+All code must also be peer-reviewed by a human before it's committed — this includes code
 written by an agent. An agent producing code is not a substitute for that review.
 
 When an agent generates the commit message, write it in the project's house style:
@@ -190,6 +208,24 @@ Good:
 
 Bad (recaps the diff, not the intent):
 `Modified fmu_node.hpp to add batteryFailsafeTick() and returnToOrigin(), changed enqueue to try_enqueue, added constants to fmu_node_base.hpp, edited px4_backend.cpp ...`
+
+## Change-impact analysis
+
+Every plan and every PR must state its blast radius up front, not bury it. A reviewer should not have
+to reverse-engineer what you touched. State, plainly:
+
+- **What existing behavior this changes.** Name it. "Additive only" is a valid answer -- say it.
+- **Whether the change breaks that behavior.** A refactor meant to be behavior-identical must say so;
+  that is a contract, and its test is that the existing tests pass UNCHANGED.
+- **Which tests re-run as-is** (the regression gate) **and which tests get rewritten.** These are
+  different. A test you have to rewrite means the product behavior it pinned down changed -- so call
+  that out loudly. Tests exist to hold functionality in place; quietly editing a test to match new
+  code defeats the point. If a required test rewrite is a surprise, stop and check you did not break
+  something you meant to leave alone.
+- **Which tests are genuinely new** (new behavior needs new coverage).
+
+Keep it concrete and short. A small table (change / behavior touched / breaks it? / test impact) beats
+paragraphs. Do not drown it in jargon.
 
 ## When unsure
 

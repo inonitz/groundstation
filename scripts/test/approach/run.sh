@@ -5,6 +5,6 @@
 cd "$(dirname "$0")" || exit 1
 FMU_OBJECTIVE="Approach the canned target, then land."
 FMU_CANNED_FLAG="--canned-approach"
-WORLD_NAME="default_car"
+WORLD_NAME="empty"
 SPAWN_POSE="0,7,3"
 source ../lib/sim_core.sh

@@ -752,3 +752,20 @@ was written -- cross-check both before trusting one in isolation.
   under standoff first), so the budget acts as the failsafe. The stop is conservative (can end a bit
   far); tightening it needs better depth, not servo logic. Adequate + safe for the POC.
 - Removed the temporary `[PERCEPTION_DEBUG]` stderr logging from perception_runtime.hpp (ship-clean).
+
+
+## 2026-08-09 -- APPROACH close-out (canned tests + lost-target completion)
+
+- **Canned/synthetic APPROACH tests run in the `empty` world, not `default_car`.** The canned rig
+  injects a fully synthetic detection; a real car in the world was still seen by real perception, and
+  its looming backstop (fill > 40%) correctly tripped at ~2.8 m -- before the synthetic dead-reckon
+  stop could complete. A synthetic-detection test must have no real obstacle to fight. `approach` and
+  `approach-impact` now both run `empty`. This is test isolation, not a control change.
+- **APPROACH finishes on dead-reckon when the target is lost inside the hold margin.** The canned rig
+  drops the phantom a fraction of a metre short of the stop (projection artifact at close range). The
+  old code entered a HOLD (zero velocity) and waited for a re-lock; on a permanent loss that deadlocked
+  at rem~0.2 m until the coast window expired -> approach_lost_failed. Fix: once latched and within
+  kApproachCoastHoldMarginM of the dead-reckoned stop, complete on odometry (approach_impact if motion
+  is off-nominal, else approach_ok) instead of holding. Stopping up to the margin short of standoff is
+  safe -- it leaves the drone farther from the target, never closer, and never coasts blind. Touches
+  the spec-1 6.4 APPROACH branch in fmu_node.hpp.

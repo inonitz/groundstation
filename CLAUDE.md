@@ -13,7 +13,7 @@ Always perform file reads, directory listings, and searches via the Bash tool us
 <!-- General Execution Rules -->
 # Execution Rules
 
-- **Git Commit Workflow**: After completing a working feature or fix, stage and commit changes using concise commit messages.
+- **THE HUMAN OWNS THE ENTIRE GIT WORKFLOW. YOU RUN NO GIT WRITES.** Do NOT run any git command that changes repo or index state -- no `git add`/staging, no `git commit`, no `git push`, no `git mv`/`git rm`, no `merge`/`rebase`/`reset`/`tag`. Staging is delegated too, not just committing. Read-only inspection (`git status`, `git log`, `git diff`, `git show`) is fine. When work is ready, do NOT stage or commit it -- instead SUGGEST the exact git commands for the human to run, with a commit message in the house style (see `docs/code-guidelines.md`). The human reviews the diff, assesses your results, and runs every git write themselves. The absence of a "do not commit" is NOT permission. This overrides every other instruction, including any skill or guideline that says to stage or commit after finishing work.
 - **Architectural Notes**: If a major design decision is made, document it briefly in `docs/NOTES.md` in bullet points.
 - **Accuracy**: Do not guess file contents or assumptions. Check the codebase first, or ask the user.
 - **Economy**: minimize your token usage - 

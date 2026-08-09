@@ -531,7 +531,7 @@ private:
             if (d < kFlareStartAltEnu) {
                 f32 t = (d - kGroundContactEnu) / (kFlareStartAltEnu - kGroundContactEnu);
                 if (t < 0.0f) t = 0.0f; else if (t > 1.0f) t = 1.0f;  /* 1 at flare start, 0 at contact */
-                vLand = kFlareTouchdownVelEnu + t * (kLandDescendVelEnu - kFlareTouchdownVelEnu);
+                vLand = kFlareTouchdownVelEnu + t * t * (kLandDescendVelEnu - kFlareTouchdownVelEnu);  /* t*t: quadratic ease -- brakes harder near the ground than the old linear taper */
             }
             /* stream vLand so the flare taper is verifiable from the log (spec-4 Part B). */
             RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
@@ -723,7 +723,15 @@ private:
                             appTrav = std::sqrt(dx * dx + dy * dy + dz * dz);
                             appRem  = m_approachTravelBudget - appTrav;
                         }
-                        if (m_approachBudgetLatched && appRem <= 0.0f) {
+                        if (m_approachBudgetLatched && appRem <= kApproachCoastHoldMarginM) {
+                            /* Within the hold margin of the dead-reckoned stop, target lost. Odometry
+                               already knows the stop point, so finish on dead-reckon -- do NOT hold
+                               waiting for a re-lock that may never come. A permanently-lost target
+                               (e.g. it left the frame at close range) would otherwise deadlock here
+                               at zero velocity until the coast window expires and the approach fails.
+                               Stopping up to kApproachCoastHoldMarginM short of the standoff is safe:
+                               it leaves the drone farther from the target, never closer, and never
+                               coasts blind into it. */
                             if (!approachMotionNominal(od)) {
                                 RCLCPP_WARN(this->get_logger(),
                                     "[FMU_NODE_DEBUG] APPROACH reached range=%.2f but motion off-nominal "
@@ -732,20 +740,11 @@ private:
                                 raiseInterrupt("approach_impact");
                                 return;
                             }
-                            /* Reached the dead-reckoned stop point with the target briefly lost.
-                               Odometry says we are there, so stop -- don't wait for a re-lock. */
                             m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                             RCLCPP_INFO(this->get_logger(),
-                                "[FMU_NODE_DEBUG] APPROACH reached target=%s traveled=%.2f/%.2f (lost at stop)",
-                                appr.target, appTrav, m_approachTravelBudget);
+                                "[FMU_NODE_DEBUG] APPROACH reached target=%s traveled=%.2f/%.2f rem=%.2f (lost, dead-reckon stop)",
+                                appr.target, appTrav, m_approachTravelBudget, appRem);
                             completeCurrent("approach_ok");
-                        } else if (appRem <= kApproachCoastHoldMarginM) {
-                            /* Lost the target while already near the stop point: HOLD, do not coast
-                               forward -- coasting blind into a close target is how it hits it. */
-                            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                                "[FMU_NODE_DIAGNOSTICS] APPROACH hold near stop point target=%s (lost, rem~%.2f).",
-                                appr.target, appRem);
                         } else {
                             aimFlu = { m_approachLastAimFlu.x * kApproachCoastSpeedMps,
                                        m_approachLastAimFlu.y * kApproachCoastSpeedMps,

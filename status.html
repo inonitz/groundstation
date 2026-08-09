@@ -1,0 +1,310 @@
+<title>Groundstation — POC Status</title>
+<style>
+  :root{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18;
+    --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16;
+    --def:#5b6470; --def-bg:#5b647014;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+      --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+      --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+      --ok:#4cc46a; --ok-bg:#4cc46a1c;
+      --wip:#e0a83e; --wip-bg:#e0a83e1c;
+      --gap:#e5675b; --gap-bg:#e5675b1a;
+      --def:#8f9aa6; --def-bg:#8f9aa614;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18; --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16; --def:#5b6470; --def-bg:#5b647014;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+    --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+    --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+    --ok:#4cc46a; --ok-bg:#4cc46a1c; --wip:#e0a83e; --wip-bg:#e0a83e1c;
+    --gap:#e5675b; --gap-bg:#e5675b1a; --def:#8f9aa6; --def-bg:#8f9aa614;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(18px,4vw,44px)}
+  a{color:var(--sig);text-decoration:none;border-bottom:1px solid var(--sig-soft)}
+  h1,h2,h3{text-wrap:balance;margin:0}
+  .mono{font-family:var(--mono)}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* header */
+  .masthead{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;
+    justify-content:space-between;border-bottom:2px solid var(--sig);padding-bottom:18px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--sig);margin-bottom:8px}
+  h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;font-weight:700}
+  .sub{color:var(--muted);font-size:15px;margin-top:6px;max-width:60ch}
+  .stamp{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.9}
+  .stamp b{color:var(--ink);font-weight:600}
+
+  /* metric strip */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:26px 0}
+  .metric{background:var(--surface);padding:16px 18px}
+  .metric .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;
+    display:flex;align-items:baseline;gap:6px}
+  .metric .n small{font-size:13px;color:var(--muted);font-weight:400}
+  .metric .l{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+
+  section{margin-top:40px}
+  .h-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .h-row h2{font-size:19px;letter-spacing:-.01em}
+  .h-row .idx{font-family:var(--mono);font-size:12px;color:var(--sig);
+    border:1px solid var(--sig-soft);border-radius:5px;padding:2px 7px}
+  .h-row .rule{flex:1;height:1px;background:var(--line)}
+  .lede{color:var(--muted);font-size:14.5px;margin:-6px 0 18px;max-width:74ch}
+
+  /* status chip */
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+    font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%}
+  .ok{color:var(--ok);background:var(--ok-bg)} .ok::before{background:var(--ok)}
+  .wip{color:var(--wip);background:var(--wip-bg)} .wip::before{background:var(--wip)}
+  .gap{color:var(--gap);background:var(--gap-bg)} .gap::before{background:var(--gap)}
+  .def{color:var(--def);background:var(--def-bg)} .def::before{background:var(--def)}
+
+  /* split cards */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .panel>.top{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;
+    align-items:center;justify-content:space-between;gap:12px}
+  .panel>.top h3{font-size:16px}
+  .panel .body{padding:16px 20px}
+  .panel .verdict{font-size:13.5px;color:var(--muted);margin:0 0 12px}
+  .lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .lst li{display:grid;grid-template-columns:16px 1fr;gap:9px;font-size:14px;align-items:start}
+  .lst li .m{font-family:var(--mono);font-weight:700;line-height:1.45}
+  .yes .m{color:var(--ok)} .no .m{color:var(--gap)} .part .m{color:var(--wip)}
+  .lst li span{color:var(--ink)} .lst li em{color:var(--muted);font-style:normal}
+
+  /* capability grid */
+  .caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .cap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    border-left:3px solid var(--line)}
+  .cap.s-ok{border-left-color:var(--ok)} .cap.s-wip{border-left-color:var(--wip)}
+  .cap.s-gap{border-left-color:var(--gap)} .cap.s-def{border-left-color:var(--def)}
+  .cap .ch{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .cap h4{margin:0;font-size:14.5px;font-weight:650}
+  .cap p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+
+  /* table */
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);font-weight:600}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:var(--surface-2)}
+  td.t{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap}
+  td.v{color:var(--muted)} td.r{font-family:var(--mono);color:var(--faint);white-space:nowrap}
+
+  /* demo cards */
+  .demos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .demo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:15px 17px;
+    display:flex;flex-direction:column;gap:8px}
+  .demo .dh{display:flex;align-items:baseline;gap:8px}
+  .demo .num{font-family:var(--mono);font-size:12px;color:var(--sig);font-weight:700}
+  .demo h4{margin:0;font-size:14.5px}
+  .demo p{margin:0;font-size:13px;color:var(--muted)}
+  .demo .flow{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:6px;padding:6px 9px;line-height:1.6}
+
+  /* plan timeline */
+  .plan{display:flex;flex-direction:column;gap:0}
+  .step{display:grid;grid-template-columns:132px 1fr;gap:18px;padding:14px 0;border-top:1px solid var(--line)}
+  .step:first-child{border-top:none}
+  @media(max-width:620px){.step{grid-template-columns:1fr;gap:5px}}
+  .step .when{font-family:var(--mono);font-size:12px;color:var(--sig);font-weight:600;padding-top:2px}
+  .step .what h4{margin:0 0 3px;font-size:14.5px}
+  .step .what p{margin:0;font-size:13px;color:var(--muted)}
+
+  /* debt list */
+  .debt{columns:2;column-gap:26px}
+  @media(max-width:640px){.debt{columns:1}}
+  .debt div{break-inside:avoid;font-size:13px;color:var(--muted);padding:5px 0;display:flex;gap:8px}
+  .debt div b{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:12px}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;
+    justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Groundstation · feature-llm-driver</div>
+      <h1>Off-board VLM drone — POC status</h1>
+      <p class="sub">VLM plans, deterministic math executes. SITL is demonstrable end-to-end. Real-Tello autonomy is gated on one unproven thing: position.</p>
+    </div>
+    <div class="stamp">
+      <div>report&nbsp; <b>2026-08-09</b></div>
+      <div>SITL suite&nbsp; <b>20 / 20</b></div>
+      <div>deadline&nbsp; <b>window closed</b></div>
+    </div>
+  </header>
+
+  <div class="metrics">
+    <div class="metric"><div class="n tnum">20<small>/20</small></div><div class="l">SITL tests green</div></div>
+    <div class="metric"><div class="n tnum">2<small> commits</small></div><div class="l">staged: feature + governance</div></div>
+    <div class="metric"><div class="n tnum" style="color:var(--wip)">3.5×</div><div class="l">depth over perf target</div></div>
+    <div class="metric"><div class="n tnum" style="color:var(--gap)">0</div><div class="l">Tello X / Y position</div></div>
+    <div class="metric"><div class="n tnum" style="color:var(--sig)">SLAM</div><div class="l">the dominant unknown</div></div>
+  </div>
+
+  <!-- THE VERDICT -->
+  <section>
+    <div class="h-row"><span class="idx">01</span><h2>The verdict — two solutions, very different footing</h2><span class="rule"></span></div>
+    <p class="lede">Everything the drone does was proven inside isolated tests, never yet as one live system. SITL can fly the full stack today. The Tello can sense and think, but cannot reliably move to a place until SLAM gives it a position.</p>
+    <div class="split">
+      <div class="panel">
+        <div class="top"><h3>SITL (PX4 · Gazebo)</h3><span class="chip ok">Showcase-ready</span></div>
+        <div class="body">
+          <p class="verdict">Position comes free from PX4 EKF2, so every motion law works. This is the reliable demo.</p>
+          <ul class="lst">
+            <li class="yes"><span class="m">✓</span><span>GO · ROTATE · APPROACH · ORBIT · SEARCH all fly <em>— odometry-accurate</em></span></li>
+            <li class="yes"><span class="m">✓</span><span>Safety reflex, boundary, battery failsafe, manual override</span></li>
+            <li class="yes"><span class="m">✓</span><span>Real Qwen3-VL planning from live YOLO-seg + depth</span></li>
+            <li class="part"><span class="m">~</span><span>Never run as a <em>full system</em> — only per-feature test rigs</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="top"><h3>DJI Tello (real hardware)</h3><span class="chip wip">Gated on SLAM</span></div>
+        <div class="body">
+          <p class="verdict">Telemetry, camera, and planning are live on the drone. Horizontal position is not — the SDK reports none.</p>
+          <ul class="lst">
+            <li class="yes"><span class="m">✓</span><span>Takeoff · hover · yaw · altitude · land · camera stream</span></li>
+            <li class="yes"><span class="m">✓</span><span>Battery failsafe, manual override, VLM planning off the feed</span></li>
+            <li class="no"><span class="m">✕</span><span>GO / APPROACH / ORBIT / SEARCH <em>— drift without X,Y</em></span></li>
+            <li class="no"><span class="m">✕</span><span>Return-to-start — needs a metric origin it doesn't have</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITY MATRIX -->
+  <section>
+    <div class="h-row"><span class="idx">02</span><h2>Capability matrix</h2><span class="rule"></span></div>
+    <div class="caps">
+      <div class="cap s-ok"><div class="ch"><h4>Flight core</h4><span class="chip ok">Done</span></div><p>20 Hz loop; GO, ROTATE, TAKEOFF, LAND, STOP, ORBIT, SEARCH. SPSC queue + backpressure.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>APPROACH</h4><span class="chip ok">Done</span></div><p>Dead-reckon travel budget, motion-gate impact reject, standoff 2.5 m, dead-reckon finish on target loss.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>Safety / failsafe</h4><span class="chip ok">Done</span></div><p>Interrupt reflex, velocity-scaled + free-space boundary, storm escalation, battery RTH/land, override.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>VLM planner</h4><span class="chip ok">Done</span></div><p>Event-driven wake, async off the control thread, tolerant plan extraction, dynamic state+history prompt.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>Perception</h4><span class="chip wip">Perf miss</span></div><p>Vision lib + FMU two-rate integration ship. Seg ~1.5–2×, depth ~3.5–4.6× over target on this CPU.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>Backends</h4><span class="chip wip">Tello partial</span></div><p>GenericBackend + PX4 done. Tello telemetry/camera live; stick-to-m/s cal + wind correction open.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>SLAM / pose</h4><span class="chip gap">Scaffold</span></div><p>Monocular stella_vslam compiles &amp; links, vocab + config present, pose code written — not brought up.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Objective termination</h4><span class="chip gap">Design only</span></div><p>No deterministic "done" detector. Layered plan: reassess verdict + human voice + battery floor.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Observability</h4><span class="chip gap">Missing</span></div><p>No way to see the VLM's input frame or the depth map. Debugging is log-archaeology today.</p></div>
+      <div class="cap s-def"><div class="ch"><h4>Runtime config</h4><span class="chip def">Deferred</span></div><p>Tuning constants are compile-time constexpr; one binary can't serve SITL and Tello without a rebuild (9.14).</p></div>
+    </div>
+  </section>
+
+  <!-- TEST SUITE -->
+  <section>
+    <div class="h-row"><span class="idx">03</span><h2>SITL test suite — 20 scenarios green</h2><span class="rule"></span></div>
+    <p class="lede">Each is a canned-plan rig with a filter that asserts pass from the captured log. This is the evidence the feature commit rests on.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Scenario</th><th>Proves</th><th>Roadmap</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="t">forward · cross · speed</td><td class="v">GO framing + speed clamp</td><td class="r">1.1.1</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">rotate-land</td><td class="v">ROTATE granularity 90cw + 200ccw</td><td class="r">1.1.2</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">land-flare</td><td class="v">quadratic taper, soft touchdown</td><td class="r">9.11</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">approach</td><td class="v">dead-reckon stop on synthetic target</td><td class="r">5.1</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">approach-real</td><td class="v">APPROACH on real ONNX seg+depth</td><td class="r">5.1.5</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">approach-impact</td><td class="v">motion-gate rejects false "reached"</td><td class="r">6.4</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">boundary</td><td class="v">emergency boundary trips + interrupts</td><td class="r">6.1</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">interrupt-storm</td><td class="v">escalation prompt after N trips</td><td class="r">6.3</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">orbit · search</td><td class="v">odometry circle · lawnmower + conf floor</td><td class="r">1.1.6/7</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">battery ×3 · override</td><td class="v">RTH / land-in-place / reversible takeover</td><td class="r">6.2</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">flood · flood-airborne</td><td class="v">queue stays bounded under storm</td><td class="r">1.4</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">vlm</td><td class="v">full Qwen3-VL flight, no canned plan</td><td class="r">3 / 5.1</td><td><span class="chip ok">Pass</span></td></tr>
+          <tr><td class="t">terrain-land</td><td class="v">exposes AGL gap (diagnostic)</td><td class="r">9.12</td><td><span class="chip wip">By design</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DEMO READINESS -->
+  <section>
+    <div class="h-row"><span class="idx">04</span><h2>Showcase demos — the fallback plan</h2><span class="rule"></span></div>
+    <p class="lede">If either platform breaks at showcase time, the other still shows something whole. SITL carries the ambitious story; the Tello set is deliberately position-free so it survives a SLAM failure.</p>
+
+    <h3 style="font-size:14px;font-family:var(--mono);color:var(--sig);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">SITL — full system, VLM-driven</h3>
+    <div class="demos">
+      <div class="demo"><div class="dh"><span class="num">S1</span><h4>Find &amp; inspect</h4></div><p>Objective: "find the car and circle it." The whole autonomy loop in one run.</p><div class="flow">SEARCH → detect → APPROACH → ORBIT → land</div><span class="chip ok">Ready after commit</span></div>
+      <div class="demo"><div class="dh"><span class="num">S2</span><h4>Hazard reroute</h4></div><p>Approach a target with a wall or person in the path. Safety takes over, then the VLM rethinks.</p><div class="flow">APPROACH → boundary interrupt → reassess</div><span class="chip ok">Ready after commit</span></div>
+      <div class="demo"><div class="dh"><span class="num">S3</span><h4>Voice stand-down</h4></div><p>Drone patrols; operator says "done, land"; it stands down on command.</p><div class="flow">SEARCH → [USER] "land" → land</div><span class="chip wip">Needs Phase-2 voice</span></div>
+    </div>
+
+    <h3 style="font-size:14px;font-family:var(--mono);color:var(--sig);letter-spacing:.04em;text-transform:uppercase;margin:22px 0 12px">Tello — hardware, position-free = robust</h3>
+    <div class="demos">
+      <div class="demo"><div class="dh"><span class="num">T1</span><h4>Yaw-scan &amp; describe</h4></div><p>Take off, hover, ROTATE to sweep the room, VLM narrates what it sees, land on command. No position needed.</p><div class="flow">TAKEOFF → ROTATE-scan → VLM describe → land</div><span class="chip ok">Robust fallback</span></div>
+      <div class="demo"><div class="dh"><span class="num">T2</span><h4>Safety stack live</h4></div><p>Voice commands, battery failsafe, manual override — the human-in-loop safety story on real hardware.</p><div class="flow">voice cmd → failsafe → override handoff</div><span class="chip ok">Robust fallback</span></div>
+      <div class="demo"><div class="dh"><span class="num">T3</span><h4>SLAM approach</h4></div><p>With slam/pose wired in, a short real APPROACH toward a target. The ambitious one.</p><div class="flow">SLAM pose → APPROACH → hold standoff</div><span class="chip gap">Stretch · gated</span></div>
+    </div>
+  </section>
+
+  <!-- TOOLING GAPS -->
+  <section>
+    <div class="h-row"><span class="idx">05</span><h2>Validation &amp; tooling — what's still blind</h2><span class="rule"></span></div>
+    <div class="caps">
+      <div class="cap s-gap"><div class="ch"><h4>No live sandbox</h4><span class="chip gap">Build it</span></div><p><b class="mono">scripts/sandbox/run.sh &lt;world&gt; &lt;objective&gt;</b> — launch the real binaries with no canned plan, drive the VLM live, hit manual interrupts, record a bag for reproducible edge cases.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Human-debuggee gap</h4><span class="chip gap">Observability</span></div><p>Publish the annotated camera frame + a depth colormap to a topic, view in Foxglove/rviz, and log the VLM prompt+response each cycle. Today you fly blind to what the model sees.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>tmux capture fragility</h4><span class="chip wip">Quick fix</span></div><p>Tests scrape tmux scrollback, which drops events under load. Tee FMU stdout to a file so nothing is lost — stops the "false FAIL" reruns.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Objective termination</h4><span class="chip gap">Design only</span></div><p>Layered: a completion verdict in every reassess, a spoken "done, land" backstop, and the battery floor. Prompt work first, then the voice wire.</p></div>
+    </div>
+  </section>
+
+  <!-- NEXT 48H -->
+  <section>
+    <div class="h-row"><span class="idx">06</span><h2>The path from here</h2><span class="rule"></span></div>
+    <div class="plan">
+      <div class="step"><div class="when">NOW</div><div class="what"><h4>Land the two commits</h4><p>Feature (spec-1 + spec-2 + this session's fixes) and governance, separately. Unlocks the FMU.</p></div></div>
+      <div class="step"><div class="when">PARALLEL</div><div class="what"><h4>Track 1 ∥ Track 2</h4><p>Operator calibrates the Tello camera on the ground. Overseer brings stella_vslam up in SITL and confirms <b class="mono">slam/pose</b> tracks. Neither touches the FMU.</p></div></div>
+      <div class="step"><div class="when">PHASE 2</div><div class="what"><h4>Wire pose · voice · termination</h4><p>Feed slam/pose into the FMU as Tello position + return-to-start. Route ASR to an interrupt with a [USER] prompt block. Add the completion verdict.</p></div></div>
+      <div class="step"><div class="when">PHASE 2b</div><div class="what"><h4>Build the sandbox + observability</h4><p>Live full-system launch, depth/VLM-view viewer, log-to-file capture. This is what makes the SITL demos and every future debug session tractable.</p></div></div>
+      <div class="step"><div class="when">PHASE 3</div><div class="what"><h4>Hardware, next Tello window</h4><p>Calibrated config on the real drone, stella tuned, 10–15 min flights, people clear. Fall back to the position-free demos if tracking is shaky.</p></div></div>
+    </div>
+  </section>
+
+  <!-- DEBT -->
+  <section>
+    <div class="h-row"><span class="idx">07</span><h2>Debt carried forward</h2><span class="rule"></span></div>
+    <div class="debt">
+      <div><b>fmu_node.hpp</b> ~2044 LOC, every law inline in controlLoop() — extract per law post-POC.</div>
+      <div><b>9.12 AGL</b> landing keys on height-above-origin, not ground; flare mis-triggers on slopes.</div>
+      <div><b>9.13 GO drift</b> forward travel tracks 10–30° off the commanded heading in SITL.</div>
+      <div><b>4.1.8 depth</b> both seg and depth miss the perf target; backbone swap is its own research.</div>
+      <div><b>5.1.6</b> APPROACH stop is still depth-governed in practice; make the travel budget primary once depth improves.</div>
+      <div><b>GPU/depth</b> shelved — no easy hardware-agnostic path beside the Vulkan VLM.</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>groundstation · POC status · generated 2026-08-09</span>
+    <span>VLM plans · deterministic math executes</span>
+  </footer>
+
+</div>
