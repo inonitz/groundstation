@@ -195,6 +195,14 @@ odometry abstraction.** FMU stores X/Y/Z + yaw in `std::atomic`, `SensorDataQoS`
 - **Future:** pinhole camera model → local-3D target points; later local→global via tf2 from
   SLAM (OctoMap/A*). Deferred post-POC. No TF2 now.
 
+**stella_vslam considerations (2026-08-09):** picked over ORB-SLAM3 for being the actively
+maintained fork (ORB-SLAM3 upstream has seen little activity in years). First live SITL pass
+failed intermittently; root cause was our own build compiling its feature extractor
+single-threaded (an upstream `USE_OPENMP` flag defaulting off, never enabled on our side), not a
+stella_vslam ceiling. Fixed and re-verified across repeated SITL trials — full numbers and
+methodology in `docs/NOTES.md` ("B1 stella_vslam live SITL verification + OpenMP fix"). Not yet
+verified with the VLM running concurrently or against real (non-SITL) camera footage.
+
 ---
 
 ## 9. Perception Ingestion (vision engine interface)

@@ -5,7 +5,6 @@ build/
 venv
 */venv
 
-
 # Makefiles
 Makefile
 
@@ -32,3 +31,8 @@ Makefile
 
 # misc
 imgui.ini
+
+
+# Log files
+*.log
+*/slam_check.log
