@@ -15,7 +15,7 @@
 # 1. CONTROL PANEL (Modify paths and configurations here)
 # ==============================================================================
 SESSION_NAME="devenv"
-BUILD_DIRECTORY="/root/groundstation/build/release/shared"
+BUILD_DIRECTORY="/root/groundstation/build/release/shared/px4"
 BUILD_BINARY_DIR="$BUILD_DIRECTORY/bin"
 PX4_DIRECTORY="/root/PX4-Autopilot"
 ASR_MODEL_PATH="/root/models/asr/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-q4_k.bin"

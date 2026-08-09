@@ -29,7 +29,6 @@ function(define_ros2_node EXE_NAME FILE_SOURCES)
       UTIL2::util2
       cxxopts::cxxopts
       rclcpp::rclcpp
-      px4_msgs::px4_msgs__rosidl_typesupport_cpp
       geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
    )
 
@@ -71,14 +70,24 @@ target_include_directories(util_base_header INTERFACE
 # Nodes -- each lives in its own folder with its own CMakeLists.txt. Backends
 # come before the FMU so its Drone::tello_backend link target exists.
 # ---------------------------------------------------------------------------
-add_subdirectory(px4_backend)
-add_subdirectory(tello_backend)
-add_subdirectory(gstreamer_gz_udp_tx)
+# Exactly one backend is selected (top-level FATAL_ERROR guard enforces it), so
+# build only that backend's library. gstreamer_gz_udp_tx (the Gazebo camera plugin,
+# which pulls gz-sim8/gz-plugin2) and offboard_ctrl (the PX4 offboard publisher) are
+# PX4/SITL-only -- a Tello build skips them and thus never pulls gz-sim8 or px4_msgs.
+if(GROUNDSTATION_BUILD_BACKEND_PX4 OR GROUNDSTATION_BUILD_BACKEND_ALL)
+    add_subdirectory(px4_backend)
+    add_subdirectory(gstreamer_gz_udp_tx)
+endif()
+if(GROUNDSTATION_BUILD_BACKEND_TELLO OR GROUNDSTATION_BUILD_BACKEND_ALL)
+    add_subdirectory(tello_backend)
+endif()
 
 add_subdirectory(fmu)
 add_subdirectory(keyboard)
 add_subdirectory(asr)
-add_subdirectory(offboard_ctrl)
+if(GROUNDSTATION_BUILD_BACKEND_PX4 OR GROUNDSTATION_BUILD_BACKEND_ALL)
+    add_subdirectory(offboard_ctrl)
+endif()
 add_subdirectory(gstreamer_udp_cam_rx)
 # There shouldn't be a need for a tello udp transmitter since the tello already sends the Packets
 # add_subdirectory(gstreamer_tello_udp_tx)

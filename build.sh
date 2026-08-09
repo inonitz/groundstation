@@ -12,7 +12,6 @@ CMAKE_ARGLIST="\
     -DGROUNDSTATION_BUILD_EXECUTABLE=ON \
     -DGROUNDSTATION_BUILD_TESTS=OFF \
     -DGROUNDSTATION_BUILD_BENCHMARKS=OFF \
-    -DGROUNDSTATION_BUILD_BACKEND_PX4=ON \
     \
 
     "
@@ -29,26 +28,27 @@ BUILD_BINARIES_FLAG="false"
 
 if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
     cat << EOF
-Usage: $0 <build_type> <library_type> <action>
+Usage: $0 <build_type> <library_type> <backend> <action>
 
 Arguments:
   build_type   - Type of build: debug, release, release_dbginfo, debug_perf, release_perf
   library_type - Type of library: shared (.dll/.so), static (.lib/.a)
+  backend      - FMU flight backend: px4, tello, all
   action       - Action to take: cleanbuild, configure, build
 
 Options:
   help         - Display this help message
 
 Examples:
-  $0 debug   static build
-  $0 release shared build
+  $0 debug   static px4   build
+  $0 release shared tello build
 EOF
     exit 0
 fi
 
 
-if [[ $# -ne 3 ]]; then
-    echo "3 Arguments required to run the script"
+if [[ $# -ne 4 ]]; then
+    echo "4 Arguments required to run the script"
     exit 1
 fi
 
@@ -84,18 +84,32 @@ else
     exit 1
 fi
 
-if [[ "$3" == "cleanbuild" ]]; then
+if [[ "$3" == "px4" ]]; then
+    CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_PX4=ON"
+    CMAKE_INTRMD_BUILD_DIR+="px4/"
+elif [[ "$3" == "tello" ]]; then
+    CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_TELLO=ON"
+    CMAKE_INTRMD_BUILD_DIR+="tello/"
+elif [[ "$3" == "all" ]]; then
+    CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_ALL=ON"
+    CMAKE_INTRMD_BUILD_DIR+="all/"
+else
+    printf "Unknown Argument %s - valid values are: px4, tello, all\nExiting...\n" "$3"
+    exit 1
+fi
+
+if [[ "$4" == "cleanbuild" ]]; then
     CLEAN_CURRENT_ROOT_BUILD_DIR="true"
 
-elif [[ "$3" == "configure" ]]; then
+elif [[ "$4" == "configure" ]]; then
     CONFIGURE_CMAKE_FLAG="true"
     CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON"
 
-elif [[ "$3" == "build" ]]; then
+elif [[ "$4" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"
 
 else
-    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build\nExiting...\n" "$3"
+    printf "Unknown Argument %s - valid values are: cleanbuild, configure, build\nExiting...\n" "$4"
     exit 1
 fi
 
@@ -106,7 +120,7 @@ echo "Out-of-source Target Build Directory is '$CMAKE_FINAL_BUILD_DIR' "
 echo "Cmake Arguments passed are ==> { "
 echo "$CMAKE_ARGLIST"
 echo "}"
-echo "Script arguments are '$1' '$2' '$3' "
+echo "Script arguments are '$1' '$2' '$3' '$4' "
 
 mkdir -p build
 
@@ -122,7 +136,7 @@ fi
 
 if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    cp "compile_commands.json" "../../compile_commands.json"
+    cp "compile_commands.json" "../../../compile_commands.json"
     echo "CURRENT WORKING DIRECTORY IS $PWD"
     
     # Safely fallback to 1 core if nproc fails or is missing

@@ -181,7 +181,12 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    9.3 ARCHITECTURE.md refreshed to reality                      [x]
    9.4 rename backend atomics m_posN/E/D (hold ENU now)          [DEFER]  cosmetic
    9.5 remove dead option GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE [ ]
-   9.6 reconcile build.sh vs build.ps1 backend/test divergence   [ ]
+   9.6 reconcile build.sh vs build.ps1 backend/test divergence   [x]
+       build.sh now takes a 4th arg <backend> (px4|tello|all), builds only the
+       selected backend into build/<cfg>/<lib>/<backend>/, and gates px4_backend/
+       offboard_ctrl/gstreamer_gz_udp_tx (+ px4_msgs, gz-sim8) out of a tello build.
+       build.ps1 now mirrors build.sh: same 4th <backend> arg, same nested
+       build/<cfg>/<lib>/<backend>/ output. Backend/test parity restored.
    9.7 reconcile takeoff climb height (2 m node vs FMU)          [ ]  maybe moot post-ENU
    9.8 investigate ~20 s first-odometry handshake latency        [ ]  low priority
    9.9 reduce ~15 s first-frame latency (QoS/DDS/keyframe)       [ ]  low priority

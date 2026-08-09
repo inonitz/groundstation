@@ -22,25 +22,18 @@ bring-up plus a real mission will burn through more than one.
 
 ## Build
 
-`build.sh` cannot build the Tello backend today (it hardcodes the PX4 backend; tracked as
-ROADMAP 9.6). Build a separate Tello tree by hand:
+`build.sh` takes the backend as its third argument, so a Tello-only tree is one command.
+It builds only the Tello backend: no PX4 backend, no Gazebo camera plugin, no px4_msgs, no
+gz-sim8.
 
 ```bash
 cd /root/groundstation
-mkdir -p build/release/tello
-cmake -S . -B build/release/tello -G Ninja \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-    -DGROUNDSTATION_BUILD_EXECUTABLE=ON \
-    -DGROUNDSTATION_BUILD_TESTS=OFF \
-    -DGROUNDSTATION_BUILD_BENCHMARKS=OFF \
-    -DGROUNDSTATION_BUILD_BACKEND_TELLO=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_SHARED_LIBS=1 \
-    -DGIT_SUBMODULE=ON
-cmake --build build/release/tello --target all -j"$(nproc)"
+./build.sh release shared tello configure
+./build.sh release shared tello build
 ```
 
-This produces `build/release/tello/bin/llm_to_action_fmu_tello`, plus the shared
+Output lands in `build/release/shared/tello/`. This produces
+`build/release/shared/tello/bin/llm_to_action_fmu_tello`, plus the shared
 `llm_to_action_gstreamer_rx` and `llm_to_action_keyboard_hook`. `run.sh` refuses to start
 if any of the three are missing.
 

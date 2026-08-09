@@ -8,6 +8,10 @@ param(
     [string]$LinkType,
 
     [Parameter(Mandatory=$true, ParameterSetName="Build")]
+    [ValidateSet("px4", "tello", "all")]
+    [string]$Backend,
+
+    [Parameter(Mandatory=$true, ParameterSetName="Build")]
     [ValidateSet("cleanbuild", "configure", "build")]
     [string]$Action,
 
@@ -18,12 +22,13 @@ param(
 
 
 function Show-CustomHelp {
-    Write-Host "Usage: .\build.ps1 -BuildType <type> -LinkType <link> -Action <action>" -ForegroundColor Cyan
+    Write-Host "Usage: .\build.ps1 -BuildType <type> -LinkType <link> -Backend <backend> -Action <action>" -ForegroundColor Cyan
     Write-Host "Usage: .\build.ps1 -Help" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "Arguments:"
     Write-Host "  -BuildType : debug, release, release_dbginfo, debug_perf, release_perf"
     Write-Host "  -LinkType  : shared, static"
+    Write-Host "  -Backend   : px4, tello, all"
     Write-Host "  -Action    : cleanbuild, configure, build"
 }
 
@@ -37,8 +42,7 @@ $CMAKE_ARGLIST = @(
     "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
     "-DGROUNDSTATION_BUILD_EXECUTABLE=ON",
     "-DGROUNDSTATION_BUILD_TESTS=OFF",
-    "-DGROUNDSTATION_BUILD_BENCHMARKS=OFF",
-    "-DGROUNDSTATION_BUILD_BACKEND_PX4=ON"
+    "-DGROUNDSTATION_BUILD_BENCHMARKS=OFF"
 )
 
 switch ($BuildType) {
@@ -54,11 +58,17 @@ switch ($LinkType) {
     "static" { $CMAKE_ARGLIST += "-DBUILD_SHARED_LIBS=0" }
 }
 
-$CMAKE_FINAL_BUILD_DIR = Join-Path $CMAKE_ROOT_BUILD_DIR (Join-Path $BuildType $LinkType)
+switch ($Backend) {
+    "px4"   { $CMAKE_ARGLIST += "-DGROUNDSTATION_BUILD_BACKEND_PX4=ON" }
+    "tello" { $CMAKE_ARGLIST += "-DGROUNDSTATION_BUILD_BACKEND_TELLO=ON" }
+    "all"   { $CMAKE_ARGLIST += "-DGROUNDSTATION_BUILD_BACKEND_ALL=ON" }
+}
+
+$CMAKE_FINAL_BUILD_DIR = Join-Path $CMAKE_ROOT_BUILD_DIR (Join-Path $BuildType (Join-Path $LinkType $Backend))
 
 Write-Host "Out-of-source Root   Build Directory: '$CMAKE_ROOT_BUILD_DIR'"  -ForegroundColor Blue
 Write-Host "Out-of-source Target Build Directory: '$CMAKE_FINAL_BUILD_DIR'" -ForegroundColor Blue
-Write-Host "Arguments: $BuildType $LinkType $Action"
+Write-Host "Arguments: $BuildType $LinkType $Backend $Action"
 
 New-Item -ItemType Directory -Path $CMAKE_ROOT_BUILD_DIR -Force | Out-Null
 
@@ -74,7 +84,7 @@ if ($Action -eq "configure") {
 
 if ($Action -eq "build") {
     Push-Location $CMAKE_FINAL_BUILD_DIR
-    if (Test-Path "compile_commands.json") { Copy-Item "compile_commands.json" "../../compile_commands.json" -Force }
+    if (Test-Path "compile_commands.json") { Copy-Item "compile_commands.json" "../../../compile_commands.json" -Force }
     $cores = [int]$env:NUMBER_OF_PROCESSORS
     $jobs  = if ($cores -gt 2) { $cores - 2 } else { 1 }
     cmake --build . --target $PROJECT_NAME -- -j$jobs

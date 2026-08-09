@@ -72,7 +72,11 @@ find_package(geometry_msgs   REQUIRED)
 find_package(sensor_msgs     REQUIRED)
 find_package(nav_msgs        REQUIRED)
 find_package(cv_bridge       REQUIRED)
-find_package(px4_msgs        REQUIRED)
+# px4_msgs is only needed by the PX4 backend + offboard node; it ships in a
+# separate px4_ws overlay, not base ROS. A Tello-only build skips it entirely.
+if(GROUNDSTATION_BUILD_BACKEND_PX4 OR GROUNDSTATION_BUILD_BACKEND_ALL)
+    find_package(px4_msgs    REQUIRED)
+endif()
 # Required Dependency for OpenVINS
 find_package(Eigen3          REQUIRED)
 find_package(OpenCV          REQUIRED)

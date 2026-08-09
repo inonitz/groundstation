@@ -800,3 +800,89 @@ was written -- cross-check both before trusting one in isolation.
   flags `collapsed-fit`. Without the second metric, this would rubber-stamp a non-tracking run as PASS.
   `scripts/test/slam/compare_ground_truth.py` reports both; treat `drift_m` as meaningless whenever
   `spread_ratio` is near zero.
+
+
+## 2026-08-09 -- B1 stella_vslam live SITL verification + OpenMP fix
+
+Why stella_vslam at all: it was picked over ORB-SLAM3 for being the actively maintained fork (ORB-SLAM3
+upstream has seen little activity in years; stella_vslam absorbed dependency/tooling modernization
+stella_vslam never got). First live SITL run against real Gazebo camera frames (not synthetic noise)
+came back FAIL: tracking rate stayed healthy (11-18 Hz, never near 0, so the node was live and
+publishing) but `spread_ratio` oscillated between a healthy ~0.5-0.6 and a collapsed ~0.1-0.4, landing
+on a collapsed window at verdict time.
+
+- **Root cause: stella_vslam's own per-frame feature extraction was compiled single-threaded.** Upstream
+  `find_package(OpenMP REQUIRED)` runs unconditionally in stella_vslam's CMake, but the actual
+  `#pragma omp parallel for` loops in `orb_extractor.cc` (FAST keypoint detection across pyramid levels +
+  ORB descriptor computation -- the exact per-frame hot path) are gated behind a `USE_OPENMP` option that
+  **defaults OFF**. `cmake/FetchStellaSLAM.cmake` never passed `-DUSE_OPENMP=ON`, so every build up to
+  this point extracted features on one core while competing against Gazebo/PX4/the FMU's own real YOLO+
+  depth perception threads for that one core.
+- **Fix: added `-DUSE_OPENMP=ON` to `STELLA_OPTIMIZED_COMPILER_FEATURE_FLAGS`** in
+  `cmake/FetchStellaSLAM.cmake`. Confirmed via `CMakeCache.txt` (`USE_OPENMP:BOOL=ON` vs the old build's
+  `OFF`), not just assumed from the flag being passed.
+- **Verified with repeated live SITL trials, not one run.** Full stack each time: PX4 SITL + Gazebo,
+  the FMU running a canned (non-VLM) plan with its real `PerceptionRuntime` (YOLO seg + depth, ONNX)
+  running throughout -- `PerceptionRuntime::start()` is unconditional in the FMU constructor, so this
+  load is present regardless of canned vs. VLM-driven flight. VLM/`llama-server` itself was not running
+  (`LAUNCH_VLM` unset). Baseline (OpenMP off, cross maneuver): peak rate ~17 Hz, `spread_ratio` 0.48-0.62
+  (straddling the 0.5 pass line), 1 FAIL of 3. OpenMP on, same maneuver: peak rate 25-27 Hz (camera is
+  30 Hz), `spread_ratio` 0.60-0.86, 3 PASS of 3 (4th trial pass-quality but its log file was corrupted by
+  a harness race, excluded from the count rather than fudged in).
+- **A side test refuted an earlier hypothesis.** Guessed the cross maneuver's direction reversals were
+  hurting tracking; tested a single smooth forward hop instead (`--canned`, no reversals) and it failed
+  *more* consistently (`spread_ratio` 0.40-0.45, 3 FAIL of 3) than the cross. Reversals are not the
+  problem -- a short hop just doesn't give the fit enough time/distance to converge before landing cuts
+  it off.
+- **Not yet tested: with the VLM (`llama-server`/Qwen3-VL) running concurrently.** All trials above ran
+  with `LAUNCH_VLM=0`; the VLM is a real GPU/CPU consumer that would compete with stella_vslam's now
+  multi-threaded extraction for cores. Worth a follow-up run with `LAUNCH_VLM=1` before calling this
+  closed for the full stack. Also SITL-only: Gazebo's camera is a clean, distortion-free render, easier
+  to track than real Tello video (compression, motion blur, rolling shutter, real lens distortion) --
+  the numbers above should not be read as a real-hardware prediction.
+- Full trial-by-trial numbers, verdict lines, and the harness script used live in this session's
+  transcript; ask for the raw log files if they're needed again -- not duplicated here.
+
+**Follow-up (same day): 3 more trials with `LAUNCH_VLM=1`.** Closes the gap flagged above. Same
+cross maneuver, same OpenMP build, `llama-server` (Qwen3-VL-2B, Vulkan GPU offload,
+`--threads 1`) genuinely running -- confirmed by process check mid-flight, not assumed. One
+caveat worth stating plainly: `--canned-cross` never enters the VLM replanning loop
+(`m_missionActive` is forced false for any canned run), so this tests "VLM resident in GPU memory
+and idling" contention, not "VLM actively answering queries" contention -- the harder test would
+need a real (non-canned) VLM-driven flight.
+
+- **Result: 2 PASS (spread_ratio 0.67, 0.67), 1 FAIL (spread_ratio 0.34).** `rate` (24.6-25.0 Hz
+  peak) and `tracking_frac` (1.00, all three) were unaffected -- essentially identical to the
+  VLM-off OpenMP numbers above. The one failure was a scale/alignment event (`scale` swung to
+  3.657 vs 0.497/0.937 on the passing runs), not a throughput drop, and run-to-run
+  `spread_ratio` variance this size was already present in the VLM-off data before any VLM was
+  involved. Read: an idling VLM does not appear to measurably hurt SLAM throughput; whether it
+  raises the alignment-failure rate specifically needs a larger sample than n=3 to say with
+  confidence, and the harder question (VLM under real, actively-queried load) is still open.
+
+
+
+## Per-backend build trees + dependency prune (2026-08-09)
+
+- `build.sh` gained a 4th positional arg: `build.sh <cfg> <lib> <backend> <action>`, where
+  `<backend>` is `px4`, `tello`, or `all`. Output moved from `build/<cfg>/<lib>/` to
+  `build/<cfg>/<lib>/<backend>/` -- the SITL px4 tree is now `build/release/shared/px4`, the
+  real-drone tree is `build/release/shared/tello`.
+- Only the selected backend's library builds now. The subdirs `px4_backend`, `offboard_ctrl`,
+  and `gstreamer_gz_udp_tx` are gated to px4/all; `tello_backend` to tello/all. A Tello build
+  therefore never configures `gz-sim8`/`gz-plugin2` (the Gazebo camera plugin) and never needs
+  `px4_msgs` (the px4_ws overlay). Confirmed: the tello CMakeCache has zero `gz-sim8`/`px4_msgs`
+  entries, and its configure dropped from 348s to 178s.
+- `px4_msgs` was linked into EVERY node by the shared `define_ros2_node` helper, though only
+  `offboard_ctrl` uses it. Removed from the helper; re-added to `offboard_ctrl` alone.
+  `find_package(px4_msgs)` is now guarded by the px4/all backend condition.
+- `frame_convert.hpp` and `generic_backend_types.hpp` are already px4_msgs-free (an earlier grep
+  false-matched the word inside a comment), so no FMU/backend header changes were needed.
+- `gstreamer_rx` no longer links `CameraPlugin::GazeboGstCameraLibrary`; it reads the shared UDP
+  port constant from `gstreamer_gz_udp_tx/gazebo_cam_plugin_base.hpp` (a gz-free header) through the
+  `util_base_header` module include root, so gating the Gazebo plugin does not break the receiver.
+- `build.ps1` was given the same 4th `-Backend` arg (px4|tello|all) and the same nested
+  `build/<cfg>/<lib>/<backend>/` layout, so Windows/Linux build entry points stay in parity
+  (closes ROADMAP 9.6).
+- Consequence: the old flat `build/release/shared` px4 tree and the earlier `build/release/tello`
+  are now stale layout; both need a fresh configure under the new nested paths.

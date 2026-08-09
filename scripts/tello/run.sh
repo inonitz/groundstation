@@ -29,7 +29,7 @@ cd "$(dirname "$0")" || exit 1
 : "${SESSION_NAME:=tello}"
 
 # --- fixed config (absolute paths; cwd-independent) ---
-BUILD_DIR="/root/groundstation/build/release/tello"
+BUILD_DIR="/root/groundstation/build/release/shared/tello"
 BUILD_BINARY_DIR="$BUILD_DIR/bin"
 ONNXRUNTIME_LIB_DIR="$BUILD_DIR/_deps/onnxruntime/onnxruntime-linux-x64-1.20.1/lib"
 DELAY_RX=2

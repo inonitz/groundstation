@@ -24,7 +24,7 @@ FMU_CANNED_FLAG="${FMU_CANNED_FLAG-}"   # allow an explicit empty (VLM) value
 : "${LOG_FILE:=$(pwd)/captured_panes_log.txt}"   # FMU stdout/stderr tee target; filter.sh reads this, not tmux scrollback
 
 # --- fixed config (absolute paths; cwd-independent) ---
-BUILD_DIR="/root/groundstation/build/release/shared"
+BUILD_DIR="/root/groundstation/build/release/shared/px4"
 BUILD_BINARY_DIR="$BUILD_DIR/bin"
 PX4_DIRECTORY="/root/PX4-Autopilot"
 ASSET_DIR_PATH="/root/groundstation/dependencies"

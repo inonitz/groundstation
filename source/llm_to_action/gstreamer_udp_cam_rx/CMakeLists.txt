@@ -12,7 +12,6 @@ define_ros2_node(${GSTREAMER_RECEIVER_NAME_POSTFIX} "${GSTREAMER_RECEIVER_SOURCE
 ros2_node_add_library(${GSTREAMER_RECEIVER_NAME_POSTFIX}
     util_base_header
     GSTREAMER::gstreamer
-    CameraPlugin::GazeboGstCameraLibrary
     sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
 )
 target_deploy_gstreamer(${PROJECT_NAME}_${GSTREAMER_RECEIVER_NAME_POSTFIX})
