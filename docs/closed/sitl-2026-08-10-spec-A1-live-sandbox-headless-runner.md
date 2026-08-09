@@ -1,6 +1,10 @@
 # A1 — Live-system sandbox + headless SITL runner (capture to file)
 
-**Status:** scheduled / not started. **Created:** 2026-08-10. **Branch:** feature-llm-driver (SITL showcase).
+**Status:** DONE 2026-08-09 -- all 7 tasks landed (uncommitted, human review pending), independently
+re-verified (syntax + functional smoke test). See `docs/active/sitl-2026-08-09-wave1-testing-runbook.md`
+for the testing walkthrough and the 4 follow-up fixes applied after operator testing. Kept here per
+`docs/closed/README.md` until its findings fold into `NOTES.md`/`ROADMAP.md` and this file deletes.
+**Created:** 2026-08-10. **Branch:** feature-llm-driver (SITL showcase).
 **Depends:** none — do this FIRST, it unblocks CI for every other spec. **ROADMAP:** 8.6, 9 (test-capture debt).
 **Lock:** touches `scripts/test/lib/sim_core.sh` only; no `fmu_node.hpp`.
 

@@ -20,7 +20,7 @@ include(cmake/BuildDiagnostics.cmake)
 include(cmake/FetchLLamaCPP.cmake)
 include(cmake/FindGStreamer.cmake)
 # include(cmake/FetchOpenVINS.cmake)
-# include(cmake/FetchStellaSLAM.cmake)
+include(cmake/FetchStellaSLAM.cmake)
 include_cpm()
 
 
@@ -37,6 +37,7 @@ OPTION(GROUNDSTATION_ENABLE_LINK_TIME_OPTIMIZATION "Enable Link-Time/Interproced
 OPTION(GROUNDSTATION_BUILD_EXECUTABLE              "Build The GroundStation Server"                OFF)
 OPTION(GROUNDSTATION_BUILD_TESTS                   "Testing Correct functionality of the project"  ${GROUNDSTATION_IS_TOP_LEVEL})
 OPTION(GROUNDSTATION_BUILD_BENCHMARKS              "Testing Performance/Accuracy Metrics"          ${GROUNDSTATION_IS_TOP_LEVEL})
+OPTION(GROUNDSTATION_BUILD_SLAM                    "Build the stella_vslam bring-up node"          OFF)
 # FMU drone backend selection: exactly one of these must be ON (checked below).
 OPTION(GROUNDSTATION_BUILD_BACKEND_PX4   "Build the Groundstation against the PX4 backend"        OFF)
 OPTION(GROUNDSTATION_BUILD_BACKEND_TELLO "Build the Groundstation against the Tello backend"      OFF)
@@ -81,7 +82,7 @@ endif()
 
 define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
-# define_library_fetch_of_stella_vslam_with_external_project()
+define_library_fetch_of_stella_vslam_with_external_project()
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -201,4 +202,8 @@ safe_cpm_add_package(
 if(GROUNDSTATION_BUILD_EXECUTABLE)
     add_subdirectory(source/llm_to_action)
     # add_subdirectory(source/nav)
+endif()
+
+if(GROUNDSTATION_BUILD_SLAM)
+    add_subdirectory(source/slam)
 endif()

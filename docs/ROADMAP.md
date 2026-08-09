@@ -220,6 +220,14 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    9.14 tuning constants are compile-time constexpr, not runtime drone config  [ ]  [GATE real-Tello]
         SITL vs real-Tello values differ; one binary can't serve both without a
         recompile. Spec: docs/scheduled/2026-08-08-runtime-drone-config-constants.md
+   9.15 vlm/approach-real/override SITL scenarios need ~12GiB VRAM              [ ]  2026-08-09
+        finding: LAUNCH_VLM=1 loads Qwen3-VL-2B (-ngl 99 -c 65536, full GPU offload,
+        64k context) on top of the seg+depth ONNX perception models every scenario
+        already loads -- confirmed ~12GiB on the operator's machine, too much for a
+        laptop-class GPU. scripts/test/run_all.sh (A1) gets a SKIP_HIGH_VRAM=1 knob
+        to skip these three; not a fix, just a documented escape hatch for
+        constrained hardware. A real fix (smaller VLM quant, lower context, or a
+        low-VRAM SITL profile) is unscoped.
 ```
 
 ---

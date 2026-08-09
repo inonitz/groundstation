@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdlib>
 #include <thread>
 #include <atomic>
 #include <memory>
@@ -31,6 +32,12 @@ constexpr const char* kSlamActivePointCloudTopic = "slam/active_cloud_pts";
 constexpr const char* kSlamLocalPointCloudTopic  = "slam/local_cloud_pts";
 
 
+static std::string env_or_default(const char* name, const char* fallback) {
+    const char* value = std::getenv(name);
+    return (value != nullptr && value[0] != '\0') ? std::string{value} : std::string{fallback};
+}
+
+
 class SLAMNode : public rclcpp::Node {
 private:
     using ImageType         = sensor_msgs::msg::Image;
@@ -55,9 +62,13 @@ private:
 public:
     SLAMNode() : Node("stella_vslam_node") 
     {
-        // Stella VSLAM requires a YAML config and a pre-trained ORB vocabulary
-        constexpr const char* kConfigPath = "/root/groundstation/dependencies/stella_config.yaml";
-        constexpr const char* kVocabPath  = "/root/groundstation/dependencies/orb_vocab.fbow";
+        // Stella VSLAM requires a YAML config and a pre-trained ORB vocabulary.
+        // Paths default to the primary checkout, but STELLA_CONFIG_PATH /
+        // STELLA_VOCAB_PATH override them so a worktree or a relocated
+        // checkout does not silently load the wrong config.
+        const std::string kConfigPath = env_or_default("STELLA_CONFIG_PATH", "/root/groundstation/dependencies/stella_config.yaml");
+        const std::string kVocabPath  = env_or_default("STELLA_VOCAB_PATH",  "/root/groundstation/dependencies/orb_vocab.fbow");
+        RCLCPP_INFO(this->get_logger(), "stella config=%s vocab=%s", kConfigPath.c_str(), kVocabPath.c_str());
 
         /* Init Subscription */
         m_subImg = this->create_subscription<ImageType>(
@@ -121,7 +132,7 @@ private:
             try {
                 auto cv_ptr = cv_bridge::toCvShare(pendingImg, sensor_msgs::image_encodings::BGR8);
                 m_slamSystem->feed_monocular_frame(cv_ptr->image, timestamp, cv::Mat{});
-                // publish_rviz_pose();
+                publish_rviz_pose();
                 publish_global_point_cloud();
 
             } catch (const cv_bridge::Exception& e) {

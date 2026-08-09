@@ -2,17 +2,14 @@
 # approach-impact PASS/FAIL: an impact must interrupt, not declare a clean approach_ok.
 set -uo pipefail
 cd "$(dirname "$0")" || exit 1
-SESSION="${1:-llmsim}"
 OUT="captured_panes_log.txt"
-if ! tmux has-session -t "$SESSION" 2>/dev/null; then
-    echo "no tmux session '$SESSION' — start it first with ./run.sh" >&2
+LOG_FILE="${1:-$(pwd)/captured_panes_log.txt}"
+if [ ! -f "$LOG_FILE" ]; then
+    echo "no FMU log at '$LOG_FILE' -- start a run first with ./run.sh" >&2
     exit 2
 fi
-: > "$OUT"
-while read -r pane; do
-    { echo "===== pane $pane ====="; tmux capture-pane -p -J -S - -t "$pane"; echo; } >> "$OUT"
-done < <(tmux list-panes -a -t "$SESSION" -F '#{session_name}:#{window_index}.#{pane_index}')
-echo "[capture] all panes -> $OUT"
+[ "$LOG_FILE" -ef "$OUT" ] || cp "$LOG_FILE" "$OUT"
+echo "[capture] FMU log -> $OUT"
 
 echo "----- approach-impact digest -----"
 grep -E 'APPROACH activated|APPROACH reached|motion off-nominal|INTERRUPT \(reason=approach_impact\)|INTERRUPT \(reason=emergency_boundary\)|approach_ok|LANDING->STANDBY' "$OUT" || true

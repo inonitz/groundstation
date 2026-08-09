@@ -21,6 +21,7 @@ FMU_CANNED_FLAG="${FMU_CANNED_FLAG-}"   # allow an explicit empty (VLM) value
 : "${SPAWN_POSE:=0,7,3}"
 : "${LAUNCH_VLM:=0}"
 : "${SESSION_NAME:=llmsim}"
+: "${LOG_FILE:=$(pwd)/captured_panes_log.txt}"   # FMU stdout/stderr tee target; filter.sh reads this, not tmux scrollback
 
 # --- fixed config (absolute paths; cwd-independent) ---
 BUILD_DIR="/root/groundstation/build/release/shared"
@@ -41,12 +42,23 @@ cleanup() {
     if [ -f "${GZ_GIMBAL_SDF_FILE}.bak" ]; then
         mv "${GZ_GIMBAL_SDF_FILE}.bak" "$GZ_GIMBAL_SDF_FILE"
     fi
+    if [ -n "${BAG_PANE_ID:-}" ]; then
+        echo "[CLEANUP] Stopping bag recorder gracefully (SIGINT, via pane)..."
+        tmux send-keys -t "$BAG_PANE_ID" C-c 2>/dev/null || true
+        sleep 2
+    elif [ -n "${BAG_BG_PID:-}" ]; then
+        echo "[CLEANUP] Stopping bag recorder gracefully (SIGINT, background process)..."
+        kill -INT "$BAG_BG_PID" 2>/dev/null || true
+        wait "$BAG_BG_PID" 2>/dev/null || true
+    fi
     echo "[CLEANUP] Killing lingering processes..."
     pkill -9 -f "llm_to_action_"
     pkill -9 -f "llama-server"
     pkill -9 -f "gz"
     pkill -9 -f "px4"
     pkill -9 -f "MicroXRCEAgent"
+    pkill -9 -f "ros2 bag record"
+    tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
     echo "[SUCCESS] Clean."
 }
 trap cleanup EXIT INT TERM
@@ -96,11 +108,33 @@ CMD_RX="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     echo 'RX stopped'; read"
 CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_FMU && \
-    $BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG; \
+    ($BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG 2>&1 | tee \"$LOG_FILE\"); \
     echo 'FMU stopped'; read"
 CMD_KEYBOARD="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_FMU && $BUILD_BINARY_DIR/llm_to_action_keyboard_hook; \
     echo 'keyboard stopped'; read"
+# Default: record when attended (a human might want it), skip when headless (2026-08-09
+# finding -- nothing currently reads the bag automatically; recording it by default in
+# unattended runs was pure cost with a real bug attached: LAUNCH_VLM=1 scenarios (override,
+# vlm, approach-real) push the pane count high enough that tmux can fail to allocate the bag
+# pane ("no space for new pane"), which silently skipped recording with no error at all.
+# Override explicitly with RECORD_BAG=1 if you want a bag from a headless run.
+: "${RECORD_BAG:=$([ "${HEADLESS:-0}" = "1" ] && echo 0 || echo 1)}"
+: "${BAG_DIR:=$(pwd)/bag_$(date +%Y%m%d_%H%M%S)}"
+CMD_BAG="ros2 bag record -o \"$BAG_DIR\" \
+    /fmu/out/vehicle_odometry \
+    /fmu/out/vehicle_status_v4 \
+    /fmu/out/vehicle_land_detected \
+    /fmu/out/battery_status_v1; \
+    echo 'bag recorder stopped'; read"
+# Headless variant: no trailing `read` (nothing will ever answer it) and no tmux pane at all --
+# run as a plain background process of THIS script instead. Structurally cannot hit "no space
+# for new pane" since it no longer needs pane real estate.
+CMD_BAG_HEADLESS="ros2 bag record -o \"$BAG_DIR\" \
+    /fmu/out/vehicle_odometry \
+    /fmu/out/vehicle_status_v4 \
+    /fmu/out/vehicle_land_detected \
+    /fmu/out/battery_status_v1"
 CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
@@ -122,5 +156,28 @@ if [ "$LAUNCH_VLM" = "1" ]; then
     tmux split-window -v -t "$SESSION_NAME:0.1" "$CMD_VLM"
 fi
 tmux split-window -v -t "$SESSION_NAME:0" "$CMD_KEYBOARD"
+if [ "$RECORD_BAG" = "1" ]; then
+    if [ "${HEADLESS:-0}" = "1" ]; then
+        eval "$CMD_BAG_HEADLESS" > /dev/null 2>&1 < /dev/null &
+        BAG_BG_PID=$!
+        echo "[INFO] Recording bag as a background process (headless, no pane): pid=$BAG_BG_PID"
+    else
+        BAG_PANE_ID=$(tmux split-window -v -t "$SESSION_NAME:0" -P -F '#{pane_id}' "$CMD_BAG")
+    fi
+fi
 tmux select-layout -t "$SESSION_NAME:0" tiled
-tmux attach-session -t "$SESSION_NAME"
+
+if [ "${HEADLESS:-0}" = "1" ]; then
+    : "${HEADLESS_COMPLETION:=flight}"
+    : "${HEADLESS_TIMEOUT_SECONDS:=120}"
+    echo "[INFO] HEADLESS=1 -- no attach; waiting on ground truth (mode=$HEADLESS_COMPLETION, timeout=${HEADLESS_TIMEOUT_SECONDS}s)"
+    "$(dirname "${BASH_SOURCE[0]}")/wait_for_ground_truth.sh" "$HEADLESS_COMPLETION" "$HEADLESS_TIMEOUT_SECONDS"
+else
+    if [ "${RECORD_BAG:-1}" = "1" ]; then
+        echo "[INFO] Attached. When done: press Ctrl-B then D to DETACH (not Ctrl-C) --"
+        echo "[INFO] detaching is what lets this script reach cleanup() and finalize the bag."
+        echo "[INFO] Ctrl-C only interrupts whatever pane has focus; the session (and the bag"
+        echo "[INFO] recorder) keeps running, and the bag is left without valid metadata."
+    fi
+    tmux attach-session -t "$SESSION_NAME"
+fi

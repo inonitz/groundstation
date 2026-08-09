@@ -769,3 +769,34 @@ was written -- cross-check both before trusting one in isolation.
   is off-nominal, else approach_ok) instead of holding. Stopping up to the margin short of standoff is
   safe -- it leaves the drone farther from the target, never closer, and never coasts blind. Touches
   the spec-1 6.4 APPROACH branch in fmu_node.hpp.
+
+
+## 2026-08-09 -- A1 headless SITL runner: two design decisions worth recording
+
+- **Headless completion is judged from real PX4 topics, not FMU log text.** `wait_for_ground_truth.sh`
+  polls `/fmu/out/vehicle_status_v4` (arming_state) and `/fmu/out/vehicle_land_detected` (landed) to
+  decide a canned run is over -- never by grepping the FMU's own printed "reached"/"complete" claims.
+  Reason: the FMU's self-reported state has been wrong before (ROADMAP 6.4, the impact-frame false
+  approach_ok). Cross-checking the FMU's *claims* against this same ground truth (not just using it for
+  a stop signal) is a deliberate fast-follow, not done in A1.
+- **`filter.sh` keeps its `OUT` variable after switching from tmux capture to the log file.** All 20
+  filters run under `set -u` and reference `$OUT` several times downstream (the grep/awk digest logic);
+  dropping the assignment aborts every scenario with `OUT: unbound variable`. Where `LOG_FILE` and `OUT`
+  resolve to the same path (14 of the 20 scenarios use the shared default filename), the copy step is
+  skipped via a same-inode check rather than run unconditionally -- `cp x x` errors, and 6 of those 20
+  filters run under `set -e` so that error would otherwise be fatal.
+
+
+## 2026-08-09 -- B1 stella_vslam comparator: drift alone cannot certify tracking
+
+- **Monocular SLAM has no metric scale or fixed origin** -- comparing its trajectory against PX4 EKF2
+  ground truth needs a Umeyama similarity fit (rotation + scale + translation) first; a raw position
+  subtraction is meaningless.
+- **A collapsed alignment makes raw drift look deceptively small.** First version of the comparator used
+  a path-length-ratio check; synthetic testing showed it read 6.68 on a known-good track (30 Hz
+  per-sample jitter dominates arc length at that rate) -- not usable as a signal. Replaced with an RMS
+  spread-ratio metric. Validated against injected noise: a fit that collapses onto its centroid (total
+  tracking failure) reports `drift_m` as small as 0.55 m, but `spread_ratio` correctly drops to ~0.22 and
+  flags `collapsed-fit`. Without the second metric, this would rubber-stamp a non-tracking run as PASS.
+  `scripts/test/slam/compare_ground_truth.py` reports both; treat `drift_m` as meaningless whenever
+  `spread_ratio` is near zero.

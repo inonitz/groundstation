@@ -2,3 +2,5 @@
 captured_*.txt
 *_log.txt
 log_*.txt
+bag_*/
+run_all_summary.txt
