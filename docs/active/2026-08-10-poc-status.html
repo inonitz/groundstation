@@ -147,12 +147,12 @@
     <div>
       <div class="eyebrow">Groundstation · feature-llm-driver · overnight session review</div>
       <h1>Where we stand after tonight</h1>
-      <p class="sub">Five real bugs found and fixed by actually flying the stack, one architecture question resolved, one branch ready to merge, and an honest read on what's left before real hardware.</p>
+      <p class="sub">Seven real bugs found and fixed by actually flying the stack, the color-discrimination showcase run for the first time (two fixes confirmed, one new safety-relevant gap found), an honest TRL read, and what's left before real hardware.</p>
     </div>
     <div class="stamp">
-      <div>report&nbsp; <b>2026-08-10, 03:xx</b></div>
-      <div>live flights tonight&nbsp; <b>5</b></div>
-      <div>last flight&nbsp; <b>clean, 0 failures</b></div>
+      <div>report&nbsp; <b>2026-08-10, 05:xx</b></div>
+      <div>live flights tonight&nbsp; <b>6</b></div>
+      <div>last flight&nbsp; <b>informative failure, not clean</b></div>
     </div>
   </header>
 
@@ -168,13 +168,16 @@
           <li class="yes"><span class="m">✓</span><span>Full live mission: takeoff → search → approach → land, all _ok, zero parse failures</span></li>
           <li class="yes"><span class="m">✓</span><span>A failed APPROACH correctly reached LAND instead of hanging (earlier run)</span></li>
           <li class="yes"><span class="m">✓</span><span>VLM output now schema-constrained at the server — can't emit non-JSON anymore</span></li>
+          <li class="yes"><span class="m">✓</span><span>Takeoff-ordering gate confirmed live, both directions — real takeoff first, two bad plans correctly rejected</span></li>
+          <li class="yes"><span class="m">✓</span><span>rubicon_colors' red car model loads clean — yesterday's identical-car problem is gone</span></li>
         </ul>
       </div>
       <div class="not">
         <h5>Not yet done</h5>
         <ul class="lst">
           <li class="no"><span class="m">✕</span><span>Nothing flown on real Tello hardware tonight</span></li>
-          <li class="no"><span class="m">✕</span><span>rubicon_colors world built, untested live</span></li>
+          <li class="no"><span class="m">✕</span><span>Color/attribute target matching doesn't work — perception never emits color-qualified labels, needs a design fix</span></li>
+          <li class="no"><span class="m">✕</span><span>APPROACH on an unmatched target caused a violent uncommanded excursion, not a safe failure — do not re-test unattended</span></li>
           <li class="part"><span class="m">~</span><span>ROTATE hang seen once, root cause still unknown</span></li>
         </ul>
       </div>
@@ -186,12 +189,10 @@
     <div class="h-row"><span class="idx">01</span><h2>Next session — in order</h2><span class="rule"></span></div>
     <p class="lede">Ordered because merging first keeps the one expected conflict easy to reason about while it's fresh.</p>
     <div class="runbook">
-      <div class="rb"><div class="n"></div><div><h4>Merge feature-calibrate-slam <span class="chip ok">Reviewed, low-risk</span></h4><p>One expected conflict (docs/NOTES.md, pure append/append). Real, evidence-based debugging work: SDK keepalive, firewall-drop root cause, a 600x corner-detection perf fix.</p></div><div class="t">~10 min</div></div>
-      <div class="rb"><div class="n"></div><div><h4>Commit tonight's 13 files</h4><p>Plan-parsing rewrite + schema constraint, SEARCH return-to-start, failure-replanning prompt rule, doc updates. Suggested message already drafted below.</p></div><div class="t">~5 min</div></div>
-      <div class="rb"><div class="n"></div><div><h4>Run the color-discrimination showcase</h4><p><span class="mono">cd scripts/test/colors && ./run.sh</span> — never run live tonight, this is the first real trial.</p></div><div class="t">~10 min</div></div>
-      <div class="rb"><div class="n"></div><div><h4>Watch the full GUI showcase yourself</h4><p>Command's ready from earlier tonight — I can't watch a GUI, you can.</p></div><div class="t">~10 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Investigate the APPROACH excursion <span class="chip gap">Safety-relevant</span></h4><p>An unmatched target produced ~14m of uncommanded motion at 9+ m/s instead of a safe failure. Do not re-run this scenario unattended until the root cause is understood.</p></div><div class="t">~30-45 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Fix color/attribute target matching <span class="chip gap">Design gap</span></h4><p>Perception emits plain classes ("car"), never color-qualified labels — <span class="mono">target_object: "blue_car"</span> can never match. Needs a real field (e.g. color checked against the bounding-box crop), not a retry.</p></div><div class="t">~45-60 min</div></div>
       <div class="rb"><div class="n"></div><div><h4>Physical Tello dry tests <span class="chip gap">Needs the laptop</span></h4><p>Follow docs/active/2026-08-09-tello-physical-handoff.md — takeoff/rotate/describe/land only, no position-dependent commands yet.</p></div><div class="t">~60-90 min</div></div>
-      <div class="rb"><div class="n"></div><div><h4>Real physical camera calibration</h4><p>Tooling exists (post-merge). The community intrinsics are provisional; a real checkerboard session against this airframe is still open.</p></div><div class="t">~30 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Real physical camera calibration</h4><p>Tooling exists (post-merge, feature-calibrate-slam already merged). The community intrinsics are provisional; a real checkerboard session against this airframe is still open.</p></div><div class="t">~30 min</div></div>
     </div>
   </section>
 
@@ -202,8 +203,8 @@
       <div class="tier u">
         <h3>Urgent · blocks next session</h3>
         <ul>
-          <li>Merge feature-calibrate-slam<small>before it goes stale</small></li>
-          <li>Commit tonight's fixes<small>13 files, nothing committed yet</small></li>
+          <li>APPROACH-on-bad-target excursion<small>safety-relevant, don't re-test unattended</small></li>
+          <li>Color/attribute target matching<small>current premise cannot work, blocks colors demo</small></li>
           <li>Physical Tello dry run<small>the one thing only you can do</small></li>
         </ul>
       </div>
@@ -235,13 +236,13 @@
         <thead><tr><th>Document</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
         <tbody>
           <tr><td class="doc">ROADMAP.md</td><td class="v">Master objective tree</td><td><span class="chip ok">Current</span></td><td class="v">Annotated 1.1.6, 1.1.7, 3.3; added 3.8</td></tr>
-          <tr><td class="doc">NOTES.md</td><td class="v">Architecture decision log</td><td><span class="chip ok">Current</span></td><td class="v">~200 new lines tonight, evidence-based</td></tr>
+          <tr><td class="doc">NOTES.md</td><td class="v">Architecture decision log</td><td><span class="chip ok">Current</span></td><td class="v">Colors re-verification + TRL assessment added</td></tr>
           <tr><td class="doc">ARCHITECTURE.md</td><td class="v">System architecture</td><td><span class="chip ok">Corrected</span></td><td class="v">§4 was flatly wrong on ORBIT/SEARCH status</td></tr>
           <tr><td class="doc">active/2026-08-09-tello-physical-handoff.md</td><td class="v">Hardware test procedure</td><td><span class="chip ok">New</span></td><td class="v">Read before touching the drone</td></tr>
-          <tr><td class="doc">active/2026-08-10-poc-status.html</td><td class="v">This report</td><td><span class="chip ok">New</span></td><td class="v">Supersedes 2026-08-08's</td></tr>
+          <tr><td class="doc">active/2026-08-10-poc-status.html</td><td class="v">This report</td><td><span class="chip ok">Updated</span></td><td class="v">Refreshed after colors re-verification run</td></tr>
           <tr><td class="doc">scheduled/…spec-A3-voice-interrupt.md</td><td class="v">ASR wiring spec</td><td><span class="chip wip">Line numbers now stale</span></td><td class="v">Re-locate hooks before starting</td></tr>
-          <tr><td class="doc">dependencies/rubicon_colors.sdf</td><td class="v">Lightweight showcase world</td><td><span class="chip wip">Untested</span></td><td class="v">First run is next session's job</td></tr>
-          <tr><td class="doc">feature-calibrate-slam (branch)</td><td class="v">Camera calibration tooling</td><td><span class="chip ok">Reviewed, ready</span></td><td class="v">Merge — see runbook</td></tr>
+          <tr><td class="doc">dependencies/rubicon_colors.sdf</td><td class="v">Lightweight showcase world</td><td><span class="chip wip">Live-tested, 1 new gap found</span></td><td class="v">Loads clean; target-matching premise broken</td></tr>
+          <tr><td class="doc">feature-calibrate-slam (branch)</td><td class="v">Camera calibration tooling</td><td><span class="chip ok">Merged</span></td><td class="v">Done</td></tr>
         </tbody>
       </table>
     </div>
@@ -257,6 +258,8 @@
       <div class="cap s-wip"><div class="ch"><h4>Tello backend</h4><span class="chip wip">Rebuilt, unflown</span></div><p>Binary current with every fix tonight. Zero real-hardware flights this session — needs the laptop.</p></div>
       <div class="cap s-gap"><div class="ch"><h4>SLAM / pose</h4><span class="chip gap">Not wired to control</span></div><p>Tracks well (OpenMP fix), still purely observational — nothing reads its pose for flight decisions. Real hardware has zero position source until this changes.</p></div>
       <div class="cap s-gap"><div class="ch"><h4>ROTATE hang</h4><span class="chip gap">Unexplained</span></div><p>Seen once: commanded yawrate ignored for 20+ min. No timeout on ROTATE's own completion predicate either.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>Color/attribute target matching</h4><span class="chip gap">Doesn't work</span></div><p>Perception only emits plain classes ("car") — a <span class="mono">target_object</span> like "blue_car" can never match. Needs a real design fix.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>APPROACH on unmatched target</h4><span class="chip gap">Unsafe, not investigated</span></div><p>Produced a ~14m, 9+ m/s uncommanded excursion instead of a safe failure. Do not re-test unattended until understood.</p></div>
     </div>
   </section>
 

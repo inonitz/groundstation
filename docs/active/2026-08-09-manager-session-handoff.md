@@ -1,5 +1,7 @@
 # Manager session handoff — 2026-08-09
 
+> **Superseded (2026-08-10):** read `2026-08-10-session-handoff.md` instead. Specs A1-A4/B1-B5 referenced below are stale or done; git state below predates the feature-calibrate-slam merge and tonight's fixes. Kept here for its still-true gotchas (§7) until the next docs/closed/ housekeeping pass.
+
 Cold-start brief for the next overseer session. Read this first, then the docs it points to. It
 replaces the stale `2026-08-08-manager-session-handoff.md` (delete that one).
 

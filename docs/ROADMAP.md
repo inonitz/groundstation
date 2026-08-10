@@ -7,8 +7,7 @@ single place the whole objective set lives; it was previously scattered across `
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.
 
-Last synced: 2026-08-08 (spec-3 failsafe supervisor + user override + SPSC backpressure landed and SITL-verified; earlier: 2026-08-06 GenericBackend build-verify + build_yolo benchmark).
-benchmark results landed).
+Last synced: 2026-08-09 (spec-1/spec-2 SITL runs landed -- boundary/approach-impact/interrupt-storm/orbit/search all PASS; SEARCH return-to-start, tolerant plan extraction, APPROACH motion-gate, SLAM tracking spike; earlier: 2026-08-08 spec-3 failsafe supervisor + user override + SPSC backpressure; 2026-08-06 GenericBackend build-verify + build_yolo benchmark).
 
 ---
 
@@ -204,7 +203,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    9.2 zero ../ includes                                         [x]
    9.3 ARCHITECTURE.md refreshed to reality                      [x]
    9.4 rename backend atomics m_posN/E/D (hold ENU now)          [DEFER]  cosmetic
-   9.5 remove dead option GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE [ ]
+   9.5 remove dead option GROUNDSTATION_BUILD_SYSTEM_BACKEND_TYPE [x]  removed 2026-08-07; confirmed gone from CMakeLists.txt's option list
    9.6 reconcile build.sh vs build.ps1 backend/test divergence   [x]
        build.sh now takes a 4th arg <backend> (px4|tello|all), builds only the
        selected backend into build/<cfg>/<lib>/<backend>/, and gates px4_backend/
@@ -263,7 +262,7 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
 
 ## SITL test matrix (2026-08-08)
 
-All 15 baseline `scripts/test/<feature>/` runs green in PX4 Gazebo SITL (operator-run, 2026-08-08); the 3 spec-1 + 2 spec-2 rows at the bottom are NEW: each is wired to a new canned flag in fmu_node.cpp and is runnable after a rebuild, but is unrun (build+SITL pending). **Type:**
+All 20 `scripts/test/<feature>/` runs are green in PX4 Gazebo SITL: the 15 baseline rows (operator-run, 2026-08-08) plus the 3 spec-1 + 2 spec-2 rows at the bottom, which were new the same day and have since run to PASS too (see their Status column) -- nothing in this matrix is still pending a run. **Type:**
 Auto = `filter.sh` asserts PASS/FAIL from the captured log; Milestone = operator confirms the digest
 against expected behavior. Per-run pane captures are git-ignored (regenerated each run).
 

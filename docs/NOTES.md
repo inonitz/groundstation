@@ -1293,3 +1293,31 @@ APPROACH target produced dangerous flight, not a safe no-op.**
 unattended again until the APPROACH-on-bad-target behavior is understood.** It produced real,
 uncommanded, several-meters-per-second motion in simulation from what should have been a benign
 "target not found" case -- worth being cautious about on real hardware.
+
+## TRL assessment (2026-08-10) -- given verbally in-session, not persisted at the time
+
+Asked directly: given the agreed final-3-days goal (a solid SITL showcase, plus a physical
+demonstration as a stretch), what's the current Technology Readiness Level, and the realistic
+Thursday-morning TRL?
+
+**Current: TRL 4 (technology validated in a lab/simulated environment).** The full VLM-plan ->
+deterministic-execution loop runs end-to-end in SITL against real inference models (not mocked),
+and tonight's testing found and fixed six real bugs through actual use, which is exactly what
+TRL 4 validation looks like -- not a demo run once and left alone. It is not TRL 5 ("validated in
+a *relevant* environment") yet, for two concrete reasons: a known, unresolved, safety-relevant
+failure mode (the APPROACH excursion above) means the system cannot yet be called validated
+against realistic failure conditions, only against the nominal path; and there has been zero
+real-hardware flight this cycle, so nothing has moved from simulated to physical evidence. SLAM
+sits lower on its own, around TRL 3 (proof of concept) -- it tracks in isolation but has never
+been read by flight control, on sim or hardware.
+
+**Realistic Thursday morning, if the agreed plan holds:** still TRL 4 overall, not higher --
+one physical flight isn't enough repetition to claim "validated in a relevant environment" for
+the full autonomy stack, and the plan deliberately keeps SLAM out of the critical path. What
+changes is the *evidence mix*, which matters for a contest demo even without a TRL number moving:
+a repeatable, clean SITL run (the guaranteed deliverable) plus one real physical flight of the
+non-localized subset (takeoff/rotate/describe/land) would be genuine TRL 4 evidence for that
+narrower flight-control slice, arguably touching TRL 5 for just that slice, while the full
+color-discrimination/SLAM-assisted stack stays at TRL 3-4. Do not present it as more than that --
+the honest story is "the core loop is validated and repeatable under real testing, with one
+specific failure mode still open," not "flight-ready."

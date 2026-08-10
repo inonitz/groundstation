@@ -33,7 +33,8 @@ return) is metric, and add active wind/prop-wash correction so it holds station 
   }
   ```
   `stick = round(mps / kTelloMaxSpeedMps * 100)`, clamped to +-100 — literal linear scale, no per-axis
-  asymmetry, no curve. The three constants it depends on (`tello_backend_base.hpp:61-67`:
+  asymmetry, no curve. The three constants it depends on (`tello_backend_base.hpp:45-48`, verified 2026-08-10 --
+  was cited as :61-67, stale:
   `kTelloMaxSpeedMps = 1.0f`, `kTelloStickMax = 100`, `kTelloMaxYawRateRadps = M_PI`) are explicitly
   commented as "a first estimate... plan: hardware calibration" — this is exactly what B5 replaces.
 - **Hover has no existing drift-correction hook to extend — this is a smaller precedent than "extend
