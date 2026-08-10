@@ -149,7 +149,7 @@ CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
-    -dev Vulkan0 -ngl 99 -c 65536 --flash-attn on --temp 0.3 \
+    -dev Vulkan0 -ngl 99 -c ${VLM_CTX_SIZE:-65536} --flash-attn on --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads 1; echo 'llama-server stopped'; read"
 
 # --- launch tmux ---
