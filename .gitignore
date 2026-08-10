@@ -33,6 +33,10 @@ Makefile
 imgui.ini
 
 
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+
 # Log files
 *.log
 */slam_check.log

@@ -24,12 +24,13 @@ def main():
         img = cv2.imread(f)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_size = gray.shape[::-1]
-        found, corners = cv2.findChessboardCorners(gray, (board_cols, board_rows))
+        # SB is the sector-based detector. It returns subpixel corners directly, so it needs
+        # no cornerSubPix pass, and it does not blow up on frames where the board is absent
+        # or partly occluded -- the classic detector took ~50s on such a frame at 960x720.
+        found, corners = cv2.findChessboardCornersSB(gray, (board_cols, board_rows))
         if not found:
             print(f"skip {f}: checkerboard not found")
             continue
-        corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1),
-            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001))
         objpoints.append(objp)
         imgpoints.append(corners)
 
@@ -51,7 +52,9 @@ def main():
             "k1": float(k1), "k2": float(k2), "p1": float(p1), "p2": float(p2), "k3": float(k3),
             "fps": fps,
             "cols": img_size[0], "rows": img_size[1],
-            "color_order": "RGB",
+            # BGR, not RGB: rx_node's pipeline ends in `video/x-raw, format=BGR`, and the
+            # sim config declares BGR for the same reason. The frames stella sees are BGR.
+            "color_order": "BGR",
         }
     }
     out_path = "dependencies/stella_config_tello.yaml"
