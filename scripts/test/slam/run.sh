@@ -48,7 +48,7 @@ done
 # --- sim_core.sh knobs ---
 # A cross gives translation on both horizontal axes, so the drift number reflects
 # real motion instead of a single straight line that a scale error can hide in.
-FMU_OBJECTIVE="Fly a canned cross while SLAM tracks."
+: "${FMU_OBJECTIVE:=Fly a canned cross while SLAM tracks.}"
 : "${FMU_CANNED_FLAG:=--canned-cross}"
 # rubicon_targets is textured; default_car and empty are too feature-poor for
 # monocular tracking to initialise reliably.

@@ -1,0 +1,59 @@
+<sdf version="1.9">
+  <world name="rubicon_colors">
+
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"></plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"></plugin>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"></plugin>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"></plugin>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>47.397743</latitude_deg>
+      <longitude_deg>8.545594</longitude_deg>
+      <elevation>0.0</elevation>
+    </spherical_coordinates>
+
+    <scene>
+      <ambient>.4 .4 .4</ambient>
+      <sky></sky>
+    </scene>
+
+    <!-- Same Rubicon terrain as rubicon_targets (kept: SLAM needs its texture to track --
+         "empty"/default_car are too feature-poor per earlier session notes). -->
+    <include>
+      <name>Rubicon</name>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Rubicon</uri>
+    </include>
+
+    <!-- 2026-08-09: lightweight color-discrimination showcase. Trimmed from rubicon_targets.sdf --
+         dropped both person models to cut object count/perception load for field demos where
+         12GiB VRAM (rubicon_targets' real number, ROADMAP 9.15) isn't available. Only the two
+         hatchbacks remain, same poses as rubicon_targets so they're still both in view from the
+         standard spawn (0,7,3 facing +X). Objective: force the VLM to distinguish "the car" by an
+         attribute (color), not just detect "a car" -- e.g. "find the BLUE car and approach it,
+         ignore the other one." -->
+    <include>
+      <name>storm_hatchback_blue</name>
+      <pose>6 2 1.5 0 0 0</pose>
+      <uri>model://hatchback_blue</uri>
+      <static>true</static>
+    </include>
+    <include>
+      <name>storm_hatchback</name>
+      <pose>12 -4.5 4.1 0 0 0</pose>
+      <uri>model://hatchback</uri>
+      <static>true</static>
+    </include>
+
+  </world>
+</sdf>

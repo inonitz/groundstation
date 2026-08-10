@@ -983,12 +983,39 @@ private:
                         hit->bbox_xmin, hit->bbox_ymin, hit->bbox_xmax, hit->bbox_ymax);
                     completeCurrent("search_ok");
                 } else if ((tnow - m_searchStartUs) > m_searchTimeoutUs ||
-                           m_searchLegCount >= m_searchMaxLegs) {
-                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                    RCLCPP_INFO(this->get_logger(),
-                        "[FMU_NODE_DEBUG] SEARCH exhausted target=%s legs=%u elapsed_ms=%.0f",
-                        srch.target, m_searchLegCount, (tnow - m_searchStartUs) / 1000.0);
-                    completeCurrent("search_exhausted");
+                           m_searchLegCount >= m_searchMaxLegs || m_searchReturning) {
+                    /* Failed: return to where SEARCH started before completing, rather than
+                       stranding the drone wherever the last lane happened to end -- a failed
+                       search should not itself become a navigation hazard for whatever the VLM
+                       plans next. m_searchOriginPos (unlike m_searchStartPos) is set once at
+                       activation and never touched by a lane transition, so it is still the
+                       true start point here. */
+                    if (!m_searchReturning) {
+                        m_searchReturning  = true;
+                        m_searchLegStartUs = tnow;   /* reused as the return-leg's own timer. */
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] SEARCH exhausted target=%s legs=%u elapsed_ms=%.0f -- returning to start.",
+                            srch.target, m_searchLegCount, (tnow - m_searchStartUs) / 1000.0);
+                    }
+                    dx        = m_searchOriginPos.x - od.pos.x;
+                    dy        = m_searchOriginPos.y - od.pos.y;
+                    distStart = std::sqrt(dx * dx + dy * dy);
+                    if (distStart < kGoCompletionRadiusM ||
+                        (tnow - m_searchLegStartUs) > __scast(u64, kSearchReturnTimeoutMs) * 1000ULL) {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] SEARCH return-to-start complete dist=%.2f", distStart);
+                        completeCurrent("search_exhausted");
+                    } else {
+                        altErr   = m_searchAltEnu - od.pos.z;
+                        velEnu.x = (dx / distStart) * kSearchSweepSpeedMps;
+                        velEnu.y = (dy / distStart) * kSearchSweepSpeedMps;
+                        velEnu.z = kApproachVertGain * altErr;
+                        m_backend->set_velocity(velEnu, 0.0f);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] SEARCH returning-to-start target=%s dist=%.2f",
+                            srch.target, distStart);
+                    }
                 } else if (m_searchCrossing) {
                     /* Sideways step to the next lane: fly the fixed cross heading for one lane spacing,
                        then flip the lane heading 180 so the next lane runs back the other way. */
@@ -1409,6 +1436,8 @@ private:
             srch                  = m_currTask.m_cmd.m_extractCmd.m_SearchTarget;
             od                    = m_backend->odometry();
             m_searchStartPos       = od.pos;
+            m_searchOriginPos      = od.pos;
+            m_searchReturning      = false;
             m_searchAltEnu         = od.pos.z;
             m_searchLaneHeadingRad = wrap_pi(od.yaw + __scast(f32, srch.start_heading_deg) * kPi / 180.0f);
             m_searchDir            = srch.cw_or_ccw ? -1.0f : 1.0f;   /* which side the lanes march. */
@@ -1593,6 +1622,11 @@ private:
                     "[FMU_NODE_DEBUG] VLM 200 but body not as expected: %.240s", res->body.c_str());
             } else {
                 content = j["choices"][0]["message"]["content"];
+                /* Only the char count was ever logged here -- made every parse failure
+                   undebuggable without re-running and adding prints by hand. Log the real
+                   text (bounded, RCLCPP_INFO handles embedded newlines fine). */
+                RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] VLM raw response: %.2000s",
+                    content.c_str());
             }
         }
         out = content;
@@ -2058,6 +2092,12 @@ private:
     u32  m_searchLegCount{0};                 /* lanes flown so far.                               */
     u32  m_searchMaxLegs{0};                  /* lane cap so the pattern terminates.               */
     bool m_searchCrossing{false};             /* true = flying the sideways step between two lanes. */
+    Vec3 m_searchOriginPos{0.0f, 0.0f, 0.0f}; /* true SEARCH-activation pose; unlike m_searchStartPos
+                                                  this is never overwritten by a lane transition, so
+                                                  it survives to the return-to-start leg on exhaustion.*/
+    bool m_searchReturning{false};            /* true = SEARCH failed, flying back to m_searchOriginPos
+                                                  before completing (rather than stranding the drone
+                                                  wherever the last lane happened to end).            */
 
     /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
        controlLoop synthesizes a PerceptionSnapshot for a point fixed relative to the

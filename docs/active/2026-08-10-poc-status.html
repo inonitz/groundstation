@@ -1,0 +1,268 @@
+<title>Groundstation — POC Status</title>
+<style>
+  :root{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18;
+    --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16;
+    --def:#5b6470; --def-bg:#5b647014;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+      --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+      --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+      --ok:#4cc46a; --ok-bg:#4cc46a1c;
+      --wip:#e0a83e; --wip-bg:#e0a83e1c;
+      --gap:#e5675b; --gap-bg:#e5675b1a;
+      --def:#8f9aa6; --def-bg:#8f9aa614;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eceff0; --surface:#ffffff; --surface-2:#f4f6f6;
+    --ink:#111a1e; --muted:#5c6b72; --faint:#85959c; --line:#d7dedf;
+    --sig:#0f766e; --sig-soft:#0f766e22;
+    --ok:#2f7d3a; --ok-bg:#2f7d3a18; --wip:#a86a12; --wip-bg:#a86a1218;
+    --gap:#bd3b2e; --gap-bg:#bd3b2e16; --def:#5b6470; --def-bg:#5b647014;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0e11; --surface:#111a1f; --surface-2:#0e161a;
+    --ink:#e7eef1; --muted:#8b9aa2; --faint:#5d6a71; --line:#223038;
+    --sig:#2dd4bf; --sig-soft:#2dd4bf1e;
+    --ok:#4cc46a; --ok-bg:#4cc46a1c; --wip:#e0a83e; --wip-bg:#e0a83e1c;
+    --gap:#e5675b; --gap-bg:#e5675b1a; --def:#8f9aa6; --def-bg:#8f9aa614;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(18px,4vw,44px)}
+  a{color:var(--sig);text-decoration:none;border-bottom:1px solid var(--sig-soft)}
+  h1,h2,h3{text-wrap:balance;margin:0}
+  .mono{font-family:var(--mono)}
+  .tnum{font-variant-numeric:tabular-nums}
+  .masthead{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;
+    justify-content:space-between;border-bottom:2px solid var(--sig);padding-bottom:18px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--sig);margin-bottom:8px}
+  h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;font-weight:700}
+  .sub{color:var(--muted);font-size:15px;margin-top:6px;max-width:60ch}
+  .stamp{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.9}
+  .stamp b{color:var(--ink);font-weight:600}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:26px 0}
+  .metric{background:var(--surface);padding:16px 18px}
+  .metric .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;
+    display:flex;align-items:baseline;gap:6px}
+  .metric .n small{font-size:13px;color:var(--muted);font-weight:400}
+  .metric .l{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+  section{margin-top:40px}
+  .h-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .h-row h2{font-size:19px;letter-spacing:-.01em}
+  .h-row .idx{font-family:var(--mono);font-size:12px;color:var(--sig);
+    border:1px solid var(--sig-soft);border-radius:5px;padding:2px 7px}
+  .h-row .rule{flex:1;height:1px;background:var(--line)}
+  .lede{color:var(--muted);font-size:14.5px;margin:-6px 0 18px;max-width:74ch}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+    font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%}
+  .ok{color:var(--ok);background:var(--ok-bg)} .ok::before{background:var(--ok)}
+  .wip{color:var(--wip);background:var(--wip-bg)} .wip::before{background:var(--wip)}
+  .gap{color:var(--gap);background:var(--gap-bg)} .gap::before{background:var(--gap)}
+  .def{color:var(--def);background:var(--def-bg)} .def::before{background:var(--def)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .panel>.top{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;
+    align-items:center;justify-content:space-between;gap:12px}
+  .panel>.top h3{font-size:16px}
+  .panel .body{padding:16px 20px}
+  .panel .verdict{font-size:13.5px;color:var(--muted);margin:0 0 12px}
+  .lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .lst li{display:grid;grid-template-columns:16px 1fr;gap:9px;font-size:14px;align-items:start}
+  .lst li .m{font-family:var(--mono);font-weight:700;line-height:1.45}
+  .yes .m{color:var(--ok)} .no .m{color:var(--gap)} .part .m{color:var(--wip)}
+  .lst li span{color:var(--ink)} .lst li em{color:var(--muted);font-style:normal}
+  .caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .cap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    border-left:3px solid var(--line)}
+  .cap.s-ok{border-left-color:var(--ok)} .cap.s-wip{border-left-color:var(--wip)}
+  .cap.s-gap{border-left-color:var(--gap)} .cap.s-def{border-left-color:var(--def)}
+  .cap .ch{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .cap h4{margin:0;font-size:14.5px;font-weight:650}
+  .cap p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);font-weight:600}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:var(--surface-2)}
+  td.t{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap}
+  td.v{color:var(--muted)} td.r{font-family:var(--mono);color:var(--faint);white-space:nowrap}
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;
+    justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .hero{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);
+    border-radius:12px;padding:22px 24px;margin:24px 0}
+  .hero .q{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+  .hero .a{font-size:clamp(21px,3.4vw,30px);font-weight:750;letter-spacing:-.02em;margin:7px 0 0}
+  .hero .a b{color:var(--ok)} .hero .a i{color:var(--wip);font-style:normal}
+  .hero p{color:var(--muted);font-size:14px;margin:10px 0 0;max-width:82ch}
+  .hero .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+  @media(max-width:720px){.hero .cols{grid-template-columns:1fr}}
+  .hero h5{margin:0 0 8px;font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+  .hero .flies h5{color:var(--ok)} .hero .not h5{color:var(--gap)}
+  .runbook{counter-reset:rb}
+  .rb{display:grid;grid-template-columns:30px 1fr 96px;gap:14px;align-items:start;
+    padding:13px 0;border-top:1px solid var(--line)}
+  .rb:first-child{border-top:none}
+  .rb .n{counter-increment:rb;font-family:var(--mono);font-weight:700;color:var(--sig);font-size:14px}
+  .rb .n::before{content:counter(rb)}
+  .rb h4{margin:0 0 2px;font-size:14.5px} .rb h4 .chip{margin-left:8px;vertical-align:middle}
+  .rb p{margin:0;font-size:13px;color:var(--muted)}
+  .rb .t{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;
+    font-variant-numeric:tabular-nums;padding-top:2px}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:780px){.tiers{grid-template-columns:1fr}}
+  .tier{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .tier>h3{margin:0;padding:11px 15px;font-size:12px;font-family:var(--mono);text-transform:uppercase;
+    letter-spacing:.06em;border-bottom:1px solid var(--line)}
+  .tier.u>h3{color:var(--gap);background:var(--gap-bg)}
+  .tier.w>h3{color:var(--wip);background:var(--wip-bg)}
+  .tier.d>h3{color:var(--def);background:var(--def-bg)}
+  .tier ul{list-style:none;margin:0;padding:12px 15px;display:flex;flex-direction:column;gap:9px}
+  .tier li{font-size:13px;color:var(--ink);padding-left:13px;position:relative;line-height:1.4}
+  .tier li::before{content:"–";position:absolute;left:0;color:var(--muted)}
+  .tier li small{color:var(--muted);display:block;font-size:11.5px;margin-top:1px}
+  td.doc{font-family:var(--mono);font-size:12px;color:var(--ink);white-space:nowrap}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Groundstation · feature-llm-driver · overnight session review</div>
+      <h1>Where we stand after tonight</h1>
+      <p class="sub">Five real bugs found and fixed by actually flying the stack, one architecture question resolved, one branch ready to merge, and an honest read on what's left before real hardware.</p>
+    </div>
+    <div class="stamp">
+      <div>report&nbsp; <b>2026-08-10, 03:xx</b></div>
+      <div>live flights tonight&nbsp; <b>5</b></div>
+      <div>last flight&nbsp; <b>clean, 0 failures</b></div>
+    </div>
+  </header>
+
+  <!-- VERDICT -->
+  <div class="hero">
+    <div class="q">Is the SITL showcase ready? Is the Tello ready?</div>
+    <div class="a"><b>SITL: yes.</b> <i>Tello: not yet — needs the laptop.</i></div>
+    <p>The full VLM-driven stack (planning, vision, safety, SLAM alongside) ran clean end-to-end tonight, twice, the second time with zero plan-parsing failures. That's real, repeated evidence, not a hopeful guess. The Tello binary is rebuilt and current, but nothing on real hardware has flown tonight — that needs you standing next to the drone, which this session doesn't have. A handoff doc is ready for exactly that.</p>
+    <div class="cols">
+      <div class="flies">
+        <h5>Proven tonight</h5>
+        <ul class="lst">
+          <li class="yes"><span class="m">✓</span><span>Full live mission: takeoff → search → approach → land, all _ok, zero parse failures</span></li>
+          <li class="yes"><span class="m">✓</span><span>A failed APPROACH correctly reached LAND instead of hanging (earlier run)</span></li>
+          <li class="yes"><span class="m">✓</span><span>VLM output now schema-constrained at the server — can't emit non-JSON anymore</span></li>
+        </ul>
+      </div>
+      <div class="not">
+        <h5>Not yet done</h5>
+        <ul class="lst">
+          <li class="no"><span class="m">✕</span><span>Nothing flown on real Tello hardware tonight</span></li>
+          <li class="no"><span class="m">✕</span><span>rubicon_colors world built, untested live</span></li>
+          <li class="part"><span class="m">~</span><span>ROTATE hang seen once, root cause still unknown</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUNBOOK -->
+  <section>
+    <div class="h-row"><span class="idx">01</span><h2>Next session — in order</h2><span class="rule"></span></div>
+    <p class="lede">Ordered because merging first keeps the one expected conflict easy to reason about while it's fresh.</p>
+    <div class="runbook">
+      <div class="rb"><div class="n"></div><div><h4>Merge feature-calibrate-slam <span class="chip ok">Reviewed, low-risk</span></h4><p>One expected conflict (docs/NOTES.md, pure append/append). Real, evidence-based debugging work: SDK keepalive, firewall-drop root cause, a 600x corner-detection perf fix.</p></div><div class="t">~10 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Commit tonight's 13 files</h4><p>Plan-parsing rewrite + schema constraint, SEARCH return-to-start, failure-replanning prompt rule, doc updates. Suggested message already drafted below.</p></div><div class="t">~5 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Run the color-discrimination showcase</h4><p><span class="mono">cd scripts/test/colors && ./run.sh</span> — never run live tonight, this is the first real trial.</p></div><div class="t">~10 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Watch the full GUI showcase yourself</h4><p>Command's ready from earlier tonight — I can't watch a GUI, you can.</p></div><div class="t">~10 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Physical Tello dry tests <span class="chip gap">Needs the laptop</span></h4><p>Follow docs/active/2026-08-09-tello-physical-handoff.md — takeoff/rotate/describe/land only, no position-dependent commands yet.</p></div><div class="t">~60-90 min</div></div>
+      <div class="rb"><div class="n"></div><div><h4>Real physical camera calibration</h4><p>Tooling exists (post-merge). The community intrinsics are provisional; a real checkerboard session against this airframe is still open.</p></div><div class="t">~30 min</div></div>
+    </div>
+  </section>
+
+  <!-- URGENCY -->
+  <section>
+    <div class="h-row"><span class="idx">02</span><h2>What's urgent, what waits</h2><span class="rule"></span></div>
+    <div class="tiers">
+      <div class="tier u">
+        <h3>Urgent · blocks next session</h3>
+        <ul>
+          <li>Merge feature-calibrate-slam<small>before it goes stale</small></li>
+          <li>Commit tonight's fixes<small>13 files, nothing committed yet</small></li>
+          <li>Physical Tello dry run<small>the one thing only you can do</small></li>
+        </ul>
+      </div>
+      <div class="tier w">
+        <h3>This week · real integration</h3>
+        <ul>
+          <li>SLAM startup scale calibration<small>known-object depth + altitude</small></li>
+          <li>SLAM staleness/fallback check<small>mandatory before any position-dependent Tello command</small></li>
+          <li>Real camera calibration<small>replace provisional community yaml</small></li>
+          <li>ASR/A3 wiring<small>node exists, spec exists, unwired</small></li>
+        </ul>
+      </div>
+      <div class="tier d">
+        <h3>Can wait · open, not urgent</h3>
+        <ul>
+          <li>ROTATE hang root cause<small>seen once, no repro yet</small></li>
+          <li>Catastrophic SLAM tracking-loss recovery<small>hard problem, common to all monocular SLAM at this budget</small></li>
+          <li>Model-reasoning-quality check on DECISION RULE 9<small>works mechanically, quality unverified</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENT REGISTER -->
+  <section>
+    <div class="h-row"><span class="idx">03</span><h2>Document register — what changed tonight</h2><span class="rule"></span></div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Document</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td class="doc">ROADMAP.md</td><td class="v">Master objective tree</td><td><span class="chip ok">Current</span></td><td class="v">Annotated 1.1.6, 1.1.7, 3.3; added 3.8</td></tr>
+          <tr><td class="doc">NOTES.md</td><td class="v">Architecture decision log</td><td><span class="chip ok">Current</span></td><td class="v">~200 new lines tonight, evidence-based</td></tr>
+          <tr><td class="doc">ARCHITECTURE.md</td><td class="v">System architecture</td><td><span class="chip ok">Corrected</span></td><td class="v">§4 was flatly wrong on ORBIT/SEARCH status</td></tr>
+          <tr><td class="doc">active/2026-08-09-tello-physical-handoff.md</td><td class="v">Hardware test procedure</td><td><span class="chip ok">New</span></td><td class="v">Read before touching the drone</td></tr>
+          <tr><td class="doc">active/2026-08-10-poc-status.html</td><td class="v">This report</td><td><span class="chip ok">New</span></td><td class="v">Supersedes 2026-08-08's</td></tr>
+          <tr><td class="doc">scheduled/…spec-A3-voice-interrupt.md</td><td class="v">ASR wiring spec</td><td><span class="chip wip">Line numbers now stale</span></td><td class="v">Re-locate hooks before starting</td></tr>
+          <tr><td class="doc">dependencies/rubicon_colors.sdf</td><td class="v">Lightweight showcase world</td><td><span class="chip wip">Untested</span></td><td class="v">First run is next session's job</td></tr>
+          <tr><td class="doc">feature-calibrate-slam (branch)</td><td class="v">Camera calibration tooling</td><td><span class="chip ok">Reviewed, ready</span></td><td class="v">Merge — see runbook</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CAPABILITY -->
+  <section>
+    <div class="h-row"><span class="idx">04</span><h2>Capability &amp; tonight's evidence</h2><span class="rule"></span></div>
+    <div class="caps">
+      <div class="cap s-ok"><div class="ch"><h4>VLM plan parsing</h4><span class="chip ok">Fixed twice</span></div><p>First fix: tolerant extraction. Better fix: server-side schema constraint. Live-verified: 0 parse failures, full clean mission.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>SEARCH</h4><span class="chip ok">Gap closed</span></div><p>Now returns to its start pose on failure instead of stranding the drone. Grid size still fixed, not room-aware — open.</p></div>
+      <div class="cap s-ok"><div class="ch"><h4>Failure → replanning</h4><span class="chip ok">Fixed cheaply</span></div><p>Model now explicitly told a non-_ok status means failure. Mechanism confirmed working; reasoning quality unverified.</p></div>
+      <div class="cap s-wip"><div class="ch"><h4>Tello backend</h4><span class="chip wip">Rebuilt, unflown</span></div><p>Binary current with every fix tonight. Zero real-hardware flights this session — needs the laptop.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>SLAM / pose</h4><span class="chip gap">Not wired to control</span></div><p>Tracks well (OpenMP fix), still purely observational — nothing reads its pose for flight decisions. Real hardware has zero position source until this changes.</p></div>
+      <div class="cap s-gap"><div class="ch"><h4>ROTATE hang</h4><span class="chip gap">Unexplained</span></div><p>Seen once: commanded yawrate ignored for 20+ min. No timeout on ROTATE's own completion predicate either.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>groundstation · overnight session review · 2026-08-10</span>
+    <span>VLM plans · deterministic math executes</span>
+  </footer>
+
+</div>

@@ -100,8 +100,8 @@ The FMU owns the flight **state machine** (STANDBY/TAKEOFF/FLIGHT/LANDING); the 
 | **TAKEOFF** | FMU state machine: arm → climb to target → FLIGHT | Completion = odom altitude ≥ target. Reconcile climb height (offboard node hardcodes 2 m). Stall guard (ceiling-blind). |
 | **LAND** | FMU state machine: descend → force-disarm near ground | Odom alt≈0 ∧ vz≈0. **Flare shipped (ROADMAP 9.11):** descent tapers from `kLandDescendVelEnu` to `kFlareTouchdownVelEnu` below `kFlareStartAltEnu`. Depth estimator gated OFF only in final 10–30 cm, after clear-to-land. WHERE-to-land = planning, separate. |
 | **STOP** | one hover cycle → instant | Near-redundant; kept for VLM expressiveness. |
-| **ORBIT** | ≥360° accumulated (default 1 rev) OR time limit | **Not parsed from the VLM plan** (silently dropped before enqueue) -- same `continue`-and-drop. Design intent preserved below for when it lands: anchor to a detected target in-frame only (no SLAM = no reliable global anchor). Visual servo: bbox in frame, `median_depth ≈ radius`, small steps. Target lost → abort → re-assess. |
-| **SEARCH** | success = detected; fail = timeout | **Not parsed from the VLM plan** (silently dropped before enqueue) -- same `continue`-and-drop. Design intent preserved below: 2-D horizontal circle, 360° step-rotate-settle-detect, expand outward. Record pre-search **anchor**; fail → `GO anchor` + FAILED. post-search → re-assess. |
+| **ORBIT** | swept angle ≥ target OR lock timeout | **Shipped, parsed from the VLM plan (`fmu_node.hpp` `action == "orbit"`), live-VLM-verified 2026-08-09** (real Qwen3-VL flight, not canned): locks a fixed odometry center from a detection, then flies a pure-odometry circle at that radius while vision only aims the camera -- vision never touches the path. Lost lock past `kApproachLostTimeoutUs` → `orbit_lost_failed`. |
+| **SEARCH** | success = detected above `kSearchMinConfidence`; fail = lane cap or timeout | **Shipped, parsed from the VLM plan (`fmu_node.hpp` `action == "search"`).** Parallel-track (lawnmower) sweep, `kSearchMaxLanes` lanes capped so it always terminates. On failure (`search_exhausted`) the drone now flies back to its SEARCH-activation pose before completing (fixed 2026-08-09 -- previously left the drone wherever the last lane ended). Known gap, not yet fixed: the swept area is a fixed-size grid computed once at activation, blind to the room's actual size/shape -- see `docs/NOTES.md` 2026-08-09. |
 | **CURVE** | — | Dropped for POC. Also not parsed from the VLM plan (silently dropped before enqueue), on top of being scoped out. |
 
 **20 Hz streaming contract:** active task → setpoint; queue empty → Hover. Never send once.
@@ -146,6 +146,15 @@ mission objective · vehicle state (`alt_up_m`/`speed_mps`/`airborne`) · percep
 (label/bbox/confidence/median_depth from snapshot §9) · executed command history
 (`{status,thought,id}`). **No active-pending-queue section exists** -- the queue is drained
 before the VLM is ever woken (§5), so there is nothing pending to list.
+
+- **`status` carries real failure information, and the system prompt now says so.**
+  `completeCurrent()` stores whatever status string the caller passes (`search_exhausted`,
+  `orbit_lost_failed`, `approach_lost`, ...; anything not ending `_ok` is a failure) but
+  `TaskState::FINISHED_FAIL` itself is declared and never assigned -- every task is internally
+  marked `FINISHED_SUCCESS` regardless of outcome, so nothing downstream can filter on task
+  state, only on the free-text string. Until 2026-08-09 the system prompt never told the model
+  these non-`_ok` strings existed or meant anything; DECISION RULE 9 (`fmu/llm_base.hpp`) now
+  spells this out explicitly. See `docs/NOTES.md` 2026-08-09.
 
 - **Send the raw, unmarked camera frame** (JPEG-encoded, resized to 640x640) AND the
   perception JSON as text -- there is no bbox/label drawing onto the image; "marked image"
@@ -284,7 +293,7 @@ time-to-contact / looming threshold until metric depth exists.
 | 1 | pending → active → completed; no ReadyToPublish. Queue = `moodycamel::ReaderWriterQueue`. `operator= = default`. |
 | 2 | `start()` bootstrap: `m_missionActive` atomic flips true; `maybePlan()` waits up to `kVisionWarmupUs` for a first camera frame (else plans text-only) then fires the first VLM call. **No condition_variable** -- gated by an atomic flag + timeout, checked each 20Hz poll (§5). |
 | 3 | Offboard = in-process backend publish loop (30Hz PX4 / 20Hz Tello); **state machine in FMU** (§7). FORK-C collapse done -- concrete backends, no separate node. |
-| 4 | GO = one carrot-chasing cross-track law (no `go_vel`/`go_pos` split). STOP instant. APPROACH shipped, target-anchored (§4). ORBIT/SEARCH/ROTATE/CURVE designed but not parsed from the VLM plan yet (§4). |
+| 4 | GO = one carrot-chasing cross-track law (no `go_vel`/`go_pos` split). STOP instant. APPROACH, ROTATE, ORBIT, SEARCH all shipped and parsed from the VLM plan (§4). CURVE remains dropped for POC, not parsed. |
 | 5 | Interrupt = reflexive hold-clearance → consumer drain → VLM reassess (§5.1). |
 | 6 | Camera: FMU subscribes **`camera/stream`** (rx_node output), PTS-timestamped. |
 | 7 | Odometry: direct `VehicleOdometry` (sim) — **migrate to cross-hw abstraction** (FORK-B). |

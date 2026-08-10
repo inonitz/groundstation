@@ -60,6 +60,28 @@ public:
         m_client.create();
         m_jsonRequest["temperature"] = m_temperature;
         m_jsonRequest["max_tokens"]  = m_maxTokens;
+        /* Force the response to be a JSON array of objects -- llama-server converts this
+           to a GBNF grammar server-side and constrains sampling with it, so the model
+           CANNOT emit markdown fences or prose around the plan anymore. This is the real
+           fix for the plan-parsing problem: extractJsonArray() (plan_parse.hpp) becomes a
+           defense-in-depth backstop instead of the primary line of defense. Deliberately
+           left loose (bare "array of objects", no per-action property schema) so it does
+           not need to track every action type's exact fields and reject valid variations;
+           translateToBaseCommands() already validates/drops unrecognized actions safely.
+           Verified empirically against this exact model+mmproj+llama-server combination
+           with a real multimodal (image+text) request before wiring in -- see
+           docs/NOTES.md 2026-08-09. */
+        m_jsonRequest["response_format"] = {
+            {"type", "json_schema"},
+            {"json_schema", {
+                {"name", "flight_plan"},
+                {"schema", {
+                    {"type", "array"},
+                    {"items", {{"type", "object"}}},
+                    {"minItems", 1}
+                }}
+            }}
+        };
         return;
     }
 

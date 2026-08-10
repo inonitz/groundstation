@@ -111,6 +111,18 @@ constexpr const char* kSystemPrompt =
     8. ORBITING: Target object must be visible in current camera view.
     Host executes landmark-relative arc trajectory using bounding box and depth.
 
+    9. READ YOUR OWN HISTORY BEFORE PLANNING: [EXECUTED COMMAND HISTORY] lists
+    every command you have already run, each with its outcome status. A status
+    ending in _ok succeeded -- proceed normally. ANY OTHER STATUS IS A FAILURE:
+    e.g. search_exhausted (SEARCH swept its whole pattern, target never found),
+    approach_lost / orbit_lost_failed (target visible when the command started,
+    then lost before it finished). A failure means the drone did NOT do what you
+    intended. Do not silently continue your original plan as if it had worked --
+    that repeats the same mistake blind. Look at current PERCEPTION and VEHICLE
+    STATE, diagnose why the last command failed, and adjust: a different heading
+    or approach for SEARCH, a different target, widening the search area, or
+    falling back to a safe stop/land if the objective is no longer reachable.
+
     ===========================================
     OUTPUT FORMAT
 

@@ -192,6 +192,11 @@ constexpr f32 kSearchSweepSpeedMps  = 0.50f;   /* cruise speed along a lane / cr
 constexpr f32 kSearchLaneLengthM    = 6.0f;    /* length of each straight lane.                         */
 constexpr f32 kSearchLaneSpacingM   = 2.0f;    /* sideways step between lanes (keep < camera FOV width).*/
 constexpr u32 kSearchMaxLanes       = 6;       /* lane cap so the pattern always terminates.            */
+constexpr u32 kSearchReturnTimeoutMs = 40000;  /* return-to-start leg after SEARCH is exhausted (spec:
+                                                a failed SEARCH must not strand the drone away from
+                                                where it started -- worst-case distance is bounded by
+                                                kSearchMaxLanes*kSearchLaneSpacingM diagonally, ~40s
+                                                covers that at kSearchSweepSpeedMps with margin).      */
 constexpr u32 kSearchLegTimeoutMs   = 20000;   /* advance a phase after this even if the distance never registers. */
 constexpr u64 kSearchLegTimeoutUs   = static_cast<u64>(kSearchLegTimeoutMs) * 1000ULL;
 constexpr f32 kSearchMinConfidence  = 0.50f;   /* reject weak/phantom hits; keep searching below this.  */

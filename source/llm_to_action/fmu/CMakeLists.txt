@@ -74,7 +74,7 @@ endforeach()
 # ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_TESTS)
     add_executable(plan_parse_test test/plan_parse_test.cpp)
-    target_link_libraries(plan_parse_test PRIVATE util_base_header)
+    target_link_libraries(plan_parse_test PRIVATE util_base_header nlohmann_json::nlohmann_json)
     target_compile_features(plan_parse_test PRIVATE cxx_std_17)
     add_custom_target(run_plan_parse_test COMMAND plan_parse_test DEPENDS plan_parse_test)
 

@@ -886,3 +886,200 @@ need a real (non-canned) VLM-driven flight.
   (closes ROADMAP 9.6).
 - Consequence: the old flat `build/release/shared` px4 tree and the earlier `build/release/tello`
   are now stale layout; both need a fresh configure under the new nested paths.
+
+## VLM plan-execution bugs found during live (non-canned) flight testing (2026-08-09)
+
+First real, non-canned, VLM-driven live SITL flight of the day (`slam/run.sh`, `LAUNCH_VLM=1`,
+`FMU_CANNED_FLAG=none`, real Qwen3-VL planning throughout) surfaced three real bugs that no canned
+scenario could have caught, because canned scenarios never enter the VLM replanning loop at all.
+
+- **Plan-parsing bug, fixed: a valid plan could be silently discarded and the drone left hovering
+  forever with no path to LAND.** `extractJsonArray()` (`source/llm_to_action/fmu/plan_parse.hpp`)
+  used to slice from the first `[` to the last `]` in the whole VLM response. Qwen3-VL routinely
+  describes what it sees (pixel coordinates, bounding boxes) in the prose around its JSON plan, and
+  that prose often contains its own stray brackets. Any stray bracket before or after the real plan
+  made the whole slice invalid JSON, `nlohmann::json::parse` rejected it, and the plan was dropped
+  with no fallback -- observed live: 10 consecutive dropped plans after an ORBIT finished, ~2 minutes
+  of hover, never reached LAND. Root cause found by dumping the tmux session's full pane scrollback
+  (`tmux capture-pane` per pane) and reading the FMU pane's own `[FMU_NODE_DEBUG] plan JSON parse
+  failed / not array.` warnings against the VLM pane's `llama-server` request log.
+  Fix: try every `[` in the string in turn; for each, walk forward with quote-aware bracket-depth
+  counting to find its own matching `]`, then check the resulting span actually parses as a JSON
+  array; return the first one that does. Survives stray brackets on *either* side of the real plan,
+  not just after it. 3 new regression cases added to `fmu/test/plan_parse_test.cpp` reproducing the
+  leading-bracket, trailing-bracket, and both-sides shapes; all 11 assertions (8 original + 3 new)
+  pass under a standalone `g++ -std=c++17` build (no ROS, no CMake reconfigure needed). A live
+  re-run with the fix in place was still in progress as of this entry -- the unit tests prove the
+  parser is now correct in isolation, not yet that a full live flight reaches LAND.
+
+- **SEARCH gaps, one fixed, two deferred.** Live behavior (search sweeps a fixed lawnmower grid,
+  6 lanes x 2m spacing, computed once at activation) was flagged as "a gimmick": (1) the swept area
+  never adapts to the room's actual size/shape, (2) on failure the drone was simply left wherever the
+  last lane ended, no return to its start point, (3) the only obstacle awareness during the sweep is
+  the same reactive emergency-boundary check every command gets, not the reactive vs. gimmicky.
+  Fixed (1.5 of the 3): on `search_exhausted`, the drone now flies back to `m_searchOriginPos` (the
+  true SEARCH-activation pose -- note this is a *different* field from the pre-existing
+  `m_searchStartPos`, which is reused/overwritten every lane transition for the sweep's own
+  per-leg distance tracking, so it could not be reused for this) before completing the task, capped
+  at `kSearchReturnTimeoutMs` (40s, sized for the worst-case ~13.4m diagonal at
+  `kSearchSweepSpeedMps`) so a return leg cannot itself hang forever. `search_ok` (target found) is
+  untouched -- returning to start after a *successful* search would fight whatever the VLM plans
+  next (ORBIT/APPROACH on the now-visible target). Deferred: making the sweep grid size/shape
+  actually aware of the room (gap 1) and giving it more than reactive-only obstacle handling during
+  the sweep itself (part of gap 3) are real redesign work, scoped separately rather than rushed in.
+
+- **Replanning-on-failure gap, fixed cheaply.** Asked directly: when a command like SEARCH or
+  APPROACH fails (not a safety INTERRUPT, just "didn't achieve its goal"), does the VLM actually get
+  told, and does anything push it to adapt instead of blindly continuing? Traced the whole path:
+  `completeCurrent()` unconditionally sets `TaskState::FINISHED_SUCCESS` for every finished task --
+  `TaskState::FINISHED_FAIL` is declared in the enum but never actually assigned anywhere, dead code.
+  The free-text `status` string (e.g. `"search_exhausted"`, `"orbit_lost_failed"`, `"approach_lost"`)
+  does reach the model verbatim, in `[EXECUTED COMMAND HISTORY]` inside `buildDynamicPrompt()`, and
+  the queue-empty wake condition does re-invoke the VLM after any task ends, success or failure. But
+  the system prompt (`fmu/llm_base.hpp`) never told the model that non-`_ok` statuses exist or mean
+  anything -- it was entirely up to the base model to notice an odd-looking status string in a JSON
+  history dump, unprompted, and choose to react. Fixed cheaply: added DECISION RULE 9, explicitly
+  telling the model any non-`_ok` status is a failure, listing the concrete status shapes it can see,
+  and instructing it to diagnose and adjust rather than silently continue the original plan. Did NOT
+  touch `TaskState::FINISHED_FAIL` / add a code-level failure-streak escalation (mirroring the
+  existing interrupt-storm escalation) -- that is a real option if rule 9 alone proves insufficient
+  in practice, but is bigger, riskier surgery than today's window supports.
+
+- **Harness bug found as a side effect: `FMU_OBJECTIVE` could not actually be overridden.**
+  `scripts/test/slam/run.sh` set `FMU_OBJECTIVE="Fly a canned cross while SLAM tracks."` as a plain,
+  unconditional assignment (not the `: "${VAR:=default}"` pattern `FMU_CANNED_FLAG` correctly uses),
+  so any `FMU_OBJECTIVE=...` passed in from outside was silently thrown away every time, regardless
+  of `FMU_CANNED_FLAG`. This means the "find the car, approach it, then land" live-VLM run earlier
+  today was actually run under the harness's hardcoded default objective text, not the intended one
+  -- the model's search-and-orbit behavior was it improvising against a mismatched/underspecified
+  goal, not proof it can follow an arbitrary stated objective. Fixed with the same `:=` pattern
+  `FMU_CANNED_FLAG` already uses. A clean re-run with the *actual* intended objective text is still
+  needed before treating "can the VLM complete a stated real-world objective end to end" as verified.
+
+## Live-flight verification chain, harness hardening, and the real root-cause fix (2026-08-09, cont.)
+
+Continuing directly from the section above (plan-parsing bug, SEARCH gaps, replanning-on-failure gap,
+`FMU_OBJECTIVE` override bug). This section covers what happened when actually re-verifying those
+fixes live, and a better fix than the original one for the plan-parsing problem.
+
+- **ROTATE hang, found live, root cause still unknown.** A verification flight got stuck commanding
+  a yaw rotation that never happened: `ROTATE remainRad=1.560 cmdYawrate=0.800 measYaw=3.04
+  measYawrate=0.00` repeated unchanged for 20+ minutes, altitude frozen low (~0.52-0.54m). `ROTATE`
+  has no timeout in its completion predicate (unlike SEARCH/APPROACH), so once yaw genuinely stops
+  responding it waits forever. The SLAM comparator's numbers degraded to `note=collapsed-fit` with
+  `drift_max_m` over 21m during this -- a symptom of the frozen drone (nothing to fit a trajectory
+  against), not a new SLAM regression. **Only observed once. Not investigated further, not fixed.**
+  If this recurs (SITL or real hardware), land manually rather than waiting for it to resolve.
+
+- **Harness bug, fixed: a timeout that doesn't kill anything is worse than no timeout.** The
+  external watcher script used to verify live flights polled for a landing event for up to 400s,
+  but if that expired without success it just silently gave up -- no kill, no signal, nothing --
+  and fell through into a `wait` that then blocked indefinitely on the SITL script. This is why a
+  hung run sat for 23 minutes with zero warning instead of failing loud at 7 minutes. Separately
+  confirmed `scripts/test/lib/wait_for_ground_truth.sh` itself DOES correctly exit at its own stated
+  timeout (reads clean) -- the hang was downstream of that, in `sim_core.sh`'s post-wait cleanup
+  path, not fully root-caused. Fixed the verification harness with a real external `timeout
+  --kill-after=Ns` wrapper plus unconditional cleanup (`pkill` by process name) that runs regardless
+  of how the wrapped command exited. First hardened attempt used too tight a margin (480s outer vs.
+  400s inner) and got killed by its own outer bound before the inner one had a fair chance --
+  inconclusive, not a real data point. Second attempt (600s outer vs. 300s inner) gave real margin
+  and worked correctly.
+
+- **Real successful live-flight verification.** With the hardened harness: `takeoff` ->
+  `search_ok` (target found in ~1.4s) -> `APPROACH` -> `approach_lost_failed` (target lost mid-
+  flight, a genuine new failure, first live observation of this) -> model's next plan was `land` ->
+  `land_ok`, mission halted cleanly (`Mission complete after LAND; VLM planning halted.`). One VLM
+  response mid-flight still failed to parse (`plan JSON parse failed`), but this time the FMU
+  recovered on its very next wake cycle instead of getting stuck -- proof the plan-parsing fix works
+  under real conditions, not just in the unit test. SLAM stayed healthy throughout
+  (`tracking_frac=1.00`, `note=ok`, no collapse). Open, unresolved question: after the APPROACH
+  failure, the model chose to land rather than retry -- permitted under DECISION RULE 9 ("adjust or
+  safe-land"), but whether it was genuine reasoning or just defaulting to the easy way out can't be
+  confirmed, since the raw model text for that specific plan wasn't captured verbatim (fixed for
+  future runs, see below).
+
+- **Better fix for the plan-parsing problem: stop extracting, force the format instead.** Challenged
+  directly on why `extractJsonArray` manually hunts for JSON instead of just using the JSON library
+  already in the codebase -- correct challenge. `nlohmann::json::parse()` can't solve "find JSON
+  embedded in a larger non-JSON string" because that's not a parsing problem, it's a text-search
+  problem no JSON library attempts. But the real fix is removing the need for that search entirely:
+  this exact vendored `llama-server` build (confirmed by reading `server-common.cpp`) supports
+  OpenAI-style `response_format: {"type": "json_schema", ...}` on `/v1/chat/completions` --
+  internally converted to a grammar that constrains what tokens the model can even sample. Verified
+  empirically before touching any code: a standalone request against this exact model + mmproj, with
+  a real generated JPEG (not a stub), came back as pure JSON with zero prose and zero markdown
+  fences, in under a second. Wired into `llamaclient.hpp`'s request template with a deliberately
+  loose schema (`array of objects`, not exact per-action-field shapes) so it can't reject a valid
+  variation it wasn't told about. `extractJsonArray` (the fix from earlier tonight) is now
+  defense-in-depth, not the primary mechanism. **Not yet live-flight-verified** -- built and unit-
+  buildable, but the one successful live flight above ran on the binary from *before* this change.
+
+- **Raw VLM response text is now logged.** Previously only a character count
+  (`VLM plan received (N chars)`) was logged, which made every parse failure undebuggable after the
+  fact without re-running and adding prints by hand. `callLlamaServer()` now logs the actual text
+  (bounded to 2000 chars) whenever a response is successfully extracted from the HTTP body.
+
+## ASR status check (2026-08-09)
+
+Asked directly whether ASR (voice override) had been forgotten. It has not: the ASR publisher node
+already exists and works standalone (`source/llm_to_action/asr/asr_node.hpp`, push-to-talk on key
+`H`, publishes to `/asr_server/transcribe`), and a full, detailed implementation spec already exists
+at `docs/scheduled/sitl-2026-08-10-spec-A3-voice-interrupt-and-termination.md` (status: scheduled,
+not started). `fmu_node.hpp` has zero references to the ASR topic today -- the wiring is genuinely
+unbuilt, not forgotten. Worth flagging: that spec cites specific `fmu_node.hpp` line numbers for
+where to hook in; those are now stale after tonight's edits (the file has grown), so whoever picks
+up A3 will need to re-locate the relevant functions rather than trust the spec's line numbers
+verbatim. Confirmed no conflict with tonight's `response_format` schema change -- it's deliberately
+loose (any object shape) and A3's planned `objective_complete`/`reason` fields on the first array
+element fit within it fine.
+
+## feature-calibrate-slam branch: merge assessment (2026-08-09)
+
+Reviewed (read-only: `git log`/`git diff` against `origin/feature-calibrate-slam`, no checkout, no
+merge performed) ahead of merging into the next commit on this branch. Two commits on top of our
+shared history at `be3db5d` (the OpenMP commit) -- `42c5b36` and `afe189b`, the latter looking like
+a fixup of the former (near-identical messages).
+
+- **Clean divergence.** 13 files changed, 500 insertions / 136 deletions. Only one file overlaps
+  with tonight's own changes on this branch: `docs/NOTES.md` -- both branches append after the same
+  anchor line, so this will show as a merge conflict, but it is a **pure append/append conflict**,
+  not a logical one. Resolution is "keep both blocks," nothing to reconcile.
+- **Real, well-documented debugging work, not half-finished junk despite the branch name.** Content:
+  a provisional (explicitly marked "NOT calibrated for our airframe") community camera-intrinsics
+  yaml for stella_vslam on the Tello (`dependencies/stella_config_tello.yaml`), a checkerboard
+  generator, and substantial fixes to the calibration capture tooling: a missing SDK keepalive that
+  was timing out real hardware, an OpenCV-GStreamer-vs-FFMPEG hang risk when no video is present,
+  a recurrence of an earlier firewall-drop bug now with a real root cause (container launched
+  without `devenv.sh`'s startup sequence, so its `iptables` rules were simply never inserted), and a
+  genuine performance bug (`cv2.findChessboardCorners` costing ~50s/call on a boardless frame,
+  freezing the capture preview; switched to `findChessboardCornersSB`, ~600x faster). All of this
+  is already written up in that branch's own `docs/NOTES.md` additions in the same evidence-based
+  style as this file.
+- **Safe cleanup included:** two accidentally-tracked `__pycache__/*.pyc` files are deleted, and
+  `source/llm_to_action/gstreamer_tello_udp_tx/CMakeLists.txt` is removed as dead code (the
+  Tello-specific camera plugin, made unnecessary once `rx_node.cpp` got its `--tello` runtime flag).
+  Confirmed safe: this subdirectory is already commented out of the build on `feature-llm-driver`
+  (`source/llm_to_action/CMakeLists.txt:93`), so nothing references the file being deleted.
+- **Recommendation:** merge is low-risk and should happen before the next real work session. Order:
+  merge `origin/feature-calibrate-slam` into this branch first (while today's other changes are
+  still fresh and the NOTES.md conflict is easy to reason about), resolve the one NOTES.md conflict
+  by keeping both additions, then continue. The camera intrinsics it adds are still explicitly
+  provisional -- a real checkerboard capture against the actual airframe is still open work, not
+  closed by this branch.
+
+## Lightweight color-discrimination SITL showcase (2026-08-09)
+
+Built in response to a real field-showcase constraint: the existing full `rubicon_targets` scene
+(2 cars + 2 people) measures ~12GiB VRAM (ROADMAP 9.15), which limits what can be demoed outside a
+machine with a big GPU. New world `dependencies/rubicon_colors.sdf` (source of truth;
+`scripts/test/lib/sim_core.sh` symlinks whatever `WORLD_NAME` resolves to from `dependencies/` into
+the PX4-Autopilot worlds directory fresh on every run, so the world file must live there, not be
+dropped directly into the PX4-Autopilot tree). Trimmed from `rubicon_targets.sdf`: kept the Rubicon
+terrain (SLAM needs its texture -- "empty"/`default_car` are too feature-poor per earlier session
+findings) and both existing hatchback models (`hatchback_blue` and the plain `hatchback`, already
+present in `rubicon_targets.sdf` at different poses), dropped both person models entirely to cut
+object count and perception load. Use `WORLD_NAME=rubicon_colors` in place of `rubicon_targets` in
+any of tonight's run commands. Purpose: an objective like *"find the BLUE car, not the other one"*
+tests whether the VLM discriminates by a real visual attribute instead of just detecting "a car" --
+a meaningfully different and harder capability than object presence alone. **Not yet run** -- world
+file created and reasoned through, but no live trial against it has happened tonight.

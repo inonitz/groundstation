@@ -34,7 +34,12 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
        1.1.6 ORBIT (target-anchored)                             [x]  odometry circle, SITL PASS 2026-08-08
+             2026-08-09: also verified under a real (non-canned) live VLM-driven flight, not
+             just the canned scenario -- see docs/NOTES.md.
        1.1.7 SEARCH (parallel-track lawnmower)                   [x]  SITL PASS 2026-08-08
+             2026-08-09: fixed a real gap -- failed SEARCH left the drone stranded wherever
+             the sweep ended; now returns to its start pose before completing. Grid size/shape
+             still fixed at activation, blind to the room -- open, see docs/NOTES.md.
        1.1.8 CURVE                                               [dropped for POC]
    1.2 ENU convention (Task 4)                                   [x]  operator SITL re-gate [ ] (human)
    1.3 Offboard streaming ~100 Hz (collapsed into backend)       [x]
@@ -71,9 +76,25 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
    3.1 Event-driven wake (queue-empty / reassess)                [x]
    3.2 Async off the control thread + single-flight guard        [x]
    3.3 Tolerant plan extraction (extractJsonArray)               [x]
+       2026-08-09: the original first-'['-to-last-']' version was NOT actually tolerant --
+       any stray bracket in the VLM's own prose (routine for Qwen3-VL describing what it
+       sees) broke it, silently dropping a valid plan with no fallback; observed live as a
+       drone stuck hovering ~2 min with no path to LAND. Rewritten to try each candidate
+       bracket span and validate it as real JSON before accepting it. See docs/NOTES.md.
+       Same day, better fix: llama-server's response_format/json_schema forces the model to
+       emit ONLY a JSON array at the sampling level (verified empirically, then wired into
+       llamaclient.hpp) -- extractJsonArray is now a backstop, not the primary defense. Live
+       flight the same night with this change: 0 parse failures, full mission succeeded
+       (takeoff/search/approach/land all _ok). See docs/NOTES.md.
    3.4 Dynamic prompt (state + history + perception JSON)        [x]  fed by PerceptionRuntime (4.2)
    3.5 Context budget FORK-A (-c 4096, max_tokens 512)           [x]
    3.6 System-prompt: APPROACH entry + interrupt text            [x]
+   3.8 System-prompt: explicit failure-status replanning rule    [x]  2026-08-09: EXECUTED COMMAND
+       HISTORY already carried real failure strings (search_exhausted, orbit_lost_failed, ...) but
+       the model was never told they meant anything -- pure luck whether it noticed. Added DECISION
+       RULE 9. Internally, TaskState::FINISHED_FAIL is still dead code (completeCurrent() always sets
+       FINISHED_SUCCESS); a code-level failure-streak escalation (mirroring the interrupt-storm one)
+       is a real option if rule 9 alone proves insufficient -- open, see docs/NOTES.md.
    3.7 Multi-takeoff / VLM-signalled mission end                 [DEFER]  (POC: LAND = end)
 
 4. Perception                                                    [~]  vision lib done + FMU-integrated; APPROACH (5) next
