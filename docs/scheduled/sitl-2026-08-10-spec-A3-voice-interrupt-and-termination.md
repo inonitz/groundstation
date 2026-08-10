@@ -13,6 +13,11 @@ ASR transcript into an interrupt with a `[USER]` prompt block, and make each rea
 structured completion verdict first, standing the drone down when the objective is met.
 
 ## Grounding (verified against this checkout, 2026-08-09)
+
+**Stale-line-number warning (added 2026-08-10):** the file:line citations below were verified
+2026-08-09. `fmu_node.hpp` has grown substantially since (plan-parse rewrite, SEARCH return-to-start,
+grammar-constrained VLM output -- see `docs/NOTES.md` 2026-08-09) and is now 2109+ lines. Re-locate
+every cited function/line by name before trusting a line number verbatim.
 - **The ASR node already exists and already answers the spec's "pick one" UX question.**
   `source/llm_to_action/asr/asr_node.hpp` defines `ASRStandaloneNode`, publishing transcripts to
   `kOutASRServerTranscriptionTopic = "/asr_server/transcribe"` (`asr_node_base.hpp:4`) as

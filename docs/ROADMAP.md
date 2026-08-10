@@ -183,7 +183,10 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        to catch is the remaining real-world unknown -> 5.1.5.
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
-   7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  scaffolding only
+   7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  tracking verified live
+         in SITL 2026-08-09 after an OpenMP threading fix -- best case 2 PASS/1 FAIL (spread_ratio
+         0.60-0.86) with VLM idling, marginal not solid. SITL-only (clean Gazebo render), untested
+         on real camera; not yet wired to control (B3 -- see docs/NOTES.md 2026-08-09).
    7.2 OctoMap occupancy from SLAM cloud + depth                 [ ]
    7.3 A* global planning over the OctoMap                       [ ]
    7.4 local-to-global tf2 anchor                                [ ]

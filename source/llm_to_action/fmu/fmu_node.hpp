@@ -107,6 +107,7 @@ struct CmdSearch {
     i32             timeout{0};
     i32             start_heading_deg{0};   /* first sweep heading, relative to current facing (deg). */
     bool            cw_or_ccw{false};       /* fan direction: true=cw, false=ccw. The VLM sets it by context. */
+    u8              size{kSearchDefaultSizeIdx};  /* index into kSearchSizePresets: 0=small 1=medium 2=large. */
 };
 
 struct CmdReassess {
@@ -1022,8 +1023,8 @@ private:
                     dx        = od.pos.x - m_searchStartPos.x;
                     dy        = od.pos.y - m_searchStartPos.y;
                     distStart = std::sqrt(dx * dx + dy * dy);
-                    if (distStart >= kSearchLaneSpacingM ||
-                        (tnow - m_searchLegStartUs) > kSearchLegTimeoutUs) {
+                    if (distStart >= m_searchParams.laneSpacingM ||
+                        (tnow - m_searchLegStartUs) > __scast(u64, m_searchParams.legTimeoutMs) * 1000ULL) {
                         m_searchCrossing       = false;
                         m_searchLaneHeadingRad = wrap_pi(m_searchLaneHeadingRad + kPi);
                         m_searchStartPos       = od.pos;
@@ -1038,7 +1039,7 @@ private:
                         m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                             "[FMU_NODE_DIAGNOSTICS] SEARCH cross lane=%u target=%s dist=%.2f/%.2f",
-                            m_searchLegCount, srch.target, distStart, kSearchLaneSpacingM);
+                            m_searchLegCount, srch.target, distStart, m_searchParams.laneSpacingM);
                     }
                 } else {
                     /* Fly one straight lane at fixed altitude, camera forward. At the lane end, start the
@@ -1046,8 +1047,8 @@ private:
                     dx        = od.pos.x - m_searchStartPos.x;
                     dy        = od.pos.y - m_searchStartPos.y;
                     distStart = std::sqrt(dx * dx + dy * dy);
-                    if (distStart >= kSearchLaneLengthM ||
-                        (tnow - m_searchLegStartUs) > kSearchLegTimeoutUs) {
+                    if (distStart >= m_searchParams.laneLengthM ||
+                        (tnow - m_searchLegStartUs) > __scast(u64, m_searchParams.legTimeoutMs) * 1000ULL) {
                         m_searchCrossing   = true;
                         m_searchStartPos   = od.pos;
                         m_searchLegStartUs = tnow;
@@ -1060,7 +1061,7 @@ private:
                         m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                             "[FMU_NODE_DIAGNOSTICS] SEARCH lane=%u target=%s dist=%.2f/%.2f heading=%.2f",
-                            m_searchLegCount, srch.target, distStart, kSearchLaneLengthM,
+                            m_searchLegCount, srch.target, distStart, m_searchParams.laneLengthM,
                             m_searchLaneHeadingRad);
                     }
                 }
@@ -1448,10 +1449,13 @@ private:
                                                         : 60ULL * 1000000ULL;
             m_searchCrossing       = false;
             m_searchLegCount       = 0;
-            m_searchMaxLegs        = kSearchMaxLanes;
+            m_searchParams          = kSearchSizePresets[srch.size < 3 ? srch.size : kSearchDefaultSizeIdx];
+            m_searchMaxLegs        = m_searchParams.maxLanes;
             RCLCPP_INFO(this->get_logger(),
-                "[FMU_NODE_DEBUG] SEARCH activated target=%s alt=%.2f startHeadingDeg=%d dir=%s timeout_s=%d",
-                srch.target, m_searchAltEnu, srch.start_heading_deg, srch.cw_or_ccw ? "cw" : "ccw", srch.timeout);
+                "[FMU_NODE_DEBUG] SEARCH activated target=%s alt=%.2f startHeadingDeg=%d dir=%s timeout_s=%d "
+                "size=%u (lane=%.1fm spacing=%.1fm maxLanes=%u)",
+                srch.target, m_searchAltEnu, srch.start_heading_deg, srch.cw_or_ccw ? "cw" : "ccw", srch.timeout,
+                srch.size, m_searchParams.laneLengthM, m_searchParams.laneSpacingM, m_searchParams.maxLanes);
             break;
         default:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d auto-completes.",
@@ -1634,7 +1638,7 @@ private:
 
     void translateToBaseCommands(std::string_view flightPlan) {
         nlohmann::json plan;
-        std::string    action, thought, arr;
+        std::string    action, thought, arr, sizeStr, firstAction;
         GenericCommand cmd;
         ActiveTask     task;
         CmdGo          go;
@@ -1642,6 +1646,8 @@ private:
         CmdRotate      rot;
         CmdOrbit       orbit;
         CmdSearch      search;
+        Odometry       od;
+        bool           airborne;
 
         arr  = extractJsonArray(flightPlan);  /* strip ```json fences / prose from the VLM. */
         plan = nlohmann::json::parse(arr, nullptr, false);
@@ -1654,6 +1660,36 @@ private:
             RCLCPP_WARN(this->get_logger(),
                 "[FMU_NODE_DEBUG] VLM plan has %zu actions (cap=%u); overflow dropped by backpressure.",
                 plan.size(), kMaxPlanActions);
+        }
+
+        /* 2026-08-10: found live -- a plan whose OWN thought text correctly said "not airborne,
+           need to take off first" still emitted takeoff as its 3rd action, not its 1st. Nothing
+           enforced the model's stated reasoning against its actual output order. Result: earlier
+           queued movement commands (SEARCH/APPROACH/...) ran first while grounded and disarmed,
+           and takeoff was never reached -- APPROACH in particular has no timeout on a flickering
+           lost/reacquired target, so this hung forever. Reject the WHOLE plan (same path as a
+           JSON-parse failure: discard, let queue-empty immediately re-wake the VLM) if not
+           airborne and the first real action (skipping the leading {"thought":...} object, which
+           has no "action" key) is not takeoff. Deliberately NOT "last must be land" -- that would
+           break the normal multi-cycle pattern (search -> reassess -> approach -> land is several
+           separate plans, not one) and would fight the interrupt-reassess path, where the drone
+           is already airborne and forcing a fresh takeoff would be nonsensical -- conditioning on
+           !airborne already excludes that case. See docs/NOTES.md. */
+        od       = m_backend->odometry();
+        airborne = od.pos.z > 0.3f;
+        if (!airborne) {
+            for (const auto& item : plan) {
+                if (item.contains("action")) {
+                    firstAction = item.value("action", std::string(""));
+                    break;
+                }
+            }
+            if (!firstAction.empty() && firstAction != "takeoff") {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] plan rejected: not airborne and first action is '%s', not "
+                    "takeoff -- discarding whole plan, re-asking VLM.", firstAction.c_str());
+                return;
+            }
         }
 
         for (const auto& item : plan) {
@@ -1699,6 +1735,8 @@ private:
                 search.timeout       = item.value("timeout_sec", 0);
                 search.start_heading_deg = item.value("start_heading_deg", 0);
                 search.cw_or_ccw     = (item.value("direction", std::string("ccw")) == "cw");
+                sizeStr = item.value("search_size", std::string("medium"));
+                search.size = (sizeStr == "small") ? 0 : (sizeStr == "large") ? 2 : kSearchDefaultSizeIdx;
                 cmd = GenericCommand(search);
             } else {
                 continue; /* Phase 1: takeoff/land/stop/go/rotate/approach executed. */
@@ -2098,6 +2136,10 @@ private:
     bool m_searchReturning{false};            /* true = SEARCH failed, flying back to m_searchOriginPos
                                                   before completing (rather than stranding the drone
                                                   wherever the last lane happened to end).            */
+    SearchSizeParams m_searchParams{kSearchSizePresets[kSearchDefaultSizeIdx]};  /* resolved once at
+                                                  activation from CmdSearch::size; every leg/timeout
+                                                  calc below reads this, never the raw preset table,
+                                                  so a size choice stays consistent for one SEARCH. */
 
     /* Canned no-YOLO detection rig (block 5.1 verification, spec §7): when enabled,
        controlLoop synthesizes a PerceptionSnapshot for a point fixed relative to the

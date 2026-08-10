@@ -189,14 +189,32 @@ constexpr f32 kOrbitAimTrimGain     = 0.30f;   /* small vision trim on top of th
    lanes covering a rectangle. Detection runs every tick. Distances come from odometry (drifts on
    Tello), so a per-phase timeout also advances the pattern. SITL-tune; pending loader (ROADMAP 9.14). */
 constexpr f32 kSearchSweepSpeedMps  = 0.50f;   /* cruise speed along a lane / cross step (m/s).         */
-constexpr f32 kSearchLaneLengthM    = 6.0f;    /* length of each straight lane.                         */
-constexpr f32 kSearchLaneSpacingM   = 2.0f;    /* sideways step between lanes (keep < camera FOV width).*/
-constexpr u32 kSearchMaxLanes       = 6;       /* lane cap so the pattern always terminates.            */
-constexpr u32 kSearchReturnTimeoutMs = 40000;  /* return-to-start leg after SEARCH is exhausted (spec:
+
+/* 2026-08-10: three fixed size presets instead of one flat grid, chosen per-search by the VLM
+   (CmdSearch::size) rather than the system auto-measuring the room -- that measurement doesn't
+   exist yet. MEDIUM is byte-for-byte the old flat constants, so an unspecified/old-format plan
+   behaves exactly as before. legTimeoutMs must comfortably exceed laneLengthM / kSearchSweepSpeedMps
+   or the leg times out before ever reaching its own intended length -- LARGE's timeout is NOT the
+   old flat 20s scaled up, it is sized for LARGE's own lane length. */
+struct SearchSizeParams {
+    f32 laneLengthM;
+    f32 laneSpacingM;
+    u32 maxLanes;
+    u32 legTimeoutMs;
+};
+constexpr SearchSizeParams kSearchSizePresets[3] = {
+    /* small  */ { 3.0f,  1.0f, 4, 10000 },
+    /* medium */ { 6.0f,  2.0f, 6, 20000 },   /* == the old flat kSearchLaneLengthM/Spacing/MaxLanes. */
+    /* large  */ { 10.0f, 3.0f, 8, 30000 },
+};
+constexpr u32 kSearchDefaultSizeIdx = 1;       /* medium -- old behavior when size is unspecified.     */
+constexpr u32 kSearchReturnTimeoutMs = 70000;  /* return-to-start leg after SEARCH is exhausted (spec:
                                                 a failed SEARCH must not strand the drone away from
-                                                where it started -- worst-case distance is bounded by
-                                                kSearchMaxLanes*kSearchLaneSpacingM diagonally, ~40s
-                                                covers that at kSearchSweepSpeedMps with margin).      */
-constexpr u32 kSearchLegTimeoutMs   = 20000;   /* advance a phase after this even if the distance never registers. */
-constexpr u64 kSearchLegTimeoutUs   = static_cast<u64>(kSearchLegTimeoutMs) * 1000ULL;
+                                                where it started). 2026-08-10: one flat bound covering
+                                                even the LARGE preset's worst case (maxLanes*spacing
+                                                diagonal with laneLengthM, 8*3.0/10.0 -> ~26m at
+                                                kSearchSweepSpeedMps ~= 52s) with real margin, rather
+                                                than a 3rd per-size constant to keep track of.         */
+/* kSearchLegTimeoutMs is now per-size (SearchSizeParams above); kept no non-size-indexed constant
+   around to avoid a stale value someone reads instead of the real one. */
 constexpr f32 kSearchMinConfidence  = 0.50f;   /* reject weak/phantom hits; keep searching below this.  */

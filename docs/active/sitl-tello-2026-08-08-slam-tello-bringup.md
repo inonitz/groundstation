@@ -1,5 +1,14 @@
 # SLAM + DJI Tello bring-up plan (2026-08-09)
 
+> **Stale as of 2026-08-10.** This doc frames camera calibration and stella_vslam bring-up as
+> upcoming "Track 1"/"Track 2" below. Both have since landed and closed out as their own specs:
+> [tello-2026-08-10-spec-B2-tello-camera-calibration.md](../closed/tello-2026-08-10-spec-B2-tello-camera-calibration.md)
+> and [sitl-2026-08-10-spec-B1-stella-vslam-sitl-bringup.md](../closed/sitl-2026-08-10-spec-B1-stella-vslam-sitl-bringup.md)
+> (tracking verified live, marginal 2 PASS/1 FAIL — see `docs/ROADMAP.md` 7.1 and `docs/NOTES.md`).
+> "Phase 2" below (wiring `slam/pose` into the FMU) is B3, still not started, correctly scheduled
+> in `docs/scheduled/sitl-tello-B3-agent-prompt.md`. Read this file for the original plan reasoning
+> only; for current status use the two closed specs and ROADMAP 7.1/2.3 instead.
+
 The actionable path from a green SITL POC to real-Tello autonomy. This supersedes the scattered
 notes from the planning session. The objective tree and status live in [ROADMAP.md](../ROADMAP.md)
 (SLAM = 7.1, Tello = 2.3); this doc is the execution order.

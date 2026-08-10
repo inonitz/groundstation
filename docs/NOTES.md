@@ -1129,5 +1129,167 @@ present in `rubicon_targets.sdf` at different poses), dropped both person models
 object count and perception load. Use `WORLD_NAME=rubicon_colors` in place of `rubicon_targets` in
 any of tonight's run commands. Purpose: an objective like *"find the BLUE car, not the other one"*
 tests whether the VLM discriminates by a real visual attribute instead of just detecting "a car" --
-a meaningfully different and harder capability than object presence alone. **Not yet run** -- world
-file created and reasoned through, but no live trial against it has happened tonight.
+a meaningfully different and harder capability than object presence alone.
+
+**Update 2026-08-10: run, and it surfaced a real bug -- the drone never took off.** Checked
+`scripts/test/colors/captured_panes_log.txt` directly (`altENU`, `arm=`, the raw VLM plan), not just
+the diagnostic lines that looked like normal flight at a glance:
+- `altENU` never exceeds 0.06 m across the entire 278-sample log. The vehicle armed once (~t=492s)
+  and stayed armed, but never climbed.
+- The VLM's own plan: `thought` correctly reasoned *"The drone is currently not airborne and needs
+  to take off first"* -- then the action array was `search`, `approach`, `takeoff`, in that literal
+  order. `takeoff` was queued third, behind two actions that don't request altitude, and per the log
+  was never reached.
+- `search`/`approach` ran for real, on the ground, near the rocky outcrop the model's own `thought`
+  mentions -- almost certainly the "hugging the rocks" behavior observed live.
+- `scripts/test/colors/slam_check.log` shows `spread_ratio` 0.04-0.05 (`note=collapsed-fit`) for
+  215/287 samples, 0 healthy -- consistent with a vehicle that never actually moved, not a SLAM/world
+  problem in its own right.
+
+Root cause is a plan-validation gap, not a colors-world or SLAM problem: nothing rejects a plan whose
+first real action isn't `takeoff` while `!airborne`. Fix already scoped (not yet built): reject the
+whole plan on that condition, same path as a JSON-parse failure -- discard, let queue-empty
+immediately re-wake the VLM. Re-run this world once that lands before drawing any conclusion about
+whether stella_vslam tracks in it.
+
+## Honest capacity/risk assessment for the final 3 days (2026-08-10) -- written down per explicit request
+
+This was given verbally in-session first and not persisted, which was a real gap given how much
+weighs on it -- written here now so it survives context loss, not just chat history.
+
+**On the 8-item plan (finish tonight's work, message-injection, ASR wiring, fix SEARCH, hardware
+E2E, a real SLAM answer capped at 6h, Tello-specific tuning, plus two contest demos by Thursday
+2026-08-13, one physical-with-localization preferred): not comfortably achievable as literally
+scoped in ~40 working hours.** Basis for that read, not a guess: tonight alone, testing a system
+believed largely finished, found six distinct real bugs in one evening -- a build flag, a
+plan-parsing failure, three separate SEARCH gaps, a hardcoded objective silently eating every
+override, an unexplained 20+ minute hang, and a command-ordering bug that kept a plan from ever
+taking off. That is the real discovery rate this system produces under actual testing, not a
+fluke to discount. SLAM has zero integration into flight control -- none, at any point tonight or
+before. Wiring it into real hardware for the first time, under deadline pressure, at the same
+discovery rate, risks the whole contest slot, not just one demo.
+
+**Agreed mitigation:** SITL is the guaranteed deliverable (closest to solid, real positive
+evidence already). Physical-with-localization is a stretch goal with an explicit checkpoint --
+if the SLAM fallback gate (see item F below) is not cleanly working in SITL by Wednesday evening,
+2026-08-12, do not attempt it live for the contest; fall back to the physical *non-localized* demo
+(takeoff/rotate/describe/land, no position dependency) instead. That is still a real, honest,
+working physical demonstration.
+
+**Per-item read:**
+- Finishing tonight's loose ends: essentially done as of this entry (merge landed, docs current).
+  One new item added by tonight's own testing: a plan that puts `takeoff` after a movement command
+  can leave the drone stuck forever, ungrounded, never airborne (see "SEARCH ordering bug" below)
+  -- worth fixing before anything else, since it can silently eat a demo attempt.
+- Message injection + ASR: correctly scoped as nearly one task -- the ASR spec's `[USER]`
+  interrupt-injection mechanism doesn't care whether the text comes from a microphone or a typed
+  string. Build the generic injection path first; real ASR becomes "subscribe to the existing topic
+  and call the same function," not a second implementation.
+- SEARCH: the return-to-start gap closed tonight; the size-preset request closed same night (see
+  below). The harder gap (auto-measuring the room) remains open and was not attempted -- correctly
+  out of scope for this window.
+- Hardware E2E: the one item genuinely bound by calendar time (battery swaps, physical iteration),
+  not by effort -- cannot be compressed by working harder. Should start early and run in parallel
+  with everything else, not last.
+- SLAM, capped at 6h: right instinct on the cap. Spend it on scale calibration + a staleness/
+  fallback gate (never trust pose that hasn't updated recently), not on chasing a replacement
+  library -- every alternative already evaluated has the same or worse fundamental limits for
+  monocular SLAM at this budget. "Fully solve catastrophic tracking-loss recovery" is not
+  achievable in 6h and should not quietly become the goal.
+- Tello-specific tuning: flows directly out of hardware E2E time; cannot proceed independently of it.
+
+## Two field-showcase fixes (2026-08-10)
+
+- **rubicon_colors' two cars were not actually different colors.** Confirmed live: `hatchback` (no
+  suffix) is ALSO blue, same as `hatchback_blue` -- the world was not a valid color-discrimination
+  test as originally built. Replaced with OpenRobotics' real "Hatchback red" model (confirmed to
+  exist via the Fuel API: same publisher, same weight class, 671KB), wired in via the explicit Fuel
+  HTTPS URI (`.../OpenRobotics/models/Hatchback%20red`) rather than the `model://` shorthand --
+  matches the pattern the Rubicon terrain include already uses reliably in this environment; the
+  shorthand's exact resolution mechanism was never confirmed. **Not yet live-verified** -- a
+  standalone `gz sim` sanity check was invalid (it failed on the pre-existing `hatchback_blue` line
+  too, because it doesn't replicate the GZ_SIM_RESOURCE_PATH setup `sim_core.sh` normally provides),
+  so this needs a real `scripts/test/colors/run.sh` run to confirm.
+- **VLM context size is now overridable** (`VLM_CTX_SIZE`, `scripts/test/lib/sim_core.sh`),
+  defaulting to 4096 for `scripts/test/colors/run.sh` specifically (was a hardcoded 65536
+  everywhere). Could not verify the resulting VRAM figure -- this sandbox has no
+  `nvidia-smi`/`rocm-smi`, and `vulkaninfo` does not report live heap usage here. Real number needs
+  checking with whatever GPU tool exists on the actual demo machine before trusting it for a field
+  demo with a real VRAM ceiling.
+
+## SEARCH size presets (2026-08-10)
+
+Replaced the single fixed lawnmower grid with three presets (small/medium/large), selectable per-
+search by the VLM via a new optional `search_size` field, defaulting to medium (byte-identical to
+the old flat constants, so an unspecified/old-format plan is unaffected). `fmu_node_base.hpp`:
+`SearchSizeParams` struct + `kSearchSizePresets[3]` table (laneLengthM/laneSpacingM/maxLanes/
+legTimeoutMs each). Important detail that would have been a real bug if missed: the per-leg timeout
+had to become part of the per-size table, not stay a single flat constant -- LARGE's longer lane
+takes longer to traverse at the same cruise speed, and the old flat 20s timeout would have cut a
+large-preset lane short before it ever reached its own intended length, silently shrinking "large"
+back down to whatever the timeout allowed. `kSearchReturnTimeoutMs` (the return-to-start bound)
+stays one flat, generously-sized constant (70s) covering even LARGE's worst-case diagonal, rather
+than adding a third per-size timeout to track. System prompt (`llm_base.hpp`) documents the new
+parameter with guidance on when to use which size. Builds clean.
+
+## SEARCH-then-APPROACH-before-TAKEOFF bug, found live (2026-08-10)
+
+`scripts/test/colors/run.sh`'s first real trial produced a plan whose own `thought` field correctly
+said *"The drone is currently not airborne and needs to take off first"* -- then emitted the action
+array `search, approach, takeoff, orbit, stop, land`, with `takeoff` third, not first. Nothing
+enforces the model's own stated reasoning against its actual output order. Result: SEARCH ran its
+full 60s sweep while grounded and disarmed (never moved, matches `search_exhausted`'s own correct
+timeout behavior -- that part worked), then APPROACH activated next and never resolved -- no
+timeout fires because it kept flickering between "lost" and "reacquired" rather than staying
+continuously lost long enough to trip its own failure timer, so `takeoff` (queued third) was never
+reached. Confirmed via the unbounded FMU log (`scripts/test/colors/captured_panes_log.txt`), not
+the scrollback-limited pane capture -- `arm=2` (armed) does not appear even once in the entire log.
+**Fixed (2026-08-10, same session):** `translateToBaseCommands` now rejects the whole plan (same
+path as a JSON-parse failure -- discard, let queue-empty immediately re-wake the VLM) if `!airborne`
+and the first real action (skipping the leading `{"thought":...}` object) is not `takeoff`.
+Deliberately NOT "last action must be land" -- see the design reasoning above, unchanged. Builds
+clean. Also fixed the same night: the two `rubicon_colors` cars were both genuinely blue
+(`hatchback` and `hatchback_blue` render identically) -- replaced with OpenRobotics' real
+"Hatchback red" (confirmed to exist and resolve via the Fuel API and a manual HTTP GET before
+wiring in; user separately downloaded/cached it locally). Re-verification of both fixes together
+launched same session -- see the next entry once it lands.
+
+## Colors POC re-verified: 2 fixes confirmed, 1 new fundamental problem found (2026-08-10)
+
+Real takeoff-ordering gate and the red-car model both confirmed working. **New finding: the
+color-discrimination premise itself doesn't work with the current matching mechanism, and a bad
+APPROACH target produced dangerous flight, not a safe no-op.**
+
+- **Takeoff-ordering gate: confirmed working, both directions.** Real `takeoff_ok` first this
+  time. Later in the same flight, two more VLM plans that opened with `search` while not airborne
+  were correctly rejected (`plan rejected: not airborne and first action is 'search'`) instead of
+  executing.
+- **Red car model: loads correctly.** No Fuel/model errors this run -- yesterday's loading problem
+  is resolved.
+- **New, more serious finding: `target_object: "blue_car"` never matches anything, because nothing
+  in the perception pipeline emits color-qualified labels.** SEARCH/APPROACH match by exact string
+  against the detector's own class labels (plain YOLO classes like `"car"`, not `"blue_car"`). The
+  model can *see* the color and say so in its `thought` text, but has no way to make that survive
+  into a `target_object` the matching logic can actually use. The whole premise of "ask it to tell
+  two cars apart by color via target_object" cannot work as currently wired -- this needs a design
+  fix (e.g. color as a separate field checked against the actual bounding-box crop, not folded into
+  the label string), not a retry.
+- **More urgent: chasing an unmatched APPROACH target produced a violent, erratic excursion, not a
+  safe failure.** The instant `APPROACH activated target=blue_car` printed, position jumped from
+  (2.6,-0.2) to (16.4,5.5) in about 1 second with `measVelENU` values over 9 m/s and wild yawrate
+  swings -- then self-terminated as `noop_ok` rather than a controlled `approach_lost_failed`. Left
+  the vehicle in a confused state afterward: PX4-level arm dropped to disarmed while the FMU's own
+  flight-state tracking (`fs=2`) kept believing it was still flying, causing a real
+  `TAKEOFF rejected (backend not STANDBY)` a few seconds later and a SEARCH command running at a
+  physically nonsensical negative-then-noisy altitude. **This is a real safety-relevant gap**: an
+  invalid/unmatched APPROACH target should fail safely (hover, or `approach_lost_failed`), not
+  produce large uncommanded motion. Not investigated further tonight -- root cause of the wild
+  velocity command itself (not just the missing-target symptom) is still open.
+- The run's log was cut short mid-SEARCH by the harness's own cleanup before a natural end state
+  was reached, so there's no clean final verdict line for this trial -- treat as a real, informative
+  failure, not a clean pass or fail.
+
+**Recommendation, not acted on tonight given the hour: do not re-attempt this specific test
+unattended again until the APPROACH-on-bad-target behavior is understood.** It produced real,
+uncommanded, several-meters-per-second motion in simulation from what should have been a benign
+"target not found" case -- worth being cautious about on real hardware.

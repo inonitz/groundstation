@@ -1,6 +1,6 @@
 # Tello physical hardware handoff (dry, position-independent tests)
 
-**Why this doc exists:** written at 02:xx on 2026-08-09, session ending without laptop/hardware
+**Why this doc exists:** written at 02:xx on 2026-08-10, session ending without laptop/hardware
 access. Everything below is prepared and buildable from this checkout; none of it has been run on
 real hardware yet. This is the handoff for whoever is at the laptop next to the drone.
 

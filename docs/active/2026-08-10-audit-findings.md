@@ -1,5 +1,15 @@
 # Audit — git, docs, and code state as of 2026-08-10
 
+> **Status update (later pass, 2026-08-10):** every item in this report's "Suggested cleanup" list
+> is now done — `feature-calibrate-slam` merged (`a2f1626`), ROADMAP 7.1 updated, the B1 closed-spec
+> status line fixed, A3's stale-line-number warning added to the spec itself, `2026-08-08-poc-status.html`
+> moved to `closed/`, `all_panes.txt` gone, `.gitignore` has `__pycache__/`/`*.py[cod]`, and
+> `docs/LOCKS.md` refreshed. **The headline SLAM-collapse finding below is also superseded, and its
+> framing was too strong:** `docs/NOTES.md`'s "colors showcase" 2026-08-10 update traced the same
+> `slam_check.log` collapse to the drone never taking off (`altENU` never exceeded 0.06m, a
+> takeoff-ordering plan bug), not a SLAM/world problem — it explicitly says re-run before drawing
+> any SLAM conclusion from this data. Kept below for the git/doc hygiene findings, which still hold.
+
 Read-only investigation, no files changed. Covers everything committed since this session's start
 (`b50f286` → `be3db5d`, 7 commits) plus the current uncommitted working tree. Findings ranked by
 what actually matters, not file order.

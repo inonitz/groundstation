@@ -37,11 +37,16 @@
 
     <!-- 2026-08-09: lightweight color-discrimination showcase. Trimmed from rubicon_targets.sdf --
          dropped both person models to cut object count/perception load for field demos where
-         12GiB VRAM (rubicon_targets' real number, ROADMAP 9.15) isn't available. Only the two
-         hatchbacks remain, same poses as rubicon_targets so they're still both in view from the
-         standard spawn (0,7,3 facing +X). Objective: force the VLM to distinguish "the car" by an
-         attribute (color), not just detect "a car" -- e.g. "find the BLUE car and approach it,
-         ignore the other one." -->
+         12GiB VRAM (rubicon_targets' real number, ROADMAP 9.15) isn't available. Objective: force
+         the VLM to distinguish "the car" by an attribute (color), not just detect "a car" -- e.g.
+         "find the BLUE car and approach it, ignore the other one."
+         2026-08-10: rubicon_targets' plain `model://hatchback` is ALSO blue -- confirmed live, not
+         a valid two-color test as originally built. Replaced with OpenRobotics' actual "Hatchback
+         red" (same publisher/style/weight class as hatchback_blue, 671KB, confirmed to exist via
+         the Fuel API before wiring in). Explicit Fuel URI used instead of the model:// shorthand --
+         same pattern the Rubicon terrain include above already uses reliably in this environment;
+         the shorthand's exact resolution mechanism was never confirmed and wasn't worth the risk
+         here. -->
     <include>
       <name>storm_hatchback_blue</name>
       <pose>6 2 1.5 0 0 0</pose>
@@ -49,9 +54,9 @@
       <static>true</static>
     </include>
     <include>
-      <name>storm_hatchback</name>
+      <name>storm_hatchback_red</name>
       <pose>12 -4.5 4.1 0 0 0</pose>
-      <uri>model://hatchback</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Hatchback%20red</uri>
       <static>true</static>
     </include>
 

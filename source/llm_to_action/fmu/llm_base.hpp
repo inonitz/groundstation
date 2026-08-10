@@ -69,10 +69,15 @@ constexpr const char* kSystemPrompt =
                         object into view. start_heading_deg sets the first lane heading (relative to
                         current facing: 0=ahead, 90=left, -90=right, 180=behind); direction (cw|ccw)
                         sets which side the lanes march across. Point the search where you expect the
-                        target based on context. Aborts if not found by timeout_sec.
+                        target based on context. Aborts if not found by timeout_sec, returning to
+                        where the search started before giving up.
+                        search_size picks how large an area to sweep -- "small" for a tight indoor
+                        room, "medium" (default if omitted) for a normal room/hallway, "large" for an
+                        open area/outdoors. Undersized wastes time re-searching the same small patch;
+                        oversized wastes time covering empty area the target was never going to be in.
     {"action": "search", "target_object": "<name_string>",
     "start_heading_deg": <int>, "direction": "cw|ccw",
-    "expected_search_time_sec": <int>, "timeout_sec": <int>}
+    "expected_search_time_sec": <int>, "timeout_sec": <int>, "search_size": "small|medium|large"}
 
     re-assess           Stop current plan execution. Force host to capture new
                         image and run a new planning cycle.

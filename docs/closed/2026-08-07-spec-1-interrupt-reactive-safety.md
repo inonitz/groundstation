@@ -1,6 +1,6 @@
 # Spec 1 — Interrupt & reactive safety
 
-**Status:** unassigned (for a spawned session). **ROADMAP:** 1.5, 6.1, 6.4.
+**Status:** DONE, SITL-verified 2026-08-08 (see "FINAL REVIEW & STATUS" below). **ROADMAP:** 1.5, 6.1, 6.3, 6.4 (6.3 added by operator directive, see final review).
 **Owns (edits):** `source/llm_to_action/fmu/fmu_node.hpp`, `.../fmu/fmu_node_base.hpp`.
 Overlaps the movement handler with Spec 2 & 4 — the overseeing session merges; keep edits localized
 and clearly commented.

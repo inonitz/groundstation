@@ -1,10 +1,12 @@
 # B1 — stella_vslam SITL bring-up (the risk spike)
 
-**Status:** IN PROGRESS 2026-08-09 — Tasks 1-4 done (build wired, `publish_rviz_pose()` uncommented,
-`color_order` fixed to BGR, `scripts/test/slam/run.sh` + `compare_ground_truth.py` written, build
-independently reproduced: `stella_vslam_monocular` 1.1MB). **Task 5 (live SITL run, real drift numbers
-against EKF2) is the one open item** — see `docs/active/sitl-B1-task5-agent-prompt.md` for the dispatch
-prompt. **Created:** 2026-08-10. **Revised:** 2026-08-09, twice (session
+**Status:** DONE 2026-08-09 — all 5 tasks landed. Task 5 (live SITL verification) found tracking was
+single-threaded (OpenMP disabled upstream); fixed via `-DUSE_OPENMP=ON` in `cmake/FetchStellaSLAM.cmake`,
+then re-verified: best case 2 PASS/1 FAIL (`spread_ratio` 0.60-0.86) on the `cross` maneuver with the VLM
+idling, marginal reliability, not solid. SITL-only, untested on real camera. Full trial-by-trial numbers
+in `docs/NOTES.md` "B1 stella_vslam live SITL verification + OpenMP fix" (2026-08-09). B3 (wiring
+`slam/pose` into the Tello backend) is unblocked but should treat this as marginal, not solid, evidence.
+**Created:** 2026-08-10. **Revised:** 2026-08-09, twice (session
 review, then an operator correction on the build-time estimate — see Revision log). **Branch:** none
 needed to start (see B4's "Where this runs" note — same reasoning: `source/slam/` has no A-track
 collision).

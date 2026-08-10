@@ -21,19 +21,32 @@ spec edits; the locks below serialize access to it and the other shared FMU file
    the **overseer** clears someone else's lock.
 
 ## Locks
+
+Notes below were last refreshed 2026-08-10. Everything is `FREE` right now -- entries predating
+2026-08-09 (spec-1/2/3 era) were cleared because their notes described work from several sessions ago
+and had stopped reflecting reality; a stale note is worse than no note since it misleads a reader
+checking here before an edit. Fill in `notes` with what you actually did, not what a prior session did.
+
 | file | holder | since (UTC) | notes |
 |------|--------|-------------|-------|
-| source/llm_to_action/fmu/fmu_node.hpp | FREE |  | spec-2: orbit back to pure odometry circle; SEARCH now parallel-track lawnmower; needs build |
-| source/llm_to_action/fmu/fmu_node_base.hpp | FREE |  | spec-2: reverted orbit drift consts; SEARCH now parallel-track (lane/spacing/maxlanes); needs build |
-| source/llm_to_action/fmu/llm_base.hpp | FREE | | spec-2: search schema now parallel-track (lawnmower) lanes |
-| source/llm_to_action/keyboard/keyboard_node.hpp | FREE | | spec-3 DONE: construct m_rawKeyEvent publisher |
-| docs/code-guidelines.md | FREE | | spec-1: loop-local hoisting rule added |
-| source/llm_to_action/perception/detection_query.hpp | FREE | | spec-1: nearestDepthM() + maxBboxFillFrac() (pure, unit-testable) |
-| docs/ROADMAP.md | FREE | | spec-1: 1.5/6.1/6.3/6.4 -> [x] SITL-verified; boundary/approach-impact/interrupt-storm matrix rows PASS |
-| source/llm_to_action/fmu/fmu_node.cpp | FREE |  | spec-2: +2 canned flags (orbit/search); needs build |
+| source/llm_to_action/fmu/fmu_node.hpp | FREE | | |
+| source/llm_to_action/fmu/fmu_node_base.hpp | FREE | | |
+| source/llm_to_action/fmu/llm_base.hpp | FREE | | |
+| source/llm_to_action/fmu/llamaclient.hpp | FREE | | |
+| source/llm_to_action/fmu/plan_parse.hpp | FREE | | |
+| source/llm_to_action/keyboard/keyboard_node.hpp | FREE | | |
+| docs/code-guidelines.md | FREE | | |
+| source/llm_to_action/perception/detection_query.hpp | FREE | | |
+| docs/ROADMAP.md | FREE | | |
+| source/llm_to_action/fmu/fmu_node.cpp | FREE | | |
 | scripts/simenv_llm.sh | DELETED | | superseded by scripts/test/lib/sim_core.sh + scripts/test/*/run.sh (2026-08-07) |
-| source/llm_to_action/generic_backend/generic_backend_types.hpp | FREE | | spec-3 DONE: kBatteryReadingUnknown added |
-| source/llm_to_action/px4_backend/px4_backend_base.hpp | FREE | | spec-3 DONE: battery topic + include |
-| source/llm_to_action/px4_backend/px4_backend.hpp | FREE | | spec-3 DONE: battery sub member + real battery_pct_impl |
-| source/llm_to_action/px4_backend/px4_backend.cpp | FREE | | spec-3 DONE: battery subscription + callback |
-| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | spec-1: nearestFreeDepthM() central-cone near-depth from the depth map (walls); needs build |
+| source/llm_to_action/generic_backend/generic_backend_types.hpp | FREE | | |
+| source/llm_to_action/px4_backend/px4_backend_base.hpp | FREE | | |
+| source/llm_to_action/px4_backend/px4_backend.hpp | FREE | | |
+| source/llm_to_action/px4_backend/px4_backend.cpp | FREE | | |
+| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | |
+| source/llm_to_action/tello_backend/tello_backend.hpp | FREE | | |
+| source/llm_to_action/tello_backend/tello_backend.cpp | FREE | | |
+| source/llm_to_action/tello_backend/tello_backend_base.hpp | FREE | | |
+| source/slam/slam2.hpp | FREE | | |
+| CMakeLists.txt (top-level) | FREE | | |

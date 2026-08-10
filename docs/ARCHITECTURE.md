@@ -122,15 +122,19 @@ cooldown + an `m_planning` single-flight atomic guard, then fires the VLM call o
 
 ### 5.1 Interrupt & Reassessment (deterministic-first)
 
-**✓ Implemented (Spec 1, SITL-verified 2026-08-09).** The steps below describe the (now built)
-emergency/interrupt path; none of it exists in `fmu_node.hpp` yet. `TaskState::STOPPED` is
-declared in the enum but never assigned anywhere in the tree -- it is dead code reserved for
-step 2 below, once built.
+**✓ Implemented (Spec 1, SITL-verified 2026-08-09).** Shipped as a hover-then-stash reflex:
+`raiseInterrupt(reason)` hovers the vehicle, copies `m_currTask` into `m_stashedTask`
+(`m_hasStashed=true`), clears `m_hasActive`, and lets the next VLM plan land normally --
+the stash is surfaced in the prompt (`[INTERRUPT] reason=... stashed=...`) but never
+auto-resumed. Evidence: `INTERRUPT (reason=...) stashed=... hover+reassess` in the
+boundary/approach-impact SITL logs. This is a different concrete mechanism than the
+`TaskState::STOPPED` enum value named below -- `STOPPED` is declared but never assigned
+anywhere in the tree; the stash flag does that job instead, and `STOPPED` is dead code.
 
 1. **Reflexive hold-clearance (control loop, no VLM).** `target = pos + reverse_vec·backoff`,
    `reverse_vec = -normalize(recent velocity)`, `backoff ≈ 20–30 cm`. Actively holds clearance
    vs hover overshoot. **Requires internal state:** short last-velocity history (also feeds §8).
-2. **Consumer drains the queue**, records interrupted task as `STOPPED` (+`thought`). SPSC-safe.
+2. **Consumer drains the queue**, stashes the interrupted task (+`thought`). SPSC-safe.
 3. **Wake VLM** with: what it was doing, what was queued, depth map + segmented hazard frame.
 4. **Producer refills** the empty queue; loop resumes.
 
@@ -354,18 +358,17 @@ the camera path (TX→RX→FMU, vision-grounded planning confirmed). Both FMU bi
 (`llm_to_action_fmu_px4` / `_tello`).
 
 **Remaining gap (what this spec still describes but the repo does not yet do):**
-- **APPROACH's "reached" has no motion sanity check** (ROADMAP 6.4) — a real SITL collision
-  (2026-08-06, live VLM run) produced a false `approach_ok`: the range reading was taken
-  during/after a physical impact (yawrate 6.9 rad/s vs commanded ~-0.10) and happened to pass
-  the standoff check. No check exists that "reached" coincides with nominal vehicle motion.
 - **live-YOLO GO** (ROADMAP 5.2) — APPROACH recomputes per-tick off a live detection; plain GO
   is still a one-shot dead-reckoned waypoint. Visual-servo GO redesign not started
   (`docs/active/2026-08-05-go-controller-visual-servo.md`).
-- **Emergency boundary** (§10, ROADMAP 6.1) — designed, not implemented (Spec 1). *(The
-  battery/failsafe supervisor §11 is now shipped + SITL-verified — see the resolved note below.)*
 - **Tello hardware bring-up** — backend flight-verified on real hardware 2026-08-06 (telemetry,
   odometry, camera all confirmed live); stick-to-m/s calibration, Simpson-rule odometry
   integration, and wind/prop-wash stability correction still open (ROADMAP 2.3.1/2.3.2/2.3.5).
+
+Resolved, previously listed here as still open: **APPROACH's "reached" motion sanity check**
+(ROADMAP 6.4) and the **emergency boundary** (§10, ROADMAP 6.1) are both shipped and
+SITL-verified (Spec 1, 2026-08-09) -- see §10/§11 above, which already carried the correct
+status. This list just hadn't been reconciled against them.
 
 Resolved since this section was last written: perception (real YOLO seg+depth) IS wired into
 the FMU and confirmed working end-to-end against a real object with a live VLM planning off it
