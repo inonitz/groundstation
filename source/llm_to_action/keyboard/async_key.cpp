@@ -1,6 +1,7 @@
 #include "async_key.hpp"
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 
 
 #if defined(UTIL2_OS_LINUX) && !defined(__WSL__) /* __WSL__ is compile-time defined using cmake */
@@ -319,7 +320,14 @@ bool AsyncKeyHook::findAllKeyboardDeviceInfo(std::vector<KeyboardDeviceInfo>& kb
     bool isKb = false;
 
     while (std::getline(file, line)) {
-        if (line.find("Name=") != std::string::npos) name = line;
+		/* Keep just the quoted device name; the raw "N: Name=..." line only clutters logs. */
+        if (line.find("Name=") != std::string::npos) {
+			std::size_t open  = line.find('"');
+			std::size_t close = line.rfind('"');
+			name = (open != std::string::npos && close > open)
+					 ? line.substr(open + 1, close - open - 1)
+					 : line;
+		}
         if (line.find("Handlers=") != std::string::npos) {
 			if (line.find("kbd") != std::string::npos) { 
 				isKb = true;
@@ -333,7 +341,14 @@ bool AsyncKeyHook::findAllKeyboardDeviceInfo(std::vector<KeyboardDeviceInfo>& kb
         
         /* Blank line means end of device block https://www.kernel.org/doc/html/latest/input/input.html */
         if (line.empty()) {
-            if (isKb && !path.empty()) { 
+			/* /proc lists host devices a container's snapshotted /dev may have no node for. */
+            if (isKb && !path.empty() && ::access(path.c_str(), F_OK) != 0) {
+				fprintf(stderr, "[HOOK_DBG] skipping %s [%s]: in /proc, no device node\n",
+					path.c_str(),
+					name.c_str()
+				);
+			}
+            else if (isKb && !path.empty()) { 
 				kbInfo.push_back({name, path}); 
 			}
 			/* Reset for next block */
@@ -432,25 +447,37 @@ void AsyncKeyHook::producerThread() {
 	m_fds.clear();
 	for (const auto& dev : kbDevInfoBuf) {
 		FileDescriptor fd = ::open(dev.path.c_str(), O_RDONLY);
-		
-		fprintf(stderr, "[HOOK_DBG] ::open(%s) fd = %d (errno: %d)\n", 
-			dev.path.c_str(), 
+
+		fprintf(stderr, "[HOOK_DBG] ::open(%s) fd = %d (%s) [%s]\n",
+			dev.path.c_str(),
 			fd,
-			errno
+			(fd == -1) ? strerror(errno) : "ok",
+			dev.name.c_str()
 		);
-		if(fd != -1 && isActuallyKeyboard(fd)) {
+		/* One unreadable device must not cost us the rest; only an empty set is fatal. */
+		if (fd == -1) {
+			continue;
+		}
+		if (isActuallyKeyboard(fd)) {
 			m_fds.push_back(fd);
-		} else if(fd == -1) {
-			fprintf(stderr, "[HOOK_DBG] Cannot open input device %d", fd);
-			{
-				/* trigger init failure inside create() */
-				std::lock_guard<std::mutex> lock(m_queueMtx);
-				m_startupSuccess  = false;
-				m_startupComplete = true;
-			}
-			m_cv.notify_all();
-			return;
-		}	
+			continue;
+		}
+		::close(fd);   /* not a keyboard; don't leak the fd. */
+	}
+
+	if (m_fds.empty()) {
+		fprintf(stderr,
+			"[HOOK_DBG] Producer aborted: no readable keyboard among %zu candidate device(s)\n",
+			kbDevInfoBuf.size()
+		);
+		{
+			/* trigger init failure inside create() */
+			std::lock_guard<std::mutex> lock(m_queueMtx);
+			m_startupSuccess  = false;
+			m_startupComplete = true;
+		}
+		m_cv.notify_all();
+		return;
 	}
 
 

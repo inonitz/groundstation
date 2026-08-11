@@ -23,6 +23,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstdio>
+#include <cstdlib>
 #include <opencv2/opencv.hpp>
 
 #include "tello_backend/tello_backend.hpp"
@@ -30,9 +31,13 @@
 #include "keyboard/key_codes.hpp"
 
 
-/* Fixed teleop magnitudes (m/s and rad/s). Deliberately gentle for indoor test. */
-static constexpr f32 kMoveSpeedMps = 0.4f;
-static constexpr f32 kYawRateRadps = 1.0f;
+/* Teleop magnitudes (m/s and rad/s). 0.4 m/s maps to only 40 of 100 stick through
+   kTelloMaxSpeedMps, which is not enough authority to fight the airframe's own drift indoors.
+   Env-tunable so authority can be found on the drone without a rebuild. */
+static const f32 kMoveSpeedMps =
+    std::getenv("TELLO_MOVE_MPS") ? std::strtof(std::getenv("TELLO_MOVE_MPS"), nullptr) : 0.8f;
+static const f32 kYawRateRadps =
+    std::getenv("TELLO_YAW_RADPS") ? std::strtof(std::getenv("TELLO_YAW_RADPS"), nullptr) : 1.0f;
 
 static std::atomic<bool> g_running{true};
 
@@ -106,6 +111,8 @@ int main() {
         return 1;
     }
     std::printf("[teleop] connected. T=takeoff L=land  WASD=move RF=up/down QE=yaw  Space=hover  Esc=quit\n");
+    std::printf("[teleop] move=%.2f m/s (stick %d/100)  yaw=%.2f rad/s  -- tune with TELLO_MOVE_MPS / TELLO_YAW_RADPS\n",
+                kMoveSpeedMps, mps_to_stick(kMoveSpeedMps), kYawRateRadps);
 
     TeleopState teleop(drone);
     AsyncKeyHook keys;
@@ -125,7 +132,12 @@ int main() {
     if (!cap.isOpened())
         std::printf("[teleop] camera stream not open yet (continuing without video).\n");
 
+    /* Tello broadcasts state at 10Hz, so 100ms is the finest rate that carries new data.
+       Override with TELLO_TELE_MS when a slower, more readable log is wanted. */
+    const char* teleMsEnv = std::getenv("TELLO_TELE_MS");
+    const u64   teleMs    = teleMsEnv ? std::strtoull(teleMsEnv, nullptr, 10) : 100ULL;
     u64 lastTelemetryMs = 0;
+    u64 firstTelemetryMs = 0;
     cv::Mat frame;
     while (g_running.load()) {
         if (cap.isOpened() && cap.read(frame) && !frame.empty()) {
@@ -133,17 +145,19 @@ int main() {
             if (cv::waitKey(1) == 27) g_running.store(false);   /* Esc in window too */
         }
 
-        /* Throttle to ~2 Hz. Fires whether or not telemetry is valid -- if it's
-           NOT valid, that's exactly the signal we need to see (state socket dead)
-           instead of the print silently never firing for the whole flight. */
+        /* Fires whether or not telemetry is valid -- if it's NOT valid, that's exactly the
+           signal we need to see (state socket dead) instead of the print silently never
+           firing for the whole flight. */
         Odometry od = drone.odometry();
         auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now().time_since_epoch()).count();
-        if (__scast(u64, nowMs) - lastTelemetryMs > 500ULL) {
+        if (__scast(u64, nowMs) - lastTelemetryMs >= teleMs) {
             lastTelemetryMs = __scast(u64, nowMs);
-            std::printf("[tele] valid=%d alt=%.2fm  vel(F,L,U)=(%.2f,%.2f,%.2f) m/s  yaw=%.1f deg  "
+            if (firstTelemetryMs == 0) firstTelemetryMs = lastTelemetryMs;
+            std::printf("[tele] t=%llu ms valid=%d alt=%.2fm tof=%dcm  vel(F,L,U)=(%.2f,%.2f,%.2f) m/s  yaw=%.1f deg  "
                         "state=%d  cmd(fwd=%.2f lat=%.2f vert=%.2f yaw=%.2f)\n",
-                        __scast(int, od.valid), od.pos.z, od.vel.x, od.vel.y, od.vel.z,
+                        __scast(unsigned long long, lastTelemetryMs - firstTelemetryMs),
+                        __scast(int, od.valid), od.pos.z, drone.tof_cm(), od.vel.x, od.vel.y, od.vel.z,
                         od.yaw * 180.0f / __scast(f32, M_PI),
                         __scast(int, drone.state()),
                         teleop.fwd.load(), teleop.lat.load(), teleop.vert.load(), teleop.yaw.load());

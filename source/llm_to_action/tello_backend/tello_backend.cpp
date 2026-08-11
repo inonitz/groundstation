@@ -172,6 +172,7 @@ void TelloBackend::stateLoop() {
             if (parse_tello_state_branchless(s->c_str(), st)) {
                 m_yawDeg.store(st.yaw, std::memory_order_relaxed);
                 m_heightCm.store(st.h, std::memory_order_relaxed);
+                m_tofCm.store(st.tof, std::memory_order_relaxed);
                 m_batPct.store(st.bat, std::memory_order_relaxed);
                 m_vgx.store(st.vgx, std::memory_order_relaxed);
                 m_vgy.store(st.vgy, std::memory_order_relaxed);

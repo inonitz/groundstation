@@ -44,9 +44,10 @@ cd scripts/tello
 ./run.sh
 ```
 
-Three panes come up: the video receiver, the FMU, and the keyboard teleop. Click the
-keyboard pane to give it focus before you fly. The FMU connects the Tello, enters command
-mode, sends `streamon`, and starts the 20Hz control loop. The rc keepalive rides on that
+Three panes come up: the video receiver, the FMU, and the keyboard teleop. The keyboard
+hook reads evdev globally, so no pane needs focus. It does need permission to read
+`/dev/input`, so be in the `input` group or run as root. The FMU connects the Tello, enters
+command mode, sends `streamon`, and starts the 20Hz control loop. The rc keepalive rides on that
 same loop, so the drone keeps getting stick updates without any extra code. The Tello
 auto-lands if the keepalive stops for about 15 seconds, so keep the FMU pane alive in
 flight.
@@ -54,6 +55,29 @@ flight.
 The VLM is not started by `run.sh`. Bring-up (video decode, telemetry, keepalive) does not
 need it. To fly the VLM-driven T1 mission, start `llama-server` in a fourth pane, the same
 way `scripts/test/lib/sim_core.sh` does (`CMD_VLM`).
+
+### Keyboard controls
+
+The keyboard drives the manual override only. It does not arm, take off, or land.
+
+| Key | Effect |
+|---|---|
+| Enter | Toggle manual override -- press once to take control, again to hand it back |
+| W / S | Forward / back |
+| A / D | Left / right |
+| Up / Down arrow | Climb / descend |
+| Left / Right arrow | Yaw left / right |
+| Space | Hover, zeroing every axis |
+
+Movement keys do nothing until the override is engaged, and Enter is the only key that
+engages it. The shell equivalent is
+`ros2 topic pub --once /fmu/in/override std_msgs/msg/Bool "{data:true}"`.
+
+Takeoff and landing arrive as plan commands from the VLM. There is no key for either. To fly
+manually from takeoff to landing, use the standalone `tello_teleop` harness instead: T takes
+off, L lands, WASD moves in the horizontal plane, R and F change altitude, Q and E yaw, Space
+hovers, and Esc lands then quits. That harness talks to the Tello directly and does not go
+through `run.sh`.
 
 ## What success looks like
 
@@ -74,7 +98,8 @@ on 11111 -- confirm the WiFi association and that the FMU pane got its `streamon
 
 ## Land and stop
 
-Land with the keyboard before you stop the session. Do not kill the panes mid-flight; the
-cleanup path `pkill`s the FMU, which cuts the rc keepalive and drops the drone into its own
-~15s auto-land. To re-arm and fly again, land, then take off again from the keyboard. When
-the battery runs low, land, swap the battery, and rerun `./run.sh`.
+Land before you stop the session. Under `run.sh` that landing comes from the VLM plan, since
+the keyboard has no land key. With no VLM running, land with the `tello_teleop` harness or
+the stock Tello app. Do not kill the panes mid-flight; the cleanup path `pkill`s the FMU,
+which cuts the rc keepalive and drops the drone into its own ~15s auto-land. When the battery
+runs low, land, swap the battery, and rerun `./run.sh`.

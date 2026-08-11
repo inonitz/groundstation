@@ -38,6 +38,12 @@ set -- "$@" -v "${HostPathVisionModel}:${ContainerPathVisionModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
 set -- "$@" -v "$HOME/.claude:/root/.claude"
 
+# Bind-mounted, not --device: docker snapshots /dev at creation, so a keyboard plugged in
+# later would otherwise have no node here.
+if [ -d "/dev/input" ]; then
+    set -- "$@" -v "/dev/input:/dev/input"
+fi
+
 # DRI for Intel/AMD/Generic
 if [ -d "/dev/dri" ]; then
     set -- "$@" --device "/dev/dri"

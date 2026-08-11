@@ -85,7 +85,8 @@ tmux split-window -v -t "$SESSION_NAME:0" "$CMD_FMU"
 tmux split-window -v -t "$SESSION_NAME:0" "$CMD_KEYBOARD"
 tmux select-layout -t "$SESSION_NAME:0" tiled
 
-echo "[INFO] Attached. Click the keyboard pane to give it focus before flying."
-echo "[INFO] LAND with the keyboard before you stop the session -- do not kill mid-flight."
+echo "[INFO] Attached. The key hook reads /dev/input globally, so no pane needs focus."
+echo "[INFO] Enter toggles manual override; WASD/arrows fly. There is NO takeoff or land key."
+echo "[INFO] Land before stopping (VLM plan, or the tello_teleop harness) -- do not kill mid-flight."
 echo "[INFO] When done: Ctrl-B then D to detach, or Ctrl-C the focused pane to stop."
 tmux attach-session -t "$SESSION_NAME"

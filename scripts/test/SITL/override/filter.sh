@@ -20,10 +20,10 @@ awk '
     /MANUAL OVERRIDE released/{ rel++ }
     /will re-plan/{ replan++ }
     END{
-        if(!eng){ print "\n  FAIL: no MANUAL OVERRIDE engaged — did you publish {data: true} to /fmu/in/override?"; exit 1 }
+        if(!eng){ print "\n  FAIL: no MANUAL OVERRIDE engaged — press Enter (or publish {data: true} to /fmu/in/override)"; exit 1 }
         print "\n  ok   engaged x" eng+0 " (autonomy paused, operator in control)";
         if(rel){ print "  ok   released x" rel+0 " (autonomy resumed)"; }
-        else    { print "  WARN: no release seen — publish {data: false} to hand control back"; }
+        else    { print "  WARN: no release seen — press Enter again to hand control back"; }
         if(rel && !replan){ print "  WARN: released but no re-plan line — check the VLM pane is up (LAUNCH_VLM=1)"; }
         print "\nPASS (manual keys flew it; handback resumed autonomy).";
         exit 0

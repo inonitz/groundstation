@@ -59,6 +59,7 @@ public:
     Odometry odometry_impl() const;
     IOState  state_impl() const { return m_ioState.load(std::memory_order_relaxed); }
     i32      battery_pct_impl() const { return m_batPct.load(std::memory_order_relaxed); }
+    i32      tof_cm()          const { return m_tofCm.load(std::memory_order_relaxed); }
 
     /* ---- backend-specific (not part of the backend interface) --------------
        Teleop-direct: body FLU velocity (m/s) + yaw rate (rad/s, CCW+); no
@@ -86,6 +87,9 @@ private:
 
     /* Shared telemetry (state loop -> callers). Ints in native SDK units. */
     std::atomic<i32> m_yawDeg{0}, m_heightCm{0}, m_batPct{0};
+    /* Downward IR ranger, cm. The VPS is this plus the downward camera, so a tof that never
+       moves is the tell that vision positioning is blind and vgx/vgy will stay 0. */
+    std::atomic<i32> m_tofCm{0};
     std::atomic<i32> m_vgx{0}, m_vgy{0}, m_vgz{0};
     std::atomic<u64> m_hostStampUs{0};
     std::atomic<bool> m_gotFirstState{false};
