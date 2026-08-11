@@ -1,42 +1,29 @@
-# PROVISIONAL -- NOT A CALIBRATION OF THIS AIRFRAME.
-#
-# These intrinsics are community-measured values for a DJI Tello at 960x720, taken from
-# https://tellopilots.com/threads/camera-intrinsic-parameter.2620/ (ROS camera_calibration
-# output). They are here so SLAM can be brought up and tracked before our own calibration
-# exists. They are NOT measured from our drone.
-#
-# Two reasons they cannot stay: lens assembly varies between individual units, and the
-# Tello's stream can be cropped by its digital stabilisation, which changes the intrinsics
-# outright. Distortion error shows up downstream as map drift that reads like a tuning
-# problem, so chasing FeatureExtractor numbers against this file will waste time.
-#
-# Replace by running scripts/tello/calibrate_camera.py, which overwrites this file with
-# measured values and drops these comments. See scripts/tello/CALIBRATION.md.
-#
-# Sanity checks these values pass: cx/cy sit near the true centre (480, 360), and fx and fy
-# agree to within 0.2%. What is NOT verified: that our drone streams 960x720 at all. The
-# capture script prints the confirmed resolution -- if it is not 960x720, these are invalid
-# and must not be scaled by hand.
+# MEASURED CALIBRATION OF THIS AIRFRAME -- 2026-08-11.
+# calibrate_camera.py over 39 checkerboard frames (9x6 inner, 20 mm squares), 960x720,
+# with full edge coverage and a 0.20-2.00 m distance spread.
+# Reprojection RMS error: 0.438 px (target < 1.0 px) -- trustworthy.
+# fps is the Tello's native stream rate (30), not the host-measured decode fps, which
+# ran far below 30 under load and does not reflect the drone's output.
+# FeatureExtractor block copied unchanged from dependencies/stella_config.yaml; tuning it is B1's job.
 
 Camera:
-  name: "Tello_Provisional_Community"
-  setup: "monocular"
-  model: "perspective"
-  fx: 921.170702
-  fy: 919.018377
-  cx: 459.904354
-  cy: 351.238301
-  k1: -0.033458
-  k2: 0.105152
-  p1: 0.001256
-  p2: -0.006647
-  k3: 0.0
+  name: Tello_Real_Camera
+  setup: monocular
+  model: perspective
+  fx: 914.980469812666
+  fy: 914.705287791177
+  cx: 486.0935386756224
+  cy: 362.42163366938945
+  k1: -0.025176094899854732
+  k2: -0.004570986368618646
+  p1: 0.00032905226647847376
+  p2: 0.0017664448131143222
+  k3: 0.10730186949886227
   fps: 30.0
   cols: 960
   rows: 720
-  color_order: "BGR"
+  color_order: BGR
 
-# Copied unchanged from dependencies/stella_config.yaml. Tuning these is B1's job.
 FeatureExtractor:
   name: "default"
   num_keypoints: 2500
