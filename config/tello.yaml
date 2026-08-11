@@ -1,0 +1,56 @@
+# ==============================================================================
+# config/tello.yaml -- runtime FMU tuning profile for a real DJI Tello indoors.
+#
+# Apartment scale. The compiled constexpr defaults are PX4 Gazebo SITL / outdoor
+# numbers (2 m climb at 2 m/s); flying those on a Tello in a room put it into the
+# ceiling. Every value here is a conservative indoor override. Loaded once at FMU
+# startup via the DRONE_CONFIG env var (scripts/tello/run.sh sets it). NO rebuild
+# to re-tune: edit a value here, re-run ./run.sh.
+#
+# Format: flat `key: value`, one per line, '#' starts a comment. Keys match the
+# DroneConfig fields in source/llm_to_action/fmu/drone_config.hpp. Any field left
+# out keeps its compiled default. Unknown keys are warned-and-skipped.
+# ==============================================================================
+
+# --- Takeoff (ENU, Up+) ---
+takeoffTargetAltEnu:  0.8      # m   -- low hover, well under a ceiling
+takeoffClimbVelEnu:   0.5      # m/s -- gentle climb
+
+# --- Land (ENU, Down = -Up) ---
+landDescendVelEnu:    -0.3     # m/s -- slow descent
+flareStartAltEnu:     0.5      # m   -- begin the flare taper this low
+flareTouchdownVelEnu: -0.10    # m/s -- soft touchdown speed
+groundContactEnu:     0.10     # m   -- landed when Up <= this
+
+# --- GO (translate to a point) ---
+defaultGoSpeedCmS:    20       # cm/s -- slow indoor cruise
+goApproachGainHz:     0.5      # 1/s  -- decel gain into the target
+goCrossTrackGainHz:   1.0      # 1/s  -- pull back to the line
+
+# --- ROTATE (yaw in place) ---
+rotateYawGainHz:      1.5      # rad/s per rad
+rotateMaxYawRate:     0.6      # rad/s -- gentler turn indoors
+
+# --- APPROACH (visual servo to a target) ---
+approachStandoffM:    1.0      # m    -- stop this far off; short room
+approachSpeedDefault: 30       # cm/s -- slow closing speed
+
+# --- SEARCH (lawnmower sweep) ---
+searchSweepSpeedMps:  0.25     # m/s  -- slow sweep
+searchLaneLengthM:    1.5      # m    -- short lanes for a room
+searchLaneSpacingM:   0.8      # m    -- tight lane spacing
+searchLegTimeoutMs:   8000     # ms   -- comfortably > laneLength/sweepSpeed (6s)
+
+# --- ORBIT (circle a target) ---
+orbitDefaultSpeedMps: 0.2      # m/s  -- slow tangential speed
+
+# --- Emergency boundary (trip = base + scale * closingSpeed) ---
+boundaryBaseM:        0.5      # m    -- standoff at zero closing speed
+boundaryVelScale:     0.5      # m per m/s
+
+# --- Battery failsafe ---
+batteryReturnPct:     20       # %  -- <= this: return to origin, then land
+batteryLandPct:       10       # %  -- <= this: land in place now
+
+# --- Manual operator override ---
+manualTeleopVelCmS:   30       # cm/s per axis -- gentler teleop indoors

@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>   /* cv::rectangle/putText -- annotated-frame overlay (A2). */
 #include <cv_bridge/cv_bridge.hpp>
 #include <cstdio>            /* fprintf/stderr -- approach-real perception debug */
 
@@ -42,12 +43,19 @@
 
 class PerceptionRuntime {
 public:
+    /* onAnnotatedFrame / onDepthColormap are A2 observability sinks (fmu owns the ROS
+       publishers). Default-empty so existing callers/tests that pass neither still
+       compile and simply skip publishing -- purely additive, no behavior change. */
     PerceptionRuntime(const std::string& segModelPath, const std::string& depthModelPath,
                        int segThreads, int depthThreads, u32 segLoopMs, u32 depthLoopMs,
-                       std::function<khUDPCamMsgType()> frameSource)
+                       std::function<khUDPCamMsgType()> frameSource,
+                       std::function<void(cv::Mat const&)> onAnnotatedFrame = {},
+                       std::function<void(cv::Mat const&)> onDepthColormap  = {})
         : m_seg(segModelPath, segThreads)
         , m_depth(depthModelPath, depthThreads)
         , m_frameSource(std::move(frameSource))
+        , m_onAnnotatedFrame(std::move(onAnnotatedFrame))
+        , m_onDepthColormap(std::move(onDepthColormap))
         , m_segPeriod(segLoopMs)
         , m_depthPeriod(depthLoopMs)
     {}
@@ -107,6 +115,11 @@ private:
                 if (!frame.empty()) {
                     std::vector<vision::SegDetection> dets = m_seg.segment(frame, kConf, kIou);
                     publish(dets);
+                    /* A2: hand the FMU an already-annotated frame to publish. The fixed
+                       void(cv::Mat const&) callback cannot carry the detections, so the
+                       boxes/labels are drawn here where dets is in scope, on a clone (the
+                       toCvShare mat aliases the ROS message and must not be written). */
+                    if (m_onAnnotatedFrame) m_onAnnotatedFrame(drawDetections(frame, dets));
                 }
             }
             sleepRemainder(tickStart, m_segPeriod);
@@ -121,6 +134,8 @@ private:
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
                     auto depth = std::make_shared<cv::Mat>(m_depth.estimate(frame));
+                    /* A2: emit the raw metric-depth mat; the FMU normalizes + applyColorMap. */
+                    if (m_onDepthColormap) m_onDepthColormap(*depth);
                     m_nearestFreeDepthM.store(computeNearestFreeDepthM(*depth), std::memory_order_relaxed);
                     m_freeDepthStampUs.store(nowUs(), std::memory_order_relaxed);
                     std::atomic_store(&m_depthMap, depth);
@@ -150,6 +165,23 @@ private:
         snap->host_stamp_us = nowUs();
         snap->valid       = true;
         std::atomic_store(&m_snapshot, snap);
+    }
+
+    /* A2 observability: draw YOLO boxes + class@conf labels onto a clone of the frame,
+       for the annotated-frame topic the FMU publishes. Clone because the source mat
+       aliases the ROS image message (toCvShare) and must stay read-only. */
+    static cv::Mat drawDetections(const cv::Mat& frame,
+                                   const std::vector<vision::SegDetection>& dets) {
+        cv::Mat out = frame.clone();
+        char    label[64];
+        for (const vision::SegDetection& d : dets) {
+            cv::rectangle(out, d.box, cv::Scalar(0, 255, 0), 2);
+            std::snprintf(label, sizeof(label), "%s %.0f%%",
+                vision::coco_class_name(d.classId), d.conf * 100.0f);
+            cv::putText(out, label, cv::Point(d.box.x, std::max(0, d.box.y - 5)),
+                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
+        }
+        return out;
     }
 
     /* Same bbox/mask median-over-depth sampling as vision::fuse()'s internal
@@ -225,6 +257,8 @@ private:
     vision::YoloSegEngine             m_seg;
     vision::YoloDepthEngine           m_depth;
     std::function<khUDPCamMsgType()>  m_frameSource;
+    std::function<void(cv::Mat const&)> m_onAnnotatedFrame; /* A2: annotated-frame sink (fmu publishes). */
+    std::function<void(cv::Mat const&)> m_onDepthColormap;  /* A2: raw depth-mat sink (fmu colormaps).   */
     std::chrono::milliseconds         m_segPeriod;
     std::chrono::milliseconds         m_depthPeriod;
 

@@ -26,7 +26,14 @@ cd "$(dirname "$0")" || exit 1
 
 # --- knobs (override on the command line, e.g. FMU_OBJECTIVE="..." ./run.sh) ---
 : "${FMU_OBJECTIVE:=Take off, yaw-scan the area, describe what you see, then land.}"
+: "${FMU_FLAG:=}"   # optional canned-plan flag, e.g. --canned-rotate (no-VLM airframe+ROTATE test). Empty = VLM-driven.
 : "${SESSION_NAME:=tello}"
+# Per-drone runtime tuning profile (ROADMAP 9.14). Defaults to the apartment-scale Tello
+# profile so ./run.sh flies indoor-safe constants with NO rebuild -- edit config/tello.yaml
+# and re-run. Override to another profile, or to "" to fly on the compiled SITL defaults.
+# The FMU aborts if this points at a missing/unreadable/unparsable file.
+: "${DRONE_CONFIG:=/root/groundstation/config/tello.yaml}"
+export DRONE_CONFIG
 
 # --- fixed config (absolute paths; cwd-independent) ---
 BUILD_DIR="/root/groundstation/build/release/shared/tello"
@@ -62,7 +69,8 @@ CMD_RX="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_RX && $RX_BIN --tello; \
     echo 'RX stopped'; read"
 CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBRARY_PATH && \
-    sleep $DELAY_FMU && $FMU_BIN \"$FMU_OBJECTIVE\"; \
+    export DRONE_CONFIG=\"$DRONE_CONFIG\" && \
+    sleep $DELAY_FMU && $FMU_BIN \"$FMU_OBJECTIVE\" $FMU_FLAG; \
     echo 'FMU stopped'; read"
 CMD_KEYBOARD="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_FMU && $KB_BIN; \

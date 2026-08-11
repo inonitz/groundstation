@@ -8,6 +8,9 @@
 #include <memory>
 #include <future>
 #include <cstdlib>
+#include <fstream>       /* A2: per-run VLM prompt/response JSONL log.        */
+#include <filesystem>    /* A2: ensure kVlmPromptLogDir exists at construction.*/
+#include <ctime>         /* A2: per-run log filename timestamp.               */
 #include <nlohmann/json.hpp>
 #include <readerwriterqueue.h>
 #include <util2/C/macro.h>
@@ -22,6 +25,7 @@
 
 #include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* UDPCamMsgType, khUDPCamMsgType, camera topic */
 #include "fmu_node_base.hpp"
+#include "drone_config.hpp"   /* DroneConfig + loadDroneConfig (ROADMAP 9.14). */
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
@@ -29,6 +33,8 @@
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 #include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>      /* A2: /fmu/hud text status.        */
+#include <sensor_msgs/msg/image.hpp>    /* A2: annotated-frame + depth topics.*/
 #include "keyboard/keyboard_node_base.hpp"  /* kOutKeyboardRawTopic, KeyboardRawInputType (Int32MultiArray) */
 #include "keyboard/key_codes.hpp"           /* KeyCodeEnum, KeyAction */
 #include "frame/frame_convert.hpp"          /* flu_to_enu / enu_to_flu */
@@ -213,6 +219,33 @@ public:
 
         m_taskQueue = std::make_unique<spsc_queue<ActiveTask>>(3 * kControlLoopRateHz);
 
+        /* Runtime per-drone tuning (ROADMAP 9.14). DRONE_CONFIG names a profile file;
+           this getenv is the sanctioned runtime-config hook -- the codebase's usual
+           zero-getenv rule does not apply to this one selector. Unset -> the all-defaults
+           struct, which equals the compiled constexpr (SITL scale), so behavior is
+           unchanged. Set-but-missing/unreadable/unparsable -> FATAL + abort: an explicitly
+           selected profile must never silently fall back to the wrong-scale defaults (the
+           apartment-ceiling crash this loader exists to prevent). Load once, then read. */
+        {
+            const char* cfgPath = std::getenv("DRONE_CONFIG");
+            if (cfgPath && cfgPath[0] != '\0') {
+                bool cfgOk = false;
+                m_cfg      = loadDroneConfig(cfgPath, cfgOk);
+                if (!cfgOk) {
+                    RCLCPP_FATAL(this->get_logger(),
+                        "[FMU_NODE_FATAL] DRONE_CONFIG='%s' selected but missing/unreadable/"
+                        "unparsable -- refusing to fly on fallback constants. Aborting.", cfgPath);
+                    std::abort();
+                }
+                mb_cfgActive = true;
+                RCLCPP_INFO(this->get_logger(),
+                    "[FMU_NODE_DEBUG] DRONE_CONFIG loaded from %s (takeoffAlt=%.2f climbVel=%.2f "
+                    "landVel=%.2f approachStandoff=%.2f searchSpeed=%.2f).",
+                    cfgPath, m_cfg.takeoffTargetAltEnu, m_cfg.takeoffClimbVelEnu,
+                    m_cfg.landDescendVelEnu, m_cfg.approachStandoffM, m_cfg.searchSweepSpeedMps);
+            }
+        }
+
         m_subImg = this->create_subscription<UDPCamMsgType>(
             kOutUDPCameraRawFrameTopic, 10,
             std::bind(&FlightManagementUnitNode::imgCallback, this, std::placeholders::_1),
@@ -239,15 +272,48 @@ public:
         m_backend = make_active_backend(this, m_cbGroup);
         m_backend->start();
 
+        /* A2 observability (additive): image topics the perception loops feed, a text
+           HUD topic, and the per-run VLM prompt/response log path (filename fixed once
+           here so a whole run lands in one file -- no per-cycle recompute, no clobber
+           across runs). std::error_code overload: a pre-existing dir is not an error. */
+        {
+            const char* obs  = std::getenv("FMU_OBSERVABILITY");
+            mb_observability = obs && obs[0] != '\0' && obs[0] != '0';
+        }
+        if (mb_observability) {
+            m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
+            m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
+            m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
+            m_vlmLogPath       = makeVlmLogPath();
+            std::error_code ec;
+            std::filesystem::create_directories(kVlmPromptLogDir, ec);
+            if (ec) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] VLM log dir create failed (%s): %s -- prompt log disabled.",
+                    kVlmPromptLogDir, ec.message().c_str());
+            }
+        }
+        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] observability=%s.",
+            mb_observability ? "ON" : "off");
+
         /* Two-rate perception (ARCH sec 9): PerceptionRuntime owns its own seg/depth
            threads and publishes an atomic PerceptionSnapshot; buildDynamicPrompt()
            reads it. Thread counts are capped (fmu_node_base.hpp) so ORT cannot starve
-           this control loop. */
+           this control loop. The two trailing callbacks are A2 sinks: an already-drawn
+           annotated frame and the raw depth mat, published on the topics above. */
+        /* Image sinks only when observability is on -- empty otherwise, so the seg/depth
+           loops skip the annotate-draw and colormap (their guards are `if (sink)`). */
+        std::function<void(cv::Mat const&)> annSink, depthSink;
+        if (mb_observability) {
+            annSink   = [this](cv::Mat const& a) { publishAnnotatedFrame(a); };
+            depthSink = [this](cv::Mat const& d) { publishDepthColormap(d); };
+        }
         m_perception = std::make_unique<PerceptionRuntime>(
             kVisionSegModelPath, kVisionDepthModelPath,
             kVisionSegThreads, kVisionDepthThreads,
             kVisionSegLoopMs, kVisionDepthLoopMs,
-            [this]() { return std::atomic_load(&m_currImg); });
+            [this]() { return std::atomic_load(&m_currImg); },
+            std::move(annSink), std::move(depthSink));
         if (!m_perception->ready()) {
             RCLCPP_FATAL(this->get_logger(),
                 "[FMU_NODE_FATAL] vision model(s) failed to load -- seg=%s depth=%s. "
@@ -264,7 +330,7 @@ public:
         /* max_tokens caps generation. A plan is ~200 tokens; the old 32768 (65536/2)
            let a no-EOS runaway ramble for minutes and wedge the planner. 512 bounds
            it to ~4s. temp 0.2 matches the server and reduces degenerate loops. */
-        m_vlmClient.create(kSystemPrompt, 0.2f, 512);
+        m_vlmClient.create(kSystemPrompt, 0.2f, 768);
         m_chat.m_completedTasks.reserve(kDefaultPromptHistorySize);
 
         RCLCPP_INFO(this->get_logger(),
@@ -485,6 +551,15 @@ private:
             n, e, d, od.vel.x, od.vel.y, od.vel.z, od.yaw, od.yawrate,
             __scast(int, m_hasActive), m_taskQueue->size_approx());
 
+        /* A2 readability HUD (additive, ~5Hz): one clean [FMU_HUD] line + /fmu/hud topic
+           so a human/Foxglove text panel sees STATE/ALT/TASK/VLM/DET/VEL/BATT at a glance
+           instead of parsing the ~60 debug lines. Reads only what is already in scope here;
+           does NOT touch any existing debug line. Throttled by a plain timestamp gate. */
+        if (mb_observability && (nowUs() - m_lastHudUs) >= kHudThrottleUs) {
+            m_lastHudUs = nowUs();
+            publishHud(st, d, od);
+        }
+
         /* Airborne command-storm (spec-3): once we've been in FLIGHT ~5s, inject the flood
            from a producer-role async (mirrors the VLM's std::async path) so the SPSC contract
            holds -- the control thread only LAUNCHES it here, it never enqueues. */
@@ -510,7 +585,7 @@ private:
         }
 
         if (st == FlightState::TAKEOFF) {
-            m_backend->set_velocity(Vec3{0.0f, 0.0f, kTakeoffClimbVelEnu}, 0.0f);  /* stream the climb (Up+) */
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, m_cfg.takeoffClimbVelEnu}, 0.0f);  /* stream the climb (Up+) */
             if (m_backend->state() == IOState::FAULT) {
                 RCLCPP_WARN(this->get_logger(),
                     "[FMU_NODE_DEBUG] TAKEOFF faulted (backend IOState=FAULT). Aborting task.");
@@ -518,7 +593,7 @@ private:
                 completeCurrent("takeoff_faulted");
                 return;
             }
-            if (d >= kTakeoffTargetAltEnu) {
+            if (d >= m_cfg.takeoffTargetAltEnu) {
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=%.2f", d);
                 m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
                 completeCurrent("takeoff_ok");
@@ -528,17 +603,17 @@ private:
 
         if (st == FlightState::LANDING) {
             /* slow-descent from full-speed to slow-touchdown as altitude nears the ground */
-            f32 vLand = kLandDescendVelEnu;
-            if (d < kFlareStartAltEnu) {
-                f32 t = (d - kGroundContactEnu) / (kFlareStartAltEnu - kGroundContactEnu);
+            f32 vLand = m_cfg.landDescendVelEnu;
+            if (d < m_cfg.flareStartAltEnu) {
+                f32 t = (d - m_cfg.groundContactEnu) / (m_cfg.flareStartAltEnu - m_cfg.groundContactEnu);
                 if (t < 0.0f) t = 0.0f; else if (t > 1.0f) t = 1.0f;  /* 1 at flare start, 0 at contact */
-                vLand = kFlareTouchdownVelEnu + t * t * (kLandDescendVelEnu - kFlareTouchdownVelEnu);  /* t*t: quadratic ease -- brakes harder near the ground than the old linear taper */
+                vLand = m_cfg.flareTouchdownVelEnu + t * t * (m_cfg.landDescendVelEnu - m_cfg.flareTouchdownVelEnu);  /* t*t: quadratic ease -- brakes harder near the ground than the old linear taper */
             }
             /* stream vLand so the flare taper is verifiable from the log (spec-4 Part B). */
             RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                 "[FMU_NODE_DIAGNOSTICS] LAND altENU=%.2f vLand=%.3f", d, vLand);
             m_backend->set_velocity(Vec3{0.0f, 0.0f, vLand}, 0.0f);  /* stream the (flared) descent (Down) */
-            if (d <= kGroundContactEnu) {
+            if (d <= m_cfg.groundContactEnu) {
                 m_backend->force_disarm();
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] LANDING->STANDBY altENU=%.2f (force_disarm)", d);
                 m_flightState.store(FlightState::STANDBY, kMemOrderRelax);
@@ -550,6 +625,24 @@ private:
                 RCLCPP_INFO(this->get_logger(),
                     "[FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.");
             }
+            return;
+        }
+
+        /* Lost-flight guard (safety): we believe we are airborne, but the backend has left FLIGHT
+           -- an unexpected disarm/failsafe (the PX4 backend surfaces it as FAULT), not a commanded
+           land (that runs in the LANDING branch above, which returns before here). Streaming velocity
+           to a vehicle that is no longer flying is exactly the desync that stranded the FMU at
+           fs=FLIGHT while PX4 was disarmed. Stop, reconcile to STANDBY, abort the active task, and
+           halt the mission so the VLM is not re-woken to fly a dead/crashed drone. Tello never
+           reports FAULT, so this cannot false-trip there -- its own ~15s keepalive auto-land covers it. */
+        if (st == FlightState::FLIGHT && m_backend->state() != IOState::FLIGHT) {
+            m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+            m_flightState.store(FlightState::STANDBY, kMemOrderRelax);
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] backend left FLIGHT (io=%d) while FMU airborne -> stop, reconcile STANDBY, abort task.",
+                __scast(int, m_backend->state()));
+            if (m_hasActive) completeCurrent("backend_lost_flight");
+            m_missionActive.store(false, std::memory_order_release);
             return;
         }
 
@@ -569,7 +662,7 @@ private:
            depth. nearestDepthM() returns 0 for "nothing measurable", which is not an obstacle. */
         if (st == FlightState::FLIGHT) {
             boundSpeed = std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y + od.vel.z * od.vel.z);
-            boundTrig  = kBoundaryBaseM + kBoundaryVelScale * boundSpeed;
+            boundTrig  = m_cfg.boundaryBaseM + m_cfg.boundaryVelScale * boundSpeed;
             loomFrac   = 0.0f;
             freeM      = 0.0f;
             if (m_obstacleArmed && m_obstacleFired && nowUs() < m_obstacleUntilUs) {
@@ -656,12 +749,12 @@ private:
                     crE = alE - along * m_goDirE;
                     crD = alD - along * m_goDirD;
 
-                    sp = kGoApproachGainHz * remain;
+                    sp = m_cfg.goApproachGainHz * remain;
                     if (sp > m_activeSpeed) sp = m_activeSpeed;
 
-                    vN = m_goDirN * sp - kGoCrossTrackGainHz * crN;
-                    vE = m_goDirE * sp - kGoCrossTrackGainHz * crE;
-                    vD = m_goDirD * sp - kGoCrossTrackGainHz * crD;
+                    vN = m_goDirN * sp - m_cfg.goCrossTrackGainHz * crN;
+                    vE = m_goDirE * sp - m_cfg.goCrossTrackGainHz * crE;
+                    vD = m_goDirD * sp - m_cfg.goCrossTrackGainHz * crD;
                     mag = std::sqrt(vN * vN + vE * vE + vD * vD);
                     if (mag > m_activeSpeed) {
                         sp  = m_activeSpeed / mag;
@@ -688,9 +781,9 @@ private:
                     RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] ROTATE complete remainRad=%.3f", m_rotateRemainingRad);
                     completeCurrent("rotate_ok");
                 } else {
-                    f32 yawRate = m_rotateDir * kRotateYawGainHz * m_rotateRemainingRad;
-                    if (yawRate >  kRotateMaxYawRate) yawRate =  kRotateMaxYawRate;
-                    else if (yawRate < -kRotateMaxYawRate) yawRate = -kRotateMaxYawRate;
+                    f32 yawRate = m_rotateDir * m_cfg.rotateYawGainHz * m_rotateRemainingRad;
+                    if (yawRate >  m_cfg.rotateMaxYawRate) yawRate =  m_cfg.rotateMaxYawRate;
+                    else if (yawRate < -m_cfg.rotateMaxYawRate) yawRate = -m_cfg.rotateMaxYawRate;
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, yawRate);
                     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                         "[FMU_NODE_DIAGNOSTICS] ROTATE remainRad=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
@@ -716,7 +809,7 @@ private:
                     if (m_approachHaveLastAim &&
                         (tnow - m_approachLastAimUs) <= kApproachLostTimeoutUs) {
                         appTrav = 0.0f;
-                        appRem  = kApproachStandoffM;   /* until latched, treat the stop point as far */
+                        appRem  = m_cfg.approachStandoffM;   /* until latched, treat the stop point as far */
                         if (m_approachBudgetLatched) {
                             dx      = od.pos.x - m_approachStartPos.x;
                             dy      = od.pos.y - m_approachStartPos.y;
@@ -793,7 +886,7 @@ private:
                     if (!m_approachBudgetLatched &&
                         m_approachRangeCount >= kApproachRangeMedianWindow) {
                         m_approachStartPos      = od.pos;
-                        m_approachTravelBudget  = m_approachLastRange - kApproachStandoffM;
+                        m_approachTravelBudget  = m_approachLastRange - m_cfg.approachStandoffM;
                         if (m_approachTravelBudget < 0.0f) m_approachTravelBudget = 0.0f;
                         m_approachBudgetLatched = true;
                         RCLCPP_INFO(this->get_logger(),
@@ -801,7 +894,7 @@ private:
                             m_approachLastRange, m_approachTravelBudget);
                     }
                     appTrav = 0.0f;
-                    appRem  = kApproachStandoffM;   /* until latched, treat the stop point as far */
+                    appRem  = m_cfg.approachStandoffM;   /* until latched, treat the stop point as far */
                     if (m_approachBudgetLatched) {
                         dx      = od.pos.x - m_approachStartPos.x;
                         dy      = od.pos.y - m_approachStartPos.y;
@@ -811,7 +904,7 @@ private:
                     }
 
                     if ((m_approachBudgetLatched && appRem <= 0.0f) ||
-                        (m_approachLastRange > 0.0f && m_approachLastRange < kApproachStandoffM)) {
+                        (m_approachLastRange > 0.0f && m_approachLastRange < m_cfg.approachStandoffM)) {
                         if (!approachMotionNominal(od)) {
                             RCLCPP_WARN(this->get_logger(),
                                 "[FMU_NODE_DEBUG] APPROACH reached range=%.2f but motion off-nominal "
@@ -826,7 +919,7 @@ private:
                             appr.target, appTrav, m_approachTravelBudget, m_approachLastRange);
                         completeCurrent("approach_ok");
                     } else {
-                        speedCeil = (appr.speed > 0.0f ? appr.speed : kApproachSpeedDefault) / 100.0f;
+                        speedCeil = (appr.speed > 0.0f ? appr.speed : m_cfg.approachSpeedDefault) / 100.0f;
                         /* Brake on remaining dead-reckoned travel once latched; before the latch,
                            creep slowly forward while collecting range samples for R0. */
                         spF       = m_approachBudgetLatched
@@ -1009,8 +1102,8 @@ private:
                         completeCurrent("search_exhausted");
                     } else {
                         altErr   = m_searchAltEnu - od.pos.z;
-                        velEnu.x = (dx / distStart) * kSearchSweepSpeedMps;
-                        velEnu.y = (dy / distStart) * kSearchSweepSpeedMps;
+                        velEnu.x = (dx / distStart) * m_cfg.searchSweepSpeedMps;
+                        velEnu.y = (dy / distStart) * m_cfg.searchSweepSpeedMps;
                         velEnu.z = kApproachVertGain * altErr;
                         m_backend->set_velocity(velEnu, 0.0f);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
@@ -1034,9 +1127,9 @@ private:
                     } else {
                         headErr = wrap_pi(m_searchCrossHeadingRad - od.yaw);
                         altErr  = m_searchAltEnu - od.pos.z;
-                        aimFlu  = { kSearchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
+                        aimFlu  = { m_cfg.searchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
                         velEnu  = flu_to_enu(aimFlu, od.yaw);
-                        m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
+                        m_backend->set_velocity(velEnu, m_cfg.rotateYawGainHz * headErr);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                             "[FMU_NODE_DIAGNOSTICS] SEARCH cross lane=%u target=%s dist=%.2f/%.2f",
                             m_searchLegCount, srch.target, distStart, m_searchParams.laneSpacingM);
@@ -1056,9 +1149,9 @@ private:
                     } else {
                         headErr = wrap_pi(m_searchLaneHeadingRad - od.yaw);
                         altErr  = m_searchAltEnu - od.pos.z;
-                        aimFlu  = { kSearchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
+                        aimFlu  = { m_cfg.searchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
                         velEnu  = flu_to_enu(aimFlu, od.yaw);
-                        m_backend->set_velocity(velEnu, kRotateYawGainHz * headErr);
+                        m_backend->set_velocity(velEnu, m_cfg.rotateYawGainHz * headErr);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                             "[FMU_NODE_DIAGNOSTICS] SEARCH lane=%u target=%s dist=%.2f/%.2f heading=%.2f",
                             m_searchLegCount, srch.target, distStart, m_searchParams.laneLengthM,
@@ -1148,6 +1241,142 @@ private:
             std::chrono::steady_clock::now().time_since_epoch()).count());
     }
 
+    /* ================= A2 observability helpers (additive) ===================
+       Image/HUD publishing + the per-run VLM prompt/response log. None of this
+       feeds control; it is pure inspection tooling for the live demo. */
+
+    static const char* flightStateName(FlightState st) {
+        switch (st) {
+            case FlightState::STANDBY: return "STANDBY";
+            case FlightState::TAKEOFF: return "TAKEOFF";
+            case FlightState::FLIGHT:  return "FLIGHT";
+            case FlightState::LANDING: return "LANDING";
+        }
+        return "?";
+    }
+
+    /* PerceptionRuntime already drew the boxes/labels (it owns the detections); here we
+       only wrap the BGR mat as a ROS image and publish it at the seg loop's native rate. */
+    void publishAnnotatedFrame(cv::Mat const& bgr) {
+        std_msgs::msg::Header hdr;
+        hdr.stamp    = this->now();
+        hdr.frame_id = "camera";
+        m_pubAnnotated->publish(*cv_bridge::CvImage(hdr, "bgr8", bgr).toImageMsg());
+        return;
+    }
+
+    /* Normalize the metric-depth mat to 8-bit, colormap it, publish at the depth rate.
+       patchNaNs first so a stray NaN cannot wreck the min/max normalization. */
+    void publishDepthColormap(cv::Mat const& depth) {
+        cv::Mat clean, norm, color;
+        if (depth.empty()) return;
+        clean = depth.clone();
+        cv::patchNaNs(clean, 0.0f);
+        cv::normalize(clean, norm, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        cv::applyColorMap(norm, color, cv::COLORMAP_TURBO);
+        std_msgs::msg::Header hdr;
+        hdr.stamp    = this->now();
+        hdr.frame_id = "camera";
+        m_pubDepthColormap->publish(*cv_bridge::CvImage(hdr, "bgr8", color).toImageMsg());
+        return;
+    }
+
+    /* TASK field: the active command as a short verb (+ its target where one exists). */
+    void hudTask(char* buf, size_t cap) {
+        CmdApproach appr;
+        CmdOrbit    orb;
+        CmdSearch   srch;
+        if (!m_hasActive) { std::snprintf(buf, cap, "idle"); return; }
+        switch (m_currTask.m_cmd.id()) {
+            case CommandID::TAKEOFF: std::snprintf(buf, cap, "takeoff"); return;
+            case CommandID::LAND:    std::snprintf(buf, cap, "land");    return;
+            case CommandID::STOP:    std::snprintf(buf, cap, "stop");    return;
+            case CommandID::GO:      std::snprintf(buf, cap, "go");      return;
+            case CommandID::CURVE:   std::snprintf(buf, cap, "curve");   return;
+            case CommandID::ROTATE:  std::snprintf(buf, cap, "rotate");  return;
+            case CommandID::REASSESS:std::snprintf(buf, cap, "reassess");return;
+            case CommandID::APPROACH:
+                appr = m_currTask.m_cmd.m_extractCmd.m_approach;
+                std::snprintf(buf, cap, "approach(%s)", appr.target[0] ? appr.target : "?");
+                return;
+            case CommandID::ORBIT:
+                orb = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
+                std::snprintf(buf, cap, "orbit(%s)", orb.target[0] ? orb.target : "?");
+                return;
+            case CommandID::SEARCH:
+                srch = m_currTask.m_cmd.m_extractCmd.m_SearchTarget;
+                std::snprintf(buf, cap, "search(%s)", srch.target[0] ? srch.target : "?");
+                return;
+            default: std::snprintf(buf, cap, "?"); return;
+        }
+    }
+
+    /* DET field: top few detections as label@conf, or "-" when nothing is in view. */
+    void hudDet(char* buf, size_t cap) {
+        std::shared_ptr<PerceptionSnapshot> snap = m_perception->snapshot();
+        u32    n, i;
+        int    off;
+        if (!snap || !snap->valid || snap->count == 0) { std::snprintf(buf, cap, "-"); return; }
+        n   = std::min(snap->count, 3u);
+        off = 0;
+        for (i = 0; i < n && off < static_cast<int>(cap) - 1; ++i) {
+            off += std::snprintf(buf + off, cap - off, "%s%s@%.0f%%",
+                (i == 0) ? "" : ",", snap->dets[i].label, snap->dets[i].confidence * 100.0f);
+        }
+        return;
+    }
+
+    /* Build + emit the ~5Hz human-readable status: [FMU_HUD] log line AND /fmu/hud topic. */
+    void publishHud(FlightState st, f32 altUp, Odometry const& od) {
+        char               task[64], det[128], body[320];
+        f32                vel;
+        std_msgs::msg::String msg;
+        hudTask(task, sizeof(task));
+        hudDet(det, sizeof(det));
+        vel = std::sqrt(od.vel.x * od.vel.x + od.vel.y * od.vel.y + od.vel.z * od.vel.z);
+        std::snprintf(body, sizeof(body),
+            "STATE=%s ALT=%.2fm TASK=%s VLM=%s DET=%s VEL=%.2fm/s BATT=%d%%",
+            flightStateName(st), altUp, task,
+            m_planning.load(kMemOrderRelax) ? "busy" : "idle",
+            det, vel, m_telemetry.battery_pct);
+        RCLCPP_INFO(this->get_logger(), "[FMU_HUD] %s", body);
+        msg.data = body;
+        m_pubHud->publish(msg);
+        return;
+    }
+
+    /* Per-run log filename, computed once at construction: vlm_prompts_<YYYYMMDD_HHMMSS>.jsonl
+       under kVlmPromptLogDir. Same timestamp idiom sim_core.sh uses for BAG_DIR, in C++. */
+    std::string makeVlmLogPath() const {
+        std::time_t t = std::time(nullptr);
+        std::tm     tmv{};
+        char        stamp[32];
+        localtime_r(&t, &tmv);
+        std::strftime(stamp, sizeof(stamp), "%Y%m%d_%H%M%S", &tmv);
+        return std::string(kVlmPromptLogDir) + "/vlm_prompts_" + stamp + ".jsonl";
+    }
+
+    /* One JSON object per line. Image bytes are NOT inlined (they are live on the annotated
+       topic) -- only image_attached + image_b64_bytes, to keep a long run's log small.
+       Called on the single-flight planning thread (m_planning guards it), so no lock needed. */
+    void appendVlmLog(bool imageAttached, size_t b64Bytes,
+                      std::string const& prompt, std::string const& response) {
+        nlohmann::json rec;
+        std::ofstream  f(m_vlmLogPath, std::ios::app);
+        if (!f) {
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] VLM prompt log open failed: %s", m_vlmLogPath.c_str());
+            return;
+        }
+        rec["timestamp_us"]    = nowUs();
+        rec["image_attached"]  = imageAttached;
+        rec["image_b64_bytes"] = static_cast<u64>(b64Bytes);
+        rec["prompt"]          = prompt;
+        rec["response"]        = response;
+        f << rec.dump() << '\n';
+        return;
+    }
+
     /* ---- Battery failsafe + manual override ------------------------------ */
     /* Returns true if the failsafe pre-empted this tick. battery_pct < 0
        (kBatteryReadingUnknown) means no trustworthy reading -> skip; a real 0 is
@@ -1157,7 +1386,7 @@ private:
         if (pct < 0)          return false;   /* UNKNOWN sentinel: never a false alarm. */
         if (mb_batteryReturn || mb_batteryLand) return false;   /* EITHER failsafe latched -> committed to a landing; don't re-evaluate (land-in-place must not then escalate to RTH). */
 
-        if (pct <= kBatteryLandPct && !mb_batteryLand) {      /* critical -> land where we are. */
+        if (pct <= m_cfg.batteryLandPct && !mb_batteryLand) {      /* critical -> land where we are. */
             mb_batteryLand = true;
             m_hasActive    = false;
             { ActiveTask stale; while (m_taskQueue->try_dequeue(stale)) { } }  /* drop the rest of the plan (consumer side); leftover actions must not run after we land. */
@@ -1167,7 +1396,7 @@ private:
                 "[FMU_NODE_DEBUG] FAILSAFE battery %d%% -> LAND in place.", pct);
             return true;
         }
-        if (pct <= kBatteryReturnPct && !mb_batteryReturn) {  /* low -> return to origin, then land. */
+        if (pct <= m_cfg.batteryReturnPct && !mb_batteryReturn) {  /* low -> return to origin, then land. */
             mb_batteryReturn = true;
             RCLCPP_WARN(this->get_logger(),
                 "[FMU_NODE_DEBUG] FAILSAFE battery %d%% -> RETURN to origin.", pct);
@@ -1258,18 +1487,34 @@ private:
         return;
     }
 
-    /* Raw keylog [keycode, action]. While override is engaged, movement keys map to
-       a constant body-FLU velocity (converted to ENU in controlLoop). WASD=plane,
-       arrows=alt/yaw, Space=hover. Ignored when not overridden. */
+    /* Raw keylog [keycode, action]. Enter toggles the manual override; while that override
+       is engaged, movement keys map to a constant body-FLU velocity (converted to ENU in
+       controlLoop). WASD=plane, arrows=alt/yaw, Space=hover. Movement keys are ignored when
+       not overridden. */
     void keyCallback(const KeyboardRawInputType::SharedPtr msg) {
-        if (msg->data.size() < 2 || !m_manualOverride.load(kMemOrderRelax)) return;
+        if (msg->data.size() < 2) return;
 
-        constexpr f32 kV   = kManualTeleopVelCmS / 100.0f;   /* m/s per axis. */
-        constexpr f32 kYaw = 0.6f;                           /* rad/s; TUNE in sim+real. */
         int  key  = msg->data[0];
         bool down = (msg->data[1] == __scast(int, KeyAction::PRESSED));
         bool up   = (msg->data[1] == __scast(int, KeyAction::RELEASED));
         if (!down && !up) return;                            /* ignore auto-repeat, etc. */
+
+        /* Override toggle, handled BEFORE the override gate below: nothing publishes
+           /fmu/in/override in the running rig, so this key is the only way to engage it and
+           a gated toggle could never fire. Press only -- the matching release would undo it
+           instantly. Routed through overrideCallback so the key and the topic share one
+           engage/disengage path (zeroManualVel, interrupt reset, handback re-plan). */
+        if (key == __scast(int, KeyCodeEnum::Enter)) {
+            if (!down) return;
+            auto toggled  = std::make_shared<std_msgs::msg::Bool>();
+            toggled->data = !m_manualOverride.load(kMemOrderRelax);
+            overrideCallback(toggled);
+            return;
+        }
+        if (!m_manualOverride.load(kMemOrderRelax)) return;
+
+        const f32 kV   = m_cfg.manualTeleopVelCmS / 100.0f;   /* m/s per axis. */
+        constexpr f32 kYaw = 0.6f;                           /* rad/s; TUNE in sim+real. */
         f32 on = down ? 1.0f : 0.0f;
 
         if      (key == __scast(int, KeyCodeEnum::W))          m_manualFwd.store(  kV  * on, kMemOrderRelax);
@@ -1281,6 +1526,7 @@ private:
         else if (key == __scast(int, KeyCodeEnum::LeftArrow))  m_manualYaw.store(  kYaw* on, kMemOrderRelax);
         else if (key == __scast(int, KeyCodeEnum::RightArrow)) m_manualYaw.store( -kYaw* on, kMemOrderRelax);
         else if (key == __scast(int, KeyCodeEnum::Space))      zeroManualVel();   /* hover. */
+        return;
     }
 
     /* ---- Task lifecycle helpers ------------------------------------------ */
@@ -1384,7 +1630,7 @@ private:
             } else {
                 m_goDirN = m_goDirE = m_goDirD = 0.0f;
             }
-            m_activeSpeed = (g.speed > 0.0f ? g.speed : kDefaultGoSpeedCmS) / 100.0f;
+            m_activeSpeed = (g.speed > 0.0f ? g.speed : m_cfg.defaultGoSpeedCmS) / 100.0f;
             RCLCPP_INFO(this->get_logger(),
                 "[FMU_NODE_DEBUG] GO activated. relFLU=(%.2f,%.2f,%.2f) targetENU=(%.2f,%.2f,%.2f) dirENU=(%.2f,%.2f,%.2f) speed=%.2f",
                 relFlu.x, relFlu.y, relFlu.z, m_targetN, m_targetE, m_targetD,
@@ -1420,7 +1666,7 @@ private:
         case CommandID::ORBIT:
             orb                = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
             od                 = m_backend->odometry();
-            m_orbitSpeed       = (orb.speed > 0.0f) ? orb.speed / 100.0f : kOrbitDefaultSpeedMps;
+            m_orbitSpeed       = (orb.speed > 0.0f) ? orb.speed / 100.0f : m_cfg.orbitDefaultSpeedMps;
             m_orbitDir         = orb.cw_or_ccw ? -1.0f : 1.0f;   /* ccw = +1 (math positive), cw = -1. SITL-verify. */
             m_orbitTargetRad   = std::fabs(orb.angle_deg) * kPi / 180.0f;
             m_orbitSweptRad    = 0.0f;
@@ -1450,6 +1696,14 @@ private:
             m_searchCrossing       = false;
             m_searchLegCount       = 0;
             m_searchParams          = kSearchSizePresets[srch.size < 3 ? srch.size : kSearchDefaultSizeIdx];
+            if (mb_cfgActive) {
+                /* A loaded profile overrides the size preset lane geometry with the per-drone
+                   tuned values (indoor lanes are far shorter); maxLanes stays from the VLM-chosen
+                   size. No profile -> preset used verbatim, so SITL is byte-identical. */
+                m_searchParams.laneLengthM  = m_cfg.searchLaneLengthM;
+                m_searchParams.laneSpacingM = m_cfg.searchLaneSpacingM;
+                m_searchParams.legTimeoutMs = m_cfg.searchLegTimeoutMs;
+            }
             m_searchMaxLegs        = m_searchParams.maxLanes;
             RCLCPP_INFO(this->get_logger(),
                 "[FMU_NODE_DEBUG] SEARCH activated target=%s alt=%.2f startHeadingDeg=%d dir=%s timeout_s=%d "
@@ -1585,6 +1839,8 @@ private:
     void callLlamaServer(std::string_view userQuery, khUDPCamMsgType const& img,
                          std::string& out) {
         std::string               b64, content, dyn;
+        bool                      imageAttached = false;
+        size_t                    b64Bytes      = 0;
         OptionalHttpRequestFuture  fut;
         nlohmann::json            j;
         cv::Mat                   frame, resized;
@@ -1602,13 +1858,16 @@ private:
         }
 
         dyn = buildDynamicPrompt();
+        imageAttached = static_cast<bool>(img) && !b64.empty();
+        b64Bytes      = b64.size();
         RCLCPP_INFO(this->get_logger(),
             "[FMU_NODE_DEBUG] VLM request: image=%s b64Bytes=%zu promptChars=%zu",
-            (img && !b64.empty()) ? "yes" : "no", b64.size(), dyn.size());
-        fut = m_vlmClient.send(dyn, userQuery, b64);
+            imageAttached ? "yes" : "no", b64.size(), dyn.size());
+        fut = m_vlmClient.send(dyn, userQuery, b64, /*requireTakeoffFirst=*/m_flightState.load(kMemOrderRelax) == FlightState::STANDBY);
         if (!fut.has_value()) {
             RCLCPP_WARN(this->get_logger(),
                 "[FMU_NODE_DEBUG] VLM submit returned nullopt (HTTP client not ready).");
+            if (mb_observability) appendVlmLog(imageAttached, b64Bytes, dyn, content);
             out = content;
             return;
         }
@@ -1633,6 +1892,7 @@ private:
                     content.c_str());
             }
         }
+        if (mb_observability) appendVlmLog(imageAttached, b64Bytes, dyn, content);
         out = content;
     }
 
@@ -2045,6 +2305,13 @@ private:
     VehicleTelemetry                                m_telemetry;
     std::unique_ptr<PerceptionRuntime>               m_perception;
 
+    /* A2 observability (additive): image + HUD publishers, per-run VLM log path, HUD throttle. */
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr  m_pubAnnotated;     /* /fmu/perception/annotated. */
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr  m_pubDepthColormap; /* /fmu/perception/depth.     */
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr    m_pubHud;           /* /fmu/hud text status.      */
+    std::string                                           m_vlmLogPath;       /* per-run prompt/response log.*/
+    u64                                                    m_lastHudUs{0};     /* ~5Hz HUD throttle gate.    */
+
     std::atomic<FlightState>  m_flightState{FlightState::STANDBY};
     std::atomic<bool>         m_missionActive{false};
     std::atomic<bool>         m_planning{false};
@@ -2136,6 +2403,13 @@ private:
     bool m_searchReturning{false};            /* true = SEARCH failed, flying back to m_searchOriginPos
                                                   before completing (rather than stranding the drone
                                                   wherever the last lane happened to end).            */
+    bool        mb_observability{false}; /* A2 dashboard off unless FMU_OBSERVABILITY set; gates all
+                                          image/HUD/VLM-log work so a plain run keeps every core. */
+    DroneConfig m_cfg;                 /* runtime tunables; every field defaults to the compiled
+                                          constexpr, so a no-profile run is byte-identical to before.
+                                          Loaded once from DRONE_CONFIG in the ctor (ROADMAP 9.14). */
+    bool        mb_cfgActive{false};   /* true only when a DRONE_CONFIG profile was loaded; gates the
+                                          SEARCH preset overlay so SITL keeps exact preset behavior.  */
     SearchSizeParams m_searchParams{kSearchSizePresets[kSearchDefaultSizeIdx]};  /* resolved once at
                                                   activation from CmdSearch::size; every leg/timeout
                                                   calc below reads this, never the raw preset table,

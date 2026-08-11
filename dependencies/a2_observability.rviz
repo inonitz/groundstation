@@ -1,0 +1,70 @@
+# A2 observability fallback layout for rviz2 (ships with ROS Jazzy).
+# Foxglove is the primary target (dependencies/foxglove_layout.json); this exists
+# because Foxglove availability is unverified on the demo machine. Open with:
+#     rviz2 -d dependencies/a2_observability.rviz
+# Shows the annotated camera frame and the depth colormap. The /fmu/hud text
+# status has no native rviz2 display -- view it with `ros2 topic echo /fmu/hud`.
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Annotated frame1
+        - /Depth colormap1
+      Splitter Ratio: 0.5
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Annotated frame
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /fmu/perception/annotated
+      Max Value: 1
+      Min Value: 0
+      Median window: 5
+      Normalize Range: true
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Depth colormap
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /fmu/perception/depth
+      Max Value: 1
+      Min Value: 0
+      Median window: 5
+      Normalize Range: true
+      Value: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: camera
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Name: Current View
+      Distance: 10
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 800
+  Width: 1200
+  Annotated frame:
+    collapsed: false
+  Depth colormap:
+    collapsed: false

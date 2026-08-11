@@ -1,0 +1,53 @@
+{
+  "configById": {
+    "Image!annotated": {
+      "imageMode": {
+        "imageTopic": "/fmu/perception/annotated"
+      },
+      "topic": "/fmu/perception/annotated",
+      "cameraState": {
+        "distance": 20,
+        "perspective": false
+      },
+      "synchronize": false
+    },
+    "Image!depth": {
+      "imageMode": {
+        "imageTopic": "/fmu/perception/depth"
+      },
+      "topic": "/fmu/perception/depth",
+      "cameraState": {
+        "distance": 20,
+        "perspective": false
+      },
+      "synchronize": false
+    },
+    "RawMessages!hud": {
+      "topicPath": "/fmu/hud.data"
+    },
+    "RawMessages!diag": {
+      "topicPath": "/fmu/in/override"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "first": {
+      "first": "Image!annotated",
+      "second": "Image!depth",
+      "direction": "column",
+      "splitPercentage": 50
+    },
+    "second": {
+      "first": "RawMessages!hud",
+      "second": "RawMessages!diag",
+      "direction": "column",
+      "splitPercentage": 55
+    },
+    "direction": "row",
+    "splitPercentage": 62
+  }
+}

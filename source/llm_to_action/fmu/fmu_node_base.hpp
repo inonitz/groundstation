@@ -86,6 +86,19 @@ constexpr int kVisionDepthThreads = 2;
 constexpr u32 kVisionSegLoopMs    = 33;   /* ~30 Hz target; measured: meets it. */
 constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40Hz refresh. */
 
+/* ---- A2 observability (2026-08-10): image topics, HUD topic, per-run VLM prompt log ----
+   Additive tooling for the live demo -- new publishers + a debug log, no behavior change.
+   Topic names match the A2 dashboard mockup (docs/active/2026-08-10-a2-dashboard-mockup.html)
+   so the Foxglove/rviz layout and the mockup line up. kVlmPromptLogDir is a compile-time
+   constant (this codebase uses zero getenv); only the per-run FILENAME is computed once at
+   FMU construction, the same idiom sim_core.sh uses for BAG_DIR timestamps. */
+constexpr const char* kVlmViewTopic       = "/fmu/perception/annotated"; /* annotated frame: bboxes+labels. */
+constexpr const char* kDepthColormapTopic = "/fmu/perception/depth";     /* depth colormap (normalized+applyColorMap). */
+constexpr const char* kFmuHudTopic        = "/fmu/hud";                   /* std_msgs/String human-readable status. */
+constexpr const char* kVlmPromptLogDir    = "/root/groundstation/vlm_logs"; /* per-run vlm_prompts_<stamp>.jsonl live here. */
+constexpr u32         kHudThrottleMs      = 200;   /* ~5 Hz HUD line + /fmu/hud publish. */
+constexpr u64         kHudThrottleUs      = static_cast<u64>(kHudThrottleMs) * 1000ULL;
+
 /* ---- APPROACH visual servo (ROADMAP 5.1, spec 2026-08-05-visual-servoing-approach-design.md) --
    Recomputed every control tick from the live camera detection; no world point is stored, so
    nothing here can drift (spec D4). Gains use the same "Hz" (1/s) convention as the GO
