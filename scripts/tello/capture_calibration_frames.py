@@ -52,6 +52,33 @@ def keepalive_loop(sock, stop_event):
 	return
 
 
+def state_loop(stop_event, battery):
+	"""Track live battery %% from the Tello state broadcast on UDP 8890.
+
+	The drone broadcasts semicolon-separated state (`...;bat:87;...`) once in SDK mode.
+	This is passive: it only reads, so it never competes with the video keepalive."""
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	try:
+		sock.bind(("0.0.0.0", STATE_PORT))
+	except OSError as e:
+		print(f"battery monitor off: could not bind UDP {STATE_PORT}: {e}")
+		return
+	sock.settimeout(1.0)
+	while not stop_event.is_set():
+		try:
+			data, _ = sock.recvfrom(1024)
+		except socket.timeout:
+			continue
+		except OSError:
+			break
+		for kv in data.decode(errors="replace").split(";"):
+			if kv.startswith("bat:"):
+				battery[0] = kv[4:].strip()
+	sock.close()
+	return
+
+
 def wait_for_video_packets(timeout_s):
 	"""Confirm the drone is actually sending video before any decoder opens.
 
@@ -155,6 +182,9 @@ def main():
 	stop_event = threading.Event()
 	keepalive = threading.Thread(target=keepalive_loop, args=(sock, stop_event), daemon=True)
 	keepalive.start()
+	battery = [None]
+	state = threading.Thread(target=state_loop, args=(stop_event, battery), daemon=True)
+	state.start()
 
 	reply = send_and_wait(sock, "streamon", 5.0)
 	if reply is None or reply.lower() != "ok":
@@ -188,7 +218,15 @@ def main():
 	h, w = frame.shape[:2]
 	print(f"CONFIRMED resolution: {w}x{h} -- use this for cols/rows below, not an assumed value.")
 
-	saved = 0
+	# Continue numbering from frames already in out_dir. The real Tello overheats and
+	# powers off after a few minutes on a table (props still, no cooling airflow), so a
+	# full 20-40 frame set is captured in short bursts with cool-downs between. Resetting
+	# to 0 each run would overwrite the earlier burst, so resume past the highest index.
+	existing = [f for f in os.listdir(out_dir)
+	            if f.startswith("frame_") and f.endswith(".png") and f[6:-4].isdigit()]
+	saved = max((int(f[6:-4]) for f in existing), default=-1) + 1
+	if saved:
+		print(f"resuming at frame_{saved:03d} ({saved} frames already in {out_dir}/)")
 	t_start = time.time()
 	frame_count = 0
 	while True:
@@ -205,8 +243,12 @@ def main():
 			cv2.drawChessboardCorners(disp, (board_cols, board_rows),
 			                          corners / DETECT_SCALE, found)
 		live_fps = frame_count / max(time.time() - t_start, 1e-6)
-		cv2.putText(disp, f"saved={saved}  {live_fps:4.1f} fps  SPACE=save  ESC=quit", (10, 30),
-		            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+		bat = battery[0]
+		bat_ok = bat is not None and bat.isdigit() and int(bat) >= 20
+		bat_s = f"bat={bat}%" if bat is not None else "bat=?"
+		color = (0, 255, 0) if bat_ok else (0, 0, 255)
+		cv2.putText(disp, f"saved={saved}  {live_fps:4.1f} fps  {bat_s}  SPACE=save  ESC=quit", (10, 30),
+		            cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
 		cv2.imshow("Tello calibration capture", disp)
 		key = cv2.waitKey(1) & 0xFF
 		if key == 27:
