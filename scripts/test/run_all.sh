@@ -9,6 +9,7 @@ set -uo pipefail
 cd "$(dirname "$0")" || exit 1
 SUMMARY_FILE="${SUMMARY_FILE:-$(pwd)/run_all_summary.txt}"
 : > "$SUMMARY_FILE"
+cd SITL || exit 1
 
 ONLY=""
 INCLUDE_UNVERIFIABLE=0
@@ -64,7 +65,7 @@ is_high_vram() {
 # (pre-existing, not introduced by this work). Headless, nobody is there to judge them, so a
 # headless "PASS" from one of these is meaningless -- confirmed 2026-08-09. Excluded from the
 # default sweep so the summary doesn't lie; run them attended instead:
-#   cd scripts/test/<name> && ./run.sh   (watch it)   then   ./filter.sh   (report what you saw)
+#   cd scripts/test/SITL/<name> && ./run.sh   (watch it)   then   ./filter.sh   (report what you saw)
 # --only <name> or --include-unverifiable still runs them, since that's an explicit ask.
 UNVERIFIABLE_SCENARIOS=(approach approach-real cross forward speed vlm orbit search)
 is_unverifiable() {
@@ -121,7 +122,7 @@ else
             continue
         fi
         if [ "$INCLUDE_UNVERIFIABLE" != "1" ] && is_unverifiable "$name"; then
-            echo "$name: SKIP (no automated verdict -- run attended: cd scripts/test/$name && ./run.sh && ./filter.sh)" | tee -a "$SUMMARY_FILE"
+            echo "$name: SKIP (no automated verdict -- run attended: cd scripts/test/SITL/$name && ./run.sh && ./filter.sh)" | tee -a "$SUMMARY_FILE"
             SKIP=$((SKIP + 1))
             continue
         fi
