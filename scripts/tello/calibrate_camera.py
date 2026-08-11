@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Run OpenCV calibrateCamera over captured checkerboard frames and write
-dependencies/stella_config_tello.yaml in the schema stella_vslam expects.
+config/stella_config_tello.yaml in the schema stella_vslam expects.
 Usage: python3 calibrate_camera.py <frames_dir> <board_cols> <board_rows> <square_size_m> <measured_fps>"""
 import sys, glob
 import cv2
@@ -57,7 +57,7 @@ def main():
             "color_order": "BGR",
         }
     }
-    out_path = "dependencies/stella_config_tello.yaml"
+    out_path = "config/stella_config_tello.yaml"
     with open(out_path, "w") as fh:
         yaml.safe_dump(out, fh, default_flow_style=False, sort_keys=False)
     print(f"wrote {out_path}")

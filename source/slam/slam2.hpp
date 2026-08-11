@@ -66,7 +66,7 @@ public:
         // Paths default to the primary checkout, but STELLA_CONFIG_PATH /
         // STELLA_VOCAB_PATH override them so a worktree or a relocated
         // checkout does not silently load the wrong config.
-        const std::string kConfigPath = env_or_default("STELLA_CONFIG_PATH", "/root/groundstation/dependencies/stella_config.yaml");
+        const std::string kConfigPath = env_or_default("STELLA_CONFIG_PATH", "/root/groundstation/config/stella_config_px4.yaml");
         const std::string kVocabPath  = env_or_default("STELLA_VOCAB_PATH",  "/root/groundstation/dependencies/orb_vocab.fbow");
         RCLCPP_INFO(this->get_logger(), "stella config=%s vocab=%s", kConfigPath.c_str(), kVocabPath.c_str());
 

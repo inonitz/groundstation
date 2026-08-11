@@ -25,7 +25,7 @@ SLAM_CHECK_LOG="$REPO_ROOT/scripts/test/slam/slam_check.log"
 # Point the node at THIS checkout's assets. Without these the node falls back to
 # its compiled-in /root/groundstation/dependencies paths, which is the wrong tree
 # whenever you run from a worktree.
-export STELLA_CONFIG_PATH="${STELLA_CONFIG_PATH:-$REPO_ROOT/dependencies/stella_config.yaml}"
+export STELLA_CONFIG_PATH="${STELLA_CONFIG_PATH:-$REPO_ROOT/config/stella_config_px4.yaml}"
 export STELLA_VOCAB_PATH="${STELLA_VOCAB_PATH:-$REPO_ROOT/dependencies/orb_vocab.fbow}"
 
 if [ ! -x "$SLAM_BINARY" ]; then

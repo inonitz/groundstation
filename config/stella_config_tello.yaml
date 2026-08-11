@@ -4,7 +4,7 @@
 # Reprojection RMS error: 0.438 px (target < 1.0 px) -- trustworthy.
 # fps is the Tello's native stream rate (30), not the host-measured decode fps, which
 # ran far below 30 under load and does not reflect the drone's output.
-# FeatureExtractor block copied unchanged from dependencies/stella_config.yaml; tuning it is B1's job.
+# FeatureExtractor block copied unchanged from config/stella_config_px4.yaml; tuning it is B1's job.
 
 Camera:
   name: Tello_Real_Camera

@@ -1,7 +1,7 @@
 # Tello camera calibration
 
-Measure the real Tello's camera and write `dependencies/stella_config_tello.yaml`, the
-real-camera counterpart to the sim config `dependencies/stella_config.yaml`.
+Measure the real Tello's camera and write `config/stella_config_tello.yaml`, the
+real-camera counterpart to the sim config `config/stella_config_px4.yaml`.
 
 Two scripts, run in order. No ROS2, no FMU build, no Gazebo. The drone never flies.
 
@@ -75,7 +75,7 @@ are not, your board coverage was too thin, whatever the RMS says. Recapture with
 and more edge coverage.
 
 The script writes the `Camera:` block only. Copy `FeatureExtractor:` over from
-`dependencies/stella_config.yaml` by hand. Tuning it is B1's job.
+`config/stella_config_px4.yaml` by hand. Tuning it is B1's job.
 
 ## If something breaks
 

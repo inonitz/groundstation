@@ -16,7 +16,7 @@ SLAM_BINARY="$SLAM_BIN_DIR/stella_vslam_monocular"
 COMPARATOR="$REPO_ROOT/scripts/test/slam/compare_ground_truth.py"
 SLAM_CHECK_LOG="$REPO_ROOT/scripts/test/colors/slam_check.log"
 
-export STELLA_CONFIG_PATH="${STELLA_CONFIG_PATH:-$REPO_ROOT/dependencies/stella_config.yaml}"
+export STELLA_CONFIG_PATH="${STELLA_CONFIG_PATH:-$REPO_ROOT/config/stella_config_px4.yaml}"
 export STELLA_VOCAB_PATH="${STELLA_VOCAB_PATH:-$REPO_ROOT/dependencies/orb_vocab.fbow}"
 
 if [ ! -x "$SLAM_BINARY" ]; then
