@@ -60,28 +60,9 @@ public:
         m_client.create();
         m_jsonRequest["temperature"] = m_temperature;
         m_jsonRequest["max_tokens"]  = m_maxTokens;
-        /* Force the response to be a JSON array of objects -- llama-server converts this
-           to a GBNF grammar server-side and constrains sampling with it, so the model
-           CANNOT emit markdown fences or prose around the plan anymore. This is the real
-           fix for the plan-parsing problem: extractJsonArray() (plan_parse.hpp) becomes a
-           defense-in-depth backstop instead of the primary line of defense. Deliberately
-           left loose (bare "array of objects", no per-action property schema) so it does
-           not need to track every action type's exact fields and reject valid variations;
-           translateToBaseCommands() already validates/drops unrecognized actions safely.
-           Verified empirically against this exact model+mmproj+llama-server combination
-           with a real multimodal (image+text) request before wiring in -- see
-           docs/NOTES.md 2026-08-09. */
-        m_jsonRequest["response_format"] = {
-            {"type", "json_schema"},
-            {"json_schema", {
-                {"name", "flight_plan"},
-                {"schema", {
-                    {"type", "array"},
-                    {"items", {{"type", "object"}}},
-                    {"minItems", 1}
-                }}
-            }}
-        };
+        /* The plan grammar (GBNF, "grammar" field) is built per-send in send(), conditioned on
+           whether the drone is grounded so takeoff can be pinned as the first action.
+           See buildPlanGrammar / docs/NOTES.md 2026-08-10. */
         return;
     }
 
@@ -94,7 +75,8 @@ public:
     auto send(
         std::string_view systemPrompt, 
         std::string_view userPrompt, 
-        std::string_view imageB64Blob
+        std::string_view imageB64Blob,
+        bool             requireTakeoffFirst
     ) {
         std::string sys_prompt = systemPrompt.empty() ? m_systemPrompt : std::string(systemPrompt);
 
@@ -112,8 +94,44 @@ public:
             { {"role", "user"  }, { "content", userContent } }
         });
 
+        m_jsonRequest["grammar"] = buildPlanGrammar(requireTakeoffFirst);
+
         return m_client.submit(m_jsonRequest);
     }
+    /* Plan grammar (GBNF). llama-server's json_schema path does NOT enforce const/prefixItems
+       for this model+build -- verified adversarially: the model ignored a takeoff const and
+       planned 'go' first, exactly the failure that stranded the drone on the ground. A raw
+       GBNF passed via "grammar" IS enforced token-by-token, so we hand-write it. Shape: a
+       mandated {"thought":...} object, then action objects whose "action" is one of the known
+       verbs. When grounded (requireTakeoffFirst) the SECOND element is pinned to the literal
+       {"action":"takeoff"} -- deterministic, cannot be violated. Every string and the action
+       count are length-bounded so a runaway thought cannot blow past max_tokens and truncate
+       the array. Verified adversarially against this exact model+mmproj+llama-server: const is
+       ignored, grammar+bounds give 4/4 takeoff-first with no truncation. See docs/NOTES.md 2026-08-10. */
+    static std::string buildPlanGrammar(bool requireTakeoffFirst) {
+        static const char* kRootGrounded =
+            R"GBNF(root    ::= "[" ws thought ws "," ws takeoff rest ws "]" ws
+)GBNF";
+        static const char* kRootAirborne =
+            R"GBNF(root    ::= "[" ws thought (ws "," ws action){1,7} ws "]" ws
+)GBNF";
+        static const char* kCommon =
+            R"GBNF(rest    ::= (ws "," ws action){0,6}
+thought ::= "{" ws "\"thought\"" ws ":" ws tstring ws "}"
+tstring ::= "\"" tchar{0,300} "\""
+tchar   ::= [^"\\] | "\\" ["\\bfnrtu/]
+takeoff ::= "{" ws "\"action\"" ws ":" ws "\"takeoff\"" ws "}"
+action  ::= "{" ws "\"action\"" ws ":" ws verb (ws "," ws member){0,8} ws "}"
+verb    ::= "\"takeoff\"" | "\"land\"" | "\"go\"" | "\"curve\"" | "\"rotate\"" | "\"orbit\"" | "\"approach\"" | "\"stop\"" | "\"search\"" | "\"re-assess\""
+member  ::= sstring ws ":" ws value
+value   ::= sstring | number | "true" | "false" | "null"
+sstring ::= "\"" tchar{0,160} "\""
+number  ::= "-"? [0-9]+ ("." [0-9]+)?
+ws      ::= [ \t\n]*
+)GBNF";
+        return std::string(requireTakeoffFirst ? kRootGrounded : kRootAirborne) + kCommon;
+    }
+
 private:
     llamaClient    m_client;
     std::string    m_systemPrompt;

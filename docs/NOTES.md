@@ -1321,3 +1321,269 @@ narrower flight-control slice, arguably touching TRL 5 for just that slice, whil
 color-discrimination/SLAM-assisted stack stays at TRL 3-4. Do not present it as more than that --
 the honest story is "the core loop is validated and repeatable under real testing, with one
 specific failure mode still open," not "flight-ready."
+
+
+## Tello manual-control reality check + run.sh canned knob (2026-08-10)
+
+Re-checked the real Tello control path before handing off a physical dry-test runbook, because the
+existing docs assume a manual keyboard takeoff/land that the code does not implement. Findings,
+all read from source, not assumed:
+
+- **The keyboard gives no takeoff/land/arm.** `keyboard_node.hpp` publishes only raw `[keycode,
+  action]` events. The FMU's `keyCallback` (`fmu_node.hpp`) ignores every key unless manual-override
+  is engaged, and even then maps only movement: WASD = horizontal body-FLU velocity, up/down arrows
+  = altitude, left/right arrows = yaw, Space = hover. H and Enter are bound in the keyboard node but
+  the FMU does nothing with them. There is no key that enqueues TAKEOFF or LAND.
+- **Manual override itself can't be engaged from the Tello rig.** Override is a `std_msgs/Bool` on
+  `/fmu/in/override`, toggled only by a manual `ros2 topic pub` (see `scripts/test/override/run.sh`).
+  `scripts/tello/run.sh` launches only RX + FMU + keyboard, so nothing publishes that topic. Even if
+  engaged, override is velocity-only and still cannot take off or land.
+- **So takeoff/land come only from a plan** -- either the VLM (needs `llama-server` in a 4th pane),
+  or a canned-plan flag on the FMU binary (argv[2], parsed in `fmu_node.cpp`). The stale header
+  comment in `run.sh` ("manual arm / takeoff / interrupt / land") predates this and is wrong.
+- **`--canned-rotate` is the position-free no-VLM airframe test.** It injects takeoff -> rotate 90 cw
+  -> rotate 200 ccw -> land, yaw-only, no position source needed -- correct for a real Tello, which
+  has no X/Y source wired. It also exercises the ROTATE-hang risk directly.
+- **Real in-flight abort = Ctrl-C the FMU pane.** run.sh's cleanup `pkill`s the FMU, which stops the
+  ~20 Hz rc keepalive; the Tello then auto-lands on its own ~15 s keepalive-loss timer. The docs'
+  "land manually via keyboard" abort (`scripts/tello/README.md`, the tello physical handoff) does not
+  exist and must not be relied on. The ~15 s auto-land is the actual safety net for a hung ROTATE.
+
+Change made: added an optional `FMU_FLAG` env knob to `scripts/tello/run.sh` (default empty =
+unchanged VLM-driven behavior), so the no-VLM canned test is reachable as
+`FMU_FLAG=--canned-rotate ./run.sh` without editing the launcher or hand-rolling the FMU invocation.
+Still open (doc debt, not fixed here): `run.sh`'s stale header comment and the keyboard-land claims
+in `scripts/tello/README.md` and the tello physical handoff.
+
+
+## P1 fix: FMU/backend flight-state desync on unexpected disarm (2026-08-10)
+
+Root-caused the APPROACH "excursion" from the colors re-verify run. The guidance law is not the
+culprit: every APPROACH velocity is clamped to `speedCeil` (~kApproachSpeedDefault) and the
+unmatched-target paths command zero (hover/acquire) or a small `kApproachCoastSpeedMps` coast, so
+the ~9 m/s / ~14 m jump in the log was *measured* state, not a *commanded* runaway -- a SITL
+backend/estimator blowup. The real, fixable bug is what followed: the FMU never reconciles its own
+`FlightState` against the backend once airborne. `FlightState`->`STANDBY` happened in only two
+places (TAKEOFF seeing `IOState::FAULT`, LANDING touchdown); the `FLIGHT` branch logged
+`m_backend->state()` but never acted on it. And the PX4 backend only moved `m_ioState` out of
+`FLIGHT` on a *commanded* disarm (`disarm_impl`/`force_disarm_impl`) -- an unexpected PX4-side
+disarm (failsafe/kill/crash) left `m_ioState=FLIGHT` even though `m_armingState` telemetry showed
+disarmed. So the FMU kept streaming velocity to a disarmed vehicle and stayed `fs=FLIGHT`, which is
+the desync seen live (later `TAKEOFF rejected (backend not STANDBY)`, SEARCH at nonsensical
+altitude). The `noop_ok` was a *later* command falling through the "not movement -> auto-complete"
+branch once state was corrupted, not APPROACH itself.
+
+Two-part fix (syntax-verified via compile_commands `-fsyntax-only`; not yet full-built or
+flight-tested):
+- `px4_backend.cpp`: in the periodic tick, if `m_ioState==FLIGHT` and arming telemetry != ARMED,
+  store `IOState::FAULT`. FAULT (not STANDBY) is deliberate -- it blocks an automatic re-takeoff
+  after a failsafe until the operator restarts.
+- `fmu_node.hpp` control loop: when `FlightState==FLIGHT` and `m_backend->state() != IOState::FLIGHT`,
+  zero velocity, reconcile `FlightState`->`STANDBY`, `completeCurrent("backend_lost_flight")` if a
+  task is active, and halt the mission. Placed after the LANDING/TAKEOFF early-returns so a normal
+  land (FMU in LANDING at touchdown) can't false-trip it. Tello never reports FAULT, so it cannot
+  false-trip there either; the Tello's own ~15 s keepalive auto-land remains its net.
+
+Still open: the *measured* excursion's own trigger (why the SITL estimator/backend produced the
+9 m/s state) is not root-caused -- needs a reproducing run with the FMU log retained. The guard
+above makes the aftermath safe regardless. The single-detection APPROACH fallback (locks onto
+whatever one object is in frame, ignoring the label) is a separate hazard, folded into the P2
+discussion, not fixed here.
+
+## VLM VRAM on the 4 GiB laptop (GTX 1050 Ti): current SITL config does NOT fit (2026-08-10)
+
+Measured on the actual GPU (NVIDIA GTX 1050 Ti Max-Q, 4096 MiB). Tool: `nvidia-smi`. Gotcha worth
+recording: the VLM runs on **Vulkan**, and Vulkan VRAM does **not** appear in
+`nvidia-smi --query-compute-apps` (that lists CUDA contexts only) -- measure total
+`--query-gpu=memory.used` instead, or the per-process read is a misleading 0.
+
+- **Only the VLM uses the GPU during flight.** onnxruntime in this build is CPU-only (no
+  `libonnxruntime_providers_cuda.so`), so YOLO seg + depth run on CPU (0 VRAM). GStreamer uses
+  `avdec_h264` (software decode, 0 VRAM). Desktop/display baseline ~440 MiB.
+- **The SITL `CMD_VLM` config OOMs at load on 4 GiB.** `-ngl 99 -c 65536` and `-ngl 99 -c 32768`
+  both fail: `ggml_vulkan: Device memory allocation of size 1073741824 failed ... failed to
+  allocate buffer for kv cache`. Root: `-ngl 99` forces all layers onto the GPU
+  (`common_fit_params: failed to fit params to free device memory: n_gpu_layers set to 99, abort`)
+  alongside Q4_K_M weights (1.11 GB) + mmproj BF16 (0.82 GB) + vision graph, leaving no room for KV.
+- **Working config found:** drop `-ngl 99` (let llama.cpp auto-fit layers across GPU/CPU) with
+  `-c 8192`. Loads clean; total GPU use ~3252 MiB (VLM delta ~2813 MiB), ~844 MiB free. That ~844
+  MiB is the headroom for the vision-encoder transient during a real image inference -- Qwen3-VL
+  wants >=1024 image tokens, so a full-res frame may spike into it; not yet measured live.
+- Worst-case method: sample `nvidia-smi --query-gpu=memory.used --format=csv -lms 250` during an
+  actual multimodal inference at the target `-c`, take the peak. Levers to free VRAM if the vision
+  spike is too tight: quantized KV (`--cache-type-k/-v q8_0`), smaller `-c`, downscale camera frames
+  before send, or a lower `-ngl`.
+
+
+## Full VLM-driven SITL mission PASSES on the 4 GiB laptop + QGC-arming gotcha (2026-08-10)
+
+End-to-end `scripts/test/vlm` run (objective "Take off, find the car, approach it, then land")
+verified live on the GTX 1050 Ti (4 GiB). Clean pass: `takeoff_ok` -> `search_ok` ->
+`APPROACH reached target=car range=1.94` -> `approach_ok` -> `land_ok`, `[SUCCESS] Clean`. No
+excursion, no boundary interrupt, no lost-flight guard trip; max measured velocity ~0.09 m/s. This
+is the nominal path -- one `car`, exact label match -- distinct from the 2-car unmatched `colors`
+case (P2).
+
+Two things made it work:
+- **VRAM:** the default `sim_core.sh` `CMD_VLM` (`-ngl 99 -c 65536`) OOMs on 4 GiB. Ran with the lean
+  config via the new knobs: `VLM_NGL_ARG="" VLM_CTX_SIZE=8192 VLM_KV_ARG="--cache-type-k q8_0
+  --cache-type-v q8_0"`. Full stack (PX4 + Gazebo render + VLM) sat at ~3.45 GiB, ~580 MiB free.
+- **Arming gotcha:** PX4 SITL refused to arm with `Arming denied: Resolve system health failures
+  first` until **QGroundControl was running**. The GCS heartbeat/health link is a de-facto arming
+  prerequisite for this SITL setup -- no QGC, no arm, drone never leaves the ground. Not a code
+  bug. Start QGC before an armed SITL run.
+
+Repro command (from `scripts/test/vlm/`, with QGC running):
+`HEADLESS=1 HEADLESS_TIMEOUT_SECONDS=240 VLM_NGL_ARG="" VLM_CTX_SIZE=8192 VLM_KV_ARG="--cache-type-k q8_0 --cache-type-v q8_0" ./run.sh`
+Drop HEADLESS for the attended/visual version for a live demo.
+
+
+## Tello network verified + VLM speed levers in SITL (2026-08-10)
+
+**Tello connectivity is correctly configured -- no change needed.** Runs directly on the laptop
+(`wlp59s0`), not a container, so no container-routing issue. Firewall is `ufw` (INPUT policy DROP):
+port 8889 (Tello command + response) is host-initiated so it rides the `ufw-before-input`
+`ctstate RELATED,ESTABLISHED ACCEPT` rule; 8890 (state) and 11111 (video) are unsolicited pushes
+from the drone and have explicit top-level ACCEPT rules. Route to 192.168.10.1 currently goes via
+the default gateway only because the host isn't on the `TELLO-XXXX` AP yet; joining it gives
+192.168.10.2 and a direct 192.168.10.0/24 route. All three ports covered.
+
+**VLM speed in `scripts/test/vlm` -- the real levers (12-core laptop, GTX 1050 Ti):**
+- Root cause of slowness: the 4 GiB VRAM cap forces the lean auto-fit config to offload some VLM
+  layers to CPU, and `sim_core.sh` hardcoded `--threads 1`. Single-threaded CPU layers = slow.
+- Fix (added, no rebuild): `VLM_THREADS` knob on `CMD_VLM` (default 1 = unchanged). Set
+  `VLM_THREADS=6` (leave cores for Gazebo/PX4/FMU/YOLO-on-CPU). Biggest win.
+- `kPlanCooldownMs = 2000` (`fmu_node_base.hpp`) is the *replan cadence* constant, not inference
+  speed -- it throttles how often the FMU wakes the VLM. Compiled; lowering makes replanning
+  snappier but doesn't speed a single inference.
+- `max_tokens = 256` (`llamaclient.hpp`) caps plan length; compiled.
+- Prompting "go faster" does NOT speed inference (compute is fixed). It CAN speed the *mission*:
+  the plan schema has `speed` on go/approach/rotate and `search_size` on search, so nudging the
+  objective toward higher speeds / smaller search makes the VLM emit larger speed values and the
+  drone finish sooner. `llm_base.hpp` warns "keep speed low" for real hardware (transport latency);
+  fine to push in SITL.
+
+
+## A2 observability: annotated frame, depth colormap, VLM prompt log, HUD (2026-08-10)
+
+Additive demo tooling. Nothing here feeds control; it is pure inspection. No existing
+log line, topic, or behavior changed, so all SITL scenarios re-run as-is.
+
+New topics the FMU node publishes:
+- `/fmu/perception/annotated` (`sensor_msgs/Image`): camera frame with YOLO boxes + `class@conf`
+  labels, at the seg loop rate.
+- `/fmu/perception/depth` (`sensor_msgs/Image`): depth colormap (normalize -> 8-bit -> TURBO),
+  at the depth loop rate.
+- `/fmu/hud` (`std_msgs/String`): one human-readable status line, ~5 Hz. Also logged as `[FMU_HUD]`.
+  Format: `STATE=... ALT=..m TASK=... VLM=idle|busy DET=label@NN%,... VEL=..m/s BATT=..%`.
+
+Design decision: `PerceptionRuntime` gained two default-empty `std::function<void(cv::Mat const&)>`
+callbacks (`onAnnotatedFrame`, `onDepthColormap`), so existing callers/tests still compile and just
+skip publishing. The FMU owns the ROS publishers. The fixed `void(cv::Mat const&)` signature cannot
+carry detections, so the boxes are drawn in `segLoop()` (where the detections are in scope) on a
+clone of the frame; the FMU only wraps and publishes. The depth callback passes the raw metric mat
+and the FMU applies the colormap.
+
+Per-run VLM prompt/response log: `callLlamaServer()` writes one JSONL record per call to
+`vlm_prompts_<YYYYMMDD_HHMMSS>.jsonl` under `kVlmPromptLogDir = /root/groundstation/vlm_logs`. The
+filename is computed once at construction (no clobber across runs, same idiom as `sim_core.sh`'s
+BAG_DIR). Record = `{timestamp_us, image_attached, image_b64_bytes, prompt, response}` -- the base64
+image bytes are NOT inlined (they are live on the annotated topic), keeping a long run small. Written
+on EVERY exit path, including HTTP/parse failures (empty `response` is itself the signal).
+
+New constants (`fmu_node_base.hpp`): `kVlmViewTopic`, `kDepthColormapTopic`, `kFmuHudTopic`,
+`kVlmPromptLogDir`, `kHudThrottleMs`/`kHudThrottleUs`.
+
+New files: `scripts/test/lib/vlm_log_tool.sh` (no-arg lists files+records+sizes+total; `--clean`
+wipes the dir), `dependencies/foxglove_layout.json` (primary), `dependencies/a2_observability.rviz`
+(fallback -- Foxglove availability unverified; rviz2 ships with Jazzy).
+
+## Runtime drone-config loader: per-drone tuning without a rebuild (2026-08-10)
+
+The FMU flight constants were compile-time `constexpr` sized for PX4 Gazebo SITL. A real
+Tello flown on those numbers climbed into an apartment ceiling. The loader fixes this. It
+tunes the constants per drone and per environment from a text file at startup. No rebuild.
+
+New file `source/llm_to_action/fmu/drone_config.hpp`. It holds a `DroneConfig` struct plus a
+`loadDroneConfig(path, ok)` parser. The struct has one field per tunable. Every field DEFAULTS
+to the exact compiled `constexpr k*` value in `fmu_node_base.hpp`. So with no profile loaded the
+FMU reads the same numbers as before. No-profile behavior is byte-identical to the old binary.
+The `constexpr` constants stay put as the documented default and the fallback. They were not
+deleted.
+
+Selection is the `DRONE_CONFIG` env var, read once in the FMU constructor. This getenv is the
+one sanctioned runtime-config hook. The codebase's usual zero-getenv rule does not apply to this
+selector. Unset means the all-defaults struct (SITL scale). Set-but-missing, unreadable, or
+unparsable is `RCLCPP_FATAL` then `std::abort()`. An explicitly selected profile must never
+silently fall back to the wrong-scale defaults. That silent fallback is the crash this prevents.
+The config loads once and is then read-only. There is no hot-reload.
+
+Parser: a flat `key: value` text file, hand-rolled, no YAML library. One pair per line. `#`
+starts a comment. Whitespace is tolerated. An unknown key warns and is skipped, so a newer
+profile still loads on an older binary. A malformed line or a bad numeric value sets `ok=false`,
+which aborts a selected profile. No exceptions anywhere; parse uses `strtof`/`strtol`.
+
+Wired fields (`fmu_node.hpp` now reads `m_cfg.*`, not `k*`): takeoff target/climb, land descend
+plus the full flare taper, ground contact, GO cruise + position/cross-track gains, ROTATE yaw
+gain + clamp (the SEARCH heading control reuses the same yaw gain), APPROACH standoff + speed,
+SEARCH sweep speed and lane geometry, ORBIT speed, the emergency boundary base + velocity scale,
+the two battery failsafe thresholds, and manual teleop speed.
+
+SEARCH lane geometry is the one non-scalar wire. Lane length, spacing, and leg timeout come from
+the VLM-chosen size preset (`kSearchSizePresets`). A loaded profile overlays those three with its
+own tuned values via an `mb_cfgActive` gate; `maxLanes` stays from the preset. With no profile the
+gate is false and the preset is used verbatim, so SITL is unchanged. This overlay is the only place
+a loaded profile changes preset-selection behavior, and only for a real configured drone.
+
+Profiles: `config/tello.yaml` is apartment scale and fixes the crash (0.8 m climb at 0.5 m/s, 1 m
+standoff, 0.25 m/s search, short lanes). `config/px4_sitl.yaml` spells out today's SITL defaults;
+loading it is identical to loading nothing, and it documents the format. `scripts/tello/run.sh`
+defaults `DRONE_CONFIG` to `config/tello.yaml`, so `./run.sh` flies indoor-safe with no rebuild.
+`scripts/test/lib/sim_core.sh` leaves it unset, so SITL keeps the compiled defaults; it only
+passes a profile through if one is explicitly set.
+
+Re-tune loop: edit `config/tello.yaml`, then `./run.sh`. No recompile. Blast radius: additive; the
+only behavior change is opt-in, guarded by `DRONE_CONFIG` being set.
+
+
+## VLM plan grammar: use raw GBNF, not json_schema (2026-08-10)
+- The VLM kept stranding the drone on the ground. Every grounded plan was discarded:
+  the first action was not `takeoff`, or the JSON truncated mid-array. 9 requests, 9 rejects,
+  never airborne.
+- Root cause 1: our llama-server build does NOT enforce json_schema `const`/`prefixItems`
+  for this model. Verified adversarially -- with a takeoff `const` and a prompt demanding
+  "do NOT take off", the model still planned `go` first. The schema shaped nothing; the
+  takeoff-first we saw earlier was just the model's own choice.
+- Root cause 2: the mandated first `{"thought":...}` object is a verbose 3-part analysis.
+  A long thought ate `max_tokens` before the array closed -> truncated -> parse failed.
+- Fix: hand-write a GBNF grammar and pass it via the `grammar` field (which IS enforced
+  token-by-token). Built per-send in `llamaClientConnection::buildPlanGrammar`. Grounded
+  (`requireTakeoffFirst`) pins the SECOND array element to the literal `{"action":"takeoff"}`.
+  The `action` value is constrained to the verb enum, so the model cannot emit a sentence
+  where a verb belongs. Every string and the action count are length-bounded (`{0,N}`
+  repetition) so a runaway thought cannot truncate the array.
+- `maxLength` on a schema string BREAKS this build's grammar (it injects junk `{" ":", "}`
+  objects). Do not use it. Bound strings with `{0,N}` char repetition instead.
+- The grounded flag is `m_flightState == STANDBY`, not an odometry-z threshold -- odometry
+  can read stale/garbage in the first cycle before the EKF settles, which let one non-takeoff
+  plan slip through. `STANDBY` is glitch-free.
+- Verified in SITL: 3 requests, 0 grounded rejects, 0 parse fails, takeoff in ~30 s. Post-takeoff
+  actions are clean verbs (go, search, orbit, stop). `max_tokens` raised 512 -> 768 for headroom.
+
+## VLM llama-server config: fits the 4 GB GPU (2026-08-10)
+- `-ngl 99 -c 8192 --cache-type-k q4_0 --cache-type-v q4_0 --threads 1` runs Qwen3-VL-2B
+  FULLY on the 4 GB GTX 1050 Ti (~3.1 GiB VRAM with Gazebo), ~40 tok/s. App-stack RAM 1.9 GiB,
+  well under the 8 GiB budget.
+- The old default `-c 65536` OOMs. `--threads 1` is correct -- llama-server never needed more;
+  throwing CPU threads at it starved the GPU path and made plans crawl.
+- Baked as the defaults in `scripts/test/lib/sim_core.sh` (still overridable via VLM_* env).
+- Plan latency: the FIRST plan is prefill-bound (~27 s -- the 8241-char system prompt + image,
+  prefilled once). Steady-state reuses the KV cache (~8 s prefill) and is decode-bound, so it
+  swings with output length, not the image. Trimming the system prompt mainly speeds the first
+  plan. The image is already ~460 tokens (below Qwen-VL's 1024 floor), so shrinking it does not help.
+
+## FMU thread/observability trims (2026-08-10)
+- `MultiThreadedExecutor` capped 12 -> 3 (`fmu_node.cpp`) to cut ROS thread contention.
+- `FMU_OBSERVABILITY` (env, default OFF) gates the A2 image publishers, HUD, and VLM-JSONL log.
+  OFF is takeoff-safe: the always-on 1280x720 image encode+publish was saturating the 12 cores and
+  starving the VLM. ON is for the dashboard (resize to 320x240 before publish -- pending).

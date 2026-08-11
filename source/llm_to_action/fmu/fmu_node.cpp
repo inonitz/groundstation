@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
     /* from the global context, which is null until init() runs. Cannot be    */
     /* hoisted above init for that reason.                                     */
     {
-        rclcpp::executors::MultiThreadedExecutor executor;
+        rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions{}, 3);
         executor.add_node(node);
         executor.spin();
     }

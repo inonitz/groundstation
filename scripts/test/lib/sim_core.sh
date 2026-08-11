@@ -21,6 +21,10 @@ FMU_CANNED_FLAG="${FMU_CANNED_FLAG-}"   # allow an explicit empty (VLM) value
 : "${SPAWN_POSE:=0,7,3}"
 : "${LAUNCH_VLM:=0}"
 : "${SESSION_NAME:=llmsim}"
+# Optional per-drone tuning profile (ROADMAP 9.14). SITL stays on the compiled defaults:
+# leave this UNSET and the FMU uses its built-in constexpr (== config/px4_sitl.yaml). Set it
+# only to tweak a SITL value without a rebuild. We do NOT force a profile here.
+DRONE_CONFIG="${DRONE_CONFIG:-}"
 : "${LOG_FILE:=$(pwd)/captured_panes_log.txt}"   # FMU stdout/stderr tee target; filter.sh reads this, not tmux scrollback
 
 # --- fixed config (absolute paths; cwd-independent) ---
@@ -117,6 +121,7 @@ CMD_RX="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_RX && $BUILD_BINARY_DIR/llm_to_action_gstreamer_rx; \
     echo 'RX stopped'; read"
 CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBRARY_PATH && \
+    export DRONE_CONFIG=\"$DRONE_CONFIG\" && \
     sleep $DELAY_FMU && \
     ($BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG 2>&1 | tee \"$LOG_FILE\"); \
     echo 'FMU stopped'; read"
@@ -149,8 +154,8 @@ CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
-    -dev Vulkan0 -ngl 99 -c ${VLM_CTX_SIZE:-65536} --flash-attn on --temp 0.3 \
-    --host 0.0.0.0 --port 8080 --threads 1; echo 'llama-server stopped'; read"
+    -dev Vulkan0 ${VLM_NGL_ARG--ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG--cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
+    --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 
 # --- launch tmux ---
 echo "[INFO] Launching tmux session '$SESSION_NAME'..."
