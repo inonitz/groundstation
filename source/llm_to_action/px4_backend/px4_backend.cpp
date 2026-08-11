@@ -132,6 +132,19 @@ void PX4Backend::streamTick() {
         }
     }
 
+    /* Unexpected-disarm detection: once airborne (FLIGHT), PX4 can drop ARM on its own via a
+       failsafe/kill/crash -- not through our disarm()/force_disarm(), which set STANDBY directly.
+       Nothing else moves m_ioState out of FLIGHT in that case, so surface it as FAULT here from the
+       live arming telemetry. FAULT (not STANDBY) is deliberate: it blocks an automatic re-takeoff
+       after a failsafe until the operator restarts. The FMU reads state() and stops commanding. */
+    if (m_ioState.load(rlx) == IOState::FLIGHT
+        && m_armingState.load(rlx) != StatusMsgType::ARMING_STATE_ARMED) {
+        m_ioState.store(IOState::FAULT, rlx);
+        RCLCPP_WARN(m_node->get_logger(),
+            "[PX4_BACKEND_DEBUG] unexpected disarm while airborne (arm=%d) -> IOState FLIGHT->FAULT.",
+            __scast(int, m_armingState.load(rlx)));
+    }
+
     RCLCPP_INFO_THROTTLE(m_node->get_logger(), *m_node->get_clock(), 1000,
         "[PX4_BACKEND_DEBUG] io=%d setpoints=%lu nav=%d arm=%d altENU=%.2f velzENU=%.2f",
         __scast(int, m_ioState.load(rlx)), __scast(unsigned long, cnt),
