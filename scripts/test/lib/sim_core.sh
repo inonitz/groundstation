@@ -114,6 +114,7 @@ CMD_PX4="\
     export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH && \
     export PX4_GZ_WORLD=$WORLD_NAME && \
     export PX4_NET_INTERFACE=eth0 && \
+    export HEADLESS=${HEADLESS:-0} && \
     cd $PX4_DIRECTORY && \
     make px4_sitl gz_x500_gimbal; \
     echo 'PX4 EXITED. Press enter...'; read"
@@ -122,6 +123,7 @@ CMD_RX="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     echo 'RX stopped'; read"
 CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBRARY_PATH && \
     export DRONE_CONFIG=\"$DRONE_CONFIG\" && \
+    export FMU_OBSERVABILITY=\"${FMU_OBSERVABILITY:-}\" && \
     sleep $DELAY_FMU && \
     ($BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG 2>&1 | tee \"$LOG_FILE\"); \
     echo 'FMU stopped'; read"
@@ -154,10 +156,17 @@ CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
     -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
     --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
-    -dev Vulkan0 ${VLM_NGL_ARG--ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG--cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
+    -dev Vulkan0 ${VLM_NGL_ARG- -ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG- --cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 
 # --- launch tmux ---
+echo "=================================================================="
+echo " REQUIREMENT: QGroundControl MUST be running before this launches, or"
+echo " PX4 refuses to arm (Preflight Fail: No connection to the GCS) and the"
+echo " drone never leaves the ground. Open QGroundControl now, or export"
+echo " PX4_PARAM_NAV_DLL_ACT=0 to waive the GCS check for a headless run."
+echo " See docs/NOTES.md (RUN QGROUNDCONTROL BEFORE ANY SITL SIM)."
+echo "=================================================================="
 echo "[INFO] Launching tmux session '$SESSION_NAME'..."
 # Large scrollback: a long hover (interrupt-storm) or the override toggle otherwise flushes the
 # early takeoff/interrupt lines out of tmux's default 2000-line history before filter.sh captures.

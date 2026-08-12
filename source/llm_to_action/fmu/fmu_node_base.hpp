@@ -95,9 +95,14 @@ constexpr u32 kVisionDepthLoopMs  = 80;   /* measured ~75ms/frame; not a real 40
 constexpr const char* kVlmViewTopic       = "/fmu/perception/annotated"; /* annotated frame: bboxes+labels. */
 constexpr const char* kDepthColormapTopic = "/fmu/perception/depth";     /* depth colormap (normalized+applyColorMap). */
 constexpr const char* kFmuHudTopic        = "/fmu/hud";                   /* std_msgs/String human-readable status. */
+constexpr const char* kVlmTextTopic       = "/fmu/vlm_text";             /* std_msgs/String: latest VLM reasoning text. */
 constexpr const char* kVlmPromptLogDir    = "/root/groundstation/vlm_logs"; /* per-run vlm_prompts_<stamp>.jsonl live here. */
 constexpr u32         kHudThrottleMs      = 200;   /* ~5 Hz HUD line + /fmu/hud publish. */
 constexpr u64         kHudThrottleUs      = static_cast<u64>(kHudThrottleMs) * 1000ULL;
+constexpr u32         kA2ImgW             = 320;   /* A2 dashboard downscale width  (lean transport). */
+constexpr u32         kA2ImgH             = 240;   /* A2 dashboard downscale height (lean transport). */
+constexpr u32         kImgThrottleMs      = 100;   /* ~10 Hz cap on annotated + depth image publish. */
+constexpr u64         kImgThrottleUs      = static_cast<u64>(kImgThrottleMs) * 1000ULL;
 
 /* ---- APPROACH visual servo (ROADMAP 5.1, spec 2026-08-05-visual-servoing-approach-design.md) --
    Recomputed every control tick from the live camera detection; no world point is stored, so
@@ -149,6 +154,15 @@ constexpr u64 kApproachFreshUs        = static_cast<u64>(kApproachFreshMs) * 100
 /* Camera profile used by the APPROACH servo -- the concrete constant lives once in
    detection_query.hpp (kGzX500GimbalCam) so it is not repeated here and in the unit test. */
 constexpr CameraIntrinsics kApproachCamera = kGzX500GimbalCam;
+
+/* FOLLOW: same visual servo as APPROACH but it HOLDS the standoff and never completes; it
+   runs until re-assess or stop (spec agent1). Bbox centering reuses kApproachYawGain /
+   kApproachVertGain. Forward gain drives range back to the standoff and is allowed to go
+   negative -- the drone backs off when the target closes inside the standoff. */
+constexpr f32 kFollowStandoffM      = 2.00f;   /* fallback hold distance (m) when config unset. */
+constexpr f32 kFollowFwdGain        = 0.35f;   /* (range-standoff) -> forward speed; sign kept.  */
+constexpr u32 kFollowLostTimeoutMs  = 3000;    /* coast window before hovering on a lost target.  */
+constexpr u64 kFollowLostTimeoutUs  = static_cast<u64>(kFollowLostTimeoutMs) * 1000ULL;
 
 /* ---- Canned APPROACH detection rig (ROADMAP 5.1 verification, spec §7) -------------------
    No-YOLO closed-loop test: synthesizes a PerceptionSnapshot by projecting a target through
