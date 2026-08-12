@@ -13,6 +13,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/point_field.hpp>
@@ -30,6 +31,7 @@ constexpr const char* kCameraImageTopic = "camera/stream";
 constexpr const char* kSlamPoseTopic    = "slam/pose";
 constexpr const char* kSlamActivePointCloudTopic = "slam/active_cloud_pts";
 constexpr const char* kSlamLocalPointCloudTopic  = "slam/local_cloud_pts";
+constexpr const char* kSlamTrackingStateTopic    = "slam/tracking_state";
 
 
 static std::string env_or_default(const char* name, const char* fallback) {
@@ -84,6 +86,9 @@ public:
         m_pubLocalPoints = this->create_publisher<PointCloudType>(
             kSlamLocalPointCloudTopic, 10
         );
+        m_pubTrackingState = this->create_publisher<std_msgs::msg::Bool>(
+            kSlamTrackingStateTopic, 10
+        );
         
         
 
@@ -134,11 +139,24 @@ private:
                 m_slamSystem->feed_monocular_frame(cv_ptr->image, timestamp, cv::Mat{});
                 publish_rviz_pose();
                 publish_global_point_cloud();
+                publish_tracking_state();
 
             } catch (const cv_bridge::Exception& e) {
                 RCLCPP_ERROR(this->get_logger(), "cv_bridge conversion exception: %s", e.what());
             }
         }
+    }
+
+
+    void publish_tracking_state() {
+        /* True = stella is actively tracking; false = tracker paused/lost. The
+           hover-hold / FMU gates a hard stop on this (see slam_recovery_fsm.hpp).
+           Published every worker cycle, including while paused -- a stale "alive"
+           would let the controller keep trusting a dead pose. */
+        std_msgs::msg::Bool msg;
+        msg.data = !m_slamSystem->tracker_is_paused();
+        m_pubTrackingState->publish(msg);
+        return;
     }
 
 
@@ -284,6 +302,7 @@ private:
     PublisherPtr<PoseType>                 m_pubPose;
     PublisherPtr<PointCloudType>           m_pubActivePoints;
     PublisherPtr<PointCloudType>           m_pubLocalPoints;
+    PublisherPtr<std_msgs::msg::Bool>      m_pubTrackingState;
 
     std::thread                            m_slamThread;
     std::atomic<bool>                      m_exitSlam{false};    
