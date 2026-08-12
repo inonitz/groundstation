@@ -40,3 +40,10 @@ __pycache__/
 # Log files
 *.log
 */slam_check.log
+
+# Stella vSLAM config calibration 
+frame*.png
+
+# Test-run pane captures (not caught by *.log)
+captured_panes_log.txt
+*.out
