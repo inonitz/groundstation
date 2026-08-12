@@ -1,70 +1,77 @@
-# ASR integration — voice objective into the FMU (owner: agent + human)
+# ASR integration — one-hour finish (owner: agent + human)
 
-**Date: 2026-08-12** · Deadline: Wed evening 2026-08-12.
+**Date: 2026-08-12** · Deadline: Wed evening 2026-08-12. Demo MUST include voice.
 
-**Mission**: wire the already-built speech-to-text stack into the drone command path, so a spoken
-objective ("find the person in the hat and follow them") reaches the VLM planner the same way a typed
-one does. The model selection and measurement are DONE — this spec is integration, not research.
+**Reality check — the node is already built.** `source/llm_to_action/asr/asr_node.cpp` captures on a
+push-to-talk key, resamples, runs Parakeet-q4, and publishes the transcript on
+`/asr_server/transcribe` (`asr_node_base.hpp`, `std_msgs/String`). It logs `>>> TRANSCRIBED (Xms)`.
+`scripts/simenv.sh` already points at the parakeet-q4 model; `devenv.sh` mounts `/root/models/asr`.
+Do NOT rebuild any of this.
 
-## Precondition work — DONE (do not redo)
+**The only real gap: nothing consumes the transcript.** The FMU still reads its objective from
+`argv[1]` (`fmu_node.cpp:35`). The transcript is published into the void. Closing that seam, plus two
+tiny enables, is the whole job — and it fits in an hour.
 
-Measured in `sttserv` (`bench.sh`); full write-up in that repo's README. Settled:
-- **Model: Parakeet TDT 0.6B v3, q4_k, on RAW audio.** ~0.15–1.5 s/clip (median 0.59 s), 397 MB,
-  best pass rate. whisper-large models are ~12× slower for no gain.
-- **No denoise.** GTCRN speech-enhancement in front of Parakeet is net-negative (37/44 → 27/44); it
-  cannot recover speech that noise has drowned. Ship raw audio.
-- **Loudness handling = ASR confidence, not SNR.** Gate on decode confidence and ask the speaker to
-  repeat; do not SNR-gate a denoiser.
-- **VLM first-plan latency** is prefill-bound (~27 s cold). A warmup request at server boot (or
-  `--prompt-cache`) prewarms the system-prompt KV → ~8–10 s. Identified, not yet wired.
+**Precondition work (DONE, do not redo):** Parakeet-q4 on raw audio is the model; no denoise; confidence does NOT gate accuracy (tested — the model scores wrong transcripts higher than right ones, so operator read-back replaces it); noise filtering (GTCRN / SpeexDSP / classical) all tested net-negative, so raw audio ships; VLM cold first-plan (~27 s) is cut to ~9 s by a boot warmup.
 
-## REQUIRED reading
+## REQUIRED reading (process, before any code)
 
-`docs/active/sitl-orchestration-plan.md`, `CLAUDE.md`, `docs/code-guidelines.md`,
-`docs/writing-style.md`. Study the OLD reference node on the other branch — it already did capture +
-transcribe + publish and is the template to port from, not reinvent:
-`git show feature-showcase-v2 -- <path to speech_to_action>` (locate it with
-`rtk git ls-tree -r --name-only feature-showcase-v2 | rtk grep -i speech`). Study the sttserv library
-surface (`sttserv/include/sttserv/`: `backend.hpp`, `audio2.hpp`, `async_key.hpp`) and how the FMU
-takes an objective today (the keyboard/objective path into `buildDynamicPrompt` / `userQuery`).
+`docs/active/sitl-orchestration-plan.md` (the whole plan + the LOCKS protocol + the commit rules),
+`CLAUDE.md` (RTK wrappers, economy, NO git writes), `docs/code-guidelines.md` (house code style +
+commit message style), `docs/writing-style.md` (prose for your Report and commit bodies),
+`docs/project_overview.md` and `docs/ARCHITECTURE.md` (system context: where the FMU objective seam and
+the VLM sit), `docs/NOTES.md` (grep `ASR` / `VLM` / `VRAM` for prior gotchas), `docs/LOCKS.md` (acquire
+the `fmu_node.hpp` lock before editing it). Docs drift — trust the code over the docs and flag any
+mismatch in your Report.
 
-## Do
+## The hour (three code steps)
 
-1. **ASR node.** Bring sttserv into the ROS graph as a node: push-to-talk key → capture → Parakeet-q4
-   transcribe (raw audio) → publish transcript + confidence. Port from the old `speech_to_action`
-   node; keep it lean. Parakeet-q4 shares the 4 GB GPU with the VLM, so it must not blow the budget.
-2. **Confidence gate + ask-again.** If decode confidence is below threshold, do not forward the
-   transcript — prompt the operator to repeat (TTS beep or a printed line is fine). Threshold is
-   tunable via config.
-3. **Transcript → FMU objective.** Wire the accepted transcript into the FMU as the objective/userQuery,
-   the same slot a typed goal uses. One clean seam; do not duplicate the planning path.
-4. **VLM VRAM refit.** `scripts/test/lib/sim_core.sh` runs the VLM at `-c 8192`. With Parakeet-q4
-   (~400 MB) co-resident, re-fit both on 4 GB: shrink `-c` (the old co-run used `-c 1024`) and measure
-   VRAM + total RSS. Deliver the `-c` value that holds both without OOM. Keep the change env-tunable
-   (`VLM_CTX_SIZE`) so it is one flag, not a rebuild.
-5. **VLM prewarm.** Add the boot-time warmup request (or `--prompt-cache`) so the first real plan is
-   ~8–10 s, not ~27 s. Measure the before/after.
-6. **Listen-mode decision (write it down).** Push-to-talk (key → listen → transcribe) is the default
-   and enough for the demo: one objective at the start. An always-on VAD background listener is only
-   needed for barge-in commands ("stop"/"halt") mid-flight, and it costs a constantly-running capture +
-   VAD. Recommend push-to-talk for Wednesday, VAD as a stretch, and state which you built.
+**Step 1 — operator read-back, NOT a confidence gate (~10 min).** The "ask again if confidence low" idea was tested and killed: on 44 clips, token-probability confidence does not track correctness — failing transcriptions averaged cf 0.971 vs 0.964 for passing ones, and no threshold separates them. Do NOT gate on confidence for accuracy. Instead echo the transcript for a human to confirm before it runs: on each transcript, log it prominently (`[ASR] heard: "<text>" — <key> run / <key> redo`) so a mis-hear is caught before the drone acts. That is the reliable safety net for a noisy room. (Want the confidence number for logs only? The fork stores the raw logit in `.plog`, so use `.p`; blanks are never in the token list, nothing to filter.)
 
-## Tests (with the human)
+**Step 2 — FMU consumes the transcript (~25 min).** In `fmu_node.hpp`, add a subscription to
+`/asr_server/transcribe` (`std_msgs/String`). In the callback: if `FlightState == STANDBY`, call
+`start(text)` to launch the mission from the spoken objective; if already flying, route `text` into the
+existing re-plan path (the same seam `callLlamaServer` uses for re-assess) so a spoken command replans
+mid-flight. Lock `fmu_node.hpp` in `docs/LOCKS.md` first — Agents 0/1/2 also touch it; keep the hold
+short. This is the seam that makes the demo voice-driven.
 
-Speak an objective → transcript appears with a confidence number → a low-confidence mumble triggers
-ask-again → a clean objective reaches the FMU and the VLM plans from it. Confirm VLM + Parakeet both
-resident on the 4 GB GPU with no OOM, and first-plan latency improved by the prewarm.
+**Step 3 — co-residency + prewarm + launch (~20 min).** Parakeet-q4 (~400 MB) now shares the 4 GB GPU
+with the VLM. Drop the VLM context so both fit: set `VLM_CTX_SIZE` low (start 1024, the old co-run
+value) in `scripts/test/lib/sim_core.sh` / `simenv.sh`. Add a boot-time warmup request to `llama-server`
+(one throwaway `/v1/chat/completions` with the system prompt) so the first real plan is ~9 s not ~27 s.
+Make sure the ASR node is actually launched in the SITL harness (it is wired in `simenv.sh`; mirror it
+into the test launcher if missing).
 
-## Locks (docs/LOCKS.md)
+## Tests — the clock (three tiers, ~30 min total)
 
-`scripts/test/lib/sim_core.sh` (VLM flags — Agent 1 may also touch it; short hold). New ASR node files
-are yours alone. The FMU objective seam touches `fmu_node.hpp` — coordinate with Agents 0/1/2 there.
+**Simple (5 min) — ASR alone.** Launch just the ASR node. `ros2 topic echo /asr_server/transcribe`.
+Press the PTT key, speak "hold position". Transcript appears on the topic and is echoed as `[ASR] heard: "..."`. Pass = transcript published + read-back line shown.
+
+**Not-so-simple (10 min) — FMU consumes it, both models resident.** Bring up the FMU + llama-server
+headless (no drone). Publish or speak a transcript; confirm the FMU logs `Mission started ... objective:
+<the spoken text>` from the topic, not from argv. In parallel watch `nvidia-smi`: VLM + Parakeet both
+resident, no OOM; total app RSS < 8 GiB. Pass = spoken text drives the FMU objective with both models
+co-resident.
+
+**Full demo (15 min) — end-to-end voice hat-follow.** Full SITL stack. On the ground, press PTT and
+speak "find the person in the hat and follow them". The transcript reaches the FMU, the VLM plans, the
+drone takes off and runs FOLLOW on the hatted target. Speak the objective **before takeoff** — prop
+noise wrecks in-flight capture, and this is the physics limit, not a code bug. Pass = a spoken sentence
+flies the hat-follow demo with no typed objective.
+
+## Files
+
+Change: `asr_node.cpp`, `asr_node.hpp`, `asr_node_base.hpp`, `fmu_node.hpp` (+ maybe `fmu_node.cpp`),
+`scripts/test/lib/sim_core.sh`, `scripts/simenv.sh`, `config/*.yaml` (threshold + `VLM_CTX_SIZE`).
+Read first: the full `asr_node.*`, `fmu_node.hpp` `start()` (`364`) + `callLlamaServer`/re-assess path,
+`asr_node_base.hpp`, `simenv.sh`.
 
 ## Constraints
 
-RAM budget is hard: total app must stay under 8 GiB and both models must fit 4 GB VRAM — leanness wins.
-No git writes — suggest atomic, agent-labelled commits (`asr: node + transcript wiring`,
-`asr: vlm vram refit + prewarm`). Prose per `docs/writing-style.md`.
+Both models must fit 4 GB VRAM; total app < 8 GiB. Speak the objective on the ground. No git writes —
+suggest atomic commits (`asr: transcript read-back`, `asr: fmu consumes transcript`,
+`asr: vram refit + vlm prewarm`). Prose per `docs/writing-style.md`.
 
 ## Report
-_(append the chosen `-c` value + measured VRAM/RSS, prewarm before/after, listen-mode built, blockers)_
+_(append: chosen `VLM_CTX_SIZE` + measured VRAM/RSS, prewarm before/after,
+which test tiers passed, blockers)_
