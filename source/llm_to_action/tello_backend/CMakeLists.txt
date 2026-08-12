@@ -69,3 +69,32 @@ if(OpenCV_FOUND)
 else()
     message(STATUS "[tello_backend] OpenCV not found; skipping tello_teleop harness.")
 endif()
+
+# ---------------------------------------------------------------------------
+# Tier-2 SLAM hover-hold node (ON HARDWARE): owns a TelloBackend, subscribes
+# stella's slam/pose + slam/tracking_state, holds station and lands on loss.
+# Header-only reuse of the offline-tested bridge / controller / recovery FSM in
+# source/slam. Uses the ROS imported targets the top-level build already
+# find_package'd (rclcpp + geometry_msgs; std_msgs Bool rides in transitively via
+# geometry_msgs, same as slam2.hpp). Guarded on the targets so a ROS-less
+# configuration still builds the rest of the tree.
+# ---------------------------------------------------------------------------
+if(TARGET rclcpp::rclcpp AND TARGET geometry_msgs::geometry_msgs__rosidl_typesupport_cpp)
+    add_executable(tello_slam_hold
+        test/tello_slam_hold.cpp
+        ${LLM_TO_ACTION_DIR}/keyboard/async_key.cpp
+        ${LLM_TO_ACTION_DIR}/keyboard/key_codes.cpp
+    )
+    target_link_libraries(tello_slam_hold PRIVATE
+        Drone::tello_backend
+        UTIL2::util2
+        rclcpp::rclcpp
+        geometry_msgs::geometry_msgs__rosidl_typesupport_cpp
+    )
+    target_include_directories(tello_slam_hold PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../slam   # slam_pose_bridge / hover_hold_control / recovery FSM
+    )
+    target_compile_features(tello_slam_hold PRIVATE cxx_std_17)
+else()
+    message(STATUS "[tello_backend] ROS targets not present; skipping tello_slam_hold.")
+endif()
