@@ -1,4 +1,44 @@
+## Camera UDP port split: SITL vs Tello (2026-08-11, agent1)
+- **Problem:** SITL image-in and real-Tello video-in both bound UDP **11111** (one hardcoded
+  `kUdpHostPortAddress` in the gstreamer TX base), so a SITL run and a Tello calibration could not
+  share a host -- blocked parallel work (Agent 1 FOLLOW SITL vs Agent 4 Tello calib).
+- **Ownership (the point):** ports belong to the backend that owns the transport, not to a gstreamer
+  catch-all constant. The Tello video port already existed as `kTelloVideoPort` (tello_backend_base.hpp,
+  ROS-free) -- reuse it, do not duplicate. The SITL camera has no ROS backend that owns it: it comes
+  from Gazebo via the gz TX plugin, so its port lives with that transport module as a single
+  `kSitlUdpCamPort = 11112` (gstreamer_gz_udp_tx/gazebo_cam_plugin_base.hpp). It is NOT put in
+  px4_backend_base.hpp, which is the DDS/px4_msgs contract -- the shared, backend-neutral RX is built
+  once for both backends and must not pull px4_msgs (see rx_node.cpp main comment).
+- **Wiring:** the RX picks the port by its `bUseTelloPipeline` flag -- `kTelloVideoPort` (pulled from
+  the Tello backend) for the real drone, `kSitlUdpCamPort` for the sim. The gz TX plugin (sim-only)
+  uses `kSitlUdpCamPort`. Compile-time, no env var (monolithic single-build constraint). Real-Tello
+  path is byte-unchanged (still 11111).
+- **Effect:** a SITL run (11112) and a Tello video stream (11111) now coexist on one host.
+- **Caveat:** a sim started BEFORE this build still runs the old 11111 binary (old inode); it must be
+  torn down before it stops squatting 11111.
+
 # Architectural Notes
+
+## ⚠ RUN QGROUNDCONTROL BEFORE ANY SITL SIM (2026-08-11) -- HARD REQUIREMENT
+
+PX4 will NOT arm without a ground-control-station link. With no GCS connected the pxh
+console prints `Preflight Fail: No connection to the GCS` then `Arming denied: Resolve
+system health failures first`, and the drone sits disarmed forever: FMU streams the climb
+setpoint, `nav=14` (OFFBOARD accepted), `arm` stays disarmed, altitude pinned at ~0. It
+looks like a stuck takeoff; it is a refused arm.
+
+The check is `rcAndDataLinkCheck.cpp`: arming needs a GCS or RC link when `NAV_DLL_ACT > 0`
+(this build's default). QGroundControl supplies that link -- so **open QGroundControl before
+launching any SITL scenario that must fly.** This is why the whole green SITL matrix was
+operator-attended.
+
+- **You (running a SITL sim): open QGroundControl first.** If you are an automated agent
+  that cannot open a GUI, STOP and tell the human to open QGroundControl.
+- Headless alternative (no GUI): export `PX4_PARAM_NAV_DLL_ACT=0` to waive the data-link
+  check so a run can arm with no GCS. QGC is the intended path; the waiver is the fallback.
+- Root-caused during the P1 disarm verify -- see
+  `docs/active/sitl-agent3-qa-cleanups-spec.md` Report section 2.
+
 
 ## PX4 OFFBOARD engage (fmu_node offboardPublishLoop)
 - Stream `OffboardControlMode` + `TrajectorySetpoint` continuously from node start
@@ -1586,4 +1626,144 @@ only behavior change is opt-in, guarded by `DRONE_CONFIG` being set.
 - `MultiThreadedExecutor` capped 12 -> 3 (`fmu_node.cpp`) to cut ROS thread contention.
 - `FMU_OBSERVABILITY` (env, default OFF) gates the A2 image publishers, HUD, and VLM-JSONL log.
   OFF is takeoff-safe: the always-on 1280x720 image encode+publish was saturating the 12 cores and
-  starving the VLM. ON is for the dashboard (resize to 320x240 before publish -- pending).
+  starving the VLM. ON is for the dashboard: resize to 320x240 + ~10 Hz throttle before publish
+  (done, agent2 2026-08-11 -- see the A2 dashboard note below).
+
+## A2 dashboard: lean bridge + 320x240 downscale + headless self-test (agent2, 2026-08-11)
+
+Completes the A2 path from topics to a browser, and lands the leanness fix. All FMU-side work stays
+under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
+- FMU (`fmu_node.hpp`): `publishAnnotatedFrame` + `publishDepthColormap` now `cv::resize` to 320x240
+  (`INTER_AREA`) and throttle to ~10 Hz (`m_lastAnnUs`/`m_lastDepthUs`, mirroring `kHudThrottleUs`)
+  before publishing. This is the fix for the 1280x720 encode+publish that starved the VLM. Depth
+  throttles BEFORE the colormap so the CPU is skipped, not just the publish. New `/fmu/vlm_text`
+  (`std_msgs/String`) carries the VLM reasoning text, set in `callLlamaServer` (the HUD only had
+  busy/idle). New constants (`fmu_node_base.hpp`): `kVlmTextTopic`, `kA2ImgW`/`kA2ImgH`,
+  `kImgThrottleMs`/`kImgThrottleUs`.
+- Browser dashboard (`scripts/dashboard/`, zero pip deps): `serve.py` is one `rclpy` node + a stdlib
+  `ThreadingHTTPServer` (MJPEG per image, one SSE for HUD+VLM). `dashboard.html` renders it. No
+  websockets/rosbridge/foxglove (not installed). `serve.py` has file logging (`--log`/`--verbose`);
+  `smoke.py` publishes fake topics for a no-drone bench test; `assess.py` writes a PASS/FAIL verdict.
+- Self-assessing headless test (`scripts/test/SITL/dashboard/run.sh`): brings up the moving_person
+  FOLLOW demo with Gazebo HEADLESS + observability, runs the bridge + assessor. Verified on a full
+  run: real Gazebo camera -> perception -> 320x240 at ~7.5 Hz, live HUD/detections/VLM on the page,
+  total RSS ~2.4 GiB (well under the 8 GiB budget), no leak, no dup publishers.
+- `sim_core.sh` passes `FMU_OBSERVABILITY` (into `CMD_FMU`) and `HEADLESS` (into `CMD_PX4`) through to
+  the tmux panes; both default off/0, so attended runs are unchanged. HEADLESS gives a gz server with
+  no GUI, so the dashboard is the observation surface.
+
+## Keyboard override toggle + input-hook robustness (agent0, 2026-08-11)
+- Enter now toggles manual override in `keyCallback`, handled before the `m_manualOverride` gate.
+- Nothing publishes `/fmu/in/override` in the running rig, so a gated toggle could never fire.
+- The key synthesises a Bool and calls `overrideCallback`, so key and topic share one engage path.
+- Press-only: the matching key release would otherwise undo the toggle milliseconds later.
+- The keyboard has no arm/takeoff/land key; those reach the backend only as VLM plan commands.
+- `tello_teleop` (`tello_backend/test/`) is the manual takeoff-to-landing path, not `run.sh`.
+- `AsyncKeyHook` aborted the whole hook on the first failed device open, discarding nine good ones.
+- It now skips unopenable devices, drops `/proc` paths with no node, and is fatal only when none open.
+- It also leaked a descriptor for every non-keyboard it opened; those are closed now.
+- Container gotcha: `/dev` is a tmpfs snapshot taken at creation, `/proc/bus/input/devices` is host-live.
+- So a keyboard plugged in after container start is listed in `/proc` with no node to open.
+- `scripts/devenv.sh` now bind-mounts `/dev/input` (not `--device`, which snapshots the same way).
+- Immediate workaround without a restart: `mknod /dev/input/eventN c 13 $((64+N))`.
+- `${VLM_KV_ARG--cache-type-k ...}` in `sim_core.sh` spent its first dash on the `-` default operator.
+- llama-server therefore saw `-cache-type-k` and refused to start, leaving the FMU with 0-char plans.
+- Both that and `${VLM_NGL_ARG--ngl 99}` now carry a space; the latter survived only by luck.
+
+## Tello drift is a surface problem, not an airframe problem (agent0, 2026-08-11)
+- Measured on the real drone across four logged flights; this overturns "the Tello drifts badly".
+- The Tello holds position with its Vision Positioning System: a downward camera plus an IR ranger.
+- Blind VPS means no station-keeping at all, so the airframe wanders off on any air current.
+- On the original uniform reflective floor it could not hold a 3 s hover and flew into a wall.
+- Over hard flat chair mats it held a **38 s hands-off hover**, drifting only +0.20 m in altitude.
+- Same drone, same room, same binary. Only the surface under it changed.
+- The rule is flat, hard, matte and high-contrast -- NOT merely "textured".
+- A floral bed FAILED (1/123 samples) while plain chair mats WORKED (72/118). Soft, non-planar
+  surfaces deform under the drone's own downwash and give the VPS nothing stable to lock onto.
+- Demo consequence: cover the flight area. See the coverage correction below -- a patch is not enough.
+- **CORRECTION (same day, after the translation test).** The 38 s hover and the drift figures below
+  were flown over roughly 1 m2 of chair mats in a 3-3.5 m x 6-7 m room: about 5% floor coverage.
+  Across a 49 s translation flight the drone reported velocity for only 28% of airborne time. The
+  other 72% produced NO measurement, and the operator reports it was drifting quickly during those
+  stretches. A blind VPS reports zero, and integrating zero reads as "not moving", so the measured
+  drift of 0.2 cm/s describes only the locked 28% -- it is drift WHILE HELD, not drift.
+- A 1 m2 patch is a weak visual anchor. The drone leaves it in under a second of commanded motion,
+  and the surrounding uniform reflective floor gives the camera nothing to fall back on.
+- Sizing the real thing: a 3.5 x 7 m room is ~24 m2, so full coverage is ~100 tiles of 50 cm. That
+  is a genuine logistics cost for the demo, not an afternoon of taping mats down.
+- `vgx`/`vgy` are useless as a drift instrument: they read 0 when the VPS is blind AND when the
+  drone is genuinely still. Do not build dead reckoning on them.
+- `vgz` and `tof` stay live throughout, which is how we proved the state parse was never at fault.
+- `tof` (downward IR, cm) is now stored in `TelloBackend` (`m_tofCm` / `tof_cm()`) and logged by
+  `tello_teleop`. A tof that tracks altitude with dead `vgx`/`vgy` means the camera half is blind.
+- For an actual drift figure in cm, use `scripts/tello/measure_drift.py` against a phone video.
+- `tello_teleop` teleop speed was 0.4 m/s = stick 40/100, too little authority to fight drift.
+  Default is now 0.8 m/s, tunable live via `TELLO_MOVE_MPS` / `TELLO_YAW_RADPS`.
+
+## Tello demo: what the environment must provide (agent0, 2026-08-11)
+- Written down because it currently exists only in one conversation, and the demo depends on it.
+- **Floor**: hard, flat, matte, high-contrast, covering the WHOLE flight envelope plus a margin.
+- Interlocking EVA foam tiles are the cheap answer; their seams give the camera free contrast lines.
+- Tape every edge and seam. The drone's own downwash lifts loose material, and a flapping corner is
+  a moving feature, which is worse for the VPS than no feature at all.
+- Rubber-backed patterned rugs or a taped-flat matte dropcloth also work. They must not ripple.
+- Avoid glossy tile, glass, polished concrete, uniform low-pile carpet.
+- **Partial coverage is worse than none**: the drone gets a lock, holds, then loses it mid-transit.
+- **Air**: no fans, no HVAC vents, no open windows. A household fan beats this airframe outright.
+- **Light**: even indoor lighting. No direct sun -- the camera needs light, the IR ranger hates sun.
+- **Altitude**: fly 0.5-2 m. VPS is out of range below 0.3 m.
+- Do not test outdoors: wind dominates an 80 g airframe and sun washes out the IR ranger, so an
+  outdoor result would tell you nothing about an indoor demo.
+- WiFi degrades badly through walls; keep the laptop line-of-sight to the drone.
+- **If the venue floor cannot be covered, do not fly the Tello.** SITL hat-follow was always the
+  reliable headline and the Tello the stretch; that is now a hardware fact, not caution.
+
+## Agent 5 C3: dead reckoning is unimplementable on this airframe (agent0, 2026-08-11)
+- C3 in `sitl-agent5-slam-stabilization-spec.md` says to Simpson-integrate `vgx/vgy/vgz` into a DR
+  XY pose, and to free-run on DR whenever SLAM tracking pauses. Neither is possible.
+- `vgx`/`vgy` are 0 for the entire airborne phase: 411 samples in one log, 606 in another,
+  max|vel| 0.00, while `vgz` and `tof` stay live in the same 16-field parse. Integrating zeros
+  yields zero, so there is no DR pose and no DR fallback.
+- Recovery must instead be: on tracking loss command zero velocity at once, let the Tello's own VPS
+  station-keep, relocalize against the in-RAM map, re-anchor, resume.
+- That fallback only holds while the surface underneath is VPS-readable, which makes the floor
+  itself part of the recovery design, not just a comfort.
+- The tracking-state topic C3 asks for is still needed, and now matters more: it gates a hard stop
+  rather than a handover to dead reckoning.
+
+## tmux capture loses data by default; use pipe-pane (agent0, 2026-08-11)
+- Cost us a real diagnosis: an FMU pane held ~1900 lines and the `MANUAL OVERRIDE` line we needed
+  had scrolled off 0.6 s before the capture window began. It read as "the override never fired".
+- `run.sh:82` and `sim_core.sh:172` both set `-g history-limit 200000`, but the live server was at
+  the 2000 default. The set is swallowed by `2>/dev/null || true`, so the failure is silent.
+- 2000 lines of a 20 Hz FMU is well under a minute of flight.
+- Fix for a running session: `tmux set-option -t <session> history-limit 200000` (future lines only).
+- Real fix, independent of buffer size -- stream every line as it is produced:
+  `for p in $(tmux list-panes -s -t <session> -F '#{pane_id}'); do
+     tmux pipe-pane -t "$p" -o "cat >> logs/pane${p#%}.log"; done`
+- When capturing scrollback instead, `capture-pane` needs `-J` as well as `-S -`. Without `-J` tmux
+  breaks long lines at the pane width, which silently defeats greps: `yawRate=` lands on a different
+  line from `ORBIT target=car`.
+
+## Tello teleop telemetry: 10 Hz and timestamped (agent0, 2026-08-11)
+- `tello_teleop` printed telemetry at 2 Hz with no timestamp, and its key-event print fires only on
+  press/release -- exactly the moments when velocity is near zero by construction.
+- Reading only the key-event print led me to conclude the drone reported no horizontal velocity at
+  all. It was the wrong print. Use the `[tele]` lines, not `telemetry(`.
+- Now samples at 10 Hz, matching the Tello's state broadcast rate so no update is missed, and each
+  line carries `t=<ms>` from the first sample. Override with `TELLO_TELE_MS`.
+- This is what made the surface comparison and the drift integration possible at all.
+- Latent, wider than teleop: `kTelloMaxSpeedMps = 1.0` (tello_backend_base.hpp) is the constant that
+  turns m/s into a [-100,100] stick, and its own comment admits it is a first estimate pending
+  hardware calibration. EVERY velocity the FMU commands is scaled by it, not just teleop, so if the
+  Tello's true full-stick speed is several m/s then every autonomous speed is wrong by that factor.
+  Not measured here; flagged so it is not mistaken for a calibrated value.
+
+## ORBIT geometry defect handed to agent 1 (agent0, 2026-08-11)
+- Found in a live SITL log: the VLM planned `orbit ... "speed":1`, read as cm/s, so 0.01 m/s. A 360
+  orbit at R=4 m became a ~42 minute task that looked like hovering.
+- `radius_cm` is parsed and never used; the radius is whatever distance the drone sits at on lock.
+- Completion is angle-only, so there is no duration bound and a slow speed stalls the task forever.
+- The VLM is not at fault: the orbit schema gives `"speed": <int>` with no units, and the prompt
+  says "Keep speed low". Units appear once in the whole prompt, for `go`.
+- Full write-up with the four defaulting cases: `docs/active/sitl-agent1-orbit-geometry-spec.md`.

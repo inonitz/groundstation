@@ -29,15 +29,15 @@ checking here before an edit. Fill in `notes` with what you actually did, not wh
 
 | file | holder | since (UTC) | notes |
 |------|--------|-------------|-------|
-| source/llm_to_action/fmu/fmu_node.hpp | FREE | | |
-| source/llm_to_action/fmu/fmu_node_base.hpp | FREE | | |
-| source/llm_to_action/fmu/llm_base.hpp | FREE | | |
-| source/llm_to_action/fmu/llamaclient.hpp | FREE | | |
+| source/llm_to_action/fmu/fmu_node.hpp | FREE | | agent2: verified A2 throttle live (temp debug added+removed); no code change vs prior. |
+| source/llm_to_action/fmu/fmu_node_base.hpp | FREE | | agent1: added kFollow* constants (standoff/fwd-gain/lost-timeout) |
+| source/llm_to_action/fmu/llm_base.hpp | FREE | | agent1: added follow verb spec |
+| source/llm_to_action/fmu/llamaclient.hpp | FREE | | agent1: added follow to grammar verb enum |
 | source/llm_to_action/fmu/plan_parse.hpp | FREE | | |
 | source/llm_to_action/keyboard/keyboard_node.hpp | FREE | | |
 | docs/code-guidelines.md | FREE | | |
-| source/llm_to_action/perception/detection_query.hpp | FREE | | |
-| docs/ROADMAP.md | FREE | | |
+| source/llm_to_action/perception/detection_query.hpp | FREE | | agent1: added detectionNearestCenter |
+| docs/ROADMAP.md | FREE | | agent3: added 3.9 prompt-trim (DEFER) + 1.1.2 rotate/drift reframe as [GATE Agent-5 SLAM] |
 | source/llm_to_action/fmu/fmu_node.cpp | FREE | | |
 | scripts/simenv_llm.sh | DELETED | | superseded by scripts/test/lib/sim_core.sh + scripts/test/*/run.sh (2026-08-07) |
 | source/llm_to_action/generic_backend/generic_backend_types.hpp | FREE | | |
@@ -45,8 +45,9 @@ checking here before an edit. Fill in `notes` with what you actually did, not wh
 | source/llm_to_action/px4_backend/px4_backend.hpp | FREE | | |
 | source/llm_to_action/px4_backend/px4_backend.cpp | FREE | | |
 | source/llm_to_action/fmu/perception_runtime.hpp | FREE | | |
-| source/llm_to_action/tello_backend/tello_backend.hpp | FREE | | |
-| source/llm_to_action/tello_backend/tello_backend.cpp | FREE | | |
+| source/llm_to_action/tello_backend/tello_backend.hpp | FREE | | agent0: expose m_tofCm + tof_cm() for VPS diagnosis |
+| source/llm_to_action/tello_backend/tello_backend.cpp | FREE | | agent0: store st.tof in the state loop |
 | source/llm_to_action/tello_backend/tello_backend_base.hpp | FREE | | |
-| source/slam/slam2.hpp | FREE | | |
+| source/slam/slam2.hpp | FREE | | agent4: STELLA_CONFIG_PATH default now config/stella_config_px4.yaml (config move). |
 | CMakeLists.txt (top-level) | FREE | | |
+| config/stella_config_tello.yaml | FREE | | agent4: moved dependencies/ -> config/, all path refs updated; RMS 0.438 px. |
