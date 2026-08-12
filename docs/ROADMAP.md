@@ -29,6 +29,13 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
              200 ccw swept +195 deg (long way CCW, not shortest-path).
              Regression test: `scripts/test/rotate-land/filter.sh` captures all sim panes and
              asserts the swept angle/direction of the canned 90 cw + 200 ccw turns.
+             2026-08-11 (agent3): rotation testing on the REAL airframe is reframed
+             as [GATE Agent-5 SLAM], not a yaw fix. The airframe drifts through space
+             during a turn (whole-airframe drift, see 9.13 / Agent 0). A rotation test
+             cannot separate a yaw-law error from that positional drift until SLAM
+             stabilizes the pose. This is a test-gating problem, not a rotate-code bug.
+             The once-seen ROTATE hang (no completion timeout, docs/NOTES.md) stays a
+             separate open item.
        1.1.3 TAKEOFF state machine (arm, climb, FLIGHT)          [x]
        1.1.4 LAND state machine (descend, force-disarm)          [x]
        1.1.5 STOP / Hover                                        [x]
@@ -94,6 +101,18 @@ ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
        RULE 9. Internally, TaskState::FINISHED_FAIL is still dead code (completeCurrent() always sets
        FINISHED_SUCCESS); a code-level failure-streak escalation (mirroring the interrupt-storm one)
        is a real option if rule 9 alone proves insufficient -- open, see docs/NOTES.md.
+   3.9 Prompt-trim: drop grammar-enforced prompt scaffolding      [ ]  [DEFER, low-urgency]
+       2026-08-11 (agent3): the GBNF grammar (buildPlanGrammar, llamaclient.hpp:111)
+       now enforces the plan's JSON shape, thought-first ordering, the verb enum, and
+       takeoff-first at the sampling level (docs/NOTES.md 2026-08-10). Two older prompt
+       pieces are now redundant with it: the OUTPUT FORMAT block (llm_base.hpp:132) and
+       the dynamic "your plan MUST start with {"action":"takeoff"}" line
+       (fmu_node.hpp:1787). Trimming them shortens the prompt. The payoff is small: it
+       only speeds the FIRST plan, and the grammar already guarantees the shape, so this
+       is a cleanup, not a fix -- hence low-urgency. Keep the thought's 3-part content
+       guidance (feasibility / flight strategy / landing-clearance). The grammar bounds
+       that string's length but not its meaning, so only the structural scaffolding is
+       safe to cut.
    3.7 Multi-takeoff / VLM-signalled mission end                 [DEFER]  (POC: LAND = end)
 
 4. Perception                                                    [~]  vision lib done + FMU-integrated; APPROACH (5) next
