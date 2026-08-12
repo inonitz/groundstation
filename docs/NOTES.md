@@ -1786,3 +1786,73 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
 - The VLM is not at fault: the orbit schema gives `"speed": <int>` with no units, and the prompt
   says "Keep speed low". Units appear once in the whole prompt, for `go`.
 - Full write-up with the four defaulting cases: `docs/active/sitl-agent1-orbit-geometry-spec.md`.
+
+## HOVER verb + FOLLOW hold-on-loss + typed-member grammar (agent1, 2026-08-12)
+- Diagnosed from live SITL logs: the VLM kept losing the target, failing FOLLOW, then flailing on
+  re-plan -- emitting `go 0,0,0` to "hold", re-issuing `takeoff` every cycle, and rebuilding the whole
+  mission from scratch. Root causes were all upstream of the flight code.
+- Cause 1: no persistent hold. `stop` sets zero velocity for one tick, then auto-completes (`noop_ok`),
+  which empties the queue and re-wakes the VLM. Only FOLLOW/SEARCH/ORBIT persist. So the model had no
+  clean "hold station, don't ask me again" token and abused `go`. Fix: new `CommandID::HOVER` verb --
+  zero velocity, never completes, never wakes the VLM. Exits only on interrupt / re-assess / new command.
+  The station hold itself is the backend position controller (PX4 EKF / Tello VPS), which already exists.
+- Cause 2: FOLLOW failing on brief loss. On sustained loss FOLLOW called `completeCurrent("follow_lost")`,
+  handing a flailing VLM control. Reworked: if FOLLOW was EVER locked, on loss it HOLDS station and keeps
+  re-acquiring by label indefinitely (no wake, no fail); the tr.found branch re-locks automatically when
+  the target returns. Only a follow that NEVER locked within the acquire window fails, as
+  `follow_no_target`, so the VLM learns the named target is not there. FOLLOW never self-completes (spec).
+- Cause 3: loose GBNF let the model emit `{"parameters":"x: 0, ..."}` as a free-form string, so the
+  parser read every field as its default (track_id -> 0, breaking the bind). Fix: members are now TYPED
+  per key -- coordinate/id/speed keys take a number, only target_object/direction/search_size/reason take
+  a string. An unknown key like "parameters" is rejected token-by-token. Also, when airborne the verb list
+  DROPS `takeoff`, so the model cannot re-launch mid-flight and rebuild the mission from the ground up.
+- Parser also routes a zero-vector `go` (x=y=z=0) to HOVER -- the model's real intent was to hold.
+- Tracker coast bumped from 5 to 15 frames (perception_runtime.hpp m_trackerParams). Live actor detection
+  flickers, and the short window retired+re-minted ids constantly (observed track_id 13 -> 50 -> 86 for a
+  single actor). Longer coast keeps the id stable across blinks. Association still gates on label+geometry,
+  so a genuinely new person does not inherit a coasting id.
+- Prompt (llm_base.hpp) gained: hover doc, "hold with hover NEVER a zero go", "go/approach MOVE the drone
+  so never use them to follow/maintain", "target already visible -> go straight to follow, do not search",
+  and "plan only what REMAINS; takeoff_ok in history means you are airborne, never takeoff again".
+
+
+## C1 SLAM go/no-go + hover-hold node (agent5, 2026-08-12)
+- C1 flown handheld on chair mats (axistest_20260812): stella held a CLEAN continuous lock --
+  100% tracking uptime, 0 BLIND, 0 NO-VIDEO, ~27 Hz over 45 s. On a textured floor stella tracks
+  fine; the venue's glass/concrete is the open risk, screened before flight by feature_scout.py.
+- Frame decoded from the raw slam/pose trace against a scripted motion (forward, right, up): stella's
+  map is the CAMERA-OPTICAL frame -- +x = right, +y = down, +z = forward. So a level forward-facing
+  Tello's horizontal ground plane is map (x, z) and vertical is -y. This is the one mapping the
+  hover-hold node needed and was refusing to guess; it is now validated on hardware.
+- Rough scale from that run: ~1 m real ~= 0.6 map units. Monocular is up-to-scale, so the node
+  resolves live scale per-frame as tof_height / (-y) (median-smoothed) rather than trusting any fixed
+  constant.
+- Built tello_slam_hold (source/llm_to_action/tello_backend/test/tello_slam_hold.cpp): owns a
+  TelloBackend, subscribes slam/pose + slam/tracking_state, runs the offline-tested bridge + PID +
+  recovery FSM, holds station via set_body_velocity, lands on sustained loss. Frame mapping above;
+  ENU->body uses the engage heading (yaw0=0), exact only while the drone holds heading (the hold case).
+  Rotating by a live SLAM heading is deferred behind a single seam (worldErrToBody) because C1 logged
+  position only, not the quaternion -- do NOT engage a hold after a large yaw until that is validated.
+- Builds only under a Tello backend config (-D GROUNDSTATION_BUILD_BACKEND_TELLO=ON), guarded on the
+  rclcpp/geometry_msgs targets. Pure CMake, no ament. Compiles clean against real ROS headers.
+
+
+## ASR noise robustness + demo decision (2026-08-12, Insurance Agent)
+
+- SNR robustness benchmark: `snr_mix_core.h` (header-only, zero-dep) mixes gunfire/explosion beds into
+  clean clips at a controlled SNR; wired in-process into `sttserv/test/asr_test.cpp` as a sweep that
+  prints an accuracy-vs-SNR table. Parakeet-q4 holds 91% intent @ 0 dB, ~80% @ -4 dB, on raw audio.
+  Confirms "ship raw" — every denoiser (GTCRN/SpeexDSP/classical) was net-negative. Beds live in
+  `dependencies/noise_beds/`. Full method + reproduce steps: `docs/active/asr-noise-robustness.md`.
+- "Explosion/noise proof" is a robustness spec, not a denoiser task. The real mitigations are model
+  robustness (curve above), capture-side hardening (push-to-talk + close mic; a blast that clips the
+  ADC is unrecoverable in software), and operator read-back for residual errors. Denoising was tested
+  and dropped.
+- Demo decision for Demo Day: pure-SITL voice-driven mission on the dashboard is the headline; Tello
+  hardware is not bet on. The mission chains perception-conditioned verbs live — "take off and find
+  the hatted man" -> approach/hold -> "now follow him" (sequential context) -> "orbit him" (re-task)
+  -> one improvised Q&A command (proves not-canned). Hebrew handled as English-live + one canned
+  Hebrew clip + roadmap. Must-do: pre-warm the VLM (cold 27s), record a backup video, deterministic
+  world/seed, speak on the ground.
+- Pre-existing fix while building: `asr_test.cpp` still included `util2/C/print.h`; the util2 swap
+  renamed it to `util2/C/print2.h`. Only file left on the old path.

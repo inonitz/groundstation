@@ -29,14 +29,14 @@ checking here before an edit. Fill in `notes` with what you actually did, not wh
 
 | file | holder | since (UTC) | notes |
 |------|--------|-------------|-------|
-| source/llm_to_action/fmu/fmu_node.hpp | FREE | | agent2: verified A2 throttle live (temp debug added+removed); no code change vs prior. |
-| source/llm_to_action/fmu/fmu_node_base.hpp | FREE | | agent1: added kFollow* constants (standoff/fwd-gain/lost-timeout) |
-| source/llm_to_action/fmu/llm_base.hpp | FREE | | agent1: added follow verb spec |
-| source/llm_to_action/fmu/llamaclient.hpp | FREE | | agent1: added follow to grammar verb enum |
+| source/llm_to_action/fmu/fmu_node.hpp | FREE | | agent1: reverted image448 + VISIBLE-NOW (back to 640 + plain JSON perception) | agent1: VISIBLE-NOW directive in [PERCEPTION] (stop 2B hallucinating not-visible->search) + image 448 (speed); px4 clean | agent1: FOLLOW loss = HOLD only (sweep removed - was spinning open-loop on flicker); px4 clean | agent1: FOLLOW coasts brief flickers (hold), sweeps only on sustained loss - kills flicker-spinning; px4 clean | agent1: [PERCEPTION] coasts blank frames + first plan waits for first detection (kills false 'no detections'->spin-search); px4 clean | agent1: FOLLOW centre-detection fallback (locks person even when VLM track_id is wrong); px4 clean | agent1: kFollowYawGain 3.0 + yaw cap (snappier follow centering); px4 clean | agent1: drop zero-go (no hover-starve); FOLLOW loss sweeps yaw to last-seen (4s bound); px4 clean | agent1: SEARCH-by-tag done (CmdSearch.target_id, tag-aware hit, surface track_id in SEARCH DETECTED); px4 clean | agent2: /fmu/rates publisher (perception refresh + publish Hz, obs-gated, ~1Hz). |
+| source/llm_to_action/fmu/fmu_node_base.hpp | FREE | | agent1: kFollowYawGain 5.0 (snappier) | agent1: kFollowCoastMs/Us=800ms | agent1: kPerceptionCoastMs/Us + kPerceptionWarmupMs/Us | agent1: kFollowYawGain=3.0 kFollowYawMaxRps=1.5 | agent1: kFollowSweepMs/Us + kFollowSweepYawMaxRps | agent2: kFmuRatesTopic. |
+| source/llm_to_action/fmu/llm_base.hpp | FREE | | agent1: rule 12 no-guess-ids + act-on-search_ok; px4 clean | agent1: SEARCH confirm-by-tag flow + optional search track_id | agent1: hover only when NO target; follow=hold+watch (fixed model choosing hover over follow) | agent1: incremental/target-visible/no-go-to-hold rules + hover verb doc |
+| source/llm_to_action/fmu/llamaclient.hpp | FREE | | agent1: single verb list, no takeoff in action slots (kills double-takeoff) | agent1: typed-member GBNF (kills parameters blob), airborne verb drops takeoff, added hover |
 | source/llm_to_action/fmu/plan_parse.hpp | FREE | | |
 | source/llm_to_action/keyboard/keyboard_node.hpp | FREE | | |
 | docs/code-guidelines.md | FREE | | |
-| source/llm_to_action/perception/detection_query.hpp | FREE | | agent1: added detectionNearestCenter |
+| source/llm_to_action/perception/detection_query.hpp | FREE | | agent1: detectionByTrackId helper |
 | docs/ROADMAP.md | FREE | | agent3: added 3.9 prompt-trim (DEFER) + 1.1.2 rotate/drift reframe as [GATE Agent-5 SLAM] |
 | source/llm_to_action/fmu/fmu_node.cpp | FREE | | |
 | scripts/simenv_llm.sh | DELETED | | superseded by scripts/test/lib/sim_core.sh + scripts/test/*/run.sh (2026-08-07) |
@@ -44,10 +44,10 @@ checking here before an edit. Fill in `notes` with what you actually did, not wh
 | source/llm_to_action/px4_backend/px4_backend_base.hpp | FREE | | |
 | source/llm_to_action/px4_backend/px4_backend.hpp | FREE | | |
 | source/llm_to_action/px4_backend/px4_backend.cpp | FREE | | |
-| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | |
+| source/llm_to_action/fmu/perception_runtime.hpp | FREE | | agent2: seg/depth iteration counters + segIters()/depthIters() getters. |
 | source/llm_to_action/tello_backend/tello_backend.hpp | FREE | | agent0: expose m_tofCm + tof_cm() for VPS diagnosis |
 | source/llm_to_action/tello_backend/tello_backend.cpp | FREE | | agent0: store st.tof in the state loop |
 | source/llm_to_action/tello_backend/tello_backend_base.hpp | FREE | | |
-| source/slam/slam2.hpp | FREE | | agent4: STELLA_CONFIG_PATH default now config/stella_config_px4.yaml (config move). |
+| source/slam/slam2.hpp | FREE | | agent5: added slam/tracking_state (Bool, !tracker_is_paused) published every worker cycle. Compiles + links (stella_vslam_monocular built). |
 | CMakeLists.txt (top-level) | FREE | | |
 | config/stella_config_tello.yaml | FREE | | agent4: moved dependencies/ -> config/, all path refs updated; RMS 0.438 px. |
