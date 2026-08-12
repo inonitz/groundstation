@@ -53,6 +53,7 @@ struct DroneConfig {
     /* @approach*:
         stop distance and the fallback approach speed. */
     f32 approachStandoffM    = 2.50f;    /* m  (kApproachStandoffM)      */
+    f32 followStandoffM      = 2.00f;    /* m  (kFollowStandoffM)        */
     f32 approachSpeedDefault = 80.0f;    /* cm/s (kApproachSpeedDefault) */
 
     /* @search*:
@@ -184,6 +185,7 @@ inline bool droneConfigParseU32(std::string const& v, u32& out) {
         else if (key == "rotateYawGainHz")      good = droneConfigParseF32(val, cfg.rotateYawGainHz);
         else if (key == "rotateMaxYawRate")     good = droneConfigParseF32(val, cfg.rotateMaxYawRate);
         else if (key == "approachStandoffM")    good = droneConfigParseF32(val, cfg.approachStandoffM);
+        else if (key == "followStandoffM")      good = droneConfigParseF32(val, cfg.followStandoffM);
         else if (key == "approachSpeedDefault") good = droneConfigParseF32(val, cfg.approachSpeedDefault);
         else if (key == "searchSweepSpeedMps")  good = droneConfigParseF32(val, cfg.searchSweepSpeedMps);
         else if (key == "searchLaneLengthM")    good = droneConfigParseF32(val, cfg.searchLaneLengthM);
