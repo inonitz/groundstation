@@ -67,7 +67,8 @@ enum class CommandID : u8 {
     SEARCH   = 7,
     REASSESS = 8,
     APPROACH = 9,
-    MAX_ID   = 10
+    FOLLOW   = 10,
+    MAX_ID   = 11
 };
 
 /* FMU-owned flight state machine (platform-neutral; drives the backend via verbs). */
@@ -128,6 +129,15 @@ struct CmdApproach {
     f32             speed{0.0f};
 };
 
+/* FOLLOW (spec agent1): position-free visual servo that holds a standoff on a VLM-chosen
+   target and keeps it centered. target_index selects the detection from the [PERCEPTION] list;
+   it is resolved to a label + bbox center once at activation, then tracked by nearest-centroid. */
+struct CmdFollow {
+    i32 target_index{-1};
+    i32 standoff_cm{0};
+    i32 speed{0};
+};
+
 struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     union {
         struct alignpk(CACHE_LINE_BYTES) {
@@ -150,6 +160,7 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
                 CmdSearch   m_SearchTarget;
                 CmdReassess m_Reassess;
                 CmdApproach m_approach;
+                CmdFollow   m_follow;
             };
         } m_extractCmd;
     };
@@ -179,6 +190,9 @@ struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     }
     GenericCommand(CmdApproach const& cmd) : m_rawBytes{__scast(u8, CommandID::APPROACH), {0}, {0}} {
         memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdApproach));
+    }
+    GenericCommand(CmdFollow const& cmd) : m_rawBytes{__scast(u8, CommandID::FOLLOW), {0}, {0}} {
+        memcpy(&m_rawBytes.m_cmdBytes, &cmd, sizeof(CmdFollow));
     }
 
     /* Defaulted -> trivially copyable -> the queue keeps the fast POD path. */
@@ -284,6 +298,7 @@ public:
             m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
             m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
             m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
+            m_pubVlmText       = this->create_publisher<std_msgs::msg::String>(kVlmTextTopic, 10);
             m_vlmLogPath       = makeVlmLogPath();
             std::error_code ec;
             std::filesystem::create_directories(kVlmPromptLogDir, ec);
@@ -506,6 +521,7 @@ private:
         FlightState st;
         CommandID   id;
         CmdApproach appr;
+        CmdFollow   fol;
         TargetRelative tr;
         std::shared_ptr<PerceptionSnapshot> snap;
         Vec3        velEnu, aimFlu, fwdDir, lat;
@@ -953,6 +969,56 @@ private:
                             tr.errX, tr.errY, velEnu.x, velEnu.y, velEnu.z, yawRate);
                     }
                 }
+            } else if (id == CommandID::FOLLOW) {
+                /* Hold the standoff on the resolved target and keep it centered. Position-free
+                   (bbox + depth only), so it works where od.pos carries no target (the Tello).
+                   Unlike APPROACH it NEVER completes -- it runs until re-assess or stop. */
+                fol  = m_currTask.m_cmd.m_extractCmd.m_follow;
+                tnow = nowUs();
+                snap = m_perception->snapshot();
+                tr   = (snap && m_followHaveLast)
+                         ? detectionNearestCenter(*snap, m_followLabel, m_followLastU, m_followLastV, kApproachCamera, tnow)
+                         : (snap ? detectionByLabel(*snap, m_followLabel, kApproachCamera, tnow) : TargetRelative{});
+
+                if (tr.found && tr.age_us <= kApproachFreshUs) {
+                    /* Re-anchor the nearest-centroid tracker on the bbox center just locked (px). */
+                    m_followLastU      = kApproachCamera.cx + tr.errX * kApproachCamera.cx;
+                    m_followLastV      = kApproachCamera.cy + tr.errY * kApproachCamera.cy;
+                    m_followLastAimFlu = tr.dirFlu;
+                    m_followLastAimUs  = tnow;
+                    m_followHaveLast   = true;
+
+                    f32 standoff = (fol.standoff_cm > 0) ? fol.standoff_cm / 100.0f : m_cfg.followStandoffM;
+                    speedCeil    = (fol.speed > 0 ? __scast(f32, fol.speed) : kApproachSpeedDefault) / 100.0f;
+                    spF          = kFollowFwdGain * (tr.range - standoff);   /* sign kept: negative backs off. */
+                    if (spF >  speedCeil) spF =  speedCeil;
+                    if (spF < -speedCeil) spF = -speedCeil;
+                    yawRate = -kApproachYawGain  * tr.errX;
+                    vUp     = -kApproachVertGain * tr.errY;
+                    aimFlu  = { spF, 0.0f, vUp };
+                    velEnu  = flu_to_enu(aimFlu, od.yaw);
+                    m_backend->set_velocity(velEnu, yawRate);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] FOLLOW target=%s range=%.2f standoff=%.2f errX=%.2f errY=%.2f "
+                        "spF=%.2f cmdVelENU=(%.2f,%.2f,%.2f) yawRate=%.2f",
+                        m_followLabel, tr.range, standoff, tr.errX, tr.errY, spF,
+                        velEnu.x, velEnu.y, velEnu.z, yawRate);
+                } else if (m_followHaveLast && (tnow - m_followLastAimUs) <= kFollowLostTimeoutUs) {
+                    /* Briefly lost: coast slowly along the last aim so a target that stepped out of
+                       frame is re-acquired. Never complete. */
+                    aimFlu = { m_followLastAimFlu.x * kApproachCoastSpeedMps,
+                               m_followLastAimFlu.y * kApproachCoastSpeedMps,
+                               m_followLastAimFlu.z * kApproachCoastSpeedMps };
+                    velEnu = flu_to_enu(aimFlu, od.yaw);
+                    m_backend->set_velocity(velEnu, 0.0f);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] FOLLOW lost target=%s -> coasting (no complete).", m_followLabel);
+                } else {
+                    /* Lost past the coast window, or never acquired: hover and wait. Never complete. */
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] FOLLOW target=%s not in view -> hovering (no complete).", m_followLabel);
+                }
             } else if (id == CommandID::ORBIT) {
                 orb  = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
                 tnow = nowUs();
@@ -1258,26 +1324,36 @@ private:
     /* PerceptionRuntime already drew the boxes/labels (it owns the detections); here we
        only wrap the BGR mat as a ROS image and publish it at the seg loop's native rate. */
     void publishAnnotatedFrame(cv::Mat const& bgr) {
+        u64     now = nowUs();
+        cv::Mat small;
+        if (now - m_lastAnnUs < kImgThrottleUs) return;   /* ~10 Hz cap -- lean transport. */
+        m_lastAnnUs = now;
+        cv::resize(bgr, small, cv::Size{kA2ImgW, kA2ImgH}, 0, 0, cv::INTER_AREA);
         std_msgs::msg::Header hdr;
         hdr.stamp    = this->now();
         hdr.frame_id = "camera";
-        m_pubAnnotated->publish(*cv_bridge::CvImage(hdr, "bgr8", bgr).toImageMsg());
+        m_pubAnnotated->publish(*cv_bridge::CvImage(hdr, "bgr8", small).toImageMsg());
         return;
     }
 
     /* Normalize the metric-depth mat to 8-bit, colormap it, publish at the depth rate.
        patchNaNs first so a stray NaN cannot wreck the min/max normalization. */
     void publishDepthColormap(cv::Mat const& depth) {
-        cv::Mat clean, norm, color;
+        cv::Mat clean, norm, color, small;
+        u64     now;
         if (depth.empty()) return;
+        now = nowUs();
+        if (now - m_lastDepthUs < kImgThrottleUs) return;   /* throttle before the colormap work. */
+        m_lastDepthUs = now;
         clean = depth.clone();
         cv::patchNaNs(clean, 0.0f);
         cv::normalize(clean, norm, 0, 255, cv::NORM_MINMAX, CV_8UC1);
         cv::applyColorMap(norm, color, cv::COLORMAP_TURBO);
+        cv::resize(color, small, cv::Size{kA2ImgW, kA2ImgH}, 0, 0, cv::INTER_AREA);
         std_msgs::msg::Header hdr;
         hdr.stamp    = this->now();
         hdr.frame_id = "camera";
-        m_pubDepthColormap->publish(*cv_bridge::CvImage(hdr, "bgr8", color).toImageMsg());
+        m_pubDepthColormap->publish(*cv_bridge::CvImage(hdr, "bgr8", small).toImageMsg());
         return;
     }
 
@@ -1298,6 +1374,9 @@ private:
             case CommandID::APPROACH:
                 appr = m_currTask.m_cmd.m_extractCmd.m_approach;
                 std::snprintf(buf, cap, "approach(%s)", appr.target[0] ? appr.target : "?");
+                return;
+            case CommandID::FOLLOW:
+                std::snprintf(buf, cap, "follow(%s)", m_followLabel[0] ? m_followLabel : "?");
                 return;
             case CommandID::ORBIT:
                 orb = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
@@ -1487,10 +1566,8 @@ private:
         return;
     }
 
-    /* Raw keylog [keycode, action]. Enter toggles the manual override; while that override
-       is engaged, movement keys map to a constant body-FLU velocity (converted to ENU in
-       controlLoop). WASD=plane, arrows=alt/yaw, Space=hover. Movement keys are ignored when
-       not overridden. */
+    /* Raw keylog [keycode, action]: Enter toggles manual override, and while engaged
+       WASD=plane, arrows=alt/yaw, Space=hover as body-FLU velocity (ENU'd in controlLoop). */
     void keyCallback(const KeyboardRawInputType::SharedPtr msg) {
         if (msg->data.size() < 2) return;
 
@@ -1499,11 +1576,8 @@ private:
         bool up   = (msg->data[1] == __scast(int, KeyAction::RELEASED));
         if (!down && !up) return;                            /* ignore auto-repeat, etc. */
 
-        /* Override toggle, handled BEFORE the override gate below: nothing publishes
-           /fmu/in/override in the running rig, so this key is the only way to engage it and
-           a gated toggle could never fire. Press only -- the matching release would undo it
-           instantly. Routed through overrideCallback so the key and the topic share one
-           engage/disengage path (zeroManualVel, interrupt reset, handback re-plan). */
+        /* Must precede the override gate, since this key is the only way to engage it. */
+        /* Press only, and routed through overrideCallback so key and topic share one path. */
         if (key == __scast(int, KeyCodeEnum::Enter)) {
             if (!down) return;
             auto toggled  = std::make_shared<std_msgs::msg::Bool>();
@@ -1663,6 +1737,31 @@ private:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] APPROACH activated target=%s.",
                 m_currTask.m_cmd.m_extractCmd.m_approach.target);
             break;
+        case CommandID::FOLLOW: {
+            /* Resolve target_index ONCE against the current detections -> label + bbox center;
+               nearest-centroid tracks it from there. Detections carry no stable id. */
+            CmdFollow fol     = m_currTask.m_cmd.m_extractCmd.m_follow;
+            m_followHaveLast  = false;
+            m_followLastAimUs = nowUs();
+            m_followLabel[0]  = '\0';
+            std::shared_ptr<PerceptionSnapshot> fsnap = m_perception->snapshot();
+            if (fsnap && fsnap->valid && fol.target_index >= 0 &&
+                static_cast<u32>(fol.target_index) < fsnap->count) {
+                TargetDetection const& d = fsnap->dets[fol.target_index];
+                strncpy(m_followLabel, d.label, sizeof(m_followLabel) - 1);
+                m_followLastU    = 0.5f * static_cast<f32>(d.bbox_xmin + d.bbox_xmax);
+                m_followLastV    = 0.5f * static_cast<f32>(d.bbox_ymin + d.bbox_ymax);
+                m_followHaveLast = true;
+                RCLCPP_INFO(this->get_logger(),
+                    "[FMU_NODE_DEBUG] FOLLOW activated target_index=%d label=%s centerPx=(%.0f,%.0f) standoff_cm=%d.",
+                    fol.target_index, m_followLabel, m_followLastU, m_followLastV, fol.standoff_cm);
+            } else {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] FOLLOW activated but target_index=%d out of range (count=%u) -> hover until a lock.",
+                    fol.target_index, fsnap ? fsnap->count : 0u);
+            }
+            break;
+        }
         case CommandID::ORBIT:
             orb                = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
             od                 = m_backend->odometry();
@@ -1796,8 +1895,8 @@ private:
             for (u32 t = 0; t < snap->count; ++t) {
                 const TargetDetection& det = snap->dets[t];
                 snprintf(buf, sizeof(buf),
-                    "{\"label\":\"%s\", \"bbox\":[%d,%d,%d,%d], \"confidence\":%.2f, \"median_depth_cm\":%.1f}\n",
-                    det.label, det.bbox_xmin, det.bbox_ymin, det.bbox_xmax, det.bbox_ymax,
+                    "{\"index\":%d, \"label\":\"%s\", \"bbox\":[%d,%d,%d,%d], \"confidence\":%.2f, \"median_depth_cm\":%.1f}\n",
+                    t, det.label, det.bbox_xmin, det.bbox_ymin, det.bbox_xmax, det.bbox_ymax,
                     det.confidence, det.median_depth_cm);
                 prompt += buf;
             }
@@ -1890,6 +1989,12 @@ private:
                    text (bounded, RCLCPP_INFO handles embedded newlines fine). */
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] VLM raw response: %.2000s",
                     content.c_str());
+                if (mb_observability && m_pubVlmText) {   /* A2: surface reasoning on /fmu/vlm_text. */
+                    std_msgs::msg::String vmsg;
+                    m_lastVlmText = content;
+                    vmsg.data     = content;
+                    m_pubVlmText->publish(vmsg);
+                }
             }
         }
         if (mb_observability) appendVlmLog(imageAttached, b64Bytes, dyn, content);
@@ -1903,6 +2008,7 @@ private:
         ActiveTask     task;
         CmdGo          go;
         CmdApproach    approach;
+        CmdFollow      follow;
         CmdRotate      rot;
         CmdOrbit       orbit;
         CmdSearch      search;
@@ -1978,6 +2084,12 @@ private:
                     sizeof(approach.target) - 1);
                 approach.speed = item.value("speed", 0.0f);
                 cmd = GenericCommand(approach);
+            } else if (action == "follow") {
+                follow = CmdFollow{};
+                follow.target_index = item.value("target_index", -1);
+                follow.standoff_cm  = item.value("standoff_cm", 0);
+                follow.speed        = item.value("speed", 0);
+                cmd = GenericCommand(follow);
             } else if (action == "orbit") {
                 orbit = CmdOrbit{};
                 strncpy(orbit.target, item.value("target_object", "").c_str(),
@@ -1999,7 +2111,7 @@ private:
                 search.size = (sizeStr == "small") ? 0 : (sizeStr == "large") ? 2 : kSearchDefaultSizeIdx;
                 cmd = GenericCommand(search);
             } else {
-                continue; /* Phase 1: takeoff/land/stop/go/rotate/approach executed. */
+                continue; /* Phase 1: takeoff/land/stop/go/rotate/approach/follow executed. */
             }
 
             task = ActiveTask{};
@@ -2309,8 +2421,12 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr  m_pubAnnotated;     /* /fmu/perception/annotated. */
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr  m_pubDepthColormap; /* /fmu/perception/depth.     */
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr    m_pubHud;           /* /fmu/hud text status.      */
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr    m_pubVlmText;       /* /fmu/vlm_text reasoning.   */
     std::string                                           m_vlmLogPath;       /* per-run prompt/response log.*/
+    std::string                                           m_lastVlmText;      /* latest VLM text (cache).   */
     u64                                                    m_lastHudUs{0};     /* ~5Hz HUD throttle gate.    */
+    u64                                                    m_lastAnnUs{0};     /* ~10Hz annotated throttle.  */
+    u64                                                    m_lastDepthUs{0};   /* ~10Hz depth throttle.      */
 
     std::atomic<FlightState>  m_flightState{FlightState::STANDBY};
     std::atomic<bool>         m_missionActive{false};
@@ -2364,6 +2480,15 @@ private:
     Vec3 m_approachStartPos{0.0f, 0.0f, 0.0f};   /* drone pose when the travel budget was latched */
     f32  m_approachTravelBudget{0.0f};           /* range-standoff at latch; dead-reckon stop point */
     bool m_approachBudgetLatched{false};
+
+    /* FOLLOW state (control thread only). Resolved once at activation: label + the bbox center
+       (px) that seeds nearest-centroid tracking. Reset at activation. */
+    FixedStringType m_followLabel{"\0"};
+    f32  m_followLastU{0.0f};
+    f32  m_followLastV{0.0f};
+    Vec3 m_followLastAimFlu{0.0f, 0.0f, 0.0f};
+    u64  m_followLastAimUs{0};
+    bool m_followHaveLast{false};
 
     /* ORBIT state (control thread only). At the start we median a few depth reads into one fixed car
        position (the circle center); after that the circle is flown from ODOMETRY around that fixed

@@ -33,6 +33,7 @@ rotateMaxYawRate:     0.6      # rad/s -- gentler turn indoors
 
 # --- APPROACH (visual servo to a target) ---
 approachStandoffM:    1.0      # m    -- stop this far off; short room
+followStandoffM:      1.5      # m    -- FOLLOW hold distance; short room
 approachSpeedDefault: 30       # cm/s -- slow closing speed
 
 # --- SEARCH (lawnmower sweep) ---

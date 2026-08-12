@@ -80,6 +80,47 @@ static inline TargetRelative detectionByLabel(PerceptionSnapshot const& snap, ch
     return out;
 }
 
+/* FOLLOW instance tracker: detections carry no stable id, so among the label matches pick the
+   bbox center nearest lastCenterPx (nearest-centroid across ticks), then back-project it like
+   detectionByLabel. If the label match misses but exactly one thing is in frame, track that --
+   YOLO flips class on unfamiliar meshes, same reason APPROACH falls back to presence. found=false
+   when no valid snapshot or no candidate. Loop locals hoisted per the code-guidelines. */
+static inline TargetRelative detectionNearestCenter(PerceptionSnapshot const& snap, char const* label,
+                                                    f32 lastU, f32 lastV, CameraIntrinsics const& cam,
+                                                    u64 now_us) {
+    TargetRelative         out;
+    TargetDetection const* best = nullptr;
+    f32                    bestD2 = 0.0f, u, v, du, dv, d2, camX, camY, mag;
+    Vec3                   raw;
+    u32                    i;
+
+    if (!snap.valid) return out;
+    for (i = 0; i < snap.count; ++i) {
+        if (std::strcmp(snap.dets[i].label, label) != 0) continue;
+        u  = 0.5f * static_cast<f32>(snap.dets[i].bbox_xmin + snap.dets[i].bbox_xmax);
+        v  = 0.5f * static_cast<f32>(snap.dets[i].bbox_ymin + snap.dets[i].bbox_ymax);
+        du = u - lastU; dv = v - lastV; d2 = du * du + dv * dv;
+        if (best == nullptr || d2 < bestD2) { best = &snap.dets[i]; bestD2 = d2; }
+    }
+    if (best == nullptr && snap.count == 1) best = &snap.dets[0];  /* label flipped; only one in frame. */
+    if (best == nullptr) return out;
+
+    u    = 0.5f * static_cast<f32>(best->bbox_xmin + best->bbox_xmax);
+    v    = 0.5f * static_cast<f32>(best->bbox_ymin + best->bbox_ymax);
+    camX = (u - cam.cx) / cam.fx;
+    camY = (v - cam.cy) / cam.fy;
+    raw  = { 1.0f, -camX, -camY };
+    mag  = std::sqrt(raw.x * raw.x + raw.y * raw.y + raw.z * raw.z);
+    out.dirFlu = { raw.x / mag, raw.y / mag, raw.z / mag };
+    out.range  = best->median_depth_cm / 100.0f;
+    out.errX   = (u - cam.cx) / cam.cx;
+    out.errY   = (v - cam.cy) / cam.cy;
+    out.age_us = (now_us > snap.host_stamp_us) ? (now_us - snap.host_stamp_us) : 0;
+    out.found  = true;
+    return out;
+}
+
+
 /* Nearest measurable obstacle range (m) across all detections, for the emergency boundary
    (spec 2026-08-07-spec-1 6.1). Pure/ROS-free so it is unit-testable next to detectionByLabel.
    Returns 0.0f when nothing is measurable (no valid snapshot, no detections, or every depth is

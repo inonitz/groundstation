@@ -1,0 +1,81 @@
+<sdf version="1.6">
+  <world name="moving_person">
+
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"></plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"></plugin>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"></plugin>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"></plugin>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>47.397743</latitude_deg>
+      <longitude_deg>8.545594</longitude_deg>
+      <elevation>0.0</elevation>
+    </spherical_coordinates>
+
+    <scene>
+      <ambient>.4 .4 .4</ambient>
+      <sky></sky>
+    </scene>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>200 200</size></plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>200 200</size></plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Moving FOLLOW target. An actor is kinematic: it interpolates the scripted
+         waypoints with no physics, so the person slides left-right on a fixed loop
+         and never falls, drifts, or fights the sim. The drone spawns at (0,7,3)
+         facing +X (yaw 0), so the person sits ~4 m ahead at x=4 and sweeps y=5..9
+         -- a ~4 m lateral pan across the camera, well inside the ~114 deg FOV.
+         The mesh is the person_walking model, so YOLO reads it as "person". -->
+    <actor name="moving_person">
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <mesh><uri>model://person_walking/meshes/walking.dae</uri></mesh>
+          </geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <delay_start>0.0</delay_start>
+        <trajectory id="0" type="walk">
+          <waypoint><time>0</time><pose>4 5 0 0 0 1.5708</pose></waypoint>
+          <waypoint><time>6</time><pose>4 9 0 0 0 1.5708</pose></waypoint>
+          <waypoint><time>7</time><pose>4 9 0 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>13</time><pose>4 5 0 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>14</time><pose>4 5 0 0 0 1.5708</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+  </world>
+</sdf>

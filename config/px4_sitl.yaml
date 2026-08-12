@@ -36,6 +36,7 @@ rotateMaxYawRate:     0.8      # rad/s (kRotateMaxYawRate)
 
 # --- APPROACH ---
 approachStandoffM:    2.50     # m    (kApproachStandoffM)
+followStandoffM:      2.00     # m    (kFollowStandoffM) -- FOLLOW hold distance
 approachSpeedDefault: 80       # cm/s (kApproachSpeedDefault)
 
 # --- SEARCH (defaults == the MEDIUM size preset, kSearchSizePresets[1]) ---
