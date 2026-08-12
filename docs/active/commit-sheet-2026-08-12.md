@@ -16,7 +16,7 @@ end of the groundstation set, not per-agent.
 git add source/llm_to_action/fmu/fmu_node.hpp source/llm_to_action/fmu/fmu_node_base.hpp \
         source/llm_to_action/fmu/llm_base.hpp source/llm_to_action/fmu/llamaclient.hpp \
         source/llm_to_action/fmu/perception_runtime.hpp source/llm_to_action/fmu/CMakeLists.txt \
-        source/llm_to_action/perception/detection_query.hpp source/llm_to_action/perception/detection_query_test.cpp \
+        source/llm_to_action/perception/detection_query.hpp source/llm_to_action/fmu/test/detection_query_test.cpp \
         source/llm_to_action/perception/target_tracker.hpp source/llm_to_action/fmu/test/target_tracker_test.cpp \
         dependencies/three_people.sdf \
         scripts/test/SITL/logtest.sh scripts/test/SITL/digest.sh scripts/test/SITL/TESTING.md \

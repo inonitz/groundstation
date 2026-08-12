@@ -59,3 +59,109 @@ No git writes — suggest `agent5: slam->odometry bridge` etc. per unit. Prose p
 
 ## Report
 _(append C1 tracking numbers / C2 drift on-vs-off / C3 recovery result + blockers below)_
+
+### 2026-08-12 — session report (agent5)
+
+**Status one-liner.** stella tracks fine on the real Tello (C1 pass on textured forward scenes). The
+hover-hold node is built and instrumented but NOT yet validated on hardware. That validation is the open
+blocker.
+
+#### DONE (landed)
+- **C1 go/no-go: PASS on textured surfaces.** stella_vslam on the real Tello held clean tracking across
+  multi-minute handheld + flown runs: 99–100% uptime, 0 BLIND seconds, ~27 Hz. On a textured forward
+  scene stella is solid. The venue's glass/concrete remains the open risk, screened before flight by
+  `feature_scout.py`.
+- **Frame mapping decoded and validated on hardware** (run axistest_20260812, correlating the raw
+  `slam/pose` trace to a scripted forward/right/up motion). stella's map is the CAMERA-OPTICAL frame:
+  `+x = right, +y = down, +z = forward`. So a level forward-facing Tello has its horizontal ground plane
+  in map `(x, z)` and vertical along `-y`. This is the one mapping I refused to guess; it is now pinned.
+- **Pure control headers, all offline-unit-tested** (`runtests.sh`, 4/4 pass): map→ENU alignment,
+  scale-from-height with a running median, an optional OneEuro filter behind an on/off toggle, the
+  P-dominant + clamped-integral hover-hold PID, and the degrade-then-land recovery FSM.
+- **`slam/tracking_state` (Bool) published from `slam2.hpp`** every worker cycle (`= !tracker_is_paused`).
+  Built and links in the real SLAM binary.
+- **`tello_slam_hold` node built + linked** under the Tello backend config. Instrumented this session
+  (per-tick `[hold]` diagnostic) with env-tunable gains. Turnkey harness shipped: `feature_scout.py`
+  (venue ORB pre-screen), `c1test.sh`/`digest.sh` (go/no-go), `test3.sh` (hover-hold + land-on-loss),
+  `TESTING.md`.
+
+#### WIP (open blocker)
+- **Hover-hold is NOT validated. First bare-floor flights did not visibly stabilize.** I am mid-way
+  through a weak-authority-vs-sign-bug diagnosis (see gotchas). The node now logs, twice a second, the
+  ENU error, the live scale, and the actual body velocity command, so the next flight's `hold_*.log`
+  resolves it. Awaiting the human's diagnostic run.
+- **Recovery land-on-loss**: coded and offline-tested, hardware-unconfirmed.
+
+#### TODO (not started)
+- **Unit A**: `TelloBackend.setSlamPose` + write last-known XY into `odometry().pos` (hold-last when
+  paused, `pos.z` stays height). Deferred — only FMU-APPROACH consumes it.
+- **ArUco fallback INTEGRATION**: `scripts/tello/slam/aruco_pose.py` exists standalone and its self-test
+  passes, but nothing consumes it. Wire it as a second pose source behind a switch (SLAM primary, ArUco
+  on loss) AFTER the hover-hold validates. The hover controller is deliberately source-agnostic, so this
+  is a wiring job, not a rewrite. Caveat: the tag must be a PHYSICAL printed marker in the FORWARD
+  camera's view — on-screen fails (rolling shutter × refresh), and a floor tag is invisible (forward-only
+  camera).
+- **FMU integration** of the bridge (`slam/pose` → `fmu_node.hpp`) — deferred until other agents finish.
+  Header B is ROS-free for exactly this reuse.
+- **Smoothing on/off A/B and drift on-vs-off** (external-camera metres via `measure_drift.py`) — only
+  meaningful once the hold holds.
+
+#### Design notes + gotchas (the reasoning that only lives in my head)
+- **The VPS-vs-SLAM surface confusion that FAKED earlier "good" holds — read this first.** The Tello VPS
+  looks DOWN (internal downward camera + optical flow); stella looks FORWARD (the streamed 960×720
+  camera). They see DIFFERENT surfaces. Early tests flew over floor chair-mats and the drone held station
+  beautifully — but that was the VPS locking onto the mats, NOT SLAM. stella never saw the floor mats; it
+  tracked the room ahead. Lesson: floor mats test the VPS, not SLAM, and mask the very drift SLAM must
+  cancel. The honest test flies over BARE floor (VPS blinded, `vgx/vgy` read a false zero) so any hold is
+  pure SLAM. Bare floor also matches the venue (glass/concrete → VPS dead). NEVER validate SLAM over a
+  textured floor.
+- **`feature_scout.py`'s "POOR" verdict disagrees with reality.** The live ORB overlay repeatedly read
+  POOR while the actual measure node showed 100% tracking uptime. The scout is a strict optimistic-ceiling
+  screen; trust the measure node (`[TELLO_SLAM]`), not the scout overlay, for the go/no-go.
+- **`return/peak` in the C1 digest is NOT drift-in-metres and NOT a hold metric.** It is an up-to-scale
+  return-to-start proxy for a manually flown path. A high value just means the pilot did not fly back to
+  the takeoff point. Physical drift needs a fixed-camera clip + `measure_drift.py`.
+- **The weak-authority-vs-sign-bug diagnosis (current).** The hover-hold caps output at 0.4 m/s, but
+  `tello_teleop.cpp` warns that 0.4 m/s is only 40/100 stick — "not enough authority to fight the
+  airframe's own drift indoors" (it defaults teleop to 0.8). So the leading hypothesis is too little
+  authority (raise `TELLO_HOLD_MAXV`). The alternative is a frame/sign error pushing the wrong way. The
+  `[hold]` diagnostic settles it: correct sign but tiny/capped `vcmd` → weak; `vcmd` pushing the way the
+  error grows → sign bug. Gains are env-tunable (`TELLO_HOLD_KP/KI/MAXV`) so authority can be swept live
+  with no rebuild.
+- **HEADING is pinned at engage (`yaw0 = 0`).** The ENU→body mapping (`forward = +North, left = -East`)
+  is exact ONLY while the drone holds the heading it engaged at — the pure hover-hold case. Rotating the
+  hold through a yaw needs the pose QUATERNION convention validated, and C1 logged position only. The
+  rotation is wired as a single seam (`worldErrToBody`, `headingRad = 0`) but deferred. Do NOT engage a
+  hold after a large yaw until that seam is validated.
+- **C3 dead-reckoning is DROPPED, not deferred.** `vgx/vgy` are VPS-derived and read a false zero exactly
+  when the VPS is blind (the same low-texture condition that kills SLAM). Integrating them would report
+  real drift as zero. So there is no DR/fusion path on the Tello. Tracking loss goes to bounded-hold-then-
+  land (LOST_HOLD ~2 s → LAND on tof/baro), never to DR. The spec's C3 "Simpson-integrate vgx/vgy" step
+  above is superseded by this — kept for history, but do not build it.
+- **Scale is resolved live, not fixed.** Monocular is up-to-scale (~1 m real ≈ 0.6 map units in the C1
+  run, and inconsistent across axes). The node computes scale per-frame as `tof_height / (-y)`,
+  median-smoothed, rather than trusting any constant. tof works over any surface (ToF ranger), so height
+  and thus scale stay valid even when the VPS flow is blind.
+- **Build reality.** `tello_slam_hold` builds ONLY under a Tello backend config
+  (`-DGROUNDSTATION_BUILD_EXECUTABLE=ON -DGROUNDSTATION_BUILD_BACKEND_TELLO=ON`); the shared build is
+  normally PX4, so a plain build skips it. This session reconfigured shared → Tello, built the one target,
+  and flipped the cache back to PX4 so other agents' builds are undisturbed. The Tello output dir differs
+  from the shared/bin dir, so the fresh binary was copied into `build/release/shared/tello/bin/` where
+  `test3.sh` looks. Pure CMake, no ament. `slam2.hpp`'s compiled default config is the PX4 airframe — the
+  run scripts set `STELLA_CONFIG_PATH` to `config/stella_config_tello.yaml` explicitly.
+
+#### Suggested commits (house style — human runs all git writes)
+1. `agent5: slam pose->ENU bridge + hover-hold PID + recovery FSM (pure headers, offline-tested)`
+2. `agent5: publish slam/tracking_state (Bool) from slam2.hpp every worker cycle`
+3. `agent5: tello_slam_hold node (slam/pose -> hold -> land-on-loss) + CMake target, no ament`
+4. `agent5: C1 go/no-go harness + Test 3 hover launcher + venue pre-screen + docs`
+
+#### Files changed
+- Modified: `docs/NOTES.md`, `docs/LOCKS.md`, `source/slam/slam2.hpp`,
+  `source/llm_to_action/tello_backend/CMakeLists.txt`, this spec.
+- New headers: `source/slam/slam_pose_bridge.hpp`, `source/slam/hover_hold_control.hpp`,
+  `source/slam/slam_recovery_fsm.hpp`.
+- New offline tests: `source/slam/test/{slam_pose_bridge,hover_hold_control,slam_recovery_fsm,hover_hold_sim}_test.cpp`.
+- New node: `source/llm_to_action/tello_backend/test/tello_slam_hold.cpp`.
+- New scripts: `scripts/tello/slam/{feature_scout.py, run.sh, c1test.sh, test3.sh, measure_tello_slam.py, digest.sh, runtests.sh, aruco_pose.py, README.md, TESTING.md}`.
+- `scripts/tello/slam/runs/` is generated logs — gitignore, do not commit.

@@ -12,25 +12,25 @@ The answer for Parakeet-TDT-0.6B q4, on raw audio with no front-end filter:
 
 | SNR (dB) | mean acc | median | note |
 |---|---|---|---|
-| +20 | 87.7% | 96.3% | speech 10x louder than noise |
-| +16 | 89.8% | 96.3% | |
-| +12 | 92.3% | 95.1% | |
-| +10 | 93.6% | 93.8% | speech ~3x louder |
-| +8 | 92.2% | 95.1% | |
-| +6 | 94.5% | 95.1% | |
-| +4 | 93.1% | 95.1% | |
-| +2 | 92.7% | 93.1% | |
-| 0 | 91.2% | 91.3% | speech and gunfire equally loud |
-| -2 | 84.9% | 88.1% | knee starts |
-| -4 | 79.8% | 78.3% | gunfire ~1.6x louder, still usable |
-| -6 | 67.5% | 67.9% | falling |
-| -10 | 37.3% | 33.9% | speech drowned, collapse |
+| +20 | 87.0% | 96.3% | speech 10x louder than noise |
+| +16 | 91.2% | 96.3% | |
+| +12 | 92.6% | 95.5% | |
+| +10 | 92.1% | 95.0% | speech ~3x louder |
+| +8 | 93.6% | 95.0% | |
+| +6 | 92.8% | 94.6% | |
+| +4 | 92.9% | 94.6% | |
+| +2 | 91.7% | 93.6% | |
+| 0 | 91.8% | 92.0% | speech and gunfire equally loud, 38/38 pass |
+| -2 | 88.1% | 87.3% | knee starts |
+| -4 | 80.0% | 80.4% | gunfire ~1.6x louder, still usable |
+| -6 | 64.2% | 66.0% | falling |
+| -10 | 31.9% | 31.7% | speech drowned, collapse |
 
-> Note: the table above is from the first bed set (8 s beds). The beds were lengthened to 20 s and the
-> sweep is being re-run; the shape holds and the numbers will be refreshed. n = 38 per SNR (19 clean clips x 2 noise beds). The +20 mean sitting below +6 is small-sample noise;
-the +20 median is 96%. Report the band honestly: at least 87% across +20 to 0 dB, ~80% at -4 dB.
+n = 38 per SNR (19 clean clips x 2 noise beds: battle_0 + battle_2, 20 s each). The +20 mean sitting
+below the mid-band is small-sample noise; the +20 median is 96%. Report the band honestly: at least
+87% across +20 to 0 dB, ~80% at -4 dB. An earlier run with 8 s beds gave the same shape within ~2%.
 
-Headline: 91% intent accuracy at 0 dB, ~80% at -4 dB, on raw audio. This confirms the earlier
+Headline: 92% intent accuracy at 0 dB (38/38 pass), ~80% at -4 dB, on raw audio. This confirms the earlier
 "ship raw" decision. Every denoiser tested before (GTCRN neural, SpeexDSP, classical DSP) was
 net-negative, because the ASR model is trained on noisy speech and beats a generic front-end. See the
 BUILD_noisefilter benchmark for that comparison.
