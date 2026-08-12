@@ -89,7 +89,7 @@ void GstCameraPlugin::InitializePipeline(guint w, guint h) {
             preventing random offsets from being written. 
         */
         "rtph264pay timestamp-offset=0 ! "
-        "udpsink host=" + kUdpHostIpAddress + " port=" + std::to_string(kUdpHostPortAddress);
+        "udpsink host=" + kUdpHostIpAddress + " port=" + std::to_string(kSitlUdpCamPort);
 
     m_pipeline  = gst_parse_launch(kGstPipelineDefStr.c_str(), nullptr);
     m_appSource = gst_bin_get_by_name(GST_BIN(m_pipeline), "mysource");

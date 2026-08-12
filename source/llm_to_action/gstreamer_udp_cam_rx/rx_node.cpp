@@ -1,5 +1,6 @@
 #include "rx_node.hpp"
-#include "gstreamer_gz_udp_tx/gazebo_cam_plugin_base.hpp"
+#include "gstreamer_gz_udp_tx/gazebo_cam_plugin_base.hpp"  /* kSitlUdpCamPort (sim camera transport). */
+#include "tello_backend/tello_backend_base.hpp"           /* kTelloVideoPort (Tello's own source of truth). */
 #include <gst/app/gstappsink.h>
 #include <gst/video/video.h>
 
@@ -24,9 +25,13 @@ GstReceiverNode::GstReceiverNode(bool bUseTelloPipeline) : Node("gst_receiver_no
        units with h264parse and has no rtph264depay stage. Gazebo's simulated camera
        sends RTP-framed H.264 and must be depayloaded first. Everything from avdec_h264
        onward is identical, so only the source+depay stage differs between the two. */
+    /* Port owned by whichever backend feeds this pipeline: the Tello backend fixes video at 11111
+       (kTelloVideoPort); the gz sim transport uses kSitlUdpCamPort. Split lets SITL and a real
+       Tello share a host without both binding 11111. */
+    const u16 kRxCamPort = bUseTelloPipeline ? kTelloVideoPort : kSitlUdpCamPort;
     const std::string kSourceStage = bUseTelloPipeline
-        ? "udpsrc port=" + std::to_string(kUdpHostPortAddress) + " ! h264parse ! "
-        : "udpsrc port=" + std::to_string(kUdpHostPortAddress) + " caps=\"application/x-rtp, media=video, clock-rate=90000, encoding-name=H264\" ! "
+        ? "udpsrc port=" + std::to_string(kRxCamPort) + " ! h264parse ! "
+        : "udpsrc port=" + std::to_string(kRxCamPort) + " caps=\"application/x-rtp, media=video, clock-rate=90000, encoding-name=H264\" ! "
           "rtph264depay ! ";
     const std::string kRxPipelineStr = kSourceStage +
         "avdec_h264 ! videoconvert ! video/x-raw, format=BGR ! "
@@ -47,8 +52,8 @@ GstReceiverNode::GstReceiverNode(bool bUseTelloPipeline) : Node("gst_receiver_no
         std::bind(&GstReceiverNode::PollBusCb, this)
     );
 
-    RCLCPP_INFO(this->get_logger(), "GStreamer Receiver Node Active (%s pipeline). Dual-timer polling on port 11111.",
-        bUseTelloPipeline ? "Tello raw-H264" : "PX4/Gazebo RTP");
+    RCLCPP_INFO(this->get_logger(), "GStreamer Receiver Node Active (%s pipeline). Dual-timer polling on port %u.",
+        bUseTelloPipeline ? "Tello raw-H264" : "PX4/Gazebo RTP", kRxCamPort);
 }
 
 
