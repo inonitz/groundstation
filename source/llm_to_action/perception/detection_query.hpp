@@ -18,6 +18,7 @@
 #include <util2/C/base_type.h>
 #include <vision/perception_types.hpp>   /* global TargetDetection / PerceptionSnapshot */
 #include "frame/frame_convert.hpp"        /* Vec3 */
+#include "perception/target_tracker.hpp" /* FrameTrackIds (stable ids per detection). */
 
 struct CameraIntrinsics {
     f32 fx{0.0f}, fy{0.0f}, cx{0.0f}, cy{0.0f};
@@ -87,7 +88,7 @@ static inline TargetRelative detectionByLabel(PerceptionSnapshot const& snap, ch
    when no valid snapshot or no candidate. Loop locals hoisted per the code-guidelines. */
 static inline TargetRelative detectionNearestCenter(PerceptionSnapshot const& snap, char const* label,
                                                     f32 lastU, f32 lastV, CameraIntrinsics const& cam,
-                                                    u64 now_us) {
+                                                    u64 now_us, f32 maxJumpPx = 0.0f) {
     TargetRelative         out;
     TargetDetection const* best = nullptr;
     f32                    bestD2 = 0.0f, u, v, du, dv, d2, camX, camY, mag;
@@ -105,6 +106,16 @@ static inline TargetRelative detectionNearestCenter(PerceptionSnapshot const& sn
     if (best == nullptr && snap.count == 1) best = &snap.dets[0];  /* label flipped; only one in frame. */
     if (best == nullptr) return out;
 
+    /* Jump gate: if the chosen same-label box is implausibly far from where the target was last,
+       it is churn / a false positive, not our object -- reject it (found stays false) so the
+       caller's coast/hover ladder holds instead of teleporting the lock. maxJumpPx<=0 disables. */
+    if (maxJumpPx > 0.0f) {
+        f32 bu = 0.5f * static_cast<f32>(best->bbox_xmin + best->bbox_xmax);
+        f32 bv = 0.5f * static_cast<f32>(best->bbox_ymin + best->bbox_ymax);
+        f32 jdu = bu - lastU, jdv = bv - lastV;
+        if (jdu * jdu + jdv * jdv > maxJumpPx * maxJumpPx) return out;
+    }
+
     u    = 0.5f * static_cast<f32>(best->bbox_xmin + best->bbox_xmax);
     v    = 0.5f * static_cast<f32>(best->bbox_ymin + best->bbox_ymax);
     camX = (u - cam.cx) / cam.fx;
@@ -117,6 +128,40 @@ static inline TargetRelative detectionNearestCenter(PerceptionSnapshot const& sn
     out.errY   = (v - cam.cy) / cam.cy;
     out.age_us = (now_us > snap.host_stamp_us) ? (now_us - snap.host_stamp_us) : 0;
     out.found  = true;
+    return out;
+}
+
+
+/* Back-project the detection carrying `track_id` this frame (FrameTrackIds is id-aligned to
+   snap.dets[]). Same pinhole math as detectionByLabel. found=false if the id is not present.
+   Lets a verb hold ONE specific tracked object regardless of label drift or list re-ordering --
+   the disambiguation a label alone cannot give when two same-label people are in view. */
+static inline TargetRelative detectionByTrackId(PerceptionSnapshot const& snap, FrameTrackIds const& ids,
+                                                i32 track_id, CameraIntrinsics const& cam, u64 now_us) {
+    TargetRelative out;
+    f32            u, v, camX, camY, mag;
+    Vec3           raw;
+    u32            i, n;
+
+    if (!snap.valid || track_id < 0) return out;
+    n = (ids.count < snap.count) ? ids.count : snap.count;
+    for (i = 0; i < n; ++i) {
+        if (ids.id[i] != track_id) continue;
+        TargetDetection const& best = snap.dets[i];
+        u    = 0.5f * static_cast<f32>(best.bbox_xmin + best.bbox_xmax);
+        v    = 0.5f * static_cast<f32>(best.bbox_ymin + best.bbox_ymax);
+        camX = (u - cam.cx) / cam.fx;
+        camY = (v - cam.cy) / cam.fy;
+        raw  = { 1.0f, -camX, -camY };
+        mag  = std::sqrt(raw.x * raw.x + raw.y * raw.y + raw.z * raw.z);
+        out.dirFlu = { raw.x / mag, raw.y / mag, raw.z / mag };
+        out.range  = best.median_depth_cm / 100.0f;
+        out.errX   = (u - cam.cx) / cam.cx;
+        out.errY   = (v - cam.cy) / cam.cy;
+        out.age_us = (now_us > snap.host_stamp_us) ? (now_us - snap.host_stamp_us) : 0;
+        out.found  = true;
+        return out;
+    }
     return out;
 }
 

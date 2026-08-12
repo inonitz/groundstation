@@ -30,6 +30,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>   /* cv::rectangle/putText -- annotated-frame overlay (A2). */
+#include "perception/target_tracker.hpp"  /* TargetTracker / TrackedSnapshot / stable ids. */
 #include <cv_bridge/cv_bridge.hpp>
 #include <cstdio>            /* fprintf/stderr -- approach-real perception debug */
 
@@ -79,8 +80,22 @@ public:
 
     /* Same atomic-shared_ptr idiom the FMU already uses for m_currImg. */
     std::shared_ptr<PerceptionSnapshot> snapshot() const {
-        return std::atomic_load(&m_snapshot);
+        auto t = std::atomic_load(&m_tracked);
+        if (!t) return nullptr;
+        /* aliasing shared_ptr: shares t's lifetime but points at the inner snap, so every
+           existing caller is unchanged and gets the snapshot with a matched lifetime. */
+        return std::shared_ptr<PerceptionSnapshot>(t, &t->snap);
     }
+    /* snap + per-detection stable ids together, for id-aware callers ([PERCEPTION]/verbs). */
+    std::shared_ptr<TrackedSnapshot> trackedSnapshot() const {
+        return std::atomic_load(&m_tracked);
+    }
+
+    /* Perception refresh rate: raw seg/depth loop iteration counts (one per processed frame). The
+       FMU deltas these ~1 Hz to report seg/depth Hz on /fmu/rates -- the real inference throughput,
+       distinct from the throttled ~10 Hz publish rate. */
+    u64 segIters()   const { return m_segIters.load(std::memory_order_relaxed); }
+    u64 depthIters() const { return m_depthIters.load(std::memory_order_relaxed); }
 
     /* Nearest free-space depth (m) over a central forward cone of the whole depth map -- the
        obstacle signal the per-detection medians cannot give (a wall has no YOLO box). 0.0f = unknown
@@ -102,7 +117,11 @@ public:
        never call publish(), so this is the only writer and nothing races it. Used by the
        canned APPROACH rig (ROADMAP 5.1 verification, no YOLO needed). */
     void injectSynthetic(PerceptionSnapshot const& snap) {
-        std::atomic_store(&m_snapshot, std::make_shared<PerceptionSnapshot>(snap));
+        auto tracked = std::make_shared<TrackedSnapshot>();
+        tracked->snap = snap;
+        u64 t = snap.host_stamp_us ? snap.host_stamp_us : nowUs();
+        tracked->ids = trackerUpdate(m_tracker, tracked->snap, t, m_trackerParams);
+        std::atomic_store(&m_tracked, tracked);
     }
 
 private:
@@ -114,12 +133,16 @@ private:
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
                     std::vector<vision::SegDetection> dets = m_seg.segment(frame, kConf, kIou);
+                    m_segIters.fetch_add(1, std::memory_order_relaxed);
                     publish(dets);
                     /* A2: hand the FMU an already-annotated frame to publish. The fixed
                        void(cv::Mat const&) callback cannot carry the detections, so the
                        boxes/labels are drawn here where dets is in scope, on a clone (the
                        toCvShare mat aliases the ROS message and must not be written). */
-                    if (m_onAnnotatedFrame) m_onAnnotatedFrame(drawDetections(frame, dets));
+                    if (m_onAnnotatedFrame) {
+                        auto tr = std::atomic_load(&m_tracked);
+                        m_onAnnotatedFrame(drawDetections(frame, dets, tr ? &tr->ids : nullptr));
+                    }
                 }
             }
             sleepRemainder(tickStart, m_segPeriod);
@@ -134,6 +157,7 @@ private:
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
                     auto depth = std::make_shared<cv::Mat>(m_depth.estimate(frame));
+                    m_depthIters.fetch_add(1, std::memory_order_relaxed);
                     /* A2: emit the raw metric-depth mat; the FMU normalizes + applyColorMap. */
                     if (m_onDepthColormap) m_onDepthColormap(*depth);
                     m_nearestFreeDepthM.store(computeNearestFreeDepthM(*depth), std::memory_order_relaxed);
@@ -147,12 +171,13 @@ private:
 
     void publish(const std::vector<vision::SegDetection>& dets) {
         std::shared_ptr<cv::Mat> depth = std::atomic_load(&m_depthMap);
-        auto snap = std::make_shared<PerceptionSnapshot>();
+        auto tracked = std::make_shared<TrackedSnapshot>();
+        PerceptionSnapshot& snap = tracked->snap;
         u32  n    = std::min(static_cast<u32>(dets.size()), PerceptionSnapshot::kMaxDetections);
 
         for (u32 i = 0; i < n; ++i) {
             const vision::SegDetection& d   = dets[i];
-            TargetDetection&            out = snap->dets[i];
+            TargetDetection&            out = snap.dets[i];
             std::snprintf(out.label, sizeof(FixedStringType), "%s", vision::coco_class_name(d.classId));
             out.bbox_xmin      = d.box.x;
             out.bbox_ymin      = d.box.y;
@@ -161,25 +186,34 @@ private:
             out.confidence     = d.conf;
             out.median_depth_cm = (depth && !depth->empty()) ? medianDepthCm(*depth, d) : 0.0f;
         }
-        snap->count       = n;
-        snap->host_stamp_us = nowUs();
-        snap->valid       = true;
-        std::atomic_store(&m_snapshot, snap);
+        snap.count       = n;
+        snap.host_stamp_us = nowUs();
+        snap.valid       = true;
+        /* Stable ids: run the tracker on this frame's boxes, published in lockstep with the snap. */
+        tracked->ids = trackerUpdate(m_tracker, snap, snap.host_stamp_us, m_trackerParams);
+        std::atomic_store(&m_tracked, tracked);
     }
 
     /* A2 observability: draw YOLO boxes + class@conf labels onto a clone of the frame,
        for the annotated-frame topic the FMU publishes. Clone because the source mat
        aliases the ROS image message (toCvShare) and must stay read-only. */
     static cv::Mat drawDetections(const cv::Mat& frame,
-                                   const std::vector<vision::SegDetection>& dets) {
+                                   const std::vector<vision::SegDetection>& dets,
+                                   FrameTrackIds const* ids) {
         cv::Mat out = frame.clone();
-        char    label[64];
+        char    label[80];
+        u32     i = 0;
         for (const vision::SegDetection& d : dets) {
             cv::rectangle(out, d.box, cv::Scalar(0, 255, 0), 2);
-            std::snprintf(label, sizeof(label), "%s %.0f%%",
-                vision::coco_class_name(d.classId), d.conf * 100.0f);
+            if (ids && i < ids->count)
+                std::snprintf(label, sizeof(label), "#%d %s %.0f%%",
+                    ids->id[i], vision::coco_class_name(d.classId), d.conf * 100.0f);
+            else
+                std::snprintf(label, sizeof(label), "%s %.0f%%",
+                    vision::coco_class_name(d.classId), d.conf * 100.0f);
             cv::putText(out, label, cv::Point(d.box.x, std::max(0, d.box.y - 5)),
                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
+            ++i;
         }
         return out;
     }
@@ -267,9 +301,15 @@ private:
     std::atomic<bool> m_running{false};
 
     std::shared_ptr<cv::Mat>            m_depthMap; /* latest metric depth map, meters. */
-    std::shared_ptr<PerceptionSnapshot> m_snapshot; /* published atomically to the FMU. */
+    std::shared_ptr<TrackedSnapshot> m_tracked; /* snap + stable ids, published atomically to the FMU. */
+    TargetTracker m_tracker;                    /* frame-to-frame identity (seg thread is sole writer). */
+    TrackerParams m_trackerParams{0.3f, 80.0f, 15u};   /* iouGate, distGatePx, coast frames. Coast is
+                                                          bumped from 5: live actor detection flickers,
+                                                          and a short window churned track_ids (13->50->86). */
     std::atomic<float> m_nearestFreeDepthM{0.0f};   /* central-cone near-depth (m), 0 = unknown.  */
     std::atomic<u64>   m_freeDepthStampUs{0};       /* depth cycle time of the reading above.     */
+    std::atomic<u64>   m_segIters{0};                /* seg loop iterations (perception refresh).  */
+    std::atomic<u64>   m_depthIters{0};              /* depth loop iterations.                     */
 
     static constexpr float kConf = 0.25f;
     static constexpr float kIou  = 0.45f;

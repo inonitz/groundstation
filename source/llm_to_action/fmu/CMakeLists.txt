@@ -87,4 +87,12 @@ if(GROUNDSTATION_BUILD_TESTS)
     target_include_directories(detection_query_test PRIVATE ${vision_SOURCE_DIR}/vision/include)
     target_compile_features(detection_query_test PRIVATE cxx_std_17)
     add_custom_target(run_detection_query_test COMMAND detection_query_test DEPENDS detection_query_test)
+
+    # ROS-free unit test for perception/target_tracker.hpp (stable target ids). Same pure-math
+    # setup as detection_query_test -- util2 base types + the vendored perception_types.hpp only.
+    add_executable(target_tracker_test test/target_tracker_test.cpp)
+    target_link_libraries(target_tracker_test PRIVATE util_base_header UTIL2::util2)
+    target_include_directories(target_tracker_test PRIVATE ${vision_SOURCE_DIR}/vision/include)
+    target_compile_features(target_tracker_test PRIVATE cxx_std_17)
+    add_custom_target(run_target_tracker_test COMMAND target_tracker_test DEPENDS target_tracker_test)
 endif()

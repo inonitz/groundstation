@@ -96,6 +96,8 @@ constexpr const char* kVlmViewTopic       = "/fmu/perception/annotated"; /* anno
 constexpr const char* kDepthColormapTopic = "/fmu/perception/depth";     /* depth colormap (normalized+applyColorMap). */
 constexpr const char* kFmuHudTopic        = "/fmu/hud";                   /* std_msgs/String human-readable status. */
 constexpr const char* kVlmTextTopic       = "/fmu/vlm_text";             /* std_msgs/String: latest VLM reasoning text. */
+constexpr const char* kVlmContextTopic    = "/fmu/vlm_context";          /* std_msgs/String JSON: objective + executed-command history. */
+constexpr const char* kFmuRatesTopic      = "/fmu/rates";               /* std_msgs/String JSON: perception refresh + publish rates. */
 constexpr const char* kVlmPromptLogDir    = "/root/groundstation/vlm_logs"; /* per-run vlm_prompts_<stamp>.jsonl live here. */
 constexpr u32         kHudThrottleMs      = 200;   /* ~5 Hz HUD line + /fmu/hud publish. */
 constexpr u64         kHudThrottleUs      = static_cast<u64>(kHudThrottleMs) * 1000ULL;
@@ -163,6 +165,26 @@ constexpr f32 kFollowStandoffM      = 2.00f;   /* fallback hold distance (m) whe
 constexpr f32 kFollowFwdGain        = 0.35f;   /* (range-standoff) -> forward speed; sign kept.  */
 constexpr u32 kFollowLostTimeoutMs  = 3000;    /* coast window before hovering on a lost target.  */
 constexpr u64 kFollowLostTimeoutUs  = static_cast<u64>(kFollowLostTimeoutMs) * 1000ULL;
+constexpr u32 kFollowSweepMs        = 4000u;   /* on loss, sweep toward last-seen for this long.  */
+constexpr u64 kFollowSweepUs        = static_cast<u64>(kFollowSweepMs) * 1000ULL;
+constexpr f32 kFollowSweepYawMaxRps = 0.6f;    /* cap the loss-recovery sweep yaw-rate (rad/s).   */
+constexpr u32 kFollowCoastMs        = 800u;    /* on a lost detection, HOLD (coast) this long before
+                                                  sweeping -- bridges seg flicker so brief blinks do
+                                                  not make the drone yaw-sweep on every gap.          */
+constexpr u64 kFollowCoastUs        = static_cast<u64>(kFollowCoastMs) * 1000ULL;
+constexpr f32 kFollowEdgeSweepThresh= 0.55f;   /* only sweep-to-last-seen if the target was THIS far off
+                                                  centre when lost (i.e. genuinely exiting the frame). A
+                                                  centred flicker holds instead of yawing away from a
+                                                  target that is still right there.                    */
+constexpr f32 kFollowYawGain        = 5.0f;    /* follow bbox-centre yaw gain (snappier than approach's 1.0
+                                                  so a moving target stays centred, not trailed by ~0.6). */
+constexpr f32 kFollowYawMaxRps      = 1.5f;    /* cap follow yaw-rate so a large error never snaps violently.*/
+constexpr u32 kPerceptionCoastMs    = 1500u;   /* feed the VLM the last-seen detection across a blank frame
+                                                  for this long, instead of lying "(no detections)".        */
+constexpr u64 kPerceptionCoastUs    = static_cast<u64>(kPerceptionCoastMs) * 1000ULL;
+constexpr u32 kPerceptionWarmupMs   = 6000u;   /* wait up to this for seg's FIRST detection before the very
+                                                  first plan, so we never plan on a warm-up blank frame.    */
+constexpr u64 kPerceptionWarmupUs   = static_cast<u64>(kPerceptionWarmupMs) * 1000ULL;
 
 /* ---- Canned APPROACH detection rig (ROADMAP 5.1 verification, spec §7) -------------------
    No-YOLO closed-loop test: synthesizes a PerceptionSnapshot by projecting a target through

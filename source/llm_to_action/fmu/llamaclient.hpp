@@ -115,6 +115,17 @@ public:
         static const char* kRootAirborne =
             R"GBNF(root    ::= "[" ws thought (ws "," ws action){1,7} ws "]" ws
 )GBNF";
+        /* ONE verb list, and it never contains "takeoff": the only legal takeoff is the pinned FIRST
+           element of a grounded plan (the `takeoff` rule below), so an `action` slot must never be
+           able to emit another takeoff (that produced takeoff_ok then takeoff_rejected). Airborne
+           re-plans likewise cannot re-launch. */
+        static const char* kVerb =
+            R"GBNF(verb    ::= "\"land\"" | "\"go\"" | "\"curve\"" | "\"rotate\"" | "\"orbit\"" | "\"approach\"" | "\"follow\"" | "\"hover\"" | "\"stop\"" | "\"search\"" | "\"re-assess\""
+)GBNF";
+        /* Members are TYPED per key: coordinate/id/speed keys take a number, and only the four text
+           keys take a string. This forbids the free-form {"parameters":"x: 0, ..."} blob the model
+           emitted (which parsed every field as its default, e.g. track_id -> 0, breaking follow). An
+           unknown key like "parameters" is rejected token-by-token, so the model MUST emit real fields. */
         static const char* kCommon =
             R"GBNF(rest    ::= (ws "," ws action){0,6}
 thought ::= "{" ws "\"thought\"" ws ":" ws tstring ws "}"
@@ -122,14 +133,18 @@ tstring ::= "\"" tchar{0,300} "\""
 tchar   ::= [^"\\] | "\\" ["\\bfnrtu/]
 takeoff ::= "{" ws "\"action\"" ws ":" ws "\"takeoff\"" ws "}"
 action  ::= "{" ws "\"action\"" ws ":" ws verb (ws "," ws member){0,8} ws "}"
-verb    ::= "\"takeoff\"" | "\"land\"" | "\"go\"" | "\"curve\"" | "\"rotate\"" | "\"orbit\"" | "\"approach\"" | "\"follow\"" | "\"stop\"" | "\"search\"" | "\"re-assess\""
-member  ::= sstring ws ":" ws value
-value   ::= sstring | number | "true" | "false" | "null"
+member  ::= nummember | strmember
+nummember ::= numkey ws ":" ws number
+strmember ::= strkey ws ":" ws sstring
+numkey  ::= "\"x\"" | "\"y\"" | "\"z\"" | "\"x1\"" | "\"y1\"" | "\"z1\"" | "\"x2\"" | "\"y2\"" | "\"z2\"" | "\"speed\"" | "\"angle_deg\"" | "\"radius_cm\"" | "\"standoff_cm\"" | "\"track_id\"" | "\"target_index\"" | "\"start_heading_deg\"" | "\"expected_search_time_sec\"" | "\"timeout_sec\""
+strkey  ::= "\"target_object\"" | "\"direction\"" | "\"search_size\"" | "\"reason\""
 sstring ::= "\"" tchar{0,160} "\""
 number  ::= "-"? [0-9]+ ("." [0-9]+)?
 ws      ::= [ \t\n]*
 )GBNF";
-        return std::string(requireTakeoffFirst ? kRootGrounded : kRootAirborne) + kCommon;
+        return std::string(requireTakeoffFirst ? kRootGrounded : kRootAirborne)
+             + std::string(kVerb)
+             + kCommon;
     }
 
 private:

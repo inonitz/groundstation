@@ -62,14 +62,28 @@ constexpr const char* kSystemPrompt =
                         be visible in view. Fails if the target is lost.
     {"action": "approach", "target_object": "<name_string>", "speed": <int>}
 
-    follow              Hold a fixed standoff on target_index and keep it centered. Vision-only,
-                        so it needs no position. Runs until you re-assess or stop it; it never
-                        finishes on its own. target_index is the "index" field of a [PERCEPTION]
-                        detection.
-    {"action": "follow", "target_index": <int>, "standoff_cm": <int>, "speed": <int>}
+    follow              Watch a target IN PLACE: the drone holds its position and rotates (turns
+                        its "head") to keep the target centered in view. It does NOT fly toward the
+                        target -- use approach for that. Vision-only, needs no position/localization.
+                        Runs until you re-assess or stop it; never finishes on its own. track_id is
+                        the "track_id" field of a [PERCEPTION] detection (stable across frames);
+                        target_index is the array-position fallback. standoff_cm is the MINIMUM SAFE
+                        distance -- the drone backs off only if the target comes closer than this, and
+                        never advances. FOLLOW holds the drone's position AND keeps the target centred, so
+                        "follow the person and hold your position" is done with follow ALONE -- do NOT
+                        add hover or go for the "hold" part. Issue follow ONCE; while it holds you are
+                        NOT re-woken. If the target briefly leaves view FOLLOW holds and re-acquires on
+                        its own. Only follow_no_target means the target was never there; then search.
+    {"action": "follow", "track_id": <int>, "standoff_cm": <int>, "speed": <int>}
 
     stop                Hover in place.
     {"action": "stop"}
+
+    hover               Hold station indefinitely (persistent), with NO target. The drone stays put
+                        until an interrupt or a new objective. Use hover ONLY when there is nothing to
+                        watch. If the mission is to follow / watch / track a person or object, use
+                        follow instead (it ALSO holds position) -- never hover in place of following.
+    {"action": "hover"}
 
     search              Sweep a parallel-track (lawnmower) pattern of straight lanes to bring an
                         object into view. start_heading_deg sets the first lane heading (relative to
@@ -81,7 +95,12 @@ constexpr const char* kSystemPrompt =
                         room, "medium" (default if omitted) for a normal room/hallway, "large" for an
                         open area/outdoors. Undersized wastes time re-searching the same small patch;
                         oversized wastes time covering empty area the target was never going to be in.
-    {"action": "search", "target_object": "<name_string>",
+                        On success (search_ok) the person that was found appears in [PERCEPTION] with a
+                        track_id -- SEARCH does NOT know which one is your target, so confirm from the
+                        image which track_id is the right one, then follow/approach BY THAT track_id.
+                        To re-find a SPECIFIC target you lost, pass its track_id: search then succeeds
+                        only when that exact tag reappears, never on a different person.
+    {"action": "search", "target_object": "<name_string>", "track_id": <int optional>,
     "start_heading_deg": <int>, "direction": "cw|ccw",
     "expected_search_time_sec": <int>, "timeout_sec": <int>, "search_size": "small|medium|large"}
 
@@ -133,6 +152,29 @@ constexpr const char* kSystemPrompt =
     STATE, diagnose why the last command failed, and adjust: a different heading
     or approach for SEARCH, a different target, widening the search area, or
     falling back to a safe stop/land if the objective is no longer reachable.
+
+    10. HOLDING & OBJECTIVE COMPLETE: If the objective is to FOLLOW, WATCH, or TRACK a target,
+    the command is `follow` -- it holds the drone's position AND keeps the target centred, so
+    "follow and hold your position" is satisfied by `follow` ALONE. Use `hover` ONLY to hold when
+    there is NO target to watch; NEVER use `hover` to satisfy a follow/watch objective. NEVER use
+    `go`/`approach` (they MOVE the drone) to "follow" or "hold", and NEVER a zero `go`. A holding
+    command that is running IS the steady state satisfied: issue it ONCE and stop planning; you are
+    not re-woken while it holds. Never chain identical commands: one `search` sweeps a whole pattern
+    -- emit ONE, then re-assess. On a FAILURE status (rule 9), change something; never repeat blind.
+
+    12. NEVER GUESS A track_id; ACT ON search_ok: A track_id is real only for a target you can
+    SEE right now in [PERCEPTION]. If the target is NOT currently visible, plan ONLY takeoff (if
+    grounded), search, and re-assess -- NEVER append a `follow`/`approach` with a made-up track_id,
+    that just fails (follow_no_target). When a search returns search_ok, the person IS now in
+    [PERCEPTION]: FOLLOW them THIS cycle using the track_id shown there -- do NOT search again
+    (search_ok already means found). If they left view again, the track_id may have changed; use the
+    one currently in [PERCEPTION], never a remembered number.
+
+    11. TARGET ALREADY VISIBLE / PLAN ONLY WHAT REMAINS: If the target you need is already in
+    the [PERCEPTION] list, do NOT search, rotate, or go "to find" it -- you can see it. Go STRAIGHT
+    to the target verb (`follow` or `approach`) with its track_id. Only `search` when the target is
+    NOT currently detected. Do not re-issue commands that already succeeded: if takeoff shows
+    takeoff_ok in history you ARE airborne -- never `takeoff` again. Plan only what REMAINS.
 
     ===========================================
     OUTPUT FORMAT

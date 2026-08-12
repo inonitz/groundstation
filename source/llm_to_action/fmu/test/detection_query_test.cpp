@@ -148,6 +148,52 @@ int main() {
         assert(close(maxBboxFillFrac(empty, cam), 0.0f));
     }
 
+    /* ---- detectionNearestCenter (FOLLOW's per-frame lock) ------------------------------- */
+
+    /* Two same-label boxes: picks the one whose center is nearer lastCenterPx, not the first. */
+    {
+        PerceptionSnapshot snap;
+        snap.valid = true; snap.count = 2; snap.host_stamp_us = 1000;
+        std::snprintf(snap.dets[0].label, sizeof(FixedStringType), "person");
+        snap.dets[0].bbox_xmin = 100; snap.dets[0].bbox_ymin = 300; snap.dets[0].bbox_xmax = 180; snap.dets[0].bbox_ymax = 460;
+        snap.dets[0].median_depth_cm = 300.0f;
+        std::snprintf(snap.dets[1].label, sizeof(FixedStringType), "person");
+        snap.dets[1].bbox_xmin = 900; snap.dets[1].bbox_ymin = 300; snap.dets[1].bbox_xmax = 980; snap.dets[1].bbox_ymax = 460;
+        snap.dets[1].median_depth_cm = 300.0f;
+        /* last center near the RIGHT box (~940,380) -> should pick det[1]. */
+        TargetRelative tr = detectionNearestCenter(snap, "person", 940.0f, 380.0f, cam, 2000);
+        assert(tr.found);
+        /* det[1] center errX = (940-640)/640 ~= 0.469 */
+        assert(tr.errX > 0.3f);
+    }
+
+    /* Label miss but a single detection in frame -> tracks the sole box (label-flip fallback). */
+    {
+        PerceptionSnapshot snap = makeSnapshot("boat", 600, 320, 680, 400, 250.0f);   /* YOLO flipped */
+        TargetRelative tr = detectionNearestCenter(snap, "person", 640.0f, 360.0f, cam, 2000);
+        assert(tr.found);
+    }
+
+    /* Empty / invalid snapshot -> not found. */
+    {
+        PerceptionSnapshot empty; empty.valid = true; empty.count = 0;
+        assert(!detectionNearestCenter(empty, "person", 640.0f, 360.0f, cam, 2000).found);
+        PerceptionSnapshot invalid = makeSnapshot("person", 600, 320, 680, 400, 250.0f);
+        invalid.valid = false;
+        assert(!detectionNearestCenter(invalid, "person", 640.0f, 360.0f, cam, 2000).found);
+    }
+
+    /* Jump gate: the only same-label box is far from lastCenterPx -> rejected (not found), so the
+       caller coasts instead of teleporting the lock. With the gate off (default) it WOULD lock. */
+    {
+        PerceptionSnapshot snap = makeSnapshot("person", 900, 300, 980, 460, 300.0f);   /* center ~940,380 */
+        /* last seen far away at (100,380); jump ~840px. */
+        assert(detectionNearestCenter(snap, "person", 100.0f, 380.0f, cam, 2000).found);            /* gate off */
+        assert(!detectionNearestCenter(snap, "person", 100.0f, 380.0f, cam, 2000, 120.0f).found);   /* gate on */
+        /* a small jump within the gate still locks. */
+        assert(detectionNearestCenter(snap, "person", 930.0f, 372.0f, cam, 2000, 120.0f).found);
+    }
+
     std::printf("detection_query_test OK\n");
     return 0;
 }
