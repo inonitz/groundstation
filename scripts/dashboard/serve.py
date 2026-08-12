@@ -42,7 +42,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
 HTML_FILE = Path(__file__).with_name("dashboard.html")
-JPEG_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, 70]
+JPEG_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, 70]   # reassigned from --quality in main()
 RATE_LOG_PERIOD_S = 5.0   # how often each subscription logs a rate summary
 
 LOG = logging.getLogger("dashboard")
@@ -345,6 +345,8 @@ def parse_args(argv):
                    help="also write logs to this file (or set DASH_LOG)")
     p.add_argument("--workers", type=int, default=int(os.environ.get("DASH_WORKERS", "6")),
                    help="HTTP worker-pool size (bounded; needs >= 3 per open dashboard tab)")
+    p.add_argument("--quality", type=int, default=int(os.environ.get("DASH_JPEG_QUALITY", "70")),
+                   help="MJPEG JPEG quality 1-100 (default 70; raise for debugging, e.g. 92)")
     p.add_argument("--verbose", action="store_true",
                    default=os.environ.get("DASH_VERBOSE", "") not in ("", "0"),
                    help="DEBUG-level logging (per-request detail; or set DASH_VERBOSE=1)")
@@ -354,6 +356,8 @@ def parse_args(argv):
 def main():
     args = parse_args(sys.argv[1:])
     setup_logging(args.log, args.verbose)
+    global JPEG_PARAMS
+    JPEG_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, max(1, min(100, args.quality))]
     LOG.info("starting dashboard bridge on port %d (verbose=%s)", args.port, args.verbose)
 
     rclpy.init()

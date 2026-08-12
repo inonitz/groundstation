@@ -57,6 +57,26 @@ arriving from the FMU and how fast. Every HTTP request is logged, and each strea
 the frame or event count. `--verbose` (or `DASH_VERBOSE=1`) adds per-request DEBUG detail. A blank page
 with no `first message on 'annotated'` line means the FMU is not publishing -- check `FMU_OBSERVABILITY`.
 
+## Debug: higher-quality images
+
+The seg/depth streams are downscaled to 320x240 and JPEG q70 to stay lean. For a closer look while
+debugging, two knobs raise quality without risking a freeze -- both stay throttled (~10 Hz) and, crucially,
+the FMU does the image work only while a browser is actually subscribed (no viewer -> no cost):
+
+- **Resolution (FMU, on launch):** `FMU_A2_IMG_W` / `FMU_A2_IMG_H` override the 320x240 publish size,
+  e.g. `FMU_A2_IMG_W=960 FMU_A2_IMG_H=540` for 16:9. Clamped to the source frame (no upscale). Unset =
+  lean default. Set these in the environment of the FMU/SITL launch.
+- **JPEG quality (bridge):** `--quality 92` (or `DASH_JPEG_QUALITY=92`), default 70.
+
+```bash
+# FMU side (e.g. before the SITL run):   FMU_A2_IMG_W=960 FMU_A2_IMG_H=540 ...
+python3 scripts/dashboard/serve.py 8088 --quality 92
+```
+
+Because the FMU skips the resize/encode when nothing is subscribed, a big debug resolution costs
+nothing until you open the dashboard; when you do, it is still 10 Hz capped. Close the tab and it goes
+idle again.
+
 ## Resource use
 
 The bridge is built to stay light, especially while nobody is watching it during a SITL run:

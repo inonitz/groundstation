@@ -139,3 +139,33 @@ SSE check was fixed (it demanded a fixed byte count under a short timeout; now r
 Caveat surfaced, not a dashboard issue: takeoff is VLM-latency-bound. On the 4 GB GTX 1050 Ti, Qwen3-VL-2B
 contended with Gazebo + ONNX can take longer than the run window to return the first plan, so the drone
 may stay STANDBY. A less contended probe did complete a plan and reach FLIGHT. Stack/VLM tuning, Agent 1.
+
+### 2026-08-12 — CPU benchmark, executor decision, debug-image knobs
+
+Live headless-SITL flight (moving_person FOLLOW, Gazebo headless): the drone armed, took off, and
+followed the person (`STATE=FLIGHT`, `TASK=follow(person)`, real YOLO `DET=person@90%`), with the VLM
+producing 6 plans over 10 min and the dashboard live throughout. Total stack RSS 2.29 -> 2.44 GiB
+(well under the 8 GiB budget), stable, no leak; publish rate 3.3-7.9 Hz (under the 10 Hz cap the whole
+time). Takeoff is VLM-latency-bound on the 4 GB GPU -- sometimes the first plan lands after the window,
+leaving the drone in STANDBY; that is stack/VLM behavior, not the dashboard.
+
+Bridge CPU A/B on the saturated box (baseline = committed pre-optimization bridge; per-process CPU via
+/proc, two readings each; the single-threaded row is an isolation test that changed only the executor):
+
+| bridge config | idle CPU | watched CPU | threads |
+|---|---|---|---|
+| baseline (always-on subs, ThreadingHTTPServer) | 4.7% | ~5% | 16->19, unbounded |
+| 2-thread MultiThreadedExecutor | 2-3% | ~9% | 23->24 |
+| single-threaded (shipped) | 0.5% | 3.9% | 22, bounded |
+
+Decision: ship single-threaded. rclpy's `MultiThreadedExecutor` roughly doubled watched CPU for this
+light workload (two 10 Hz encodes fit one thread); single-threaded is leanest on both idle and watched.
+Kept the dynamic image subscriptions (subscribe only while a browser streams), encode-gating, and the
+bounded HTTP worker pool -- together they drop idle CPU ~90% vs baseline (4.7% -> 0.5%).
+
+Debug image quality (for closer inspection without a freeze): `FMU_A2_IMG_W`/`FMU_A2_IMG_H` (FMU env)
+override the 320x240 publish size, clamped to source; bridge `--quality` sets JPEG quality. The FMU
+image sinks now skip when `get_subscription_count()==0`, so with the bridge's on-demand subs the FMU
+does image work ONLY while a browser is watching -- a high debug resolution costs nothing when
+unwatched, and stays 10 Hz capped when watched. Verified: `FMU_A2_IMG_W=960 FMU_A2_IMG_H=540` published
+960-wide annotated + depth.

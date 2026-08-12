@@ -1653,6 +1653,10 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
   feeds the model. Obs-gated, event-driven (mission start + each completion). The VLM pane renders the
   objective, a numbered executed-command list, and the reasoning log; the log is an out-of-flow scroll
   box so it cannot resize the grid.
+- Debug image quality: `FMU_A2_IMG_W`/`FMU_A2_IMG_H` (FMU env) override the 320x240 A2 publish size,
+  clamped to the source frame; the bridge `--quality` sets JPEG quality. Both throttled. The image
+  sinks now skip entirely when `get_subscription_count()==0`, so with the bridge's on-demand subs the
+  FMU does image work ONLY while a browser is watching -- a high debug resolution is free when unwatched.
 - Bridge threading/CPU: ROS callbacks on a single-threaded spin (A/B: a 2-thread MultiThreadedExecutor
   ~2x'd watched CPU for this light workload, so single-threaded is leaner);
   HTTP on a bounded daemon-thread pool (not thread-per-connection); image topics subscribed ONLY while
