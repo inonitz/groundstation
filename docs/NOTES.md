@@ -1648,6 +1648,15 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
   FOLLOW demo with Gazebo HEADLESS + observability, runs the bridge + assessor. Verified on a full
   run: real Gazebo camera -> perception -> 320x240 at ~7.5 Hz, live HUD/detections/VLM on the page,
   total RSS ~2.4 GiB (well under the 8 GiB budget), no leak, no dup publishers.
+- `/fmu/vlm_context` (`std_msgs/String` JSON: objective + executed-command history with status) lets
+  the dashboard show what the VLM was told, not just its reply -- the SAME context `buildDynamicPrompt`
+  feeds the model. Obs-gated, event-driven (mission start + each completion). The VLM pane renders the
+  objective, a numbered executed-command list, and the reasoning log; the log is an out-of-flow scroll
+  box so it cannot resize the grid.
+- Bridge threading/CPU: ROS callbacks on a single-threaded spin (A/B: a 2-thread MultiThreadedExecutor
+  ~2x'd watched CPU for this light workload, so single-threaded is leaner);
+  HTTP on a bounded daemon-thread pool (not thread-per-connection); image topics subscribed ONLY while
+  a browser streams them, so the bridge is near-idle when unwatched (most of a SITL run).
 - `sim_core.sh` passes `FMU_OBSERVABILITY` (into `CMD_FMU`) and `HEADLESS` (into `CMD_PX4`) through to
   the tmux panes; both default off/0, so attended runs are unchanged. HEADLESS gives a gz server with
   no GUI, so the dashboard is the observation surface.

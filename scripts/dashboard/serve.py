@@ -25,15 +25,17 @@ import argparse
 import json
 import logging
 import os
+import queue
 import sys
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 import cv2
 import rclpy
 from cv_bridge import CvBridge
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -75,6 +77,7 @@ class Shared:
         self.text_cond = threading.Condition()
         self.hud = ""
         self.vlm = ""
+        self.ctx = ""
         self.seq = 0
 
     def set_frame(self, key, jpeg):
@@ -85,20 +88,24 @@ class Shared:
         with self.frame_lock:
             return self.frames[key]
 
-    def set_text(self, hud=None, vlm=None):
+    def set_text(self, hud=None, vlm=None, ctx=None):
         with self.text_cond:
             if hud is not None:
                 self.hud = hud
             if vlm is not None:
                 self.vlm = vlm
+            if ctx is not None:
+                self.ctx = ctx
             self.seq += 1
             self.text_cond.notify_all()
 
     def snapshot_text(self):
-        return json.dumps({"hud": self.hud, "vlm": self.vlm})
+        return json.dumps({"hud": self.hud, "vlm": self.vlm, "ctx": self.ctx})
+
 
 
 SH = Shared()
+NODE = None   # the Bridge node; set in main, used by the MJPEG handler
 
 
 class Bridge(Node):
@@ -112,33 +119,59 @@ class Bridge(Node):
     def __init__(self):
         super().__init__("dashboard_bridge")
         self.bridge = CvBridge()
+        self.cb = ReentrantCallbackGroup()   # all subs share one group (mirrors the FMU node)
+        self._stats_lock = threading.Lock()
         self._stats = {k: {"n": 0, "t0": time.monotonic(), "seen": False}
-                       for k in ("annotated", "depth", "hud", "vlm")}
+                       for k in ("annotated", "depth", "hud", "vlm", "ctx")}
         # depth 1 so a slow encoder drops stale frames instead of piling a backlog.
-        self.create_subscription(Image, "/fmu/perception/annotated",
-                                 lambda m: self._on_image("annotated", m), 1)
-        self.create_subscription(Image, "/fmu/perception/depth",
-                                 lambda m: self._on_image("depth", m), 1)
+        self._img_subs = {"annotated": None, "depth": None}
+        self._img_lock = threading.Lock()
+        self._viewers = {"annotated": 0, "depth": 0}
+        # Text topics are cheap -> always on. Image topics are heavy (230 KB/frame @ 10 Hz each),
+        # so subscribe them only while a browser is streaming, and drop the subscription when the
+        # last viewer leaves. With no one watching (most of a SITL run) the bridge receives no
+        # images at all -> near-zero CPU.
         self.create_subscription(String, "/fmu/hud",
-                                 lambda m: self._on_text("hud", m), 10)
+                                 lambda m: self._on_text("hud", m), 10, callback_group=self.cb)
         self.create_subscription(String, "/fmu/vlm_text",
-                                 lambda m: self._on_text("vlm", m), 10)
-        LOG.info("subscribed: /fmu/perception/annotated, /fmu/perception/depth, "
-                 "/fmu/hud, /fmu/vlm_text")
+                                 lambda m: self._on_text("vlm", m), 10, callback_group=self.cb)
+        self.create_subscription(String, "/fmu/vlm_context",
+                                 lambda m: self._on_text("ctx", m), 10, callback_group=self.cb)
+        LOG.info("subscribed: /fmu/hud, /fmu/vlm_text, /fmu/vlm_context "
+                 "(image topics subscribed on demand while viewed)")
+
+    def stream_opened(self, key):
+        with self._img_lock:
+            self._viewers[key] += 1
+            if self._img_subs[key] is None:
+                topic = "/fmu/perception/" + key
+                self._img_subs[key] = self.create_subscription(
+                    Image, topic, lambda m, k=key: self._on_image(k, m), 1, callback_group=self.cb)
+                LOG.info("subscribed %s (first viewer)", topic)
+
+    def stream_closed(self, key):
+        with self._img_lock:
+            self._viewers[key] = max(0, self._viewers[key] - 1)
+            if self._viewers[key] == 0 and self._img_subs[key] is not None:
+                self.destroy_subscription(self._img_subs[key])
+                self._img_subs[key] = None
+                SH.set_frame(key, None)   # drop the stale cached frame
+                LOG.info("unsubscribed /fmu/perception/%s (no viewers)", key)
 
     def _tick(self, key, extra=""):
-        st = self._stats[key]
-        st["n"] += 1
-        if not st["seen"]:
-            st["seen"] = True
-            LOG.info("first message on '%s'%s", key, extra)
-        now = time.monotonic()
-        dt = now - st["t0"]
-        if dt >= RATE_LOG_PERIOD_S:
-            LOG.info("'%s': %d msgs in %.1fs = %.1f Hz%s",
-                     key, st["n"], dt, st["n"] / dt, extra)
-            st["n"] = 0
-            st["t0"] = now
+        with self._stats_lock:
+            st = self._stats[key]
+            st["n"] += 1
+            if not st["seen"]:
+                st["seen"] = True
+                LOG.info("first message on '%s'%s", key, extra)
+            now = time.monotonic()
+            dt = now - st["t0"]
+            if dt >= RATE_LOG_PERIOD_S:
+                LOG.info("'%s': %d msgs in %.1fs = %.1f Hz%s",
+                         key, st["n"], dt, st["n"] / dt, extra)
+                st["n"] = 0
+                st["t0"] = now
 
     def _on_image(self, key, msg):
         try:
@@ -154,10 +187,7 @@ class Bridge(Node):
             LOG.warning("encode '%s' failed: %s", key, exc)
 
     def _on_text(self, key, msg):
-        if key == "hud":
-            SH.set_text(hud=msg.data)
-        else:
-            SH.set_text(vlm=msg.data)
+        SH.set_text(**{key: msg.data})
         self._tick(key)
         LOG.debug("'%s' <- %s", key, msg.data[:120])
 
@@ -205,6 +235,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Connection", "close")
         self.end_headers()
         who = self.address_string()
+        NODE.stream_opened(key)   # subscribe the image topic while this stream is watched
         LOG.info("MJPEG '%s' stream opened for %s", key, who)
         sent, t0, waited_logged = 0, time.monotonic(), False
         try:
@@ -225,6 +256,7 @@ class Handler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError, OSError):
             pass
         finally:
+            NODE.stream_closed(key)   # drop the subscription when the last viewer leaves
             dt = time.monotonic() - t0
             LOG.info("MJPEG '%s' stream closed for %s: %d frames in %.1fs (%.1f fps)",
                      key, who, sent, dt, sent / dt if dt else 0.0)
@@ -260,11 +292,59 @@ class Handler(BaseHTTPRequestHandler):
             LOG.info("SSE stream closed for %s: %d events sent", who, events)
 
 
+class DaemonThreadPool:
+    """Fixed pool of daemon worker threads. Bounds concurrent HTTP connections instead of
+    spawning a thread per client. Daemon threads so the process still exits cleanly on Ctrl-C
+    while streams are mid-loop. A saturated pool queues new connections until a worker frees."""
+
+    def __init__(self, workers):
+        self._q = queue.Queue()
+        for i in range(workers):
+            threading.Thread(target=self._worker, daemon=True, name=f"dash-http-{i}").start()
+
+    def submit(self, fn, *args):
+        self._q.put((fn, args))
+
+    def _worker(self):
+        while True:
+            fn, args = self._q.get()
+            try:
+                fn(*args)
+            except Exception:
+                pass
+
+
+class PooledHTTPServer(HTTPServer):
+    """Dispatch each request to a bounded daemon-thread pool (not the unbounded
+    thread-per-connection of ThreadingHTTPServer). Long-lived MJPEG/SSE streams each hold one
+    worker for their lifetime, so size the pool for the viewers you expect: >= 3 per open tab
+    (two image streams + the SSE stream)."""
+
+    allow_reuse_address = True
+
+    def __init__(self, addr, handler, workers):
+        super().__init__(addr, handler)
+        self._pool = DaemonThreadPool(workers)
+
+    def process_request(self, request, client_address):
+        self._pool.submit(self._run, request, client_address)
+
+    def _run(self, request, client_address):
+        try:
+            self.finish_request(request, client_address)
+        except Exception:
+            self.handle_error(request, client_address)
+        finally:
+            self.shutdown_request(request)
+
+
 def parse_args(argv):
     p = argparse.ArgumentParser(description="A2 dashboard bridge")
     p.add_argument("port", nargs="?", type=int, default=8088, help="HTTP port (default 8088)")
     p.add_argument("--log", default=os.environ.get("DASH_LOG"),
                    help="also write logs to this file (or set DASH_LOG)")
+    p.add_argument("--workers", type=int, default=int(os.environ.get("DASH_WORKERS", "6")),
+                   help="HTTP worker-pool size (bounded; needs >= 3 per open dashboard tab)")
     p.add_argument("--verbose", action="store_true",
                    default=os.environ.get("DASH_VERBOSE", "") not in ("", "0"),
                    help="DEBUG-level logging (per-request detail; or set DASH_VERBOSE=1)")
@@ -278,7 +358,12 @@ def main():
 
     rclpy.init()
     node = Bridge()
-
+    global NODE
+    NODE = node
+    # Single-threaded spin is the leanest here: the two image encodes at 10 Hz fit one thread, and
+    # rclpy's MultiThreadedExecutor added enough overhead to ~2x the watched CPU in A/B testing
+    # (3.9% single-threaded vs 9% with 2 threads). The Reentrant group below is harmless with one
+    # thread; kept only so the dynamic image subs share a group.
     def spin():
         try:
             rclpy.spin(node)
@@ -286,9 +371,9 @@ def main():
             pass  # normal on Ctrl-C: main() called rclpy.shutdown() under us.
 
     threading.Thread(target=spin, daemon=True).start()
-    server = ThreadingHTTPServer(("0.0.0.0", args.port), Handler)
-    server.daemon_threads = True  # let open streams die with the process on Ctrl-C.
-    LOG.info("dashboard ready: http://localhost:%d", args.port)
+    server = PooledHTTPServer(("0.0.0.0", args.port), Handler, args.workers)
+    LOG.info("dashboard ready: http://localhost:%d (http worker pool=%d, ros executor=single-threaded)",
+             args.port, args.workers)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

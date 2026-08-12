@@ -28,6 +28,7 @@ must not be added.
 | `/fmu/perception/depth` | `sensor_msgs/Image` | depth colormap |
 | `/fmu/hud` | `std_msgs/String` | HUD tiles + detection list |
 | `/fmu/vlm_text` | `std_msgs/String` | VLM reasoning log |
+| `/fmu/vlm_context` | `std_msgs/String` (JSON) | objective + executed-command history (with status) |
 
 All four are published only when the FMU runs with `FMU_OBSERVABILITY=1`. With the gate off, the FMU
 publishes nothing and this dashboard sees no data.
@@ -42,6 +43,7 @@ python3 scripts/dashboard/serve.py                      # default port 8088
 python3 scripts/dashboard/serve.py 9000                 # or pick a port
 python3 scripts/dashboard/serve.py 8088 --log dash.log  # also write a log file
 python3 scripts/dashboard/serve.py 8088 --log dash.log --verbose   # + per-request DEBUG
+python3 scripts/dashboard/serve.py 8088 --workers 6                # HTTP worker-pool size
 ```
 
 Open `http://localhost:8088`. The camera and depth panels stream over MJPEG. The HUD and VLM log update
@@ -54,6 +56,18 @@ subscription logs its first message and a rate summary every 5 s, so the log sho
 arriving from the FMU and how fast. Every HTTP request is logged, and each stream logs open/close with
 the frame or event count. `--verbose` (or `DASH_VERBOSE=1`) adds per-request DEBUG detail. A blank page
 with no `first message on 'annotated'` line means the FMU is not publishing -- check `FMU_OBSERVABILITY`.
+
+## Resource use
+
+The bridge is built to stay light, especially while nobody is watching it during a SITL run:
+- **ROS callbacks** run on a single-threaded spin. A/B testing showed rclpy's `MultiThreadedExecutor`
+  roughly doubled watched CPU for this light workload (two 10 Hz encodes), so single-threaded is leaner.
+- **HTTP** is served from a **bounded daemon-thread pool** (`--workers`, default 6), not a thread per
+  connection. Long-lived MJPEG/SSE streams each hold one worker, so keep it `>= 3` per open tab.
+- **Image topics are subscribed on demand.** The heavy `/fmu/perception/*` topics (230 KB/frame at
+  10 Hz each) are subscribed only while a browser is actively streaming them, and dropped when the last
+  viewer leaves. With no one watching, the bridge receives and encodes nothing -- it is near-idle. The
+  cheap text topics stay subscribed so the HUD/VLM panes are ready the moment a tab opens.
 
 ## Endpoints
 
