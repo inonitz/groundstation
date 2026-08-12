@@ -29,6 +29,7 @@ must not be added.
 | `/fmu/hud` | `std_msgs/String` | HUD tiles + detection list |
 | `/fmu/vlm_text` | `std_msgs/String` | VLM reasoning log |
 | `/fmu/vlm_context` | `std_msgs/String` (JSON) | objective + executed-command history (with status) |
+| `/fmu/rates` | `std_msgs/String` (JSON) | FMU's own perception-refresh + publish rates (~1 Hz) |
 
 All four are published only when the FMU runs with `FMU_OBSERVABILITY=1`. With the gate off, the FMU
 publishes nothing and this dashboard sees no data.

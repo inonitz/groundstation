@@ -90,7 +90,7 @@
   <div class="grid">
     <!-- ANNOTATED CAMERA -->
     <div class="card" id="cam">
-      <div class="hd">Annotated camera · /fmu/perception/annotated<span class="tag">320×240 · ~10 Hz</span></div>
+      <div class="hd">Annotated camera · /fmu/perception/annotated<span class="tag" id="camrate">320×240 · ~10 Hz</span></div>
       <div class="bd">
         <span class="overlaytag" id="camtask">task: —</span>
         <img id="camimg" src="/stream/annotated" alt="annotated stream"/>
@@ -100,7 +100,7 @@
     <!-- HUD + TARGET LIST -->
     <div id="side">
       <div id="hud">
-        <div class="hd">Flight HUD · /fmu/hud<span class="tag">5 Hz</span></div>
+        <div class="hd">Flight HUD · /fmu/hud<span class="tag" id="hudrate">5 Hz</span></div>
         <div class="tiles">
           <div class="tile"><div class="k">State</div><div class="v" id="t_state">—</div></div>
           <div class="tile"><div class="k">VLM</div><div class="v info" id="t_vlm">—</div></div>
@@ -118,7 +118,7 @@
 
     <!-- DEPTH -->
     <div class="card" id="depth">
-      <div class="hd">Depth colormap · /fmu/perception/depth<span class="tag">320×240</span></div>
+      <div class="hd">Depth colormap · /fmu/perception/depth<span class="tag" id="depthrate">320×240</span></div>
       <div class="bd">
         <img id="depthimg" src="/stream/depth" alt="depth stream"/>
         <div class="legend"><span>near</span><div class="ramp"></div><span>far</span></div>
@@ -239,6 +239,21 @@
     });
   }
 
+  // Three-stage pipeline rate, at a glance: perception refresh -> FMU publish -> bridge receive.
+  // rates_pub is the FMU's OWN report (it alone knows its true publish/perception rate -- a dropped
+  // frame is invisible to the bridge); rates_rx is what actually reached us.
+  function r1(v){ return (v === undefined || v === null || isNaN(v)) ? "-" : (Math.round(v * 10) / 10); }
+  function applyRates(pubStr, rx){
+    let p = {}; try { p = JSON.parse(pubStr || "{}"); } catch { p = {}; }
+    rx = rx || {};
+    const cam = document.getElementById("camrate");
+    const dep = document.getElementById("depthrate");
+    const hud = document.getElementById("hudrate");
+    if(cam) cam.textContent = `seg ${r1(p.seg_hz)} | pub ${r1(p.ann_pub_hz)} | rx ${r1(rx.annotated)} Hz`;
+    if(dep) dep.textContent = `depth ${r1(p.depth_hz)} | pub ${r1(p.depth_pub_hz)} | rx ${r1(rx.depth)} Hz`;
+    if(hud) hud.textContent = `pub ${r1(p.hud_pub_hz)} | rx ${r1(rx.hud)} Hz`;
+  }
+
   function connect(){
     const es = new EventSource("/events");
     es.onopen = () => {
@@ -250,6 +265,7 @@
       applyHud(d.hud);
       applyVlm(d.vlm);
       applyCtx(d.ctx);
+      applyRates(d.rates_pub, d.rates_rx);
     };
     es.onerror = () => {
       $("conn").textContent = "reconnecting…";

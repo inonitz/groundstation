@@ -78,6 +78,10 @@ class Shared:
         self.hud = ""
         self.vlm = ""
         self.ctx = ""
+        self.rates_pub = "{}"   # raw JSON from /fmu/rates: FMU's own perception + publish rates
+        self.rx = {"annotated": 0, "depth": 0, "hud": 0}   # cumulative received counts
+        self.rx_lock = threading.Lock()
+        self.rates_rx = {"annotated": 0.0, "depth": 0.0, "hud": 0.0}   # bridge-measured receive Hz
         self.seq = 0
 
     def set_frame(self, key, jpeg):
@@ -99,8 +103,26 @@ class Shared:
             self.seq += 1
             self.text_cond.notify_all()
 
+    def bump_rx(self, key):
+        with self.rx_lock:
+            if key in self.rx:
+                self.rx[key] += 1
+
+    def set_rates_pub(self, data):
+        with self.text_cond:
+            self.rates_pub = data
+            self.seq += 1
+            self.text_cond.notify_all()
+
+    def set_rates_rx(self, rates):
+        with self.text_cond:
+            self.rates_rx = rates
+            self.seq += 1
+            self.text_cond.notify_all()
+
     def snapshot_text(self):
-        return json.dumps({"hud": self.hud, "vlm": self.vlm, "ctx": self.ctx})
+        return json.dumps({"hud": self.hud, "vlm": self.vlm, "ctx": self.ctx,
+                           "rates_pub": self.rates_pub, "rates_rx": self.rates_rx})
 
 
 
@@ -137,7 +159,9 @@ class Bridge(Node):
                                  lambda m: self._on_text("vlm", m), 10, callback_group=self.cb)
         self.create_subscription(String, "/fmu/vlm_context",
                                  lambda m: self._on_text("ctx", m), 10, callback_group=self.cb)
-        LOG.info("subscribed: /fmu/hud, /fmu/vlm_text, /fmu/vlm_context "
+        self.create_subscription(String, "/fmu/rates",
+                                 lambda m: SH.set_rates_pub(m.data), 10, callback_group=self.cb)
+        LOG.info("subscribed: /fmu/hud, /fmu/vlm_text, /fmu/vlm_context, /fmu/rates "
                  "(image topics subscribed on demand while viewed)")
 
     def stream_opened(self, key):
@@ -174,6 +198,7 @@ class Bridge(Node):
                 st["t0"] = now
 
     def _on_image(self, key, msg):
+        SH.bump_rx(key)
         try:
             bgr = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             ok, buf = cv2.imencode(".jpg", bgr, JPEG_PARAMS)
@@ -187,6 +212,8 @@ class Bridge(Node):
             LOG.warning("encode '%s' failed: %s", key, exc)
 
     def _on_text(self, key, msg):
+        if key == "hud":
+            SH.bump_rx("hud")
         SH.set_text(**{key: msg.data})
         self._tick(key)
         LOG.debug("'%s' <- %s", key, msg.data[:120])
@@ -375,6 +402,20 @@ def main():
             pass  # normal on Ctrl-C: main() called rclpy.shutdown() under us.
 
     threading.Thread(target=spin, daemon=True).start()
+
+    def rater():
+        prev = {"annotated": 0, "depth": 0, "hud": 0}
+        prev_t = time.monotonic()
+        while True:
+            time.sleep(1.0)
+            now = time.monotonic()
+            dt = now - prev_t or 1.0
+            prev_t = now
+            with SH.rx_lock:
+                cur = dict(SH.rx)
+            SH.set_rates_rx({k: round((cur[k] - prev[k]) / dt, 1) for k in cur})
+            prev = cur
+    threading.Thread(target=rater, daemon=True).start()
     server = PooledHTTPServer(("0.0.0.0", args.port), Handler, args.workers)
     LOG.info("dashboard ready: http://localhost:%d (http worker pool=%d, ros executor=single-threaded)",
              args.port, args.workers)

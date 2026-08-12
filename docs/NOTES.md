@@ -1653,6 +1653,12 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
   feeds the model. Obs-gated, event-driven (mission start + each completion). The VLM pane renders the
   objective, a numbered executed-command list, and the reasoning log; the log is an out-of-flow scroll
   box so it cannot resize the grid.
+- Pipeline rates: `/fmu/rates` (obs-gated `std_msgs/String` JSON, ~1 Hz) reports the FMU's OWN
+  perception-refresh Hz (seg/depth loop iteration deltas via `PerceptionRuntime::segIters/depthIters`)
+  and publish Hz. The bridge measures its receive Hz separately; the dashboard shows all three per
+  stream (`seg | pub | rx`). Publish Hz reads 0 when unwatched (subscriber-gate) while perception Hz
+  keeps ticking -- so you see the throttle/gate juggling at a glance. Publish rate must come from the
+  FMU: a dropped frame is invisible to the bridge (ROS2 Images carry no sequence number).
 - Debug image quality: `FMU_A2_IMG_W`/`FMU_A2_IMG_H` (FMU env) override the 320x240 A2 publish size,
   clamped to the source frame; the bridge `--quality` sets JPEG quality. Both throttled. The image
   sinks now skip entirely when `get_subscription_count()==0`, so with the bridge's on-demand subs the
