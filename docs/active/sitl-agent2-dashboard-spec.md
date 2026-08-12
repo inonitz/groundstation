@@ -55,3 +55,87 @@ Concise intentful code. No git writes — suggest `agent2: dashboard bridge + do
 
 ## Report
 _(append findings / blockers / decisions below)_
+
+### 2026-08-11 — agent2 build complete (compile verify pending)
+
+**Done.**
+- `scripts/dashboard/serve.py` (new, mine): one `rclpy` node + `ThreadingHTTPServer`, zero pip deps.
+  Subscribes `/fmu/perception/annotated`, `/fmu/perception/depth` (JPEG q70 via `cv_bridge`+`cv2`),
+  `/fmu/hud`, `/fmu/vlm_text`. Serves `dashboard.html`, one MJPEG `multipart/x-mixed-replace` endpoint
+  per image (`/stream/annotated`, `/stream/depth`), and `/events` SSE for HUD + VLM text. Image queue
+  depth 1 so a slow encoder drops stale frames instead of backing up. MJPEG loop sleeps 0.1s (~10 fps
+  ceiling). SSE blocks on a condition var and only wakes on a real HUD/VLM change (15s keep-alive tick).
+- `scripts/dashboard/dashboard.html` (new, mine): the mockup restyled with the sim removed. Two `<img>`
+  MJPEG panels + one `EventSource`. Parses the fixed HUD line into tiles + a detection list. VLM text
+  goes into the reasoning log via `textContent` (no HTML injection from model output).
+- `fmu_node_base.hpp`: added `kVlmTextTopic` (`/fmu/vlm_text`), `kA2ImgW`/`kA2ImgH` (320/240),
+  `kImgThrottleMs`/`kImgThrottleUs` (~10 Hz).
+- `fmu_node.hpp` (all under the existing `mb_observability` gate — OFF stays zero-cost):
+  - `publishAnnotatedFrame`: ~10 Hz throttle (`m_lastAnnUs`) + `cv::resize` to 320x240 `INTER_AREA`
+    before `toImageMsg()`.
+  - `publishDepthColormap`: throttle (`m_lastDepthUs`) placed BEFORE the normalize/colormap work so the
+    CPU cost is skipped, not just the publish; then resize to 320x240.
+  - `m_pubVlmText` publisher created in the obs gate; `callLlamaServer` caches `m_lastVlmText` and
+    publishes the reasoning text after a successful parse.
+
+**Decisions.**
+- Throttle counters (`m_lastAnnUs`/`m_lastDepthUs`) are plain `u64`, not atomic: each is touched by a
+  single perception thread (seg for annotated, depth for depth). No cross-thread race.
+- Depth throttle sits before the colormap, not after — the point is to spend no CPU on dropped frames.
+- Leanness over prettiness: FMU ships 320x240 already, so the bridge only re-encodes what arrives and
+  never requests full frames. This is the fix for the earlier 1280x720 RSS regression.
+
+**Locks.** `fmu_node.hpp` + `fmu_node_base.hpp` acquired 11:39Z, released after the edits. Both FREE now.
+
+**Compile.** Incremental `release shared px4` build PASSED (exit 0, 0 errors): `fmu_node.cpp.o` rebuilt
+and `bin/llm_to_action_fmu_px4` linked. `serve.py` passes `py_compile`.
+
+**Tests (with human).** `FMU_OBSERVABILITY=1` SITL run + `python3 scripts/dashboard/serve.py`; open
+`http://localhost:8088`; confirm camera + depth + boxes + HUD + VLM update live with FMU CPU low; re-run
+a takeoff to confirm no regression and total app RSS < 8 GiB.
+
+**Suggested commit** (human runs it): `agent2: dashboard bridge + downscale`
+
+
+### 2026-08-11 — live verification against the real FMU (headless, no drone)
+
+Ran the real `llm_to_action_fmu_px4` binary with `FMU_OBSERVABILITY=1`, fed synthetic camera frames
+on `camera/stream`, and let its real ONNX perception drive the topics. No PX4/Gazebo/VLM needed for the
+image path. Verified end-to-end:
+
+- `observability=ON`, both ONNX models load, topics appear only under the gate.
+- Annotated frame width = **320** (real `cv::resize` on the live perception output).
+- Publish rate in a clean `ROS_DOMAIN_ID`, single publisher: **~7.5 Hz annotated / ~6.5 Hz depth** --
+  under the 10 Hz cap. Throttle confirmed working on the real perception loop.
+- Real HUD line, with the DET field carrying live YOLO detections (e.g. `sports ball@62%`, `frisbee@28%`
+  frame-to-frame). VLM=idle (no VLM server up); the 66 `VLM HTTP error` lines are expected.
+- Website: page + both MJPEG streams (real JPEG frames) + SSE HUD, all live through `serve.py`.
+- Independently re-verified by a second agent reviewing the FMU log + curling the site: all PASS.
+
+False alarm worth recording: an early measurement read ~28 Hz and looked like a broken throttle. Root
+cause was the test harness, not the code -- FMU processes killed abruptly left phantom DDS publishers on
+the default domain that inflated the topic-level rate. In a clean domain with one publisher it is the
+correct ~7.5 Hz. Temporary debug instrumentation was added and removed; no code change resulted.
+
+Enabling fix landed: `scripts/test/lib/sim_core.sh` `CMD_FMU` now exports
+`FMU_OBSERVABILITY=${FMU_OBSERVABILITY:-}` so the var reaches the FMU's tmux pane; default stays OFF.
+
+Still pending (need the full stack / hardware): Layer 4 takeoff regression + RSS < 8 GiB under real VLM
+load, and all of HITL.
+
+### 2026-08-11 — packaged self-assessing test (headless Gazebo)
+
+New `scripts/test/SITL/dashboard/` (run.sh + README): brings up the moving_person FOLLOW demo with
+Gazebo HEADLESS (no GUI), FMU_OBSERVABILITY on, GCS arm-check waived; starts the dashboard bridge; runs
+`scripts/dashboard/assess.py`, which checks the whole pipeline and writes a PASS/FAIL verdict. Logs land
+in `logs_<stamp>/` (fmu, dashboard, assessor, verdict). The stack is a child process (its own sim_core
+cleanup trap); the wrapper owns only the bridge. `sim_core.sh` CMD_PX4 now passes `HEADLESS` through.
+
+Verified on a full headless SITL run: **DASHBOARD ASSESSMENT: PASS (9/9)** -- real camera 1280x720 from
+Gazebo -> perception -> 320x240 annotated/depth at ~7.6 Hz (under cap), HUD with live `DET=person@83%`,
+MJPEG + SSE serving real frames. `serve.py` now has file logging (`--log`, `--verbose`); the assessor's
+SSE check was fixed (it demanded a fixed byte count under a short timeout; now reads until one event).
+
+Caveat surfaced, not a dashboard issue: takeoff is VLM-latency-bound. On the 4 GB GTX 1050 Ti, Qwen3-VL-2B
+contended with Gazebo + ONNX can take longer than the run window to return the first plan, so the drone
+may stay STANDBY. A less contended probe did complete a plan and reach FLIGHT. Stack/VLM tuning, Agent 1.

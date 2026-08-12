@@ -62,6 +62,12 @@ constexpr const char* kSystemPrompt =
                         be visible in view. Fails if the target is lost.
     {"action": "approach", "target_object": "<name_string>", "speed": <int>}
 
+    follow              Hold a fixed standoff on target_index and keep it centered. Vision-only,
+                        so it needs no position. Runs until you re-assess or stop it; it never
+                        finishes on its own. target_index is the "index" field of a [PERCEPTION]
+                        detection.
+    {"action": "follow", "target_index": <int>, "standoff_cm": <int>, "speed": <int>}
+
     stop                Hover in place.
     {"action": "stop"}
 
