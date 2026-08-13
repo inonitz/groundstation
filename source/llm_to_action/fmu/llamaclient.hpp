@@ -128,14 +128,19 @@ public:
            unknown key like "parameters" is rejected token-by-token, so the model MUST emit real fields. */
         static const char* kCommon =
             R"GBNF(rest    ::= (ws "," ws action){0,6}
-thought ::= "{" ws "\"thought\"" ws ":" ws tstring ws "}"
+thought ::= "{" ws "\"thought\"" ws ":" ws tstring (ws "," ws complete)? (ws "," ws creason)? ws "}"
+complete ::= "\"objective_complete\"" ws ":" ws boolv
+creason  ::= "\"reason\"" ws ":" ws sstring
+boolv    ::= "true" | "false"
 tstring ::= "\"" tchar{0,300} "\""
 tchar   ::= [^"\\] | "\\" ["\\bfnrtu/]
 takeoff ::= "{" ws "\"action\"" ws ":" ws "\"takeoff\"" ws "}"
 action  ::= "{" ws "\"action\"" ws ":" ws verb (ws "," ws member){0,8} ws "}"
-member  ::= nummember | strmember
+member  ::= nummember | strmember | arrmember
 nummember ::= numkey ws ":" ws number
 strmember ::= strkey ws ":" ws sstring
+arrmember ::= arrkey ws ":" ws "[" ws number ws "," ws number ws "," ws number ws "," ws number ws "]"
+arrkey  ::= "\"bbox\""
 numkey  ::= "\"x\"" | "\"y\"" | "\"z\"" | "\"x1\"" | "\"y1\"" | "\"z1\"" | "\"x2\"" | "\"y2\"" | "\"z2\"" | "\"speed\"" | "\"angle_deg\"" | "\"radius_cm\"" | "\"standoff_cm\"" | "\"track_id\"" | "\"target_index\"" | "\"start_heading_deg\"" | "\"expected_search_time_sec\"" | "\"timeout_sec\""
 strkey  ::= "\"target_object\"" | "\"direction\"" | "\"search_size\"" | "\"reason\""
 sstring ::= "\"" tchar{0,160} "\""

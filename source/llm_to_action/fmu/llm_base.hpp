@@ -45,6 +45,14 @@ constexpr const char* kSystemPrompt =
                         Example: Forward 50cm at 20cm/s = x:50, y:0, z:0, speed:20.
     {"action": "go", "x": <int>, "y": <int>, "z": <int>, "speed": <int>}
 
+    READING THE CAMERA INTO go (this is where plans go wrong -- read carefully):
+    The camera looks FORWARD along +x. Translate what you SEE:
+      - LEFT half of image  = +y      RIGHT half of image = -y   (RIGHT IS NEGATIVE y!)
+      - UPPER half of image = +z      LOWER half of image = -z
+      - to move TOWARD anything in view, ALWAYS drive +x forward (never x:0).
+    Example: a target in the UPPER-RIGHT of the frame -> go x:80, y:-40, z:20.
+    Common mistake: using +y for something on your RIGHT. Right is -y. Left is +y.
+
     curve               Fly a curve spanning through relative coord 1 to relative coord 2
                         at speed.
     {"action": "curve", "x1": <int>, "y1": <int>, "z1": <int>,
@@ -55,12 +63,26 @@ constexpr const char* kSystemPrompt =
 
     orbit               Orbit target object maintaining radius_cm.
                         Target must be visible in view. Angle in deg (1-360).
+                        For a target YOLO cannot detect (a BUILDING, house, wall, or large structure
+                        that is NOT a person/vehicle/COCO object), you MUST add "bbox":[xmin,ymin,xmax,ymax]
+                        in PIXELS of the image you see (0..640 both axes) drawn tightly around it. The
+                        bbox freezes the orbit centre from the image + depth, so no detector box is
+                        needed. Omit bbox only for a normal detected object.
     {"action": "orbit", "target_object": "<name_string>", "radius_cm": <int>,
-    "angle_deg": <int>, "direction": "cw|ccw", "speed": <int>}
+    "angle_deg": <int>, "direction": "cw|ccw", "speed": <int>, "bbox": [<int>,<int>,<int>,<int>]}
+    EXAMPLE (a building filling the centre of your view -- COPY THIS SHAPE, put YOUR bbox on the building):
+    {"action": "orbit", "target_object": "building", "bbox": [170,110,480,410], "radius_cm": 600, "angle_deg": 360, "direction": "cw", "speed": 30}
 
     approach            Fly toward target_object until within standoff distance. Target must
                         be visible in view. Fails if the target is lost.
-    {"action": "approach", "target_object": "<name_string>", "speed": <int>}
+                        For a target YOLO cannot detect (a WINDOW, door, house, or structure that is
+                        NOT a person/vehicle/COCO object), you MUST add "bbox":[xmin,ymin,xmax,ymax] in
+                        PIXELS of the image you see (0..640 both axes) tightly around it. The bbox gives
+                        a heading + depth to fly to, so no detector box is needed. Omit bbox only for a
+                        normal detected object (approach it by target_object/track_id).
+    {"action": "approach", "target_object": "<name_string>", "speed": <int>, "bbox": [<int>,<int>,<int>,<int>]}
+    EXAMPLE (a window on the building -- COPY THIS SHAPE, put YOUR bbox tightly on the window):
+    {"action": "approach", "target_object": "window", "bbox": [300,190,380,300], "speed": 20}
 
     follow              Watch a target IN PLACE: the drone holds its position and rotates (turns
                         its "head") to keep the target centered in view. It does NOT fly toward the
@@ -85,12 +107,17 @@ constexpr const char* kSystemPrompt =
                         follow instead (it ALSO holds position) -- never hover in place of following.
     {"action": "hover"}
 
-    search              Sweep a parallel-track (lawnmower) pattern of straight lanes to bring an
-                        object into view. start_heading_deg sets the first lane heading (relative to
-                        current facing: 0=ahead, 90=left, -90=right, 180=behind); direction (cw|ccw)
-                        sets which side the lanes march across. Point the search where you expect the
-                        target based on context. Aborts if not found by timeout_sec, returning to
-                        where the search started before giving up.
+    search              Advance-and-scan to bring an object into view: at your spot, rotate a full
+                        360 in place (a "checkpoint") to look all around; if not found, step forward a
+                        few metres and scan again, repeating until found or max reach is hit.
+                        start_heading_deg sets the ADVANCE direction (relative to current facing:
+                        0=ahead -- the DEFAULT, use it unless you have a clear reason; 90=left,
+                        -90=right, 180=behind). The 360 scan already sees every direction at each
+                        checkpoint, so just point the ADVANCE toward where the target most likely is
+                        -- usually straight AHEAD. Aborts if not found by timeout_sec, returning to
+                        where the search started before giving up. Pick a size that REACHES the target:
+                        small reaches ~8m forward, medium ~18m, large ~30m. For anything more than a
+                        few metres away or outdoors, use medium or large -- small gives up short.
                         search_size picks how large an area to sweep -- "small" for a tight indoor
                         room, "medium" (default if omitted) for a normal room/hallway, "large" for an
                         open area/outdoors. Undersized wastes time re-searching the same small patch;
@@ -163,8 +190,10 @@ constexpr const char* kSystemPrompt =
     -- emit ONE, then re-assess. On a FAILURE status (rule 9), change something; never repeat blind.
 
     12. NEVER GUESS A track_id; ACT ON search_ok: A track_id is real only for a target you can
-    SEE right now in [PERCEPTION]. If the target is NOT currently visible, plan ONLY takeoff (if
-    grounded), search, and re-assess -- NEVER append a `follow`/`approach` with a made-up track_id,
+    SEE right now in [PERCEPTION]. If the target is not in [PERCEPTION] but you CAN SEE it in the
+    camera image (e.g. a person in RED, only too far for the detector to box yet), do NOT search --
+    fly toward it to close distance (rule 13). ONLY when the target is not visible ANYWHERE in the
+    image, plan ONLY takeoff (if grounded), search, and re-assess -- NEVER append a `follow`/`approach` with a made-up track_id,
     that just fails (follow_no_target). When a search returns search_ok, the person IS now in
     [PERCEPTION]: FOLLOW them THIS cycle using the track_id shown there -- do NOT search again
     (search_ok already means found). If they left view again, the track_id may have changed; use the
@@ -176,15 +205,41 @@ constexpr const char* kSystemPrompt =
     NOT currently detected. Do not re-issue commands that already succeeded: if takeoff shows
     takeoff_ok in history you ARE airborne -- never `takeoff` again. Plan only what REMAINS.
 
+    13. SEE IT? FLY TO IT -- do NOT search past a target you can see. The detector (YOLO) only
+    boxes targets that are CLOSE; something you can plainly SEE in the camera image can be too far to
+    appear in [PERCEPTION] yet. That is NOT absent. When the objective names a target by a visible cue
+    ("the person in RED") and you can see it in the frame, HEAD TOWARD IT with `go` using the
+    camera->go mapping above -- centre it (LEFT=+y / RIGHT=-y, UP=+z / DOWN=-z) and ALWAYS drive +x
+    forward. Take a BIG forward step when it is far and roughly centred (e.g. x:400, y:+40 for a
+    target ahead and a little left); smaller steps (x:100) with y/z centring as you get close. Append
+    re-assess as the LAST element, then repeat -- closing distance each cycle -- until the target
+    enters [PERCEPTION] with a track_id. THEN `follow` BY THAT track_id. SEARCH is ONLY for a target
+    you cannot see ANYWHERE in the image. Trust your eyes over the detector list.
+
+    14. BUILDING / WINDOW / WALL => bbox IS MANDATORY. These are NOT detector classes, so they will
+    NEVER be in [PERCEPTION]. You SEE them in the image -- that is enough. Every `orbit` or `approach`
+    on a building, window, wall, door or large structure MUST carry a "bbox":[xmin,ymin,xmax,ymax]
+    (0..640) drawn on it, exactly like the orbit/approach EXAMPLES above. A plan that omits the bbox
+    does NOTHING (the drone cannot anchor and will not move) -- so NEVER emit orbit/approach on such a
+    target without a bbox, and NEVER `search` for a building you can already see. Orbit is possible
+    with the bbox alone.
+
     ===========================================
     OUTPUT FORMAT
 
     Generate a JSON array of objects. First object MUST be your thought
     process. Subsequent objects are your flight plan.
 
+    On the FIRST object you MAY add "objective_complete": true (with a short "reason")
+    ONLY when the mission objective is fully achieved -- the drone then stands down (lands
+    if airborne, else stops) and you are not re-woken. Default false: keep flying. When you
+    set it true, still emit a final "land" action so the plan stays well-formed.
+
     [
     {
-        "thought": "<1. Feasibility. 2. Flight strategy. 3. Landing clearance check.>"
+        "thought": "<1. Feasibility. 2. Flight strategy. 3. Landing clearance check.>",
+        "objective_complete": false,
+        "reason": "<only meaningful when objective_complete is true>"
     },
     {
         "action": "<action 1>",

@@ -103,6 +103,13 @@ constexpr u32         kHudThrottleMs      = 200;   /* ~5 Hz HUD line + /fmu/hud 
 constexpr u64         kHudThrottleUs      = static_cast<u64>(kHudThrottleMs) * 1000ULL;
 constexpr u32         kA2ImgW             = 320;   /* A2 dashboard downscale width  (lean transport). */
 constexpr u32         kA2ImgH             = 240;   /* A2 dashboard downscale height (lean transport). */
+constexpr u32         kVlmImageSide       = 640;   /* square side the VLM sees (callLlamaServer resize); VLM bbox coords live in this space. */
+/* Central default bbox (VLM 640-space) = "the structure straight ahead". Used when the VLM omits the
+   bbox on orbit/approach (the 2B is inconsistent), so "orbit the building in front" is deterministic. */
+constexpr i16         kCenterBboxX0       = 220;
+constexpr i16         kCenterBboxY0       = 180;
+constexpr i16         kCenterBboxX1       = 420;
+constexpr i16         kCenterBboxY1       = 380;
 constexpr u32         kImgThrottleMs      = 100;   /* ~10 Hz cap on annotated + depth image publish. */
 constexpr u64         kImgThrottleUs      = static_cast<u64>(kImgThrottleMs) * 1000ULL;
 
@@ -133,6 +140,11 @@ constexpr f32 kApproachFwdGainHz     = 0.35f;   /* (range-standoff) -> forward s
                                                     self-correct before standoff. */
 constexpr f32 kApproachYawGain       = 1.0f;    /* horiz bbox error -> yaw-rate.                 */
 constexpr f32 kApproachVertGain      = 0.5f;    /* vert bbox error -> vertical velocity.         */
+constexpr f32 kApproachMinAnchorAltEnu = 0.8f;  /* NEVER approach below this ENU alt: a low/hallucinated
+                                                   bbox projected through depth can anchor UNDERGROUND
+                                                   (seen: z=-1.87) and fly the drone into the dirt ->
+                                                   PX4 disarm. Floors both the bbox anchor and the servo
+                                                   descent. SITL ground is ENU 0; 0.8 m keeps clearance. */
 constexpr f32 kApproachLateralDamp   = 0.5f;    /* perpendicular measured-velocity damping (R1). */
 constexpr f32 kApproachCoastSpeedMps = 0.15f;   /* speed while coasting on a briefly-lost target
                                                     (not in the spec's tunable table -- same
@@ -197,7 +209,7 @@ constexpr u64 kPerceptionWarmupUs   = static_cast<u64>(kPerceptionWarmupMs) * 10
 constexpr f32          kCannedApproachTargetFwdM   = 7.0f;   /* body-forward offset at activation; MUST exceed kApproachStandoffM so the drone flies a real approach, and stay reachable within kCannedApproachRigKillAfterMs at the slow braking approach speed. */
 constexpr f32          kCannedApproachTargetUpM    =  0.0f;  /* level with the drone. A below-target point drops out the bottom of the frame as the drone closes, so the synthetic rig (a point, not a car-sized box) loses it just short of the stop and FAILs. Real YOLO approaches keep the box in frame; the canned point must be level. */
 constexpr const char* kCannedApproachTargetLabel  = "canned_target";
-constexpr u32         kCannedApproachRigKillAfterMs = 30 * kMillisecondsInOneSecond;  /* was 15s: the braking approach at ~0.28 m/s needs longer to cross several meters before the target is dropped */
+constexpr u32         kCannedApproachRigKillAfterMs = 120 * kMillisecondsInOneSecond;  /* was 30s: a bbox-anchored approach to a far/high window (~10m + climb at the slow braking speed) needs ~60s+ to REACH; 30s dropped the fixed anchor mid-approach -> approach_lost -> it landed short. */
 constexpr u64         kCannedApproachRigKillAfterUs =
     static_cast<u64>(kCannedApproachRigKillAfterMs) * 1000ULL;
 
@@ -232,6 +244,14 @@ constexpr f32 kOrbitDefaultSpeedMps = 0.30f;   /* tangential speed around the ci
 constexpr f32 kOrbitRadialGainHz    = 0.5f;    /* (radius - dist) -> radial speed: hold the circle.      */
 constexpr f32 kOrbitYawGain         = 1.0f;    /* look-angle error (rad) -> turn rate: aim at locked center.*/
 constexpr f32 kOrbitAimTrimGain     = 0.30f;   /* small vision trim on top of the odometry aim (no hard chase).*/
+constexpr f32 kOrbitMinRadiusM      = 3.0f;    /* floor on the orbit radius: never fly closer than this to the locked centre (collision guard), even if the VLM asks for a tiny radius_cm. */
+constexpr f32 kOrbitMaxRadialMps    = 0.25f;    /* cap on the visual-servo orbit's forward/back (range-hold) speed. */
+constexpr f32 kOrbitMinTangentialMps= 0.6f;    /* floor on the orbit strafe speed so it circles in reasonable time. */
+constexpr f32 kOrbitFixedRadiusM    = 7.0f;    /* HARDCODED orbit: centre is this far straight ahead of orbit-start AND the radius, so the drone starts ON the circle (never flies inward). */
+constexpr f32 kOrbitFixedAltM       = 4.0f;    /* HARDCODED orbit: minimum altitude (ENU) to hold -- safely above terrain, cannot descend into it. */
+constexpr f32 kOrbitAimGateM        = 2.0f;    /* vision aim-trim only when the nearest structure is within this of the locked range (else it is a different object -- ignore it). */
+constexpr f32 kOrbitCorrErrXGate    = 0.40f;   /* correct the centre only when the structure is within this |errX| (well-centred = it IS the building, not a spurious side object). */
+constexpr f32 kOrbitCenterCorrAlpha = 0.04f;   /* low-pass rate for continuously correcting the orbit centre toward the OBSERVED building each tick (slow => converges, no chase/divergence). */
 
 /* ---- SEARCH (ROADMAP 1.1.7): a parallel-track (lawnmower) sweep at fixed altitude. Fly a straight
    lane, step sideways by the lane spacing, fly the next lane back the other way, repeat -- parallel
@@ -266,4 +286,4 @@ constexpr u32 kSearchReturnTimeoutMs = 70000;  /* return-to-start leg after SEAR
                                                 than a 3rd per-size constant to keep track of.         */
 /* kSearchLegTimeoutMs is now per-size (SearchSizeParams above); kept no non-size-indexed constant
    around to avoid a stale value someone reads instead of the real one. */
-constexpr f32 kSearchMinConfidence  = 0.50f;   /* reject weak/phantom hits; keep searching below this.  */
+constexpr f32 kSearchMinConfidence  = 0.25f;   /* reject weak/phantom hits; keep searching below this. 0.25: a person at ~10m only scores 25-53%, and 0.35 dropped real red hits so the search never stopped. */

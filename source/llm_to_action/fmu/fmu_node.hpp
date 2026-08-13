@@ -4,6 +4,8 @@
 #include <cstring>
 #include <cmath>
 #include <string>
+#include <mutex>
+#include <cctype>
 #include <vector>
 #include <memory>
 #include <future>
@@ -36,6 +38,7 @@
 #include <std_msgs/msg/string.hpp>      /* A2: /fmu/hud text status.        */
 #include <sensor_msgs/msg/image.hpp>    /* A2: annotated-frame + depth topics.*/
 #include "keyboard/keyboard_node_base.hpp"  /* kOutKeyboardRawTopic, KeyboardRawInputType (Int32MultiArray) */
+#include "asr/asr_node_base.hpp"            /* kOutASRServerTranscriptionTopic, ASRTextType (std_msgs/String) */
 #include "keyboard/key_codes.hpp"           /* KeyCodeEnum, KeyAction */
 #include "frame/frame_convert.hpp"          /* flu_to_enu / enu_to_flu */
 
@@ -108,6 +111,7 @@ struct CmdOrbit {
     f32             angle_deg{0.0f};
     f32             speed{0.0f};
     bool            cw_or_ccw{true};
+    i16             bbox[4]{0, 0, 0, 0};   /* VLM-emitted [xmin,ymin,xmax,ymax] in the 640x640 image it sees; valid when xmax>xmin && ymax>ymin. Anchors ORBIT on a non-COCO target (house). */
 };
 
 struct CmdSearch {
@@ -131,6 +135,7 @@ struct CmdApproach {
     FixedStringType target{"\0"};   /* label fallback. */
     i32             target_id{-1};   /* stable track id from [PERCEPTION] (preferred). */
     f32             speed{0.0f};
+    i16             bbox[4]{0, 0, 0, 0};   /* VLM-emitted [xmin,ymin,xmax,ymax] in the 640x640 image; anchors APPROACH on a non-COCO target (house/window) YOLO cannot box. */
 };
 
 /* FOLLOW (spec agent1): position-free visual servo that holds a standoff on a VLM-chosen
@@ -142,6 +147,9 @@ struct CmdFollow {
     i32 standoff_cm{0};
     i32 speed{0};
 };
+
+static_assert(sizeof(CmdOrbit)    <= CACHE_LINE_BYTES - sizeof(u64), "CmdOrbit exceeds GenericCommand payload");
+static_assert(sizeof(CmdApproach) <= CACHE_LINE_BYTES - sizeof(u64), "CmdApproach exceeds GenericCommand payload");
 
 struct alignpk(CACHE_LINE_BYTES) GenericCommand {
     union {
@@ -286,6 +294,14 @@ public:
             subOpts
         );
 
+        /* Voice objective (push-to-talk ASR -> std_msgs/String). Spoken on the ground it
+           launches the mission; spoken in flight it re-tasks the VLM. See asrCallback. */
+        m_subAsr = this->create_subscription<ASRTextType>(
+            kOutASRServerTranscriptionTopic, 10,
+            std::bind(&FlightManagementUnitNode::asrCallback, this, std::placeholders::_1),
+            subOpts
+        );
+
         /* All platform wire I/O lives in the backend. make_active_backend hides
            the per-backend ctor asymmetry (PX4 needs this Node + callback group;
            Tello, being ROS-free, ignores them) behind one uniform call, so the
@@ -389,13 +405,14 @@ public:
                bool useBatteryLandNowPlan = false, bool usePatrolPlan = false,
                bool useBoundaryPlan = false, bool useStormPlan = false,
                bool useApproachImpactPlan = false, bool useOrbitPlan = false,
-               bool useSearchPlan = false) {
+               bool useSearchPlan = false, bool useVoicePlan = false,
+               bool useCompletePlan = false) {
         m_chat.m_initialCommand = objective;
         publishVlmContext();   /* surface the objective on the dashboard right away. */
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan || useBoundaryPlan || useStormPlan || useApproachImpactPlan || useOrbitPlan || useSearchPlan;
+        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan || useBoundaryPlan || useStormPlan || useApproachImpactPlan || useOrbitPlan || useSearchPlan || useVoicePlan || useCompletePlan;
         m_missionActive.store(!cannedRun, std::memory_order_release);
         if (useCrossPlan) {
             injectCannedCrossPlan();
@@ -431,6 +448,10 @@ public:
             injectCannedOrbitPlan();
         } else if (useSearchPlan) {
             injectCannedSearchPlan();
+        } else if (useVoicePlan) {
+            injectCannedVoicePlan();
+        } else if (useCompletePlan) {
+            injectCannedCompletePlan();
         } else if (useCannedPlan) {
             injectCannedPlan();
         }
@@ -457,6 +478,108 @@ private:
             msg->width, msg->height, msg->encoding.c_str(), (unsigned long)c);
     }
 
+    /* Voice command intake. The push-to-talk ASR node publishes each transcript as a
+       std_msgs/String on /asr_server/transcribe. This callback runs on a separate executor
+       thread, so to keep raiseInterrupt()/flight-state mutation control-thread-only it ONLY
+       trims + posts the transcript; controlLoop drains it (m_asrPending) and runs
+       handleAsrCommand() on the control thread. Read-back is logged here so a mishear is
+       caught before the drone acts (token-probability confidence does NOT track correctness
+       -- the operator's ear is the safety net, not an automatic gate). */
+    void asrCallback(const ASRTextType::SharedPtr msg) {
+        std::string text = msg->data;
+        size_t b = text.find_first_not_of(" \t\r\n");
+        if (b == std::string::npos) return;            /* silence / blank capture -- ignore. */
+        size_t e = text.find_last_not_of(" \t\r\n");
+        text = text.substr(b, e - b + 1);
+
+        RCLCPP_WARN(this->get_logger(), "[ASR] heard: \"%s\"", text.c_str());
+        {
+            std::lock_guard<std::mutex> lk(m_asrMtx);
+            m_asrPendingText = text;
+        }
+        m_asrPending.store(true, std::memory_order_release);   /* control loop picks it up. */
+    }
+
+    /* Control-thread handler for a posted ASR transcript. Returns true if it took a terminal
+       action that should yield the current control tick (emergency land/stop), false to let
+       the loop continue (mission launch / VLM re-task). EMERGENCY callouts are matched as
+       short imperatives and act deterministically -- the VLM is NOT in the loop, so spoken
+       "land"/"stop" is instant. A full sentence ("find the house and land near it") is NOT an
+       emergency; it routes to the VLM as a user_command interrupt. */
+    bool handleAsrCommand(const std::string& text) {
+        std::string low;
+        low.reserve(text.size());
+        for (char c : text) low += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        while (!low.empty() && (low.back() == ' ' || low.back() == '.' ||
+                                low.back() == '!' || low.back() == '?')) low.pop_back();
+        auto endsWith = [&](const char* suf) {
+            std::string t = suf;
+            return low.size() >= t.size() && low.compare(low.size() - t.size(), t.size(), t) == 0;
+        };
+        if (endsWith(" now")) { low.resize(low.size() - 4);
+            while (!low.empty() && low.back() == ' ') low.pop_back(); }
+
+        FlightState st = m_flightState.load(kMemOrderRelax);
+
+        /* EMERGENCY LAND (deterministic, VLM bypassed) -- same land-in-place primitive the
+           battery failsafe uses: drop the plan, stop soliciting, hand the control loop LANDING. */
+        if (low == "land" || low == "abort" || low == "emergency" || low == "mayday" ||
+            low == "come down" || low == "get down" || low == "descend") {
+            if (st == FlightState::STANDBY) {
+                RCLCPP_WARN(this->get_logger(), "[ASR] EMERGENCY 'land' ignored -- already grounded.");
+                return false;
+            }
+            RCLCPP_WARN(this->get_logger(), "[ASR] EMERGENCY LAND (deterministic, VLM bypassed).");
+            emergencyLandNow();
+            return true;
+        }
+        /* EMERGENCY STOP / HOLD (deterministic hover, VLM bypassed). */
+        if (low == "stop" || low == "halt" || low == "freeze" || low == "hold" ||
+            low == "hover" || low == "hold position" || low == "stop moving") {
+            if (st == FlightState::STANDBY) return false;   /* nothing to stop on the ground. */
+            RCLCPP_WARN(this->get_logger(), "[ASR] EMERGENCY STOP -> hover (deterministic, VLM bypassed).");
+            emergencyHoldNow();
+            return true;
+        }
+
+        /* NON-EMERGENCY. Grounded -> launch the mission from the spoken objective. */
+        if (st == FlightState::STANDBY) {
+            RCLCPP_WARN(this->get_logger(), "[ASR] launching mission from spoken objective.");
+            start(text);
+            return false;
+        }
+        /* Airborne -> A3 user_command interrupt: hover now, surface the words in the next
+           [USER] prompt block, let the VLM reassess against the running objective. */
+        RCLCPP_WARN(this->get_logger(), "[ASR] in-flight command -> user_command interrupt (VLM reassess).");
+        m_userCommandText = text;
+        raiseInterrupt("user_command");
+        return false;
+    }
+
+    /* Deterministic emergency land-in-place (mirrors the battery-failsafe land path): drop the
+       queued plan, clear active/stash, stop soliciting VLM plans, hand the control loop LANDING. */
+    void emergencyLandNow() {
+        ActiveTask stale;
+        while (m_taskQueue->try_dequeue(stale)) { }
+        m_hasActive            = false;
+        m_hasStashed           = false;
+        m_settleTicksRemaining = 0;
+        m_missionActive.store(false, std::memory_order_release);
+        m_flightState.store(FlightState::LANDING, kMemOrderRelax);
+    }
+
+    /* Deterministic emergency hover-hold: drop the plan, stop soliciting, stream zero velocity.
+       The backend repeats the last setpoint, so the drone holds until the next command. */
+    void emergencyHoldNow() {
+        ActiveTask stale;
+        while (m_taskQueue->try_dequeue(stale)) { }
+        m_hasActive            = false;
+        m_hasStashed           = false;
+        m_settleTicksRemaining = 0;
+        m_missionActive.store(false, std::memory_order_release);
+        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+    }
+
     /* ---- APPROACH helpers ------------------------------------------------- */
     /* Perpendicular component of measVel relative to forwardUnit (assumed unit length);
        damps the pursuit-arc residual left after switching to a measured bearing (spec §9 R1). */
@@ -471,6 +594,25 @@ private:
        transient. A real impact spikes yaw-rate + vertical velocity while the range still reads
        plausible off the impact frame (SITL: yawrate 6.9, vertVel -1.75, alt 0.99->0.02 in ~1s).
        Not nominal -> the APPROACH branch treats "reached" as an impact and interrupts. */
+    /* The VLM names targets in natural language ("human in red", "red person"), but YOLO emits
+       COCO class labels ("person"). An exact strcmp then never matches, so SEARCH can stare
+       straight at the target and never register it -- it just keeps advancing (into the rocks).
+       Match a person detection whenever the requested target refers to a human; WHICH person is
+       red stays the VLM's job via the image + bbox. */
+    static bool labelMatchesTarget(const char* detLabel, const char* target) {
+        if (!detLabel || !target) return false;
+        if (std::strcmp(detLabel, target) == 0) return true;
+        char t[128]; size_t i = 0;
+        for (; target[i] && i < sizeof(t) - 1; ++i)
+            t[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(target[i])));
+        t[i] = '\0';
+        const bool targetIsPerson =
+            std::strstr(t, "human") || std::strstr(t, "person") || std::strstr(t, "people") ||
+            std::strstr(t, "man")   || std::strstr(t, "woman")  || std::strstr(t, "guy")    ||
+            std::strstr(t, "someone")|| std::strstr(t, "boy")   || std::strstr(t, "girl");
+        return targetIsPerson && std::strcmp(detLabel, "person") == 0;
+    }
+
     bool approachMotionNominal(Odometry const& od) const {
         if (m_forceApproachImpact) return false;   /* test-only forced impact (--canned-approach-impact). */
         return std::fabs(od.yawrate) < kApproachNominalYawrate
@@ -483,6 +625,42 @@ private:
        back-projection: world point -> body-FLU vector -> pixel. Not visible (behind the
        camera or outside the frame) -> publish a valid-but-empty snapshot, exactly what a
        real camera reports when nothing matches. */
+    /* Freeze a world (ENU) anchor from a VLM-emitted bbox -- the enabler that lets APPROACH/ORBIT
+       drive toward a non-COCO target (house/window) YOLO never boxes. The VLM emits the bbox in the
+       640x640 image it is shown (kVlmImageSide); scale to native camera px, median the dense depth
+       over it (YOLO-independent), then pinhole back-project through the live pose. This is the exact
+       inverse of updateCannedApproachRig's forward projection. Returns false when the bbox is
+       absent/degenerate or no depth is measurable there -- the caller then keeps its label path. */
+    bool bboxRangeDir(const i16 bbox[4], Odometry const& od, f32& outRangeM, Vec3& outDirEnu) const {
+        if (!(bbox[2] > bbox[0] && bbox[3] > bbox[1])) return false;   /* absent / degenerate. */
+        f32 sx = static_cast<f32>(kApproachCamera.width)  / static_cast<f32>(kVlmImageSide);
+        f32 sy = static_cast<f32>(kApproachCamera.height) / static_cast<f32>(kVlmImageSide);
+        cv::Rect rect(cv::Point(static_cast<int>(bbox[0] * sx), static_cast<int>(bbox[1] * sy)),
+                      cv::Point(static_cast<int>(bbox[2] * sx), static_cast<int>(bbox[3] * sy)));
+        f32 rangeM = m_perception->medianDepthCmInRect(rect) / 100.0f;
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 500,
+            "[FMU_NODE_DIAGNOSTICS] bboxToEnuAnchor rect=(%d,%d,%d,%d) rangeM=%.2f freeDepth=%.2f",
+            rect.x, rect.y, rect.width, rect.height, rangeM, m_perception->nearestFreeDepthM());
+        if (rangeM <= 0.0f) return false;
+        f32  uc   = 0.5f * static_cast<f32>(rect.x + rect.x + rect.width);
+        f32  vc   = 0.5f * static_cast<f32>(rect.y + rect.y + rect.height);
+        f32  camX = (uc - kApproachCamera.cx) / kApproachCamera.fx;   /* = -relFlu.y / relFlu.x */
+        f32  camY = (vc - kApproachCamera.cy) / kApproachCamera.fy;   /* = -relFlu.z / relFlu.x */
+        Vec3 dirFlu = { 1.0f, -camX, -camY };
+        f32  nrm    = std::sqrt(dirFlu.x * dirFlu.x + dirFlu.y * dirFlu.y + dirFlu.z * dirFlu.z);
+        dirFlu = { dirFlu.x / nrm, dirFlu.y / nrm, dirFlu.z / nrm };
+        outDirEnu  = flu_to_enu(dirFlu, od.yaw);
+        outRangeM  = rangeM;
+        return true;
+    }
+
+    bool bboxToEnuAnchor(const i16 bbox[4], Odometry const& od, Vec3& outEnu) const {
+        f32 r; Vec3 d;
+        if (!bboxRangeDir(bbox, od, r, d)) return false;
+        outEnu = { od.pos.x + d.x * r, od.pos.y + d.y * r, od.pos.z + d.z * r };
+        return true;
+    }
+
     void updateCannedApproachRig(Odometry const& od) {
         Vec3               relEnu, relFlu;
         f32                u, v, camX, camY;
@@ -520,7 +698,7 @@ private:
         }
 
         synth.count = 1;
-        std::snprintf(synth.dets[0].label, sizeof(FixedStringType), "%s", kCannedApproachTargetLabel);
+        std::snprintf(synth.dets[0].label, sizeof(FixedStringType), "%s", m_cannedApproachLabel);
         synth.dets[0].bbox_xmin = static_cast<i32>(u - 20.0f);   /* synthetic 40x40px bbox.   */
         synth.dets[0].bbox_ymin = static_cast<i32>(v - 20.0f);
         synth.dets[0].bbox_xmax = static_cast<i32>(u + 20.0f);
@@ -569,6 +747,17 @@ private:
 
         /* Battery failsafe = ultimate safety net: pre-empts the plan AND the pilot. */
         if (batteryFailsafeTick()) return;
+
+        /* Voice command intake (control-thread): drain a posted ASR transcript and act on it.
+           Placed right after the battery failsafe (which outranks all) and BEFORE the manual-
+           override gate, so an emergency "land"/"stop" fires even while override is held. An
+           emergency yields this tick (LANDING/hover already commanded); a launch/re-task falls
+           through to the normal loop. */
+        if (m_asrPending.exchange(false, std::memory_order_acquire)) {
+            std::string asrTxt;
+            { std::lock_guard<std::mutex> lk(m_asrMtx); asrTxt.swap(m_asrPendingText); }
+            if (handleAsrCommand(asrTxt)) return;
+        }
 
         /* Manual operator override: pilot flies (body-FLU keys -> world ENU); autonomy
            paused. Disabled once a battery failsafe has latched (failsafe wins). */
@@ -844,10 +1033,44 @@ private:
                         m_rotateRemainingRad, yawRate, od.yaw, od.yawrate);
                 }
             } else if (id == CommandID::APPROACH) {
-                if (m_useCannedApproachRig) updateCannedApproachRig(od);
+                if (m_useCannedApproachRig || m_approachBboxRig) updateCannedApproachRig(od);
 
                 appr = m_currTask.m_cmd.m_extractCmd.m_approach;
                 tnow = nowUs();
+
+                if (m_approachBboxRig) {
+                    /* bbox-approach = fly to the FROZEN world anchor by ODOMETRY, not vision. The
+                       synthetic rig only "shows" the anchor when it is in frame; once the drone is
+                       off-axis (after an orbit) the anchor falls off-frame, the vision servo sees
+                       nothing and HOVERS FOREVER (no interrupt, no stuck-detection). We KNOW the
+                       anchor's ENU, so just turn toward it and go -- this always makes progress and
+                       completes at the stand-off, so it can never get stuck. */
+                    Vec3 toT   = { m_cannedApproachTargetEnu.x - od.pos.x,
+                                   m_cannedApproachTargetEnu.y - od.pos.y,
+                                   m_cannedApproachTargetEnu.z - od.pos.z };
+                    f32  horiz = std::sqrt(toT.x * toT.x + toT.y * toT.y);
+                    f32  rem   = horiz - m_cfg.approachStandoffM;
+                    f32  aYaw  = (horiz > 0.05f)
+                               ? kOrbitYawGain * wrap_pi(std::atan2(toT.y, toT.x) - od.yaw) : 0.0f;
+                    if (rem <= 0.10f) {
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f,
+                            kApproachVertGain * (m_cannedApproachTargetEnu.z - od.pos.z)}, aYaw);
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] APPROACH(bbox) reached anchor target=%s rem=%.2f -> approach_ok.",
+                            appr.target, rem);
+                        completeCurrent("approach_ok");
+                    } else {
+                        f32  spd = std::min(rem, kApproachSpeedDefault / 100.0f);   /* brake near the end. */
+                        Vec3 dir = { toT.x / horiz, toT.y / horiz, 0.0f };
+                        m_backend->set_velocity(
+                            Vec3{ dir.x * spd, dir.y * spd,
+                                  kApproachVertGain * (m_cannedApproachTargetEnu.z - od.pos.z) }, aYaw);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] APPROACH(bbox) go-to anchor target=%s rem=%.2f horiz=%.2f dz=%.2f",
+                            appr.target, rem, horiz, m_cannedApproachTargetEnu.z - od.pos.z);
+                    }
+                    return;
+                }
                 {
                     /* Prefer the stable track id (holds the chosen person across list re-sorting
                        or a second person in view); fall back to the label. Snap + ids come from
@@ -993,6 +1216,9 @@ private:
                         if (spF > speedCeil) spF = speedCeil;
                         yawRate = -kApproachYawGain * tr.errX;
                         vUp     = -kApproachVertGain * tr.errY;
+                        /* Never let vertical centering drive the drone below safe AGL (ground person
+                           low in frame -> errY pulls down -> sink into dirt -> PX4 disarm). */
+                        if (od.pos.z <= kApproachMinAnchorAltEnu && vUp < 0.0f) vUp = 0.0f;
                         aimFlu  = { spF, 0.0f, vUp };
                         velEnu  = flu_to_enu(aimFlu, od.yaw);
                         fwdDir  = flu_to_enu(Vec3{1.0f, 0.0f, 0.0f}, od.yaw);
@@ -1103,82 +1329,45 @@ private:
             } else if (id == CommandID::ORBIT) {
                 orb  = m_currTask.m_cmd.m_extractCmd.m_orbitTarget;
                 tnow = nowUs();
-                snap = m_perception->snapshot();
+                f32 yawRate = 0.0f;
 
-                /* Live detection this frame -- seeds the circle center at the start, and keeps the
-                   camera pointed at the real car during the orbit. */
-                hit = nullptr;
-                if (snap && snap->valid) {
-                    for (di = 0; di < snap->count; ++di) {
-                        if (std::strcmp(snap->dets[di].label, orb.target) == 0) { hit = &snap->dets[di]; break; }
-                    }
-                    if (hit == nullptr && snap->count == 1) hit = &snap->dets[0];
-                }
-                errX = 0.0f;
-                if (hit != nullptr) {
-                    m_orbitLastSeenUs = tnow;
-                    errX = (0.5f * __scast(f32, hit->bbox_xmin + hit->bbox_xmax) - kApproachCamera.cx)
-                             / kApproachCamera.cx;
-                }
-
+                /* HARDCODED SAFE ORBIT (agent1, 2026-08-13). Deterministic geometry, NO depth. Monocular
+                   depth range proved too noisy for an autonomous building-orbit -- every depth-seeded
+                   version placed the centre wrong and flung the drone into the terrain (z -> -3.8m). This
+                   flies a FIXED circle: centre = kOrbitFixedRadiusM straight ahead of where the orbit
+                   starts, radius = the SAME distance (so the drone begins ON the circle and never flies
+                   inward toward the wall), altitude HELD at >= kOrbitFixedAltM (cannot descend). The demo
+                   narrates that depth estimation is the current limitation. */
                 if (!m_orbitLatched) {
-                    /* Startup: median a few depth reads into ONE car position so the noisy depth is
-                       filtered before we commit the circle center. Hover, camera on the car, meanwhile. */
-                    if (hit != nullptr && hit->median_depth_cm > 0.0f) {
-                        pushOrbitRange(hit->median_depth_cm / 100.0f);
-                        if (m_orbitRangeCount >= kApproachRangeMedianWindow) {
-                            oMedRange = medianOrbitRange();
-                            oDirEnu   = flu_to_enu(
-                                detectionByLabel(*snap, hit->label, kApproachCamera, tnow).dirFlu, od.yaw);
-                            m_orbitCenterEnu = { od.pos.x + oDirEnu.x * oMedRange,
-                                                 od.pos.y + oDirEnu.y * oMedRange, od.pos.z };
-                            oToDrone         = { od.pos.x - m_orbitCenterEnu.x,
-                                                 od.pos.y - m_orbitCenterEnu.y, 0.0f };
-                            m_orbitRadius    = std::sqrt(oToDrone.x * oToDrone.x + oToDrone.y * oToDrone.y);
-                            m_orbitPrevPos   = od.pos;
-                            m_orbitLatched   = true;
-                            RCLCPP_INFO(this->get_logger(),
-                                "[FMU_NODE_DEBUG] ORBIT center locked target=%s R=%.2f centerENU=(%.2f,%.2f)",
-                                orb.target, m_orbitRadius, m_orbitCenterEnu.x, m_orbitCenterEnu.y);
-                        }
-                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, -kOrbitYawGain * errX);
-                    } else if ((tnow - m_orbitStartUs) <= kApproachLostTimeoutUs) {
-                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] ORBIT target=%s: waiting for a lock to fix the center.", orb.target);
-                    } else {
-                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                        RCLCPP_WARN(this->get_logger(),
-                            "[FMU_NODE_DEBUG] ORBIT never locked target=%s -> FAIL.", orb.target);
-                        completeCurrent("orbit_lost_failed");
-                    }
+                    Vec3 fwd = flu_to_enu(Vec3{1.0f, 0.0f, 0.0f}, od.yaw);
+                    m_orbitCenterEnu = { od.pos.x + fwd.x * kOrbitFixedRadiusM,
+                                         od.pos.y + fwd.y * kOrbitFixedRadiusM, od.pos.z };
+                    m_orbitRadius   = kOrbitFixedRadiusM;
+                    m_orbitAltEnu   = std::max(od.pos.z, kOrbitFixedAltM);
+                    m_orbitPrevPos  = od.pos;
+                    m_orbitSweptRad = 0.0f;
+                    m_orbitLatched  = true;
+                    RCLCPP_INFO(this->get_logger(),
+                        "[FMU_NODE_DEBUG] ORBIT (hardcoded) target=%s centerENU=(%.2f,%.2f) R=%.2f alt=%.2f dir=%s",
+                        orb.target, m_orbitCenterEnu.x, m_orbitCenterEnu.y, m_orbitRadius, m_orbitAltEnu,
+                        (m_orbitDir > 0.0f) ? "ccw" : "cw");
                 } else {
-                    /* Latched: fly a fixed circle around the locked center from ODOMETRY only. The
-                       center never moves and the position is smooth odometry, so the path carries no
-                       depth jitter and cannot wobble. Vision drives ONLY the camera aim below, never
-                       the path -- feeding vision into the geometry is what wrecked the earlier versions,
-                       and a slow "drift correction" did the same (it dragged the center off in SITL,
-                       where there is no real drift to cancel). Odometry drift over one short orbit is
-                       the accepted trade. */
                     oToDrone = { od.pos.x - m_orbitCenterEnu.x, od.pos.y - m_orbitCenterEnu.y, 0.0f };
                     oDist    = std::sqrt(oToDrone.x * oToDrone.x + oToDrone.y * oToDrone.y);
                     if (oDist < 1e-3f) oDist = 1e-3f;
                     oRadial  = { oToDrone.x / oDist, oToDrone.y / oDist, 0.0f };
                     oTangent = { -oRadial.y * m_orbitDir, oRadial.x * m_orbitDir, 0.0f };
                     oRadErr  = m_orbitRadius - oDist;
-                    velEnu.x = oRadial.x * (kOrbitRadialGainHz * oRadErr) + oTangent.x * m_orbitSpeed;
-                    velEnu.y = oRadial.y * (kOrbitRadialGainHz * oRadErr) + oTangent.y * m_orbitSpeed;
-                    velEnu.z = kApproachVertGain * (m_orbitAltEnu - od.pos.z);
-                    /* Aim from odometry: always point at the locked center. The center is fixed
-                       and the position is odometry, so the look-angle drifts slowly and the camera
-                       never chases the noisy bbox -- that chase was the hard, jittery rotation. A
-                       small vision trim nudges onto the real car if the center is slightly off. */
-                    oDesYaw = std::atan2(-oToDrone.y, -oToDrone.x);
-                    yawRate = kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
-                    if (hit != nullptr) yawRate += -kOrbitAimTrimGain * errX;
+                    f32 radialV = kOrbitRadialGainHz * oRadErr;
+                    if (radialV >  kOrbitMaxRadialMps) radialV =  kOrbitMaxRadialMps;
+                    if (radialV < -kOrbitMaxRadialMps) radialV = -kOrbitMaxRadialMps;
+                    f32 strafe = std::max(m_orbitSpeed, kOrbitMinTangentialMps);
+                    velEnu.x = oRadial.x * radialV + oTangent.x * strafe;
+                    velEnu.y = oRadial.y * radialV + oTangent.y * strafe;
+                    velEnu.z = kApproachVertGain * (m_orbitAltEnu - od.pos.z);   /* strong altitude hold. */
+                    oDesYaw  = std::atan2(-oToDrone.y, -oToDrone.x);             /* face the centre. */
+                    yawRate  = kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
                     m_backend->set_velocity(velEnu, yawRate);
-                    /* Swept from odometry: angle change of the drone around the CURRENT center (same
-                       center for both samples), so the slow center correction adds no false sweep. */
                     oAngle     = std::atan2(od.pos.y - m_orbitCenterEnu.y, od.pos.x - m_orbitCenterEnu.x);
                     oPrevAngle = std::atan2(m_orbitPrevPos.y - m_orbitCenterEnu.y,
                                             m_orbitPrevPos.x - m_orbitCenterEnu.x);
@@ -1192,8 +1381,9 @@ private:
                         completeCurrent("orbit_ok");
                     } else {
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] ORBIT target=%s swept=%.2f/%.2f dist=%.2f/%.2f yawRate=%.2f",
-                            orb.target, m_orbitSweptRad, m_orbitTargetRad, oDist, m_orbitRadius, yawRate);
+                            "[FMU_NODE_DIAGNOSTICS] ORBIT target=%s dist=%.2f/%.2f alt=%.2f/%.2f swept=%.2f/%.2f",
+                            orb.target, oDist, m_orbitRadius, od.pos.z, m_orbitAltEnu,
+                            m_orbitSweptRad, m_orbitTargetRad);
                     }
                 }
             } else if (id == CommandID::SEARCH) {
@@ -1215,7 +1405,7 @@ private:
                     for (di = 0; di < tk->snap.count; ++di) {
                         bool match = (srch.target_id >= 0)
                             ? (di < tk->ids.count && tk->ids.id[di] == srch.target_id)
-                            : (std::strcmp(tk->snap.dets[di].label, srch.target) == 0);
+                            : labelMatchesTarget(tk->snap.dets[di].label, srch.target);
                         if (match) {
                             hit        = &tk->snap.dets[di];
                             hitTrackId = (di < tk->ids.count) ? tk->ids.id[di] : -1;
@@ -1238,6 +1428,7 @@ private:
                         hit->bbox_xmin, hit->bbox_ymin, hit->bbox_xmax, hit->bbox_ymax);
                     completeCurrent("search_ok");
                 } else if ((tnow - m_searchStartUs) > m_searchTimeoutUs ||
+                           m_searchTotalDistM >= m_searchMaxDistM ||
                            m_searchLegCount >= m_searchMaxLegs || m_searchReturning) {
                     /* Failed: return to where SEARCH started before completing, rather than
                        stranding the drone wherever the last lane happened to end -- a failed
@@ -1271,41 +1462,48 @@ private:
                             "[FMU_NODE_DIAGNOSTICS] SEARCH returning-to-start target=%s dist=%.2f",
                             srch.target, distStart);
                     }
-                } else if (m_searchCrossing) {
-                    /* Sideways step to the next lane: fly the fixed cross heading for one lane spacing,
-                       then flip the lane heading 180 so the next lane runs back the other way. */
-                    dx        = od.pos.x - m_searchStartPos.x;
-                    dy        = od.pos.y - m_searchStartPos.y;
-                    distStart = std::sqrt(dx * dx + dy * dy);
-                    if (distStart >= m_searchParams.laneSpacingM ||
-                        (tnow - m_searchLegStartUs) > __scast(u64, m_searchParams.legTimeoutMs) * 1000ULL) {
-                        m_searchCrossing       = false;
-                        m_searchLaneHeadingRad = wrap_pi(m_searchLaneHeadingRad + kPi);
-                        m_searchStartPos       = od.pos;
-                        m_searchLegStartUs     = tnow;
-                        m_searchLegCount++;
-                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                    } else {
-                        headErr = wrap_pi(m_searchCrossHeadingRad - od.yaw);
-                        altErr  = m_searchAltEnu - od.pos.z;
-                        aimFlu  = { m_cfg.searchSweepSpeedMps, 0.0f, kApproachVertGain * altErr };
-                        velEnu  = flu_to_enu(aimFlu, od.yaw);
-                        m_backend->set_velocity(velEnu, m_cfg.rotateYawGainHz * headErr);
-                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] SEARCH cross lane=%u target=%s dist=%.2f/%.2f",
-                            m_searchLegCount, srch.target, distStart, m_searchParams.laneSpacingM);
-                    }
-                } else {
-                    /* Fly one straight lane at fixed altitude, camera forward. At the lane end, start the
-                       sideways step. A per-phase timeout also advances us (Tello odometry drifts). */
-                    dx        = od.pos.x - m_searchStartPos.x;
-                    dy        = od.pos.y - m_searchStartPos.y;
-                    distStart = std::sqrt(dx * dx + dy * dy);
-                    if (distStart >= m_searchParams.laneLengthM ||
-                        (tnow - m_searchLegStartUs) > __scast(u64, m_searchParams.legTimeoutMs) * 1000ULL) {
-                        m_searchCrossing   = true;
+                } else if (m_searchScanning) {
+                    /* CHECKPOINT: rotate 360 in place (no translation), holding altitude. Detection is
+                       checked every tick above, so a hit mid-spin ends the search. A full turn with no
+                       hit -> step forward to the next checkpoint. */
+                    f32 dScan = od.yaw - m_searchScanPrevYaw;
+                    while (dScan >  kPi) dScan -= 2.0f * kPi;
+                    while (dScan < -kPi) dScan += 2.0f * kPi;
+                    m_searchScanPrevYaw       = od.yaw;
+                    m_searchScanRemainingRad -= std::fabs(dScan);   /* direction-agnostic full turn. */
+                    if (m_searchScanRemainingRad <= kRotateCompletionRad) {
+                        m_searchScanning   = false;                 /* scanned here, nothing -> advance. */
                         m_searchStartPos   = od.pos;
                         m_searchLegStartUs = tnow;
+                        m_searchLegCount++;
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                        RCLCPP_INFO(this->get_logger(),
+                            "[FMU_NODE_DEBUG] SEARCH checkpoint %u scanned, target=%s not found -> advance %.1fm.",
+                            m_searchLegCount, srch.target, m_searchStepM);
+                    } else {
+                        f32 yawRate = m_searchDir * 1.0f;   /* dedicated scan rate ~360 in 6.3s: fast enough to
+                                                               cover ground, slow enough for YOLO to catch a
+                                                               target sweeping through view (rotateMaxYawRate=0.8 was ~8s). */
+                        altErr = m_searchAltEnu - od.pos.z;
+                        m_backend->set_velocity(Vec3{0.0f, 0.0f, kApproachVertGain * altErr}, yawRate);
+                        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                            "[FMU_NODE_DIAGNOSTICS] SEARCH scan checkpoint=%u target=%s remainRad=%.2f",
+                            m_searchLegCount, srch.target, m_searchScanRemainingRad);
+                    }
+                } else {
+                    /* ADVANCE: fly straight one step along the search heading (yaw+start_heading_deg),
+                       camera facing the travel direction, at fixed altitude. At the step end, scan again.
+                       A per-phase timeout also advances us (odometry can drift). */
+                    dx        = od.pos.x - m_searchStartPos.x;
+                    dy        = od.pos.y - m_searchStartPos.y;
+                    distStart = std::sqrt(dx * dx + dy * dy);
+                    if (distStart >= m_searchStepM ||
+                        (tnow - m_searchLegStartUs) > __scast(u64, m_searchParams.legTimeoutMs) * 1000ULL) {
+                        m_searchTotalDistM      += distStart;        /* count real distance toward the cap. */
+                        m_searchScanning         = true;             /* reached a checkpoint -> scan 360. */
+                        m_searchScanRemainingRad = 2.0f * kPi;
+                        m_searchScanPrevYaw      = od.yaw;
+                        m_searchLegStartUs       = tnow;
                         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                     } else {
                         headErr = wrap_pi(m_searchLaneHeadingRad - od.yaw);
@@ -1314,9 +1512,9 @@ private:
                         velEnu  = flu_to_enu(aimFlu, od.yaw);
                         m_backend->set_velocity(velEnu, m_cfg.rotateYawGainHz * headErr);
                         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
-                            "[FMU_NODE_DIAGNOSTICS] SEARCH lane=%u target=%s dist=%.2f/%.2f heading=%.2f",
-                            m_searchLegCount, srch.target, distStart, m_searchParams.laneLengthM,
-                            m_searchLaneHeadingRad);
+                            "[FMU_NODE_DIAGNOSTICS] SEARCH advance checkpoint=%u target=%s dist=%.2f/%.2f total=%.1f/%.1f",
+                            m_searchLegCount, srch.target, distStart, m_searchStepM,
+                            m_searchTotalDistM, m_searchMaxDistM);
                     }
                 }
             } else if (id == CommandID::HOVER) {
@@ -1687,6 +1885,7 @@ private:
         m_interruptPending    = false;
         m_interruptEscalated  = false;
         m_lastInterruptReason = nullptr;
+        m_userCommandText.clear();
         m_interruptRingIdx    = 0;
         for (u32 k = 0; k < kInterruptMaxRetries; ++k) m_interruptTimes[k] = 0;
         return;
@@ -1851,6 +2050,7 @@ private:
             break;
         case CommandID::APPROACH:
             m_approachHaveLastAim      = false;
+            m_approachBboxRig          = false;
             m_approachActivateUs       = nowUs();
             m_approachRangeCount       = 0;
             m_approachBudgetLatched    = false;
@@ -1870,6 +2070,23 @@ private:
             relFlu = { kCannedApproachTargetFwdM, 0.0f, kCannedApproachTargetUpM };
             relEnu = flu_to_enu(relFlu, od.yaw);
             m_cannedApproachTargetEnu = { od.pos.x + relEnu.x, od.pos.y + relEnu.y, od.pos.z + relEnu.z };
+            {   /* VLM bbox present -> freeze the anchor on the boxed object and drive the servo off it
+                   through the synthetic rig, so a non-COCO target (house/window) needs no YOLO box. */
+                CmdApproach const& ap = m_currTask.m_cmd.m_extractCmd.m_approach;
+                Vec3 anchorEnu;
+                if (bboxToEnuAnchor(ap.bbox, od, anchorEnu)) {
+                    /* Floor the anchor altitude: a low/hallucinated bbox can project UNDERGROUND
+                       (seen: ENU z=-1.87) and the go-to servo then flies the drone into the ground. */
+                    if (anchorEnu.z < kApproachMinAnchorAltEnu) anchorEnu.z = kApproachMinAnchorAltEnu;
+                    m_cannedApproachTargetEnu = anchorEnu;
+                    std::snprintf(m_cannedApproachLabel, sizeof(FixedStringType), "%s",
+                                  ap.target[0] ? ap.target : kCannedApproachTargetLabel);
+                    m_approachBboxRig = true;
+                    RCLCPP_INFO(this->get_logger(),
+                        "[FMU_NODE_DEBUG] APPROACH bbox-anchored target=%s ENU=(%.2f,%.2f,%.2f) (VLM bbox, no YOLO).",
+                        m_cannedApproachLabel, anchorEnu.x, anchorEnu.y, anchorEnu.z);
+                }
+            }
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] APPROACH activated target=%s track_id=%d.",
                 m_currTask.m_cmd.m_extractCmd.m_approach.target, m_approachTrackId);
             break;
@@ -1951,14 +2168,37 @@ private:
             m_searchStartPos       = od.pos;
             m_searchOriginPos      = od.pos;
             m_searchReturning      = false;
-            m_searchAltEnu         = od.pos.z;
+            m_searchAltEnu         = (od.pos.z > 3.0f) ? 3.0f : od.pos.z;   /* hold a LOW search altitude:
+                                     from ~5m up a ground person is tiny in frame and YOLO confidence collapses, so
+                                     clamp the search to a height where people are actually detectable. */
+            {
+                /* Blind-search reach: a search issued while the drone sees NOTHING (DET=-) must cover
+                   enough ground to bring a far target into YOLO range. The 2B VLM tends to pick 'small'
+                   (reach ~2m), stranding the drone short of a person 12m+ away; the empty search then
+                   feeds a hallucinated approach. When perception is empty at activation, promote to
+                   LARGE (reach ~24m). Once anything is in view, the VLM-chosen size is respected. */
+                std::shared_ptr<TrackedSnapshot> st = std::atomic_load(&m_lastPromptTracked);
+                if (!st) st = m_perception->trackedSnapshot();
+                bool blind = !(st && st->snap.valid && st->snap.count > 0);
+                if (blind && srch.size < 2) {
+                    RCLCPP_INFO(this->get_logger(),
+                        "[FMU_NODE_DEBUG] SEARCH blind (no detections) -> promoting size %u to LARGE for reach.",
+                        (unsigned)srch.size);
+                    srch.size = 2;
+                }
+            }
             m_searchLaneHeadingRad = wrap_pi(od.yaw + __scast(f32, srch.start_heading_deg) * kPi / 180.0f);
             m_searchDir            = srch.cw_or_ccw ? -1.0f : 1.0f;   /* which side the lanes march. */
             m_searchCrossHeadingRad= wrap_pi(m_searchLaneHeadingRad + m_searchDir * 0.5f * kPi);
             m_searchStartUs        = nowUs();
             m_searchLegStartUs     = m_searchStartUs;
-            m_searchTimeoutUs      = (srch.timeout > 0) ? static_cast<u64>(srch.timeout) * 1000000ULL
-                                                        : 60ULL * 1000000ULL;
+            {
+                /* Floor the timeout: a too-short VLM timeout_sec (it emitted 10) gives up after ~one
+                   scan, before the search advances far enough to reach the target. */
+                u64 tmoS = (srch.timeout > 0) ? static_cast<u64>(srch.timeout) : 60ULL;
+                if (tmoS < 45ULL) tmoS = 45ULL;
+                m_searchTimeoutUs = tmoS * 1000000ULL;
+            }
             m_searchCrossing       = false;
             m_searchLegCount       = 0;
             m_searchParams          = kSearchSizePresets[srch.size < 3 ? srch.size : kSearchDefaultSizeIdx];
@@ -1971,11 +2211,23 @@ private:
                 m_searchParams.legTimeoutMs = m_cfg.searchLegTimeoutMs;
             }
             m_searchMaxLegs        = m_searchParams.maxLanes;
+            /* advance-and-scan: begin with a 360 scan at the origin (look around before moving), then
+               advance step_m and scan again, up to maxDist total. step/maxDist scale with size. The
+               advance heading is m_searchLaneHeadingRad (= yaw + start_heading_deg, default forward). */
+            m_searchScanning         = true;
+            m_searchScanRemainingRad = 2.0f * kPi;
+            m_searchScanPrevYaw      = od.yaw;
+            m_searchTotalDistM       = 0.0f;
+            switch (srch.size) {
+                case 0:  m_searchStepM = 0.5f; m_searchMaxDistM = 8.0f;  break;   /* small: fine steps, tight area */
+                case 2:  m_searchStepM = 3.0f; m_searchMaxDistM = 30.0f; break;   /* large: coarse steps, open area */
+                default: m_searchStepM = 1.5f; m_searchMaxDistM = 18.0f; break;   /* medium (default) */
+            }
             RCLCPP_INFO(this->get_logger(),
-                "[FMU_NODE_DEBUG] SEARCH activated target=%s alt=%.2f startHeadingDeg=%d dir=%s timeout_s=%d "
-                "size=%u (lane=%.1fm spacing=%.1fm maxLanes=%u)",
-                srch.target, m_searchAltEnu, srch.start_heading_deg, srch.cw_or_ccw ? "cw" : "ccw", srch.timeout,
-                srch.size, m_searchParams.laneLengthM, m_searchParams.laneSpacingM, m_searchParams.maxLanes);
+                "[FMU_NODE_DEBUG] SEARCH activated (advance-and-scan) target=%s alt=%.2f headingDeg=%d (0=fwd) "
+                "dir=%s timeout_s=%d step=%.1fm maxDist=%.1fm",
+                srch.target, m_searchAltEnu, srch.start_heading_deg, srch.cw_or_ccw ? "cw" : "ccw",
+                srch.timeout, m_searchStepM, m_searchMaxDistM);
             break;
         case CommandID::HOVER:
             RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] HOVER activated -> holding station (persistent).");
@@ -2148,6 +2400,14 @@ private:
                 m_hasStashed ? m_stashedTask.m_thought : "");
             prompt += buf;
         }
+        /* [USER] block (A3): the operator's spoken in-flight command, surfaced to the VLM so it
+           reassesses against the running objective. One-shot: gated on the still-pending
+           user_command interrupt, which activateTask() clears when the reassess plan lands. */
+        if (m_interruptPending && m_lastInterruptReason &&
+            std::strcmp(m_lastInterruptReason, "user_command") == 0 && !m_userCommandText.empty()) {
+            snprintf(buf, sizeof(buf), "[USER]\nspoken command: %s\n\n", m_userCommandText.c_str());
+            prompt += buf;
+        }
         if (m_interruptEscalated) {
             prompt += "[ESCALATION]\n";
             prompt += "You have tripped repeated safety interrupts in a short window "
@@ -2294,6 +2554,26 @@ private:
             }
         }
 
+        /* Completion verdict (A3): the VLM judges its own completion on the FIRST array element
+           ({"thought":..., "objective_complete": bool, "reason": ...}). Default false via .value()
+           so any response missing the field behaves exactly as before -- no silent auto-land. When
+           true, stand down deterministically (land if airborne, else stop) and process no further
+           actions this plan. */
+        if (!plan.empty() && plan[0].is_object() && plan[0].value("objective_complete", false)) {
+            std::string vreason = plan[0].value("reason", std::string(""));
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] VLM verdict objective_complete=true (%s) -> stand down (%s).",
+                vreason.c_str(), airborne ? "land" : "stop");
+            ActiveTask done{};
+            done.m_cmd   = airborne ? GenericCommand(CmdLand{}) : GenericCommand(CmdStop{});
+            done.m_state = TaskState::PENDING;
+            strncpy(done.m_thought, vreason.empty() ? "objective complete" : vreason.c_str(),
+                    sizeof(done.m_thought) - 1);
+            m_taskQueue->try_enqueue(done);
+            m_missionActive.store(false, std::memory_order_release);   /* mission ends; don't re-solicit. */
+            return;
+        }
+
         for (const auto& item : plan) {
             if (!item.contains("action")) continue;
             action  = item["action"].get<std::string>();
@@ -2329,6 +2609,9 @@ private:
                     sizeof(approach.target) - 1);
                 approach.target_id = item.value("track_id", -1);
                 approach.speed = item.value("speed", 0.0f);
+                if (item.contains("bbox") && item["bbox"].is_array() && item["bbox"].size() == 4)
+                    for (int bi = 0; bi < 4; ++bi)
+                        approach.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(approach);
             } else if (action == "follow") {
                 follow = CmdFollow{};
@@ -2345,6 +2628,9 @@ private:
                 orbit.angle_deg = item.value("angle_deg", 0.0f);   /* raw; dispatch converts deg->rad. */
                 orbit.speed     = item.value("speed", 0.0f);       /* raw; dispatch converts cm/s->m/s. */
                 orbit.cw_or_ccw = (item.value("direction", std::string("ccw")) == "cw");
+                if (item.contains("bbox") && item["bbox"].is_array() && item["bbox"].size() == 4)
+                    for (int bi = 0; bi < 4; ++bi)
+                        orbit.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(orbit);
             } else if (action == "search") {
                 search = CmdSearch{};
@@ -2393,6 +2679,30 @@ private:
             "[FMU_NODE_DEBUG] FLOOD test: injecting %u actions vs queue cap %u.",
             kFloodActions, 3u * kControlLoopRateHz);
         translateToBaseCommands(plan);
+    }
+
+    /* A3 [AUTO] --canned-voice: simulate an IN-FLIGHT spoken command bypassing the ASR node.
+       Pin FLIGHT so handleAsrCommand takes the airborne branch, hand it a non-emergency
+       transcript, and confirm it raises a user_command interrupt (INTERRUPT reason=user_command)
+       with m_userCommandText armed for the next [USER] block. No VLM is called (canned). */
+    void injectCannedVoicePlan() {
+        m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
+        RCLCPP_WARN(this->get_logger(),
+            "[FMU_NODE_DEBUG] CANNED-VOICE: simulating in-flight spoken command.");
+        handleAsrCommand("turn right and look at the target");
+    }
+
+    /* A3 [AUTO] --canned-complete: force a completion verdict through the real translate path.
+       First action is takeoff so the not-airborne takeoff-first guard passes; plan[0] carries
+       objective_complete=true, so the drone stands down (stop while grounded) and stops soliciting
+       plans (m_missionActive=false) -- proving the verdict parse + termination and the default-false
+       safety (every other scenario omits the field and is unaffected). */
+    void injectCannedCompletePlan() {
+        static const char* kCannedCompleteJson = R"([
+            {"thought":"objective met, standing down","objective_complete":true,"reason":"target reached"},
+            {"action":"takeoff"}
+        ])";
+        translateToBaseCommands(kCannedCompleteJson);
     }
 
     void injectCannedPlan() {
@@ -2631,6 +2941,7 @@ private:
     rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr    m_subOverride;  /* operator override toggle. */
     rclcpp::Subscription<KeyboardRawInputType>::SharedPtr   m_subKey;       /* raw keylog for manual flight. */
+    rclcpp::Subscription<ASRTextType>::SharedPtr            m_subAsr;       /* voice objective / in-flight re-task. */
     /* Battery failsafe + manual-override state (control-thread latches + cross-thread atomics). */
     bool              mb_batteryReturn{false};   /* RTH latched: fly home, then land.     */
     bool              mb_batteryLand{false};     /* land latched (in-place or after RTH). */
@@ -2650,6 +2961,10 @@ private:
        reassess owns whether to re-issue it. Written only on the control thread. */
     ActiveTask                                      m_stashedTask{};
     bool                                            m_hasStashed{false};
+    std::string                                     m_userCommandText;        /* A3: [USER] block text (control-thread owned). */
+    std::atomic<bool>                               m_asrPending{false};      /* ASR posted a transcript; controlLoop drains it. */
+    std::string                                     m_asrPendingText;         /* transcript payload, guarded by m_asrMtx. */
+    std::mutex                                      m_asrMtx;
     bool                                            m_interruptPending{false};
     const char*                                     m_lastInterruptReason{nullptr};
 
@@ -2765,6 +3080,7 @@ private:
     f32  m_orbitTargetRad{0.0f};              /* total angle to sweep around the car, rad.              */
     f32  m_orbitSweptRad{0.0f};               /* angle swept so far (from odometry), rad.               */
     Vec3 m_orbitPrevPos{0.0f, 0.0f, 0.0f};    /* drone position last tick, for swept-angle accounting.  */
+    f32  m_orbitPrevYaw{0.0f};                /* drone yaw last tick, for visual-servo swept-angle.     */
     f32  m_orbitAltEnu{0.0f};                 /* altitude to hold during the orbit (Up+).               */
     bool m_orbitLatched{false};               /* false until the center is fixed from the median range. */
     f32  m_orbitRangeHist[kApproachRangeMedianWindow]{};  /* startup range samples, to median.          */
@@ -2792,6 +3108,13 @@ private:
     bool m_searchReturning{false};            /* true = SEARCH failed, flying back to m_searchOriginPos
                                                   before completing (rather than stranding the drone
                                                   wherever the last lane happened to end).            */
+    /* advance-and-scan sub-FSM (replaces the lawnmower): 360 checkpoint scan, then step forward. */
+    bool m_searchScanning{false};             /* true = doing the 360 checkpoint scan, false = advancing.*/
+    f32  m_searchScanRemainingRad{0.0f};      /* angle left in the current 360 scan.                    */
+    f32  m_searchScanPrevYaw{0.0f};           /* prev yaw, to accumulate scan progress.                 */
+    f32  m_searchTotalDistM{0.0f};            /* total forward distance advanced, vs m_searchMaxDistM.  */
+    f32  m_searchStepM{4.0f};                 /* distance between checkpoints.                          */
+    f32  m_searchMaxDistM{16.0f};             /* give up after this much forward reach.                 */
     bool        mb_observability{false}; /* A2 dashboard off unless FMU_OBSERVABILITY set; gates all
                                           image/HUD/VLM-log work so a plain run keeps every core. */
     DroneConfig m_cfg;                 /* runtime tunables; every field defaults to the compiled
@@ -2811,4 +3134,6 @@ private:
     bool m_useCannedApproachRig{false};
     u64  m_cannedApproachActivateUs{0};
     Vec3 m_cannedApproachTargetEnu{0.0f, 0.0f, 0.0f};
+    char m_cannedApproachLabel[32]{"canned_target"};   /* synthetic-det label for the rig; APPROACH sets it to the VLM target when bbox-anchored. */
+    bool m_approachBboxRig{false};                      /* this APPROACH is driven by a frozen VLM-bbox anchor (rig on, no YOLO). Reset each activation. */
 };

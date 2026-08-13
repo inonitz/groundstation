@@ -124,6 +124,63 @@ public:
         std::atomic_store(&m_tracked, tracked);
     }
 
+    /* Median metric depth (cm) over an arbitrary pixel rect of the latest dense depth map. For a
+       VLM-emitted bbox on a target YOLO cannot class (house/window): the depth net covers every
+       pixel, so we sample it directly, no detection needed. Same median-over-bbox sampling as
+       medianDepthCm(), rect-only (no seg mask). rect is in native camera pixels. Returns 0.0f when
+       there is no depth map yet, the rect falls off-frame, or every sample is invalid. */
+    float medianDepthCmInRect(cv::Rect const& rect) const {
+        std::shared_ptr<cv::Mat> depth = std::atomic_load(&m_depthMap);
+        if (!depth || depth->empty()) return 0.0f;
+        cv::Rect bbox = rect & cv::Rect(0, 0, depth->cols, depth->rows);
+        if (bbox.width <= 0 || bbox.height <= 0) return 0.0f;
+        std::vector<float> samples;
+        samples.reserve(static_cast<size_t>(bbox.width) * static_cast<size_t>(bbox.height));
+        for (int y = bbox.y; y < bbox.y + bbox.height; ++y) {
+            const float* row = depth->ptr<float>(y);
+            for (int x = bbox.x; x < bbox.x + bbox.width; ++x) {
+                float v = row[x];
+                if (v > 0.0f && std::isfinite(v)) samples.push_back(v);
+            }
+        }
+        if (samples.empty()) return 0.0f;
+        std::sort(samples.begin(), samples.end());
+        return samples[samples.size() / 2] * 100.0f;
+    }
+
+    /* Bearing (errX in -1..1) + metric range (m) of the nearest large structure in the central band
+       of the dense depth map. For a VISUAL-SERVO orbit of a non-COCO structure (a building) YOLO
+       cannot box: tracked directly from depth every tick, so the orbit needs no fixed 3-D centre
+       (monocular RANGE is too noisy to place one). Robust -- a 10th-percentile "near" threshold plus a
+       column-centroid of the near shell, so speckle and far background do not pull the bearing.
+       false when too few near samples (nothing solid in view). cx = image centre x (px). */
+    bool nearestStructure(float cx, float& outErrX, float& outRangeM) const {
+        std::shared_ptr<cv::Mat> depth = std::atomic_load(&m_depthMap);
+        if (!depth || depth->empty()) return false;
+        const int W = depth->cols, H = depth->rows;
+        const int x0 = static_cast<int>(W * 0.10f), x1 = static_cast<int>(W * 0.90f);
+        const int y0 = static_cast<int>(H * 0.30f), y1 = static_cast<int>(H * 0.70f);
+        std::vector<float> vals; vals.reserve(static_cast<size_t>((x1 - x0) * (y1 - y0)));
+        for (int y = y0; y < y1; ++y) {
+            const float* r = depth->ptr<float>(y);
+            for (int x = x0; x < x1; ++x) { float v = r[x]; if (v > 0.0f && std::isfinite(v)) vals.push_back(v); }
+        }
+        if (vals.size() < 300) return false;
+        std::vector<float> srt = vals; std::sort(srt.begin(), srt.end());
+        const float pNear = srt[srt.size() / 10];
+        const float band  = pNear + 2.5f;
+        double colSum = 0.0, dSum = 0.0; long n = 0;
+        for (int y = y0; y < y1; ++y) {
+            const float* r = depth->ptr<float>(y);
+            for (int x = x0; x < x1; ++x) { float v = r[x];
+                if (v > 0.0f && std::isfinite(v) && v <= band) { colSum += x; dSum += v; ++n; } }
+        }
+        if (n < 150) return false;
+        outErrX   = (static_cast<float>(colSum / static_cast<double>(n)) - cx) / cx;
+        outRangeM = static_cast<float>(dSum / static_cast<double>(n));
+        return true;
+    }
+
 private:
     void segLoop() {
         while (m_running.load(std::memory_order_relaxed)) {

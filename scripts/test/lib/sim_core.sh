@@ -11,27 +11,33 @@
 #   WORLD_NAME       sim world basename in dependencies/ (default: default_car).
 #   SPAWN_POSE       drone spawn x,y,z (default: 0,7,3).
 #   LAUNCH_VLM       1 => also start the Qwen3-VL llama-server pane (default: 0).
+#   LAUNCH_ASR       1 => also start the Parakeet ASR node pane (voice objectives) (default: 0).
 #   SESSION_NAME     tmux session (default: llmsim).
 #   DRAIN_BATTERY    1 => PX4 SITL drains battery for failsafe tests.
 # ==============================================================================
 
-: "${FMU_OBJECTIVE:=Canned SITL test.}"
+: "${FMU_OBJECTIVE=Canned SITL test.}"   # NO colon: default only when UNSET; keep an explicit empty (voice mode: idle until spoken)
 FMU_CANNED_FLAG="${FMU_CANNED_FLAG-}"   # allow an explicit empty (VLM) value
 : "${WORLD_NAME:=default_car}"
 : "${SPAWN_POSE:=0,7,3}"
 : "${LAUNCH_VLM:=0}"
+: "${LAUNCH_ASR:=0}"
 : "${SESSION_NAME:=llmsim}"
 # Optional per-drone tuning profile (ROADMAP 9.14). SITL stays on the compiled defaults:
 # leave this UNSET and the FMU uses its built-in constexpr (== config/px4_sitl.yaml). Set it
 # only to tweak a SITL value without a rebuild. We do NOT force a profile here.
 DRONE_CONFIG="${DRONE_CONFIG:-}"
 : "${LOG_FILE:=$(pwd)/captured_panes_log.txt}"   # FMU stdout/stderr tee target; filter.sh reads this, not tmux scrollback
+# Fresh run == fresh log. Delete any prior capture BEFORE launching, so a run that dies
+# before tee opens cannot leave stale data that reads as the current run's log.
+if [ -e "$LOG_FILE" ]; then rm -f "$LOG_FILE"; fi
 
 # --- fixed config (absolute paths; cwd-independent) ---
 BUILD_DIR="/root/groundstation/build/release/shared/px4"
 BUILD_BINARY_DIR="$BUILD_DIR/bin"
 PX4_DIRECTORY="/root/PX4-Autopilot"
 ASSET_DIR_PATH="/root/groundstation/dependencies"
+ASR_MODEL_PATH="${ASR_MODEL_PATH:-/root/models/asr/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-q4_k.bin}"
 GZ_GIMBAL_SDF_FILE="$PX4_DIRECTORY/Tools/simulation/gz/models/gimbal/model.sdf"
 TARGET_WORLD_DIR="$PX4_DIRECTORY/Tools/simulation/gz/worlds"
 GZ_SIM_SYSTEM_PLUGIN_PATH="$BUILD_BINARY_DIR:$GZ_SIM_SYSTEM_PLUGIN_PATH"
@@ -114,7 +120,11 @@ CMD_PX4="\
     export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH && \
     export PX4_GZ_WORLD=$WORLD_NAME && \
     export PX4_NET_INTERFACE=eth0 && \
-    export HEADLESS=${HEADLESS:-0} && \
+    # PX4's px4-rc.gzsim starts the gz GUI only when HEADLESS is EMPTY (`[ -z "$HEADLESS" ]`).
+    # A literal "0" is non-empty, so exporting HEADLESS=0 silently suppresses the GUI on every run
+    # (regression from commit 54b8a6a). Export "1" only for a real headless run; otherwise export
+    # empty so the GUI launches. Internal `${HEADLESS:-0}` checks below still treat unset/empty as attended.
+    export HEADLESS="$([ "${HEADLESS:-0}" = "1" ] && echo 1)" && \
     cd $PX4_DIRECTORY && \
     make px4_sitl gz_x500_gimbal; \
     echo 'PX4 EXITED. Press enter...'; read"
@@ -159,6 +169,14 @@ CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     -dev Vulkan0 ${VLM_NGL_ARG- -ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG- --cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 
+# Optional voice-objective source. The Parakeet ASR node publishes each transcript on
+# /asr_server/transcribe, which the FMU now consumes (asrCallback: STANDBY -> start(),
+# in-flight -> re-task). Flags mirror simenv.sh's ASR pane.
+CMD_ASR="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
+    $BUILD_BINARY_DIR/llm_to_action_asr_server \
+    --backend=whisper-parakeet --model=$ASR_MODEL_PATH --fa --language=en \
+    --threads=1 --gid=0 --captureid=-1; echo 'asr node stopped'; read"
+
 # --- launch tmux ---
 echo "=================================================================="
 echo " REQUIREMENT: QGroundControl MUST be running before this launches, or"
@@ -177,19 +195,54 @@ tmux split-window -h -t "$SESSION_NAME:0" "$CMD_PX4"
 tmux split-window -v -t "$SESSION_NAME:0.0" "$CMD_RX"
 tmux split-window -v -t "$SESSION_NAME:0.2" "$CMD_FMU"
 if [ "$LAUNCH_VLM" = "1" ]; then
-    tmux split-window -v -t "$SESSION_NAME:0.1" "$CMD_VLM"
+    tmux new-window -t "$SESSION_NAME" -n vlm "$CMD_VLM"
+    # VLM prewarm: the FIRST inference pays a one-time Vulkan shader/graph compile (~27s
+    # cold). Fire one throwaway completion once the server is listening so the first
+    # operator plan is warm (~9s). Backgrounded + self-timing out -- never blocks bring-up.
+    # Warms BOTH the LLM/Vulkan graph AND the vision projector (mmproj) by sending a real
+    # 640x640 image -- mmproj compiles on the first IMAGE, which was the big residual cost.
+    (
+        for _ in $(seq 1 90); do
+            curl -sf http://localhost:8080/health >/dev/null 2>&1 && break
+            sleep 1
+        done
+        python3 - <<'PYWARM'
+import base64, json, urllib.request
+import numpy as np, cv2
+# A real 640x640 image (same size the FMU sends) so the vision encoder + mmproj compile NOW,
+# not on the first operator plan. max_tokens=1: the image prefill is what we are warming.
+img = (np.random.rand(640, 640, 3) * 255).astype('uint8')
+ok, buf = cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, 75])
+b64 = base64.b64encode(buf.tobytes()).decode()
+body = json.dumps({"messages": [{"role": "user", "content": [
+    {"type": "text", "text": "warmup"},
+    {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}}]}],
+    "max_tokens": 1, "temperature": 0}).encode()
+req = urllib.request.Request("http://localhost:8080/v1/chat/completions",
+    data=body, headers={"Content-Type": "application/json"})
+try:
+    urllib.request.urlopen(req, timeout=180).read()
+    print("[INFO] VLM IMAGE prewarm complete -- vision graph compiled; first real plan warm.")
+except Exception as e:
+    print("[WARN] VLM image prewarm skipped:", e)
+PYWARM
+    ) &
 fi
-tmux split-window -v -t "$SESSION_NAME:0" "$CMD_KEYBOARD"
+if [ "$LAUNCH_ASR" = "1" ]; then
+    tmux new-window -t "$SESSION_NAME" -n asr "$CMD_ASR"
+fi
+tmux new-window -t "$SESSION_NAME" -n keys "$CMD_KEYBOARD"
 if [ "$RECORD_BAG" = "1" ]; then
     if [ "${HEADLESS:-0}" = "1" ]; then
         eval "$CMD_BAG_HEADLESS" > /dev/null 2>&1 < /dev/null &
         BAG_BG_PID=$!
         echo "[INFO] Recording bag as a background process (headless, no pane): pid=$BAG_BG_PID"
     else
-        BAG_PANE_ID=$(tmux split-window -v -t "$SESSION_NAME:0" -P -F '#{pane_id}' "$CMD_BAG")
+        BAG_PANE_ID=$(tmux new-window -t "$SESSION_NAME" -n bag -P -F '#{pane_id}' "$CMD_BAG")
     fi
 fi
 tmux select-layout -t "$SESSION_NAME:0" tiled
+tmux select-window -t "$SESSION_NAME:0"
 
 if [ "${HEADLESS:-0}" = "1" ]; then
     : "${HEADLESS_COMPLETION:=flight}"

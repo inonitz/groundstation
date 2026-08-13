@@ -1856,3 +1856,209 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
   world/seed, speak on the ground.
 - Pre-existing fix while building: `asr_test.cpp` still included `util2/C/print.h`; the util2 swap
   renamed it to `util2/C/print2.h`. Only file left on the old path.
+
+
+## ASR -> FMU voice integration + demo-1 world (2026-08-12, Manager)
+
+- The ASR node was already built and publishing transcripts on `/asr_server/transcribe`
+  (`std_msgs/String`); nothing consumed them. Closed the seam in `fmu_node.hpp`: a new subscription
+  (`m_subAsr`) whose `asrCallback` logs a read-back (`[ASR] heard: "..."`) then, if `STANDBY`, calls
+  `start(text)` to launch the mission from the spoken objective; if already flying, it re-tasks the
+  VLM by mirroring the override-handback path (drain queue, clear cooldown, re-arm `m_missionActive`).
+  Read-back is the safety net, NOT a confidence gate -- token-probability confidence was tested and
+  does not track correctness.
+- Voice-first launch: `fmu_node.cpp main()` now skips the boot `start()` when the objective is an
+  explicit empty string and no `--canned` flag is present -- the drone idles in `STANDBY` until the
+  first spoken transcript. Any typed objective (incl. the argc<=1 "Hold position." default) or any
+  canned flag auto-starts as before, so every existing test script is unaffected.
+- VLM prewarm: `sim_core.sh` fires one throwaway `/v1/chat/completions` after the llama-server pane is
+  listening (backgrounded, self-timing out). This burns the one-time Vulkan shader/graph compile so
+  the FIRST operator plan is warm (~9s vs ~27s cold). CAVEAT: a text-only warmup does NOT compile the
+  vision projector (mmproj compiles on the first IMAGE request), so the first real image-plan may still
+  pay a small residual -- measure it and, if it bites, warm with a tiny image instead.
+- `sim_core.sh` gained a `LAUNCH_ASR` knob + `CMD_ASR` pane (mirrors `simenv.sh`) so one launcher brings
+  up the full voice stack: PX4+Gazebo+RX+FMU+VLM+ASR. `scripts/test/SITL/rubicon/run.sh` is now Demo 1:
+  `WORLD_NAME=rubicon_tree`, `LAUNCH_VLM=1`, `LAUNCH_ASR=1`, typed objective by default (blank it for
+  voice-only).
+- Demo-1 world `dependencies/rubicon_tree.sdf`: Rubicon map + three `person_walking` actors, centre one
+  recoloured RED via a diffuse override (proven in `three_people.sdf`). Still the person mesh -> YOLO
+  labels each "person"; the VLM disambiguates by colour. Actor poses are placeholders for the standard
+  spawn -- the human supplies the final tree-cluster coordinates to hardcode.
+
+
+## Gazebo GUI window never opened — HEADLESS=0 regression (2026-08-12, Manager)
+
+- Symptom: no Gazebo GUI window at all via the SITL harness, but the dashboard (camera) still
+  worked. Worked ~20 commits ago. glxgears fine, DISPLAY/GPU healthy — so not an env/GL problem.
+- Root cause: PX4's `ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim` starts the gz **server**
+  unconditionally (`gz sim -r -s world.sdf`) but the **GUI** only `if [ -z "${HEADLESS}" ]` — i.e.
+  when HEADLESS is EMPTY. `sim_core.sh` exported `HEADLESS=${HEADLESS:-0}`, so HEADLESS="0", a
+  non-empty string -> `[ -z "0" ]` is false -> GUI never launched. The server kept rendering the
+  camera, so the dashboard masked the failure. Introduced in commit `54b8a6a` (~20 commits back),
+  which added that `export HEADLESS=...` line.
+- Fix (`sim_core.sh` CMD_PX4): `export HEADLESS="$([ "${HEADLESS:-0}" = "1" ] && echo 1)"` — export
+  "1" only for a real headless run, otherwise export EMPTY so PX4's `[ -z ]` gate opens the GUI. The
+  internal `${HEADLESS:-0}` attach/bag checks still treat unset/empty as attended. Verified the gate
+  logic against old vs new export with a standalone shell test.
+- Watch (separate from the above): the first GUI bring-up on `rubicon*.sdf` is slow because the
+  Rubicon model streams from Fuel online + Ogre2 compiles shaders on first render. That is load
+  latency, not the HEADLESS bug.
+- Housekeeping: commit `55dc70c` relocated the test scenarios under `scripts/test/SITL/` but left the
+  old top-level copies, so `scripts/test/<scenario>` and `scripts/test/SITL/<scenario>` are now
+  duplicated. Needs a dedupe (human runs the git rm).
+
+## Voice mode drone auto-armed — `:=` clobbered the empty objective (2026-08-12, Manager)
+
+- Symptom: in voice mode (`FMU_OBJECTIVE=""`, expecting the drone to idle until spoken to), the FMU
+  started a mission and armed on its own. FMU log showed `Mission started ... objective: Canned SITL
+  test.` — the empty objective never reached the binary.
+- Root cause: `sim_core.sh` had `: "${FMU_OBJECTIVE:=Canned SITL test.}"`. The `:=` form substitutes
+  when the var is unset OR EMPTY, so an explicit `FMU_OBJECTIVE=""` was overwritten with the canned
+  default before launch. The FMU's idle-on-empty guard then saw a non-empty objective and ran start().
+- Fix: drop the colon -> `: "${FMU_OBJECTIVE=Canned SITL test.}"`. `=` defaults only when UNSET and
+  preserves an explicit empty. Verified: empty->stays empty (voice idles), unset->canned default,
+  typed->unchanged. No rebuild needed; the binary already carries the guard.
+
+## Keyboard pane silently missing — tmux pane overflow (2026-08-13, Manager)
+
+- Symptom: the keyboard-hook pane never opened, so the ASR push-to-talk key (H) was never captured
+  and voice recording could not start. No error was obvious.
+- Root cause: `sim_core.sh` split every node into panes of window 0. With LAUNCH_VLM=1 plus the new
+  LAUNCH_ASR pane, the pane count exceeded tmux's minimum pane size and `split-window` for CMD_KEYBOARD
+  (launched after the ASR pane) failed with "no space for new pane" -- silently. Pre-existing fragility
+  (the wave1 runbook already flagged LAUNCH_VLM=1 as near the limit); adding the ASR pane tipped it over.
+- Fix: give each secondary node its own tmux WINDOW (`new-window -n vlm|asr|keys|bag`) instead of a
+  split pane. Window 0 keeps the 4 core panes (agent/px4/rx/fmu). Windows have no space limit and are
+  full-size. `select-window -t :0` lands the user on the sim view. Switch with Ctrl-B w / Ctrl-B <n>.
+  H is captured globally via evdev, so it works from any window. Shell-only fix, no rebuild.
+
+## 2026-08-13 — VLM-bbox drives APPROACH/ORBIT (non-COCO targets: house/window) [agent1]
+
+Problem: YOLO only knows COCO classes, so "house"/"window" get no detection box, and the
+APPROACH/ORBIT servos (which lock a detection centroid+depth) have nothing to drive toward.
+
+Decision: drive both servos off a VLM-emitted bbox instead of a YOLO label. Key enabler is that
+depth is dense and YOLO-independent (`YoloDepthEngine::estimate` returns CV_32FC1 metres over the
+whole frame). Flow at activation only:
+- The plan carries `"bbox":[xmin,ymin,xmax,ymax]` in the 640x640 image the VLM sees (grammar gains an
+  `arrmember`/`arrkey "bbox"`; parser reads it into `CmdApproach::bbox` / `CmdOrbit::bbox`, i16[4]).
+- `bboxToEnuAnchor()` scales the bbox to native camera px (kVlmImageSide 640 -> 1280x720), takes the
+  median dense depth over it (`PerceptionRuntime::medianDepthCmInRect`), pinhole back-projects through
+  the live pose (exact inverse of `updateCannedApproachRig`), and freezes a world ENU anchor.
+- APPROACH reuses the synthetic-injection rig (`m_approachBboxRig`, reset per activation) so the
+  existing label servo consumes the frozen anchor -- no YOLO. ORBIT latches `m_orbitCenterEnu`
+  directly and skips the YOLO seed. house/window are static, so a one-shot bbox anchor is enough.
+
+Why safe: geometry is the algebraic inverse of the already-SITL-verified canned-approach projection;
+the bbox is optional (omitted -> unchanged label/track_id path); `static_assert`s guard the command
+union payload (CmdOrbit 53B, CmdApproach 48B, budget 56B). Risk: VLM bbox accuracy on the 2B, and
+SITL close-range monocular-depth over-read. Full visual proof needs the rubicon world; px4 links clean.
+
+## Voice emergency fastpath + A3 interrupt/termination -- IMPLEMENTED (2026-08-13, Manager)
+
+- Built spec A3 (docs/scheduled/sitl-2026-08-10-spec-A3-voice-interrupt-and-termination.md) plus a
+  deterministic emergency fastpath. The ASR callback now only trims + POSTS the transcript
+  (m_asrPending); controlLoop drains it and runs handleAsrCommand() on the control thread, so
+  raiseInterrupt()/flight-state mutation stays control-thread-only (fixes the "control-thread only"
+  contract that the earlier ad-hoc re-task violated).
+- Three routes in handleAsrCommand: (1) EMERGENCY LAND -- short imperatives land/abort/emergency/
+  mayday/etc. -> deterministic FlightState::LANDING, VLM bypassed (same primitive as the battery
+  failsafe); (2) EMERGENCY STOP -- stop/halt/hold/etc. -> deterministic hover, VLM bypassed;
+  (3) everything else -> grounded launches start(), airborne raises raiseInterrupt("user_command")
+  which hovers instantly and surfaces the words in a new [USER] prompt block for the VLM to reassess.
+  A full sentence ("find the house and land near it") is NOT an emergency -- only short callouts are.
+- Completion verdict: the VLM may set objective_complete=true (+reason) on the first plan object;
+  translateToBaseCommands reads plan[0] and stands the drone down (land if airborne, else stop) with
+  m_missionActive=false. Defaulted false via .value() so every existing response is unaffected.
+- GBNF grammar (llamaclient.hpp) extended: the thought object may now optionally carry
+  objective_complete + reason (backward-compatible superset -- the thought-only form still parses).
+  Without this the grammar-constrained VLM could not emit the verdict.
+- Tests (canned, run against the real binary): --canned-complete -> "verdict objective_complete=true
+  -> stand down (stop)"; --canned-voice -> "INTERRUPT (reason=user_command)"; regression --canned-cross
+  -> normal start, NO verdict (default-false safety holds). All pass.
+- Touches Agent 1's llm_base.hpp (OUTPUT FORMAT doc) + llamaclient.hpp (grammar) -- coordinate.
+
+## SEARCH rewritten: lawnmower -> advance-and-scan (2026-08-13, Manager)
+
+- Old SEARCH was a lawnmower (fly lane / step sideways / flip 180). It marched off to one side, faced
+  BACKWARD on flipped lanes, and drifted into obstacles over many legs -- and the VLM often chose a
+  sideways start_heading_deg, so it never searched the front where the target was.
+- New primitive: at a checkpoint, rotate a full 360 IN PLACE (no translation) checking perception every
+  tick; if not found, advance step_m forward along the search heading, scan again; repeat until found,
+  max reach, or timeout, then return to origin. Starts by scanning at the takeoff spot (look before
+  moving). fmu_node.hpp SEARCH dispatch + activation; new m_searchScanning/ScanRemainingRad/ScanPrevYaw/
+  TotalDistM/StepM/MaxDistM state.
+- Direction: reuses start_heading_deg as the ADVANCE heading, default 0 = forward (this is the fix). The
+  360 scan sees every direction at each stop, so a wrong advance heading still scans everything -- it only
+  controls where you progress. No new grammar key.
+- step/maxDist by size: small 3/9 m, medium (default) 4/16 m, large 5/30 m. Reuses the 360-spin math from
+  ROTATE (rotateMaxYawRate) and the existing return-to-origin-on-exhaust.
+- Prompt (llm_base.hpp) updated to describe advance-and-scan and tell the VLM to advance AHEAD by default.
+- Compiles + links; A3 voice unit tests still 3/3; live "find the red human" is the real test. Agent 1's
+  SEARCH lane -- coordinate (touched fmu_node.hpp SEARCH + llm_base.hpp).
+
+
+## 2026-08-13 -- Demo-1 crash post-mortem: empty search -> hallucinated approach -> underground sink
+
+Rubicon voice run died mid-mission. Trace (captured_panes_log.txt): takeoff OK -> SEARCH (VLM picked
+SMALL) -> person never detected -> search exhausted, returned to origin -> VLM re-planned, hallucinated
+"the human in red is visible" with NO detection, emitted APPROACH with a fabricated bbox -> bboxToEnuAnchor
+projected that low bbox through depth to an ENU anchor at z=-1.87 (UNDERGROUND) -> go-to servo flew the
+drone into the ground -> PX4 ground-contact disarm -> FMU FLIGHT->FAULT, abort to STANDBY. The HUD's
+`DET=person@100%` was misleading (track_id=-1, no YOLO lock).
+
+Root causes + fixes (all in fmu_node.hpp / fmu_node_base.hpp):
+- REACH: search reach = step x maxLegs -> small 0.5x4=2m, medium 1.5x6=9m, large 3.0x8=24m. People sit
+  12-16m out, so a small search can NEVER reach them, and YOLO can't resolve a person that far anyway.
+  Fix: when perception is EMPTY at SEARCH activation (drone blind), promote size to LARGE (reach ~24m).
+  Once anything is in view the VLM's size is respected. Forward advance already aims at the cluster.
+- SINK (the killer): bboxToEnuAnchor had no altitude floor. Fix: new kApproachMinAnchorAltEnu=0.8m; clamp
+  the bbox anchor Z up to it, AND guard the visual-servo descent (vUp>=0 once at/below the floor). SITL
+  ground is ENU 0.
+- Hallucination gate (VLM approaching a target it can't see) is NOT yet fixed -- Agent 1's prompt/grammar
+  lane. With the reach fix the demo path now gets a REAL detection, so the approach anchors on truth.
+
+Test hygiene: sim_core.sh now `rm -f "$LOG_FILE"` before launch, so a run that dies before tee opens can't
+leave the previous run's log reading as the current one (this exact staleness misled the first diagnosis).
+
+
+## 2026-08-13 -- CRITICAL: red person showed BLUE (R/B swap in the gz camera tx plugin)
+
+Symptom: the RED person rendered correct in the Gazebo GUI but appeared BLUE in the dashboard, and the
+VLM could not lock "the person in red" -- because it was seeing blue too.
+
+Root cause: our gz->udp camera plugin (source/llm_to_action/gstreamer_gz_udp_tx/gazebo_cam_plugin.cpp)
+declared its appsrc caps as `format=BGR` and memcpy'd the Gazebo camera buffer straight in. But the gimbal
+camera sensor emits R8G8B8 (RGB, gimbal model.sdf). So RGB bytes were fed to gstreamer AS BGR -> R and B
+swapped, baked into the H.264 stream. Every consumer (rx -> perception/YOLO, the VLM b64 image, the
+dashboard MJPEG) saw the swap, since they all read one stream. PX4's own GstCameraSystem.cpp declares
+"RGB" correctly; ours was the odd one out. Fix: appsrc caps BGR -> RGB (one line). Rebuilt libGazeboGst
+CameraPlugin.so. Requires a FULL sim restart (the plugin loads into the gz server; restarting only the
+dashboard does nothing).
+
+Implication: this likely sabotaged Demo 1 at the root -- "find the person in RED" cannot work when the
+VLM sees the target as blue. Re-test colour disambiguation after the restart.
+
+
+## 2026-08-13 -- SEARCH could not recognise "human in red" -> searched past it into the rocks
+
+Symptom: drone saw the red person, planned a SEARCH anyway, and flew into terrain (rocks) during the
+low-altitude advance.
+
+Root cause: the SEARCH found-check matched by EXACT label -- strcmp(det.label, srch.target). The VLM names
+the target in natural language ("human in red"); YOLO emits COCO "person". strcmp never matched, so the
+search never registered the person right in front of it, ignored it, and kept advancing until it hit the
+rocks (the search holds a FIXED low ENU altitude with zero terrain clearance).
+
+Fix (fmu_node.hpp + fmu_node_base.hpp):
+- New labelMatchesTarget(): a person detection matches whenever the requested target names a human
+  (human/person/people/man/woman/...). Colour disambiguation stays the VLM's job via the image + bbox.
+- kSearchMinConfidence 0.35 -> 0.25: a person at ~10m only scores 25-53%; 0.35 dropped real red hits.
+Effect: the moment red is in view (at the start point or anywhere in the opening 360 scan), the search
+completes as FOUND with zero velocity and hands to approach -- it no longer advances, so it no longer
+crashes into terrain when the target is already visible. This is the deterministic version of "don't
+search when it's right in front"; stopping the VLM from PLANNING a search at all is Agent 1's prompt lane.
+
+RESIDUAL: a genuine search (target truly not visible) still advances at a fixed low ENU altitude with no
+terrain clearance -- rock-collision hazard remains for that case. Separate fix (terrain-relative search
+altitude / obstacle backstop) still owed.

@@ -184,3 +184,91 @@ Suggested commit (house style):
 3. `./digest.sh` — reads the newest run + the newest `vlm_logs` prompt file. Key lines: `VLM empty
    responses` (>0 = server down), `prompts saying no-detections` (>0 = perception lied), `SEARCH activated`
    (should be 0 for a plain follow), `loss-sweep` (should be 0 — sweep removed), servo ticks, max |errX|.
+
+## Assessment — 2026-08-12 (agent1) : Manager's two-demo brief
+
+Read-only code assessment. NOTHING built yet. Manager asked: assess + report before building.
+
+### DEMO 1 — colour-disambiguated FOLLOW : READY (pending only the world file)
+
+The resolve-once chain already exists in code. Path:
+- The VLM is sent the RAW 640x640 camera frame (`kOutUDPCameraRawFrameTopic` -> `m_currImg` ->
+  `callLlamaServer`), NOT the annotated overlay. So it sees colour but no `#id` labels drawn.
+- `[PERCEPTION]` (buildDynamicPrompt) lists EACH detection as
+  `{"track_id":N,"index":t,"label":"person","bbox":[x0,y0,x1,y1],"confidence":..,"median_depth_cm":..}`.
+- So the VLM bridges colour->id by COORDINATES: it sees the red person's position in the image,
+  matches it to the `[PERCEPTION]` entry whose bbox sits there, and emits `follow.target_id`.
+- FMU pins that id via `detectionByTrackId`; the stable-id tracker (coast=15) holds it; distractor
+  ids coast on their own numbers and never steal it. FOLLOW is already position-free (yaw + vertical
+  center, forward=0). This is exactly the manager's spec.
+
+Feasibility: YES with current binary. No new FOLLOW code.
+Risks to flag loud:
+1. Colour->id is a 2B spatial-correlation call (raw image colour vs listed bbox coords). If the model
+   mis-correlates it follows the wrong person. Mitigate: make the RED actor unambiguously the centre
+   lane; objective "find the person in RED and follow them in place".
+2. VLM speed at resolve (one-time; prewarm 27s->~9s is on Manager). If it still stalls, that is the
+   demo risk -- flag it.
+3. No `#id` overlay in the VLM image is the weak link; correlation is purely coordinate-based. If it
+   proves unreliable, the fix is to send the ANNOTATED frame (with `#id`) to the VLM so it reads the
+   id directly -- small change, but changes what the model sees, so NOT done without human sign-off.
+Still needed: ground-truth PASS/FAIL (`wait_for_ground_truth.sh`) + the world file `rubicon_tree.sdf`
+and hardcoded actor positions (human is providing).
+
+### DEMO 2 KEY Q — can APPROACH/ORBIT run off a VLM-emitted bbox instead of a YOLO label? ANSWER: YES
+
+Two corrections to the brief:
+- **ORBIT IS ALREADY BUILT** (the "geometry not built" is stale). Full servo at fmu_node ~L1103:
+  seeds the circle centre from a detection centroid+depth, latches a FIXED ENU centre, then flies a
+  pure-odometry circle (radial + tangential velocity, `kOrbitRadialGainHz`/`m_orbitSpeed`), camera aim
+  from odometry with a small vision trim. Developed against a "car" label. The ONLY YOLO coupling is
+  the seed: `strcmp(det.label, orb.target)` + `hit->median_depth_cm`.
+- APPROACH is the same shape: seeds from `detectionByLabel`/`detectionByTrackId` + `median_depth_cm`,
+  and already supports a FIXED world target via the canned rig (`m_cannedApproachTargetEnu` +
+  `updateCannedApproachRig` forward-projects a world point into a synthetic snapshot).
+
+So both servos need, at ACTIVATION only: a bbox centroid (bearing) + one depth sample (range) to drop
+a fixed ENU anchor. After that they run on odometry -- no per-frame YOLO. house/window are STATIC, so a
+ONE-SHOT VLM bbox is enough; no tracker needed. => the "house/window not in COCO" blocker dissolves.
+
+The ONE new primitive required: **median depth within an arbitrary pixel rect** from the retained depth
+mat. Today depth is only attached per-YOLO-detection as `median_depth_cm`. perception_runtime keeps the
+depth frame (`shared_ptr<cv::Mat>` in depthLoop); add `medianDepthInRect(bbox)->cm`. Everything else
+already exists: pinhole back-project (detectionByLabel math), ENU freeze, synthetic injection.
+
+Build plan (when DEMO 1 lands, NOT before):
+1. Add optional `bbox[4]` (px) to CmdApproach + CmdOrbit; add grammar members + parser fields.
+2. `medianDepthInRect(bbox)` on perception_runtime.
+3. At activation: sample depth in bbox -> pinhole back-project with live pose -> freeze ENU anchor.
+   ORBIT: set `m_orbitCenterEnu`/`m_orbitRadius` directly, skip the label-lock. APPROACH: reuse the
+   `m_cannedApproachTargetEnu` path.
+4. VLM plan schema: `approach`/`orbit` gain an optional `bbox` the model emits for non-COCO targets.
+Risks: VLM bbox accuracy for "window" on a 2B; SITL close-range depth over-read (the existing
+bbox-area-fraction gate helps). "First window" = the VLM picks the bbox; acceptable.
+
+Fallbacks if the KEY Q had been NO (it is YES, so unused): proxy object at the window; or drop window
+and orbit a building face.
+
+
+## BUILT — 2026-08-13 (agent1) : DEMO 2 enabler (VLM-bbox APPROACH/ORBIT) is in the binary
+
+Status: implemented + px4 links clean. NOT yet run in SITL (needs the rubicon world or a canned proof).
+Files touched:
+- fmu_node_base.hpp: `kVlmImageSide = 640`.
+- perception_runtime.hpp: `medianDepthCmInRect(cv::Rect)` -- median dense-depth (cm) over any rect.
+- fmu_node.hpp: `i16 bbox[4]` on CmdApproach + CmdOrbit (+ static_asserts); `bboxToEnuAnchor()`;
+  APPROACH activation anchors via `m_approachBboxRig` (reset each activation) + `m_cannedApproachLabel`;
+  ORBIT activation latches `m_orbitCenterEnu` from the anchor; parser reads `bbox` for both; rig gate
+  now `m_useCannedApproachRig || m_approachBboxRig`; rig label uses `m_cannedApproachLabel`.
+- llamaclient.hpp: grammar `arrmember`/`arrkey "bbox"` (exactly 4 numbers).
+- llm_base.hpp: approach/orbit schema document the optional `bbox` for non-COCO targets.
+
+ORBIT was already fully built (odometry circle) -- only the seed was YOLO-coupled; this frees the seed.
+
+How to see it work (once a world with a boxable structure is up):
+- The VLM emits e.g. `{"action":"orbit","target_object":"house","bbox":[220,150,430,360],"radius_cm":500,"angle_deg":360}`.
+- Watch for `ORBIT bbox-anchored centerENU=(x,y) R=..` / `APPROACH bbox-anchored target=.. ENU=..` in the log.
+- No `orbit_lost_failed` / no dependence on a YOLO box for the structure.
+
+Suggested commit message:
+  fmu: VLM-bbox anchors APPROACH/ORBIT for non-COCO targets (house/window) via dense-depth back-projection
