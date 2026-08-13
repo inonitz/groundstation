@@ -1841,7 +1841,7 @@ under the `FMU_OBSERVABILITY` gate, so OFF is unchanged and takeoff-safe.
 
 - SNR robustness benchmark: `snr_mix_core.h` (header-only, zero-dep) mixes gunfire/explosion beds into
   clean clips at a controlled SNR; wired in-process into `sttserv/test/asr_test.cpp` as a sweep that
-  prints an accuracy-vs-SNR table. Parakeet-q4 holds 92% intent @ 0 dB (38/38 pass), ~80% @ -4 dB, on raw audio.
+  prints an accuracy-vs-SNR table. Parakeet-q4 median intent >=91% @ 0 dB, 80% @ -4 dB, 2/3 @ -10 dB vs real impulsive gunfire/explosions (4 beds, +20..-10 by 2dB), on raw audio.
   Confirms "ship raw" — every denoiser (GTCRN/SpeexDSP/classical) was net-negative. Beds live in
   `dependencies/noise_beds/`. Full method + reproduce steps: `docs/active/asr-noise-robustness.md`.
 - "Explosion/noise proof" is a robustness spec, not a denoiser task. The real mitigations are model
