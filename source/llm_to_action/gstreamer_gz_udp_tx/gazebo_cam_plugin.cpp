@@ -77,7 +77,10 @@ void GstCameraPlugin::InitializePipeline(guint w, guint h) {
 
     const std::string kGstPipelineDefStr = 
         "appsrc name=mysource format=time is-live=true "
-        "caps=video/x-raw,format=BGR,width=" + std::to_string(w) 
+        /* The gz camera sensor emits R8G8B8 (RGB, see gimbal model.sdf <format>). Declaring BGR here
+           fed RGB bytes to gstreamer as BGR -> R/B swapped for the WHOLE pipeline (red person showed
+           blue in the dashboard AND to the VLM, breaking colour disambiguation). Match the source: RGB. */
+        "caps=video/x-raw,format=RGB,width=" + std::to_string(w) 
         + ",height="                         + std::to_string(h) 
         + ",framerate="                      + std::to_string(kOutCameraGStreamerFrameRate) + "/1 ! "
         "videoconvert ! "

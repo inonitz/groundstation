@@ -1,8 +1,8 @@
 #!/bin/bash
 # DEMO -- voice-driven, VLM-REASONED approach on a real YOLO target (the car).
 #
-# World: default_car (Rubicon jeep -- a canonical COCO "car", detects at ~80%+, far more
-# reliable than a distant person). The VLM genuinely reads the SPOKEN objective, reasons
+# World: rubicon_targets (Rubicon terrain + a blue hatchback + 2 people). The car is a
+# canonical COCO "car", detects at ~80%+ up close. The VLM genuinely reads the SPOKEN objective, reasons
 # (its `thought` shows on the dashboard), and emits takeoff -> approach(car) -> land.
 # Real perception, real planning, real flight -- nothing canned.
 #
@@ -25,8 +25,8 @@ LAUNCH_ASR="1"
 # LAUNCH_ASR="0"
 
 FMU_CANNED_FLAG=""          # "" = VLM-driven (REAL reasoning). Do NOT set --canned-* for the demo.
-WORLD_NAME="default_car"    # Rubicon jeep -- reliable YOLO "car" detection from the spawn.
-SPAWN_POSE="0,7,3"          # proven approach-real geometry: car dead ahead (+X), detects on takeoff.
+WORLD_NAME="rubicon_targets"  # Rubicon terrain + a blue hatchback (YOLO "car") + 2 people for scene.
+SPAWN_POSE="0,3,3"          # facing +X; blue hatchback at (6,2) is ~6m dead ahead (~9deg right): clean car lock.
 LAUNCH_VLM="1"              # llama-server (prewarmed on boot)
 FMU_OBSERVABILITY="1"       # annotated frames + depth + HUD + vlm_text(thought) -> dashboard
 

@@ -57,12 +57,15 @@
       <uri>model://person_walking</uri>
       <static>true</static>
     </include>
+    <!-- DEMO TRIM 2026-08-13: far 2nd car removed so "approach the car" has ONE answer
+         and the visual servo can't hop between two cars. Uncomment to restore.
     <include>
       <name>storm_hatchback</name>
       <pose>12 -4.5 4.1 0 0 0</pose>
       <uri>model://hatchback</uri>
       <static>true</static>
     </include>
+    -->
 
   </world>
 </sdf>

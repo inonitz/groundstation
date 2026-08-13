@@ -1,6 +1,6 @@
 # A3 — Voice interrupt + mission termination
 
-**Status:** scheduled / not started. **Created:** 2026-08-10. **Revised:** 2026-08-09 (session review —
+**Status:** IMPLEMENTED 2026-08-13 (Manager) -- built + canned-tested; see docs/NOTES.md. **Created:** 2026-08-10. **Revised:** 2026-08-09 (session review —
 see Revision log). **Branch:** feature-llm-driver (SITL showcase).
 **Depends:** spec-1 interrupt path (landed). **ROADMAP:** 3.7, 5.1, 6 (termination).
 **Lock:** touches `fmu_node.hpp` (interrupt hook + prompt + new subscription) and `llm_base.hpp`

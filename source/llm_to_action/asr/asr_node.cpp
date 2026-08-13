@@ -165,6 +165,19 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             RCLCPP_WARN(this->get_logger(), "[WORKER] Woke up but no frames available in ringbuffer.");
             continue;
         }
+
+        /* Reject a momentary H tap. Too-brief PTT captures produce empty/garbage transcripts that the
+           VLM then hallucinates a whole mission from ("go find some vegetation"). If the key was held
+           for less than kMinRecordMs it is not speech -- discard the clip and publish nothing. */
+        constexpr uint64_t kMinRecordMs = 200;
+        if (m_recordTimeMs < kMinRecordMs) {
+            RCLCPP_WARN(this->get_logger(),
+                "[WORKER] H held only %lu ms (< %lu) -- momentary tap, ignoring (no transcription/publish).",
+                (unsigned long)m_recordTimeMs, (unsigned long)kMinRecordMs);
+            ma_pcm_rb_seek_read(m_audioMan.ringBufferHandle(),
+                ma_pcm_rb_available_read(m_audioMan.ringBufferHandle()));   /* discard so the next PTT is clean. */
+            continue;
+        }
     
         void*     pReadBuffer = nullptr;
         ma_uint32 framesToRead = availableFrames;

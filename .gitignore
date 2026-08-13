@@ -48,3 +48,7 @@ frame*.png
 captured_panes_log.txt
 *.out
 gs_sessions_*.tgz
+vlm_logs/
+*.wav
+scripts/test/SITL/**/bag_*/
+scripts/test/SITL/rubicon_orbit/

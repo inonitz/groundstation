@@ -1423,10 +1423,25 @@ private:
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
                     RCLCPP_WARN(this->get_logger(),
                         "[FMU_NODE] SEARCH DETECTED target=%s track_id=%d conf=%.2f depth_cm=%.1f "
-                        "bbox=(%d,%d,%d,%d) -- verify before acting on it.",
+                        "bbox=(%d,%d,%d,%d) -> auto-approach (not re-planning).",
                         srch.target, hitTrackId, hit->confidence, hit->median_depth_cm,
                         hit->bbox_xmin, hit->bbox_ymin, hit->bbox_xmax, hit->bbox_ymax);
-                    completeCurrent("search_ok");
+                    /* Search found the target. A weak planner (2B) tends to emit ANOTHER search
+                       instead of approaching, looping forever ("search doesn't short-circuit on the
+                       vehicle"). Deterministically hand the found track straight to APPROACH so a
+                       real detection leads to a real approach, no dependence on the planner here. */
+                    {
+                        CmdApproach ap{};
+                        std::snprintf(ap.target, sizeof(ap.target), "%s", srch.target);
+                        ap.target_id = hitTrackId;
+                        ap.speed     = 0.0f;
+                        ActiveTask approachTask{};
+                        approachTask.m_cmd = GenericCommand(ap);
+                        std::snprintf(approachTask.m_thought, sizeof(approachTask.m_thought),
+                                      "search found %s -> approaching it", srch.target);
+                        activateTask(approachTask);
+                        return;
+                    }
                 } else if ((tnow - m_searchStartUs) > m_searchTimeoutUs ||
                            m_searchTotalDistM >= m_searchMaxDistM ||
                            m_searchLegCount >= m_searchMaxLegs || m_searchReturning) {
@@ -2254,6 +2269,18 @@ private:
         m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
         RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task complete status=%s total=%zu",
             status, m_chat.m_completedTasks.size());
+
+        /* Deterministic close-out: the instant an APPROACH finishes, LAND -- do not hand back to a
+           weak planner that may skip the land. Completes "approach the target and land near it"
+           without a second dependence on the 2B. Land completion has id==LAND, so this never loops. */
+        if (m_currTask.m_cmd.id() == CommandID::APPROACH) {
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] APPROACH finished (%s) -> auto-land.", status);
+            ActiveTask landTask{};
+            landTask.m_cmd = GenericCommand(CmdLand{});
+            std::snprintf(landTask.m_thought, sizeof(landTask.m_thought), "approached target -> landing");
+            activateTask(landTask);
+        }
     }
 
     /* Interrupt core (spec 1 1.5/6.3): the one reflex every trigger shares -- STOP (hover), stash

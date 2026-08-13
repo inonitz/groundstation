@@ -165,3 +165,29 @@ blocker.
 - New node: `source/llm_to_action/tello_backend/test/tello_slam_hold.cpp`.
 - New scripts: `scripts/tello/slam/{feature_scout.py, run.sh, c1test.sh, test3.sh, measure_tello_slam.py, digest.sh, runtests.sh, aruco_pose.py, README.md, TESTING.md}`.
 - `scripts/tello/slam/runs/` is generated logs — gitignore, do not commit.
+
+### 2026-08-12 — Demo 3 ownership: GO/NO-GO (agent5)
+
+Manager assigned Demo 3 (physical stretch): takeoff → FOLLOW the blue-hat/red-shirt person in place →
+~30 s later voice "land" = emergency fast-path. My verdict on the SLAM-dependent parts:
+
+**Run Demo 3 SLAM-FREE. NO-GO on anything leaning on the SLAM hover-hold.**
+
+1. **Hover-hold "while FOLLOW runs" — NO-GO, and not a buildable mode by the deadline.**
+   - Not validated on hardware (the active blocker; bare-floor flights did not stabilize, mid weak-vs-sign
+     diagnosis).
+   - Architecture: FOLLOW lives in `fmu_node`; the hover-hold is a standalone binary (`tello_slam_hold`)
+     that owns its OWN `TelloBackend`. Two command clients cannot drive one Tello at once. Combining them
+     needs the FMU to consume `slam/pose` directly — an integration that does not exist (deferred TODO).
+   - It is also unnecessary: FOLLOW of a STATIONARY person already station-keeps — the servo centers the
+     person on pixels, so the drone holds position with NO SLAM. The hover-hold only matters when IDLE with
+     no target, which "follow in place" is not.
+
+2. **"land" emergency fast-path — GO on the SLAM side.** Native Tello `land()` descends on its own
+   baro/tof: no SLAM, no position, reliable. The node already lands on `L` and on recovery-timeout. The
+   override ROUTING (keyboard `/fmu/in/override`, voice via the ASR seam) is FMU + Manager's wiring, not
+   mine; as long as "land" reaches `drone.land()` / FMU disarm, it lands SLAM-free.
+
+**So Demo 3 hinges on Agent 1's FOLLOW being VERIFIED ON THE TELLO (currently unverified) + the land
+routing — NOT on the SLAM hover-hold.** If idle SLAM station-keep is deemed required, that piece is NO-GO
+for tomorrow.

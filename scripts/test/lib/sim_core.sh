@@ -242,7 +242,13 @@ if [ "$RECORD_BAG" = "1" ]; then
     fi
 fi
 tmux select-layout -t "$SESSION_NAME:0" tiled
-tmux select-window -t "$SESSION_NAME:0"
+# llama-server (VLM) must be the FRONT window on attach -- backgrounding its pane
+# stalls prompt loading. Fall back to the agent window when the VLM is not launched.
+if [ "$LAUNCH_VLM" = "1" ]; then
+    tmux select-window -t "$SESSION_NAME:vlm"
+else
+    tmux select-window -t "$SESSION_NAME:0"
+fi
 
 if [ "${HEADLESS:-0}" = "1" ]; then
     : "${HEADLESS_COMPLETION:=flight}"

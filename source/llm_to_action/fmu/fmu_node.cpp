@@ -22,6 +22,8 @@ int main(int argc, char* argv[]) {
     bool                                      useApproachImpact;
     bool                                      useOrbit;
     bool                                      useSearch;
+    bool                                      useVoice;
+    bool                                      useComplete;
 
     rclcpp::init(argc, argv);
 
@@ -51,12 +53,28 @@ int main(int argc, char* argv[]) {
     useApproachImpact = (argc > 2) && (std::string(argv[2]) == "--canned-approach-impact");
     useOrbit        = (argc > 2) && (std::string(argv[2]) == "--canned-orbit");
     useSearch       = (argc > 2) && (std::string(argv[2]) == "--canned-search");
+    useVoice        = (argc > 2) && (std::string(argv[2]) == "--canned-voice");
+    useComplete     = (argc > 2) && (std::string(argv[2]) == "--canned-complete");
 
     node = std::make_shared<FlightManagementUnitNode>();
-    node->start(objective, useCanned, useCross, useSpeed, useApproach, useApproachReal,
-                useRotate, useLandFlare, useTerrainLand, useFlood, useCrossFlood,
-                useBatteryRth, useBatteryLandNow, usePatrol,
-                useBoundary, useStorm, useApproachImpact, useOrbit, useSearch);
+
+    /* Voice-first launch: an explicitly EMPTY objective (argv[1]=="") with no canned plan
+       means "wait for a spoken objective" -- the drone idles in STANDBY until the ASR
+       callback delivers the first transcript and calls start(). Any typed objective (the
+       argc<=1 default is "Hold position.") or any --canned flag auto-starts as before, so
+       every existing test script is unaffected. */
+    bool anyCanned = (argc > 2) && (std::string(argv[2]).rfind("--canned", 0) == 0);
+    if (!objective.empty() || anyCanned) {
+        node->start(objective, useCanned, useCross, useSpeed, useApproach, useApproachReal,
+                    useRotate, useLandFlare, useTerrainLand, useFlood, useCrossFlood,
+                    useBatteryRth, useBatteryLandNow, usePatrol,
+                    useBoundary, useStorm, useApproachImpact, useOrbit, useSearch,
+                    useVoice, useComplete);
+    } else {
+        RCLCPP_WARN(node->get_logger(),
+            "[FMU_NODE_DEBUG] No objective given -- idling in STANDBY, waiting for a spoken "
+            "objective on /asr_server/transcribe.");
+    }
 
     /* MUST be built AFTER rclcpp::init — its ctor creates guard conditions   */
     /* from the global context, which is null until init() runs. Cannot be    */
