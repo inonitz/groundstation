@@ -2062,3 +2062,40 @@ search when it's right in front"; stopping the VLM from PLANNING a search at all
 RESIDUAL: a genuine search (target truly not visible) still advances at a fixed low ENU altitude with no
 terrain clearance -- rock-collision hazard remains for that case. Separate fix (terrain-relative search
 altitude / obstacle backstop) still owed.
+
+## fmu_node canned-plan removal: A1/A2/B tiering (2026-08-16, agent1)
+- **Decision:** the `--canned-*` scaffolding in fmu_node.hpp is bring-up/SITL regression test code,
+  never on the live VLM demo path (`cannedRun` is false in a real run). SITL is a no-go, so it is
+  being removed. Split by *coupling*, not by count, so each cut is verifiable and safe:
+- **A1 (DONE, build-verified):** the 10 self-contained plans -- voice, complete, plan, rotate,
+  land-flare, terrain-land, orbit, search, patrol, speed. Pure JSON -> translateToBaseCommands; touch
+  no live state, no controlLoop, no LOCKED APPROACH. Removed from fmu_node.hpp (defs + start() params
+  + dispatch + log) and fmu_node.cpp (decls + CLI parse + start() call). px4 build links clean.
+- **A2 (PENDING, coordinate):** cross, flood, cross-flood, outbound, battery-rth/landnow, boundary,
+  storm. These arm members the CONTROL LOOP reads (m_floodArmed @ the flood async, m_obstacleArmed
+  inside the emergency-boundary SAFETY block, m_batForce* in the battery inject). Production-dead, but
+  removing them edits inside controlLoop (LOCKED SEARCH/APPROACH region) -- do it with the owner.
+- **Bucket B (with the perception replacement):** approach / approach-real / approach-impact + the
+  no-YOLO rig (m_useCannedApproachRig, updateCannedApproachRig), the HARDCODED SAFE ORBIT (~L1334),
+  and the auto-land-the-instant-APPROACH-finishes (~L2273). These ARE the working demo and sit in the
+  LOCKED path -- they get *replaced* by the modular vision-servo, not blind-deleted.
+- **Dead now:** scripts/test/SITL/{forward,speed,rotate-land,land-flare,terrain-land,orbit,search} +
+  voice_unit.sh reference removed flags. Archive with the SITL harness.
+
+## fmu test harness rewrite: canned plans -> TestPlan enum + pure command map (2026-08-16, agent1)
+- **What:** the "--canned-*" scaffolding is no longer 20 bools threaded through start() + ~20 inject
+  methods inside FmuNode. Now: one `enum class TestPlan : i8` (None=-1=no test) in
+  test/fmu_test_plans.hpp, `parseTestPlan(argv)` there (lifted out of main), a single private
+  `runTestPlan(TestPlan)` switch in the node that arms the node-owned members (flood/obstacle/battery/
+  rig) + feeds the scripted JSON, and the scenario JSON as free functions in that same test header.
+  start() now takes ONE TestPlan argument.
+- **#5:** translateToBaseCommands no longer string-compares down an if/else chain. It calls the pure
+  `commandIdFromAction()` (command_id.hpp -- CommandID moved out of fmu_node.hpp) then switches on the
+  returned CommandID. Behaviour identical; px4 build compiles + links clean.
+- **Diagnosis (the point):** the canned plans were NEVER unit tests. Each needs the whole node + a
+  SITL sim to mean anything and asserts nothing in-process -- they are end-to-end scenario DATA. The
+  rewrite extracts the two genuinely pure pieces (commandIdFromAction, parseTestPlan) and puts a REAL
+  ROS-free unit test on them (test/fmu_translate_test.cpp, ALL PASS). The guidance/servo laws are
+  still welded to controlLoop with no unit coverage -- that is the next extraction, not done here.
+- **Archived (referenced removed flags):** scripts/archive/SITL/{forward,speed,rotate-land,land-flare,
+  terrain-land,orbit,search,battery,disarm-verify} + scripts/archive/voice_unit.sh.

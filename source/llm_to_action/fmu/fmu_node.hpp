@@ -31,6 +31,8 @@
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
+#include "command_id.hpp"                  /* CommandID + commandIdFromAction (ROS-free). */
+#include "test/fmu_test_plans.hpp"         /* TestPlan + parseTestPlan + scenario JSON (ROS-free). */
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 #include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
@@ -57,22 +59,6 @@ enum class TaskState {
     FINISHED_SUCCESS,
     FINISHED_FAIL,
     STOPPED
-};
-
-enum class CommandID : u8 {
-    TAKEOFF  = 0,
-    LAND     = 1,
-    STOP     = 2,
-    GO       = 3,
-    CURVE    = 4,
-    ROTATE   = 5,
-    ORBIT    = 6,
-    SEARCH   = 7,
-    REASSESS = 8,
-    APPROACH = 9,
-    FOLLOW   = 10,
-    HOVER    = 11,
-    MAX_ID   = 12
 };
 
 /* FMU-owned flight state machine (platform-neutral; drives the backend via verbs). */
@@ -396,71 +382,21 @@ public:
         m_vlmClient.destroy();
     }
 
-    /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
-    void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
-               bool useSpeedPlan = false, bool useApproachPlan = false, bool useApproachRealPlan = false,
-               bool useRotatePlan = false, bool useLandFlarePlan = false,
-               bool useTerrainLandPlan = false, bool useFloodPlan = false,
-               bool useCrossFloodPlan = false, bool useBatteryRthPlan = false,
-               bool useBatteryLandNowPlan = false, bool usePatrolPlan = false,
-               bool useBoundaryPlan = false, bool useStormPlan = false,
-               bool useApproachImpactPlan = false, bool useOrbitPlan = false,
-               bool useSearchPlan = false, bool useVoicePlan = false,
-               bool useCompletePlan = false) {
+    /* Bootstrap: arm the mission. test != None pre-fills the queue with a scripted scenario and
+       skips the VLM (see runTestPlan + test/fmu_test_plans.hpp); None is a normal VLM-driven run. */
+    void start(std::string_view objective, TestPlan test = TestPlan::None) {
         m_chat.m_initialCommand = objective;
         publishVlmContext();   /* surface the objective on the dashboard right away. */
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan || useBoundaryPlan || useStormPlan || useApproachImpactPlan || useOrbitPlan || useSearchPlan || useVoicePlan || useCompletePlan;
+        bool cannedRun = (test != TestPlan::None);
         m_missionActive.store(!cannedRun, std::memory_order_release);
-        if (useCrossPlan) {
-            injectCannedCrossPlan();
-        } else if (useSpeedPlan) {
-            injectCannedSpeedPlan();
-        } else if (useApproachRealPlan) {
-            injectCannedApproachRealPlan();
-        } else if (useApproachPlan) {
-            injectCannedApproachPlan();
-        } else if (useRotatePlan) {
-            injectCannedRotatePlan();
-        } else if (useLandFlarePlan) {
-            injectCannedLandFlarePlan();
-        } else if (useTerrainLandPlan) {
-            injectCannedTerrainLandPlan();
-        } else if (useFloodPlan) {
-            injectCannedFloodPlan();
-        } else if (useCrossFloodPlan) {
-            injectCannedCrossFloodPlan();
-        } else if (useBatteryRthPlan) {
-            injectCannedBatteryRthPlan();
-        } else if (useBatteryLandNowPlan) {
-            injectCannedBatteryLandNowPlan();
-        } else if (usePatrolPlan) {
-            injectCannedPatrolPlan();
-        } else if (useBoundaryPlan) {
-            injectCannedBoundaryPlan();
-        } else if (useStormPlan) {
-            injectCannedStormPlan();
-        } else if (useApproachImpactPlan) {
-            injectCannedApproachImpactPlan();
-        } else if (useOrbitPlan) {
-            injectCannedOrbitPlan();
-        } else if (useSearchPlan) {
-            injectCannedSearchPlan();
-        } else if (useVoicePlan) {
-            injectCannedVoicePlan();
-        } else if (useCompletePlan) {
-            injectCannedCompletePlan();
-        } else if (useCannedPlan) {
-            injectCannedPlan();
-        }
+        runTestPlan(test);
         RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d approach_real=%d rotate=%d land_flare=%d terrain_land=%d). queued~=%zu. objective: %.*s",
-            __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
-            __scast(int, useApproachPlan), __scast(int, useApproachRealPlan),
-            __scast(int, useRotatePlan), __scast(int, useLandFlarePlan), __scast(int, useTerrainLandPlan),
-            m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
+            "[FMU_NODE_DEBUG] Mission started (test=%d). queued~=%zu. objective: %.*s",
+            __scast(int, test), m_taskQueue->size_approx(),
+            __scast(int, objective.size()), objective.data()
         );
         return;
     }
@@ -810,7 +746,7 @@ private:
             if (m_floodAtUs == 0)             m_floodAtUs = nowUs() + 5ULL * 1000000ULL;
             else if (nowUs() >= m_floodAtUs) {
                 m_floodFired  = true;
-                m_floodFuture = std::async(std::launch::async, [this]() { injectCannedFloodPlan(); });
+                m_floodFuture = std::async(std::launch::async, [this]() { translateToBaseCommands(testPlanFloodJson()); });
             }
         }
 
@@ -2606,15 +2542,20 @@ private:
             action  = item["action"].get<std::string>();
             thought = item.value("thought", "");
 
-            if (action == "takeoff") {
+            switch (commandIdFromAction(action)) {
+            case CommandID::TAKEOFF:
                 cmd = GenericCommand(CmdTakeoff{});
-            } else if (action == "land") {
+                break;
+            case CommandID::LAND:
                 cmd = GenericCommand(CmdLand{});
-            } else if (action == "stop") {
+                break;
+            case CommandID::STOP:
                 cmd = GenericCommand(CmdStop{});
-            } else if (action == "hover") {
+                break;
+            case CommandID::HOVER:
                 cmd = GenericCommand(CmdHover{});
-            } else if (action == "go") {
+                break;
+            case CommandID::GO:
                 go  = { item.value("x", 0.0f), item.value("y", 0.0f),
                         item.value("z", 0.0f), item.value("speed", 0.0f) };
                 /* A zero-vector go does nothing. DROP it -- never enqueue, and never convert it to a
@@ -2625,12 +2566,14 @@ private:
                     continue;
                 }
                 cmd = GenericCommand(go);
-            } else if (action == "rotate") {
+                break;
+            case CommandID::ROTATE:
                 rot = CmdRotate{};
                 rot.angle_deg = item.value("angle_deg", 0);
                 rot.cw_or_ccw = (item.value("direction", std::string("cw")) == "cw");
                 cmd = GenericCommand(rot);
-            } else if (action == "approach") {
+                break;
+            case CommandID::APPROACH:
                 approach = CmdApproach{};
                 strncpy(approach.target, item.value("target_object", "").c_str(),
                     sizeof(approach.target) - 1);
@@ -2640,14 +2583,16 @@ private:
                     for (int bi = 0; bi < 4; ++bi)
                         approach.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(approach);
-            } else if (action == "follow") {
+                break;
+            case CommandID::FOLLOW:
                 follow = CmdFollow{};
                 follow.target_index = item.value("target_index", -1);
                 follow.target_id    = item.value("track_id", -1);
                 follow.standoff_cm  = item.value("standoff_cm", 0);
                 follow.speed        = item.value("speed", 0);
                 cmd = GenericCommand(follow);
-            } else if (action == "orbit") {
+                break;
+            case CommandID::ORBIT:
                 orbit = CmdOrbit{};
                 strncpy(orbit.target, item.value("target_object", "").c_str(),
                     sizeof(orbit.target) - 1);
@@ -2659,7 +2604,8 @@ private:
                     for (int bi = 0; bi < 4; ++bi)
                         orbit.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(orbit);
-            } else if (action == "search") {
+                break;
+            case CommandID::SEARCH:
                 search = CmdSearch{};
                 strncpy(search.target, item.value("target_object", "").c_str(),
                     sizeof(search.target) - 1);
@@ -2671,8 +2617,9 @@ private:
                 sizeStr = item.value("search_size", std::string("medium"));
                 search.size = (sizeStr == "small") ? 0 : (sizeStr == "large") ? 2 : kSearchDefaultSizeIdx;
                 cmd = GenericCommand(search);
-            } else {
-                continue; /* Phase 1: takeoff/land/stop/go/rotate/approach/follow executed. */
+                break;
+            default:
+                continue; /* unknown action (also CURVE/REASSESS -- internal, never emitted). */
             }
 
             task = ActiveTask{};
@@ -2690,277 +2637,56 @@ private:
 
     /* Canned plan is the SAME JSON the VLM emits, routed through the real       */
     /* translate path — no inverse function needed.                             */
-    /* Backpressure stress (1.4): enqueue far more actions than the queue cap in ONE
-       plan -- the worst-case oversized-plan storm (a verbose/hallucinating VLM). Expect
-       qsize to cap at the queue size and exactly (N - cap) BACKPRESSURE drops. Uses
-       'stop' (hover) actions: the test is about the queue, not the flight. */
-    void injectCannedFloodPlan() {
-        constexpr u32 kFloodActions = 100;
-        std::string plan = "[";
-        for (u32 i = 0; i < kFloodActions; ++i) {
-            if (i) plan += ",";
-            plan += "{\"thought\":\"flood\",\"action\":\"stop\"}";
+    /* Replay a canned test scenario: pre-fill the queue with its scripted JSON (test/
+       fmu_test_plans.hpp) and, for the fault-injection scenarios, arm the synthetic condition the
+       control loop acts on (flood/obstacle/battery). None is a no-op (a normal VLM-driven run).
+       The scenario DATA lives in test/*; only the node-owned member arming lives here. */
+    void runTestPlan(TestPlan test) {
+        switch (test) {
+        case TestPlan::None:
+            return;
+        case TestPlan::Cross:
+            translateToBaseCommands(testPlanCrossJson());
+            break;
+        case TestPlan::Approach:
+            m_useCannedApproachRig = true;
+            translateToBaseCommands(testPlanApproachJson());
+            break;
+        case TestPlan::ApproachReal:
+            translateToBaseCommands(testPlanApproachRealJson());
+            break;
+        case TestPlan::Flood:
+            RCLCPP_WARN(this->get_logger(),
+                "[FMU_NODE_DEBUG] FLOOD test: 100 actions vs queue cap %u.", 3u * kControlLoopRateHz);
+            translateToBaseCommands(testPlanFloodJson());
+            break;
+        case TestPlan::CrossFlood:
+            m_floodArmed = true;   /* controlLoop fires the airborne flood ~5s after FLIGHT. */
+            translateToBaseCommands(testPlanCrossJson());
+            break;
+        case TestPlan::BatteryRth:
+            m_batForceArmed = true; m_batForceValue = 18;   /* <=20% -> return-to-home. */
+            translateToBaseCommands(testPlanOutboundJson());
+            break;
+        case TestPlan::BatteryLandNow:
+            m_batForceArmed = true; m_batForceValue = 8;    /* <=10% -> land-in-place. */
+            translateToBaseCommands(testPlanOutboundJson());
+            break;
+        case TestPlan::Boundary:
+            m_obstacleArmed = true;   /* controlLoop opens the synthetic-obstacle burst once airborne. */
+            translateToBaseCommands(testPlanTakeoffOnlyJson());
+            break;
+        case TestPlan::Storm:
+            m_obstacleArmed = true;
+            m_missionActive.store(true, std::memory_order_release);   /* wake the VLM after the burst. */
+            translateToBaseCommands(testPlanTakeoffOnlyJson());
+            break;
+        case TestPlan::ApproachImpact:
+            m_forceApproachImpact  = true;   /* motion-gate forced off-nominal -> impact verdict. */
+            m_useCannedApproachRig = true;
+            translateToBaseCommands(testPlanApproachJson());
+            break;
         }
-        plan += "]";
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] FLOOD test: injecting %u actions vs queue cap %u.",
-            kFloodActions, 3u * kControlLoopRateHz);
-        translateToBaseCommands(plan);
-    }
-
-    /* A3 [AUTO] --canned-voice: simulate an IN-FLIGHT spoken command bypassing the ASR node.
-       Pin FLIGHT so handleAsrCommand takes the airborne branch, hand it a non-emergency
-       transcript, and confirm it raises a user_command interrupt (INTERRUPT reason=user_command)
-       with m_userCommandText armed for the next [USER] block. No VLM is called (canned). */
-    void injectCannedVoicePlan() {
-        m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] CANNED-VOICE: simulating in-flight spoken command.");
-        handleAsrCommand("turn right and look at the target");
-    }
-
-    /* A3 [AUTO] --canned-complete: force a completion verdict through the real translate path.
-       First action is takeoff so the not-airborne takeoff-first guard passes; plan[0] carries
-       objective_complete=true, so the drone stands down (stop while grounded) and stops soliciting
-       plans (m_missionActive=false) -- proving the verdict parse + termination and the default-false
-       safety (every other scenario omits the field and is unaffected). */
-    void injectCannedCompletePlan() {
-        static const char* kCannedCompleteJson = R"([
-            {"thought":"objective met, standing down","objective_complete":true,"reason":"target reached"},
-            {"action":"takeoff"}
-        ])";
-        translateToBaseCommands(kCannedCompleteJson);
-    }
-
-    void injectCannedPlan() {
-        static const char* kCannedPlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned go forward", "action":"go", "x":100, "y":0, "z":0, "speed":30},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedPlanJson);
-    }
-
-    /* Canned ROTATE regression (spec-4 Part B): a <180 turn then a >=180 turn, opposite
-       directions -- proves the accumulated-angle law sweeps the FULL commanded magnitude in
-       the commanded direction (200 ccw does NOT collapse to a shortest-path 160 cw). Runs the
-       SAME translate path the VLM uses. */
-    void injectCannedRotatePlan() {
-        static const char* kCannedRotatePlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned rotate cw",  "action":"rotate", "direction":"cw",  "angle_deg":90},
-            {"thought":"canned rotate ccw", "action":"rotate", "direction":"ccw", "angle_deg":200},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedRotatePlanJson);
-    }
-
-    /* Canned LAND-flare regression (spec-4 Part B): climb to ~2m then land, so the LANDING
-       branch runs its full flare taper -- vLand must ramp from kLandDescendVelEnu toward
-       kFlareTouchdownVelEnu as altitude drops, not sit at a constant -0.5. */
-    void injectCannedLandFlarePlan() {
-        static const char* kCannedLandFlarePlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedLandFlarePlanJson);
-    }
-
-    /* Canned terrain-land test: fly laterally over the real Rubicon TERRAIN world then land, so the
-       takeoff-origin height differs from the ground height at the landing spot. Exposes that
-       landing keys on od.pos.z (height above the EKF/takeoff origin), not above-ground-level --
-       a flat world hides it because there origin height == ground height everywhere. */
-    void injectCannedTerrainLandPlan() {
-        static const char* kCannedTerrainLandPlanJson = R"([
-            {"thought":"canned takeoff",        "action":"takeoff"},
-            {"thought":"canned go forward 2m",  "action":"go", "x":200,  "y":0, "z":0, "speed":30},
-            {"thought":"canned land",           "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedTerrainLandPlanJson);
-    }
-
-    /* Canned, no-YOLO closed-loop APPROACH test (ROADMAP 5.1 verification, spec §7): enables
-       the synthetic detection rig, then runs the SAME translate path the VLM uses. */
-    void injectCannedApproachPlan() {
-        static const char* kCannedApproachPlanJson = R"([
-            {"thought":"canned takeoff",  "action":"takeoff"},
-            {"thought":"canned approach", "action":"approach",
-             "target_object":"canned_target", "speed":30},
-            {"thought":"canned land",     "action":"land"}
-        ])";
-        m_useCannedApproachRig = true;
-        translateToBaseCommands(kCannedApproachPlanJson);
-    }
-
-    /* Skips the VLM planner but NOT perception -- real PerceptionRuntime (real ONNX
-       models) supplies the detection, same query path a VLM-driven run would use.
-       Targets "car" (COCO label) since the SITL world has a Rubicon jeep at spawn. */
-    void injectCannedApproachRealPlan() {
-        static const char* kCannedApproachRealPlanJson = R"([
-            {"thought":"canned takeoff",  "action":"takeoff"},
-            {"thought":"canned approach", "action":"approach",
-             "target_object":"car", "speed":30},
-            {"thought":"canned land",     "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedApproachRealPlanJson);
-    }
-
-    /* Canned ORBIT test (ROADMAP 1.1.6): real perception (real ONNX, SITL car in view). Orbits the
-       jeep for a full circle, then lands. Skips only the VLM planner. */
-    void injectCannedOrbitPlan() {
-        static const char* kCannedOrbitPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned orbit",   "action":"orbit",
-             "target_object":"car", "radius_cm":300, "angle_deg":360, "direction":"ccw", "speed":30},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedOrbitPlanJson);
-    }
-
-    /* Canned SEARCH test (ROADMAP 1.1.7): real perception. Targets an object NOT in the world
-       ("person") on purpose, so the pattern runs to its timeout and you can WATCH the full circle
-       get traced (chords + 360 look-arounds) instead of it stopping early on a detection. Sweeps ccw
-       starting ahead. To exercise the found-and-stop path instead, target "car". Skips the VLM. */
-    void injectCannedSearchPlan() {
-        static const char* kCannedSearchPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned search",  "action":"search",
-             "target_object":"person", "start_heading_deg":0, "direction":"ccw",
-             "expected_search_time_sec":40, "timeout_sec":90},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedSearchPlanJson);
-    }
-
-    /* Emergency-boundary test (spec 1 6.1): takeoff, then a synthetic close obstacle is injected
-       for a short burst once airborne so the velocity-scaled boundary trips deterministically. */
-    void injectCannedBoundaryPlan() {
-        static const char* kCannedBoundaryPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"}
-        ])";
-        m_obstacleArmed = true;
-        translateToBaseCommands(kCannedBoundaryPlanJson);
-    }
-
-    /* Interrupt-storm test (spec 1 6.3): the same obstacle burst, but VLM-driven (mission kept
-       active) so the escalated reassess prompt is actually built. The burst trips the boundary
-       >= kInterruptMaxRetries times inside the window (escalated=1), then clears so the hold path
-       reaches maybePlan and wakes the VLM, whose next prompt then carries the [ESCALATION] block. */
-    void injectCannedStormPlan() {
-        static const char* kCannedStormPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"}
-        ])";
-        m_obstacleArmed = true;
-        m_missionActive.store(true, std::memory_order_release);   /* wake the VLM after the burst. */
-        translateToBaseCommands(kCannedStormPlanJson);
-    }
-
-    /* APPROACH motion-gate test (spec 1 6.4): the canned synthetic approach reaches the standoff,
-       but the motion-gate is forced off-nominal so "reached" is treated as an impact -- proves the
-       gate raises approach_impact instead of approach_ok, deterministically and with no collision. */
-    void injectCannedApproachImpactPlan() {
-        m_forceApproachImpact = true;
-        injectCannedApproachPlan();   /* enables the synthetic rig + runs takeoff/approach/land. */
-    }
-
-    /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
-       then immediately UNDONE, one axis at a time, before the next axis starts.
-       Every "return" leg re-anchors from fresh od.yaw + od.pos at that leg's own
-       activation (not an assumed prior target) -- isolates flu_to_ned correctness
-       from GO controller error, and isolates each axis's error from the others
-       since a bad return doesn't carry into the next axis's outbound leg. */
-    void injectCannedCrossPlan() {
-        static const char* kCannedCrossPlanJson = R"([
-            {"thought":"canned takeoff",             "action":"takeoff"},
-            {"thought":"canned go forward",          "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
-            {"thought":"canned go left",             "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
-            {"thought":"canned go back",             "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
-            {"thought":"canned go right",            "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
-            {"thought":"canned land",                "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedCrossPlanJson);
-    }
-
-    /* Airborne backpressure test (spec-3, ROADMAP 1.4): fly the canned cross, then ~5s after
-       reaching FLIGHT a 100-action flood is injected mid-air (see controlLoop). Proves an
-       in-flight command storm is absorbed safely -- the queue stays bounded, excess is
-       dropped, and the maneuver in progress is NOT hijacked (FIFO: the storm queues BEHIND
-       the live plan, so the drone finishes its legs + lands before the no-op stops run). */
-    void injectCannedCrossFloodPlan() {
-        injectCannedCrossPlan();   /* takeoff + cross legs + land, enqueued at startup. */
-        m_floodArmed = true;       /* controlLoop fires the flood once airborne. */
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] AIRBORNE FLOOD armed: flooding ~5s after reaching FLIGHT.");
-    }
-
-    /* Outbound excursion for the battery-behaviour tests: takeoff, fly ~8m straight out (so RTH
-       has a real distance to cover and land-in-place is genuinely far from home), then land. */
-    void injectCannedOutboundPlan() {
-        static const char* kCannedOutboundPlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned fly out 8m", "action":"go", "x":800, "y":0, "z":0, "speed":40},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedOutboundPlanJson);
-    }
-
-    /* Battery RTH behaviour test (spec-3, ROADMAP 6.2): fly out, then force a drop to 18% far
-       from home -> the <=20% law returns the drone to origin, where it lands and disarms. */
-    void injectCannedBatteryRthPlan() {
-        injectCannedOutboundPlan();
-        m_batForceArmed = true; m_batForceValue = 18;
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] BATTERY-RTH armed: forcing 18%% ~15s after reaching FLIGHT.");
-    }
-
-    /* Battery land-in-place test (spec-3, ROADMAP 6.2): fly out, then force a sudden crash to
-       8% far from home -> the <=10% law lands the drone WHERE IT IS (no return to origin). */
-    void injectCannedBatteryLandNowPlan() {
-        injectCannedOutboundPlan();
-        m_batForceArmed = true; m_batForceValue = 8;
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] BATTERY-LANDNOW armed: forcing 8%% ~15s after reaching FLIGHT.");
-    }
-
-    /* Real-drain battery test (spec-3, ROADMAP 6.2): fly out ~6m then loop a 4m box (stays
-       6-10m from origin, never sitting at home), while the PX4 pack drains for real. Whenever
-       OUR <=20% failsafe fires -- a drain-dependent, "random" point along the patrol -- RTH
-       brings it home. Many legs; the failsafe pre-empts and drains the rest. Run with PX4's own
-       low-battery action DISABLED (COM_LOW_BAT_ACT=0) so it can't hijack the descent. */
-    void injectCannedPatrolPlan() {
-        std::string plan = "[";
-        plan += R"({"thought":"canned takeoff","action":"takeoff"},)";
-        plan += R"({"thought":"fly out 6m","action":"go","x":600,"y":0,"z":0,"speed":40},)";
-        for (int i = 0; i < 5; ++i) {   /* 5 loops of a 4m box, keeps it ~6-10m out for ~200s */
-            plan += R"({"thought":"patrol","action":"go","x":0,"y":400,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":400,"y":0,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":0,"y":-400,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":-400,"y":0,"z":0,"speed":40},)";
-        }
-        plan += R"({"thought":"canned land","action":"land"}])";
-        RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] PATROL plan: fly out + box loops; real battery drain drives the failsafe.");
-        translateToBaseCommands(plan);
-    }
-
-    /* Low vs high commanded speed, forward+return, back to back. Same guidance
-       law, same axis, only m_activeSpeed differs -- isolates whether curvature
-       scales with commanded speed (actuator-lag/overshoot signature) or is
-       roughly constant regardless (points elsewhere, e.g. the settle window). */
-    void injectCannedSpeedPlan() {
-        static const char* kCannedSpeedPlanJson = R"([
-            {"thought":"canned takeoff",              "action":"takeoff"},
-            {"thought":"canned go forward LOW speed",  "action":"go", "x":100,  "y":0, "z":0, "speed":15},
-            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":15},
-            {"thought":"canned go forward HIGH speed", "action":"go", "x":100,  "y":0, "z":0, "speed":80},
-            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":80},
-            {"thought":"canned land",                  "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedSpeedPlanJson);
     }
 
 private:

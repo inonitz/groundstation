@@ -78,6 +78,13 @@ if(GROUNDSTATION_BUILD_TESTS)
     target_compile_features(plan_parse_test PRIVATE cxx_std_17)
     add_custom_target(run_plan_parse_test COMMAND plan_parse_test DEPENDS plan_parse_test)
 
+    # ROS-free unit test for the pure decision points the canned-plan rewrite exposed:
+    # commandIdFromAction (command_id.hpp) + parseTestPlan (test/fmu_test_plans.hpp).
+    add_executable(fmu_translate_test test/fmu_translate_test.cpp)
+    target_link_libraries(fmu_translate_test PRIVATE util_base_header UTIL2::util2)
+    target_compile_features(fmu_translate_test PRIVATE cxx_std_17)
+    add_custom_target(run_fmu_translate_test COMMAND fmu_translate_test DEPENDS fmu_translate_test)
+
     # ROS-free unit test for perception/detection_query.hpp (block 5.1). perception_types.hpp
     # has zero heavy deps (util2 base types only), so point at the vendored build_yolo repo's
     # include dir directly instead of linking Perception::vision (which would drag in
