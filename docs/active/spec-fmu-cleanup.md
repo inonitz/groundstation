@@ -82,6 +82,11 @@ the Manager, `servoSearch`, `servoApproach`) — leaving `controlLoop` as dispat
 (odometry read, safety, telemetry). Behavior-identical; verify the existing SITL scenarios still fly
 (the ones under `scripts/test/SITL/` that use kept `--canned-*` flags). Start with the unlocked verbs.
 
+> FUTURE (an anecdote, NOT this pass): the end-state of pulling each command out is each becoming a
+> stateful class (e.g. `ApproachCommand` owning + managing its own state and helpers) -- that is where
+> moving command state OUT of the node leads. This pass stops at plain functions for readability;
+> do NOT introduce the command classes yet.
+
 ### F. (Deferred, when the scenarios are retired) test-injection hooks + demo hacks
 - The `controlLoop` fault-injection hooks (`m_floodArmed`, `m_obstacleArmed` inside the emergency-
   boundary SAFETY block, `m_batForce*`) are production-dead but still present. Remove with the Manager

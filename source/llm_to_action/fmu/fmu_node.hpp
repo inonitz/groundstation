@@ -210,15 +210,6 @@ struct ActiveTask {
     LargeFixedStringType m_thought = "\0";
 };
 
-/* TargetDetection / PerceptionSnapshot now come from the vision lib (global
-   namespace, vision/perception_types.hpp via perception_runtime.hpp) --
-   telemetry stays the only stub left here. */
-struct VehicleTelemetry {
-    f32 altitude_cm{0.0f};
-    f32 vx_cm_s{0.0f}, vy_cm_s{0.0f}, vz_cm_s{0.0f};
-    i32 battery_pct{100};
-};
-
 struct HistoryBuffer {
     std::string             m_initialCommand;
     std::vector<ActiveTask> m_completedTasks;
@@ -295,43 +286,7 @@ public:
         m_backend = make_active_backend(this, m_cbGroup);
         m_backend->start();
 
-        /* A2 observability (additive): image topics the perception loops feed, a text
-           HUD topic, and the per-run VLM prompt/response log path (filename fixed once
-           here so a whole run lands in one file -- no per-cycle recompute, no clobber
-           across runs). std::error_code overload: a pre-existing dir is not an error. */
-        {
-            const char* obs  = std::getenv("FMU_OBSERVABILITY");
-            mb_observability = obs && obs[0] != '\0' && obs[0] != '0';
-        }
-        if (mb_observability) {
-            m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
-            m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
-            m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
-            m_pubVlmText       = this->create_publisher<std_msgs::msg::String>(kVlmTextTopic, 10);
-            m_pubVlmContext    = this->create_publisher<std_msgs::msg::String>(kVlmContextTopic, 10);
-            m_pubRates         = this->create_publisher<std_msgs::msg::String>(kFmuRatesTopic, 10);
-            /* Debug-only higher-res A2 images: FMU_A2_IMG_W / FMU_A2_IMG_H override the 320x240
-               publish size. Still ~10 Hz throttled and only encoded while a dashboard client is
-               attached, so a bigger size costs nothing until you actually watch it; clamped to the
-               source frame at publish time (no upscale). Leave unset for the lean default. */
-            if (const char* w = std::getenv("FMU_A2_IMG_W")) { int v = std::atoi(w); if (v > 0) m_a2ImgW = v; }
-            if (const char* h = std::getenv("FMU_A2_IMG_H")) { int v = std::atoi(h); if (v > 0) m_a2ImgH = v; }
-            if (m_a2ImgW != static_cast<int>(kA2ImgW) || m_a2ImgH != static_cast<int>(kA2ImgH))
-                RCLCPP_WARN(this->get_logger(),
-                    "[FMU_NODE_DEBUG] A2 DEBUG image size = %dx%d (default %dx%d). Higher res costs CPU/bandwidth"
-                    " ONLY while the dashboard is open; still ~10 Hz capped.", m_a2ImgW, m_a2ImgH,
-                    static_cast<int>(kA2ImgW), static_cast<int>(kA2ImgH));
-            m_vlmLogPath       = makeVlmLogPath();
-            std::error_code ec;
-            std::filesystem::create_directories(kVlmPromptLogDir, ec);
-            if (ec) {
-                RCLCPP_WARN(this->get_logger(),
-                    "[FMU_NODE_DEBUG] VLM log dir create failed (%s): %s -- prompt log disabled.",
-                    kVlmPromptLogDir, ec.message().c_str());
-            }
-        }
-        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] observability=%s.",
-            mb_observability ? "ON" : "off");
+        initDashboardDiagnostics();   /* A2 dashboard pipeline, iff FMU_OBSERVABILITY is set. */
 
         /* Two-rate perception (ARCH sec 9): PerceptionRuntime owns its own seg/depth
            threads and publishes an atomic PerceptionSnapshot; buildDynamicPrompt()
@@ -364,10 +319,14 @@ public:
             std::chrono::milliseconds{kControlLoopPeriodMs},
             std::bind(&FlightManagementUnitNode::controlLoop, this), m_cbGroup);
 
-        /* max_tokens caps generation. A plan is ~200 tokens; the old 32768 (65536/2)
-           let a no-EOS runaway ramble for minutes and wedge the planner. 512 bounds
-           it to ~4s. temp 0.2 matches the server and reduces degenerate loops. */
-        m_vlmClient.create(kSystemPrompt, 0.2f, 768);
+        /* max_tokens is a CEILING on generation, not a target: the model still stops at EOS on a
+           short reply, so raising it costs nothing there -- it only stops a long "thought" from
+           being clipped mid-sentence (768 was clipping them). 1024 gives headroom. The old 32768
+           let a no-EOS runaway ramble for minutes and wedge the planner. temp 0.2 matches the
+           server and reduces degenerate loops. (A per-call budget -- e.g. a smaller cap on reassess
+           cycles -- is a possible latency tweak, deferred: a low reassess cap re-truncates thoughts,
+           and there is no initial-vs-reassess signal plumbed here to branch on.) */
+        m_vlmClient.create(kSystemPrompt, 0.2f, 1024);
         m_chat.m_completedTasks.reserve(kDefaultPromptHistorySize);
 
         RCLCPP_INFO(this->get_logger(),
@@ -672,10 +631,6 @@ private:
         u32         di;
 
         od = m_backend->odometry();
-        {
-            i32 bf = m_batteryForce.load(kMemOrderRelax);   /* test-only fault injection; -2 = off */
-            m_telemetry.battery_pct = (bf >= -1) ? bf : m_backend->battery_pct();
-        }
         n  = od.pos.x;
         e  = od.pos.y;
         d  = od.pos.z;
@@ -1575,6 +1530,51 @@ private:
        Image/HUD publishing + the per-run VLM prompt/response log. None of this
        feeds control; it is pure inspection tooling for the live demo. */
 
+    /* Enable the A2 dashboard-diagnostics pipeline iff FMU_OBSERVABILITY is set: the annotated /
+       depth / HUD / VLM-text / context / rates publishers, the optional FMU_A2_IMG_W/H debug image
+       size, and the per-run VLM prompt log (filename fixed once so a whole run lands in one file --
+       no per-cycle recompute, no clobber across runs). Off by default: zero publishers, zero
+       per-cycle cost. Called once from the ctor; the getenv here is the sanctioned config hook. */
+    void initDashboardDiagnostics() {
+        /* A2 observability (additive): image topics the perception loops feed, a text
+           HUD topic, and the per-run VLM prompt/response log path (filename fixed once
+           here so a whole run lands in one file -- no per-cycle recompute, no clobber
+           across runs). std::error_code overload: a pre-existing dir is not an error. */
+        {
+            const char* obs  = std::getenv("FMU_OBSERVABILITY");
+            mb_observability = obs && obs[0] != '\0' && obs[0] != '0';
+        }
+        if (mb_observability) {
+            m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
+            m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
+            m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
+            m_pubVlmText       = this->create_publisher<std_msgs::msg::String>(kVlmTextTopic, 10);
+            m_pubVlmContext    = this->create_publisher<std_msgs::msg::String>(kVlmContextTopic, 10);
+            m_pubRates         = this->create_publisher<std_msgs::msg::String>(kFmuRatesTopic, 10);
+            /* Debug-only higher-res A2 images: FMU_A2_IMG_W / FMU_A2_IMG_H override the 320x240
+               publish size. Still ~10 Hz throttled and only encoded while a dashboard client is
+               attached, so a bigger size costs nothing until you actually watch it; clamped to the
+               source frame at publish time (no upscale). Leave unset for the lean default. */
+            if (const char* w = std::getenv("FMU_A2_IMG_W")) { int v = std::atoi(w); if (v > 0) m_a2ImgW = v; }
+            if (const char* h = std::getenv("FMU_A2_IMG_H")) { int v = std::atoi(h); if (v > 0) m_a2ImgH = v; }
+            if (m_a2ImgW != static_cast<int>(kA2ImgW) || m_a2ImgH != static_cast<int>(kA2ImgH))
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] A2 DEBUG image size = %dx%d (default %dx%d). Higher res costs CPU/bandwidth"
+                    " ONLY while the dashboard is open; still ~10 Hz capped.", m_a2ImgW, m_a2ImgH,
+                    static_cast<int>(kA2ImgW), static_cast<int>(kA2ImgH));
+            m_vlmLogPath       = makeVlmLogPath();
+            std::error_code ec;
+            std::filesystem::create_directories(kVlmPromptLogDir, ec);
+            if (ec) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] VLM log dir create failed (%s): %s -- prompt log disabled.",
+                    kVlmPromptLogDir, ec.message().c_str());
+            }
+        }
+        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] observability=%s.",
+            mb_observability ? "ON" : "off");
+    }
+
     static const char* flightStateName(FlightState st) {
         switch (st) {
             case FlightState::STANDBY: return "STANDBY";
@@ -1691,7 +1691,7 @@ private:
             "STATE=%s ALT=%.2fm TASK=%s VLM=%s DET=%s VEL=%.2fm/s BATT=%d%%",
             flightStateName(st), altUp, task,
             m_planning.load(kMemOrderRelax) ? "busy" : "idle",
-            det, vel, m_telemetry.battery_pct);
+            det, vel, effectiveBatteryPct());
         RCLCPP_INFO(this->get_logger(), "[FMU_HUD] %s", body);
         msg.data = body;
         m_pubHud->publish(msg);
@@ -1732,11 +1732,19 @@ private:
     }
 
     /* ---- Battery failsafe + manual override ------------------------------ */
-    /* Returns true if the failsafe pre-empted this tick. battery_pct < 0
+    /* Live effective battery %: the test-only fault injection if armed (m_batteryForce != -2),
+       else the backend's continuously-updated reading. Read ON DEMAND -- never cached, so a low
+       battery can never be masked by a stale value. Cheap: one atomic load + the backend's atomic. */
+    i32 effectiveBatteryPct() const {
+        i32 bf = m_batteryForce.load(kMemOrderRelax);   /* -2 = inactive; else the forced %. */
+        return (bf >= -1) ? bf : m_backend->battery_pct();
+    }
+
+    /* Returns true if the failsafe pre-empted this tick. battery % < 0
        (kBatteryReadingUnknown) means no trustworthy reading -> skip; a real 0 is
        empty and triggers. Latches so a wobbling reading can't oscillate the state. */
     bool batteryFailsafeTick() {
-        i32 pct = m_telemetry.battery_pct;
+        i32 pct = effectiveBatteryPct();
         if (pct < 0)          return false;   /* UNKNOWN sentinel: never a false alarm. */
         if (mb_batteryReturn || mb_batteryLand) return false;   /* EITHER failsafe latched -> committed to a landing; don't re-evaluate (land-in-place must not then escalate to RTH). */
 
@@ -2254,25 +2262,6 @@ private:
     }
 
     /* ---- VLM plumbing (invoked by the Phase-2 event-driven wake, not a poll) ---- */
-    /* CommandID -> short verb, for the dashboard's executed-command list. */
-    static const char* cmdName(CommandID id) {
-        switch (id) {
-            case CommandID::TAKEOFF:  return "takeoff";
-            case CommandID::LAND:     return "land";
-            case CommandID::STOP:     return "stop";
-            case CommandID::HOVER:    return "hover";
-            case CommandID::GO:       return "go";
-            case CommandID::CURVE:    return "curve";
-            case CommandID::ROTATE:   return "rotate";
-            case CommandID::ORBIT:    return "orbit";
-            case CommandID::SEARCH:   return "search";
-            case CommandID::REASSESS: return "reassess";
-            case CommandID::APPROACH: return "approach";
-            case CommandID::FOLLOW:   return "follow";
-            default:                  return "?";
-        }
-    }
-
     /* A2: publish the mission objective + executed-command history (with status) as JSON on
        /fmu/vlm_context. This is the SAME context buildDynamicPrompt() feeds the model -- the
        dashboard shows what the VLM was told, not just its reply. Obs-gated, event-driven
@@ -2730,7 +2719,6 @@ private:
     llamaClientConnection                           m_vlmClient;
     khUDPCamMsgType                                 m_currImg;
     HistoryBuffer                                   m_chat;
-    VehicleTelemetry                                m_telemetry;
     std::unique_ptr<PerceptionRuntime>               m_perception;
 
     /* A2 observability (additive): image + HUD publishers, per-run VLM log path, HUD throttle. */

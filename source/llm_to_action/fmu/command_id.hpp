@@ -45,3 +45,24 @@ inline CommandID commandIdFromAction(std::string_view action) {
     if (action == "search")   return CommandID::SEARCH;
     return CommandID::MAX_ID;
 }
+
+/* Inverse of commandIdFromAction: a CommandID -> its short verb string, for logs and the
+   dashboard's executed-command list. Total; MAX_ID / anything unmapped -> "?". Kept next to its
+   inverse so the action vocabulary has exactly one home. */
+inline const char* cmdName(CommandID id) {
+    switch (id) {
+        case CommandID::TAKEOFF:  return "takeoff";
+        case CommandID::LAND:     return "land";
+        case CommandID::STOP:     return "stop";
+        case CommandID::HOVER:    return "hover";
+        case CommandID::GO:       return "go";
+        case CommandID::CURVE:    return "curve";
+        case CommandID::ROTATE:   return "rotate";
+        case CommandID::ORBIT:    return "orbit";
+        case CommandID::SEARCH:   return "search";
+        case CommandID::REASSESS: return "reassess";
+        case CommandID::APPROACH: return "approach";
+        case CommandID::FOLLOW:   return "follow";
+        default:                  return "?";
+    }
+}

@@ -8,6 +8,7 @@
     No rclcpp, no sim, no hardware -- runs anywhere (see fmu/CMakeLists.txt, GROUNDSTATION_BUILD_TESTS).
 */
 #include <cstdio>
+#include <string>
 #include "../command_id.hpp"
 #include "fmu_test_plans.hpp"
 
@@ -40,6 +41,12 @@ int main() {
     CHECK(commandIdFromAction("reassess") == CommandID::MAX_ID);   /* internal, never an action */
     CHECK(commandIdFromAction("TAKEOFF")  == CommandID::MAX_ID);   /* case-sensitive on purpose */
     CHECK(commandIdFromAction("go ")      == CommandID::MAX_ID);   /* no trimming */
+
+    /* cmdName is the inverse of commandIdFromAction for the handled verbs (round-trip). */
+    CHECK(std::string(cmdName(CommandID::TAKEOFF)) == "takeoff");
+    CHECK(std::string(cmdName(CommandID::MAX_ID))  == "?");
+    for (const char* v : {"takeoff","land","stop","hover","go","rotate","approach","follow","orbit","search"})
+        CHECK(std::string(cmdName(commandIdFromAction(v))) == v);
 
     /* parseTestPlan: each surviving flag -> its enum; unknown / removed / none -> None. */
     CHECK(parseFlag("--canned-cross")           == TestPlan::Cross);
