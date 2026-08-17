@@ -7,7 +7,7 @@
 #
 # Caller knobs (set BEFORE sourcing; defaults below):
 #   FMU_OBJECTIVE    mission string handed to the FMU.
-#   FMU_CANNED_FLAG  canned-plan flag, e.g. --canned-rotate ("" = VLM-driven).
+#   FMU_CANNED_FLAG  canned-plan flag, e.g. --canned-cross ("" = VLM-driven).
 #   WORLD_NAME       sim world basename in dependencies/ (default: default_car).
 #   SPAWN_POSE       drone spawn x,y,z (default: 0,7,3).
 #   LAUNCH_VLM       1 => also start the Qwen3-VL llama-server pane (default: 0).
