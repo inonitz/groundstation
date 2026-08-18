@@ -73,3 +73,28 @@ These are the ones we actually need answered — they decide whether your API su
 
 Let's pair over the code. The three that unblock the most for us, in order: **video (Q1), indoor
 position (Q2), gimbal (Q3).**
+
+
+---
+
+## 2026-08-17 re-review (after the camera commits) — for the app author
+
+**The POST verbs need a status code, and the GET verbs honestly should not exist.** It makes no
+logical sense to "GET" a takeoff command — a GET should *fetch* something (drone state, telemetry,
+a one-off status), never *perform* an action. Takeoff/land are actions, so they are POST-only.
+
+- **POST `/c/takeoff` and POST `/c/land` still send no response body** — they call
+  `controller.fly{ … }` with no `call.respond()` (confirmed in `ApiServer.kt` HEAD, lines 417-422).
+  A client can't confirm the command landed. **Add `call.respond(ok())` to both** — one line each,
+  exactly like `/flyTo`, `/lookAt`, `/fly` already do.
+- **Remove the `GET /(fly|takeoff)` and `GET /land` routes.** They exist only as a workaround for the
+  missing POST responses; once the POST verbs respond, they are redundant and semantically wrong.
+- **Video is RTMP, not what we need.** The camera streaming that landed uses `LiveStreamType.RTMP`
+  (`DJICamera.kt`) via `POST /c/stream/start {rtmpUrl}`. For Linux perception (<1 s see→act) we need
+  raw H.264 off the drone, not RTMP (an ingest server + 1-5 s latency breaks the closed loop). Please
+  add an `ICameraStreamManager` receive-stream/frame listener that forwards the H.264 NAL units over a
+  plain TCP socket. (Full detail: `docs/NOTES.md` 2026-08-17.)
+
+Until then, our `DjiBackend` confirms takeoff/land from telemetry (`aircraft.isFlying`), so it already
+works against the current app despite the missing response body — verified against the mock's new
+`MOCK_SILENT_VERBS` mode (POST verbs → 204, no body).

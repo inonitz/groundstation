@@ -5,13 +5,13 @@ Verifies interrupt-storm escalation AND recovery (spec 2026-08-07-spec-1 §D, RO
 and the next VLM prompt carries an `[ESCALATION]` block telling the model to reason about the root
 cause and find a creative escape. A later clean task completion resets the detector.
 
-- **Canned flag:** `--canned-storm`
+- **Scenario:** `--scenario-storm`
 - **VLM:** on (`LAUNCH_VLM=1`) — needed for the escalated prompt AND the recovery re-plan.
 - **World:** `rubicon_targets`   **Spawn:** `0,7,3`
 - **Filter:** Auto PASS/FAIL on escalation; RECOVERY is a soft, operator-confirmed signal.
 
 ## How it's triggered
-`--canned-storm` takes off, then injects a synthetic close-obstacle burst for ~1.5 s. That trips
+`--scenario-storm` takes off, then injects a synthetic close-obstacle burst for ~1.5 s. That trips
 the boundary many times inside the window (deterministic `escalated=1`), then clears. The prompt
 text is not logged, so the FMU logs `ESCALATION block added to reassess prompt` when it adds the
 block — that is what the filter greps.

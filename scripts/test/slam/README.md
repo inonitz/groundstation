@@ -30,7 +30,7 @@ cd scripts/test/slam
 ```
 
 `run.sh` brings up the normal SITL stack through `lib/sim_core.sh`, then grafts on
-two extra tmux panes: the SLAM node, and the comparator. It flies `--canned-cross`
+two extra tmux panes: the SLAM node, and the comparator. It flies `--scenario-cross`
 in `rubicon_targets`, which is textured enough for monocular tracking to
 initialise. `default_car` and `empty` are not.
 

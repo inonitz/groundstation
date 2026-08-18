@@ -23,7 +23,7 @@ cd scripts/test/<feature>
 
 ## Add a new feature
 Copy any `<feature>/` folder, then in its `run.sh` set `FMU_OBJECTIVE`,
-`FMU_CANNED_FLAG`, `WORLD_NAME`, `SPAWN_POSE` (see `lib/sim_core.sh` header for all
+`FMU_SCENARIO_FLAG`, `WORLD_NAME`, `SPAWN_POSE` (see `lib/sim_core.sh` header for all
 knobs, incl. `LAUNCH_VLM=1` and `DRAIN_BATTERY=1`). Point `filter.sh` at the right
 mode (`rotate` or `land`). No engine code to copy — that lives once in `lib/sim_core.sh`.
 

@@ -22,7 +22,7 @@ LAUNCH_ASR="1"
 # FMU_OBJECTIVE="Execute an orbit on the building in front of us, find the first window you can see and get close to it. Land shortly after."
 # LAUNCH_ASR="0"
 
-FMU_CANNED_FLAG=""            # "" = VLM-driven
+FMU_SCENARIO_FLAG=""            # "" = VLM-driven
 WORLD_NAME="rubicon_tree"     # Rubicon map (has the building) + the three people (harmless here)
 SPAWN_POSE="0,7,3"           # facing +x; adjust if the building isn't in front (you can SEE the GUI)
 LAUNCH_VLM="1"               # Qwen3-VL llama-server (prewarmed)

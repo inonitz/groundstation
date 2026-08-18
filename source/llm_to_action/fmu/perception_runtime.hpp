@@ -40,7 +40,7 @@
 #include <vision/yolo_depth_engine.hpp>
 #include <vision/coco_labels.hpp>
 
-#include "gstreamer_udp_cam_rx/rx_node_base.hpp" /* khUDPCamMsgType */
+#include "gstreamer_udp_cam_rx/rx_node_base.hpp" /* khCameraPipelineMsgType */
 
 class PerceptionRuntime {
 public:
@@ -49,7 +49,7 @@ public:
        compile and simply skip publishing -- purely additive, no behavior change. */
     PerceptionRuntime(const std::string& segModelPath, const std::string& depthModelPath,
                        int segThreads, int depthThreads, u32 segLoopMs, u32 depthLoopMs,
-                       std::function<khUDPCamMsgType()> frameSource,
+                       std::function<khCameraPipelineMsgType()> frameSource,
                        std::function<void(cv::Mat const&)> onAnnotatedFrame = {},
                        std::function<void(cv::Mat const&)> onDepthColormap  = {})
         : m_seg(segModelPath, segThreads)
@@ -185,7 +185,7 @@ private:
     void segLoop() {
         while (m_running.load(std::memory_order_relaxed)) {
             auto tickStart = std::chrono::steady_clock::now();
-            khUDPCamMsgType img = m_frameSource();
+            khCameraPipelineMsgType img = m_frameSource();
             if (img && m_seg.ok()) {
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
@@ -209,7 +209,7 @@ private:
     void depthLoop() {
         while (m_running.load(std::memory_order_relaxed)) {
             auto tickStart = std::chrono::steady_clock::now();
-            khUDPCamMsgType img = m_frameSource();
+            khCameraPipelineMsgType img = m_frameSource();
             if (img && m_depth.ok()) {
                 cv::Mat frame = cv_bridge::toCvShare(img, "bgr8")->image;
                 if (!frame.empty()) {
@@ -347,7 +347,7 @@ private:
 
     vision::YoloSegEngine             m_seg;
     vision::YoloDepthEngine           m_depth;
-    std::function<khUDPCamMsgType()>  m_frameSource;
+    std::function<khCameraPipelineMsgType()>  m_frameSource;
     std::function<void(cv::Mat const&)> m_onAnnotatedFrame; /* A2: annotated-frame sink (fmu publishes). */
     std::function<void(cv::Mat const&)> m_onDepthColormap;  /* A2: raw depth-mat sink (fmu colormaps).   */
     std::chrono::milliseconds         m_segPeriod;

@@ -49,13 +49,13 @@ done
 # A cross gives translation on both horizontal axes, so the drift number reflects
 # real motion instead of a single straight line that a scale error can hide in.
 : "${FMU_OBJECTIVE:=Fly a canned cross while SLAM tracks.}"
-: "${FMU_CANNED_FLAG:=--canned-cross}"
+: "${FMU_SCENARIO_FLAG:=--scenario-cross}"
 # rubicon_targets is textured; default_car and empty are too feature-poor for
 # monocular tracking to initialise reliably.
 : "${WORLD_NAME:=rubicon_targets}"
 : "${SPAWN_POSE:=0,7,3}"
 SESSION_NAME="${SESSION_NAME:-llmsim}"
-export FMU_OBJECTIVE FMU_CANNED_FLAG WORLD_NAME SPAWN_POSE SESSION_NAME
+export FMU_OBJECTIVE FMU_SCENARIO_FLAG WORLD_NAME SPAWN_POSE SESSION_NAME
 
 # The SLAM node needs stella/g2o/yaml-cpp, which install next to the binary.
 SLAM_START_DELAY="${SLAM_START_DELAY:-12}"

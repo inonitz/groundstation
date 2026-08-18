@@ -21,6 +21,7 @@ real backend sends and align both sides in one place.
 """
 import asyncio
 import json
+import os
 import sys
 import time
 
@@ -36,6 +37,13 @@ STATE = {
     "batteryPct": 87,
 }
 LAST_STICKS_US = 0  # for the keepalive/failsafe check
+
+# When MOCK_SILENT_VERBS is set, faithfully simulate the CURRENT recon-swarm app:
+# POST /c/takeoff and /c/land perform the action but send NO ok body (the author
+# omitted call.respond() on those two POST handlers -- confirmed in ApiServer.kt).
+# We return 204 No Content. The Linux backend must then confirm the verb from
+# telemetry (aircraft.isFlying), not from the HTTP reply.
+SILENT_VERBS = bool(os.environ.get("MOCK_SILENT_VERBS"))
 
 
 def now_us():
@@ -110,6 +118,8 @@ async def status_signal(_req):
 async def takeoff(_req):
     STATE["isFlying"] = True
     STATE["pos"]["z"] = max(STATE["pos"]["z"], 1.2)
+    if SILENT_VERBS:
+        return web.Response(status=204)   # action done, no ok body (like the real app)
     return ok(status="takeoff")
 
 
@@ -117,6 +127,8 @@ async def land(_req):
     STATE["isFlying"] = False
     STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
     STATE["pos"]["z"] = 0.0
+    if SILENT_VERBS:
+        return web.Response(status=204)   # action done, no ok body (like the real app)
     return ok(status="landed")
 
 

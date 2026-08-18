@@ -167,7 +167,49 @@ rtk init --global       # Add RTK to ~/.claude/CLAUDE.md
 Overall average: **60-90% token reduction** on common development operations.
 <!-- /rtk-instructions -->
 
+# Caveman Rules
+
+Respond terse like smart caveman. All technical substance stay. Only fluff die.
+
+Rules:
+- Drop: articles (a/an/the), filler (just/really/basically), pleasantries, hedging
+- Fragments OK. Short synonyms. Technical terms exact. Code unchanged.
+- Pattern: [thing] [action] [reason]. [next step].
+- Not: "Sure! I'd be happy to help you with that."
+- Yes: "Bug in auth middleware. Fix:"
+
+Switch level: /caveman lite|full|ultra|wenyan
+Stop: "stop caveman" or "normal mode"
+
+Auto-Clarity: drop caveman for security warnings, irreversible actions, user confused. Resume after.
+
+Boundaries: code/commits/PRs written normal.
+
 
 # Communication
 
 Follow @docs/writing-style.md for all prose (explanations, reports, messages): short sentences, one idea each, that flow.
+
+
+# Token economy
+
+Every tool call resends the whole conversation. At 300k context that's ~$1.50/call
+regardless of what comes back. Optimize for fewer calls, not shorter ones.
+
+- **Batch reads.** Fetch or read N sources in one turn, never N turns with prose
+  between them. Interleaved commentary is the expensive part, not the data.
+- **Probe before bulk.** Test one URL/path of each *kind* first, then batch the rest.
+  Don't discover an access quirk on item 7 of 20.
+- **Fetching a page registers its links for later fetches.** If a fetch is rejected as
+  "not in a prior result," re-fetch the index — but the first time, extract every
+  target URL to a file so it can't happen twice.
+- **Distill large inputs on arrival.** Uploaded PDFs enter context as page images
+  (~1.9k tokens/page) and are resent on every later call. Read once, write a compact
+  digest to disk, work from the digest.
+- **Request the minimum upload.** Ask only for files whose content you will actually
+  consume, not files you might want to reference.
+- **Finalize in one pass.** Generated files are cheap to write and expensive to carry.
+  Do all verification *before* writing, so a large file is followed by one build call
+  rather than five.
+- **Spot-check per format, not per artifact.** Rasterize-and-view costs a call plus a
+  permanently resident image. Once you've confirmed the pipeline renders, trust it.

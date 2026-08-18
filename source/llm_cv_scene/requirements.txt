@@ -1,0 +1,8 @@
+# Scene demo (Python, standalone from the C++ tree). Install on the GPU box.
+# torch: install the ROCm build for your AMD card (RX 7900 = gfx1100), OR run CPU. NO CUDA.
+# rclpy + std_msgs are NOT pip packages -- they come from your sourced ROS2 install
+#   (source /opt/ros/<distro>/setup.bash) so the demo can subscribe to /asr_server/transcribe.
+ultralytics>=8.3.0
+opencv-python
+numpy
+requests

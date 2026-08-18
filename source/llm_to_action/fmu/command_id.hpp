@@ -28,7 +28,7 @@ enum class CommandID : u8 {
     MAX_ID   = 12   /* count, and the "unknown action" sentinel commandIdFromAction returns. */
 };
 
-/* Map a VLM/canned plan action string to its CommandID. Total and pure: returns MAX_ID for any
+/* Map a VLM/scenario action string to its CommandID. Total and pure: returns MAX_ID for any
    string the translate path does not handle (CURVE/REASSESS are internal commands, never emitted
    as a plan "action"). String comparison lives here, isolated and unit-tested; the caller then
    switches on the id. */

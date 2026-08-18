@@ -2,7 +2,7 @@
 
 Same APPROACH servo, but REAL perception (ONNX seg+depth) vs the car in the world.
 
-- **Canned plan flag:** `--canned-approach-real`
+- **Scenario flag:** `--scenario-approach-real`
 - **World:** `default_car`   **Spawn:** `0,7,3`
 - **Filter:** milestone digest (APPROACH sees label=car ...) — no PASS/FAIL.
 

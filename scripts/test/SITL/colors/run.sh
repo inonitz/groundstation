@@ -26,7 +26,7 @@ fi
 
 # --- sim_core.sh knobs ---
 : "${FMU_OBJECTIVE:=Find the BLUE car specifically -- there are two cars, only approach the blue one, then land.}"
-: "${FMU_CANNED_FLAG:=none}"
+: "${FMU_SCENARIO_FLAG:=none}"
 WORLD_NAME="rubicon_colors"
 SPAWN_POSE="0,7,3"
 LAUNCH_VLM="${LAUNCH_VLM:-1}"
@@ -37,7 +37,7 @@ SESSION_NAME="${SESSION_NAME:-llmsim}"
 # vulkaninfo reports no live heap usage here) -- check the real number with whatever GPU tool
 # your machine has before trusting this value for a field demo.
 : "${VLM_CTX_SIZE:=4096}"
-export FMU_OBJECTIVE FMU_CANNED_FLAG WORLD_NAME SPAWN_POSE LAUNCH_VLM SESSION_NAME VLM_CTX_SIZE
+export FMU_OBJECTIVE FMU_SCENARIO_FLAG WORLD_NAME SPAWN_POSE LAUNCH_VLM SESSION_NAME VLM_CTX_SIZE
 
 SLAM_START_DELAY="${SLAM_START_DELAY:-12}"
 CMD_SLAM="export LD_LIBRARY_PATH=$SLAM_BIN_DIR:\$LD_LIBRARY_PATH && \

@@ -104,3 +104,17 @@ non-issue — the drone brakes to hover on stick-stream loss (DJI virtual-stick 
 `dji_convert_test` passes (frame map + parse), and `DjiBackend` drives the mock end to end — takeoff,
 streamed velocity that moves the mock's telemetry, land — with the build compiling + linking. Then it
 is ready to point at the real phone. Suggest house-style commits; do not stage/commit.
+
+
+## APP STATE UPDATE (2026-08-17) -- camera streaming landed
+The recon-swarm app got new commits: `add camera` -> `add camera straming` -> `quality` ->
+`error catching`, plus `add status listening` and `re-add lookat, goto` (latest `suspending actions`).
+**Video off the drone -- the #1 blocker -- now exists.** The commit messages do NOT reveal the
+transport/codec, so:
+1. **Inspect** the new streaming route in `ApiServer.kt` + the camera code: endpoint path, WS vs HTTP,
+   and codec (H264 NAL / MJPEG / JPEG frames / RTMP).
+2. **Mock it**: add that endpoint to `scripts/test/dji_mock/mock_apiserver.py` (looped test clip, same
+   transport) and build DjiBackend's video consumer against it.
+3. Re-verify the other review items against the new commits (takeoff/land response bodies? velocity
+   clamp? `/status` shape still matches?).
+4. Report the video transport back so it gets locked into spec-dji-websocket-protocol.md.

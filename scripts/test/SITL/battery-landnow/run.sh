@@ -6,7 +6,7 @@
 cd "$(dirname "$0")" || exit 1
 export PX4_PARAM_SIM_BAT_DRAIN=3600
 FMU_OBJECTIVE="Battery land-now: fly out, force 8% far, expect land-in-place (no return)."
-FMU_CANNED_FLAG="--canned-battery-landnow"
+FMU_SCENARIO_FLAG="--scenario-battery-landnow"
 WORLD_NAME="empty"
 SPAWN_POSE="0,7,3"
 source ../../lib/sim_core.sh

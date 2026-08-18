@@ -29,7 +29,7 @@ set(FLIGHT_MANAGEMENT_UNIT_COMMON_SOURCES
 # FMU backend(s) to build, from the top-level selection options.
 set(FMU_SELECTED_BACKENDS)
 if(GROUNDSTATION_BUILD_BACKEND_ALL)
-   set(FMU_SELECTED_BACKENDS px4 tello)
+   set(FMU_SELECTED_BACKENDS px4 tello dji)
 else()
    if(GROUNDSTATION_BUILD_BACKEND_PX4)
       list(APPEND FMU_SELECTED_BACKENDS px4)
@@ -61,6 +61,7 @@ foreach(backend_name IN LISTS FMU_SELECTED_BACKENDS)
        Perception::vision
        $<$<STREQUAL:${backend_name},px4>:Drone::px4_backend>
        $<$<STREQUAL:${backend_name},tello>:Drone::tello_backend>
+       $<$<STREQUAL:${backend_name},dji>:Drone::dji_backend>
    )
 
    target_include_directories(${fmu_executable_target} PRIVATE
@@ -78,11 +79,12 @@ if(GROUNDSTATION_BUILD_TESTS)
     target_compile_features(plan_parse_test PRIVATE cxx_std_17)
     add_custom_target(run_plan_parse_test COMMAND plan_parse_test DEPENDS plan_parse_test)
 
-    # ROS-free unit test for the pure decision points the canned-plan rewrite exposed:
-    # commandIdFromAction (command_id.hpp) + parseTestPlan (test/fmu_test_plans.hpp).
+    # ROS-free unit test for the pure decision points the scenario rewrite exposed:
+    # commandIdFromAction (command_id.hpp) + parseTestScenario (test/fmu_test_scenarios.hpp).
     add_executable(fmu_translate_test test/fmu_translate_test.cpp)
     target_link_libraries(fmu_translate_test PRIVATE util_base_header UTIL2::util2)
     target_compile_features(fmu_translate_test PRIVATE cxx_std_17)
+    target_include_directories(fmu_translate_test PRIVATE ${LLM_TO_ACTION_DIR})
     add_custom_target(run_fmu_translate_test COMMAND fmu_translate_test DEPENDS fmu_translate_test)
 
     # ROS-free unit test for perception/detection_query.hpp (block 5.1). perception_types.hpp

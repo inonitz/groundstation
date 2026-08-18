@@ -25,14 +25,15 @@
 #include <cv_bridge/cv_bridge.hpp>
 #include <base64.h>
 
-#include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* UDPCamMsgType, khUDPCamMsgType, camera topic */
+#include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* CameraPipelineMsgType, khCameraPipelineMsgType, camera topic */
 #include "fmu_node_base.hpp"
 #include "drone_config.hpp"   /* DroneConfig + loadDroneConfig (ROADMAP 9.14). */
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
 #include "command_id.hpp"                  /* CommandID + commandIdFromAction (ROS-free). */
-#include "test/fmu_test_plans.hpp"         /* TestPlan + parseTestPlan + scenario JSON (ROS-free). */
+#include "fmu_helpers.hpp"                 /* pure helpers: lateralComponent, labelMatchesTarget. */
+#include "test/fmu_test_scenarios.hpp"         /* TestScenario + parseTestScenario + scenario JSON (ROS-free). */
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 #include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
@@ -252,8 +253,8 @@ public:
             }
         }
 
-        m_subImg = this->create_subscription<UDPCamMsgType>(
-            kOutUDPCameraRawFrameTopic, 10,
+        m_subImg = this->create_subscription<CameraPipelineMsgType>(
+            kOutCameraPipelineRawFrameTopic, 10,
             std::bind(&FlightManagementUnitNode::imgCallback, this, std::placeholders::_1),
             subOpts
         );
@@ -342,16 +343,16 @@ public:
     }
 
     /* Bootstrap: arm the mission. test != None pre-fills the queue with a scripted scenario and
-       skips the VLM (see runTestPlan + test/fmu_test_plans.hpp); None is a normal VLM-driven run. */
-    void start(std::string_view objective, TestPlan test = TestPlan::None) {
+       skips the VLM (see runTestScenario + test/fmu_test_scenarios.hpp); None is a normal VLM-driven run. */
+    void start(std::string_view objective, TestScenario test = TestScenario::None) {
         m_chat.m_initialCommand = objective;
         publishVlmContext();   /* surface the objective on the dashboard right away. */
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = (test != TestPlan::None);
-        m_missionActive.store(!cannedRun, std::memory_order_release);
-        runTestPlan(test);
+        bool scenarioRun = (test != TestScenario::None);
+        m_missionActive.store(!scenarioRun, std::memory_order_release);
+        runTestScenario(test);
         RCLCPP_INFO(this->get_logger(),
             "[FMU_NODE_DEBUG] Mission started (test=%d). queued~=%zu. objective: %.*s",
             __scast(int, test), m_taskQueue->size_approx(),
@@ -365,7 +366,7 @@ private:
     using spsc_queue = moodycamel::ReaderWriterQueue<T, sizeof(T)>;
 
     /* ---- Subscriptions --------------------------------------------------- */
-    void imgCallback(khUDPCamMsgType msg) {
+    void imgCallback(khCameraPipelineMsgType msg) {
         std::atomic_store(&m_currImg, msg);
         u64 c = m_frameCount.fetch_add(1, kMemOrderRelax) + 1;
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
@@ -476,40 +477,12 @@ private:
     }
 
     /* ---- APPROACH helpers ------------------------------------------------- */
-    /* Perpendicular component of measVel relative to forwardUnit (assumed unit length);
-       damps the pursuit-arc residual left after switching to a measured bearing (spec §9 R1). */
-    static Vec3 lateralComponent(Vec3 measVel, Vec3 forwardUnit) {
-        f32 along = measVel.x * forwardUnit.x + measVel.y * forwardUnit.y + measVel.z * forwardUnit.z;
-        return { measVel.x - along * forwardUnit.x,
-                 measVel.y - along * forwardUnit.y,
-                 measVel.z - along * forwardUnit.z };
-    }
-
     /* Motion-gate (spec 1 6.4): "reached" is only trusted when the drone is not in a collision
        transient. A real impact spikes yaw-rate + vertical velocity while the range still reads
        plausible off the impact frame (SITL: yawrate 6.9, vertVel -1.75, alt 0.99->0.02 in ~1s).
        Not nominal -> the APPROACH branch treats "reached" as an impact and interrupts. */
-    /* The VLM names targets in natural language ("human in red", "red person"), but YOLO emits
-       COCO class labels ("person"). An exact strcmp then never matches, so SEARCH can stare
-       straight at the target and never register it -- it just keeps advancing (into the rocks).
-       Match a person detection whenever the requested target refers to a human; WHICH person is
-       red stays the VLM's job via the image + bbox. */
-    static bool labelMatchesTarget(const char* detLabel, const char* target) {
-        if (!detLabel || !target) return false;
-        if (std::strcmp(detLabel, target) == 0) return true;
-        char t[128]; size_t i = 0;
-        for (; target[i] && i < sizeof(t) - 1; ++i)
-            t[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(target[i])));
-        t[i] = '\0';
-        const bool targetIsPerson =
-            std::strstr(t, "human") || std::strstr(t, "person") || std::strstr(t, "people") ||
-            std::strstr(t, "man")   || std::strstr(t, "woman")  || std::strstr(t, "guy")    ||
-            std::strstr(t, "someone")|| std::strstr(t, "boy")   || std::strstr(t, "girl");
-        return targetIsPerson && std::strcmp(detLabel, "person") == 0;
-    }
-
     bool approachMotionNominal(Odometry const& od) const {
-        if (m_forceApproachImpact) return false;   /* test-only forced impact (--canned-approach-impact). */
+        if (m_forceApproachImpact) return false;   /* test-only forced impact (--scenario-approach-impact). */
         return std::fabs(od.yawrate) < kApproachNominalYawrate
             && std::fabs(od.vel.z)  < kApproachNominalVertVel;
     }
@@ -603,6 +576,14 @@ private:
             std::sqrt(relFlu.x * relFlu.x + relFlu.y * relFlu.y + relFlu.z * relFlu.z) * 100.0f;
         m_perception->injectSynthetic(synth);
     }
+
+    /* ---- Per-tick control laws (one per movement command) ---------------------------------------
+       controlLoop() dispatches on the active CommandID and calls exactly ONE of these each tick
+       (20 Hz). Each is behaviour-isolated: it reads the tick's Odometry, drives the backend velocity,
+       and owns its own scratch -- no cross-command shared locals. DEFINED out-of-line in fmu_node.cpp
+       so this header stays declarations. Extracted incrementally out of controlLoop; behaviour is
+       verified unchanged in Gazebo per command. */
+    void stepHover();
 
     /* ---- 20Hz control + deterministic completion ------------------------- */
     /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.
@@ -701,7 +682,7 @@ private:
             if (m_floodAtUs == 0)             m_floodAtUs = nowUs() + 5ULL * 1000000ULL;
             else if (nowUs() >= m_floodAtUs) {
                 m_floodFired  = true;
-                m_floodFuture = std::async(std::launch::async, [this]() { translateToBaseCommands(testPlanFloodJson()); });
+                m_floodFuture = std::async(std::launch::async, [this]() { translateToBaseCommands(scenarioQueueOverflowJson()); });
             }
         }
 
@@ -780,7 +761,7 @@ private:
             return;
         }
 
-        /* Test-only obstacle window (--canned-boundary / --canned-storm): once airborne, open a
+        /* Test-only obstacle window (--scenario-boundary / --scenario-storm): once airborne, open a
            short burst window; while it is open the emergency boundary below forces a close reading
            (race-free, bypassing perception) so it trips deterministically with no real obstacle in
            the world. The window then closes so the hold path can reach maybePlan and wake the VLM
@@ -800,7 +781,7 @@ private:
             loomFrac   = 0.0f;
             freeM      = 0.0f;
             if (m_obstacleArmed && m_obstacleFired && nowUs() < m_obstacleUntilUs) {
-                /* Test-only forced obstacle (--canned-boundary / --canned-storm): bypass the
+                /* Test-only forced obstacle (--scenario-boundary / --scenario-storm): bypass the
                    perception snapshot so the trip is deterministic and cannot be lost to a race
                    with live YOLO in a populated world. 0.4 m is inside kBoundaryBaseM (0.6). */
                 nearestM = 0.4f;
@@ -918,6 +899,11 @@ private:
                     f32 yawRate = m_rotateDir * m_cfg.rotateYawGainHz * m_rotateRemainingRad;
                     if (yawRate >  m_cfg.rotateMaxYawRate) yawRate =  m_cfg.rotateMaxYawRate;
                     else if (yawRate < -m_cfg.rotateMaxYawRate) yawRate = -m_cfg.rotateMaxYawRate;
+                    /* Rate floor: the proportional rate decays to ~0 near the target, which is what
+                       left ROTATE ~5 deg short. Hold a minimum turn rate until inside the (now tight)
+                       completion band so the last few degrees close promptly and precisely. */
+                    else if (yawRate >= 0.0f && yawRate <  kRotateMinYawRate) yawRate =  kRotateMinYawRate;
+                    else if (yawRate <  0.0f && yawRate > -kRotateMinYawRate) yawRate = -kRotateMinYawRate;
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, yawRate);
                     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                         "[FMU_NODE_DIAGNOSTICS] ROTATE remainRad=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
@@ -1105,6 +1091,19 @@ private:
                                         : kApproachCoastSpeedMps;
                         if (spF < 0.0f) spF = 0.0f;
                         if (spF > speedCeil) spF = speedCeil;
+                        /* Depth-independent brake: as the REAL target fills the frame it IS close,
+                           regardless of the noisy depth budget (that budget dead-reckoned into the car).
+                           Ramp spF to zero from kApproachBrakeFillFrac to the stop fill. The canned rig's
+                           fixed tiny box (fill~0.02) never reaches this, so the canned approach stays fast. */
+                        {
+                            f32 fillNow = snap ? maxBboxFillFrac(*snap, kApproachCamera) : 0.0f;
+                            if (fillNow > kApproachBrakeFillFrac) {
+                                f32 fb = speedCeil * (kApproachStopFillFrac - fillNow) /
+                                         (kApproachStopFillFrac - kApproachBrakeFillFrac);
+                                if (fb < 0.0f) fb = 0.0f;
+                                if (spF > fb) spF = fb;
+                            }
+                        }
                         yawRate = -kApproachYawGain * tr.errX;
                         vUp     = -kApproachVertGain * tr.errY;
                         /* Never let vertical centering drive the drone below safe AGL (ground person
@@ -1152,8 +1151,20 @@ private:
                            : (snap ? detectionByLabel(*snap, m_followLabel, kApproachCamera, tnow) : TargetRelative{});
                 }
 
-                if (tr.found && tr.age_us <= kApproachFreshUs) {
+                if (tr.found && tr.age_us <= kApproachFreshUs &&
+                    m_followHaveErr && std::fabs(tr.errX - m_followLastErrX) > kFollowErrJumpReject) {
+                    /* Box-jump reject: a small/distant person's box jitters frame-to-frame. An errX leap
+                       this large in one tick is noise, not lateral motion -- hold and keep the last
+                       anchor so the yaw servo can never chase a phantom jump into a spin (the range~16m
+                       failure). The next in-tolerance frame re-engages the servo below. */
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=%s box jumped errX %.2f->%.2f -> holding.",
+                        m_followLabel, m_followLastErrX, tr.errX);
+                } else if (tr.found && tr.age_us <= kApproachFreshUs) {
                     /* Re-anchor the tracker on the bbox center just locked (px). */
+                    m_followLastErrX  = tr.errX;
+                    m_followHaveErr   = true;
                     m_followLastU     = kApproachCamera.cx + tr.errX * kApproachCamera.cx;
                     m_followLastV     = kApproachCamera.cy + tr.errY * kApproachCamera.cy;
                     m_followLastAimUs = tnow;
@@ -1167,10 +1178,12 @@ private:
                        A loom/bbox-fill back-off is a future refinement.) */
                     f32 minSafe = (fol.standoff_cm > 0) ? fol.standoff_cm / 100.0f : m_cfg.followStandoffM;
                     speedCeil   = (fol.speed > 0 ? __scast(f32, fol.speed) : kApproachSpeedDefault) / 100.0f;
-                    yawRate = -kFollowYawGain * tr.errX;      /* turn head horizontally (snappy).   */
+                    /* Deadband + gentle gain + low rate cap: ignore sub-deadband error (no twitch on a
+                       centred or noisy box) and never let a large error saturate the yaw into a spin. */
+                    yawRate = (std::fabs(tr.errX) < kFollowYawDeadband) ? 0.0f : -kFollowYawGain * tr.errX;
                     if (yawRate >  kFollowYawMaxRps) yawRate =  kFollowYawMaxRps;
                     if (yawRate < -kFollowYawMaxRps) yawRate = -kFollowYawMaxRps;
-                    vUp     = -kApproachVertGain * tr.errY;   /* keep the target vertically centered. */
+                    vUp     = (std::fabs(tr.errY) < kFollowYawDeadband) ? 0.0f : -kApproachVertGain * tr.errY;
                     spF     = 0.0f;                            /* never advance.                */
                     if (tr.range > 0.0f && tr.range < minSafe)
                         spF = kFollowFwdGain * (tr.range - minSafe);   /* < 0: safety back-off only. */
@@ -1230,10 +1243,17 @@ private:
                    inward toward the wall), altitude HELD at >= kOrbitFixedAltM (cannot descend). The demo
                    narrates that depth estimation is the current limitation. */
                 if (!m_orbitLatched) {
+                    /* Honour the commanded radius_cm (clamped) so the circle is sized to the target
+                       -- a car wants a tighter orbit than a building. Centre stays exactly R ahead so
+                       the drone still begins ON the circle and never flies inward. radius_cm unset (0)
+                       falls back to the hardcoded default. */
+                    f32 R = (orb.radius > 0.0f) ? (orb.radius / 100.0f) : kOrbitFixedRadiusM;
+                    if (R < kOrbitMinRadiusM) R = kOrbitMinRadiusM;
+                    if (R > kOrbitMaxRadiusM) R = kOrbitMaxRadiusM;
                     Vec3 fwd = flu_to_enu(Vec3{1.0f, 0.0f, 0.0f}, od.yaw);
-                    m_orbitCenterEnu = { od.pos.x + fwd.x * kOrbitFixedRadiusM,
-                                         od.pos.y + fwd.y * kOrbitFixedRadiusM, od.pos.z };
-                    m_orbitRadius   = kOrbitFixedRadiusM;
+                    m_orbitCenterEnu = { od.pos.x + fwd.x * R,
+                                         od.pos.y + fwd.y * R, od.pos.z };
+                    m_orbitRadius   = R;
                     m_orbitAltEnu   = std::max(od.pos.z, kOrbitFixedAltM);
                     m_orbitPrevPos  = od.pos;
                     m_orbitSweptRad = 0.0f;
@@ -1257,7 +1277,12 @@ private:
                     velEnu.y = oRadial.y * radialV + oTangent.y * strafe;
                     velEnu.z = kApproachVertGain * (m_orbitAltEnu - od.pos.z);   /* strong altitude hold. */
                     oDesYaw  = std::atan2(-oToDrone.y, -oToDrone.x);             /* face the centre. */
-                    yawRate  = kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
+                    /* Feedforward the orbital angular rate: the bearing to the centre rotates at
+                       strafe/R in the orbit direction, so feeding that in lets the P term only trim
+                       residual error. Without it the yaw lags the centre and the drone never points
+                       exactly at the target (and that offset is what remained at the start heading). */
+                    f32 omegaFf = m_orbitDir * strafe / m_orbitRadius;
+                    yawRate  = omegaFf + kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
                     m_backend->set_velocity(velEnu, yawRate);
                     oAngle     = std::atan2(od.pos.y - m_orbitCenterEnu.y, od.pos.x - m_orbitCenterEnu.x);
                     oPrevAngle = std::atan2(m_orbitPrevPos.y - m_orbitCenterEnu.y,
@@ -1424,12 +1449,7 @@ private:
                     }
                 }
             } else if (id == CommandID::HOVER) {
-                /* Persistent hold: zero velocity, station kept by the backend position controller
-                   (PX4 EKF / Tello VPS). Never completes -> stays the active task -> the VLM is NOT
-                   re-woken. Exits only on an interrupt, a re-assess, or a new command. */
-                m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
-                    "[FMU_NODE_DIAGNOSTICS] HOVER holding station.");
+                stepHover();
             } else {
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d not movement -> auto-complete.",
                     __scast(int, id));
@@ -1473,7 +1493,7 @@ private:
        SPSC contract holds. Planning only fires in the idle gap (no active task,
        queue empty), so it never races completeCurrent()'s history writes. */
     void maybePlan() {
-        khUDPCamMsgType img;
+        khCameraPipelineMsgType img;
         u64             now;
 
         if (!m_missionActive.load(std::memory_order_acquire)) return;
@@ -2095,6 +2115,7 @@ private:
                 m_followLastV   = 0.5f * static_cast<f32>(d.bbox_ymin + d.bbox_ymax);
                 m_followTrackId = (static_cast<u32>(di) < ft->ids.count) ? ft->ids.id[di] : -1;
                 m_followHaveLast = true;
+                m_followHaveErr  = false;   /* fresh lock -> no prior errX to reject against. */
                 RCLCPP_INFO(this->get_logger(),
                     "[FMU_NODE_DEBUG] FOLLOW activated track_id=%d target_index=%d label=%s centerPx=(%.0f,%.0f) standoff_cm=%d.",
                     m_followTrackId, fol.target_index, m_followLabel, m_followLastU, m_followLastV, fol.standoff_cm);
@@ -2383,7 +2404,7 @@ private:
         return prompt;
     }
 
-    void callLlamaServer(std::string_view userQuery, khUDPCamMsgType const& img,
+    void callLlamaServer(std::string_view userQuery, khCameraPipelineMsgType const& img,
                          std::string& out) {
         std::string               b64, content, dyn;
         bool                      imageAttached = false;
@@ -2624,63 +2645,18 @@ private:
         }
     }
 
-    /* Canned plan is the SAME JSON the VLM emits, routed through the real       */
+    /* Scenario is the SAME JSON the VLM emits, routed through the real       */
     /* translate path — no inverse function needed.                             */
     /* Replay a canned test scenario: pre-fill the queue with its scripted JSON (test/
-       fmu_test_plans.hpp) and, for the fault-injection scenarios, arm the synthetic condition the
+       fmu_test_scenarios.hpp) and, for the fault-injection scenarios, arm the synthetic condition the
        control loop acts on (flood/obstacle/battery). None is a no-op (a normal VLM-driven run).
-       The scenario DATA lives in test/*; only the node-owned member arming lives here. */
-    void runTestPlan(TestPlan test) {
-        switch (test) {
-        case TestPlan::None:
-            return;
-        case TestPlan::Cross:
-            translateToBaseCommands(testPlanCrossJson());
-            break;
-        case TestPlan::Approach:
-            m_useCannedApproachRig = true;
-            translateToBaseCommands(testPlanApproachJson());
-            break;
-        case TestPlan::ApproachReal:
-            translateToBaseCommands(testPlanApproachRealJson());
-            break;
-        case TestPlan::Flood:
-            RCLCPP_WARN(this->get_logger(),
-                "[FMU_NODE_DEBUG] FLOOD test: 100 actions vs queue cap %u.", 3u * kControlLoopRateHz);
-            translateToBaseCommands(testPlanFloodJson());
-            break;
-        case TestPlan::CrossFlood:
-            m_floodArmed = true;   /* controlLoop fires the airborne flood ~5s after FLIGHT. */
-            translateToBaseCommands(testPlanCrossJson());
-            break;
-        case TestPlan::BatteryRth:
-            m_batForceArmed = true; m_batForceValue = 18;   /* <=20% -> return-to-home. */
-            translateToBaseCommands(testPlanOutboundJson());
-            break;
-        case TestPlan::BatteryLandNow:
-            m_batForceArmed = true; m_batForceValue = 8;    /* <=10% -> land-in-place. */
-            translateToBaseCommands(testPlanOutboundJson());
-            break;
-        case TestPlan::Boundary:
-            m_obstacleArmed = true;   /* controlLoop opens the synthetic-obstacle burst once airborne. */
-            translateToBaseCommands(testPlanTakeoffOnlyJson());
-            break;
-        case TestPlan::Storm:
-            m_obstacleArmed = true;
-            m_missionActive.store(true, std::memory_order_release);   /* wake the VLM after the burst. */
-            translateToBaseCommands(testPlanTakeoffOnlyJson());
-            break;
-        case TestPlan::ApproachImpact:
-            m_forceApproachImpact  = true;   /* motion-gate forced off-nominal -> impact verdict. */
-            m_useCannedApproachRig = true;
-            translateToBaseCommands(testPlanApproachJson());
-            break;
-        }
-    }
+       The scenario DATA lives in test/*; only the node-owned member arming lives here.
+       DEFINED out-of-line in fmu_node.cpp (below main) -- SITL/test wiring stays out of the header. */
+    void runTestScenario(TestScenario test);
 
 private:
     rclcpp::CallbackGroup::SharedPtr                m_cbGroup;
-    rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
+    rclcpp::Subscription<CameraPipelineMsgType>::SharedPtr  m_subImg;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr    m_subOverride;  /* operator override toggle. */
     rclcpp::Subscription<KeyboardRawInputType>::SharedPtr   m_subKey;       /* raw keylog for manual flight. */
     rclcpp::Subscription<ASRTextType>::SharedPtr            m_subAsr;       /* voice objective / in-flight re-task. */
@@ -2717,7 +2693,7 @@ private:
     bool                                            m_interruptEscalated{false};
 
     llamaClientConnection                           m_vlmClient;
-    khUDPCamMsgType                                 m_currImg;
+    khCameraPipelineMsgType                                 m_currImg;
     HistoryBuffer                                   m_chat;
     std::unique_ptr<PerceptionRuntime>               m_perception;
 
@@ -2746,13 +2722,13 @@ private:
     std::atomic<bool>         m_missionActive{false};
     std::atomic<bool>         m_planning{false};
     std::future<void>         m_planFuture;
-    /* Airborne command-storm test (--canned-cross-flood): a canned cross flight, then a
+    /* Airborne command-storm test (--scenario-cross-flood): a canned cross flight, then a
        100-action flood injected from a producer-role async ~5s after reaching FLIGHT. */
     bool                      m_floodArmed{false};
     bool                      m_floodFired{false};
     u64                       m_floodAtUs{0};
     std::future<void>         m_floodFuture;
-    /* Test-only battery fault injection (--canned-battery-rth / -landnow): ~15s into FLIGHT,
+    /* Test-only battery fault injection (--scenario-battery-rth / -landnow): ~15s into FLIGHT,
        force a discrete reading (18% -> RTH, 8% -> land-in-place) to exercise the failsafe laws
        deterministically, far from home. m_batteryForce: -2 = inactive, else the forced %. */
     std::atomic<i32>          m_batteryForce{-2};
@@ -2760,7 +2736,7 @@ private:
     bool                      m_batForceFired{false};
     i32                       m_batForceValue{0};
     u64                       m_batForceAtUs{0};
-    /* Test-only interrupt-safety injection (spec 1, --canned-boundary / -storm / -approach-impact):
+    /* Test-only interrupt-safety injection (spec 1, --scenario-boundary / -storm / -approach-impact):
        a synthetic close-obstacle burst to trip the boundary, and a forced motion-gate fail. */
     bool                      m_obstacleArmed{false};
     bool                      m_obstacleFired{false};
@@ -2805,6 +2781,8 @@ private:
     u64  m_followLastAimUs{0};
     bool m_followHaveLast{false};
     i32  m_followTrackId{-1};                             /* VLM-chosen stable id being followed. */
+    f32  m_followLastErrX{0.0f};                          /* last accepted horizontal error (box-jump reject). */
+    bool m_followHaveErr{false};                          /* seeded after the first accepted follow tick.       */
     std::shared_ptr<TrackedSnapshot> m_lastPromptTracked; /* frame the last VLM prompt was built from. */
     std::shared_ptr<TrackedSnapshot> m_lastNonEmptyTracked; /* last prompt frame that actually HAD a detection.*/
     std::atomic<u64>  m_lastNonEmptyUs{0};

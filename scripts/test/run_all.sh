@@ -35,16 +35,19 @@ declare -A SCENARIO_CFG=(
     [approach-real]="flight:150"
     [approach-impact]="flight:90"
     [vlm]="flight:180"
-    [flood]="fixed:30"
-    [flood-airborne]="flight:90"
+    [queue-overflow]="fixed:30"
+    [queue-overflow-airborne]="flight:90"
     [battery]="flight:120"
     [battery-rth]="flight:120"
     [battery-landnow]="flight:120"
     [override]="fixed:60"
-    [boundary]="flight:120"
+    [obstacle-stop]="flight:120"
     [interrupt-storm]="flight:150"
     [orbit]="flight:120"
-    [search]="flight:150"
+    [rotate]="flight:90"
+    [hover]="flight:75"
+    [follow]="flight:90"
+    [search]="flight:120"
 )
 
 # High-VRAM scenarios (2026-08-09 operator finding): these three set LAUNCH_VLM=1, which loads
@@ -67,7 +70,7 @@ is_high_vram() {
 # default sweep so the summary doesn't lie; run them attended instead:
 #   cd scripts/test/SITL/<name> && ./run.sh   (watch it)   then   ./filter.sh   (report what you saw)
 # --only <name> or --include-unverifiable still runs them, since that's an explicit ask.
-UNVERIFIABLE_SCENARIOS=(approach approach-real cross forward speed vlm orbit search)
+UNVERIFIABLE_SCENARIOS=(approach approach-real cross vlm)
 is_unverifiable() {
     local n="$1" s
     for s in "${UNVERIFIABLE_SCENARIOS[@]}"; do [ "$n" = "$s" ] && return 0; done
@@ -89,6 +92,11 @@ run_one() {
         return
     fi
 
+    if [ ! -f "$name/filter.sh" ]; then
+        echo "$name: SKIP (ran headless; no filter.sh to auto-verdict)" | tee -a "$SUMMARY_FILE"
+        SKIP=$((SKIP + 1))
+        return
+    fi
     ( cd "$name" && ./filter.sh )
     filter_status=$?
     if [ "$filter_status" -eq 0 ]; then
@@ -116,6 +124,11 @@ else
         name="${dir%/}"
         [ "$name" = "lib" ] && continue
         [ -f "$dir/run.sh" ] || continue
+        if [ ! -f "$dir/filter.sh" ]; then
+            echo "$name: SKIP (no filter.sh -- viewer/world helper, no automated verdict)" | tee -a "$SUMMARY_FILE"
+            SKIP=$((SKIP + 1))
+            continue
+        fi
         if [ "$SKIP_HIGH_VRAM" = "1" ] && is_high_vram "$name"; then
             echo "$name: SKIP (high VRAM, SKIP_HIGH_VRAM=1)" | tee -a "$SUMMARY_FILE"
             SKIP=$((SKIP + 1))

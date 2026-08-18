@@ -22,23 +22,14 @@ Use a clock when testing to measure our time and improve our presentation time
 Presenter mode inside libreoffice for presentation on thursday (with our notes inside)
 
 Scrum
-DJI Mavic Mini
-DJI Mini 2
-DJI Mini se
-DJI Spark
-DJI Mavic Air
-DJI Mavic Pro
-
-
-
 
 1. First Example (Bare Minimum):
 Put 3 Humans in the tree section of rubicon_world,
 Have one of them be of red/green/"something that sticks out" colour.
-Tell the model "Find the Human that is In a specific colour, then follow it in place" (This sounds mildly racist lol)
+Tell the model "Find the Human that is Red, approach it and then land near it"
 
 2. In the same map (rubicon_world):
-Theres this building - Orbit it, find the first window you can see and get close to it.
+Execute an Orbit on the building infront of us, find the first window you can see and get close to it. Land shortly after.
 
 IF ENOUGH TIME AND AM NOT CLINICALLY DEAD:
 3. Takeoff, and follow the person with the blue hat in place.

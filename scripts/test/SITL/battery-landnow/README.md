@@ -3,7 +3,7 @@
 Battery **land-in-place** behaviour (spec-3, ROADMAP 6.2) — the "all of a sudden extremely low,
 land NOW" fault. Distinct from RTH: the drone lands where it is, it does NOT fly home.
 
-- **Canned flag:** `--canned-battery-landnow` — fly ~8m straight out, then force a sudden **8%**
+- **Scenario:** `--scenario-battery-landnow` — fly ~8m straight out, then force a sudden **8%**
   ~15s after reaching FLIGHT (test-only battery override; PX4 drain pinned high).
 - Why forced, not drained: with gradual drain the 20% law latches RTH first, so 10% can never
   fire. Land-in-place is by nature a *discrete* crash to critical — so we inject it directly.

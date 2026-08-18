@@ -1,16 +1,18 @@
 /*
-    ROS-free unit test for the two PURE decision points the canned-plan rewrite extracted out of
+    ROS-free unit test for the two PURE decision points the scenario rewrite extracted out of
     the FmuNode class:
       - commandIdFromAction(action string) -> CommandID   (command_id.hpp)
-      - parseTestPlan(argc, argv)          -> TestPlan     (test/fmu_test_plans.hpp)
+      - parseTestScenario(argc, argv)          -> TestScenario     (test/fmu_test_scenarios.hpp)
 
     These are the parts that were previously untestable because they were buried in a ROS node.
     No rclcpp, no sim, no hardware -- runs anywhere (see fmu/CMakeLists.txt, GROUNDSTATION_BUILD_TESTS).
 */
 #include <cstdio>
 #include <string>
+#include <cmath>
 #include "../command_id.hpp"
-#include "fmu_test_plans.hpp"
+#include "../fmu_helpers.hpp"
+#include "fmu_test_scenarios.hpp"
 
 static int g_fail = 0;
 #define CHECK(cond)                                                             \
@@ -18,10 +20,10 @@ static int g_fail = 0;
         if (!(cond)) { std::printf("FAIL line %d: %s\n", __LINE__, #cond); ++g_fail; } \
     } while (0)
 
-static TestPlan parseFlag(const char* flag) {
+static TestScenario parseFlag(const char* flag) {
     char a0[] = "fmu", a1[] = "objective";
     char* argv[3] = { a0, a1, const_cast<char*>(flag) };
-    return parseTestPlan(3, argv);
+    return parseTestScenario(3, argv);
 }
 
 int main() {
@@ -48,24 +50,43 @@ int main() {
     for (const char* v : {"takeoff","land","stop","hover","go","rotate","approach","follow","orbit","search"})
         CHECK(std::string(cmdName(commandIdFromAction(v))) == v);
 
-    /* parseTestPlan: each surviving flag -> its enum; unknown / removed / none -> None. */
-    CHECK(parseFlag("--canned-cross")           == TestPlan::Cross);
-    CHECK(parseFlag("--canned-approach")        == TestPlan::Approach);
-    CHECK(parseFlag("--canned-approach-real")   == TestPlan::ApproachReal);
-    CHECK(parseFlag("--canned-flood")           == TestPlan::Flood);
-    CHECK(parseFlag("--canned-cross-flood")     == TestPlan::CrossFlood);
-    CHECK(parseFlag("--canned-battery-rth")     == TestPlan::BatteryRth);
-    CHECK(parseFlag("--canned-battery-landnow") == TestPlan::BatteryLandNow);
-    CHECK(parseFlag("--canned-boundary")        == TestPlan::Boundary);
-    CHECK(parseFlag("--canned-storm")           == TestPlan::Storm);
-    CHECK(parseFlag("--canned-approach-impact") == TestPlan::ApproachImpact);
-    CHECK(parseFlag("--canned-speed")           == TestPlan::None);   /* removed flag */
-    CHECK(parseFlag("--nonsense")               == TestPlan::None);
-    CHECK(parseFlag("a normal objective")       == TestPlan::None);
+    /* labelMatchesTarget: exact match, human synonyms collapse to "person", non-human stays exact. */
+    CHECK(labelMatchesTarget("person", "person"));
+    CHECK(labelMatchesTarget("car", "car"));
+    CHECK(labelMatchesTarget("person", "human in red"));
+    CHECK(labelMatchesTarget("person", "the red guy"));
+    CHECK(labelMatchesTarget("person", "WOMAN"));
+    CHECK(!labelMatchesTarget("car", "human in red"));   /* human target, non-person detection */
+    CHECK(!labelMatchesTarget("person", "red car"));      /* non-human target, non-exact */
+    CHECK(!labelMatchesTarget(nullptr, "person"));
+
+    /* lateralComponent: strips the along-forward part. */
+    Vec3 la = lateralComponent(Vec3{2.0f,0.0f,0.0f}, Vec3{1.0f,0.0f,0.0f});
+    CHECK(std::fabs(la.x) < 1e-5f && std::fabs(la.y) < 1e-5f && std::fabs(la.z) < 1e-5f);
+    Vec3 lb = lateralComponent(Vec3{1.0f,1.0f,0.0f}, Vec3{1.0f,0.0f,0.0f});
+    CHECK(std::fabs(lb.x) < 1e-5f && std::fabs(lb.y - 1.0f) < 1e-5f);
+
+    /* parseTestScenario: each surviving flag -> its enum; unknown / removed / none -> None. */
+    CHECK(parseFlag("--scenario-cross")           == TestScenario::Cross);
+    CHECK(parseFlag("--scenario-approach")        == TestScenario::Approach);
+    CHECK(parseFlag("--scenario-approach-real")   == TestScenario::ApproachReal);
+    CHECK(parseFlag("--scenario-queue-overflow")           == TestScenario::QueueOverflow);
+    CHECK(parseFlag("--scenario-queue-overflow-airborne")  == TestScenario::QueueOverflowAirborne);
+    CHECK(parseFlag("--scenario-battery-rth")     == TestScenario::BatteryRth);
+    CHECK(parseFlag("--scenario-battery-landnow") == TestScenario::BatteryLandNow);
+    CHECK(parseFlag("--scenario-obstacle-stop")            == TestScenario::ObstacleStop);
+    CHECK(parseFlag("--scenario-storm")           == TestScenario::Storm);
+    CHECK(parseFlag("--scenario-approach-impact") == TestScenario::ApproachImpact);
+    CHECK(parseFlag("--scenario-hover")           == TestScenario::Hover);
+    CHECK(parseFlag("--scenario-rotate")          == TestScenario::Rotate);
+    CHECK(parseFlag("--scenario-orbit")           == TestScenario::Orbit);
+    CHECK(parseFlag("--scenario-speed")           == TestScenario::None);   /* removed flag */
+    CHECK(parseFlag("--nonsense")               == TestScenario::None);
+    CHECK(parseFlag("a normal objective")       == TestScenario::None);
 
     char a0[] = "fmu";
     char* argv1[1] = { a0 };
-    CHECK(parseTestPlan(1, argv1) == TestPlan::None);                /* no flag at all */
+    CHECK(parseTestScenario(1, argv1) == TestScenario::None);                /* no flag at all */
 
     if (g_fail == 0) { std::printf("fmu_translate_test: ALL PASS\n"); return 0; }
     std::printf("fmu_translate_test: %d FAILURE(S)\n", g_fail);

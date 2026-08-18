@@ -20,7 +20,7 @@ ACTIVATED=$(grep -Ec 'APPROACH activated' "$OUT")
 
 echo ""
 if [ "$ACTIVATED" -eq 0 ]; then
-    echo "FAIL: APPROACH never activated — is --canned-approach-impact implemented in fmu_node.cpp?"
+    echo "FAIL: APPROACH never activated — is --scenario-approach-impact implemented in fmu_node.cpp?"
     exit 1
 fi
 if [ "$IMPACT" -ge 1 ] && [ "$OKAY" -eq 0 ]; then
