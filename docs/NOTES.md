@@ -2099,3 +2099,190 @@ altitude / obstacle backstop) still owed.
   still welded to controlLoop with no unit coverage -- that is the next extraction, not done here.
 - **Archived (referenced removed flags):** scripts/archive/SITL/{forward,speed,rotate-land,land-flare,
   terrain-land,orbit,search,battery,disarm-verify} + scripts/archive/voice_unit.sh.
+
+
+## DjiBackend: Linux backend for the DJI-over-Android-LAN app (2026-08-17, agent)
+- **What:** new CRTP sibling of PX4Backend/TelloBackend under source/llm_to_action/dji_backend/.
+  Talks to the recon-swarm Android app (or scripts/test/dji_mock/mock_apiserver.py) over the LAN:
+  WS /c/ws/sticks streams FlightParam{vx,vy,vz,yaw} (body m/s + yaw rate) at ~18 Hz (also the
+  keepalive); httplib GET /status/ @15 Hz -> Odometry; POST /c/takeoff|/c/land. ROS-free, two
+  std::thread loops, atomic telemetry -- same shape as TelloBackend.
+- **Files:** dji_backend_base.hpp (PURE: endpoints/rates/clamp + ENU->FlightParam map + serialise,
+  NO json so the FMU TU stays clean of nlohmann's -Werror noise), dji_status_parse.hpp (the nlohmann
+  /status parse, included ONLY by the .cpp + tests), dji_ws.hpp (opaque WS client API), dji_ws_raw.cpp,
+  dji_ws_wspp.cpp, dji_backend.hpp/.cpp. Wired: root CMake option GROUNDSTATION_BUILD_BACKEND_DJI
+  (mutual-exclusion now count-based over PX4/TELLO/DJI/ALL), fmu selection + link, active_backend.hpp
+  DJI arm, build.sh `dji`.
+- **TWO WS clients, both tested (user request):** RawWsClient (hand-rolled RFC6455 over a raw POSIX
+  socket -- DEFAULT, zero deps) and WsppWsClient (websocketpp + standalone Asio, opt-in via
+  -DGROUNDSTATION_DJI_WS_WEBSOCKETPP). Selected by a compile-time typedef (no virtual). Raw client:
+  handshake accept-key validation (inline SHA-1+base64), non-blocking connect+select timeout,
+  TCP_NODELAY, SO_SND/RCVTIMEO, alloc-free masked-frame hot path, inbound pump (auto-PONG, honours
+  CLOSE/EOF), clean reconnect. websocketpp offloads send to its io-thread (lower measured enqueue
+  latency) but allocates per message and reuses the endpoint poorly across reconnects.
+- **Verified against the live mock (standalone g++, no full CMake configure):** dji_convert_test OK;
+  head-to-head dji_ws_test raw+websocketpp both PASS (connect, stream 90 frames, mock position
+  advances ~4.9 m); dji_backend_mock_test PASS on BOTH WS configs (takeoff->FLIGHT, streamed +East
+  1 m/s -> odometry vel=(1,0,0) + dead-reckoned pos, land->STANDBY).
+- **UNCONFIRMED (isolated to one constant/spot each; flip after the app author/AircraftController.kt):**
+  (1) yaw-rate sign kDjiYawRateSign in dji_backend_base.hpp -- CW+ vs CCW+; the mock cannot confirm it
+  (its integrator ignores yaw). (2) velocity3D frame -- treated as ENU. (3) velocity envelope
+  kDjiMaxSpeedMps/kDjiMaxYawRateRadps -- conservative until the author gives the virtual-stick limits.
+- **Note vs stale docs:** mission-brief-2026-08-15 still says Agent-Backend is BENCHED and the platform
+  is an emulated-Android-in-Docker bridge; superseded by spec-dji-backend + dji-apiserver-review (the
+  teammate's Ktor app), which is what this backend targets. Video (H.264 over TCP) is still an
+  app-author dependency, not consumed here yet.
+
+
+## DjiBackend: recon-swarm source review vs the new camera commits (2026-08-17, agent)
+Cloned ExoSkeletons/DJI-android-sdk-v5-recon-swarm and read ApiServer.kt / AircraftController.kt /
+DJICamera.kt / SerializerUtils.kt directly. Findings:
+- **VIDEO = RTMP PUSH, not raw frames.** The only streaming route is `POST /c/stream/start`
+  {"rtmpUrl": "..."} + `/c/stream/stop` + `GET /c/stream/status`. DJICamera.startStream() builds
+  LiveStreamSettings(LiveStreamType.RTMP, StreamQuality.SD, bitrate AUTO) and calls
+  MediaDataCenter.liveStreamManager.startStream(). H.264 in RTMP/FLV, ~1-5 s latency, needs an ingest
+  server WE run. This is exactly the transport dji-apiserver-review.md Q1 said to AVOID (breaks the
+  <1 s see->act loop). The requested raw-H264-NAL-over-TCP frame path (ICameraStreamManager frame
+  listener -> socket) was NOT implemented. cameraStreamManager is used only for local surface render.
+  => decision for the manager before building a consumer: push the author for the TCP frame path, or
+  accept RTMP + ingest + latency. NOT building an RTMP mock/consumer speculatively.
+- **takeoff/land response bodies: STILL MISSING on the POST verbs.** `POST /c/takeoff` and
+  `POST /c/land` call controller.fly{takeoff()/land()} with NO call.respond(). Only the top-level
+  `GET /(fly|takeoff)` and `GET /land` (quickActionsRoute) respond ok(). Our DjiBackend POSTs
+  /c/takeoff|/c/land and checks status==200 -> against the REAL app that will not confirm. Fix: app
+  author adds call.respond(ok()) to the two POST handlers (1 line each), OR our client switches to the
+  responding GET /takeoff + GET /land. Manager's call (contract).
+- **No stick clamp app-side.** sendFlightParam buffers and flushes combined params at 18 Hz
+  (TRANSMISSION_FREQUENCY_HZ) straight to vSticks.sendStickParam -- no coerceIn on the raw path (the
+  coerceIn/maxVelocity clamps are only in the autonomous flyToSticks/lookAt/smoothVelocity helpers).
+  So OUR client-side clamp (kDjiMaxSpeedMps / kDjiMaxYawRateRadps) is load-bearing. Real envelope still
+  unknown (Q5 open).
+- **/status matches the protocol (confirmed from SerializerUtils.kt):** velocity3D={x,y,z};
+  attitude={pitch,roll,yaw}; position3D={latitude,longitude,altitude} (GPS -> invalid indoors, we
+  dead-reckon). Our parser + mock use velocity3D{x,y,z}+attitude.yaw correctly. The mock simplifies
+  position3D to {x,y,z}; real is lat/lon/alt -- harmless since we ignore GPS pos. FlightParam wire
+  fields {vx,vy,vz,yaw} confirmed against AircraftController.FlightParam(vy,vx,yaw,vz) kotlinx decode.
+- **NEW telemetry PUSH option:** `/c/ws/telemetry` WS streams {location,battery,velocity} (a different
+  shape, no attitude). Lower-latency alternative to polling /status/; not consumed yet.
+- **Tests hardened per manager:** dji_convert_test now covers real+mock+fuzz /status shapes, a
+  rotation-norm frame invariant, clamp boundaries, and the wire field contract. dji_backend_mock_test
+  is now a soak: 30 s / ~540 WS frames / ~450 polls, invariants checked every 500 ms -> 0 send-fail,
+  0 poll-miss, telemetry fresh 59/59 (max 66 ms), dead-reckon 29.96 m. All PASS vs the mock.
+
+
+## DjiBackend: telemetry-confirmed takeoff/land (2026-08-17, agent)
+- **Why:** the app's POST /c/takeoff|/c/land send no response body (author omitted call.respond()), so
+  trusting the HTTP ACK would misreport verbs against the real drone. Fix: takeoff/land now FIRE the
+  POST (ACK is a best-effort fast path) then confirm the physical state from telemetry
+  `aircraft.isFlying` (new atomic m_isFlying + confirmFlying(want,timeoutMs)). Drone state is the
+  authority, not an HTTP reply -- the correct pattern regardless of the missing body.
+- **Proof:** mock gained MOCK_SILENT_VERBS mode (POST verbs -> 204, no body = faithful to the app).
+  10 s soak PASSES in BOTH modes: normal (ACK) and silent (204) -> takeoff OK/FLIGHT, land OK/STANDBY,
+  0 send-fail, 0 poll-miss, telemetry fresh, dead-reckon 10 m. Manager feedback logged in
+  dji-apiserver-review.md: POST verbs must respond; the GET /takeoff|/land verbs should be removed
+  (GET fetches state, never performs an action). Video decision: SHIP CONTROL-ONLY now; video parked
+  pending the raw-H.264-over-TCP path from the author (RTMP is unusable for the <1 s loop).
+
+
+## DjiBackend: video transport CONFIRMED + Linux consumer proven (2026-08-18, agent)
+The app dev pushed the raw-frame path we asked for (commits e92cf56 response, 2669183 tcp frame
+stream, 95b7db3 update client, eff6ab6 tts route). Reviewed the actual Kotlin:
+- **Video transport (frozen):** raw TCP. The phone LISTENS on DEFAULT_STREAM_PORT = **5600**
+  (ApiServerService.kt), auto-started with the service (no start/stop route). Linux connects IN and
+  reads a **raw H.264/H.265 Annex-B elementary stream**, written verbatim by VideoTcpServer.kt
+  (`out.write(data, offset, length)` in the ICameraStreamManager.ReceiveStreamListener) -- NO framing,
+  NO length prefix. Codec is logged once via `info.mimeType` (Mini 4 Pro likely H.265). ONE client at
+  a time; TCP_NODELAY + keepAlive.
+- **takeoff/land now RESPOND** (e92cf56): `call.respond(status{"taking off"/"landing"})` ->
+  {ok:true,status:...} 200. Our telemetry-confirm (isFlying) is now a safety net; the fast ACK path
+  works too. /c/stop also responds.
+- **/tts route is intentional** (per manager): perception feeds "what it sees/understands" to the
+  phone's TTS so the drone speaks it in the demo. Future Linux->phone integration: POST /tts.
+- **Video mock added:** scripts/test/dji_mock/video_tcp_mock.py -- mirrors VideoTcpServer (TCP server
+  on 5600, one client, streams a looped raw Annex-B clip, real-time paced). Make clips with gst:
+  `videotestsrc ! x264enc ! video/x-h264,stream-format=byte-stream ! filesink` (x265enc for H.265).
+- **Consumer proven end-to-end (Linux):** `gst tcpclientsrc host=<ip> port=5600 ! decodebin !
+  videoconvert ! appsink`. decodebin is codec-agnostic -> decoded BOTH H.264 (227 frames) and H.265
+  (224 frames) over TCP from the mock, same pipeline. GStreamer 1.24 + libav decoders present; gst +
+  gst-app dev libs present (a C++ appsink consumer can be built standalone). Key gotcha: DJI emits
+  Annex-B byte-stream; a clip must be byte-stream (not AVC) or h264parse says "no valid frames".
+- **Next:** ROS-free C++ gst appsink receiver (model source/llm_to_action/gstreamer_udp_cam_rx/
+  rx_node.cpp, but tcpclientsrc + decodebin, no ROS) that hands perception BGR frames.
+
+
+## Camera receiver: one node, backend-selected pipeline + DJI TCP path (2026-08-18, agent)
+Per manager (KISS/DRY, don't duplicate): extended the existing receiver
+(source/llm_to_action/gstreamer_udp_cam_rx/rx_node.cpp) instead of forking a new one.
+- **bool -> enum:** `GstReceiverNode(bool bUseTelloPipeline)` is now
+  `GstReceiverNode(BackendType backend, std::string djiHost)`; the canonical `enum class
+  BackendType { PX4, TELLO, DJI }` lives in generic_backend_types.hpp (the shared backend-types
+  header, next to IOState/BackendStatus/Odometry -- NOT a camera-local header). main() parses `--tello` / `--dji [host]` / default PX4.
+- **DRY:** only the SOURCE+DECODE prefix differs by backend (a one-time init switch); the
+  `videoconvert ! BGR ! appsink` tail, the appsink->sensor_msgs/Image poll (PollSampleCb), and the
+  bus poll are shared. DJI prefix = `tcpclientsrc host=<ip> port=kDjiVideoPort(5600) ! decodebin`
+  (decodebin auto-selects H.264 vs H.265, so the node needn't be told the codec).
+- **Perception untouched:** it already subscribes to the `camera/stream` Image topic and knows
+  nothing of gst internals (fmu_node.hpp / perception_runtime.hpp use only rx_node_base.hpp types).
+- **No templates:** the backend only picks the prefix STRING at init; the per-frame path is identical
+  and gst_parse_launch builds the graph from a string at runtime anyway -- a compile-time
+  specialisation would remove one init switch for zero runtime gain. Documented in-code.
+- **kDjiVideoPort = 5600** added to dji_backend_base.hpp (the DJI wire source of truth, mirroring
+  kTelloVideoPort). Header-only; no new link deps for the rx target.
+- **Verified:** the exact DJI pipeline (tcpclientsrc ! decodebin ! videoconvert ! video/x-raw,
+  format=BGR) decoded 197 BGR frames over TCP from scripts/test/dji_mock/video_tcp_mock.py. The ROS
+  node compiles under the full ROS build (not runnable standalone here).
+- **RENAME PENDING (coordinate):** manager wants gstreamer_udp_cam_rx -> gstreamer_cam_rx. Deferred:
+  it edits fmu_node.hpp:28 + perception_runtime.hpp:43 (include paths) AND the UDP-prefixed shared
+  names (UDPCamMsgType / kOutUDPCameraRawFrameTopic) the FMU uses -- collides with the in-flight
+  fmu_node refactor. Do it once that lands.
+
+
+## HANDOFF to the fmu-refactor (manager) agent (2026-08-18)
+Renamed the shared camera-frame names across the receiver AND the two FMU files you own, as
+directed. Pure token substitution -- no logic touched. RECONCILE with your in-flight fmu_node work:
+- **New names** (rx_node_base.hpp): UDPCamMsgType -> **CameraPipelineMsgType** (+ h/kh variants);
+  kOutUDPCameraRawFrameTopic -> **kOutCameraPipelineRawFrameTopic**; kOutUDPCameraGstSinkName ->
+  **kOutCameraPipelineGstSinkName**; kOutUDPCameraRawFrameID -> **kOutCameraPipelineRawFrameID**.
+  Topic string value is unchanged ("camera/stream").
+- **Files I edited that are yours:** fmu_node.hpp (lines ~28, 256-257, 369, 1496, 2407, 2659, 2696 --
+  8 type + 1 const token) and perception_runtime.hpp (~43, 52, 188, 212, 350 -- 5 type tokens). If you
+  have uncommitted fmu_node changes, the tokens may have moved; the rename is mechanical, re-apply the
+  two substitutions after your merge.
+- **Also this session (mine, no overlap with fmu logic):** DJI backend complete (control + telemetry,
+  two WS clients, telemetry-confirmed takeoff/land); video path proven (dev shipped raw H.264/H.265
+  over TCP:5600; Linux decodes via tcpclientsrc!decodebin); the camera receiver now takes
+  `enum class BackendType` (in generic_backend_types.hpp; was a bool) and gained the DJI TCP pipeline.
+- **STILL PENDING (needs us to coordinate):** the directory rename gstreamer_udp_cam_rx ->
+  gstreamer_cam_rx. It changes the #include path in fmu_node.hpp:28 + perception_runtime.hpp:43. Do it
+  once your fmu refactor lands so we don't clobber each other.
+
+- 2026-08-18 -- Thursday gate demo = new standalone module `source/llm_cv_scene/` (Python +
+  OpenCV, isolated from the C++ `llm_to_action` tree on purpose). Architecture: fast eyes +
+  slow brain. YOLOE (real-time, per-frame) draws always-on background detections and, on
+  demand, highlights a phrase; SAM2 optionally turns that box into a tracked mask. Qwen3-VL-4B
+  (GGUF on the repo's llama-server) is the on-demand brain: sees frame + detections + the
+  spoken question, answers in natural language, and names what to highlight. faster-whisper
+  push-to-talk. Four colour-coded overlays (grey background / green YOLOE / magenta SAM2 /
+  amber VLM box) so detector-grounding vs VLM-grounding is visible side by side. Depth is NOT
+  used here (metric depth is a flight-pipeline concern; its SITL flip-flop is structural --
+  per-frame + per-frame normalization -- fix later with temporal consistency + a metric model).
+
+- 2026-08-18 -- DJI end-to-end bring-up PREP (spec-dji-endtoend-bringup.md, Tasks A/B/C). Hardware
+  not on the bench yet, so I built the parts that make bench time fast, all validated against the mock:
+  - **Latency probe** `dji_backend/test/dji_latency_probe.cpp` (CMake target `dji_latency_probe`).
+    Drives the REAL DjiBackend against any host:port; measures **command->action** (t0 = step
+    setpoint emitted; t1 = velocity3D crosses a threshold in the next fresh telemetry sample -- both
+    Linux steady_clock, single clock, no cross-machine sync). Steps in BODY forward and watches the
+    velocity MAGNITUDE, so it's frame-agnostic (survives the unconfirmed velocity3D frame). Also
+    reports telemetry GET round-trip. Retargets to the phone by changing host:port.
+  - **Telemetry RTT timer** added to the backend: `m_statusRttUs` set in statusLoop around the GET,
+    read via `statusRttUs()`. Diagnostics only, off the control path.
+  - **Runbook** `docs/active/dji-bringup-runbook.md`: ordered A/B/C bench procedure, exact commands
+    (phone build + tunnel-off grep, curl /status, standalone g++ line, probe, ws_latency.py, video
+    decode line), and the empty latency table to fill.
+  - Mock floor (localhost, no drone dynamics): command->action ~67 ms (= the 15 Hz poll granularity),
+    telemetry RTT ~1 ms. The real link adds WiFi + rotor spin-up.
+  - The three latency legs already had tooling: WiFi baseline = `ws_latency.py` (WS echo at command
+    cadence); video glass->Linux = film a ms clock. Only command->action was missing a harness -- now built.
+  - Verified via standalone g++ (full tree needs ROS/PX4); clean compile, probe OK against the mock.
+    No git writes -- suggest a commit to the human.
