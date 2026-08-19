@@ -13,7 +13,7 @@ SYSTEM = (
     "A fast detector also lists objects it found (labels + boxes) as a hint -- use it, but trust "
     "your own eyes over it.\n"
     "ONLY if the user asks to find/point at/highlight a specific thing, append two final lines:\n"
-    "HIGHLIGHT: <short label to search, or none>\n"
+    "HIGHLIGHT: <a concrete noun phrase a detector can localize; resolve pronouns/descriptions, e.g. 'the person in the black hat' or 'red backpack'; or none>\n"
     "VLM_BOX: x1,y1,x2,y2   (normalized 0-1, top-left origin; omit if unsure)\n"
     "Reply in PLAIN ASCII only (straight quotes, no emoji/accents/degree sign)."
 )

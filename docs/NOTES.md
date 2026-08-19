@@ -2286,3 +2286,21 @@ directed. Pure token substitution -- no logic touched. RECONCILE with your in-fl
     cadence); video glass->Linux = film a ms clock. Only command->action was missing a harness -- now built.
   - Verified via standalone g++ (full tree needs ROS/PX4); clean compile, probe OK against the mock.
     No git writes -- suggest a commit to the human.
+
+## 2026-08-19 — llm_cv_scene highlight rebuild: YOLOE -> LLMDet open-vocab grounder
+- Highlight backend swapped from YOLOE-26 (bounded-vocab, MobileCLIP text encoder) to an open-vocab
+  PHRASE grounder: **LLMDet-tiny**, loaded via the transformers **MM-Grounding-DINO** implementation.
+  Both `iSEE-Laboratory/llmdet_*` and `openmmlab-community/mm_grounding_dino_*` checkpoints report
+  `model_type=mm-grounding-dino`, so `AutoModelForZeroShotObjectDetection` loads LLMDet on stable
+  transformers >=5.15 — no git-main, no dedicated `llmdet` module needed.
+- Why LLMDet: on-box benchmark (8 images, 27 esoteric/small/referring prompts, AMD ROCm) hard-hit
+  rate **LLMDet 96% vs MM-GDINO 89% vs YOLOE 41%**; LLMDet uniquely found `backpack` + `ear cushion`.
+  Matches published LVIS rare-class AP (APr): LLMDet 44.7 > MM-GDINO 34.2 > orig GDINO ~low-20s.
+- Vendor-neutral: the grounder's multi-scale deformable attention uses transformers' pure-PyTorch
+  fallback (no CUDA-only custom op), so the SAME code runs on ROCm/CUDA/CPU. Verified on ROCm 6.4.
+- DINO-X / Grounding DINO 1.6 Pro rejected: cloud-API-only, would need internet at show time.
+- Highlight now routes through Qwen3-VL: `vlm.py` resolves the referent to a groundable noun phrase;
+  `app.py` lets that refine the deterministic regex target. Background stays fast YOLO26-seg; SAM2
+  mask retained. Thresholds box=0.25/text=0.25, HIGHLIGHT_HZ=2 (grounder ~438 ms warm on ROCm).
+- Cold-start: first ROCm/MIOpen kernel compile is slow; front-loaded by a startup warmup +
+  `MIOPEN_FIND_MODE=2`. LLMDet weights pre-baked into the Docker image for a fully OFFLINE demo.

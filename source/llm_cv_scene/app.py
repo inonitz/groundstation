@@ -3,7 +3,7 @@ ChatGPT-style chat pane with a legend, driven by voice (ASR) and a VLM brain.
 
 Perception runs on a WORKER THREAD so the display stays at camera FPS; the heavy open-vocab
 highlight is throttled to SCENE_HL_HZ and SAM2 is opt-in (lazy). Overlays: grey=background,
-green=YOLOE-26 highlight, magenta=SAM2 mask, amber=VLM's own box.
+green=grounded highlight (LLMDet), magenta=SAM2 mask, amber=VLM's own box.
 
 Keys: q quit | c clear highlight | t SAM2 mask on/off | b background on/off | x clear chat
 Record the session to share for debugging:  SCENE_RECORD=/path/out.mp4 python3 app.py
@@ -124,7 +124,7 @@ def render_chat(height, use_sam2, show_bg):
         y += 20
 
     legend(config.COL_BACKGROUND, "background",           f"b: {'on' if show_bg else 'off'}")
-    legend(config.COL_YOLOE_HL,   "highlight (YOLOE-26)")
+    legend(config.COL_YOLOE_HL,   "highlight (LLMDet)")
     legend(config.COL_SAM2_HL,    "SAM2 mask",             f"t: {'on' if use_sam2 else 'off'}")
     legend(config.COL_VLM_BOX,    "VLM's own box")
     cv2.putText(panel, "Press H: record on/off", (12, y), FONT, 0.5, config.COL_HUD, 1, cv2.LINE_AA); y += 20
@@ -186,7 +186,7 @@ def main():
         with S.lock:
             S.chat.append(("model", ans)); S.thinking = False
             if box is not None: S.vlm_box = box
-        if phrase is None and tgt:                      # fallback: VLM suggested a target
+        if tgt and phrase != "":                         # VLM resolved/refined the referent (route highlight via Qwen3-VL)
             eyes.set_target(tgt)
             print(f"[highlight] target (via VLM) -> {tgt!r}", flush=True)
             with S.lock: S.target = tgt

@@ -2,6 +2,10 @@
 you tell the four overlay sources apart on screen (the whole point of this demo)."""
 import os
 
+# ROCm/MIOpen: fast kernel-search so the one-time GPU kernel compile at startup is short (harmless
+# on non-AMD backends). Must be set before torch initializes the GPU.
+os.environ.setdefault("MIOPEN_FIND_MODE", "2")
+
 # --- VLM brain: Qwen3-VL-4B on the repo's llama-server (run_llama_server.sh) ---
 LLAMA_URL   = os.environ.get("SCENE_LLAMA_URL", "http://127.0.0.1:8080")
 VLM_TIMEOUT = 30                      # a warm 4B describe call is ~1-3 s
@@ -18,7 +22,7 @@ SAM2_WEIGHTS    = os.environ.get("SCENE_SAM2",      "sam2.1_b.pt")
 DEVICE           = os.environ.get("SCENE_DEVICE", "")   # "" = Ultralytics auto. ROCm torch shows as "cuda" (HIP). NO NVIDIA. Force "cpu" to be safe.
 CONF_BG = float(os.environ.get("SCENE_CONF_BG", "0.35"))
 CONF_HL = float(os.environ.get("SCENE_CONF_HL", "0.10"))   # open-vocab conf runs low; be lenient
-HIGHLIGHT_HZ = float(os.environ.get("SCENE_HL_HZ", "5"))   # open-vocab highlight re-runs/sec (throttled)
+HIGHLIGHT_HZ = float(os.environ.get("SCENE_HL_HZ", "2"))   # open-vocab highlight re-runs/sec (throttled)
 DETECT_IMGSZ = int(os.environ.get("SCENE_IMGSZ", "640"))   # detector input size (speed knob)
 
 # --- Ears: the EXISTING ROS2 asr_node publishes transcripts here (sttserv backend,
@@ -69,3 +73,24 @@ CAM_H = int(os.environ.get("SCENE_CAM_H", "720"))    # requested webcam height
 
 DETECT_HZ = float(os.environ.get("SCENE_DETECT_HZ", "15"))   # cap background detection so it can't starve the display
 PERF      = os.environ.get("SCENE_PERF", "0") not in ("", "0", "false", "False")
+
+
+# --- On-demand highlight grounder (REPLACES YOLOE for highlight). LLMDet-tiny: open-vocab PHRASE
+#     grounding, 2025 SOTA on rare/long-tail classes -- built for exactly the esoteric/small/described
+#     objects YOLOE could not find. Loads via the transformers MM-Grounding-DINO implementation, whose
+#     deformable attention has a pure-PyTorch fallback -> runs on ROCm/CUDA/CPU identically. Swap to a
+#     lighter/stable-only checkpoint with e.g.
+#     SCENE_GROUNDER=openmmlab-community/mm_grounding_dino_tiny_o365v1_goldg_grit_v3det ---
+GROUNDER_REPO = os.environ.get("SCENE_GROUNDER", "iSEE-Laboratory/llmdet_tiny")
+GND_BOX_THR   = float(os.environ.get("SCENE_GND_BOX",  "0.30"))   # box-confidence gate
+GND_TEXT_THR  = float(os.environ.get("SCENE_GND_TEXT", "0.25"))   # phrase-match gate
+GND_TOPK      = int(os.environ.get("SCENE_GND_TOPK", "1"))        # keep at most this many matches
+
+def resolve_torch_device():
+    """torch-style device string ('cuda'/'mps'/'cpu') for transformers/HF models. Same portability
+    contract as resolve_device(), but HF wants 'cuda' where Ultralytics wants '0'. ROCm reports as
+    'cuda' (HIP) too, so this stays vendor-neutral."""
+    dev = resolve_device()
+    return dev if dev in ("cpu", "mps") else "cuda"   # "0"/"1" (CUDA or ROCm/HIP) -> torch "cuda"
+
+WARMUP = os.environ.get("SCENE_WARMUP", "1") not in ("", "0", "false", "False")   # front-load the GPU kernel compile at startup
