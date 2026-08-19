@@ -21,12 +21,21 @@ you talk to it, it describes your environment and highlights what you ask for, l
 - magenta = SAM2 mask of the same object (the other tracker)
 - amber   = the VLM's own one-shot grounding box
 
-## Run (on the GPU box)
-1. `pip install -r requirements.txt`  (torch = ROCm build for the RX 7900, or CPU)
-2. `source /opt/ros/<distro>/setup.bash`  (so rclpy + std_msgs are importable)
-3. VLM runs on **Vulkan** already (run_llama_server.sh). Start your **asr_node** (mic + H push-to-talk + sttserv -> /asr_server/transcribe)
-4. `./run_llama_server.sh`  (warm it once with a throwaway query)
-5. `python app.py`
+## Run
+One command brings up VLM + keyboard hook + ASR node + the app (tmux windows: vlm | keys | asr | app):
+```
+./run_demo.sh
+```
+**Hold H** to talk (keyboard_hook -> /keyboard/in/raw -> asr records on H press..release). Switch windows with `Ctrl-b 0/1/2/3`. **Detaching (`Ctrl-b d`) or `Ctrl-C` shuts the whole demo down** (frees the GPU + mic) via cleanup(). Warm the VLM (vlm window) before you talk.
+
+First-time setup on the box: `pip install -r requirements.txt` (or just build the image with
+`scripts/build-devenv.sh`, which bakes it). Vision-only smoke test without voice: `python3 app.py`.
+
+
+## Input source
+Default is webcam 0. Override with `SCENE_INPUT`: a webcam index, a video-file path (test on a
+recorded clip if the webcam is flaky), or a GStreamer pipeline for the drone stream (Phase 6):
+`SCENE_INPUT='tcpclientsrc host=<phone-ip> port=5600 ! h264parse ! avdec_h264 ! videoconvert ! appsink'`
 
 ## Keys
 In the window: `c` clear highlight · `t` toggle SAM2 · `b` toggle background · `q` quit.
@@ -38,4 +47,4 @@ works on any GPU vendor (AMD/NVIDIA/Intel). The detector auto-detects its device
 `config.resolve_device()` -- a CUDA *or* ROCm/HIP GPU shows up the same way, Apple uses mps,
 and it falls back to CPU. Move this to another machine, install the matching torch + llama build
 for that box, and the code is unchanged. Force a device with `SCENE_DEVICE=cpu|0|mps`.
-YOLOE-26 weights swap in via SCENE_YOLOE_* env vars.
+Models: open-vocab highlight = YOLOE-26 (yoloe-26l-seg.pt, the 2026 model); background = yolo26n-seg.pt. Override via SCENE_OPENVOCAB / SCENE_BG.

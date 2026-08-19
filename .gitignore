@@ -56,3 +56,6 @@ vlm_logs/
 *.wav
 scripts/test/SITL/**/bag_*/
 scripts/test/SITL/rubicon_orbit/
+
+# Models
+*.pt

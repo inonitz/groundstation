@@ -179,34 +179,38 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             continue;
         }
     
-        void*     pReadBuffer = nullptr;
-        ma_uint32 framesToRead = availableFrames;
-
-        if (ma_pcm_rb_acquire_read(m_audioMan.ringBufferHandle(), &framesToRead, &pReadBuffer) != MA_SUCCESS) {
-            continue;
+        // Drain the ENTIRE utterance. The ring buffer is circular, so acquire_read yields only the
+        // contiguous span up to the wrap point -- the old single read dropped everything past the
+        // wrap, giving intermittent empty/truncated transcripts (positional: depends where the write
+        // cursor sits in the 10 s buffer). Loop until all availableFrames are consumed.
+        std::vector<float> nativePcm;
+        nativePcm.reserve(availableFrames);
+        {
+            ma_uint32 remaining = availableFrames;
+            while (remaining > 0) {
+                ma_uint32 chunk       = remaining;
+                void*     pReadBuffer = nullptr;
+                if (ma_pcm_rb_acquire_read(m_audioMan.ringBufferHandle(), &chunk, &pReadBuffer) != MA_SUCCESS || chunk == 0) {
+                    break;
+                }
+                const float* in = static_cast<const float*>(pReadBuffer);
+                nativePcm.insert(nativePcm.end(), in, in + chunk);
+                ma_pcm_rb_commit_read(m_audioMan.ringBufferHandle(), chunk);
+                remaining -= chunk;
+            }
         }
 
-        // Calculate Resampled Buffer Capacity (Native -> Target Rate) + 1024 padding
-        ma_uint64 framesToRead64 = framesToRead;
+        // Resample the FULL native buffer (native rate -> target), +1024 padding.
+        ma_uint64 framesToRead64  = nativePcm.size();
         ma_uint64 framesToWrite64 = (framesToRead64 * m_audioMan.resampleRate()) / m_audioMan.nativeSampleRate() + 1024;
         std::vector<float> resampledBuf(framesToWrite64);
-
-        // Execute Manual Resampler
         ma_resampler_process_pcm_frames(
             m_audioMan.resamplerHandle(),
-            pReadBuffer,
+            nativePcm.data(),
             &framesToRead64,
             resampledBuf.data(),
             &framesToWrite64
         );
-
-        // Commit ONLY what the resampler actually consumed
-        ma_pcm_rb_commit_read(m_audioMan.ringBufferHandle(), static_cast<ma_uint32>(framesToRead64));
-
-        // Flush remaining stray frames to keep buffer clean for next PTT
-        ma_pcm_rb_seek_read(m_audioMan.ringBufferHandle(), 
-            ma_pcm_rb_available_read( m_audioMan.ringBufferHandle() )
-        ); 
 
         // Pass resampled buffer to whisper/parakeet backend
         auto transcript_time_ns = this->now().nanoseconds();

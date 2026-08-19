@@ -1,8 +1,17 @@
-# Scene demo (Python, standalone from the C++ tree). Install on the GPU box.
-# torch: install the ROCm build for your AMD card (RX 7900 = gfx1100), OR run CPU. NO CUDA.
-# rclpy + std_msgs are NOT pip packages -- they come from your sourced ROS2 install
-#   (source /opt/ros/<distro>/setup.bash) so the demo can subscribe to /asr_server/transcribe.
-ultralytics>=8.3.0
-opencv-python
-numpy
+# Python deps for llm_cv_scene. NO CUDA / NO NVIDIA -- runs on Vulkan (VLM) + CPU/ROCm (detectors).
+# The Dockerfile (scripts/Dockerfile, step 1.6) bakes all of this; this file is for a manual install.
+#
+# 1) Install torch FIRST from a NON-CUDA index (the default PyPI torch is the CUDA build -> pulls
+#    nvidia-* wheels, which you do NOT want). Pick one:
+#      CPU (default, works anywhere, no GPU needed):
+#        pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#      AMD ROCm (your container already passes /dev/kfd -> GPU-accelerated detectors):
+#        pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm6.4
+#
+# 2) Then the rest (ultralytics pulls numpy/opencv itself; cv2 + rclpy already in the ROS base):
+# Pin opencv to 4.x: opencv-python 5.0 pulls numpy 2, which pip cannot install over the
+# apt-managed numpy on the ROS base ("RECORD file not found"); 4.x also matches ROS cv_bridge.
+numpy<2
+opencv-python<4.12
+ultralytics
 requests

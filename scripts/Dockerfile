@@ -62,6 +62,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh \
     && mv /root/.local/bin/rtk /usr/local/bin/rtk
 
+# 1.6 Python ML deps for the llm_cv_scene demo -- baked so containers never refetch (offline-safe).
+#     PIP_BREAK_SYSTEM_PACKAGES lets pip work on this externally-managed (PEP 668) base with NO
+#     --break-system-packages flag, for the build AND any manual pip you run later.
+#     TORCH_INDEX defaults to the CPU wheels: ZERO nvidia/CUDA packages, matching the Vulkan+CPU
+#     setup. devenv.sh already passes /dev/kfd + /dev/dri, so to run the detectors on the AMD GPU
+#     instead, build with scripts/build-devenv.sh (auto-detects NVIDIA/AMD/CPU) which sets --build-arg TORCH_INDEX for you.
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ARG TORCH_INDEX=https://download.pytorch.org/whl/cpu
+RUN --mount=type=cache,target=/root/.cache/pip pip install --index-url ${TORCH_INDEX} torch torchvision && pip install "numpy<2" "opencv-python<4.12" ultralytics requests
+
 # 3. Define VS Code Environment Variables
 ENV VSCodeClangdAbsPath=/usr/bin/clangd
 ENV VSCodeClangdQueryDriverAbsPath=/usr/bin/g++

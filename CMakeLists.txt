@@ -27,7 +27,7 @@ include_cpm()
 enable_coloured_diagnostics_if_available()
 use_ccache_program_if_exists()
 define_aggregate_output_artifact_directory()
-update_submodules_on_cmake_configure("dependencies")
+# update_submodules_on_cmake_configure("dependencies")
 
 
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS      "Enable AddressSanitizer"                       OFF)

@@ -1,47 +1,48 @@
-"""llama-server client for the reasoning brain (Qwen3-VL-4B). Sends the current frame +
-the detector's findings + the operator's question. Returns a spoken-style answer and,
-when the operator asked to find something, a target phrase plus the VLM's own box guess
-(so you can compare VLM grounding against the real-time detector on screen). Never raises."""
+"""llama-server client for the reasoning brain (Qwen3-VL-4B). Sends the current frame + the
+detector's findings + the user's question. Returns a spoken-style answer and, when the user asked
+to find something, a target phrase plus the VLM's own box guess. Never raises."""
 import base64, re, cv2, requests
 import config
 
 SYSTEM = (
-    "You are the perception brain of a drone. You see ONE camera frame and a list of "
-    "objects a real-time detector already found (labels + pixel boxes). Answer the "
-    "operator's question about the scene in 1-3 natural sentences: what you see, where, "
-    "and a notable detail. Be concrete and HONEST -- if something asked about is not "
-    "visible, say so plainly; never invent it.\n"
-    "If the operator asks to find/highlight/point at a specific thing, add as the LAST "
-    "lines, exactly:\n"
-    "HIGHLIGHT: <short search label, or none>\n"
-    "VLM_BOX: x1,y1,x2,y2   (normalized 0-1, top-left origin; omit the line if unsure)"
+    "You are a visual assistant looking through a live camera. Answer the user's question "
+    "DIRECTLY and specifically about what is actually in THIS image -- the objects, people, "
+    "clothing, colours, text, count, and where things are. Vary your wording each time; never "
+    "repeat a canned description. 1-3 sentences unless asked for more. If something asked about "
+    "is not visible, say so plainly.\n"
+    "A fast detector also lists objects it found (labels + boxes) as a hint -- use it, but trust "
+    "your own eyes over it.\n"
+    "ONLY if the user asks to find/point at/highlight a specific thing, append two final lines:\n"
+    "HIGHLIGHT: <short label to search, or none>\n"
+    "VLM_BOX: x1,y1,x2,y2   (normalized 0-1, top-left origin; omit if unsure)\n"
+    "Reply in PLAIN ASCII only (straight quotes, no emoji/accents/degree sign)."
 )
+
 
 def _b64(frame_bgr):
     ok, buf = cv2.imencode(".jpg", frame_bgr, [cv2.IMWRITE_JPEG_QUALITY, 80])
     return base64.b64encode(buf).decode() if ok else ""
 
+
 def _dets_text(dets):
     if not dets:
         return "(detector found nothing this frame)"
-    return "\n".join(
-        f'- {d["label"]} at {list(d["box"])}' for d in dets[:20]
-    )
+    return "\n".join(f'- {d["label"]} at {list(d["box"])}' for d in dets[:20])
+
 
 def ask(frame_bgr, question, dets):
     """-> (answer_text, highlight_target|None, vlm_box|None). vlm_box is normalized xyxy."""
     content = [
         {"type": "text",
-         "text": f"Detector found:\n{_dets_text(dets)}\n\nOperator asks: {question}"},
+         "text": f"Detector found:\n{_dets_text(dets)}\n\nUser asks: {question}"},
         {"type": "image_url",
          "image_url": {"url": "data:image/jpeg;base64," + _b64(frame_bgr)}},
     ]
     body = {"messages": [{"role": "system", "content": SYSTEM},
                          {"role": "user", "content": content}],
-            "temperature": 0.2, "max_tokens": 256}
+            "temperature": 0.6, "max_tokens": 256}
     try:
-        r = requests.post(config.LLAMA_URL + "/v1/chat/completions",
-                          json=body, timeout=config.VLM_TIMEOUT)
+        r = requests.post(config.LLAMA_URL + "/v1/chat/completions", json=body, timeout=config.VLM_TIMEOUT)
         r.raise_for_status()
         txt = r.json()["choices"][0]["message"]["content"].strip()
     except Exception as e:

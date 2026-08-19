@@ -106,7 +106,7 @@ if [[ "$4" == "cleanbuild" ]]; then
 
 elif [[ "$4" == "configure" ]]; then
     CONFIGURE_CMAKE_FLAG="true"
-    CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON"
+    CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON" # Since we've moved on from Git submodules to CPM then is obsolete (for now...)
 
 elif [[ "$4" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"
