@@ -19,3 +19,4 @@ transformers>=5.15
 pillow
 safetensors
 requests
+lapx

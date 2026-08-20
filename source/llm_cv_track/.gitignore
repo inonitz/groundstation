@@ -1,0 +1,5 @@
+*.pt
+*.ts
+*.onnx
+__pycache__/
+*.pyc

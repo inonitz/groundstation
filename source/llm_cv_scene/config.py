@@ -94,3 +94,11 @@ def resolve_torch_device():
     return dev if dev in ("cpu", "mps") else "cuda"   # "0"/"1" (CUDA or ROCm/HIP) -> torch "cuda"
 
 WARMUP = os.environ.get("SCENE_WARMUP", "1") not in ("", "0", "false", "False")   # front-load the GPU kernel compile at startup
+
+OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", "180"))  # secs to keep retrying a not-yet-live input (drone RTMP)
+READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", "150"))        # consecutive read failures tolerated (network jitter)
+
+HIGHLIGHT_BACKEND = os.environ.get("SCENE_HL_BACKEND", "vlm")   # "vlm"=Qwen3-VL grounds the described referent (understands "red hat", refuses if absent) + SAM2 mask; "yoloe"/"grounder"=detector highlight
+
+VLM_COORD_SCALE = float(os.environ.get("SCENE_VLM_COORD_SCALE", "1000"))  # Qwen3-VL(llama.cpp) returns boxes on a 0-1000 scale -> scale to frame pixels
+VLM_MAX_OBJECTS = int(os.environ.get("SCENE_VLM_MAX_OBJECTS", "8"))          # cap boxes per query so a general "what do you see" does not clutter

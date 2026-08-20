@@ -8,7 +8,7 @@ green=grounded highlight (LLMDet), magenta=SAM2 mask, amber=VLM's own box.
 Keys: q quit | c clear highlight | t SAM2 mask on/off | b background on/off | x clear chat
 Record the session to share for debugging:  SCENE_RECORD=/path/out.mp4 python3 app.py
 """
-import re, time, textwrap, threading, collections
+import os, re, subprocess, time, textwrap, threading, collections
 import cv2, numpy as np
 import config, vlm
 from eyes import Eyes
@@ -83,7 +83,8 @@ def perception_worker(eyes):
         t_bg = (time.perf_counter() - t0) * 1000.0
 
         hl, mask, t_hl = None, None, None
-        if target and (time.time() - last_hl) >= 1.0 / max(config.HIGHLIGHT_HZ, 0.1):
+        vlm_hl = config.HIGHLIGHT_BACKEND == "vlm"
+        if not vlm_hl and target and (time.time() - last_hl) >= 1.0 / max(config.HIGHLIGHT_HZ, 0.1):
             last_hl = time.time()
             t1 = time.perf_counter()
             hl, mask = eyes.highlight(frame, want_mask=use_sam2)
@@ -91,10 +92,11 @@ def perception_worker(eyes):
 
         with S.lock:
             S.bg_dets, S.t_bg = bg, t_bg
-            if hl is not None:                 # only on a fresh (non-throttled) highlight
-                S.hl_dets, S.hl_mask, S.t_hl = hl, mask, t_hl
-            if not target:
-                S.hl_dets, S.hl_mask = [], None
+            if not vlm_hl:                     # VLM backend sets S.hl_dets from on_text (one-shot)
+                if hl is not None:
+                    S.hl_dets, S.hl_mask, S.t_hl = hl, mask, t_hl
+                if not target:
+                    S.hl_dets, S.hl_mask = [], None
 
         dt = time.perf_counter() - loop_t0
         if dt < min_dt:
@@ -124,11 +126,11 @@ def render_chat(height, use_sam2, show_bg):
         y += 20
 
     legend(config.COL_BACKGROUND, "background",           f"b: {'on' if show_bg else 'off'}")
-    legend(config.COL_YOLOE_HL,   "highlight (LLMDet)")
+    legend(config.COL_YOLOE_HL,   f"highlight ({config.HIGHLIGHT_BACKEND})")
     legend(config.COL_SAM2_HL,    "SAM2 mask",             f"t: {'on' if use_sam2 else 'off'}")
     legend(config.COL_VLM_BOX,    "VLM's own box")
     cv2.putText(panel, "Press H: record on/off", (12, y), FONT, 0.5, config.COL_HUD, 1, cv2.LINE_AA); y += 20
-    cv2.putText(panel, "keys: c clear  x chat  q quit", (12, y), FONT, 0.44, (150, 150, 150), 1, cv2.LINE_AA)
+    cv2.putText(panel, "keys: c clear  x chat  Esc/q quit", (12, y), FONT, 0.44, (150, 150, 150), 1, cv2.LINE_AA)
     y += 10; cv2.line(panel, (0, y), (w, y), (70, 70, 70), 1); conv_top = y + 8
 
     maxchars = max(int((w - 26) / 9), 12)
@@ -159,6 +161,7 @@ def render_chat(height, use_sam2, show_bg):
 
 
 def main():
+    threading.Thread(target=vlm.ensure_server, daemon=True).start()   # auto-launch llama-server if down
     eyes = Eyes()
 
     def on_text(text):
@@ -166,33 +169,50 @@ def main():
         with S.lock:
             S.chat.append(("user", text)); S.thinking = True
             frame = None if S.frame is None else S.frame.copy()
-            dets = list(S.bg_dets)
+            dets = list(S.bg_dets); use_sam2 = S.use_sam2
 
-        # Highlight straight from the spoken words -- reliable, no VLM cooperation needed.
         phrase = parse_highlight(text)
-        if phrase is not None:
-            eyes.set_target(phrase or None)
-            print(f"[highlight] target -> {phrase!r}", flush=True)
-            with S.lock:
-                S.target = phrase or None
-                if not S.target:
-                    S.hl_dets, S.hl_mask, S.vlm_box = [], None, None
 
+        if phrase == "":                                       # explicit "clear / never mind"
+            eyes.set_target(None)
+            with S.lock:
+                S.target = None; S.hl_dets = []; S.hl_mask = None; S.vlm_box = None; S.thinking = False
+            return
         if frame is None:
             with S.lock: S.thinking = False
             return
+
+        if config.HIGHLIGHT_BACKEND == "vlm":
+            # ONE reliable call: description + boxes together (system-prompt JSON schema, 0-1000 coords
+            # scaled to the frame). Boxes come EVERY time; absent things simply yield none.
+            desc, dets = vlm.analyze(frame, text)
+            mask = eyes.mask_for_box(frame, dets[0]["box"]) if (dets and use_sam2) else None
+            print(f"[chat] scene: {desc}\n[highlight] {len(dets)} box(es)", flush=True)
+            with S.lock:
+                S.chat.append(("model", desc)); S.thinking = False
+                S.hl_dets = dets; S.hl_mask = mask
+                S.target = phrase or (dets[0]["label"] if dets else None)
+            return
+
+        # ---- detector backends (yoloe / grounder) ----
+        if phrase is not None:
+            eyes.set_target(phrase or None)
+            with S.lock: S.target = phrase or None
         ans, tgt, box = vlm.ask(frame, text, dets)
         print(f"[chat] scene: {ans}", flush=True)
         with S.lock:
             S.chat.append(("model", ans)); S.thinking = False
             if box is not None: S.vlm_box = box
-        if tgt and phrase != "":                         # VLM resolved/refined the referent (route highlight via Qwen3-VL)
+        if tgt and phrase != "":
             eyes.set_target(tgt)
-            print(f"[highlight] target (via VLM) -> {tgt!r}", flush=True)
             with S.lock: S.target = tgt
 
     ears = Ears(on_text)
     cap = open_capture(config.INPUT)
+    t_open = time.time()
+    while not cap.isOpened() and time.time() - t_open < config.OPEN_TIMEOUT:
+        print(f"[llm_cv_scene] waiting for input {config.INPUT!r} (start the drone stream)...", flush=True)
+        time.sleep(1.5); cap.release(); cap = open_capture(config.INPUT)
     if not cap.isOpened():
         print("cannot open input:", config.INPUT); return
 
@@ -201,10 +221,15 @@ def main():
 
     writer = None
     t_prev, fps, last_log = time.time(), 0.0, 0.0
+    read_fail = 0
     while True:
         ok, frame = cap.read()
         if not ok:
-            break
+            read_fail += 1
+            if read_fail > config.READ_RETRY:
+                print("[llm_cv_scene] input ended / lost.", flush=True); break
+            time.sleep(0.03); continue
+        read_fail = 0
         with S.lock:
             S.frame = frame
             bg, hl, mask = list(S.bg_dets), list(S.hl_dets), S.hl_mask
@@ -249,7 +274,7 @@ def main():
 
         cv2.imshow(config.WIN_NAME, canvas)
         k = cv2.waitKey(1) & 0xFF
-        if k == ord('q'):
+        if k == ord('q') or k == 27:            # q or Esc quits (Esc also tears down the whole demo)
             break
         elif k == ord('c'):
             with S.lock: S.target = None; S.vlm_box = None; S.hl_dets = []; S.hl_mask = None
@@ -266,6 +291,9 @@ def main():
     if writer:
         writer.release()
     cap.release(); cv2.destroyAllWindows(); ears.shutdown()
+    sess = os.environ.get("SCENE_TMUX_SESSION")
+    if sess:                                    # launched by run_demo* -> Esc/q kills the whole session
+        subprocess.run(["tmux", "kill-session", "-t", sess], check=False)
 
 
 if __name__ == "__main__":
