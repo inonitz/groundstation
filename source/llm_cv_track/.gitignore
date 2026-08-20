@@ -3,3 +3,7 @@
 *.onnx
 __pycache__/
 *.pyc
+
+# MediaMTX auto-generated self-signed localhost cert/key (never commit)
+*.crt
+*.key
