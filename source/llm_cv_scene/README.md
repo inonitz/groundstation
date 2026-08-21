@@ -58,3 +58,11 @@ llama build, and the code is unchanged. Force devices with `SCENE_DEVICE=cpu|0|m
 Models: highlight grounder = **LLMDet-tiny** (`iSEE-Laboratory/llmdet_tiny`, open-vocab, 2025 SOTA on
 rare classes) via transformers; background = `yolo26n-seg.pt`; mask = `sam2.1_b.pt`. Override the
 grounder with `SCENE_GROUNDER` (e.g. an MM-Grounding-DINO checkpoint), background with `SCENE_BG`.
+
+---
+## Relationship to ../llm_cv_track  (2026-08-20)
+This folder is the **BACKUP / proven demo**: voice -> Qwen3-VL describes + localizes -> SAM2. 100% local,
+always loads, but the highlight is slow and static. **`../llm_cv_track` is the STAR**: same voice loop,
+but the highlight is OmDet-Turbo (open-vocab, real-time, the box follows the object). llm_cv_track REUSES
+this folder's `vlm.py`/`ears.py`/`eyes.py`/`config.py` unchanged. If the star wobbles live, run this.
+Full details + all commands: `../llm_cv_track/README.md` and `../../docs/active/2026-08-20-demo-runsheet.md`.

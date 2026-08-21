@@ -2304,3 +2304,46 @@ directed. Pure token substitution -- no logic touched. RECONCILE with your in-fl
   mask retained. Thresholds box=0.25/text=0.25, HIGHLIGHT_HZ=2 (grounder ~438 ms warm on ROCm).
 - Cold-start: first ROCm/MIOpen kernel compile is slow; front-loaded by a startup warmup +
   `MIOPEN_FIND_MODE=2`. LLMDet weights pre-baked into the Docker image for a fully OFFLINE demo.
+
+## 2026-08-20 — llm_cv_track: voice-driven tracked highlighting (follow.py)
+- **follow.py** fuses VLM referent-resolution + BoT-SORT: voice/command -> Qwen3-VL resolves the
+  referent ONCE on a frozen snapshot -> IoU-match to a track ID on that same frame -> BoT-SORT follows
+  the ID live. Reuses llm_cv_scene vlm.py/ears.py (frozen). track.py stays as the pure-tracker playground.
+- **Re-ID is a color histogram, NOT OSNet (the OSNet problem).** Ultralytics BoT-SORT Re-ID is
+  proximity-gated (`emb_dists[iou_dist > 1-proximity_thresh] = 1.0` in bot_sort.py get_dists): appearance
+  only rescues spatially-overlapping boxes, so a target that leaves frame + returns elsewhere gets a NEW
+  id (Kalman box drifts off-screen -> ~0 IoU -> appearance never consulted). Bumping track_buffer /
+  with_reid does NOT fix this. Our fix: an HSV hue-sat histogram fingerprint + re-acquisition ABOVE the
+  tracker (follow.py `_hist`/`_reacquire`), independent of the tracker's re-id.
+  - **Limitation:** distinguishes by clothing COLOUR only -> two people in similar colours can be
+    swapped. Fine for single-subject / distinctive clothing; weak in a same-colour crowd.
+  - **Upgrade path (post-gate):** OSNet appearance embedding (~2.2M params, pure-torch/ROCm-safe) as the
+    fingerprint instead of the colour hist, or a proper re-id model wired into the tracker. Adds a dep +
+    a small per-crop inference. Do this only if same-colour confusion shows up live.
+- **Phase 2 detector feel-test (2026-08-20).** Apache open-vocab **OmDet-Turbo** (transformers, needs
+  timm) finds the esoteric/referring objects YOLOE(AGPL) missed (mic 0.61, headphones 0.67, guitar case
+  0.31, "the man on the left" 0.76), ~115ms/ROCm, no hallucination -> the YOLOE replacement. **D-FINE**
+  (Apache, transformers) = fast closed-set COCO/person (~60ms) -> YOLO26 replacement. The human's named
+  models **OV-DEIM** and **D-FINE-seg** are real+Apache but standalone repo clones -> deferred (OmDet
+  covers open-vocab already). Full AGPL escape still needs a permissive TRACKER (ultralytics .track is
+  AGPL). See docs/active/2026-08-20-phase2-detector-feeltest.md.
+- **llm_cv_track re-oriented (2026-08-20).** Its PURPOSE = llm_cv_scene's voice loop with the highlight
+  swapped to a proper real-time open-vocab detector -> clean SAM2.1 masks (fixing YOLOE/LLMDet's esoteric
+  failures + bad masks). Priority #1 = detection+seg+masking; specific-object TRACKING is priority #2.
+  - **highlight_seg.py (NEW) = priority #1.** Voice "highlight the guitar case" -> OmDet-Turbo (open-vocab,
+    ~150ms) detects it every frame (box follows) -> SAM2.1 masks it. "what do you see" -> Qwen3-VL. Reuses
+    frozen vlm.py/ears.py/eyes.py. Tracking-by-detection gives a following highlight WITHOUT a re-id tracker.
+  - **follow.py = priority #2, PARKED.** BoT-SORT + colour-hist re-id: fragile (locks onto the wrong person
+    when 2 are in FOV; IDs churn on exit/entry). Not gate-ready; needs OSNet for real person re-id. Revisit
+    after detect+seg+mask is solid.
+- **Gate passed (2026-08-20) -> Demo Day next.** The star (scene_omdet, OmDet->SAM2) + backup
+  (llm_cv_scene, VLM->SAM2) both work. See source/llm_cv_track/README.md and docs/active/2026-08-20-*.
+- **OmDet offline load FIXED (was hanging on HF).** OmDet-Turbo resolved its Swin backbone from the HF
+  Hub every load -> hung under rate-limiting; pure offline failed because transformers resolves the null
+  `backbone_config` via an HF API call. Fix: vendored /root/models/omdet-turbo-swin-tiny (copied
+  checkpoint + a config.json with backbone_config baked in via OmDetTurboConfig.save_pretrained,
+  use_pretrained_backbone=False); highlight_seg.OmDet loads it with HF_HUB_OFFLINE=1 + local_files_only
+  + monkeypatched timm.create_model(pretrained=False). Result: ~1s load, zero network. Rebuild steps in
+  the README. Also fixed this session: VLM off the ASR thread (no voice bottleneck), vlm.ask not
+  vlm.analyze for Q&A (no JSON repetition garbage), os._exit(0) clean exit (no core dump/exit-144),
+  tmux teardown on quit, ASR_CAPTUREID=5 (dead MOTU default mic).
