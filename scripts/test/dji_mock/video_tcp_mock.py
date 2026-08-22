@@ -10,8 +10,11 @@ NO framing header -- exactly what the app's ReceiveStreamListener does
 
 Make a clip first (raw Annex-B, matching what DJI emits):
   gst-launch-1.0 videotestsrc num-buffers=150 ! video/x-raw,width=640,height=360,framerate=30/1 \
-    ! x264enc tune=zerolatency key-int-max=30 ! h264parse ! filesink location=clip.h264
-  (use x265enc + h265parse for an H.265 clip.)
+    ! x264enc tune=zerolatency key-int-max=30 ! h264parse \
+    ! 'video/x-h264,stream-format=byte-stream,alignment=au' ! filesink location=clip.h264
+  (use x265enc + h265parse + 'video/x-h265,stream-format=byte-stream' for an H.265 clip.)
+  NOTE: the byte-stream caps are REQUIRED -- without them gst writes AVC (length-prefixed),
+  which h264parse cannot preroll on read (the decoder hangs). DJI emits Annex-B byte-stream.
 
 Run:  python3 video_tcp_mock.py [port=5600] [clip=clip.h264] [clip_seconds=5.0]
 Then point the consumer at tcp://127.0.0.1:5600.

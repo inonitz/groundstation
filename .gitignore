@@ -61,3 +61,7 @@ scripts/test/SITL/rubicon_orbit/
 *.pt
 # ad-hoc recognize.py test artifacts (may be private imagery; public repo)
 test_img*
+scripts/test/dji_mock/out/
+compile_commands.json
+m2.zip
+*.apk

@@ -110,8 +110,8 @@ Measure each leg on the real link. Log the WiFi band, distance, and that the tun
 |------------------------|--------|-----|--------------------------------------|
 | command → action       |        |     |                                      |
 | video glass → Linux     |        |     |                                      |
-| telemetry GET round-trip|        |     |                                      |
-| WiFi baseline (WS RTT)  |        |     |                                      |
+| telemetry GET round-trip| 35.6 ms| 46.8 ms | 5 GHz hotspot; 9867 samp/360 s, 0 loss; p99 62.5 / max 1064 (1 stall) |
+| WiFi baseline (WS RTT)  | 16.4 ms| 23.6 ms | 5 GHz hotspot; 7157 samp/360 s, 0 loss; p99 36.1 / max 152; jitter 6.8 |
 
 Mock floor for reference (localhost, no drone dynamics): command→action ≈ 67 ms (the 15 Hz poll
 granularity), telemetry RTT ≈ 1 ms. The real link adds WiFi and rotor spin-up.

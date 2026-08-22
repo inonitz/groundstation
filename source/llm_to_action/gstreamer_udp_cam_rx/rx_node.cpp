@@ -44,8 +44,8 @@ GstReceiverNode::GstReceiverNode(BackendType backend, std::string djiHost) : Nod
             break;
         case BackendType::DJI:
             kDecodeStage = "tcpclientsrc host=" + djiHost + " port=" + std::to_string(kDjiVideoPort) +
-                           " ! decodebin ! ";
-            kLabel = "DJI H264/H265/TCP";
+                           " ! h264parse ! avdec_h264 max-threads=1 output-corrupt=false ! ";  /* explicit H.264 low-latency: no decodebin queue, no frame-threading delay */
+            kLabel = "DJI H264/TCP (low-latency)";
             break;
         case BackendType::PX4:
             kDecodeStage = "udpsrc port=" + std::to_string(kSitlUdpCamPort) +

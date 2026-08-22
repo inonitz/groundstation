@@ -2347,3 +2347,39 @@ directed. Pure token substitution -- no logic touched. RECONCILE with your in-fl
   the README. Also fixed this session: VLM off the ASR thread (no voice bottleneck), vlm.ask not
   vlm.analyze for Q&A (no JSON repetition garbage), os._exit(0) clean exit (no core dump/exit-144),
   tmux teardown on quit, ASR_CAPTUREID=5 (dead MOTU default mic).
+
+## 2026-08-21 — DjiBackend yaw units/sign confirmed + fixed (risk #2 closed)
+- Confirmed against ExoSkeletons `DJIVirtualStick.build()`: FlightParam.yaw feeds
+  `VirtualStickFlightControlParam.yaw` under `YawControlMode.ANGULAR_VELOCITY` = **deg/s**
+  (SDK `VirtualStickRange.YAW_CONTROL_MAX_ANGULAR_VELOCITY = ±100`). vx/vy/vz stay m/s (VELOCITY/BODY).
+- Sign: DJI positive yaw = **CW** (heading increases) — from `AircraftController.spinBy/flyCircle`
+  (`yaw = vel * clockwiseSign`, loop converges as `attitude.yaw` rises). Our interface is ENU **CCW+**.
+- Fix in `dji_backend_base.hpp`: interface stays rad/s; at the wire boundary multiply by `kRadToDeg`,
+  negate (`kDjiYawRateSign = -1.0`), clamp to `kDjiMaxYawRateDegps = 100`. Old `kDjiMaxYawRateRadps` gone.
+- `dji_convert_test` updated to the deg/s+sign truth; still bench-verify the physical turn direction
+  props-off once before trusting in-flight yaw. Mock floor unchanged: cmd→action ~66ms, telem RTT ~0.4ms.
+
+## 2026-08-21 — drone bootstrapped; container-adb + isolated-server gotchas
+- Full stack live: DJI drone flies, MSDK Aircraft app built from source + installed on GrapheneOS.
+  Start the API server from the standalone **"API Server"** list entry, NOT "Recon Swarm (Fragmented)"
+  (the latter bundles TTS+Qwen which crash and block server start).
+- Container adb: `/dev/bus/usb` is a static snapshot; phone re-enumeration orphans the node. Fix with
+  `exoskeletons/tools/adbfix.sh` (recreate node + restart adb). See 2026-08-21-drone-bringup-status-and-next.md.
+
+## 2026-08-22 — real-drone field behavior + comms assessment (indoor/outdoor)
+- **Indoor (uniform house, no GPS, weak VPS):** auto-takeoff tops out ~0.3 m (not the ~1.2 m
+  default); FC REFUSES horizontal + vertical stick motion because VPS can't lock features.
+  Yaw/rotate always works; vertical only creeps ~0.5 cm/s. This is DJI VPS-denial safety, NOT a
+  comms fault — the commands arrive, the FC declines to move.
+- **Outdoor (SLAM features present):** all sticks nominal, no drift, responsive.
+- **Comms VERIFIED:** workstation->drone command channel + discrete verbs (/c/takeoff, /c/land,
+  /c/stop) round-trip on the real link; transport latency p95 24 ms (WS) / 47 ms (telemetry) at
+  1.5 m point-blank (docs/active/latency-2026-08-22).
+- **Comms DEFERRED / UNVERIFIED:** continuous velocity control via /c/ws/sticks @18 Hz end-to-end
+  through OUR software, and command->action latency (leg 4). Need an OUTDOOR session with the field
+  unit (new laptop). Do NOT mark comms "fully validated".
+- **Decision:** proceed on the workstation with feature-total-integration simple mode against the
+  mock; the only change when the field unit returns is pointing at the phone IP.
+- **API gap noted:** /status/ has NO height/altitude field and position3D is null indoors, so the
+  workstation cannot observe altitude over HTTP; any closed-loop height control must use on-phone
+  ac.height (e.g. AircraftController.ascendTo).

@@ -47,14 +47,14 @@ int main() {
 
     /* ================= clamp ================= */
     FlightParam fast = enu_vel_to_flightparam({ 100, 0, 0 }, 0.0f, 100.0f);
-    assert(close(fast.vx, kDjiMaxSpeedMps) && close(fast.yaw, kDjiMaxYawRateRadps));
+    assert(close(fast.vx, kDjiMaxSpeedMps) && close(fast.yaw, kDjiYawRateSign * kDjiMaxYawRateDegps));
     FlightParam slow = enu_vel_to_flightparam({ -100, 0, 0 }, 0.0f, -100.0f);
-    assert(close(slow.vx, -kDjiMaxSpeedMps) && close(slow.yaw, -kDjiMaxYawRateRadps));
+    assert(close(slow.vx, -kDjiMaxSpeedMps) && close(slow.yaw, -kDjiYawRateSign * kDjiMaxYawRateDegps));
     /* exactly at the boundary passes through; just under passes through. */
     assert(close(enu_vel_to_flightparam({ kDjiMaxSpeedMps, 0, 0 }, 0.0f, 0.0f).vx, kDjiMaxSpeedMps));
     assert(close(enu_vel_to_flightparam({ kDjiMaxSpeedMps - 0.1f, 0, 0 }, 0.0f, 0.0f).vx, kDjiMaxSpeedMps - 0.1f));
-    /* yaw sign passthrough at default (+1). */
-    assert(close(enu_vel_to_flightparam({ 0, 0, 0 }, 0.0f, 0.5f).yaw, kDjiYawRateSign * 0.5f));
+    /* yaw: rad/s in -> deg/s out (x kRadToDeg), sign applied, under the deg clamp. */
+    assert(close(enu_vel_to_flightparam({ 0, 0, 0 }, 0.0f, 0.5f).yaw, kDjiYawRateSign * 0.5f * kRadToDeg));
     /* body-direct helper agrees on axes: forward, +left -> right<0, up. */
     FlightParam bf = flu_vel_to_flightparam({ 0.3f, 0.4f, 0.5f }, 0.0f);
     assert(close(bf.vx, 0.3f) && close(bf.vy, -0.4f) && close(bf.vz, 0.5f));

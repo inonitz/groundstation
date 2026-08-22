@@ -51,24 +51,29 @@ constexpr u16         kDjiVideoPort     = 5600;
 constexpr u32 kDjiStreamRateHz          = 18;
 constexpr u32 kDjiStatusPollHz          = 15;
 
-/* ---- Velocity envelope (clamp) --------------------------------------------- */
-/* Conservative until the app author confirms the drone's virtual-stick limits
-   (dji-apiserver-review.md Q5). One place to widen once measured.               */
+/* ---- Velocity + yaw-rate envelope (clamp) --------------------------------- */
+/* vx/vy/vz: m/s, conservative until the app author confirms the virtual-stick
+   limits (dji-apiserver-review.md Q5). yaw: DJI ANGULAR_VELOCITY range is
+   +/-100 deg/s (SDK VirtualStickRange.YAW_CONTROL_MAX_ANGULAR_VELOCITY),
+   CONFIRMED against ExoSkeletons DJIVirtualStick.build() (yawControlMode =
+   ANGULAR_VELOCITY -> deg/s). One place to widen once measured.                 */
 constexpr f32 kDjiMaxSpeedMps           = 2.0f;
-constexpr f32 kDjiMaxYawRateRadps       = __scast(f32, M_PI);   /* ~180 deg/s     */
+constexpr f32 kDjiMaxYawRateDegps       = 100.0f;              /* SDK hard ceiling */
+constexpr f32 kRadToDeg                 = __scast(f32, 180.0 / M_PI);
 
-/* ---- Yaw-rate sign (UNCONFIRMED) ------------------------------------------- */
-/* FlightParam.yaw is a body yaw RATE. Our interface yaw rate is ENU CCW+. DJI's
-   sign (CW+ vs CCW+) is NOT yet confirmed against AircraftController.kt, and the
-   mock's integrator ignores yaw entirely -- so it cannot confirm it either.
-   Isolate the unknown to this ONE constant; flip to -1 once the author confirms.
-   Default: pass through (assume the app already speaks CCW+).                    */
-constexpr f32 kDjiYawRateSign           = 1.0f;
+/* ---- Yaw-rate sign (CONFIRMED) -------------------------------------------- */
+/* On the wire FlightParam.yaw is a body yaw RATE in DEG/S (DJI ANGULAR_VELOCITY).
+   DJI positive yaw = CLOCKWISE (heading increases) -- confirmed from ExoSkeletons
+   AircraftController.spinBy/flyCircle: yaw = vel * clockwiseSign and the loop
+   converges as attitude.yaw rises. Our interface yaw rate is ENU CCW+, so NEGATE.
+   Isolate the convention to this ONE constant. (Bench-verify the physical turn
+   direction once, props-off, before trusting any in-flight yaw.)               */
+constexpr f32 kDjiYawRateSign           = -1.0f;
 
 
 /* ---- The control setpoint on the wire -------------------------------------- */
 /* FlightParam = {vx,vy,vz,yaw}: body-frame m/s (vx fwd, vy RIGHT, vz up) + yaw
-   rate (rad/s). Nullable on the wire; we always send all four.                  */
+   rate in DEG/S (DJI ANGULAR_VELOCITY, CW+). Nullable; we always send all four.  */
 struct FlightParam { f32 vx{0.0f}, vy{0.0f}, vz{0.0f}, yaw{0.0f}; };
 
 
@@ -87,7 +92,7 @@ static inline FlightParam enu_vel_to_flightparam(Vec3 worldEnu, f32 yawEnu, f32 
     p.vx  = dji_clamp( flu.x, kDjiMaxSpeedMps);      /* forward           */
     p.vy  = dji_clamp(-flu.y, kDjiMaxSpeedMps);      /* right = -left     */
     p.vz  = dji_clamp( flu.z, kDjiMaxSpeedMps);      /* up                */
-    p.yaw = dji_clamp(kDjiYawRateSign * yawspeed, kDjiMaxYawRateRadps);
+    p.yaw = dji_clamp(kDjiYawRateSign * yawspeed * kRadToDeg, kDjiMaxYawRateDegps);
     return p;
 }
 
@@ -98,7 +103,7 @@ static inline FlightParam flu_vel_to_flightparam(Vec3 flu, f32 yawspeed) {
     p.vx  = dji_clamp( flu.x, kDjiMaxSpeedMps);
     p.vy  = dji_clamp(-flu.y, kDjiMaxSpeedMps);
     p.vz  = dji_clamp( flu.z, kDjiMaxSpeedMps);
-    p.yaw = dji_clamp(kDjiYawRateSign * yawspeed, kDjiMaxYawRateRadps);
+    p.yaw = dji_clamp(kDjiYawRateSign * yawspeed * kRadToDeg, kDjiMaxYawRateDegps);
     return p;
 }
 

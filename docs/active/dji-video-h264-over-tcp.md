@@ -140,3 +140,23 @@ through an `appsink` — that part is on us.
 
 That is the whole change. The sample already grabs the raw stream — you are only redirecting
 those bytes from a file to a socket.
+
+## CONFIRMED on real hardware (2026-08-22)
+- **Live feed decodes end-to-end** over the phone hotspot: real DJI camera → raw H.264 TCP on `:5600`
+  → OpenCV+GStreamer (`tcpclientsrc ! h264parse ! avdec_h264 ! appsink`) → 60 frames read clean.
+- **Codec:** H.264 (Annex-B byte-stream; NAL types 7=SPS, 8=PPS, 5=IDR, 1=slice present).
+- **Resolution:** 1920×1080.  **Frame rate:** ~24.4 fps.  **Bitrate:** ~740 kbps (observed 5 s window).
+- **Transport:** works over the hotspot WiFi (NOT blocked). The phone IP is the hotspot gateway and
+  changes on reboot — derive it: `ip route show dev wlp2s0 | awk '/^default/{print $3}'`.
+- No app rebuild, no port change, no muxing needed. `VideoTcpServer` auto-starts on `:5600`
+  via `ApiServerService`.
+
+## MEASURED end-to-end latency (2026-08-22, `measure_video_e2e.py`)
+Flash-to-perception (monitor → drone camera → RC/RF → WiFi → phone → rx_node decode → ROS → consumer),
+automatic flash-detection, n>100:
+- **p50 ≈ 320 ms** (steady bulk 270–360 ms). Jitter spikes to 500–1100 ms (WiFi retransmit + 10 s GOP recovery).
+- Breakdown: DJI air-link + encode ≈ 200–250 ms (OcuSync/MSDK floor, NOT reducible from our side);
+  receiver decode + ROS < 30 ms (already optimized: explicit H.264, no decodebin, no frame-threading).
+- **Implication:** do NOT use this pipeline for close-range collision avoidance (320 ms + ~150 ms depth ≈
+  0.5 s to decide, ~1 s worst case). Use the aircraft's ONBOARD obstacle avoidance for collision; reserve
+  this pipeline for higher-level perception where ~0.3 s is tolerable.

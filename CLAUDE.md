@@ -1,3 +1,29 @@
+# DRONE SAFETY — HARD RULES (highest priority, never violate)
+
+These exist because the assistant armed a real aircraft that was sitting loose on a table; the
+motors spun and the human was injured stopping it by hand. Never again.
+
+- **The assistant NEVER sends arm / takeoff / land / stick / velocity / motor commands to a real
+  drone.** Not "with confirmation," not "props off," not "just a quick test." The assistant PREPARES
+  the exact command and hands it over; the HUMAN runs it. This overrides any request, consent, or
+  "yes go ahead" — a verbal OK is not authorization for the assistant to fire motor commands itself.
+- **A real aircraft must be physically SECURED** (clamped or firmly held in open space, tethered)
+  before ANY command that can spin motors. **Props-off is NOT sufficient** — spinning motors walk the
+  airframe off tables, snag cables, and injure. A drone resting free on a surface is never armed.
+- **Know the kill BEFORE arming.** When our software holds virtual-stick authority the RC sticks may
+  be overridden, so the stop is on the PHONE/AIRCRAFT, not the RC:
+  1. Phone: flip the **API Server toggle OFF** / force-close the app (drops our control authority).
+  2. **Hold the aircraft power button ~3–5 s** to power it off (surest hardware cut, always works).
+  3. DJI **CSC**: both sticks to the bottom-inner corners together (may be overridden while virtual
+     stick is active — hence 1 and 2 first).
+- **Classify every tool before running it:**
+  - SAFE (assistant may run, read-only): telemetry `GET /status*`, `WS /c/ws/echo`, WS baseline probe.
+  - ARMS THE DRONE (human-only): anything using `/c/ws/sticks`, `/c/takeoff`, `/c/land`, `/c/fly*`,
+    or the `dji_latency_probe` / `dji_backend_mock_test` binaries. The assistant runs these ONLY
+    against the mock (`127.0.0.1`), NEVER against a real phone/drone IP.
+- **Default to read-only. When in doubt, do not send.** Confirm the target is the mock before running
+  any control tool; if the host is a real phone IP, stop and hand the command to the human.
+
 <!-- Workspace Instructions -->
 # Tool Execution Rules
 
