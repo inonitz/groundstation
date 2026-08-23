@@ -2,6 +2,9 @@
 HostPathProjectPath="$HOME/workspaces/groundstation"
 ContainerPathProjectPath="/root/groundstation"
 
+HostPathDjiBackendProjectPath="$HOME/workspaces/DJI-android-sdk-v5-recon-swarm"
+ContainerPathDjiBackendProjectPath="/root/DJI-android-sdk-v5-recon-swarm"
+
 HostPathASRModel="$HOME/models/asr"
 ContainerPathASRModelPath="/root/models/asr"
 
@@ -29,6 +32,7 @@ set -- "$@" --net=host
 
 # Folder Mounts
 set -- "$@" -v "${HostPathProjectPath}:${ContainerPathProjectPath}"
+set -- "$@" -v "${HostPathDjiBackendProjectPath}:${ContainerPathDjiBackendProjectPath}"
 set -- "$@" -v "/run/user/$(id -u)/pulse/native:/tmp/pulse-socket"
 set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"

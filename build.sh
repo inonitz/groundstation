@@ -139,7 +139,7 @@ fi
 
 if [[ "$BUILD_BINARIES_FLAG" == "true" ]]; then
     cd "$CMAKE_FINAL_BUILD_DIR" || exit 1
-    cp "compile_commands.json" "../../../compile_commands.json"
+    cp "compile_commands.json" "../../../../compile_commands.json"
     echo "CURRENT WORKING DIRECTORY IS $PWD"
     
     # Safely fallback to 1 core if nproc fails or is missing

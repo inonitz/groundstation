@@ -54,3 +54,24 @@ a2.set_title(f"transport vs full-read over 6 min — median gap {np.median(tel_v
 a2.legend(fontsize=9, markerscale=10); a2.grid(alpha=0.25)
 fig2.tight_layout(); fig2.savefig(outdir + "/latency_overlay.png", dpi=110)
 print("wrote latency_overview.png + latency_overlay.png to", outdir)
+
+# --- optional 4th arg: video e2e CSV (idx,latency_ms) from measure_video_e2e.py ---
+if len(sys.argv) > 4:
+    import csv as _csv
+    vv = [float(r["latency_ms"]) for r in _csv.DictReader(open(sys.argv[4])) if r.get("latency_ms")]
+    core = [x for x in vv if x >= 50]   # drop <50ms false brightness-matches
+    if vv:
+        fig3, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(14, 4))
+        ax_a.plot(range(len(vv)), vv, ".", ms=3, color="#2ca02c", alpha=0.6)
+        ax_a.axhline(np.median(core) if core else np.median(vv), color="k", ls="--", lw=0.9)
+        ax_a.set_title("video e2e latency over samples", fontsize=10)
+        ax_a.set_xlabel("sample"); ax_a.set_ylabel("ms"); ax_a.grid(alpha=0.25)
+        c = np.array(core) if core else np.array(vv)
+        ax_b.hist(c, bins=40, color="#2ca02c", alpha=0.85)
+        ax_b.axvline(np.median(c), color="k", ls="--", lw=0.9)
+        ax_b.set_title(f"distribution (>=50ms, n={len(c)}) p50={np.median(c):.0f} p95={np.percentile(c,95):.0f} ms",
+                       fontsize=10)
+        ax_b.set_xlabel("ms"); ax_b.set_ylabel("count"); ax_b.grid(alpha=0.25)
+        fig3.suptitle("DJI video glass->perception e2e (flash-detect)", fontsize=11)
+        fig3.tight_layout(rect=[0,0,1,0.94]); fig3.savefig(outdir + "/latency_video_e2e.png", dpi=110)
+        print("wrote latency_video_e2e.png")
