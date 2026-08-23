@@ -66,3 +66,21 @@ always loads, but the highlight is slow and static. **`../llm_cv_track` is the S
 but the highlight is OmDet-Turbo (open-vocab, real-time, the box follows the object). llm_cv_track REUSES
 this folder's `vlm.py`/`ears.py`/`eyes.py`/`config.py` unchanged. If the star wobbles live, run this.
 Full details + all commands: `../llm_cv_track/README.md` and `../../docs/active/2026-08-20-demo-runsheet.md`.
+
+## Voice out (TTS) — the PHONE speaks (loop is voice-in -> voice-out)
+
+The phone app (DJI backend) owns TTS: it exposes `POST /tts` and speaks via Android
+TextToSpeech. `voice.py` just POSTs the VLM answer to it -- same phone that serves the video,
+so the IP is taken from `host=` in `SCENE_INPUT` automatically. A new answer flushes the
+phone's queue, so the latest question wins. Fully LOCAL, no cloud.
+
+- Default: `SCENE_TTS=phone`. Override the target with `SCENE_TTS_HOST=<phone-ip>` (else auto).
+- Contract: `POST http://<phone>:8080/tts  {"text":"...","lang":"en","rate":1.0}`.
+- Desk debug WITHOUT a phone: `SCENE_TTS=espeak` (needs `apt install espeak-ng`), speaks on the workstation.
+
+Smoke-test the POST alone (phone on the hotspot, API Server ON):
+```
+curl -s -X POST http://<phone-ip>:8080/tts -H 'Content-Type: application/json' \
+  -d '{"text":"voice output works","lang":"en"}'
+```
+Full demo (TTS auto-targets the video phone): `/root/groundstation/source/llm_cv_scene/run_demo.sh`

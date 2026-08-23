@@ -102,3 +102,14 @@ HIGHLIGHT_BACKEND = os.environ.get("SCENE_HL_BACKEND", "vlm")   # "vlm"=Qwen3-VL
 
 VLM_COORD_SCALE = float(os.environ.get("SCENE_VLM_COORD_SCALE", "1000"))  # Qwen3-VL(llama.cpp) returns boxes on a 0-1000 scale -> scale to frame pixels
 VLM_MAX_OBJECTS = int(os.environ.get("SCENE_VLM_MAX_OBJECTS", "8"))          # cap boxes per query so a general "what do you see" does not clutter
+
+# --- Voice out (TTS): the PHONE app (DJI backend) speaks via POST /tts. LOCAL only, no cloud. ---
+TTS_BACKEND = os.environ.get("SCENE_TTS", "phone")            # phone | espeak | piper | off
+TTS_HOST    = os.environ.get("SCENE_TTS_HOST", "")            # phone IP; "" -> host= from SCENE_INPUT, else gateway
+TTS_PORT    = int(os.environ.get("SCENE_TTS_PORT", "8080"))   # app ApiServer port
+TTS_LANG    = os.environ.get("SCENE_TTS_LANG", "en")          # POST /tts lang (country omitted)
+TTS_RATE    = float(os.environ.get("SCENE_TTS_RATE", "1.0"))  # POST /tts speech rate (1.0 = normal)
+TTS_TIMEOUT = float(os.environ.get("SCENE_TTS_TIMEOUT", "3")) # POST timeout (s)
+# desk-debug fallbacks only (no phone): piper voice model + its raw sample rate
+TTS_MODEL   = os.environ.get("SCENE_TTS_MODEL", "")
+TTS_SR      = int(os.environ.get("SCENE_TTS_SR", "22050"))

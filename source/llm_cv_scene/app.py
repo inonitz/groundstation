@@ -10,7 +10,7 @@ Record the session to share for debugging:  SCENE_RECORD=/path/out.mp4 python3 a
 """
 import os, re, subprocess, time, textwrap, threading, collections
 import cv2, numpy as np
-import config, vlm
+import config, vlm, voice
 from eyes import Eyes
 from ears import Ears
 
@@ -163,6 +163,7 @@ def render_chat(height, use_sam2, show_bg):
 def main():
     threading.Thread(target=vlm.ensure_server, daemon=True).start()   # auto-launch llama-server if down
     eyes = Eyes()
+    voice_out = voice.Voice()
 
     def on_text(text):
         print(f"[chat] you:   {text}", flush=True)
@@ -192,6 +193,7 @@ def main():
                 S.chat.append(("model", desc)); S.thinking = False
                 S.hl_dets = dets; S.hl_mask = mask
                 S.target = phrase or (dets[0]["label"] if dets else None)
+            voice_out.say(desc)
             return
 
         # ---- detector backends (yoloe / grounder) ----
@@ -203,6 +205,7 @@ def main():
         with S.lock:
             S.chat.append(("model", ans)); S.thinking = False
             if box is not None: S.vlm_box = box
+        voice_out.say(ans)
         if tgt and phrase != "":
             eyes.set_target(tgt)
             with S.lock: S.target = tgt
@@ -290,7 +293,7 @@ def main():
     time.sleep(0.05)
     if writer:
         writer.release()
-    cap.release(); cv2.destroyAllWindows(); ears.shutdown()
+    cap.release(); cv2.destroyAllWindows(); ears.shutdown(); voice_out.shutdown()
     sess = os.environ.get("SCENE_TMUX_SESSION")
     if sess:                                    # launched by run_demo* -> Esc/q kills the whole session
         subprocess.run(["tmux", "kill-session", "-t", sess], check=False)

@@ -2383,3 +2383,9 @@ directed. Pure token substitution -- no logic touched. RECONCILE with your in-fl
 - **API gap noted:** /status/ has NO height/altitude field and position3D is null indoors, so the
   workstation cannot observe altitude over HTTP; any closed-loop height control must use on-phone
   ac.height (e.g. AircraftController.ascendTo).
+
+- Perception voice-out = the PHONE owns TTS. `llm_cv_scene` POSTs the VLM answer to the app's
+  `POST /tts` ({text, lang, rate}); the phone speaks via Android TextToSpeech (TTSManager). The
+  workstation never synthesizes -- espeak/piper in `voice.py` is desk-debug only. TTS host is the
+  SAME phone as the video (derived from `host=` in `SCENE_INPUT`). Keeps LLM/perception fully out
+  of the flight-control path.

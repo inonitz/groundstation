@@ -36,7 +36,7 @@ pkill -f "llm_to_action_keyboard_hook" 2>/dev/null || true
 CMD_KEYS="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH && $BIN/llm_to_action_keyboard_hook"
 CMD_ASR="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH && $BIN/llm_to_action_asr_server --backend=whisper-parakeet --model=$ASR_MODEL --fa --language=en --threads=1 --gid=0 --captureid=${ASR_CAPTUREID:--1}"
 # HF_HUB_OFFLINE: weights are already cached/pre-baked -> load from disk, no hub check, works with NO internet.
-CMD_APP="source $ROS_SETUP && cd $HERE && export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 SCENE_TMUX_SESSION=$SESSION && sleep 3 && python3 app.py"
+CMD_APP="source $ROS_SETUP && cd $HERE && export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 SCENE_TMUX_SESSION=$SESSION SCENE_TTS=${SCENE_TTS:-phone} SCENE_TTS_HOST=${SCENE_TTS_HOST:-} SCENE_TTS_PORT=${SCENE_TTS_PORT:-8080} SCENE_TTS_LANG=${SCENE_TTS_LANG:-en} && sleep 3 && python3 app.py"
 
 tmux new-session -d -s "$SESSION" -n vlm  "bash -c '$HERE/run_llama_server.sh; echo [vlm exited]; exec bash'"
 tmux new-window  -t "$SESSION"    -n keys "bash -c '$CMD_KEYS; echo [keys exited]; exec bash'"
