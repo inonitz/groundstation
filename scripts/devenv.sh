@@ -42,6 +42,11 @@ set -- "$@" -v "${HostPathVisionModel}:${ContainerPathVisionModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
 set -- "$@" -v "$HOME/.claude:/root/.claude"
 
+# Git auth that works IDENTICALLY on host or in-container: reuse the host SSH key + identity
+# (read-only). With SSH remotes this bypasses the flaky VS Code credential bridge entirely.
+[ -d "$HOME/.ssh" ]       && set -- "$@" -v "$HOME/.ssh:/root/.ssh:ro"
+[ -f "$HOME/.gitconfig" ] && set -- "$@" -v "$HOME/.gitconfig:/root/.gitconfig:ro"
+
 # Bind-mounted, not --device: docker snapshots /dev at creation, so a keyboard plugged in
 # later would otherwise have no node here.
 if [ -d "/dev/input" ]; then
