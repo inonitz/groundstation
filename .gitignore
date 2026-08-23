@@ -65,3 +65,4 @@ scripts/test/dji_mock/out/
 compile_commands.json
 m2.zip
 *.apk
+_exo_transfer/

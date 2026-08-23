@@ -24,5 +24,7 @@
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true
-  }
+  },
+  // In the Future I'll add a custom outputStyle for claude to not talk like a fucking retard
+  "outputStyle": ""
 }
