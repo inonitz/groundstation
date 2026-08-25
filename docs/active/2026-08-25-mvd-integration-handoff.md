@@ -172,3 +172,39 @@ hands over; human runs. Secure the aircraft first. Kill: phone API-Server toggle
 button 3-5s -> DJI CSC. stop(delay:0) and manual are software, not the kill.
 CONTAINER CAVEAT: the assistant runs in a container whose pgrep/ss/tmux view can be ISOLATED from the
 host. Do NOT conclude "app not running / port dead" from container-side checks — verify on the host.
+
+## 12. Repo state — uncommitted / unaccounted changes (as of 2026-08-25 handoff)
+
+`git status` at handoff shows the following NOT-yet-committed with our MVD commit. Dispositions:
+
+**Ours — commit with the MVD work:**
+- `?? docs/active/mvd-voice-command-table.md` — the ASR->DjiWire->DJI-REST-JSON command table (this session). COMMIT.
+- `?? docs/integration-mvd-2026-08-24.md` — the MVD spec (untracked, referenced throughout). COMMIT.
+
+**Intentional structural move (human, mono-repo consolidation):**
+- `D scripts/dashboard/{README.md,assess.py,dashboard.html,mock_data.py,serve.py}` +
+  `?? source/llm_to_action/dashboard/` — the dashboard was MOVED from `scripts/` into
+  `source/llm_to_action/dashboard/` on purpose: the repo is effectively a mono-repo with sub-repos under
+  `source/`, and the dashboard's logical home is with `llm_to_action`. So **the dashboard track lives
+  under `source/llm_to_action/dashboard/`**, not `scripts/`. Structural debt (acknowledged), not a bug.
+
+**Prototype leftovers — the ORIGINALS the MVD was consolidated FROM (separate decision):**
+- `M source/llm_cv_scene/{config.py,vlm.py,run_demo*.sh,run_llama_server.sh}` and
+  `M source/llm_cv_track/{highlight_seg.py,scene_omdet.py,run_scene_omdet.sh}` +
+  `?? source/llm_cv_track/run_mvd.sh` — these are the standalone perception prototypes. `source/integration/`
+  is now the CANONICAL, self-contained MVD (byte-copied + fixed from these, then decoupled). Treat
+  `integration/` as source of truth; these llm_cv_* edits are largely superseded. Do NOT re-wire the MVD
+  to them. The human decides whether to commit, archive, or drop them.
+- `?? scripts/test/router/` — router test scratch/artifacts; inspect before committing.
+
+**Infra / environment (from earlier sessions, not the MVD):**
+- `M scripts/Dockerfile`, `M scripts/build-devenv.sh` — devenv build changes.
+- `M scripts/test/dji_mock/mock_apiserver.py` — the mock we validate the wire against (implements
+  /c/takeoff, /c/land, /c/stop, /c/fly, /c/ws/sticks, /status). Useful; commit if you want the router
+  tests reproducible.
+- `M .claude/settings.local.json` — local agent settings (usually not committed).
+
+**Git ownership note:** the repo trips git's `safe.directory` guard in the container/VS Code (UID mismatch
+from the bind-mount). Fix GUI-wide with `git config --system --add safe.directory '*'` (writes
+`/etc/gitconfig`, which VS Code's git also reads), or inline per command with
+`git -c safe.directory=/root/groundstation ...`. It's a safe whitelist in this single-user root dev env.
