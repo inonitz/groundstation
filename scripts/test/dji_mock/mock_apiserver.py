@@ -132,6 +132,16 @@ async def land(_req):
     return ok(status="landed")
 
 
+async def stop(_req):
+    """POST /c/stop = relinquishControl(): drop our virtual-stick authority. The drone
+    brakes to hover (mock: zero horizontal+vertical velocity, stay airborne). Serves the
+    source/integration router's emergency fast-path and manual-override tier."""
+    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+    if SILENT_VERBS:
+        return web.Response(status=204)
+    return ok(status="stopped")
+
+
 async def fly(req):
     try:
         body = await req.json()
@@ -183,6 +193,7 @@ def build_app():
         web.get("/status/signal", status_signal),
         web.post("/c/takeoff", takeoff),
         web.post("/c/land", land),
+        web.post("/c/stop", stop),
         web.post("/c/fly", fly),
         web.get("/c/ws/sticks", ws_sticks),
     ])

@@ -7,7 +7,7 @@ import os
 os.environ.setdefault("MIOPEN_FIND_MODE", "2")
 
 # --- VLM brain: Qwen3-VL-4B on the repo's llama-server (run_llama_server.sh) ---
-LLAMA_URL   = os.environ.get("SCENE_LLAMA_URL", "http://127.0.0.1:8080")
+LLAMA_URL   = os.environ.get("SCENE_LLAMA_URL", "http://127.0.0.1:8090")
 VLM_TIMEOUT = 30                      # a warm 4B describe call is ~1-3 s
 
 # --- Real-time eyes: YOLOE (Ultralytics). Prompt-free = always-on background;

@@ -6,7 +6,7 @@ set -eu
 
 IMAGE="${IMAGE:-px4_gazebo-lts-2028_ros2-lts-2029}"
 ROCM_VERSION="${ROCM_VERSION:-6.4}"     # download.pytorch.org/whl/rocm<this>
-CUDA_VERSION="${CUDA_VERSION:-cu124}"   # download.pytorch.org/whl/<this>
+CUDA_VERSION="${CUDA_VERSION:-cu128}"   # download.pytorch.org/whl/<this>
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 if command -v nvidia-smi >/dev/null 2>&1; then

@@ -47,7 +47,7 @@ SYSTEM = (
     "DIRECTLY and specifically about what is actually in THIS image -- the objects, people, "
     "clothing, colours, text, count, and where things are. Vary your wording each time; never "
     "repeat a canned description. 1-3 sentences unless asked for more. If something asked about "
-    "is not visible, say so plainly.\n"
+    "is not visible, say so plainly. For counting questions (how many / how much / count), BEGIN the reply with the exact integer, e.g. '2 people.' then at most one short clarifying clause.\n"
     "A fast detector also lists objects it found (labels + boxes) as a hint -- use it, but trust "
     "your own eyes over it.\n"
     "ONLY if the user asks to find/point at/highlight a specific thing, append two final lines:\n"

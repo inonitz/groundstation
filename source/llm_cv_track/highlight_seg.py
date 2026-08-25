@@ -44,7 +44,7 @@ class OmDet:
     """OmDet-Turbo open-vocab detector (Apache, transformers). Stateless: pass the phrase each call.
     Loads from a LOCAL, offline copy (/root/models/omdet-turbo-swin-tiny) in ~1s -- see README 'OmDet
     offline' -- so it never hangs fetching the Swin backbone from the HF Hub."""
-    LOCAL = "/root/models/omdet-turbo-swin-tiny"
+    LOCAL = "/root/models/vision/omdet-turbo-swin-tiny"
     def __init__(self, device):
         import os, inspect, timm
         from transformers import AutoProcessor, OmDetTurboForObjectDetection

@@ -10,7 +10,7 @@ MODE="${1:-webcam}"
 SESSION=scene_omdet
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCENE=/root/groundstation/source/llm_cv_scene
-BIN=/root/groundstation/build/release/shared/px4/bin
+BIN=/root/groundstation/build/release/shared/dji/bin
 ASR_MODEL="${ASR_MODEL_PATH:-/root/models/asr/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-q4_k.bin}"
 ROS_SETUP=/opt/ros/jazzy/setup.bash
 

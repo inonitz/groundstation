@@ -18,6 +18,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = "/root/groundstation/source/llm_cv_scene"
 sys.path.insert(0, HERE); sys.path.insert(0, SCENE)
 import config, vlm
+sys.path.insert(0, os.path.dirname(SCENE))  # source/ root -> `integration` package
+from integration.router import Router
+from integration.commands import Tier
+from integration.dji_wire import DjiWire
 from eyes import Eyes
 import highlight_seg as HS                                 # OmDet, _apply_masks, parse_highlight, _ascii, open_capture
 try:
@@ -36,7 +40,7 @@ class Shared:
         self.bg_dets, self.hl_dets, self.hl_masks = [], [], []
         self.target = None; self.thinking = False
         self.use_sam, self.show_bg = True, True
-        self.conf, self.mask_k = 0.30, 3
+        self.conf, self.mask_k = 0.62, 3
         self.chat = collections.deque(maxlen=60)
         self.fps = 0.0; self.running = True
 S = Shared()
@@ -135,11 +139,30 @@ def main():
         except Exception as e: print("[scene_omdet] OmDet load FAILED:", e, flush=True)
     threading.Thread(target=_load, args=(eyes.tdevice,), daemon=True).start()
 
+    router = None
+    if os.environ.get("MVD_DRONE"):
+        try:
+            router = Router(DjiWire.from_env())
+            print("[scene_omdet] MVD drone router ON ->",
+                  os.environ.get("MVD_WIRE_HOST", "127.0.0.1"),
+                  "(real)" if os.environ.get("MVD_WIRE_REAL") else "(mock)", flush=True)
+        except Exception as e:
+            print("[scene_omdet] drone router DISABLED:", e, flush=True)
+
     def on_text(text):
         text = (text or "").strip()
         if not text: return
         print("[scene_omdet] you:", text, flush=True)
         with S.lock: S.chat.append(("user", text))
+        if router is not None:
+            try:
+                res = router.handle(text)
+            except Exception as e:
+                with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
+                return
+            if res.tier is not Tier.COMPLEX:      # basic/emergency/override handled -> done
+                with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
+                return
         ph = HS.parse_highlight(text)
         if ph == "":
             with S.lock:
@@ -147,8 +170,29 @@ def main():
                 S.chat.append(("model", "Cleared the highlight."))
             return
         if ph is not None:
+            # VLM presence GATE: OmDet (like any open-vocab detector) returns a confident box even when
+            # the object is absent -- it grounds "red backpack" onto the salient person. Before letting
+            # OmDet draw, ask the strong VLM whether the target is actually visible; suppress if not.
             with S.lock:
-                S.target = ph; S.chat.append(("model", f"Highlighting: {ph}"))
+                gframe = None if S.frame is None else S.frame.copy(); S.thinking = True
+            def _gate(fr, tgt):
+                present = True
+                if fr is not None:
+                    try:
+                        ans, _, _ = vlm.ask(fr, f"Is there a {tgt} clearly visible in this image? Answer only yes or no.", [])
+                        present = ans.strip().lower().lstrip("*_ ").startswith("y")
+                    except Exception as e:
+                        present = True   # VLM error -> don't block the highlight
+                        print("[scene_omdet] presence-gate VLM err:", e, flush=True)
+                with S.lock:
+                    S.thinking = False
+                    if present:
+                        S.target = tgt; S.chat.append(("model", f"Highlighting: {tgt}"))
+                    else:
+                        S.target = None; S.hl_dets = []; S.hl_masks = []
+                        S.chat.append(("model", f"I don't see a {tgt} in view."))
+                print(f"[scene_omdet] presence-gate '{tgt}': {'YES' if present else 'NO'}", flush=True)
+            threading.Thread(target=_gate, args=(gframe, ph), daemon=True).start()
             return
         with S.lock:
             frame = None if S.frame is None else S.frame.copy(); S.thinking = True
@@ -192,7 +236,7 @@ def main():
                 bg, hl, masks = list(S.bg_dets), list(S.hl_dets), list(S.hl_masks)
                 show_bg, use_sam = S.show_bg, S.use_sam
             if show_bg:
-                for d in bg: draw_box(disp, d["box"], config.COL_BACKGROUND, None, 1)
+                for d in bg: draw_box(disp, d["box"], config.COL_BACKGROUND, d.get("label"), 1)
             if use_sam and masks:
                 ov = disp.copy()
                 for m in masks:
