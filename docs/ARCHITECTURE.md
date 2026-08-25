@@ -469,3 +469,29 @@ Input: webcam index, RTSP (drone via DJI Fly Custom RTMP -> MediaMTX), or a GStr
 OmDet loads from a local vendored copy offline (~1s); see source/llm_cv_track/README.md.
 
 Not fully AGPL-free yet: YOLO26 + SAM2 + BoT-SORT (Ultralytics) remain AGPL; OmDet-Turbo is Apache.
+
+---
+
+## Integration MVD — voice -> 4-tier router -> DJI backend + perception (2026-08-25)
+
+> **Status:** DONE / the Demo-Day system. Lives in `source/integration/` (self-contained). A PARALLEL
+> subsystem to the FMU above — the FMU (`llm_to_action`) remains the destination C++ product; this
+> Python MVD is the shipped prototype. Full detail: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+
+**Data flow.** `voice (laptop mic / phone ASR) -> on_text -> Router.classify (4 tiers) -> {BASIC verb ->
+DjiWire -> DJI REST (POST /c/...) | COMPLEX -> perception (Qwen-VL + OmDet/SAM2)}`. Drone camera ->
+phone `:5600` raw-H.264/TCP -> `gstreamer_rx` -> ROS `camera/stream` -> perception window. Perception
+answer -> LONG (screen) + SHORT (spoken: phone `/tts` + laptop espeak).
+
+**Control authority model.** Total user control: deterministic verbs move the drone; the VLM never
+drives motion. Tiers: EMERGENCY (`stop`=`POST /c/fly [{delay:0}]`, preempts + keeps control) >
+OVERRIDE (`manual`=`/c/stop` RC handoff) / RESUME > BASIC verbs > COMPLEX (perception, no drone POST).
+`controller.fly{}` cancels the prior mission and re-`takeControl()`s, so missions naturally preempt.
+
+**Interfaces.** `dji_wire.py` is the sole aircraft client (full REST/WS: `/c/fly` mission actions,
+`/key`, `/tts`, `/status`, `/c/ws/sticks`). Inbound phone ASR via `phone_ears.py` (laptop `:8080`,
+`/input` + raw TCP, matches `GroundStationSpeechResolver.kt`). VLM on `llama-server :18090` (`-np 1`).
+Ports: phone `:8080` (control+tts) / laptop `:8080` (phone_ears) / `:5600` (video) / `:18090` (VLM).
+
+**Backend gaps (DJI app dev):** dynamic groundstation-IP discovery; gimbal commands (broken backend-side);
+API-Server foreground-service reliability. See the handoff §9.

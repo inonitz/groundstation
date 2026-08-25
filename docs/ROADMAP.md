@@ -449,3 +449,31 @@ against it + a live voice test, (3) done — that already proves "same perceptio
 Develop video-in against robomaster_sim first if no unit yet. Keep it on a feature branch so it can't
 destabilize the Demo Day build. If no unit / no time, prove agnosticism with drone+webcam+phone.
 Sources: dji-sdk/RoboMaster-SDK (GitHub), dji.com/robomaster-s1/programming-guide, jeguzzi/robomaster_sim.
+
+---
+
+## 2026-08-25 — MVD INTEGRATION DONE (voice -> router -> DJI + smart CV)
+
+Full detail + command table + next tracks: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+The `source/integration/` MVD is **DONE and considered effective**. Demo-Day system is the perception +
+voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED as the destination product).
+
+- [x] 4-tier deterministic router (EMERGENCY>OVERRIDE/RESUME>BASIC>COMPLEX), voice + phone ASR.
+- [x] Full `dji_wire.py` DJI REST client (all `/c/fly` mission actions, `/key`, `/tts`, `/status`).
+- [x] Expanded verbs: spin, scan/search (orbit OUTWARDS/INWARDS), track/follow/come_home (phone-GPS),
+      gimbal look forward/down/up, wave, directionals -> native `fly_by`, `go <unknown>` no-op guard.
+- [x] `stop` = `POST /c/fly [{delay:0}]` (preempts + keeps control); `manual`/`resume` = RC handoff/pop.
+- [x] Phone->GS ASR channel (`phone_ears.py`, `/input` + raw TCP, matches the app), receipt logging.
+- [x] TTS out (`voice.py`): phone `/tts` + laptop espeak; LONG (screen) / SHORT (spoken) split.
+- [x] Perception hardened: OmDet offline load, executor starvation, VLM `-np 1`, VLM `:18090`, video
+      watchdog/doctor, live `[dji]`/`[phone_ears]`/`[voice]` logging. 11 router tests pass.
+- [x] Self-contained `source/integration/` (no llm_cv_scene/llm_cv_track traces).
+
+- [ ] `[GATE]` **BACKEND (DJI app dev):** dynamic groundstation-IP discovery; fix gimbal commands
+      (broken backend-side; `fly_by` works); `ApiServerService` foreground-service reliability.
+- [DEFER] laptop TTS `apt install espeak-ng` (tomorrow; phone `/tts` works; must not break integration/*).
+
+**Next tracks (Demo Day = Fri 2026-08-28):** (1) pitch prep around the working MVD; (2) `llm_to_action`
+assessment + possible end-to-end VLM flight (connect current Python perception to the C++ FMU);
+(3) Robomaster backend + acquisition (S1 has no remote SDK -> buy EP/EP Core; video-in is the cheap
+path); (4) diagnostic dashboard (spec only — youtu.be/vO6SWG-jxvE ~1:25; consumes the stdout logging).

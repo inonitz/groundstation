@@ -2389,3 +2389,101 @@ directed. Pure token substitution -- no logic touched. RECONCILE with your in-fl
   workstation never synthesizes -- espeak/piper in `voice.py` is desk-debug only. TTS host is the
   SAME phone as the video (derived from `host=` in `SCENE_INPUT`). Keeps LLM/perception fully out
   of the flight-control path.
+
+## MVD integration — voice → 4-tier router → drone + perception on live video (2026-08-24)
+
+The committed MVD (per `docs/integration-mvd-2026-08-24.md` + `demo-roadmap-2026-08-28.md`).
+All code now consolidated in **`source/integration/`** (was scattered across `llm_cv_track`,
+`llm_cv_scene`, `integration`). Python talks straight to the frozen ApiServer wire — the C++ FMU
+engine is NOT in the loop.
+
+### Architecture (the destination vs the MVD)
+- **`fmu_node` (C++ llm_to_action) is the DESTINATION product, NOT the MVD.** The MVD router is
+  thin Python hitting the ApiServer directly. Do not try to run/build the FMU for the MVD.
+- Data flow:
+  ```
+  H key (keyboard_hook) · asr_server (Parakeet → /asr_server/transcribe)
+      └ ears.py → router.py (4-tier) → dji_wire.py → phone ApiServer :8080
+                       └ COMPLEX → scene_omdet (OmDet+SAM2+Qwen VLM) → answer/highlight
+  video: llm_to_action_gstreamer_rx --dji → ROS2 topic camera/stream → camera_stream.py → scene_omdet
+  ```
+- 4 tiers, fixed order: EMERGENCY > OVERRIDE/RESUME > BASIC(regex verb) > COMPLEX(perception).
+  Regex ported verbatim from the Android app `strings.xml`. LLM never drives motion.
+
+### TESTED / successful
+- **Router → wire → mock: GREEN.** All basic verbs, emergency (`stop/halt/abort/...`), override→manual
+  (basic verbs swallowed), resume→auto, WS `/c/ws/sticks` dispatch — all verified against
+  `scripts/test/dji_mock/mock_apiserver.py`.
+- Consolidation into `integration/` compiles; router uses dual-mode imports (works as a package and
+  flat via `python3 scene_omdet.py`).
+- Transport latency (2026-08-22): WS p95 24 ms, telemetry p95 47 ms, zero loss.
+
+### NOT tested / open (do not claim these work)
+- **`camera_stream.py` compiles but is NOT runtime-tested** against a live `gstreamer_rx` + drone.
+  bgr8 stride reshape matches rx_node's output encoding but needs one real-frame smoke test.
+- **Never run end-to-end on the real drone.** Deferred (drone was indoors; VPS refuses lateral/vertical).
+- Video into perception on the real link (roadmap open-question #2): now wired, not proven live.
+
+### Key findings verified this session (avoid re-litigating)
+- **`POST /c/stop` = `FlightControllerKey.KeyEmergencyStop`** (via `controller.stop(emergency=true)`,
+  `DJIAircraft.stop`), NOT a hover-brake. It is the SDK motor-kill. In-air outcome is gated by the
+  aircraft's `FCUrgentStopMotorMode` (IN_OUT_ALWAYS → motors cut, drone falls; NEVER → refused in air).
+  `.action()` is fire-and-forget (no ack). The `dji_wire.py` docstring calling it "relinquish/hover"
+  is WRONG. Our voice "stop" AND "manual" both fire it — a soft-handoff for "manual" is a real bug.
+  Surest kill remains the phone API-server toggle + power button (CLAUDE.md).
+- **Phone `VideoTcpServer` serves exactly ONE TCP client** — a new connection closes the previous
+  ("Replace and close any previous client"). Two consumers on `:5600` (e.g. `gstreamer_rx` +
+  scene_omdet's own `tcpclientsrc`) thrash and starve each other. Fix: rx_node is the SOLE `:5600`
+  client → publishes `camera/stream`; perception subscribes (`SCENE_INPUT=ros`). This was the cause
+  of the "waiting for tcpclientsrc" hang.
+- **Phone IP = WiFi default gateway** (hotspot). A second default route (ethernet) shadows the
+  `ip route` auto-fetch; pass explicit `PHONE_IP=` when both are up. IP changes per phone (was
+  10.222.215.92, was 10.200.2.63 on a different handset).
+- **Yaw units = deg/s** (app `DJIVirtualStick`); the C++ backend's rad/s was ~57× too slow. Sign
+  (CW+/CCW+) still unconfirmed — never command real yaw until settled.
+
+### Lessons for the next agent (unsuccessful attempts, so you skip them)
+- Do NOT chase `fmu_node`/`llm_to_action` C++ for the MVD — it's the destination, not the demo.
+- Do NOT propose webcam when the ask is drone footage; the MVD shows the DRONE camera.
+- READ `docs/integration-mvd-2026-08-24.md` + `final-objective-context.md` FIRST; they answer the
+  architecture unambiguously.
+
+### 2026-08-25 — MVD integration COMPLETE (voice -> router -> DJI + smart CV)
+Full detail + command table + backend tasks: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+The `source/integration/` MVD is DONE and considered effective. It is SELF-CONTAINED (no
+llm_cv_scene/llm_cv_track traces). Shipped this session:
+- 4-tier deterministic router (EMERGENCY>OVERRIDE/RESUME>BASIC>COMPLEX); expanded verbs — spin, scan
+  (orbit OUTWARDS) / search (INWARDS), track/follow/come_home (phone-GPS), gimbal look forward/down/up
+  (0/-60/+30), wave (hello/how-are-you), directionals -> native `fly_by` (POST /c/fly), a `go <unknown>`
+  no-op guard. Full `dji_wire.py` REST client (all `/c/fly` actions, /key, /tts, /status).
+- Phone ASR channel `phone_ears.py` matched to the app's real contract (POST /input + raw-TCP JSON on
+  laptop :8080, dedupe, receipt logging). TTS `voice.py` -> phone /tts + laptop espeak (LONG/SHORT split;
+  screen shows Scene:+Spoken:; speaks only SHORT). Verbose `[dji]`/`[phone_ears]`/`[voice]` logging.
+
+### Key findings verified this session (avoid re-litigating)
+- **`controller.fly{}` cancels the previous flight job AND `takeControl()`s.** So a new `/c/fly` mission
+  preempts the running one -> our **`stop` = `POST /c/fly [{delay:0}]` (`halt()`)** stops motion AND keeps
+  our stick control. `stop` no longer fires `/c/stop` and no longer latches manual (that latch was the
+  "can't control after stop" bug). `manual` = RC handoff (`/c/stop`), `resume` = pop.
+- **Gimbal sign:** `pitchCamera(-90)`=ground -> negative=down, 0=forward, +=up. Our `gimbal_pitch` JSON
+  matches the DTO, but **gimbal is broken BACKEND-SIDE** (no angle responds except "look forward" from a
+  fully-down gimbal). `fly_by` works.
+- **`CircleFaceMode`** serializes by name: `"INWARDS"|"OUTWARDS"|"TANGENT"` (lenient JSON).
+- **VLM port moved `:8090` -> `:18090`** — VS Code holds `:8090`; the earlier "GPU-wedged, reboot"
+  conclusion was WRONG (plain port collision, diagnosed from container-side `ss` which showed no owner).
+- **OmDet offline:** transformers 5.15 `backbone_utils` -> `HfApi.repo_exists(swin...)` hits the hub;
+  no internet on the hotspot -> reset/raise uncaught -> OmDet dies. Fix: `highlight_seg.py` wraps
+  `repo_exists` fail-safe to False -> timm builds the backbone offline; `run_mvd.sh` exports
+  `HF_HUB_OFFLINE=1`.
+- **Executor starvation:** `Ears` (`rclpy.spin`) and `CameraStream` (`spin_once`) fought the global
+  rclpy executor; with ASR on, CameraStream starved -> "waiting for video" despite a live topic. Each
+  now owns a `SingleThreadedExecutor`. (`--no-ears` masked it.)
+- **VLM `-np 1`** — concurrent `/c/fly` VLM images overflowed the unified KV pool and segfaulted the
+  mtmd decode. asusctl Quiet was only the trigger (GPU throttle -> requests overlapped).
+
+### Lessons for the next agent (so you skip them)
+- **CONTAINER ISOLATION:** the assistant's `pgrep`/`ss`/`tmux` view can be ISOLATED from the host's
+  running processes. Do NOT conclude "app not running / port dead" from container-side checks — verify
+  on the host. This burned a whole diagnosis ("phone_ears down" was false; the app was up on the host).
+- Single `:5600` client on the phone `VideoTcpServer` — gst_rx must be the SOLE consumer; two thrash.
+- Phone target for ASR must be the laptop's gateway IP (the app's `// fixme "0.0.0.0"`), or nothing arrives.

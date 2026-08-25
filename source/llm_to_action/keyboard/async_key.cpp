@@ -388,9 +388,10 @@ inline bool isActuallyKeyboard(int32_t fd) {
         return false;
     }
 	
-    if (testBit(EV_REL, evBitmask)) { /* check if device supports relative movement (i.e. mouse) */
-        return false; 
-    }
+    /* Do NOT reject on EV_REL. Composite laptop keyboards (e.g. the ASUS ROG "N-KEY Device")
+       expose relative axes alongside the full typing matrix, so an EV_REL veto kills the ONLY
+       real keyboard on the machine. The positive typing-key test below is the true discriminator:
+       pure mice/touchpads lack KEY_A/SPACE/ENTER and are still rejected. */
 
     if (ioctl(fd, 
 		EVIOCGBIT(EV_KEY, keyBitmask.size() * sizeof(std::uint64_t)), 
@@ -399,9 +400,14 @@ inline bool isActuallyKeyboard(int32_t fd) {
         return false;
     }
 
-    return testBit(KEY_A, keyBitmask) 
-		|| testBit(KEY_SPACE, keyBitmask) 
-		|| testBit(KEY_ENTER, keyBitmask);
+    const bool hasTypingKeys = testBit(KEY_A, keyBitmask)
+        || testBit(KEY_SPACE, keyBitmask)
+        || testBit(KEY_ENTER, keyBitmask);
+    fprintf(stderr, "[HOOK_DBG] isActuallyKeyboard: EV_REL=%d KEY_A=%d KEY_SPACE=%d KEY_ENTER=%d -> %s\n",
+        (int)testBit(EV_REL, evBitmask), (int)testBit(KEY_A, keyBitmask),
+        (int)testBit(KEY_SPACE, keyBitmask), (int)testBit(KEY_ENTER, keyBitmask),
+        hasTypingKeys ? "ACCEPT" : "reject");
+    return hasTypingKeys;
 }
 
 void AsyncKeyHook::producerThread() {
