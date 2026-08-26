@@ -1,3 +1,10 @@
+> **STATUS 2026-08-26 — read first.** The system was field-flown on 2026-08-25 (>3 h, incl. a classroom
+> flight), but the **formal A/B/C kill drill below was NOT recorded.** RUN AND RECORD it before any
+> armed session tomorrow — the boxes are honestly still unchecked. The `10.222.215.92` in the curl
+> examples is **stale**: the phone IP is the WiFi gateway, derive it. Current **software** stops:
+> emergency = `POST /c/fly [{"type":"delay","seconds":0}]` (halt — stops motion, keeps stick control).
+> The **hardware** kills below are unchanged and remain the real net.
+
 # Kill-switch verification — MANDATORY before any armed command (leg 4)
 
 Purpose: prove every stop actually stops the motors **before** we ever arm for a latency run.

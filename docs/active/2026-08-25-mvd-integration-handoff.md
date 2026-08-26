@@ -41,7 +41,7 @@ I/O: `phone_ears.py` (inbound ASR :8080, /input + raw TCP, dedupe, receipt loggi
 `camera_stream.py` (ROS camera/stream -> VideoCapture-like; own executor).
 OPS: `run_mvd.sh` (launcher + hardened teardown + HF-offline). `run_llama_server.sh` (Qwen :18090 -np 1).
 `video_doctor.py` (name the broken video layer). `video_watchdog.py` (auto-reconnect gst on stall).
-`run_router.py`, `test_router.py` (11 tests), `README.md`, `__init__.py`.
+`run_router.py`, `test_router.py` (7 tests), `README.md`, `__init__.py`.
 
 ## 3. Voice command table
 TIERS (length-independent):
@@ -149,7 +149,7 @@ DEFERRED (tomorrow, must NOT break integration/*): laptop TTS `sudo apt install 
 VERIFIED DONE (do not redo): real-flight command verification (that IS how we debugged); phone->GS
 transport design (= #1); fly_by. VLM conciseness good — revisit only if it hallucinates.
 
-## 10. Next tracks (Demo Day = Fri 2026-08-28)
+## 10. Next tracks (Demo Day = Thu 2026-08-27)
 1. Pitch prep — reorganize internally, build the narrative around the working MVD.
 2. llm_to_action — assess source/llm_to_action/ C++ engine + how to connect current Python perception;
    stretch = end-to-end VLM flight. It is the DESTINATION product; the Python router is the MVD

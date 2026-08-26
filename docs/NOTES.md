@@ -2487,3 +2487,45 @@ llm_cv_scene/llm_cv_track traces). Shipped this session:
   on the host. This burned a whole diagnosis ("phone_ears down" was false; the app was up on the host).
 - Single `:5600` client on the phone `VideoTcpServer` — gst_rx must be the SOLE consumer; two thrash.
 - Phone target for ASR must be the laptop's gateway IP (the app's `// fixme "0.0.0.0"`), or nothing arrives.
+
+## 2026-08-26 — desk session: FMU build fix, hardware reality, doc corrections (manager agent)
+Measured this session; corrections + new facts for the record. Demo is **Thu 2026-08-27 16:00**
+(on-site 10:00-12:00), NOT 2026-08-28 — every doc + the filename `demo-roadmap-2026-08-28.md` say
+28th; that is wrong. Filenames left as-is (human owns git); dates corrected in-content where load-bearing.
+
+- **FMU (`llm_to_action`) was never broken — it just never built.** `fmu/CMakeLists.txt` backend
+  selector had branches for PX4 and TELLO and NONE for DJI, so `FMU_SELECTED_BACKENDS` came back empty
+  and the executable target was never created (`./build.sh release shared dji build` exits 0 having built
+  nothing). +2 lines (a `dji` elseif) -> `llm_to_action_fmu_dji` links in 38s, 0 errors. It RUNS: 20 Hz
+  loop, loads yolo26n seg+depth ONNX, attempts `ws://.../c/ws/sticks`, blocks at "waiting for first camera
+  frame" (correct with no camera fed). Runtime needs `LD_LIBRARY_PATH=.../_deps/onnxruntime/.../lib`.
+  SAFETY: this binary holds virtual-stick authority -> human-only vs any real phone IP.
+- **C++ `dji_backend` is BEHIND the Python `dji_wire.py`:** it implements only takeoff/land/stop/sticks
+  (+ "safe stop = land", no motor-kill). It has NONE of the 10 `/c/fly` mission verbs the Python wire has
+  (fly_by, spin_by, scan_ground, track_me, follow_me, home, gimbal_pitch, wave, look_at, delay). The two
+  control paths are NOT equivalent today.
+- **Hardware: this machine is NVIDIA RTX 5070 Laptop, torch 2.11.0+cu128, CUDA 12.8** (NOT ROCm). The
+  `config.py:22` "NO NVIDIA / ROCm" comment was stale -> corrected. FMU ONNX seg+depth run on **CPU by
+  design** (keep them off the GPU so they don't starve the VLM) -- do not "fix" to GPU without proving it
+  doesn't cut VLM inference.
+- **Drone is a DJI Mini 4 Pro.** Indoor flight IS possible where there is enough space AND VPS locks
+  (flown inside a classroom successfully); it degrades only when VPS can't lock (uniform/low-feature/low-light).
+  So the demo verb set depends on VPS lock at the venue, not on indoor-vs-outdoor per se.
+- **Phone ASR runs an ON-DEVICE model** (the app downloads the ASR model; transcription is LOCAL, not
+  cloud). This SATISFIES the challenge's local/no-cloud constraint. The only residual is Android/Google
+  telemetry (a privacy concern for the operator), NOT the ASR path itself. Laptop Parakeet is likewise
+  local. [Correction: an earlier note in this block called the phone path "cloud ASR" -- that was wrong.]
+- **Router test count is 7, not 11** (`test_router.py`: 7 functions, all pass). Corrected in handoff + ROADMAP.
+- **`SCENE_HL_BACKEND` defaults to `vlm`** (Qwen3-VL grounds referent + SAM2 mask), not omdet, despite the
+  handoff calling scene_omdet+OmDet "THE app."
+- **RoboMaster S1: SDK ships DISABLED**; needs community unlock (firmware-gated). Field kit written to
+  `source/robomaster/` (probe/text/video scripts + runbook + pre-purchase checklist). Acquisition PAUSED
+  (seller asked to hold). EP/EP Core have the SDK out of the box.
+- Handoff §12 "uncommitted files" list is now STALE — that tree is clean; all committed in fdbea61 + 1a972b2.
+- **The MVD is ROS2-NATIVE -> the demo machine MUST have ROS2 (`/opt/ros/jazzy`).** Verified 2026-08-26:
+  `integration/{camera_stream,ears,video_doctor,video_watchdog}.py` call rclpy directly; `scene_omdet.py`
+  imports `ears`; `run_mvd.sh` sources ROS + runs 3 compiled ROS2 nodes (asr_server, keyboard_hook,
+  gstreamer_rx); the drone video path is `SCENE_INPUT=ros` (gstreamer_rx -> `camera/stream` -> CameraStream).
+  **The DEMO-DAY LAPTOP (this machine: RTX 5070, `/opt/ros/jazzy` present) runs the MVD** and is the box
+  going to the venue -- ROS2 is there, so this is settled (no venue-machine risk). A separate Linux Mint box
+  lacks ROS2 and is NOT the demo machine; irrelevant.

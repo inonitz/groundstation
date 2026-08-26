@@ -7,7 +7,7 @@
 
 ## Context — read these first (a cold agent MUST load these)
 - **`docs/active/mission-brief-2026-08-15.md`** — the project. Voice-commanded drone demo, Israeli
-  MOD contest (~2026-08-28). Linux does perception + planning; a drone backend does I/O. Platform is
+  MOD contest (~2026-08-27). Linux does perception + planning; a drone backend does I/O. Platform is
   a **DJI Mini via an Android phone bridge** (MSDK v5 is Android-only; there is no Linux DJI SDK).
 - **`docs/active/dji-apiserver-review.md`** — what the Android app (a teammate's Kotlin Ktor server,
   `ExoSkeletons/DJI-android-sdk-v5-recon-swarm`) exposes, the 3 fixes we asked for, and the open

@@ -249,7 +249,7 @@ still a touch slow per the user (canned uses budget, fill-brake only bites the r
 - Behaviour: Gazebo/SITL scenarios under `scripts/test/SITL/` -- **human runs these.**
 
 ## Key context (cold-start — read after a compaction)
-- **Project**: voice-commanded drone demo, Israeli MOD contest ~2026-08-28. Linux stack
+- **Project**: voice-commanded drone demo, Israeli MOD contest 2026-08-27. Linux stack
   (perception + planning) drives a drone backend. Demo = DJI hardware; SITL/Gazebo = behaviour bench.
 - **Platform**: DJI Mini via an Android bridge. The teammate's Kotlin app (`recon-swarm`,
   github ExoSkeletons/DJI-android-sdk-v5-recon-swarm) is a Ktor `ApiServer` over LAN. MSDK is

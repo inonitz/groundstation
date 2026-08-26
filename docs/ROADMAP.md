@@ -430,9 +430,13 @@ Question from the human: worth pursuing to show platform-agnostic nature? (Tello
 more problems than solutions.) Realistic take:
 
 **Technically: yes, it is a genuinely good target — far better than the Tello.**
-- The RoboMaster **EP** (education) and **S1** have an OFFICIAL open Python SDK
+- The RoboMaster **EP / EP Core** ship the OFFICIAL open Python + plaintext SDK
   (github.com/dji-sdk/RoboMaster-SDK): chassis motion control, gimbal, **video streaming (H.264)**, audio,
-  and intelligent-ID APIs. Python 3.x, runs INDEPENDENTLY of the DJI app (unlike Tello's thin SDK).
+  intelligent-ID APIs; runs INDEPENDENTLY of the DJI app (unlike Tello's thin SDK). **The S1 ships with
+  the SDK DISABLED** -- DJI never released it for the S1 officially. The S1 needs a community root/unlock
+  (sandbox escape in the app's Lab), which DJI patched in later firmware -> unlock only works on
+  compatible/older firmware. Verified 2026-08-26; field kit + scripts in `source/robomaster/`.
+  Once unlocked the S1 speaks the SAME plaintext SDK as the EP (TCP 40923 control, 40921 H.264).
 - Connectivity: WiFi (direct AP or router) or USB. Video-in is trivial for us (SDK stream -> our
   perception). A community simulator (github.com/jeguzzi/robomaster_sim) lets us develop with NO hardware.
 - **Scope clarified by the human (2026-08-20): the RoboMaster demo would be SIMPLE** — the same voice + CV
@@ -466,14 +470,14 @@ voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED 
 - [x] Phone->GS ASR channel (`phone_ears.py`, `/input` + raw TCP, matches the app), receipt logging.
 - [x] TTS out (`voice.py`): phone `/tts` + laptop espeak; LONG (screen) / SHORT (spoken) split.
 - [x] Perception hardened: OmDet offline load, executor starvation, VLM `-np 1`, VLM `:18090`, video
-      watchdog/doctor, live `[dji]`/`[phone_ears]`/`[voice]` logging. 11 router tests pass.
+      watchdog/doctor, live `[dji]`/`[phone_ears]`/`[voice]` logging. 7 router tests pass.
 - [x] Self-contained `source/integration/` (no llm_cv_scene/llm_cv_track traces).
 
 - [ ] `[GATE]` **BACKEND (DJI app dev):** dynamic groundstation-IP discovery; fix gimbal commands
       (broken backend-side; `fly_by` works); `ApiServerService` foreground-service reliability.
 - [DEFER] laptop TTS `apt install espeak-ng` (tomorrow; phone `/tts` works; must not break integration/*).
 
-**Next tracks (Demo Day = Fri 2026-08-28):** (1) pitch prep around the working MVD; (2) `llm_to_action`
+**Next tracks (Demo Day = Thu 2026-08-27):** (1) pitch prep around the working MVD; (2) `llm_to_action`
 assessment + possible end-to-end VLM flight (connect current Python perception to the C++ FMU);
 (3) Robomaster backend + acquisition (S1 has no remote SDK -> buy EP/EP Core; video-in is the cheap
 path); (4) diagnostic dashboard (spec only — youtu.be/vO6SWG-jxvE ~1:25; consumes the stdout logging).

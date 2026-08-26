@@ -19,7 +19,7 @@ BG_SEG_MODEL    = os.environ.get("SCENE_BG",        "yolo26n-seg.pt")
 # yoloe-11. "l" scale; drop to yoloe-26s/m-seg.pt for less compute.
 OPENVOCAB_MODEL = os.environ.get("SCENE_OPENVOCAB", "yoloe-26l-seg.pt")
 SAM2_WEIGHTS    = os.environ.get("SCENE_SAM2",      "sam2.1_b.pt")
-DEVICE           = os.environ.get("SCENE_DEVICE", "")   # "" = Ultralytics auto. ROCm torch shows as "cuda" (HIP). NO NVIDIA. Force "cpu" to be safe.
+DEVICE           = os.environ.get("SCENE_DEVICE", "")   # "" = Ultralytics auto. torch reports "cuda" for the active GPU (NVIDIA RTX 5070 / CUDA 12.8 here, or ROCm/HIP on the RX7900). Force "cpu" to be safe.
 CONF_BG = float(os.environ.get("SCENE_CONF_BG", "0.35"))
 CONF_HL = float(os.environ.get("SCENE_CONF_HL", "0.10"))   # open-vocab conf runs low; be lenient
 HIGHLIGHT_HZ = float(os.environ.get("SCENE_HL_HZ", "2"))   # open-vocab highlight re-runs/sec (throttled)

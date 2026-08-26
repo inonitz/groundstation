@@ -7,7 +7,7 @@ backend spec (`spec-dji-backend.md`) — different files, no collision except on
 
 ## Context — read these first (a cold agent MUST load these)
 - **`docs/active/mission-brief-2026-08-15.md`** — the project: a voice-commanded drone demo for an
-  Israeli MOD contest (~2026-08-28). Linux stack (perception + planning) drives a drone backend.
+  Israeli MOD contest (~2026-08-27). Linux stack (perception + planning) drives a drone backend.
   Platform is moving off the DJI Tello (no indoor position) to a DJI Mini via an Android bridge.
 - **`docs/code-guidelines.md`** — house rules. Non-negotiable: **no virtual dispatch, no exceptions**
   (CRTP + tagged dispatch), guard clauses, WHY-comments, ~150-400 LOC file target, don't strip
