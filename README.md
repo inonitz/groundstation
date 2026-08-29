@@ -66,6 +66,9 @@ Outside `llm_to_action/`:
 
 ## Getting Started
 
+- **NOTE:** This `README.md` requires cleanup since it doesn't address the DJI Mobile SDK Support, The new Perception Engine developed, and so much more.
+  The current Documentation is generally correct but requires fine-tuning for proper build & usage.
+
 ### Prerequisites
 
 * ROS 2 (Humble recommended)
