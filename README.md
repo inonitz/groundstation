@@ -11,6 +11,10 @@
   </p>
 </div>
 
+## NOTE
+
+**This `README.md` requires cleanup since it doesn't address the DJI Mobile SDK Support, The new Perception Engine developed, and so much more. The current Documentation is generally correct but requires fine-tuning for proper build & usage.**
+
 ## About The Project
 
 Groundstation is a C++17 / ROS 2 off-board autonomous flight stack for small drones (primary
@@ -65,9 +69,6 @@ Outside `llm_to_action/`:
 <br></br>
 
 ## Getting Started
-
-- **NOTE:** This `README.md` requires cleanup since it doesn't address the DJI Mobile SDK Support, The new Perception Engine developed, and so much more.
-  The current Documentation is generally correct but requires fine-tuning for proper build & usage.
 
 ### Prerequisites
 
