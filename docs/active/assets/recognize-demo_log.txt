@@ -1,0 +1,25 @@
+[recognize] 2026-08-27 11:39:16
+[recognize] argv    : /root/groundstation/source/integration_notify/recognize.py /tmp/claude-0/-root-groundstation/34dcdba1-7c22-42b4-8c36-e28b6b5fb197/scratchpad/testimg/people.jpg what do you see --notify a man in a red shirt --mask -o /root/groundstation/docs/active/assets/recognize-demo.jpg
+[recognize] image   : /tmp/claude-0/-root-groundstation/34dcdba1-7c22-42b4-8c36-e28b6b5fb197/scratchpad/testimg/people.jpg  (810x1080)
+[recognize] prompt  : what do you see
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:18090   mask=True  notify='a man in a red shirt'
+[recognize] querying VLM...
+
+=== VLM ANSWER  (4.3s) ===
+The image shows a blue and white electric bus parked on a city street with pedestrians walking by. The bus has "cero emisiones" (zero emissions) written on its side and is marked with the EMT Madrid logo. The background features a yellow building with green-framed windows and balconies.
+
+=== OBJECTS (5) ===
+  bus                      (8, 228, 802, 735)
+  pedestrian               (55, 396, 247, 902)
+  pedestrian               (221, 403, 345, 858)
+  pedestrian               (662, 392, 808, 880)
+  building                 (0, 0, 808, 302)
+
+=== NOTIFY: people matching 'a man in a red shirt' ===
+  person (51, 396, 244, 907) -> 'no' match=False
+  person (668, 396, 810, 880) -> 'no' match=False
+  person (221, 405, 344, 858) -> 'yes' match=True
+  person (0, 550, 74, 873) -> 'no' match=False
+[recognize] notify: 1/4 people matched 'a man in a red shirt'
+
+[recognize] saved image -> /root/groundstation/docs/active/assets/recognize-demo.jpg

@@ -2529,3 +2529,5 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   **The DEMO-DAY LAPTOP (this machine: RTX 5070, `/opt/ros/jazzy` present) runs the MVD** and is the box
   going to the venue -- ROS2 is there, so this is settled (no venue-machine risk). A separate Linux Mint box
   lacks ROS2 and is NOT the demo machine; irrelevant.
+
+- 2026-08-27: Laptop TTS for final demo lives in `source/integration_tts/` (fork of integration/, original untouched). Voice-out was already built (voice.py speaks the VLM short answer via phone /tts); the fork adds a working laptop engine: piper (en_US-lessac-medium, /root/models/tts/) preferred, espeak-ng fallback. `SCENE_TTS=both` (default) = phone + laptop; `piper`/`espeak` force laptop-only. Engines installed machine-wide (apt espeak-ng, piper bin+voice downloaded).
