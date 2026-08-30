@@ -165,8 +165,8 @@ CMD_BAG_HEADLESS="ros2 bag record -o \"$BAG_DIR\" \
     /fmu/out/battery_status_v1"
 CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
-    -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
-    --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
+    -m ${VLM_MODEL:-/root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf} \
+    --mmproj ${VLM_MMPROJ:-/root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf} \
     -dev Vulkan0 ${VLM_NGL_ARG- -ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG- --cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 

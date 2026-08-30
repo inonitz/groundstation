@@ -15,7 +15,7 @@ cd "$(dirname "$0")" || exit 1
 
 # ---- VOICE MODE (default): real reasoning, spoken trigger --------------------
 # Empty objective => idle in STANDBY until the first spoken transcript launches it.
-FMU_OBJECTIVE=""
+FMU_OBJECTIVE="Take off, approach the car ahead of you, and land near it. Do not orbit, search, rotate, or go anywhere else."
 LAUNCH_ASR="1"
 
 # ---- TYPED FALLBACK (if the mic flakes on a take): still VLM-driven ----------
