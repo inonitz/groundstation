@@ -35,6 +35,14 @@
     make_active_backend(rclcpp::Node* node, rclcpp::CallbackGroup::SharedPtr cbg) {
         return std::make_unique<PX4Backend>(node, cbg);
     }
+#elif defined(FMU_BACKEND_DJI)
+#   include "dji_backend/dji_backend.hpp"
+    using ActiveBackend = DjiBackend;
+    inline std::unique_ptr<ActiveBackend>
+    make_active_backend(rclcpp::Node* node, rclcpp::CallbackGroup::SharedPtr cbg) {
+        (void)node; (void)cbg;   /* DJI (LAN app) is ROS-free: needs neither. */
+        return std::make_unique<DjiBackend>();
+    }
 #else
 #   error "No FMU backend selected. Set -DFMU_BACKEND=PX4|TELLO|ALL at CMake configure time."
 #endif

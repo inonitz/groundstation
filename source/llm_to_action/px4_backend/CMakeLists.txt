@@ -3,10 +3,10 @@ project(px4_backend C CXX)
 
 
 # PX4 flight backend: a ROS-side GenericBackend implementation talking to a PX4
-# FC / SITL over px4_msgs. Built as a static library and linked into the FMU
-# (Drone::px4_backend) exactly like the Tello backend -- the FMU no longer
-# compiles these translation units itself.
-add_library(${PROJECT_NAME} STATIC
+# FC / SITL over px4_msgs. Linked into the FMU (Drone::px4_backend) exactly like the
+# Tello backend -- the FMU no longer compiles these translation units itself. No explicit
+# STATIC/SHARED: honours BUILD_SHARED_LIBS (the build.sh static/shared arg) like every other lib.
+add_library(${PROJECT_NAME}
     px4_backend.cpp
     px4_backend.hpp
     px4_backend_base.hpp

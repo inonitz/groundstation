@@ -3,7 +3,7 @@
 Battery **return-to-origin** behaviour (spec-3, ROADMAP 6.2) — the REAL RTH the plain `battery/`
 test couldn't show (there the drone sat at origin, so "fly home" was a no-op).
 
-- **Canned flag:** `--canned-battery-rth` — fly ~8m straight out, then force **18%** ~15s after
+- **Scenario:** `--scenario-battery-rth` — fly ~8m straight out, then force **18%** ~15s after
   reaching FLIGHT (test-only battery override; PX4 drain pinned high so only the forced value fires).
 - **World:** `empty`   **Spawn:** `0,7,3`
 

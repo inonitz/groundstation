@@ -1,24 +1,19 @@
 #!/bin/bash
-# search milestones — capture + grep the FMU debug tags for this test.
-# Self-contained: captures ALL tmux panes to captured_panes_log.txt IN THIS
-# FOLDER, then filters/checks THIS test from that same file. Run after landing.
-# Optional arg: tmux session name (default llmsim).
+# search verdict: SEARCH must activate and then DETECT the car within the advance-and-scan.
 set -uo pipefail
 cd "$(dirname "$0")" || exit 1
 OUT="captured_panes_log.txt"
 LOG_FILE="${1:-$(pwd)/captured_panes_log.txt}"
-if [ ! -f "$LOG_FILE" ]; then
-    echo "no FMU log at '$LOG_FILE' -- start a run first with ./run.sh" >&2
-    exit 2
-fi
+if [ ! -f "$LOG_FILE" ]; then echo "no FMU log at '$LOG_FILE' -- run ./run.sh first" >&2; exit 2; fi
 [ "$LOG_FILE" -ef "$OUT" ] || cp "$LOG_FILE" "$OUT"
 echo "[capture] FMU log -> $OUT"
-
 echo "----- search milestones -----"
-grep -E 'SEARCH activated|SEARCH lane|SEARCH cross|SEARCH DETECTED|SEARCH exhausted|LANDING->STANDBY' "$OUT" \
-    || echo "  (no matching milestone lines captured — check the FMU pane)"
+grep -E 'SEARCH activated|SEARCH scan|SEARCH advance|SEARCH DETECTED' "$OUT" | tail -8 \
+    || echo "  (no search lines captured)"
 echo ""
-echo "PASS = a 'SEARCH DETECTED target=car conf=.. depth_cm=.. bbox=(..)' line, then search_ok."
-echo "The DETECTED line IS the operator notification — read conf to judge a weak/false hit."
-echo "No auto PASS/FAIL — confirm against what you observed."
-exit 0
+if ! grep -q 'SEARCH activated' "$OUT"; then echo "  FAIL: SEARCH never activated"; exit 1; fi
+if grep -q 'SEARCH DETECTED target=car' "$OUT"; then
+    echo "  $(grep -E 'SEARCH DETECTED' "$OUT" | tail -1 | sed 's/.*SEARCH DETECTED/SEARCH DETECTED/')"
+    echo "  PASS: search scanned and DETECTED the car"; exit 0
+fi
+echo "  FAIL: SEARCH activated but never DETECTED the car (scanned/timed out without a find)"; exit 1

@@ -31,6 +31,12 @@ struct BackendStatus {
    arm->OFFBOARD handshake. */
 enum class IOState : u8 { STANDBY, HANDSHAKING, FLIGHT, FAULT };
 
+/* Which concrete drone backend is active -- the ONE canonical platform enum for the
+   tree. The camera receiver selects its source pipeline from it at runtime; the
+   CMake FMU_BACKEND_* macros pick the compile-time ActiveBackend. Lives here (not in
+   a camera-local header) because "which backend" is a backend-interface concept. */
+enum class BackendType : u8 { PX4, TELLO, DJI };
+
 /* Platform-neutral telemetry snapshot handed to the FMU (world frame, ENU).
    PX4 fills every field; Tello has no absolute horizontal position (pos is
    height-only, x=y=0) and no yaw-rate estimate (yawrate stays 0). */

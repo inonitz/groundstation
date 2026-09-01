@@ -1,8 +1,8 @@
 # vlm test
 
-Full VLM-driven run (Qwen3-VL): the planner issues the verbs, no canned plan.
+Full VLM-driven run (Qwen3-VL): the planner issues the verbs, no scenario.
 
-- **Canned plan flag:** `(none — VLM-driven)`
+- **Scenario flag:** `(none — VLM-driven)`
 - **World:** `default_car`   **Spawn:** `0,7,3`
 - **Filter:** milestone digest (VLM wake/plan, GO, APPROACH) — no PASS/FAIL.
 

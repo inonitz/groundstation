@@ -1,0 +1,71 @@
+<sdf version="1.9">
+  <world name="rubicon_targets">
+
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"></plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"></plugin>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"></plugin>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"></plugin>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"></plugin>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>47.397743</latitude_deg>
+      <longitude_deg>8.545594</longitude_deg>
+      <elevation>0.0</elevation>
+    </spherical_coordinates>
+
+    <scene>
+      <ambient>.4 .4 .4</ambient>
+      <sky></sky>
+    </scene>
+
+    <!-- Rubicon terrain (Fuel, cached; same model terrain-land uses). -->
+    <include>
+      <name>Rubicon</name>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Rubicon</uri>
+    </include>
+
+    <!-- Real targets for the storm-recovery test: two people + two cars in the drone's forward
+         (+X) view. Spawn is PX4_GZ_MODEL_POSE (0,7,3) facing +X, so +X is straight ahead. YOLO
+         reads the people as "person" and the hatchbacks as "car". Static so they neither tip nor
+         slide on the sloped terrain. z is a best guess on unknown terrain height; if any model
+         floats or buries on first launch, nudge its z here. -->
+    <include>
+      <name>storm_person_standing</name>
+      <pose>11.5 1 5 0 0 0</pose>
+      <uri>model://person_standing</uri>
+      <static>true</static>
+    </include>
+    <include>
+      <name>storm_hatchback_blue</name>
+      <pose>6 2 1.5 0 0 0</pose>
+      <uri>model://hatchback_blue</uri>
+      <static>true</static>
+    </include>
+    <include>
+      <name>storm_person_walking</name>
+      <pose>3 8 2.5 0 0 0</pose>
+      <uri>model://person_walking</uri>
+      <static>true</static>
+    </include>
+    <!-- DEMO TRIM 2026-08-13: far 2nd car removed so "approach the car" has ONE answer
+         and the visual servo can't hop between two cars. Uncomment to restore.
+    <include>
+      <name>storm_hatchback</name>
+      <pose>12 -4.5 4.1 0 0 0</pose>
+      <uri>model://hatchback</uri>
+      <static>true</static>
+    </include>
+    -->
+
+  </world>
+</sdf>

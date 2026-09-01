@@ -25,12 +25,15 @@
 #include <cv_bridge/cv_bridge.hpp>
 #include <base64.h>
 
-#include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* UDPCamMsgType, khUDPCamMsgType, camera topic */
+#include "gstreamer_udp_cam_rx/rx_node_base.hpp"  /* CameraPipelineMsgType, khCameraPipelineMsgType, camera topic */
 #include "fmu_node_base.hpp"
 #include "drone_config.hpp"   /* DroneConfig + loadDroneConfig (ROADMAP 9.14). */
 #include "llm_base.hpp"
 #include "llamaclient.hpp"
 #include "plan_parse.hpp"
+#include "command_id.hpp"                  /* CommandID + commandIdFromAction (ROS-free). */
+#include "fmu_helpers.hpp"                 /* pure helpers: lateralComponent, labelMatchesTarget. */
+#include "test/fmu_test_scenarios.hpp"         /* TestScenario + parseTestScenario + scenario JSON (ROS-free). */
 #include "generic_backend/active_backend.hpp"  /* ActiveBackend (FMU_BACKEND select) + BackendStatus/IOState/Odometry/Vec3 */
 #include "perception_runtime.hpp"  /* PerceptionRuntime + global TargetDetection/PerceptionSnapshot (vision lib) */
 #include "perception/detection_query.hpp"  /* detectionByLabel, CameraIntrinsics, TargetRelative */
@@ -57,22 +60,6 @@ enum class TaskState {
     FINISHED_SUCCESS,
     FINISHED_FAIL,
     STOPPED
-};
-
-enum class CommandID : u8 {
-    TAKEOFF  = 0,
-    LAND     = 1,
-    STOP     = 2,
-    GO       = 3,
-    CURVE    = 4,
-    ROTATE   = 5,
-    ORBIT    = 6,
-    SEARCH   = 7,
-    REASSESS = 8,
-    APPROACH = 9,
-    FOLLOW   = 10,
-    HOVER    = 11,
-    MAX_ID   = 12
 };
 
 /* FMU-owned flight state machine (platform-neutral; drives the backend via verbs). */
@@ -224,15 +211,6 @@ struct ActiveTask {
     LargeFixedStringType m_thought = "\0";
 };
 
-/* TargetDetection / PerceptionSnapshot now come from the vision lib (global
-   namespace, vision/perception_types.hpp via perception_runtime.hpp) --
-   telemetry stays the only stub left here. */
-struct VehicleTelemetry {
-    f32 altitude_cm{0.0f};
-    f32 vx_cm_s{0.0f}, vy_cm_s{0.0f}, vz_cm_s{0.0f};
-    i32 battery_pct{100};
-};
-
 struct HistoryBuffer {
     std::string             m_initialCommand;
     std::vector<ActiveTask> m_completedTasks;
@@ -275,8 +253,8 @@ public:
             }
         }
 
-        m_subImg = this->create_subscription<UDPCamMsgType>(
-            kOutUDPCameraRawFrameTopic, 10,
+        m_subImg = this->create_subscription<CameraPipelineMsgType>(
+            kOutCameraPipelineRawFrameTopic, 10,
             std::bind(&FlightManagementUnitNode::imgCallback, this, std::placeholders::_1),
             subOpts
         );
@@ -309,43 +287,7 @@ public:
         m_backend = make_active_backend(this, m_cbGroup);
         m_backend->start();
 
-        /* A2 observability (additive): image topics the perception loops feed, a text
-           HUD topic, and the per-run VLM prompt/response log path (filename fixed once
-           here so a whole run lands in one file -- no per-cycle recompute, no clobber
-           across runs). std::error_code overload: a pre-existing dir is not an error. */
-        {
-            const char* obs  = std::getenv("FMU_OBSERVABILITY");
-            mb_observability = obs && obs[0] != '\0' && obs[0] != '0';
-        }
-        if (mb_observability) {
-            m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
-            m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
-            m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
-            m_pubVlmText       = this->create_publisher<std_msgs::msg::String>(kVlmTextTopic, 10);
-            m_pubVlmContext    = this->create_publisher<std_msgs::msg::String>(kVlmContextTopic, 10);
-            m_pubRates         = this->create_publisher<std_msgs::msg::String>(kFmuRatesTopic, 10);
-            /* Debug-only higher-res A2 images: FMU_A2_IMG_W / FMU_A2_IMG_H override the 320x240
-               publish size. Still ~10 Hz throttled and only encoded while a dashboard client is
-               attached, so a bigger size costs nothing until you actually watch it; clamped to the
-               source frame at publish time (no upscale). Leave unset for the lean default. */
-            if (const char* w = std::getenv("FMU_A2_IMG_W")) { int v = std::atoi(w); if (v > 0) m_a2ImgW = v; }
-            if (const char* h = std::getenv("FMU_A2_IMG_H")) { int v = std::atoi(h); if (v > 0) m_a2ImgH = v; }
-            if (m_a2ImgW != static_cast<int>(kA2ImgW) || m_a2ImgH != static_cast<int>(kA2ImgH))
-                RCLCPP_WARN(this->get_logger(),
-                    "[FMU_NODE_DEBUG] A2 DEBUG image size = %dx%d (default %dx%d). Higher res costs CPU/bandwidth"
-                    " ONLY while the dashboard is open; still ~10 Hz capped.", m_a2ImgW, m_a2ImgH,
-                    static_cast<int>(kA2ImgW), static_cast<int>(kA2ImgH));
-            m_vlmLogPath       = makeVlmLogPath();
-            std::error_code ec;
-            std::filesystem::create_directories(kVlmPromptLogDir, ec);
-            if (ec) {
-                RCLCPP_WARN(this->get_logger(),
-                    "[FMU_NODE_DEBUG] VLM log dir create failed (%s): %s -- prompt log disabled.",
-                    kVlmPromptLogDir, ec.message().c_str());
-            }
-        }
-        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] observability=%s.",
-            mb_observability ? "ON" : "off");
+        initDashboardDiagnostics();   /* A2 dashboard pipeline, iff FMU_OBSERVABILITY is set. */
 
         /* Two-rate perception (ARCH sec 9): PerceptionRuntime owns its own seg/depth
            threads and publishes an atomic PerceptionSnapshot; buildDynamicPrompt()
@@ -378,10 +320,14 @@ public:
             std::chrono::milliseconds{kControlLoopPeriodMs},
             std::bind(&FlightManagementUnitNode::controlLoop, this), m_cbGroup);
 
-        /* max_tokens caps generation. A plan is ~200 tokens; the old 32768 (65536/2)
-           let a no-EOS runaway ramble for minutes and wedge the planner. 512 bounds
-           it to ~4s. temp 0.2 matches the server and reduces degenerate loops. */
-        m_vlmClient.create(kSystemPrompt, 0.2f, 768);
+        /* max_tokens is a CEILING on generation, not a target: the model still stops at EOS on a
+           short reply, so raising it costs nothing there -- it only stops a long "thought" from
+           being clipped mid-sentence (768 was clipping them). 1024 gives headroom. The old 32768
+           let a no-EOS runaway ramble for minutes and wedge the planner. temp 0.2 matches the
+           server and reduces degenerate loops. (A per-call budget -- e.g. a smaller cap on reassess
+           cycles -- is a possible latency tweak, deferred: a low reassess cap re-truncates thoughts,
+           and there is no initial-vs-reassess signal plumbed here to branch on.) */
+        m_vlmClient.create(kSystemPrompt, 0.2f, 1024);
         m_chat.m_completedTasks.reserve(kDefaultPromptHistorySize);
 
         RCLCPP_INFO(this->get_logger(),
@@ -396,71 +342,21 @@ public:
         m_vlmClient.destroy();
     }
 
-    /* Bootstrap: arm the mission. Phase 1 may inject a canned plan instead of VLM. */
-    void start(std::string_view objective, bool useCannedPlan = false, bool useCrossPlan = false,
-               bool useSpeedPlan = false, bool useApproachPlan = false, bool useApproachRealPlan = false,
-               bool useRotatePlan = false, bool useLandFlarePlan = false,
-               bool useTerrainLandPlan = false, bool useFloodPlan = false,
-               bool useCrossFloodPlan = false, bool useBatteryRthPlan = false,
-               bool useBatteryLandNowPlan = false, bool usePatrolPlan = false,
-               bool useBoundaryPlan = false, bool useStormPlan = false,
-               bool useApproachImpactPlan = false, bool useOrbitPlan = false,
-               bool useSearchPlan = false, bool useVoicePlan = false,
-               bool useCompletePlan = false) {
+    /* Bootstrap: arm the mission. test != None pre-fills the queue with a scripted scenario and
+       skips the VLM (see runTestScenario + test/fmu_test_scenarios.hpp); None is a normal VLM-driven run. */
+    void start(std::string_view objective, TestScenario test = TestScenario::None) {
         m_chat.m_initialCommand = objective;
         publishVlmContext();   /* surface the objective on the dashboard right away. */
         m_missionStartUs = nowUs();
         /* Only VLM-driven runs wake the planner; canned runs pre-fill the queue and
            must NOT poll a (possibly absent) VLM server after they drain. */
-        bool cannedRun = useCannedPlan || useCrossPlan || useSpeedPlan || useApproachPlan || useApproachRealPlan || useRotatePlan || useLandFlarePlan || useTerrainLandPlan || useFloodPlan || useCrossFloodPlan || useBatteryRthPlan || useBatteryLandNowPlan || usePatrolPlan || useBoundaryPlan || useStormPlan || useApproachImpactPlan || useOrbitPlan || useSearchPlan || useVoicePlan || useCompletePlan;
-        m_missionActive.store(!cannedRun, std::memory_order_release);
-        if (useCrossPlan) {
-            injectCannedCrossPlan();
-        } else if (useSpeedPlan) {
-            injectCannedSpeedPlan();
-        } else if (useApproachRealPlan) {
-            injectCannedApproachRealPlan();
-        } else if (useApproachPlan) {
-            injectCannedApproachPlan();
-        } else if (useRotatePlan) {
-            injectCannedRotatePlan();
-        } else if (useLandFlarePlan) {
-            injectCannedLandFlarePlan();
-        } else if (useTerrainLandPlan) {
-            injectCannedTerrainLandPlan();
-        } else if (useFloodPlan) {
-            injectCannedFloodPlan();
-        } else if (useCrossFloodPlan) {
-            injectCannedCrossFloodPlan();
-        } else if (useBatteryRthPlan) {
-            injectCannedBatteryRthPlan();
-        } else if (useBatteryLandNowPlan) {
-            injectCannedBatteryLandNowPlan();
-        } else if (usePatrolPlan) {
-            injectCannedPatrolPlan();
-        } else if (useBoundaryPlan) {
-            injectCannedBoundaryPlan();
-        } else if (useStormPlan) {
-            injectCannedStormPlan();
-        } else if (useApproachImpactPlan) {
-            injectCannedApproachImpactPlan();
-        } else if (useOrbitPlan) {
-            injectCannedOrbitPlan();
-        } else if (useSearchPlan) {
-            injectCannedSearchPlan();
-        } else if (useVoicePlan) {
-            injectCannedVoicePlan();
-        } else if (useCompletePlan) {
-            injectCannedCompletePlan();
-        } else if (useCannedPlan) {
-            injectCannedPlan();
-        }
+        bool scenarioRun = (test != TestScenario::None);
+        m_missionActive.store(!scenarioRun, std::memory_order_release);
+        runTestScenario(test);
         RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] Mission started (canned=%d cross=%d speed=%d approach=%d approach_real=%d rotate=%d land_flare=%d terrain_land=%d). queued~=%zu. objective: %.*s",
-            __scast(int, useCannedPlan), __scast(int, useCrossPlan), __scast(int, useSpeedPlan),
-            __scast(int, useApproachPlan), __scast(int, useApproachRealPlan),
-            __scast(int, useRotatePlan), __scast(int, useLandFlarePlan), __scast(int, useTerrainLandPlan),
-            m_taskQueue->size_approx(), __scast(int, objective.size()), objective.data()
+            "[FMU_NODE_DEBUG] Mission started (test=%d). queued~=%zu. objective: %.*s",
+            __scast(int, test), m_taskQueue->size_approx(),
+            __scast(int, objective.size()), objective.data()
         );
         return;
     }
@@ -470,7 +366,7 @@ private:
     using spsc_queue = moodycamel::ReaderWriterQueue<T, sizeof(T)>;
 
     /* ---- Subscriptions --------------------------------------------------- */
-    void imgCallback(khUDPCamMsgType msg) {
+    void imgCallback(khCameraPipelineMsgType msg) {
         std::atomic_store(&m_currImg, msg);
         u64 c = m_frameCount.fetch_add(1, kMemOrderRelax) + 1;
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
@@ -581,40 +477,12 @@ private:
     }
 
     /* ---- APPROACH helpers ------------------------------------------------- */
-    /* Perpendicular component of measVel relative to forwardUnit (assumed unit length);
-       damps the pursuit-arc residual left after switching to a measured bearing (spec §9 R1). */
-    static Vec3 lateralComponent(Vec3 measVel, Vec3 forwardUnit) {
-        f32 along = measVel.x * forwardUnit.x + measVel.y * forwardUnit.y + measVel.z * forwardUnit.z;
-        return { measVel.x - along * forwardUnit.x,
-                 measVel.y - along * forwardUnit.y,
-                 measVel.z - along * forwardUnit.z };
-    }
-
     /* Motion-gate (spec 1 6.4): "reached" is only trusted when the drone is not in a collision
        transient. A real impact spikes yaw-rate + vertical velocity while the range still reads
        plausible off the impact frame (SITL: yawrate 6.9, vertVel -1.75, alt 0.99->0.02 in ~1s).
        Not nominal -> the APPROACH branch treats "reached" as an impact and interrupts. */
-    /* The VLM names targets in natural language ("human in red", "red person"), but YOLO emits
-       COCO class labels ("person"). An exact strcmp then never matches, so SEARCH can stare
-       straight at the target and never register it -- it just keeps advancing (into the rocks).
-       Match a person detection whenever the requested target refers to a human; WHICH person is
-       red stays the VLM's job via the image + bbox. */
-    static bool labelMatchesTarget(const char* detLabel, const char* target) {
-        if (!detLabel || !target) return false;
-        if (std::strcmp(detLabel, target) == 0) return true;
-        char t[128]; size_t i = 0;
-        for (; target[i] && i < sizeof(t) - 1; ++i)
-            t[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(target[i])));
-        t[i] = '\0';
-        const bool targetIsPerson =
-            std::strstr(t, "human") || std::strstr(t, "person") || std::strstr(t, "people") ||
-            std::strstr(t, "man")   || std::strstr(t, "woman")  || std::strstr(t, "guy")    ||
-            std::strstr(t, "someone")|| std::strstr(t, "boy")   || std::strstr(t, "girl");
-        return targetIsPerson && std::strcmp(detLabel, "person") == 0;
-    }
-
     bool approachMotionNominal(Odometry const& od) const {
-        if (m_forceApproachImpact) return false;   /* test-only forced impact (--canned-approach-impact). */
+        if (m_forceApproachImpact) return false;   /* test-only forced impact (--scenario-approach-impact). */
         return std::fabs(od.yawrate) < kApproachNominalYawrate
             && std::fabs(od.vel.z)  < kApproachNominalVertVel;
     }
@@ -709,6 +577,14 @@ private:
         m_perception->injectSynthetic(synth);
     }
 
+    /* ---- Per-tick control laws (one per movement command) ---------------------------------------
+       controlLoop() dispatches on the active CommandID and calls exactly ONE of these each tick
+       (20 Hz). Each is behaviour-isolated: it reads the tick's Odometry, drives the backend velocity,
+       and owns its own scratch -- no cross-command shared locals. DEFINED out-of-line in fmu_node.cpp
+       so this header stays declarations. Extracted incrementally out of controlLoop; behaviour is
+       verified unchanged in Gazebo per command. */
+    void stepHover();
+
     /* ---- 20Hz control + deterministic completion ------------------------- */
     /* Pure planner side: reads an Odometry snapshot + IOState, issues verbs.
        Frame is canonical ENU (East, North, Up+); backend converts NED at wire. */
@@ -736,10 +612,6 @@ private:
         u32         di;
 
         od = m_backend->odometry();
-        {
-            i32 bf = m_batteryForce.load(kMemOrderRelax);   /* test-only fault injection; -2 = off */
-            m_telemetry.battery_pct = (bf >= -1) ? bf : m_backend->battery_pct();
-        }
         n  = od.pos.x;
         e  = od.pos.y;
         d  = od.pos.z;
@@ -810,7 +682,7 @@ private:
             if (m_floodAtUs == 0)             m_floodAtUs = nowUs() + 5ULL * 1000000ULL;
             else if (nowUs() >= m_floodAtUs) {
                 m_floodFired  = true;
-                m_floodFuture = std::async(std::launch::async, [this]() { injectCannedFloodPlan(); });
+                m_floodFuture = std::async(std::launch::async, [this]() { translateToBaseCommands(scenarioQueueOverflowJson()); });
             }
         }
 
@@ -889,7 +761,7 @@ private:
             return;
         }
 
-        /* Test-only obstacle window (--canned-boundary / --canned-storm): once airborne, open a
+        /* Test-only obstacle window (--scenario-boundary / --scenario-storm): once airborne, open a
            short burst window; while it is open the emergency boundary below forces a close reading
            (race-free, bypassing perception) so it trips deterministically with no real obstacle in
            the world. The window then closes so the hold path can reach maybePlan and wake the VLM
@@ -909,7 +781,7 @@ private:
             loomFrac   = 0.0f;
             freeM      = 0.0f;
             if (m_obstacleArmed && m_obstacleFired && nowUs() < m_obstacleUntilUs) {
-                /* Test-only forced obstacle (--canned-boundary / --canned-storm): bypass the
+                /* Test-only forced obstacle (--scenario-boundary / --scenario-storm): bypass the
                    perception snapshot so the trip is deterministic and cannot be lost to a race
                    with live YOLO in a populated world. 0.4 m is inside kBoundaryBaseM (0.6). */
                 nearestM = 0.4f;
@@ -1027,6 +899,11 @@ private:
                     f32 yawRate = m_rotateDir * m_cfg.rotateYawGainHz * m_rotateRemainingRad;
                     if (yawRate >  m_cfg.rotateMaxYawRate) yawRate =  m_cfg.rotateMaxYawRate;
                     else if (yawRate < -m_cfg.rotateMaxYawRate) yawRate = -m_cfg.rotateMaxYawRate;
+                    /* Rate floor: the proportional rate decays to ~0 near the target, which is what
+                       left ROTATE ~5 deg short. Hold a minimum turn rate until inside the (now tight)
+                       completion band so the last few degrees close promptly and precisely. */
+                    else if (yawRate >= 0.0f && yawRate <  kRotateMinYawRate) yawRate =  kRotateMinYawRate;
+                    else if (yawRate <  0.0f && yawRate > -kRotateMinYawRate) yawRate = -kRotateMinYawRate;
                     m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, yawRate);
                     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
                         "[FMU_NODE_DIAGNOSTICS] ROTATE remainRad=%.3f cmdYawrate=%.3f measYaw=%.2f measYawrate=%.2f",
@@ -1214,6 +1091,19 @@ private:
                                         : kApproachCoastSpeedMps;
                         if (spF < 0.0f) spF = 0.0f;
                         if (spF > speedCeil) spF = speedCeil;
+                        /* Depth-independent brake: as the REAL target fills the frame it IS close,
+                           regardless of the noisy depth budget (that budget dead-reckoned into the car).
+                           Ramp spF to zero from kApproachBrakeFillFrac to the stop fill. The canned rig's
+                           fixed tiny box (fill~0.02) never reaches this, so the canned approach stays fast. */
+                        {
+                            f32 fillNow = snap ? maxBboxFillFrac(*snap, kApproachCamera) : 0.0f;
+                            if (fillNow > kApproachBrakeFillFrac) {
+                                f32 fb = speedCeil * (kApproachStopFillFrac - fillNow) /
+                                         (kApproachStopFillFrac - kApproachBrakeFillFrac);
+                                if (fb < 0.0f) fb = 0.0f;
+                                if (spF > fb) spF = fb;
+                            }
+                        }
                         yawRate = -kApproachYawGain * tr.errX;
                         vUp     = -kApproachVertGain * tr.errY;
                         /* Never let vertical centering drive the drone below safe AGL (ground person
@@ -1261,8 +1151,20 @@ private:
                            : (snap ? detectionByLabel(*snap, m_followLabel, kApproachCamera, tnow) : TargetRelative{});
                 }
 
-                if (tr.found && tr.age_us <= kApproachFreshUs) {
+                if (tr.found && tr.age_us <= kApproachFreshUs &&
+                    m_followHaveErr && std::fabs(tr.errX - m_followLastErrX) > kFollowErrJumpReject) {
+                    /* Box-jump reject: a small/distant person's box jitters frame-to-frame. An errX leap
+                       this large in one tick is noise, not lateral motion -- hold and keep the last
+                       anchor so the yaw servo can never chase a phantom jump into a spin (the range~16m
+                       failure). The next in-tolerance frame re-engages the servo below. */
+                    m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
+                    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 250,
+                        "[FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=%s box jumped errX %.2f->%.2f -> holding.",
+                        m_followLabel, m_followLastErrX, tr.errX);
+                } else if (tr.found && tr.age_us <= kApproachFreshUs) {
                     /* Re-anchor the tracker on the bbox center just locked (px). */
+                    m_followLastErrX  = tr.errX;
+                    m_followHaveErr   = true;
                     m_followLastU     = kApproachCamera.cx + tr.errX * kApproachCamera.cx;
                     m_followLastV     = kApproachCamera.cy + tr.errY * kApproachCamera.cy;
                     m_followLastAimUs = tnow;
@@ -1276,10 +1178,12 @@ private:
                        A loom/bbox-fill back-off is a future refinement.) */
                     f32 minSafe = (fol.standoff_cm > 0) ? fol.standoff_cm / 100.0f : m_cfg.followStandoffM;
                     speedCeil   = (fol.speed > 0 ? __scast(f32, fol.speed) : kApproachSpeedDefault) / 100.0f;
-                    yawRate = -kFollowYawGain * tr.errX;      /* turn head horizontally (snappy).   */
+                    /* Deadband + gentle gain + low rate cap: ignore sub-deadband error (no twitch on a
+                       centred or noisy box) and never let a large error saturate the yaw into a spin. */
+                    yawRate = (std::fabs(tr.errX) < kFollowYawDeadband) ? 0.0f : -kFollowYawGain * tr.errX;
                     if (yawRate >  kFollowYawMaxRps) yawRate =  kFollowYawMaxRps;
                     if (yawRate < -kFollowYawMaxRps) yawRate = -kFollowYawMaxRps;
-                    vUp     = -kApproachVertGain * tr.errY;   /* keep the target vertically centered. */
+                    vUp     = (std::fabs(tr.errY) < kFollowYawDeadband) ? 0.0f : -kApproachVertGain * tr.errY;
                     spF     = 0.0f;                            /* never advance.                */
                     if (tr.range > 0.0f && tr.range < minSafe)
                         spF = kFollowFwdGain * (tr.range - minSafe);   /* < 0: safety back-off only. */
@@ -1339,10 +1243,17 @@ private:
                    inward toward the wall), altitude HELD at >= kOrbitFixedAltM (cannot descend). The demo
                    narrates that depth estimation is the current limitation. */
                 if (!m_orbitLatched) {
+                    /* Honour the commanded radius_cm (clamped) so the circle is sized to the target
+                       -- a car wants a tighter orbit than a building. Centre stays exactly R ahead so
+                       the drone still begins ON the circle and never flies inward. radius_cm unset (0)
+                       falls back to the hardcoded default. */
+                    f32 R = (orb.radius > 0.0f) ? (orb.radius / 100.0f) : kOrbitFixedRadiusM;
+                    if (R < kOrbitMinRadiusM) R = kOrbitMinRadiusM;
+                    if (R > kOrbitMaxRadiusM) R = kOrbitMaxRadiusM;
                     Vec3 fwd = flu_to_enu(Vec3{1.0f, 0.0f, 0.0f}, od.yaw);
-                    m_orbitCenterEnu = { od.pos.x + fwd.x * kOrbitFixedRadiusM,
-                                         od.pos.y + fwd.y * kOrbitFixedRadiusM, od.pos.z };
-                    m_orbitRadius   = kOrbitFixedRadiusM;
+                    m_orbitCenterEnu = { od.pos.x + fwd.x * R,
+                                         od.pos.y + fwd.y * R, od.pos.z };
+                    m_orbitRadius   = R;
                     m_orbitAltEnu   = std::max(od.pos.z, kOrbitFixedAltM);
                     m_orbitPrevPos  = od.pos;
                     m_orbitSweptRad = 0.0f;
@@ -1366,7 +1277,12 @@ private:
                     velEnu.y = oRadial.y * radialV + oTangent.y * strafe;
                     velEnu.z = kApproachVertGain * (m_orbitAltEnu - od.pos.z);   /* strong altitude hold. */
                     oDesYaw  = std::atan2(-oToDrone.y, -oToDrone.x);             /* face the centre. */
-                    yawRate  = kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
+                    /* Feedforward the orbital angular rate: the bearing to the centre rotates at
+                       strafe/R in the orbit direction, so feeding that in lets the P term only trim
+                       residual error. Without it the yaw lags the centre and the drone never points
+                       exactly at the target (and that offset is what remained at the start heading). */
+                    f32 omegaFf = m_orbitDir * strafe / m_orbitRadius;
+                    yawRate  = omegaFf + kOrbitYawGain * wrap_pi(oDesYaw - od.yaw);
                     m_backend->set_velocity(velEnu, yawRate);
                     oAngle     = std::atan2(od.pos.y - m_orbitCenterEnu.y, od.pos.x - m_orbitCenterEnu.x);
                     oPrevAngle = std::atan2(m_orbitPrevPos.y - m_orbitCenterEnu.y,
@@ -1533,12 +1449,7 @@ private:
                     }
                 }
             } else if (id == CommandID::HOVER) {
-                /* Persistent hold: zero velocity, station kept by the backend position controller
-                   (PX4 EKF / Tello VPS). Never completes -> stays the active task -> the VLM is NOT
-                   re-woken. Exits only on an interrupt, a re-assess, or a new command. */
-                m_backend->set_velocity(Vec3{0.0f, 0.0f, 0.0f}, 0.0f);
-                RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
-                    "[FMU_NODE_DIAGNOSTICS] HOVER holding station.");
+                stepHover();
             } else {
                 RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task id=%d not movement -> auto-complete.",
                     __scast(int, id));
@@ -1582,7 +1493,7 @@ private:
        SPSC contract holds. Planning only fires in the idle gap (no active task,
        queue empty), so it never races completeCurrent()'s history writes. */
     void maybePlan() {
-        khUDPCamMsgType img;
+        khCameraPipelineMsgType img;
         u64             now;
 
         if (!m_missionActive.load(std::memory_order_acquire)) return;
@@ -1638,6 +1549,51 @@ private:
     /* ================= A2 observability helpers (additive) ===================
        Image/HUD publishing + the per-run VLM prompt/response log. None of this
        feeds control; it is pure inspection tooling for the live demo. */
+
+    /* Enable the A2 dashboard-diagnostics pipeline iff FMU_OBSERVABILITY is set: the annotated /
+       depth / HUD / VLM-text / context / rates publishers, the optional FMU_A2_IMG_W/H debug image
+       size, and the per-run VLM prompt log (filename fixed once so a whole run lands in one file --
+       no per-cycle recompute, no clobber across runs). Off by default: zero publishers, zero
+       per-cycle cost. Called once from the ctor; the getenv here is the sanctioned config hook. */
+    void initDashboardDiagnostics() {
+        /* A2 observability (additive): image topics the perception loops feed, a text
+           HUD topic, and the per-run VLM prompt/response log path (filename fixed once
+           here so a whole run lands in one file -- no per-cycle recompute, no clobber
+           across runs). std::error_code overload: a pre-existing dir is not an error. */
+        {
+            const char* obs  = std::getenv("FMU_OBSERVABILITY");
+            mb_observability = obs && obs[0] != '\0' && obs[0] != '0';
+        }
+        if (mb_observability) {
+            m_pubAnnotated     = this->create_publisher<sensor_msgs::msg::Image>(kVlmViewTopic, 10);
+            m_pubDepthColormap = this->create_publisher<sensor_msgs::msg::Image>(kDepthColormapTopic, 10);
+            m_pubHud           = this->create_publisher<std_msgs::msg::String>(kFmuHudTopic, 10);
+            m_pubVlmText       = this->create_publisher<std_msgs::msg::String>(kVlmTextTopic, 10);
+            m_pubVlmContext    = this->create_publisher<std_msgs::msg::String>(kVlmContextTopic, 10);
+            m_pubRates         = this->create_publisher<std_msgs::msg::String>(kFmuRatesTopic, 10);
+            /* Debug-only higher-res A2 images: FMU_A2_IMG_W / FMU_A2_IMG_H override the 320x240
+               publish size. Still ~10 Hz throttled and only encoded while a dashboard client is
+               attached, so a bigger size costs nothing until you actually watch it; clamped to the
+               source frame at publish time (no upscale). Leave unset for the lean default. */
+            if (const char* w = std::getenv("FMU_A2_IMG_W")) { int v = std::atoi(w); if (v > 0) m_a2ImgW = v; }
+            if (const char* h = std::getenv("FMU_A2_IMG_H")) { int v = std::atoi(h); if (v > 0) m_a2ImgH = v; }
+            if (m_a2ImgW != static_cast<int>(kA2ImgW) || m_a2ImgH != static_cast<int>(kA2ImgH))
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] A2 DEBUG image size = %dx%d (default %dx%d). Higher res costs CPU/bandwidth"
+                    " ONLY while the dashboard is open; still ~10 Hz capped.", m_a2ImgW, m_a2ImgH,
+                    static_cast<int>(kA2ImgW), static_cast<int>(kA2ImgH));
+            m_vlmLogPath       = makeVlmLogPath();
+            std::error_code ec;
+            std::filesystem::create_directories(kVlmPromptLogDir, ec);
+            if (ec) {
+                RCLCPP_WARN(this->get_logger(),
+                    "[FMU_NODE_DEBUG] VLM log dir create failed (%s): %s -- prompt log disabled.",
+                    kVlmPromptLogDir, ec.message().c_str());
+            }
+        }
+        RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] observability=%s.",
+            mb_observability ? "ON" : "off");
+    }
 
     static const char* flightStateName(FlightState st) {
         switch (st) {
@@ -1755,7 +1711,7 @@ private:
             "STATE=%s ALT=%.2fm TASK=%s VLM=%s DET=%s VEL=%.2fm/s BATT=%d%%",
             flightStateName(st), altUp, task,
             m_planning.load(kMemOrderRelax) ? "busy" : "idle",
-            det, vel, m_telemetry.battery_pct);
+            det, vel, effectiveBatteryPct());
         RCLCPP_INFO(this->get_logger(), "[FMU_HUD] %s", body);
         msg.data = body;
         m_pubHud->publish(msg);
@@ -1796,11 +1752,19 @@ private:
     }
 
     /* ---- Battery failsafe + manual override ------------------------------ */
-    /* Returns true if the failsafe pre-empted this tick. battery_pct < 0
+    /* Live effective battery %: the test-only fault injection if armed (m_batteryForce != -2),
+       else the backend's continuously-updated reading. Read ON DEMAND -- never cached, so a low
+       battery can never be masked by a stale value. Cheap: one atomic load + the backend's atomic. */
+    i32 effectiveBatteryPct() const {
+        i32 bf = m_batteryForce.load(kMemOrderRelax);   /* -2 = inactive; else the forced %. */
+        return (bf >= -1) ? bf : m_backend->battery_pct();
+    }
+
+    /* Returns true if the failsafe pre-empted this tick. battery % < 0
        (kBatteryReadingUnknown) means no trustworthy reading -> skip; a real 0 is
        empty and triggers. Latches so a wobbling reading can't oscillate the state. */
     bool batteryFailsafeTick() {
-        i32 pct = m_telemetry.battery_pct;
+        i32 pct = effectiveBatteryPct();
         if (pct < 0)          return false;   /* UNKNOWN sentinel: never a false alarm. */
         if (mb_batteryReturn || mb_batteryLand) return false;   /* EITHER failsafe latched -> committed to a landing; don't re-evaluate (land-in-place must not then escalate to RTH). */
 
@@ -2151,6 +2115,7 @@ private:
                 m_followLastV   = 0.5f * static_cast<f32>(d.bbox_ymin + d.bbox_ymax);
                 m_followTrackId = (static_cast<u32>(di) < ft->ids.count) ? ft->ids.id[di] : -1;
                 m_followHaveLast = true;
+                m_followHaveErr  = false;   /* fresh lock -> no prior errX to reject against. */
                 RCLCPP_INFO(this->get_logger(),
                     "[FMU_NODE_DEBUG] FOLLOW activated track_id=%d target_index=%d label=%s centerPx=(%.0f,%.0f) standoff_cm=%d.",
                     m_followTrackId, fol.target_index, m_followLabel, m_followLastU, m_followLastV, fol.standoff_cm);
@@ -2318,25 +2283,6 @@ private:
     }
 
     /* ---- VLM plumbing (invoked by the Phase-2 event-driven wake, not a poll) ---- */
-    /* CommandID -> short verb, for the dashboard's executed-command list. */
-    static const char* cmdName(CommandID id) {
-        switch (id) {
-            case CommandID::TAKEOFF:  return "takeoff";
-            case CommandID::LAND:     return "land";
-            case CommandID::STOP:     return "stop";
-            case CommandID::HOVER:    return "hover";
-            case CommandID::GO:       return "go";
-            case CommandID::CURVE:    return "curve";
-            case CommandID::ROTATE:   return "rotate";
-            case CommandID::ORBIT:    return "orbit";
-            case CommandID::SEARCH:   return "search";
-            case CommandID::REASSESS: return "reassess";
-            case CommandID::APPROACH: return "approach";
-            case CommandID::FOLLOW:   return "follow";
-            default:                  return "?";
-        }
-    }
-
     /* A2: publish the mission objective + executed-command history (with status) as JSON on
        /fmu/vlm_context. This is the SAME context buildDynamicPrompt() feeds the model -- the
        dashboard shows what the VLM was told, not just its reply. Obs-gated, event-driven
@@ -2458,7 +2404,7 @@ private:
         return prompt;
     }
 
-    void callLlamaServer(std::string_view userQuery, khUDPCamMsgType const& img,
+    void callLlamaServer(std::string_view userQuery, khCameraPipelineMsgType const& img,
                          std::string& out) {
         std::string               b64, content, dyn;
         bool                      imageAttached = false;
@@ -2606,15 +2552,20 @@ private:
             action  = item["action"].get<std::string>();
             thought = item.value("thought", "");
 
-            if (action == "takeoff") {
+            switch (commandIdFromAction(action)) {
+            case CommandID::TAKEOFF:
                 cmd = GenericCommand(CmdTakeoff{});
-            } else if (action == "land") {
+                break;
+            case CommandID::LAND:
                 cmd = GenericCommand(CmdLand{});
-            } else if (action == "stop") {
+                break;
+            case CommandID::STOP:
                 cmd = GenericCommand(CmdStop{});
-            } else if (action == "hover") {
+                break;
+            case CommandID::HOVER:
                 cmd = GenericCommand(CmdHover{});
-            } else if (action == "go") {
+                break;
+            case CommandID::GO:
                 go  = { item.value("x", 0.0f), item.value("y", 0.0f),
                         item.value("z", 0.0f), item.value("speed", 0.0f) };
                 /* A zero-vector go does nothing. DROP it -- never enqueue, and never convert it to a
@@ -2625,12 +2576,14 @@ private:
                     continue;
                 }
                 cmd = GenericCommand(go);
-            } else if (action == "rotate") {
+                break;
+            case CommandID::ROTATE:
                 rot = CmdRotate{};
                 rot.angle_deg = item.value("angle_deg", 0);
                 rot.cw_or_ccw = (item.value("direction", std::string("cw")) == "cw");
                 cmd = GenericCommand(rot);
-            } else if (action == "approach") {
+                break;
+            case CommandID::APPROACH:
                 approach = CmdApproach{};
                 strncpy(approach.target, item.value("target_object", "").c_str(),
                     sizeof(approach.target) - 1);
@@ -2640,14 +2593,16 @@ private:
                     for (int bi = 0; bi < 4; ++bi)
                         approach.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(approach);
-            } else if (action == "follow") {
+                break;
+            case CommandID::FOLLOW:
                 follow = CmdFollow{};
                 follow.target_index = item.value("target_index", -1);
                 follow.target_id    = item.value("track_id", -1);
                 follow.standoff_cm  = item.value("standoff_cm", 0);
                 follow.speed        = item.value("speed", 0);
                 cmd = GenericCommand(follow);
-            } else if (action == "orbit") {
+                break;
+            case CommandID::ORBIT:
                 orbit = CmdOrbit{};
                 strncpy(orbit.target, item.value("target_object", "").c_str(),
                     sizeof(orbit.target) - 1);
@@ -2659,7 +2614,8 @@ private:
                     for (int bi = 0; bi < 4; ++bi)
                         orbit.bbox[bi] = static_cast<i16>(item["bbox"][bi].get<double>());
                 cmd = GenericCommand(orbit);
-            } else if (action == "search") {
+                break;
+            case CommandID::SEARCH:
                 search = CmdSearch{};
                 strncpy(search.target, item.value("target_object", "").c_str(),
                     sizeof(search.target) - 1);
@@ -2671,8 +2627,9 @@ private:
                 sizeStr = item.value("search_size", std::string("medium"));
                 search.size = (sizeStr == "small") ? 0 : (sizeStr == "large") ? 2 : kSearchDefaultSizeIdx;
                 cmd = GenericCommand(search);
-            } else {
-                continue; /* Phase 1: takeoff/land/stop/go/rotate/approach/follow executed. */
+                break;
+            default:
+                continue; /* unknown action (also CURVE/REASSESS -- internal, never emitted). */
             }
 
             task = ActiveTask{};
@@ -2688,284 +2645,18 @@ private:
         }
     }
 
-    /* Canned plan is the SAME JSON the VLM emits, routed through the real       */
+    /* Scenario is the SAME JSON the VLM emits, routed through the real       */
     /* translate path — no inverse function needed.                             */
-    /* Backpressure stress (1.4): enqueue far more actions than the queue cap in ONE
-       plan -- the worst-case oversized-plan storm (a verbose/hallucinating VLM). Expect
-       qsize to cap at the queue size and exactly (N - cap) BACKPRESSURE drops. Uses
-       'stop' (hover) actions: the test is about the queue, not the flight. */
-    void injectCannedFloodPlan() {
-        constexpr u32 kFloodActions = 100;
-        std::string plan = "[";
-        for (u32 i = 0; i < kFloodActions; ++i) {
-            if (i) plan += ",";
-            plan += "{\"thought\":\"flood\",\"action\":\"stop\"}";
-        }
-        plan += "]";
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] FLOOD test: injecting %u actions vs queue cap %u.",
-            kFloodActions, 3u * kControlLoopRateHz);
-        translateToBaseCommands(plan);
-    }
-
-    /* A3 [AUTO] --canned-voice: simulate an IN-FLIGHT spoken command bypassing the ASR node.
-       Pin FLIGHT so handleAsrCommand takes the airborne branch, hand it a non-emergency
-       transcript, and confirm it raises a user_command interrupt (INTERRUPT reason=user_command)
-       with m_userCommandText armed for the next [USER] block. No VLM is called (canned). */
-    void injectCannedVoicePlan() {
-        m_flightState.store(FlightState::FLIGHT, kMemOrderRelax);
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] CANNED-VOICE: simulating in-flight spoken command.");
-        handleAsrCommand("turn right and look at the target");
-    }
-
-    /* A3 [AUTO] --canned-complete: force a completion verdict through the real translate path.
-       First action is takeoff so the not-airborne takeoff-first guard passes; plan[0] carries
-       objective_complete=true, so the drone stands down (stop while grounded) and stops soliciting
-       plans (m_missionActive=false) -- proving the verdict parse + termination and the default-false
-       safety (every other scenario omits the field and is unaffected). */
-    void injectCannedCompletePlan() {
-        static const char* kCannedCompleteJson = R"([
-            {"thought":"objective met, standing down","objective_complete":true,"reason":"target reached"},
-            {"action":"takeoff"}
-        ])";
-        translateToBaseCommands(kCannedCompleteJson);
-    }
-
-    void injectCannedPlan() {
-        static const char* kCannedPlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned go forward", "action":"go", "x":100, "y":0, "z":0, "speed":30},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedPlanJson);
-    }
-
-    /* Canned ROTATE regression (spec-4 Part B): a <180 turn then a >=180 turn, opposite
-       directions -- proves the accumulated-angle law sweeps the FULL commanded magnitude in
-       the commanded direction (200 ccw does NOT collapse to a shortest-path 160 cw). Runs the
-       SAME translate path the VLM uses. */
-    void injectCannedRotatePlan() {
-        static const char* kCannedRotatePlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned rotate cw",  "action":"rotate", "direction":"cw",  "angle_deg":90},
-            {"thought":"canned rotate ccw", "action":"rotate", "direction":"ccw", "angle_deg":200},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedRotatePlanJson);
-    }
-
-    /* Canned LAND-flare regression (spec-4 Part B): climb to ~2m then land, so the LANDING
-       branch runs its full flare taper -- vLand must ramp from kLandDescendVelEnu toward
-       kFlareTouchdownVelEnu as altitude drops, not sit at a constant -0.5. */
-    void injectCannedLandFlarePlan() {
-        static const char* kCannedLandFlarePlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedLandFlarePlanJson);
-    }
-
-    /* Canned terrain-land test: fly laterally over the real Rubicon TERRAIN world then land, so the
-       takeoff-origin height differs from the ground height at the landing spot. Exposes that
-       landing keys on od.pos.z (height above the EKF/takeoff origin), not above-ground-level --
-       a flat world hides it because there origin height == ground height everywhere. */
-    void injectCannedTerrainLandPlan() {
-        static const char* kCannedTerrainLandPlanJson = R"([
-            {"thought":"canned takeoff",        "action":"takeoff"},
-            {"thought":"canned go forward 2m",  "action":"go", "x":200,  "y":0, "z":0, "speed":30},
-            {"thought":"canned land",           "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedTerrainLandPlanJson);
-    }
-
-    /* Canned, no-YOLO closed-loop APPROACH test (ROADMAP 5.1 verification, spec §7): enables
-       the synthetic detection rig, then runs the SAME translate path the VLM uses. */
-    void injectCannedApproachPlan() {
-        static const char* kCannedApproachPlanJson = R"([
-            {"thought":"canned takeoff",  "action":"takeoff"},
-            {"thought":"canned approach", "action":"approach",
-             "target_object":"canned_target", "speed":30},
-            {"thought":"canned land",     "action":"land"}
-        ])";
-        m_useCannedApproachRig = true;
-        translateToBaseCommands(kCannedApproachPlanJson);
-    }
-
-    /* Skips the VLM planner but NOT perception -- real PerceptionRuntime (real ONNX
-       models) supplies the detection, same query path a VLM-driven run would use.
-       Targets "car" (COCO label) since the SITL world has a Rubicon jeep at spawn. */
-    void injectCannedApproachRealPlan() {
-        static const char* kCannedApproachRealPlanJson = R"([
-            {"thought":"canned takeoff",  "action":"takeoff"},
-            {"thought":"canned approach", "action":"approach",
-             "target_object":"car", "speed":30},
-            {"thought":"canned land",     "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedApproachRealPlanJson);
-    }
-
-    /* Canned ORBIT test (ROADMAP 1.1.6): real perception (real ONNX, SITL car in view). Orbits the
-       jeep for a full circle, then lands. Skips only the VLM planner. */
-    void injectCannedOrbitPlan() {
-        static const char* kCannedOrbitPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned orbit",   "action":"orbit",
-             "target_object":"car", "radius_cm":300, "angle_deg":360, "direction":"ccw", "speed":30},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedOrbitPlanJson);
-    }
-
-    /* Canned SEARCH test (ROADMAP 1.1.7): real perception. Targets an object NOT in the world
-       ("person") on purpose, so the pattern runs to its timeout and you can WATCH the full circle
-       get traced (chords + 360 look-arounds) instead of it stopping early on a detection. Sweeps ccw
-       starting ahead. To exercise the found-and-stop path instead, target "car". Skips the VLM. */
-    void injectCannedSearchPlan() {
-        static const char* kCannedSearchPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"},
-            {"thought":"canned search",  "action":"search",
-             "target_object":"person", "start_heading_deg":0, "direction":"ccw",
-             "expected_search_time_sec":40, "timeout_sec":90},
-            {"thought":"canned land",    "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedSearchPlanJson);
-    }
-
-    /* Emergency-boundary test (spec 1 6.1): takeoff, then a synthetic close obstacle is injected
-       for a short burst once airborne so the velocity-scaled boundary trips deterministically. */
-    void injectCannedBoundaryPlan() {
-        static const char* kCannedBoundaryPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"}
-        ])";
-        m_obstacleArmed = true;
-        translateToBaseCommands(kCannedBoundaryPlanJson);
-    }
-
-    /* Interrupt-storm test (spec 1 6.3): the same obstacle burst, but VLM-driven (mission kept
-       active) so the escalated reassess prompt is actually built. The burst trips the boundary
-       >= kInterruptMaxRetries times inside the window (escalated=1), then clears so the hold path
-       reaches maybePlan and wakes the VLM, whose next prompt then carries the [ESCALATION] block. */
-    void injectCannedStormPlan() {
-        static const char* kCannedStormPlanJson = R"([
-            {"thought":"canned takeoff", "action":"takeoff"}
-        ])";
-        m_obstacleArmed = true;
-        m_missionActive.store(true, std::memory_order_release);   /* wake the VLM after the burst. */
-        translateToBaseCommands(kCannedStormPlanJson);
-    }
-
-    /* APPROACH motion-gate test (spec 1 6.4): the canned synthetic approach reaches the standoff,
-       but the motion-gate is forced off-nominal so "reached" is treated as an impact -- proves the
-       gate raises approach_impact instead of approach_ok, deterministically and with no collision. */
-    void injectCannedApproachImpactPlan() {
-        m_forceApproachImpact = true;
-        injectCannedApproachPlan();   /* enables the synthetic rig + runs takeoff/approach/land. */
-    }
-
-    /* Body-frame (FLU) axis test: each of forward/left/back/right is flown OUT
-       then immediately UNDONE, one axis at a time, before the next axis starts.
-       Every "return" leg re-anchors from fresh od.yaw + od.pos at that leg's own
-       activation (not an assumed prior target) -- isolates flu_to_ned correctness
-       from GO controller error, and isolates each axis's error from the others
-       since a bad return doesn't carry into the next axis's outbound leg. */
-    void injectCannedCrossPlan() {
-        static const char* kCannedCrossPlanJson = R"([
-            {"thought":"canned takeoff",             "action":"takeoff"},
-            {"thought":"canned go forward",          "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
-            {"thought":"canned go left",             "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
-            {"thought":"canned go back",             "action":"go", "x":-100, "y":0,    "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":100,  "y":0,    "z":0, "speed":30},
-            {"thought":"canned go right",            "action":"go", "x":0,    "y":-100, "z":0, "speed":30},
-            {"thought":"canned return to start",     "action":"go", "x":0,    "y":100,  "z":0, "speed":30},
-            {"thought":"canned land",                "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedCrossPlanJson);
-    }
-
-    /* Airborne backpressure test (spec-3, ROADMAP 1.4): fly the canned cross, then ~5s after
-       reaching FLIGHT a 100-action flood is injected mid-air (see controlLoop). Proves an
-       in-flight command storm is absorbed safely -- the queue stays bounded, excess is
-       dropped, and the maneuver in progress is NOT hijacked (FIFO: the storm queues BEHIND
-       the live plan, so the drone finishes its legs + lands before the no-op stops run). */
-    void injectCannedCrossFloodPlan() {
-        injectCannedCrossPlan();   /* takeoff + cross legs + land, enqueued at startup. */
-        m_floodArmed = true;       /* controlLoop fires the flood once airborne. */
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] AIRBORNE FLOOD armed: flooding ~5s after reaching FLIGHT.");
-    }
-
-    /* Outbound excursion for the battery-behaviour tests: takeoff, fly ~8m straight out (so RTH
-       has a real distance to cover and land-in-place is genuinely far from home), then land. */
-    void injectCannedOutboundPlan() {
-        static const char* kCannedOutboundPlanJson = R"([
-            {"thought":"canned takeoff",    "action":"takeoff"},
-            {"thought":"canned fly out 8m", "action":"go", "x":800, "y":0, "z":0, "speed":40},
-            {"thought":"canned land",       "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedOutboundPlanJson);
-    }
-
-    /* Battery RTH behaviour test (spec-3, ROADMAP 6.2): fly out, then force a drop to 18% far
-       from home -> the <=20% law returns the drone to origin, where it lands and disarms. */
-    void injectCannedBatteryRthPlan() {
-        injectCannedOutboundPlan();
-        m_batForceArmed = true; m_batForceValue = 18;
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] BATTERY-RTH armed: forcing 18%% ~15s after reaching FLIGHT.");
-    }
-
-    /* Battery land-in-place test (spec-3, ROADMAP 6.2): fly out, then force a sudden crash to
-       8% far from home -> the <=10% law lands the drone WHERE IT IS (no return to origin). */
-    void injectCannedBatteryLandNowPlan() {
-        injectCannedOutboundPlan();
-        m_batForceArmed = true; m_batForceValue = 8;
-        RCLCPP_WARN(this->get_logger(),
-            "[FMU_NODE_DEBUG] BATTERY-LANDNOW armed: forcing 8%% ~15s after reaching FLIGHT.");
-    }
-
-    /* Real-drain battery test (spec-3, ROADMAP 6.2): fly out ~6m then loop a 4m box (stays
-       6-10m from origin, never sitting at home), while the PX4 pack drains for real. Whenever
-       OUR <=20% failsafe fires -- a drain-dependent, "random" point along the patrol -- RTH
-       brings it home. Many legs; the failsafe pre-empts and drains the rest. Run with PX4's own
-       low-battery action DISABLED (COM_LOW_BAT_ACT=0) so it can't hijack the descent. */
-    void injectCannedPatrolPlan() {
-        std::string plan = "[";
-        plan += R"({"thought":"canned takeoff","action":"takeoff"},)";
-        plan += R"({"thought":"fly out 6m","action":"go","x":600,"y":0,"z":0,"speed":40},)";
-        for (int i = 0; i < 5; ++i) {   /* 5 loops of a 4m box, keeps it ~6-10m out for ~200s */
-            plan += R"({"thought":"patrol","action":"go","x":0,"y":400,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":400,"y":0,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":0,"y":-400,"z":0,"speed":40},)";
-            plan += R"({"thought":"patrol","action":"go","x":-400,"y":0,"z":0,"speed":40},)";
-        }
-        plan += R"({"thought":"canned land","action":"land"}])";
-        RCLCPP_INFO(this->get_logger(),
-            "[FMU_NODE_DEBUG] PATROL plan: fly out + box loops; real battery drain drives the failsafe.");
-        translateToBaseCommands(plan);
-    }
-
-    /* Low vs high commanded speed, forward+return, back to back. Same guidance
-       law, same axis, only m_activeSpeed differs -- isolates whether curvature
-       scales with commanded speed (actuator-lag/overshoot signature) or is
-       roughly constant regardless (points elsewhere, e.g. the settle window). */
-    void injectCannedSpeedPlan() {
-        static const char* kCannedSpeedPlanJson = R"([
-            {"thought":"canned takeoff",              "action":"takeoff"},
-            {"thought":"canned go forward LOW speed",  "action":"go", "x":100,  "y":0, "z":0, "speed":15},
-            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":15},
-            {"thought":"canned go forward HIGH speed", "action":"go", "x":100,  "y":0, "z":0, "speed":80},
-            {"thought":"canned return to start",       "action":"go", "x":-100, "y":0, "z":0, "speed":80},
-            {"thought":"canned land",                  "action":"land"}
-        ])";
-        translateToBaseCommands(kCannedSpeedPlanJson);
-    }
+    /* Replay a canned test scenario: pre-fill the queue with its scripted JSON (test/
+       fmu_test_scenarios.hpp) and, for the fault-injection scenarios, arm the synthetic condition the
+       control loop acts on (flood/obstacle/battery). None is a no-op (a normal VLM-driven run).
+       The scenario DATA lives in test/*; only the node-owned member arming lives here.
+       DEFINED out-of-line in fmu_node.cpp (below main) -- SITL/test wiring stays out of the header. */
+    void runTestScenario(TestScenario test);
 
 private:
     rclcpp::CallbackGroup::SharedPtr                m_cbGroup;
-    rclcpp::Subscription<UDPCamMsgType>::SharedPtr  m_subImg;
+    rclcpp::Subscription<CameraPipelineMsgType>::SharedPtr  m_subImg;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr    m_subOverride;  /* operator override toggle. */
     rclcpp::Subscription<KeyboardRawInputType>::SharedPtr   m_subKey;       /* raw keylog for manual flight. */
     rclcpp::Subscription<ASRTextType>::SharedPtr            m_subAsr;       /* voice objective / in-flight re-task. */
@@ -3002,9 +2693,8 @@ private:
     bool                                            m_interruptEscalated{false};
 
     llamaClientConnection                           m_vlmClient;
-    khUDPCamMsgType                                 m_currImg;
+    khCameraPipelineMsgType                                 m_currImg;
     HistoryBuffer                                   m_chat;
-    VehicleTelemetry                                m_telemetry;
     std::unique_ptr<PerceptionRuntime>               m_perception;
 
     /* A2 observability (additive): image + HUD publishers, per-run VLM log path, HUD throttle. */
@@ -3032,13 +2722,13 @@ private:
     std::atomic<bool>         m_missionActive{false};
     std::atomic<bool>         m_planning{false};
     std::future<void>         m_planFuture;
-    /* Airborne command-storm test (--canned-cross-flood): a canned cross flight, then a
+    /* Airborne command-storm test (--scenario-cross-flood): a canned cross flight, then a
        100-action flood injected from a producer-role async ~5s after reaching FLIGHT. */
     bool                      m_floodArmed{false};
     bool                      m_floodFired{false};
     u64                       m_floodAtUs{0};
     std::future<void>         m_floodFuture;
-    /* Test-only battery fault injection (--canned-battery-rth / -landnow): ~15s into FLIGHT,
+    /* Test-only battery fault injection (--scenario-battery-rth / -landnow): ~15s into FLIGHT,
        force a discrete reading (18% -> RTH, 8% -> land-in-place) to exercise the failsafe laws
        deterministically, far from home. m_batteryForce: -2 = inactive, else the forced %. */
     std::atomic<i32>          m_batteryForce{-2};
@@ -3046,7 +2736,7 @@ private:
     bool                      m_batForceFired{false};
     i32                       m_batForceValue{0};
     u64                       m_batForceAtUs{0};
-    /* Test-only interrupt-safety injection (spec 1, --canned-boundary / -storm / -approach-impact):
+    /* Test-only interrupt-safety injection (spec 1, --scenario-boundary / -storm / -approach-impact):
        a synthetic close-obstacle burst to trip the boundary, and a forced motion-gate fail. */
     bool                      m_obstacleArmed{false};
     bool                      m_obstacleFired{false};
@@ -3091,6 +2781,8 @@ private:
     u64  m_followLastAimUs{0};
     bool m_followHaveLast{false};
     i32  m_followTrackId{-1};                             /* VLM-chosen stable id being followed. */
+    f32  m_followLastErrX{0.0f};                          /* last accepted horizontal error (box-jump reject). */
+    bool m_followHaveErr{false};                          /* seeded after the first accepted follow tick.       */
     std::shared_ptr<TrackedSnapshot> m_lastPromptTracked; /* frame the last VLM prompt was built from. */
     std::shared_ptr<TrackedSnapshot> m_lastNonEmptyTracked; /* last prompt frame that actually HAD a detection.*/
     std::atomic<u64>  m_lastNonEmptyUs{0};

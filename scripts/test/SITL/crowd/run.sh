@@ -8,7 +8,7 @@
 # Then watch; in a 2nd terminal: ../follow/filter.sh  (or crowd/watch.sh for the view)
 cd "$(dirname "$0")" || exit 1
 FMU_OBJECTIVE="Take off, then follow the person in the middle of your view and hold your position. Do not approach, orbit, go, or move anywhere else -- only follow the middle person."
-FMU_CANNED_FLAG=""
+FMU_SCENARIO_FLAG=""
 WORLD_NAME="three_people"
 SPAWN_POSE="0,7,3"
 LAUNCH_VLM="1"

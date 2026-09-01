@@ -6,7 +6,7 @@
 cd "$(dirname "$0")" || exit 1
 export PX4_PARAM_SIM_BAT_DRAIN=3600      # keep the real pack ~full; only the forced value fires
 FMU_OBJECTIVE="Battery RTH: fly out, force 18% far, expect return-to-origin + land."
-FMU_CANNED_FLAG="--canned-battery-rth"
+FMU_SCENARIO_FLAG="--scenario-battery-rth"
 WORLD_NAME="empty"
 SPAWN_POSE="0,7,3"
 source ../../lib/sim_core.sh

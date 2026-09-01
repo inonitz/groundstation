@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# GStreamer UDP camera receiver node.
+# GStreamer camera receiver node (UDP: PX4/Tello, TCP: DJI -- selected at runtime).
 # ---------------------------------------------------------------------------
 set(GSTREAMER_RECEIVER_NAME_POSTFIX gstreamer_rx)
 set(GSTREAMER_RECEIVER_SOURCES

@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     dos2unix \
     netcat-openbsd \
     pulseaudio-utils \
+    libasound2-plugins \
     git \
     wget \
     curl \
@@ -61,6 +62,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # 1.5 Install RTK and move to PATH
 RUN curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh \
     && mv /root/.local/bin/rtk /usr/local/bin/rtk
+
+# 1.6 Python ML deps for the llm_cv_scene demo -- baked so containers never refetch (offline-safe).
+#     PIP_BREAK_SYSTEM_PACKAGES lets pip work on this externally-managed (PEP 668) base with NO
+#     --break-system-packages flag, for the build AND any manual pip you run later.
+#     TORCH_INDEX defaults to the CPU wheels: ZERO nvidia/CUDA packages, matching the Vulkan+CPU
+#     setup. devenv.sh already passes /dev/kfd + /dev/dri, so to run the detectors on the AMD GPU
+#     instead, build with scripts/build-devenv.sh (auto-detects NVIDIA/AMD/CPU) which sets --build-arg TORCH_INDEX for you.
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ARG TORCH_INDEX=https://download.pytorch.org/whl/cpu
+RUN --mount=type=cache,target=/root/.cache/pip pip install --index-url ${TORCH_INDEX} torch torchvision && pip install "numpy<2" "opencv-python<4.12" ultralytics "transformers>=5.15" pillow safetensors lapx requests timm
+# 2.7 Pre-bake the open-vocab grounder (LLMDet-tiny) into the image so the demo runs fully OFFLINE
+#     (no HuggingFace fetch at show time). Weights are backend-agnostic -> vendor-neutral. Keep this
+#     checkpoint in sync with config.GROUNDER_REPO in source/llm_cv_scene/config.py.
+RUN python3 -c "from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection as M; r='iSEE-Laboratory/llmdet_tiny'; AutoProcessor.from_pretrained(r); M.from_pretrained(r); print('baked '+r)"
 
 # 3. Define VS Code Environment Variables
 ENV VSCodeClangdAbsPath=/usr/bin/clangd

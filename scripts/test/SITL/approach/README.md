@@ -2,7 +2,7 @@
 
 Closed-loop APPROACH toward a canned (synthetic, no-YOLO) detection, then land.
 
-- **Canned plan flag:** `--canned-approach`
+- **Scenario flag:** `--scenario-approach`
 - **World:** `default_car`   **Spawn:** `0,7,3`
 - **Filter:** milestone digest (APPROACH activated/sees/reached/lost) — no PASS/FAIL.
 

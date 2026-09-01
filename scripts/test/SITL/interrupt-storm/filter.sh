@@ -30,7 +30,7 @@ RECOVERED=$(awk '
 
 echo ""
 if [ "$TRIPS" -lt 3 ]; then
-    echo "FAIL: only $TRIPS interrupt(s) seen (<3) — is --canned-storm implemented + built?"
+    echo "FAIL: only $TRIPS interrupt(s) seen (<3) — is --scenario-storm implemented + built?"
     exit 1
 fi
 if [ "$ESC" -ge 1 ] && [ "$BLOCK" -ge 1 ]; then

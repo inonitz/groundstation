@@ -7,15 +7,26 @@ single place the whole objective set lives; it was previously scattered across `
 Status legend: `[x]` done, `[~]` partial / WIP, `[ ]` todo, `[GATE]` blocked on a dependency,
 `[DEFER]` deliberate later horizon.
 
-Last synced: 2026-08-09 (spec-1/spec-2 SITL runs landed -- boundary/approach-impact/interrupt-storm/orbit/search all PASS; SEARCH return-to-start, tolerant plan extraction, APPROACH motion-gate, SLAM tracking spike; earlier: 2026-08-08 spec-3 failsafe supervisor + user override + SPSC backpressure; 2026-08-06 GenericBackend build-verify + build_yolo benchmark).
+Last synced: 2026-08-20 (perception-first pivot; see the CURRENT PHASE banner below + the dated section at the END). Prior 2026-08-09 (spec-1/spec-2 SITL runs landed -- boundary/approach-impact/interrupt-storm/orbit/search all PASS; SEARCH return-to-start, tolerant plan extraction, APPROACH motion-gate, SLAM tracking spike; earlier: 2026-08-08 spec-3 failsafe supervisor + user override + SPSC backpressure; 2026-08-06 GenericBackend build-verify + build_yolo benchmark).
 
 ---
+
+> **>>> CURRENT PHASE (2026-08-20): PERCEPTION-FIRST — read this before the tree below. <<<**
+> The project PIVOTED. The DJI **Tello was DROPPED** (limited SDK, more problems than solutions); the
+> platform is a **DJI drone** (video via DJI Fly Custom RTMP). The 2026-08-20 tech-credibility **GATE
+> (prove smart, live, voice-driven CV) was PASSED** — with the perception demo, NOT flight. So:
+> **the flight-core objective tree below (blocks 1-9: FMU, guidance, ROTATE/APPROACH/ORBIT/SEARCH,
+> backends) is DEFERRED until after Demo Day.** It is real, SITL-verified work, but it is NOT the current
+> priority and does NOT gate the demo. The perception stack (`source/llm_cv_track` + `llm_cv_scene`) runs
+> STANDALONE, not through the FMU. **Current priority + full plan = the `## 2026-08-20 — GATE PASSED`
+> section at the END of this file.**
 
 ## Objective tree
 
 ```
-ROOT: Off-board VLM-driven autonomous drone (Tello primary, PX4 SITL fallback)
-      "VLM plans, deterministic math executes"
+ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 2026; PX4 SITL for
+      flight-core dev). Two subsystems: "VLM plans, deterministic math executes" (flight core, DEFERRED)
+      + voice-driven open-vocab perception (the gate/Demo-Day demo, ACTIVE).
 
 1. Flight core / FMU                                              [~]
    1.1 20 Hz deterministic control loop                          [x]
@@ -370,3 +381,103 @@ the dominant unknown — it is research-grade integration, not plumbing.
 Critical path to the next real capability:
 **4.2 (FMU perception plumbing) -> 3.4 (real perception JSON) -> 5.1/5.2 (APPROACH + live-YOLO GO)**.
 Everything in block 5 and most of block 6 gates on perception landing in the FMU.
+(2026-08-20: for the GATE/Demo Day the perception stack runs STANDALONE — llm_cv_track/llm_cv_scene — NOT via the FMU. FMU-integrated perception is deferred with the rest of flight-core.)
+
+# ============================================================================
+# 2026-08-20 — GATE PASSED. Reassessment + Demo Day plan (~week of 08-25)
+# ============================================================================
+Timeline: today Thu 08-20. Integration-ready target Sat 08-22. RIGOROUS TESTING + feature tweaking
+Sun 08-23 + Mon 08-24. Demo Day ~08-28. Land-platform integration ONLY if time remains after Monday.
+
+## WHERE WE ARE (done / working)
+- **STAR — source/llm_cv_track/scene_omdet.py.** Voice -> OmDet-Turbo open-vocab detect (box follows) ->
+  SAM2.1 mask -> Qwen3-VL Q&A, full chat-pane UI. Loads OmDet locally/offline in ~1s. Runs on webcam +
+  drone RTMP. Validated headless; verified live at the gate (with fixes below). See llm_cv_track/README.md.
+- **BACKUP — source/llm_cv_scene.** Voice -> Qwen3-VL describes+localizes -> SAM2. 100% local, always
+  loads. The safety net.
+- **Static tools** — recognize_omdet.py (OmDet) + recognize.py (VLM): image + prompt -> boxes/masks + log.
+- **Drone feed** — DJI RC2 + DJI Fly Custom RTMP -> MediaMTX -> RTSP -> app. Working.
+- **Fixed this session** — OmDet offline load (was hanging on HF); VLM off the ASR thread (no voice
+  bottleneck); vlm.ask not analyze for Q&A (no JSON garbage); os._exit clean exit; tmux teardown;
+  ASR_CAPTUREID=5 mic; whole-frame garbage-mask guard.
+
+## NOT DONE / GAPS (honest)
+- **Persistent tracking through occlusion.** follow.py (BoT-SORT + colour re-id) is fragile (look-alikes,
+  ID churn). Parked. Needs OSNet re-id to be demo-worthy.
+- **Full AGPL escape.** OmDet is Apache, but YOLO26 background + SAM2 + BoT-SORT are Ultralytics/AGPL.
+  Productization needs permissive replacements (D-FINE bg, a permissive tracker). Not a Demo Day blocker.
+- **Control side (command -> platform).** The perception demo does NOT fly/drive anything yet; flight was
+  cut for the gate. Real drone control (llm_to_action DjiBackend over the real link) is separate,
+  unfinished work — see docs/active/spec-dji-endtoend-bringup.md.
+- **Live reliability** under demo conditions (stream drops, mic, warmup) is only lightly hardened.
+
+## DEMO DAY PLAN
+### Track A — harden the perception demo  [PRIORITY 1, Sun+Mon]
+- Repeated full live run-throughs on the drone; fix whatever breaks live. [Sun, ongoing]
+- ASR reliability: confirm ASR_CAPTUREID, mic gain, handle empty-transcript gracefully. [~2h]
+- Highlight tuning: mask-rate throttle, optional multi-object, update-rate feel. [~2h]
+- Robustness: stream-drop recovery, pre-warm script, stale-llama guard (pkill+relaunch if hung). [~2h]
+- Rehearse the pitch: 3-layer story (YOLO context / OmDet open-vocab / VLM reasoning) + star-vs-backup. [Mon]
+
+### Track B — platform-agnostic proof  [PRIORITY 2, cheap]
+- Run the SAME stack on THREE feeds with no new hardware: DJI drone (RTMP) + webcam + a phone/IP camera
+  (RTSP/GStreamer). One brain, three platforms -> proves agnosticism for the judges. [~1h]
+
+### Track C — land platform (DJI RoboMaster) — STRETCH ONLY, see assessment below.
+
+## LAND PLATFORM ASSESSMENT — DJI RoboMaster (S1 / EP)
+Question from the human: worth pursuing to show platform-agnostic nature? (Tello burned us: limited SDK,
+more problems than solutions.) Realistic take:
+
+**Technically: yes, it is a genuinely good target — far better than the Tello.**
+- The RoboMaster **EP / EP Core** ship the OFFICIAL open Python + plaintext SDK
+  (github.com/dji-sdk/RoboMaster-SDK): chassis motion control, gimbal, **video streaming (H.264)**, audio,
+  intelligent-ID APIs; runs INDEPENDENTLY of the DJI app (unlike Tello's thin SDK). **The S1 ships with
+  the SDK DISABLED** -- DJI never released it for the S1 officially. The S1 needs a community root/unlock
+  (sandbox escape in the app's Lab), which DJI patched in later firmware -> unlock only works on
+  compatible/older firmware. Verified 2026-08-26; field kit + scripts in `source/robomaster/`.
+  Once unlocked the S1 speaks the SAME plaintext SDK as the EP (TCP 40923 control, 40921 H.264).
+- Connectivity: WiFi (direct AP or router) or USB. Video-in is trivial for us (SDK stream -> our
+  perception). A community simulator (github.com/jeguzzi/robomaster_sim) lets us develop with NO hardware.
+- **Scope clarified by the human (2026-08-20): the RoboMaster demo would be SIMPLE** — the same voice + CV
+  we show on the drone, just pointed at the RoboMaster's camera. NOT autonomous ground control. So the work
+  is mostly **video-in**: take the SDK's H.264 stream into the existing perception stack (scene_omdet), the
+  same way the drone's RTMP feed does. Little/no new control code. Do it on a FEATURE BRANCH; migrate only
+  what fits without changing/breaking the working system.
+- That makes it a CHEAP stretch (~a few hours: SDK video-in + a GStreamer/RTSP shim + a live test), not a
+  control project. The Tello risk (flaky SDK) is largely gone with the RoboMaster's open Python SDK.
+
+**Recommendation:** still a STRETCH, but a cheap one. Pursue if the core drone demo is solid AND an EP unit
+is in hand. Path: (1) get the SDK video stream into our RTSP/GStreamer input (trivial), (2) run scene_omdet
+against it + a live voice test, (3) done — that already proves "same perception brain, different platform."
+Develop video-in against robomaster_sim first if no unit yet. Keep it on a feature branch so it can't
+destabilize the Demo Day build. If no unit / no time, prove agnosticism with drone+webcam+phone.
+Sources: dji-sdk/RoboMaster-SDK (GitHub), dji.com/robomaster-s1/programming-guide, jeguzzi/robomaster_sim.
+
+---
+
+## 2026-08-25 — MVD INTEGRATION DONE (voice -> router -> DJI + smart CV)
+
+Full detail + command table + next tracks: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+The `source/integration/` MVD is **DONE and considered effective**. Demo-Day system is the perception +
+voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED as the destination product).
+
+- [x] 4-tier deterministic router (EMERGENCY>OVERRIDE/RESUME>BASIC>COMPLEX), voice + phone ASR.
+- [x] Full `dji_wire.py` DJI REST client (all `/c/fly` mission actions, `/key`, `/tts`, `/status`).
+- [x] Expanded verbs: spin, scan/search (orbit OUTWARDS/INWARDS), track/follow/come_home (phone-GPS),
+      gimbal look forward/down/up, wave, directionals -> native `fly_by`, `go <unknown>` no-op guard.
+- [x] `stop` = `POST /c/fly [{delay:0}]` (preempts + keeps control); `manual`/`resume` = RC handoff/pop.
+- [x] Phone->GS ASR channel (`phone_ears.py`, `/input` + raw TCP, matches the app), receipt logging.
+- [x] TTS out (`voice.py`): phone `/tts` + laptop espeak; LONG (screen) / SHORT (spoken) split.
+- [x] Perception hardened: OmDet offline load, executor starvation, VLM `-np 1`, VLM `:18090`, video
+      watchdog/doctor, live `[dji]`/`[phone_ears]`/`[voice]` logging. 7 router tests pass.
+- [x] Self-contained `source/integration/` (no llm_cv_scene/llm_cv_track traces).
+
+- [ ] `[GATE]` **BACKEND (DJI app dev):** dynamic groundstation-IP discovery; fix gimbal commands
+      (broken backend-side; `fly_by` works); `ApiServerService` foreground-service reliability.
+- [DEFER] laptop TTS `apt install espeak-ng` (tomorrow; phone `/tts` works; must not break integration/*).
+
+**Next tracks (Demo Day = Thu 2026-08-27):** (1) pitch prep around the working MVD; (2) `llm_to_action`
+assessment + possible end-to-end VLM flight (connect current Python perception to the C++ FMU);
+(3) Robomaster backend + acquisition (S1 has no remote SDK -> buy EP/EP Core; video-in is the cheap
+path); (4) diagnostic dashboard (spec only — youtu.be/vO6SWG-jxvE ~1:25; consumes the stdout logging).

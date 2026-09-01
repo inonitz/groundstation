@@ -1,0 +1,22 @@
+# Python deps for llm_cv_scene. NO CUDA / NO NVIDIA lock-in -- runs on Vulkan (VLM) + ROCm/CUDA/CPU
+# (background detector, SAM2, and the open-vocab grounder). The Dockerfile (scripts/Dockerfile,
+# step 1.6) bakes all of this AND pre-downloads the grounder weights; this file is for a manual install.
+#
+# 1) Install torch FIRST from a NON-CUDA index (default PyPI torch is the CUDA build -> pulls nvidia-*
+#    wheels you do NOT want). Pick the one matching your GPU:
+#      CPU (works anywhere): pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#      AMD ROCm (this box):  pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm6.4
+#      NVIDIA CUDA:          pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#
+# 2) Then the rest. `transformers` provides the open-vocab highlight grounder: LLMDet-tiny, loaded via
+#    the MM-Grounding-DINO implementation. Its deformable attention has a pure-PyTorch fallback, so NO
+#    CUDA-only op is needed -- identical code path on ROCm/CUDA/CPU. Pin opencv to 4.x: opencv 5.0 pulls
+#    numpy 2, which pip cannot install over the apt numpy on the ROS base; 4.x also matches ROS cv_bridge.
+numpy<2
+opencv-python<4.12
+ultralytics
+transformers>=5.15
+pillow
+safetensors
+requests
+lapx

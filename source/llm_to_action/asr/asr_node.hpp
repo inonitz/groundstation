@@ -59,19 +59,24 @@ public:
                 }
 
 
-                if (action == KeyAction::PRESSED) {
-                    RCLCPP_INFO(this->get_logger(), "[KEY] Key H PRESSED. Recording started.");
+                /* TOGGLE: first H press starts recording, the next H press stops + transcribes.
+                   No holding. RELEASED is ignored here, REPEATED (auto-repeat) is already filtered. */
+                if (action != KeyAction::PRESSED) {
+                    return;
+                }
+
+                if (!m_isRecording) {
+                    /* START. The producer only writes while m_isRecording, so the buffer is already
+                       empty here -- nothing to drain (the consumer flushes after each utterance). */
                     m_isRecording = true;
                     m_recordTimeMs = static_cast<uint64_t>(this->now().nanoseconds());
-
-                } else if (action == KeyAction::RELEASED) {
+                    RCLCPP_INFO(this->get_logger(), "[KEY] H -> recording ON (press H again to stop).");
+                } else {
+                    /* STOP. Compute held duration and wake the consumer to transcribe. */
                     m_recordTimeMs = static_cast<uint64_t>(this->now().nanoseconds()) - m_recordTimeMs;
                     m_recordTimeMs = (m_recordTimeMs / 1000'000) + ((m_recordTimeMs % 1000'000) > 0);
-
-                    RCLCPP_INFO(this->get_logger(), 
-                        "[KEY] Key H RELEASED. Recording stopped (%lu ms). Triggering worker.", 
-                        m_recordTimeMs
-                    );
+                    RCLCPP_INFO(this->get_logger(), "[KEY] H -> recording OFF (%lu ms). Transcribing.",
+                                m_recordTimeMs);
                     {
                         std::lock_guard<std::mutex> lock(m_processMtx);
                         m_isRecording = false;

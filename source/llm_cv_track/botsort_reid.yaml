@@ -1,0 +1,15 @@
+# BoT-SORT + appearance Re-ID, tuned for the follow demo: keep a target's ID when it
+# briefly leaves frame and returns. Diff vs Ultralytics default: with_reid ON, longer
+# track_buffer, slightly looser appearance gate.  Point --tracker here.
+tracker_type: botsort
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 150        # keep a lost track alive ~5-10s (was 30) so a brief step-out keeps its ID
+match_thresh: 0.8
+fuse_score: True
+gmc_method: sparseOptFlow # camera-motion compensation (moving drone)
+proximity_thresh: 0.3
+appearance_thresh: 0.6   # looser than 0.8 so a returning person re-matches by appearance
+with_reid: True          # appearance Re-ID ON -> re-associate a target that left and returned
+model: auto              # use the detector's own features (no extra weights download)

@@ -8,7 +8,7 @@
 # Run:  cd scripts/test/SITL && ./logtest.sh search_follow hires
 cd "$(dirname "$0")" || exit 1
 FMU_OBJECTIVE="Take off, then find a person and follow them. No one is in view at first -- the people are behind you. Search to bring a person into view, then follow that person by their track_id and hold. Search first, then follow once found."
-FMU_CANNED_FLAG=""
+FMU_SCENARIO_FLAG=""
 WORLD_NAME="three_people"
 SPAWN_POSE="0,7,3,0,0,3.1416"
 LAUNCH_VLM="1"

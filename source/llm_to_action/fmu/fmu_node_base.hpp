@@ -18,9 +18,10 @@ constexpr u32 kControlLoopPeriodMs     = kMillisecondsInOneSecond / kControlLoop
 
 /* ---- Completion / flight tuning (planner-side; frame-neutral) ------------ */
 constexpr f32 kGoCompletionRadiusM   = 0.20f;   /* GO done when within 20cm.   */
-constexpr f32 kRotateCompletionDeg   = 5.0f;    /* ROTATE done within 5 deg.   */
+constexpr f32 kRotateCompletionDeg   = 0.3f;    /* ROTATE done within 0.3 deg -- effectively dead-on; the rate floor closes the last bit crisply. */
 constexpr f32 kPi                    = 3.14159265358979f;
 constexpr f32 kRotateCompletionRad   = kRotateCompletionDeg * kPi / 180.0f;
+constexpr f32 kRotateMinYawRate      = 0.05f;   /* rad/s floor near the target (terminal tick step ~0.14 deg) so ROTATE closes to <0.5 deg without a long creep. */
 constexpr f32 kRotateYawGainHz       = 1.5f;    /* P gain: yawrate = gain * yawErr (rad/s per rad). */
 constexpr f32 kRotateMaxYawRate      = 0.8f;    /* clamp commanded yawrate (rad/s); gentle turn.     */
 constexpr f32 kRotateMaxAngleRad     = 720.0f * kPi / 180.0f;  /* cap a single ROTATE's magnitude. */
@@ -128,11 +129,11 @@ constexpr f32 kApproachStandoffM     = 2.50f;   /* stop this far from the target
                                                     Raised 3.0->4.0: depth over-reads ~2m close up, so a
                                                     3m aim still parked the drone on the car; the boundary
                                                     looming net backstops any overshoot inside standoff. */
-constexpr f32 kApproachSpeedDefault  = 80.0f;   /* cm/s, if CmdApproach.speed == 0. Faster cruise so
+constexpr f32 kApproachSpeedDefault  = 120.0f;   /* cm/s, if CmdApproach.speed == 0. Faster cruise so
                                                     the brake ramp below is actually visible against
                                                     it (30cm/s cruise vs near-zero at the end reads as
                                                     "flying slow the whole time", not "decelerating"). */
-constexpr f32 kApproachFwdGainHz     = 0.35f;   /* (range-standoff) -> forward speed. Lower than cruise
+constexpr f32 kApproachFwdGainHz     = 0.55f;   /* (range-standoff) -> forward speed. Lower than cruise
                                                     speed needs, on purpose: crossover (where this starts
                                                     undercutting the speed ceiling) lands ~2.8m out instead
                                                     of ~1m, so braking is a visible ramp, not a last-instant
@@ -146,7 +147,9 @@ constexpr f32 kApproachMinAnchorAltEnu = 0.8f;  /* NEVER approach below this ENU
                                                    PX4 disarm. Floors both the bbox anchor and the servo
                                                    descent. SITL ground is ENU 0; 0.8 m keeps clearance. */
 constexpr f32 kApproachLateralDamp   = 0.5f;    /* perpendicular measured-velocity damping (R1). */
-constexpr f32 kApproachCoastSpeedMps = 0.15f;   /* speed while coasting on a briefly-lost target
+constexpr f32 kApproachCoastSpeedMps = 0.30f;
+constexpr f32 kApproachBrakeFillFrac = 0.18f;   /* start braking when the target's bbox fills this much of the frame. */
+constexpr f32 kApproachStopFillFrac  = 0.35f;   /* bbox fill at which approach forward speed hits zero (depth-independent stop). */   /* speed while coasting on a briefly-lost target
                                                     (not in the spec's tunable table -- same
                                                     first-guess/SITL-tune status as the rest). */
 constexpr u32 kApproachLostTimeoutMs = 3000;    /* coast window before FAIL on lost target; real
@@ -188,9 +191,11 @@ constexpr f32 kFollowEdgeSweepThresh= 0.55f;   /* only sweep-to-last-seen if the
                                                   centre when lost (i.e. genuinely exiting the frame). A
                                                   centred flicker holds instead of yawing away from a
                                                   target that is still right there.                    */
-constexpr f32 kFollowYawGain        = 5.0f;    /* follow bbox-centre yaw gain (snappier than approach's 1.0
+constexpr f32 kFollowYawGain        = 3.5f;    /* follow bbox-centre yaw gain (snappier than approach's 1.0
                                                   so a moving target stays centred, not trailed by ~0.6). */
-constexpr f32 kFollowYawMaxRps      = 1.5f;    /* cap follow yaw-rate so a large error never snaps violently.*/
+constexpr f32 kFollowYawMaxRps      = 0.9f;    /* moderate yaw cap: responsive, but the deadband+jump-reject stop a spin.*/
+constexpr f32 kFollowYawDeadband    = 0.06f;   /* |errX|/|errY| below this -> zero servo: no twitch on a centred/noisy box. */
+constexpr f32 kFollowErrJumpReject  = 0.30f;   /* one-tick errX leap above this = box jitter, not motion -> hold, don't chase. */
 constexpr u32 kPerceptionCoastMs    = 1500u;   /* feed the VLM the last-seen detection across a blank frame
                                                   for this long, instead of lying "(no detections)".        */
 constexpr u64 kPerceptionCoastUs    = static_cast<u64>(kPerceptionCoastMs) * 1000ULL;
@@ -225,7 +230,7 @@ constexpr u64         kCannedApproachRigKillAfterUs =
 constexpr f32 kBoundaryBaseM            = 0.6f;   /* base standoff (m) at zero closing speed.    */
 constexpr f32 kBoundaryVelScale         = 0.5f;   /* extra standoff (m) per m/s closing speed.   */
 constexpr u32 kBoundaryMaxSnapshotAgeMs = 500;    /* snapshot older than this -> nearest unknown. */
-constexpr f32 kBoundaryLoomFillFrac     = 0.40f;  /* bbox-area/frame above this = imminent collision
+constexpr f32 kBoundaryLoomFillFrac     = 0.28f;  /* bbox-area/frame above this = imminent collision
                                                      regardless of depth (it over-reads/drops out close
                                                      up). ~0.40 trips a car near 1m, well inside standoff;
                                                      a car at the 4m standoff fills ~0.05, so a clean
@@ -241,13 +246,14 @@ constexpr u32 kInterruptStormWindowMs   = 5000;   /* rolling window for the stor
    fixed point, so the path carries no depth jitter and cannot wobble. The camera turns separately (a
    gentle image-centering) to keep the real car in view. SITL-tune; pending loader (ROADMAP 9.14). */
 constexpr f32 kOrbitDefaultSpeedMps = 0.30f;   /* tangential speed around the circle if speed==0 (m/s).  */
-constexpr f32 kOrbitRadialGainHz    = 0.5f;    /* (radius - dist) -> radial speed: hold the circle.      */
-constexpr f32 kOrbitYawGain         = 1.0f;    /* look-angle error (rad) -> turn rate: aim at locked center.*/
+constexpr f32 kOrbitRadialGainHz    = 1.5f;    /* (radius - dist) -> radial speed: stiffer hold -> smaller steady radial offset. */
+constexpr f32 kOrbitYawGain         = 1.5f;    /* look-angle error (rad) -> turn rate: trims residual on top of the orbital-rate feedforward. */
 constexpr f32 kOrbitAimTrimGain     = 0.30f;   /* small vision trim on top of the odometry aim (no hard chase).*/
 constexpr f32 kOrbitMinRadiusM      = 3.0f;    /* floor on the orbit radius: never fly closer than this to the locked centre (collision guard), even if the VLM asks for a tiny radius_cm. */
 constexpr f32 kOrbitMaxRadialMps    = 0.25f;    /* cap on the visual-servo orbit's forward/back (range-hold) speed. */
 constexpr f32 kOrbitMinTangentialMps= 0.6f;    /* floor on the orbit strafe speed so it circles in reasonable time. */
-constexpr f32 kOrbitFixedRadiusM    = 7.0f;    /* HARDCODED orbit: centre is this far straight ahead of orbit-start AND the radius, so the drone starts ON the circle (never flies inward). */
+constexpr f32 kOrbitFixedRadiusM    = 7.0f;    /* fallback orbit radius when radius_cm is unset: centre is this far straight ahead of orbit-start AND the radius, so the drone starts ON the circle (never flies inward). */
+constexpr f32 kOrbitMaxRadiusM      = 12.0f;   /* sanity cap on a commanded radius_cm. */
 constexpr f32 kOrbitFixedAltM       = 4.0f;    /* HARDCODED orbit: minimum altitude (ENU) to hold -- safely above terrain, cannot descend into it. */
 constexpr f32 kOrbitAimGateM        = 2.0f;    /* vision aim-trim only when the nearest structure is within this of the locked range (else it is a different object -- ignore it). */
 constexpr f32 kOrbitCorrErrXGate    = 0.40f;   /* correct the centre only when the structure is within this |errX| (well-centred = it IS the building, not a spurious side object). */

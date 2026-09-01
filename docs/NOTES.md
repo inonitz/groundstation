@@ -2062,3 +2062,474 @@ search when it's right in front"; stopping the VLM from PLANNING a search at all
 RESIDUAL: a genuine search (target truly not visible) still advances at a fixed low ENU altitude with no
 terrain clearance -- rock-collision hazard remains for that case. Separate fix (terrain-relative search
 altitude / obstacle backstop) still owed.
+
+## fmu_node canned-plan removal: A1/A2/B tiering (2026-08-16, agent1)
+- **Decision:** the `--canned-*` scaffolding in fmu_node.hpp is bring-up/SITL regression test code,
+  never on the live VLM demo path (`cannedRun` is false in a real run). SITL is a no-go, so it is
+  being removed. Split by *coupling*, not by count, so each cut is verifiable and safe:
+- **A1 (DONE, build-verified):** the 10 self-contained plans -- voice, complete, plan, rotate,
+  land-flare, terrain-land, orbit, search, patrol, speed. Pure JSON -> translateToBaseCommands; touch
+  no live state, no controlLoop, no LOCKED APPROACH. Removed from fmu_node.hpp (defs + start() params
+  + dispatch + log) and fmu_node.cpp (decls + CLI parse + start() call). px4 build links clean.
+- **A2 (PENDING, coordinate):** cross, flood, cross-flood, outbound, battery-rth/landnow, boundary,
+  storm. These arm members the CONTROL LOOP reads (m_floodArmed @ the flood async, m_obstacleArmed
+  inside the emergency-boundary SAFETY block, m_batForce* in the battery inject). Production-dead, but
+  removing them edits inside controlLoop (LOCKED SEARCH/APPROACH region) -- do it with the owner.
+- **Bucket B (with the perception replacement):** approach / approach-real / approach-impact + the
+  no-YOLO rig (m_useCannedApproachRig, updateCannedApproachRig), the HARDCODED SAFE ORBIT (~L1334),
+  and the auto-land-the-instant-APPROACH-finishes (~L2273). These ARE the working demo and sit in the
+  LOCKED path -- they get *replaced* by the modular vision-servo, not blind-deleted.
+- **Dead now:** scripts/test/SITL/{forward,speed,rotate-land,land-flare,terrain-land,orbit,search} +
+  voice_unit.sh reference removed flags. Archive with the SITL harness.
+
+## fmu test harness rewrite: canned plans -> TestPlan enum + pure command map (2026-08-16, agent1)
+- **What:** the "--canned-*" scaffolding is no longer 20 bools threaded through start() + ~20 inject
+  methods inside FmuNode. Now: one `enum class TestPlan : i8` (None=-1=no test) in
+  test/fmu_test_plans.hpp, `parseTestPlan(argv)` there (lifted out of main), a single private
+  `runTestPlan(TestPlan)` switch in the node that arms the node-owned members (flood/obstacle/battery/
+  rig) + feeds the scripted JSON, and the scenario JSON as free functions in that same test header.
+  start() now takes ONE TestPlan argument.
+- **#5:** translateToBaseCommands no longer string-compares down an if/else chain. It calls the pure
+  `commandIdFromAction()` (command_id.hpp -- CommandID moved out of fmu_node.hpp) then switches on the
+  returned CommandID. Behaviour identical; px4 build compiles + links clean.
+- **Diagnosis (the point):** the canned plans were NEVER unit tests. Each needs the whole node + a
+  SITL sim to mean anything and asserts nothing in-process -- they are end-to-end scenario DATA. The
+  rewrite extracts the two genuinely pure pieces (commandIdFromAction, parseTestPlan) and puts a REAL
+  ROS-free unit test on them (test/fmu_translate_test.cpp, ALL PASS). The guidance/servo laws are
+  still welded to controlLoop with no unit coverage -- that is the next extraction, not done here.
+- **Archived (referenced removed flags):** scripts/archive/SITL/{forward,speed,rotate-land,land-flare,
+  terrain-land,orbit,search,battery,disarm-verify} + scripts/archive/voice_unit.sh.
+
+
+## DjiBackend: Linux backend for the DJI-over-Android-LAN app (2026-08-17, agent)
+- **What:** new CRTP sibling of PX4Backend/TelloBackend under source/llm_to_action/dji_backend/.
+  Talks to the recon-swarm Android app (or scripts/test/dji_mock/mock_apiserver.py) over the LAN:
+  WS /c/ws/sticks streams FlightParam{vx,vy,vz,yaw} (body m/s + yaw rate) at ~18 Hz (also the
+  keepalive); httplib GET /status/ @15 Hz -> Odometry; POST /c/takeoff|/c/land. ROS-free, two
+  std::thread loops, atomic telemetry -- same shape as TelloBackend.
+- **Files:** dji_backend_base.hpp (PURE: endpoints/rates/clamp + ENU->FlightParam map + serialise,
+  NO json so the FMU TU stays clean of nlohmann's -Werror noise), dji_status_parse.hpp (the nlohmann
+  /status parse, included ONLY by the .cpp + tests), dji_ws.hpp (opaque WS client API), dji_ws_raw.cpp,
+  dji_ws_wspp.cpp, dji_backend.hpp/.cpp. Wired: root CMake option GROUNDSTATION_BUILD_BACKEND_DJI
+  (mutual-exclusion now count-based over PX4/TELLO/DJI/ALL), fmu selection + link, active_backend.hpp
+  DJI arm, build.sh `dji`.
+- **TWO WS clients, both tested (user request):** RawWsClient (hand-rolled RFC6455 over a raw POSIX
+  socket -- DEFAULT, zero deps) and WsppWsClient (websocketpp + standalone Asio, opt-in via
+  -DGROUNDSTATION_DJI_WS_WEBSOCKETPP). Selected by a compile-time typedef (no virtual). Raw client:
+  handshake accept-key validation (inline SHA-1+base64), non-blocking connect+select timeout,
+  TCP_NODELAY, SO_SND/RCVTIMEO, alloc-free masked-frame hot path, inbound pump (auto-PONG, honours
+  CLOSE/EOF), clean reconnect. websocketpp offloads send to its io-thread (lower measured enqueue
+  latency) but allocates per message and reuses the endpoint poorly across reconnects.
+- **Verified against the live mock (standalone g++, no full CMake configure):** dji_convert_test OK;
+  head-to-head dji_ws_test raw+websocketpp both PASS (connect, stream 90 frames, mock position
+  advances ~4.9 m); dji_backend_mock_test PASS on BOTH WS configs (takeoff->FLIGHT, streamed +East
+  1 m/s -> odometry vel=(1,0,0) + dead-reckoned pos, land->STANDBY).
+- **UNCONFIRMED (isolated to one constant/spot each; flip after the app author/AircraftController.kt):**
+  (1) yaw-rate sign kDjiYawRateSign in dji_backend_base.hpp -- CW+ vs CCW+; the mock cannot confirm it
+  (its integrator ignores yaw). (2) velocity3D frame -- treated as ENU. (3) velocity envelope
+  kDjiMaxSpeedMps/kDjiMaxYawRateRadps -- conservative until the author gives the virtual-stick limits.
+- **Note vs stale docs:** mission-brief-2026-08-15 still says Agent-Backend is BENCHED and the platform
+  is an emulated-Android-in-Docker bridge; superseded by spec-dji-backend + dji-apiserver-review (the
+  teammate's Ktor app), which is what this backend targets. Video (H.264 over TCP) is still an
+  app-author dependency, not consumed here yet.
+
+
+## DjiBackend: recon-swarm source review vs the new camera commits (2026-08-17, agent)
+Cloned ExoSkeletons/DJI-android-sdk-v5-recon-swarm and read ApiServer.kt / AircraftController.kt /
+DJICamera.kt / SerializerUtils.kt directly. Findings:
+- **VIDEO = RTMP PUSH, not raw frames.** The only streaming route is `POST /c/stream/start`
+  {"rtmpUrl": "..."} + `/c/stream/stop` + `GET /c/stream/status`. DJICamera.startStream() builds
+  LiveStreamSettings(LiveStreamType.RTMP, StreamQuality.SD, bitrate AUTO) and calls
+  MediaDataCenter.liveStreamManager.startStream(). H.264 in RTMP/FLV, ~1-5 s latency, needs an ingest
+  server WE run. This is exactly the transport dji-apiserver-review.md Q1 said to AVOID (breaks the
+  <1 s see->act loop). The requested raw-H264-NAL-over-TCP frame path (ICameraStreamManager frame
+  listener -> socket) was NOT implemented. cameraStreamManager is used only for local surface render.
+  => decision for the manager before building a consumer: push the author for the TCP frame path, or
+  accept RTMP + ingest + latency. NOT building an RTMP mock/consumer speculatively.
+- **takeoff/land response bodies: STILL MISSING on the POST verbs.** `POST /c/takeoff` and
+  `POST /c/land` call controller.fly{takeoff()/land()} with NO call.respond(). Only the top-level
+  `GET /(fly|takeoff)` and `GET /land` (quickActionsRoute) respond ok(). Our DjiBackend POSTs
+  /c/takeoff|/c/land and checks status==200 -> against the REAL app that will not confirm. Fix: app
+  author adds call.respond(ok()) to the two POST handlers (1 line each), OR our client switches to the
+  responding GET /takeoff + GET /land. Manager's call (contract).
+- **No stick clamp app-side.** sendFlightParam buffers and flushes combined params at 18 Hz
+  (TRANSMISSION_FREQUENCY_HZ) straight to vSticks.sendStickParam -- no coerceIn on the raw path (the
+  coerceIn/maxVelocity clamps are only in the autonomous flyToSticks/lookAt/smoothVelocity helpers).
+  So OUR client-side clamp (kDjiMaxSpeedMps / kDjiMaxYawRateRadps) is load-bearing. Real envelope still
+  unknown (Q5 open).
+- **/status matches the protocol (confirmed from SerializerUtils.kt):** velocity3D={x,y,z};
+  attitude={pitch,roll,yaw}; position3D={latitude,longitude,altitude} (GPS -> invalid indoors, we
+  dead-reckon). Our parser + mock use velocity3D{x,y,z}+attitude.yaw correctly. The mock simplifies
+  position3D to {x,y,z}; real is lat/lon/alt -- harmless since we ignore GPS pos. FlightParam wire
+  fields {vx,vy,vz,yaw} confirmed against AircraftController.FlightParam(vy,vx,yaw,vz) kotlinx decode.
+- **NEW telemetry PUSH option:** `/c/ws/telemetry` WS streams {location,battery,velocity} (a different
+  shape, no attitude). Lower-latency alternative to polling /status/; not consumed yet.
+- **Tests hardened per manager:** dji_convert_test now covers real+mock+fuzz /status shapes, a
+  rotation-norm frame invariant, clamp boundaries, and the wire field contract. dji_backend_mock_test
+  is now a soak: 30 s / ~540 WS frames / ~450 polls, invariants checked every 500 ms -> 0 send-fail,
+  0 poll-miss, telemetry fresh 59/59 (max 66 ms), dead-reckon 29.96 m. All PASS vs the mock.
+
+
+## DjiBackend: telemetry-confirmed takeoff/land (2026-08-17, agent)
+- **Why:** the app's POST /c/takeoff|/c/land send no response body (author omitted call.respond()), so
+  trusting the HTTP ACK would misreport verbs against the real drone. Fix: takeoff/land now FIRE the
+  POST (ACK is a best-effort fast path) then confirm the physical state from telemetry
+  `aircraft.isFlying` (new atomic m_isFlying + confirmFlying(want,timeoutMs)). Drone state is the
+  authority, not an HTTP reply -- the correct pattern regardless of the missing body.
+- **Proof:** mock gained MOCK_SILENT_VERBS mode (POST verbs -> 204, no body = faithful to the app).
+  10 s soak PASSES in BOTH modes: normal (ACK) and silent (204) -> takeoff OK/FLIGHT, land OK/STANDBY,
+  0 send-fail, 0 poll-miss, telemetry fresh, dead-reckon 10 m. Manager feedback logged in
+  dji-apiserver-review.md: POST verbs must respond; the GET /takeoff|/land verbs should be removed
+  (GET fetches state, never performs an action). Video decision: SHIP CONTROL-ONLY now; video parked
+  pending the raw-H.264-over-TCP path from the author (RTMP is unusable for the <1 s loop).
+
+
+## DjiBackend: video transport CONFIRMED + Linux consumer proven (2026-08-18, agent)
+The app dev pushed the raw-frame path we asked for (commits e92cf56 response, 2669183 tcp frame
+stream, 95b7db3 update client, eff6ab6 tts route). Reviewed the actual Kotlin:
+- **Video transport (frozen):** raw TCP. The phone LISTENS on DEFAULT_STREAM_PORT = **5600**
+  (ApiServerService.kt), auto-started with the service (no start/stop route). Linux connects IN and
+  reads a **raw H.264/H.265 Annex-B elementary stream**, written verbatim by VideoTcpServer.kt
+  (`out.write(data, offset, length)` in the ICameraStreamManager.ReceiveStreamListener) -- NO framing,
+  NO length prefix. Codec is logged once via `info.mimeType` (Mini 4 Pro likely H.265). ONE client at
+  a time; TCP_NODELAY + keepAlive.
+- **takeoff/land now RESPOND** (e92cf56): `call.respond(status{"taking off"/"landing"})` ->
+  {ok:true,status:...} 200. Our telemetry-confirm (isFlying) is now a safety net; the fast ACK path
+  works too. /c/stop also responds.
+- **/tts route is intentional** (per manager): perception feeds "what it sees/understands" to the
+  phone's TTS so the drone speaks it in the demo. Future Linux->phone integration: POST /tts.
+- **Video mock added:** scripts/test/dji_mock/video_tcp_mock.py -- mirrors VideoTcpServer (TCP server
+  on 5600, one client, streams a looped raw Annex-B clip, real-time paced). Make clips with gst:
+  `videotestsrc ! x264enc ! video/x-h264,stream-format=byte-stream ! filesink` (x265enc for H.265).
+- **Consumer proven end-to-end (Linux):** `gst tcpclientsrc host=<ip> port=5600 ! decodebin !
+  videoconvert ! appsink`. decodebin is codec-agnostic -> decoded BOTH H.264 (227 frames) and H.265
+  (224 frames) over TCP from the mock, same pipeline. GStreamer 1.24 + libav decoders present; gst +
+  gst-app dev libs present (a C++ appsink consumer can be built standalone). Key gotcha: DJI emits
+  Annex-B byte-stream; a clip must be byte-stream (not AVC) or h264parse says "no valid frames".
+- **Next:** ROS-free C++ gst appsink receiver (model source/llm_to_action/gstreamer_udp_cam_rx/
+  rx_node.cpp, but tcpclientsrc + decodebin, no ROS) that hands perception BGR frames.
+
+
+## Camera receiver: one node, backend-selected pipeline + DJI TCP path (2026-08-18, agent)
+Per manager (KISS/DRY, don't duplicate): extended the existing receiver
+(source/llm_to_action/gstreamer_udp_cam_rx/rx_node.cpp) instead of forking a new one.
+- **bool -> enum:** `GstReceiverNode(bool bUseTelloPipeline)` is now
+  `GstReceiverNode(BackendType backend, std::string djiHost)`; the canonical `enum class
+  BackendType { PX4, TELLO, DJI }` lives in generic_backend_types.hpp (the shared backend-types
+  header, next to IOState/BackendStatus/Odometry -- NOT a camera-local header). main() parses `--tello` / `--dji [host]` / default PX4.
+- **DRY:** only the SOURCE+DECODE prefix differs by backend (a one-time init switch); the
+  `videoconvert ! BGR ! appsink` tail, the appsink->sensor_msgs/Image poll (PollSampleCb), and the
+  bus poll are shared. DJI prefix = `tcpclientsrc host=<ip> port=kDjiVideoPort(5600) ! decodebin`
+  (decodebin auto-selects H.264 vs H.265, so the node needn't be told the codec).
+- **Perception untouched:** it already subscribes to the `camera/stream` Image topic and knows
+  nothing of gst internals (fmu_node.hpp / perception_runtime.hpp use only rx_node_base.hpp types).
+- **No templates:** the backend only picks the prefix STRING at init; the per-frame path is identical
+  and gst_parse_launch builds the graph from a string at runtime anyway -- a compile-time
+  specialisation would remove one init switch for zero runtime gain. Documented in-code.
+- **kDjiVideoPort = 5600** added to dji_backend_base.hpp (the DJI wire source of truth, mirroring
+  kTelloVideoPort). Header-only; no new link deps for the rx target.
+- **Verified:** the exact DJI pipeline (tcpclientsrc ! decodebin ! videoconvert ! video/x-raw,
+  format=BGR) decoded 197 BGR frames over TCP from scripts/test/dji_mock/video_tcp_mock.py. The ROS
+  node compiles under the full ROS build (not runnable standalone here).
+- **RENAME PENDING (coordinate):** manager wants gstreamer_udp_cam_rx -> gstreamer_cam_rx. Deferred:
+  it edits fmu_node.hpp:28 + perception_runtime.hpp:43 (include paths) AND the UDP-prefixed shared
+  names (UDPCamMsgType / kOutUDPCameraRawFrameTopic) the FMU uses -- collides with the in-flight
+  fmu_node refactor. Do it once that lands.
+
+
+## HANDOFF to the fmu-refactor (manager) agent (2026-08-18)
+Renamed the shared camera-frame names across the receiver AND the two FMU files you own, as
+directed. Pure token substitution -- no logic touched. RECONCILE with your in-flight fmu_node work:
+- **New names** (rx_node_base.hpp): UDPCamMsgType -> **CameraPipelineMsgType** (+ h/kh variants);
+  kOutUDPCameraRawFrameTopic -> **kOutCameraPipelineRawFrameTopic**; kOutUDPCameraGstSinkName ->
+  **kOutCameraPipelineGstSinkName**; kOutUDPCameraRawFrameID -> **kOutCameraPipelineRawFrameID**.
+  Topic string value is unchanged ("camera/stream").
+- **Files I edited that are yours:** fmu_node.hpp (lines ~28, 256-257, 369, 1496, 2407, 2659, 2696 --
+  8 type + 1 const token) and perception_runtime.hpp (~43, 52, 188, 212, 350 -- 5 type tokens). If you
+  have uncommitted fmu_node changes, the tokens may have moved; the rename is mechanical, re-apply the
+  two substitutions after your merge.
+- **Also this session (mine, no overlap with fmu logic):** DJI backend complete (control + telemetry,
+  two WS clients, telemetry-confirmed takeoff/land); video path proven (dev shipped raw H.264/H.265
+  over TCP:5600; Linux decodes via tcpclientsrc!decodebin); the camera receiver now takes
+  `enum class BackendType` (in generic_backend_types.hpp; was a bool) and gained the DJI TCP pipeline.
+- **STILL PENDING (needs us to coordinate):** the directory rename gstreamer_udp_cam_rx ->
+  gstreamer_cam_rx. It changes the #include path in fmu_node.hpp:28 + perception_runtime.hpp:43. Do it
+  once your fmu refactor lands so we don't clobber each other.
+
+- 2026-08-18 -- Thursday gate demo = new standalone module `source/llm_cv_scene/` (Python +
+  OpenCV, isolated from the C++ `llm_to_action` tree on purpose). Architecture: fast eyes +
+  slow brain. YOLOE (real-time, per-frame) draws always-on background detections and, on
+  demand, highlights a phrase; SAM2 optionally turns that box into a tracked mask. Qwen3-VL-4B
+  (GGUF on the repo's llama-server) is the on-demand brain: sees frame + detections + the
+  spoken question, answers in natural language, and names what to highlight. faster-whisper
+  push-to-talk. Four colour-coded overlays (grey background / green YOLOE / magenta SAM2 /
+  amber VLM box) so detector-grounding vs VLM-grounding is visible side by side. Depth is NOT
+  used here (metric depth is a flight-pipeline concern; its SITL flip-flop is structural --
+  per-frame + per-frame normalization -- fix later with temporal consistency + a metric model).
+
+- 2026-08-18 -- DJI end-to-end bring-up PREP (spec-dji-endtoend-bringup.md, Tasks A/B/C). Hardware
+  not on the bench yet, so I built the parts that make bench time fast, all validated against the mock:
+  - **Latency probe** `dji_backend/test/dji_latency_probe.cpp` (CMake target `dji_latency_probe`).
+    Drives the REAL DjiBackend against any host:port; measures **command->action** (t0 = step
+    setpoint emitted; t1 = velocity3D crosses a threshold in the next fresh telemetry sample -- both
+    Linux steady_clock, single clock, no cross-machine sync). Steps in BODY forward and watches the
+    velocity MAGNITUDE, so it's frame-agnostic (survives the unconfirmed velocity3D frame). Also
+    reports telemetry GET round-trip. Retargets to the phone by changing host:port.
+  - **Telemetry RTT timer** added to the backend: `m_statusRttUs` set in statusLoop around the GET,
+    read via `statusRttUs()`. Diagnostics only, off the control path.
+  - **Runbook** `docs/active/dji-bringup-runbook.md`: ordered A/B/C bench procedure, exact commands
+    (phone build + tunnel-off grep, curl /status, standalone g++ line, probe, ws_latency.py, video
+    decode line), and the empty latency table to fill.
+  - Mock floor (localhost, no drone dynamics): command->action ~67 ms (= the 15 Hz poll granularity),
+    telemetry RTT ~1 ms. The real link adds WiFi + rotor spin-up.
+  - The three latency legs already had tooling: WiFi baseline = `ws_latency.py` (WS echo at command
+    cadence); video glass->Linux = film a ms clock. Only command->action was missing a harness -- now built.
+  - Verified via standalone g++ (full tree needs ROS/PX4); clean compile, probe OK against the mock.
+    No git writes -- suggest a commit to the human.
+
+## 2026-08-19 — llm_cv_scene highlight rebuild: YOLOE -> LLMDet open-vocab grounder
+- Highlight backend swapped from YOLOE-26 (bounded-vocab, MobileCLIP text encoder) to an open-vocab
+  PHRASE grounder: **LLMDet-tiny**, loaded via the transformers **MM-Grounding-DINO** implementation.
+  Both `iSEE-Laboratory/llmdet_*` and `openmmlab-community/mm_grounding_dino_*` checkpoints report
+  `model_type=mm-grounding-dino`, so `AutoModelForZeroShotObjectDetection` loads LLMDet on stable
+  transformers >=5.15 — no git-main, no dedicated `llmdet` module needed.
+- Why LLMDet: on-box benchmark (8 images, 27 esoteric/small/referring prompts, AMD ROCm) hard-hit
+  rate **LLMDet 96% vs MM-GDINO 89% vs YOLOE 41%**; LLMDet uniquely found `backpack` + `ear cushion`.
+  Matches published LVIS rare-class AP (APr): LLMDet 44.7 > MM-GDINO 34.2 > orig GDINO ~low-20s.
+- Vendor-neutral: the grounder's multi-scale deformable attention uses transformers' pure-PyTorch
+  fallback (no CUDA-only custom op), so the SAME code runs on ROCm/CUDA/CPU. Verified on ROCm 6.4.
+- DINO-X / Grounding DINO 1.6 Pro rejected: cloud-API-only, would need internet at show time.
+- Highlight now routes through Qwen3-VL: `vlm.py` resolves the referent to a groundable noun phrase;
+  `app.py` lets that refine the deterministic regex target. Background stays fast YOLO26-seg; SAM2
+  mask retained. Thresholds box=0.25/text=0.25, HIGHLIGHT_HZ=2 (grounder ~438 ms warm on ROCm).
+- Cold-start: first ROCm/MIOpen kernel compile is slow; front-loaded by a startup warmup +
+  `MIOPEN_FIND_MODE=2`. LLMDet weights pre-baked into the Docker image for a fully OFFLINE demo.
+
+## 2026-08-20 — llm_cv_track: voice-driven tracked highlighting (follow.py)
+- **follow.py** fuses VLM referent-resolution + BoT-SORT: voice/command -> Qwen3-VL resolves the
+  referent ONCE on a frozen snapshot -> IoU-match to a track ID on that same frame -> BoT-SORT follows
+  the ID live. Reuses llm_cv_scene vlm.py/ears.py (frozen). track.py stays as the pure-tracker playground.
+- **Re-ID is a color histogram, NOT OSNet (the OSNet problem).** Ultralytics BoT-SORT Re-ID is
+  proximity-gated (`emb_dists[iou_dist > 1-proximity_thresh] = 1.0` in bot_sort.py get_dists): appearance
+  only rescues spatially-overlapping boxes, so a target that leaves frame + returns elsewhere gets a NEW
+  id (Kalman box drifts off-screen -> ~0 IoU -> appearance never consulted). Bumping track_buffer /
+  with_reid does NOT fix this. Our fix: an HSV hue-sat histogram fingerprint + re-acquisition ABOVE the
+  tracker (follow.py `_hist`/`_reacquire`), independent of the tracker's re-id.
+  - **Limitation:** distinguishes by clothing COLOUR only -> two people in similar colours can be
+    swapped. Fine for single-subject / distinctive clothing; weak in a same-colour crowd.
+  - **Upgrade path (post-gate):** OSNet appearance embedding (~2.2M params, pure-torch/ROCm-safe) as the
+    fingerprint instead of the colour hist, or a proper re-id model wired into the tracker. Adds a dep +
+    a small per-crop inference. Do this only if same-colour confusion shows up live.
+- **Phase 2 detector feel-test (2026-08-20).** Apache open-vocab **OmDet-Turbo** (transformers, needs
+  timm) finds the esoteric/referring objects YOLOE(AGPL) missed (mic 0.61, headphones 0.67, guitar case
+  0.31, "the man on the left" 0.76), ~115ms/ROCm, no hallucination -> the YOLOE replacement. **D-FINE**
+  (Apache, transformers) = fast closed-set COCO/person (~60ms) -> YOLO26 replacement. The human's named
+  models **OV-DEIM** and **D-FINE-seg** are real+Apache but standalone repo clones -> deferred (OmDet
+  covers open-vocab already). Full AGPL escape still needs a permissive TRACKER (ultralytics .track is
+  AGPL). See docs/active/2026-08-20-phase2-detector-feeltest.md.
+- **llm_cv_track re-oriented (2026-08-20).** Its PURPOSE = llm_cv_scene's voice loop with the highlight
+  swapped to a proper real-time open-vocab detector -> clean SAM2.1 masks (fixing YOLOE/LLMDet's esoteric
+  failures + bad masks). Priority #1 = detection+seg+masking; specific-object TRACKING is priority #2.
+  - **highlight_seg.py (NEW) = priority #1.** Voice "highlight the guitar case" -> OmDet-Turbo (open-vocab,
+    ~150ms) detects it every frame (box follows) -> SAM2.1 masks it. "what do you see" -> Qwen3-VL. Reuses
+    frozen vlm.py/ears.py/eyes.py. Tracking-by-detection gives a following highlight WITHOUT a re-id tracker.
+  - **follow.py = priority #2, PARKED.** BoT-SORT + colour-hist re-id: fragile (locks onto the wrong person
+    when 2 are in FOV; IDs churn on exit/entry). Not gate-ready; needs OSNet for real person re-id. Revisit
+    after detect+seg+mask is solid.
+- **Gate passed (2026-08-20) -> Demo Day next.** The star (scene_omdet, OmDet->SAM2) + backup
+  (llm_cv_scene, VLM->SAM2) both work. See source/llm_cv_track/README.md and docs/active/2026-08-20-*.
+- **OmDet offline load FIXED (was hanging on HF).** OmDet-Turbo resolved its Swin backbone from the HF
+  Hub every load -> hung under rate-limiting; pure offline failed because transformers resolves the null
+  `backbone_config` via an HF API call. Fix: vendored /root/models/omdet-turbo-swin-tiny (copied
+  checkpoint + a config.json with backbone_config baked in via OmDetTurboConfig.save_pretrained,
+  use_pretrained_backbone=False); highlight_seg.OmDet loads it with HF_HUB_OFFLINE=1 + local_files_only
+  + monkeypatched timm.create_model(pretrained=False). Result: ~1s load, zero network. Rebuild steps in
+  the README. Also fixed this session: VLM off the ASR thread (no voice bottleneck), vlm.ask not
+  vlm.analyze for Q&A (no JSON repetition garbage), os._exit(0) clean exit (no core dump/exit-144),
+  tmux teardown on quit, ASR_CAPTUREID=5 (dead MOTU default mic).
+
+## 2026-08-21 — DjiBackend yaw units/sign confirmed + fixed (risk #2 closed)
+- Confirmed against ExoSkeletons `DJIVirtualStick.build()`: FlightParam.yaw feeds
+  `VirtualStickFlightControlParam.yaw` under `YawControlMode.ANGULAR_VELOCITY` = **deg/s**
+  (SDK `VirtualStickRange.YAW_CONTROL_MAX_ANGULAR_VELOCITY = ±100`). vx/vy/vz stay m/s (VELOCITY/BODY).
+- Sign: DJI positive yaw = **CW** (heading increases) — from `AircraftController.spinBy/flyCircle`
+  (`yaw = vel * clockwiseSign`, loop converges as `attitude.yaw` rises). Our interface is ENU **CCW+**.
+- Fix in `dji_backend_base.hpp`: interface stays rad/s; at the wire boundary multiply by `kRadToDeg`,
+  negate (`kDjiYawRateSign = -1.0`), clamp to `kDjiMaxYawRateDegps = 100`. Old `kDjiMaxYawRateRadps` gone.
+- `dji_convert_test` updated to the deg/s+sign truth; still bench-verify the physical turn direction
+  props-off once before trusting in-flight yaw. Mock floor unchanged: cmd→action ~66ms, telem RTT ~0.4ms.
+
+## 2026-08-21 — drone bootstrapped; container-adb + isolated-server gotchas
+- Full stack live: DJI drone flies, MSDK Aircraft app built from source + installed on GrapheneOS.
+  Start the API server from the standalone **"API Server"** list entry, NOT "Recon Swarm (Fragmented)"
+  (the latter bundles TTS+Qwen which crash and block server start).
+- Container adb: `/dev/bus/usb` is a static snapshot; phone re-enumeration orphans the node. Fix with
+  `exoskeletons/tools/adbfix.sh` (recreate node + restart adb). See 2026-08-21-drone-bringup-status-and-next.md.
+
+## 2026-08-22 — real-drone field behavior + comms assessment (indoor/outdoor)
+- **Indoor (uniform house, no GPS, weak VPS):** auto-takeoff tops out ~0.3 m (not the ~1.2 m
+  default); FC REFUSES horizontal + vertical stick motion because VPS can't lock features.
+  Yaw/rotate always works; vertical only creeps ~0.5 cm/s. This is DJI VPS-denial safety, NOT a
+  comms fault — the commands arrive, the FC declines to move.
+- **Outdoor (SLAM features present):** all sticks nominal, no drift, responsive.
+- **Comms VERIFIED:** workstation->drone command channel + discrete verbs (/c/takeoff, /c/land,
+  /c/stop) round-trip on the real link; transport latency p95 24 ms (WS) / 47 ms (telemetry) at
+  1.5 m point-blank (docs/active/latency-2026-08-22).
+- **Comms DEFERRED / UNVERIFIED:** continuous velocity control via /c/ws/sticks @18 Hz end-to-end
+  through OUR software, and command->action latency (leg 4). Need an OUTDOOR session with the field
+  unit (new laptop). Do NOT mark comms "fully validated".
+- **Decision:** proceed on the workstation with feature-total-integration simple mode against the
+  mock; the only change when the field unit returns is pointing at the phone IP.
+- **API gap noted:** /status/ has NO height/altitude field and position3D is null indoors, so the
+  workstation cannot observe altitude over HTTP; any closed-loop height control must use on-phone
+  ac.height (e.g. AircraftController.ascendTo).
+
+- Perception voice-out = the PHONE owns TTS. `llm_cv_scene` POSTs the VLM answer to the app's
+  `POST /tts` ({text, lang, rate}); the phone speaks via Android TextToSpeech (TTSManager). The
+  workstation never synthesizes -- espeak/piper in `voice.py` is desk-debug only. TTS host is the
+  SAME phone as the video (derived from `host=` in `SCENE_INPUT`). Keeps LLM/perception fully out
+  of the flight-control path.
+
+## MVD integration — voice → 4-tier router → drone + perception on live video (2026-08-24)
+
+The committed MVD (per `docs/integration-mvd-2026-08-24.md` + `demo-roadmap-2026-08-28.md`).
+All code now consolidated in **`source/integration/`** (was scattered across `llm_cv_track`,
+`llm_cv_scene`, `integration`). Python talks straight to the frozen ApiServer wire — the C++ FMU
+engine is NOT in the loop.
+
+### Architecture (the destination vs the MVD)
+- **`fmu_node` (C++ llm_to_action) is the DESTINATION product, NOT the MVD.** The MVD router is
+  thin Python hitting the ApiServer directly. Do not try to run/build the FMU for the MVD.
+- Data flow:
+  ```
+  H key (keyboard_hook) · asr_server (Parakeet → /asr_server/transcribe)
+      └ ears.py → router.py (4-tier) → dji_wire.py → phone ApiServer :8080
+                       └ COMPLEX → scene_omdet (OmDet+SAM2+Qwen VLM) → answer/highlight
+  video: llm_to_action_gstreamer_rx --dji → ROS2 topic camera/stream → camera_stream.py → scene_omdet
+  ```
+- 4 tiers, fixed order: EMERGENCY > OVERRIDE/RESUME > BASIC(regex verb) > COMPLEX(perception).
+  Regex ported verbatim from the Android app `strings.xml`. LLM never drives motion.
+
+### TESTED / successful
+- **Router → wire → mock: GREEN.** All basic verbs, emergency (`stop/halt/abort/...`), override→manual
+  (basic verbs swallowed), resume→auto, WS `/c/ws/sticks` dispatch — all verified against
+  `scripts/test/dji_mock/mock_apiserver.py`.
+- Consolidation into `integration/` compiles; router uses dual-mode imports (works as a package and
+  flat via `python3 scene_omdet.py`).
+- Transport latency (2026-08-22): WS p95 24 ms, telemetry p95 47 ms, zero loss.
+
+### NOT tested / open (do not claim these work)
+- **`camera_stream.py` compiles but is NOT runtime-tested** against a live `gstreamer_rx` + drone.
+  bgr8 stride reshape matches rx_node's output encoding but needs one real-frame smoke test.
+- **Never run end-to-end on the real drone.** Deferred (drone was indoors; VPS refuses lateral/vertical).
+- Video into perception on the real link (roadmap open-question #2): now wired, not proven live.
+
+### Key findings verified this session (avoid re-litigating)
+- **`POST /c/stop` = `FlightControllerKey.KeyEmergencyStop`** (via `controller.stop(emergency=true)`,
+  `DJIAircraft.stop`), NOT a hover-brake. It is the SDK motor-kill. In-air outcome is gated by the
+  aircraft's `FCUrgentStopMotorMode` (IN_OUT_ALWAYS → motors cut, drone falls; NEVER → refused in air).
+  `.action()` is fire-and-forget (no ack). The `dji_wire.py` docstring calling it "relinquish/hover"
+  is WRONG. Our voice "stop" AND "manual" both fire it — a soft-handoff for "manual" is a real bug.
+  Surest kill remains the phone API-server toggle + power button (CLAUDE.md).
+- **Phone `VideoTcpServer` serves exactly ONE TCP client** — a new connection closes the previous
+  ("Replace and close any previous client"). Two consumers on `:5600` (e.g. `gstreamer_rx` +
+  scene_omdet's own `tcpclientsrc`) thrash and starve each other. Fix: rx_node is the SOLE `:5600`
+  client → publishes `camera/stream`; perception subscribes (`SCENE_INPUT=ros`). This was the cause
+  of the "waiting for tcpclientsrc" hang.
+- **Phone IP = WiFi default gateway** (hotspot). A second default route (ethernet) shadows the
+  `ip route` auto-fetch; pass explicit `PHONE_IP=` when both are up. IP changes per phone (was
+  10.222.215.92, was 10.200.2.63 on a different handset).
+- **Yaw units = deg/s** (app `DJIVirtualStick`); the C++ backend's rad/s was ~57× too slow. Sign
+  (CW+/CCW+) still unconfirmed — never command real yaw until settled.
+
+### Lessons for the next agent (unsuccessful attempts, so you skip them)
+- Do NOT chase `fmu_node`/`llm_to_action` C++ for the MVD — it's the destination, not the demo.
+- Do NOT propose webcam when the ask is drone footage; the MVD shows the DRONE camera.
+- READ `docs/integration-mvd-2026-08-24.md` + `final-objective-context.md` FIRST; they answer the
+  architecture unambiguously.
+
+### 2026-08-25 — MVD integration COMPLETE (voice -> router -> DJI + smart CV)
+Full detail + command table + backend tasks: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+The `source/integration/` MVD is DONE and considered effective. It is SELF-CONTAINED (no
+llm_cv_scene/llm_cv_track traces). Shipped this session:
+- 4-tier deterministic router (EMERGENCY>OVERRIDE/RESUME>BASIC>COMPLEX); expanded verbs — spin, scan
+  (orbit OUTWARDS) / search (INWARDS), track/follow/come_home (phone-GPS), gimbal look forward/down/up
+  (0/-60/+30), wave (hello/how-are-you), directionals -> native `fly_by` (POST /c/fly), a `go <unknown>`
+  no-op guard. Full `dji_wire.py` REST client (all `/c/fly` actions, /key, /tts, /status).
+- Phone ASR channel `phone_ears.py` matched to the app's real contract (POST /input + raw-TCP JSON on
+  laptop :8080, dedupe, receipt logging). TTS `voice.py` -> phone /tts + laptop espeak (LONG/SHORT split;
+  screen shows Scene:+Spoken:; speaks only SHORT). Verbose `[dji]`/`[phone_ears]`/`[voice]` logging.
+
+### Key findings verified this session (avoid re-litigating)
+- **`controller.fly{}` cancels the previous flight job AND `takeControl()`s.** So a new `/c/fly` mission
+  preempts the running one -> our **`stop` = `POST /c/fly [{delay:0}]` (`halt()`)** stops motion AND keeps
+  our stick control. `stop` no longer fires `/c/stop` and no longer latches manual (that latch was the
+  "can't control after stop" bug). `manual` = RC handoff (`/c/stop`), `resume` = pop.
+- **Gimbal sign:** `pitchCamera(-90)`=ground -> negative=down, 0=forward, +=up. Our `gimbal_pitch` JSON
+  matches the DTO, but **gimbal is broken BACKEND-SIDE** (no angle responds except "look forward" from a
+  fully-down gimbal). `fly_by` works.
+- **`CircleFaceMode`** serializes by name: `"INWARDS"|"OUTWARDS"|"TANGENT"` (lenient JSON).
+- **VLM port moved `:8090` -> `:18090`** — VS Code holds `:8090`; the earlier "GPU-wedged, reboot"
+  conclusion was WRONG (plain port collision, diagnosed from container-side `ss` which showed no owner).
+- **OmDet offline:** transformers 5.15 `backbone_utils` -> `HfApi.repo_exists(swin...)` hits the hub;
+  no internet on the hotspot -> reset/raise uncaught -> OmDet dies. Fix: `highlight_seg.py` wraps
+  `repo_exists` fail-safe to False -> timm builds the backbone offline; `run_mvd.sh` exports
+  `HF_HUB_OFFLINE=1`.
+- **Executor starvation:** `Ears` (`rclpy.spin`) and `CameraStream` (`spin_once`) fought the global
+  rclpy executor; with ASR on, CameraStream starved -> "waiting for video" despite a live topic. Each
+  now owns a `SingleThreadedExecutor`. (`--no-ears` masked it.)
+- **VLM `-np 1`** — concurrent `/c/fly` VLM images overflowed the unified KV pool and segfaulted the
+  mtmd decode. asusctl Quiet was only the trigger (GPU throttle -> requests overlapped).
+
+### Lessons for the next agent (so you skip them)
+- **CONTAINER ISOLATION:** the assistant's `pgrep`/`ss`/`tmux` view can be ISOLATED from the host's
+  running processes. Do NOT conclude "app not running / port dead" from container-side checks — verify
+  on the host. This burned a whole diagnosis ("phone_ears down" was false; the app was up on the host).
+- Single `:5600` client on the phone `VideoTcpServer` — gst_rx must be the SOLE consumer; two thrash.
+- Phone target for ASR must be the laptop's gateway IP (the app's `// fixme "0.0.0.0"`), or nothing arrives.
+
+## 2026-08-26 — desk session: FMU build fix, hardware reality, doc corrections (manager agent)
+Measured this session; corrections + new facts for the record. Demo is **Thu 2026-08-27 16:00**
+(on-site 10:00-12:00), NOT 2026-08-28 — every doc + the filename `demo-roadmap-2026-08-28.md` say
+28th; that is wrong. Filenames left as-is (human owns git); dates corrected in-content where load-bearing.
+
+- **FMU (`llm_to_action`) was never broken — it just never built.** `fmu/CMakeLists.txt` backend
+  selector had branches for PX4 and TELLO and NONE for DJI, so `FMU_SELECTED_BACKENDS` came back empty
+  and the executable target was never created (`./build.sh release shared dji build` exits 0 having built
+  nothing). +2 lines (a `dji` elseif) -> `llm_to_action_fmu_dji` links in 38s, 0 errors. It RUNS: 20 Hz
+  loop, loads yolo26n seg+depth ONNX, attempts `ws://.../c/ws/sticks`, blocks at "waiting for first camera
+  frame" (correct with no camera fed). Runtime needs `LD_LIBRARY_PATH=.../_deps/onnxruntime/.../lib`.
+  SAFETY: this binary holds virtual-stick authority -> human-only vs any real phone IP.
+- **C++ `dji_backend` is BEHIND the Python `dji_wire.py`:** it implements only takeoff/land/stop/sticks
+  (+ "safe stop = land", no motor-kill). It has NONE of the 10 `/c/fly` mission verbs the Python wire has
+  (fly_by, spin_by, scan_ground, track_me, follow_me, home, gimbal_pitch, wave, look_at, delay). The two
+  control paths are NOT equivalent today.
+- **Hardware: this machine is NVIDIA RTX 5070 Laptop, torch 2.11.0+cu128, CUDA 12.8** (NOT ROCm). The
+  `config.py:22` "NO NVIDIA / ROCm" comment was stale -> corrected. FMU ONNX seg+depth run on **CPU by
+  design** (keep them off the GPU so they don't starve the VLM) -- do not "fix" to GPU without proving it
+  doesn't cut VLM inference.
+- **Drone is a DJI Mini 4 Pro.** Indoor flight IS possible where there is enough space AND VPS locks
+  (flown inside a classroom successfully); it degrades only when VPS can't lock (uniform/low-feature/low-light).
+  So the demo verb set depends on VPS lock at the venue, not on indoor-vs-outdoor per se.
+- **Phone ASR runs an ON-DEVICE model** (the app downloads the ASR model; transcription is LOCAL, not
+  cloud). This SATISFIES the challenge's local/no-cloud constraint. The only residual is Android/Google
+  telemetry (a privacy concern for the operator), NOT the ASR path itself. Laptop Parakeet is likewise
+  local. [Correction: an earlier note in this block called the phone path "cloud ASR" -- that was wrong.]
+- **Router test count is 7, not 11** (`test_router.py`: 7 functions, all pass). Corrected in handoff + ROADMAP.
+- **`SCENE_HL_BACKEND` defaults to `vlm`** (Qwen3-VL grounds referent + SAM2 mask), not omdet, despite the
+  handoff calling scene_omdet+OmDet "THE app."
+- **RoboMaster S1: SDK ships DISABLED**; needs community unlock (firmware-gated). Field kit written to
+  `source/robomaster/` (probe/text/video scripts + runbook + pre-purchase checklist). Acquisition PAUSED
+  (seller asked to hold). EP/EP Core have the SDK out of the box.
+- Handoff §12 "uncommitted files" list is now STALE — that tree is clean; all committed in fdbea61 + 1a972b2.
+- **The MVD is ROS2-NATIVE -> the demo machine MUST have ROS2 (`/opt/ros/jazzy`).** Verified 2026-08-26:
+  `integration/{camera_stream,ears,video_doctor,video_watchdog}.py` call rclpy directly; `scene_omdet.py`
+  imports `ears`; `run_mvd.sh` sources ROS + runs 3 compiled ROS2 nodes (asr_server, keyboard_hook,
+  gstreamer_rx); the drone video path is `SCENE_INPUT=ros` (gstreamer_rx -> `camera/stream` -> CameraStream).
+  **The DEMO-DAY LAPTOP (this machine: RTX 5070, `/opt/ros/jazzy` present) runs the MVD** and is the box
+  going to the venue -- ROS2 is there, so this is settled (no venue-machine risk). A separate Linux Mint box
+  lacks ROS2 and is NOT the demo machine; irrelevant.
+
+- 2026-08-27: Laptop TTS for final demo lives in `source/integration_tts/` (fork of integration/, original untouched). Voice-out was already built (voice.py speaks the VLM short answer via phone /tts); the fork adds a working laptop engine: piper (en_US-lessac-medium, /root/models/tts/) preferred, espeak-ng fallback. `SCENE_TTS=both` (default) = phone + laptop; `piper`/`espeak` force laptop-only. Engines installed machine-wide (apt espeak-ng, piper bin+voice downloaded).
+
+- 2026-08-30: Full cleanup/takeover audit performed (5 parallel archeology sweeps: docs, C++, Python forks, scripts, transcripts). All open points aggregated with evidence into docs/active/2026-08-30-cleanup-takeover-audit.md (ID-tagged for priority markup). Headline ground truths: runtime drone-config EXISTS (scheduled doc stale); drone_config.hpp approach-speed default diverges from constexpr (80 vs 120 — real bug); CURVE/re-assess taught to LLM but silently dropped; repo backup from Aug-28 never completed; fresh clone non-functional (*.pt ignored, TTS unscripted, README quickstart dead).

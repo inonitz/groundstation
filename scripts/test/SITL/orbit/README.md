@@ -9,7 +9,7 @@ point, so the flight path never reacts to the jittery depth and cannot oscillate
 separately (a gentle image-centering) to keep the real car in view, and if the center estimate was a
 bit off, that camera tracking still keeps the car framed.
 
-- **Canned plan flag:** `--canned-orbit` (takeoff -> orbit car, 360 deg, ccw, 30 cm/s -> land)
+- **Scenario flag:** `--scenario-orbit` (takeoff -> orbit car, 360 deg, ccw, 30 cm/s -> land)
 - **World:** `default_car`   **Spawn:** `0,6,3`
 - **Filter:** milestone digest — PASS = `ORBIT center locked ...` then `ORBIT complete ... orbit_ok`.
 

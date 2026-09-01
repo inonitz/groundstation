@@ -9,7 +9,7 @@
 >
 > **Scope:** `FlightManagementUnitNode` (`source/llm_to_action/fmu/`) — high-level VLM
 > planner + deterministic 20 Hz control loop, plus an in-process offboard translator (§7).
-> Primary target = **DJI Tello**; PX4 SITL is a simulation fallback.
+> Primary target = **DJI drone** (Tello DROPPED 2026; video via DJI Fly Custom RTMP); PX4 SITL for flight-core dev. NOTE (2026-08-20): the gate/Demo-Day demo is the STANDALONE **perception stack** (see the 'Perception stack' section at the end + source/llm_cv_track/README.md) — a parallel subsystem to this FMU, which is currently DEFERRED. See docs/ROADMAP.md CURRENT PHASE banner.
 
 ---
 
@@ -50,7 +50,7 @@
 - **Off-board compute.** Drone is a dumb peripheral; all planning/perception/control on the
   ground station.
 - **VLM plans, math executes.** VLM produces plans; never in the per-command completion loop.
-- **Hardware-agnostic.** Tello primary, PX4 SITL fallback. One generic setpoint + one
+- **Hardware-agnostic.** DJI drone (Tello DROPPED 2026), PX4 SITL for flight-core dev; the perception stack ingests any video source (RTMP/webcam/GStreamer). One generic setpoint + one
   odometry abstraction (cross-hw migration pending, §8).
 - **No heap in steady state.** Fixed-size command structs, SPSC task queue, atomic flags.
 - Constraints: no `std::variant`/exceptions/mutex-on-image; C89 hoisting; `FixedStringType`;
@@ -449,3 +449,49 @@ Why was I stopped? What was I doing? How do I get around <hazard> without collid
 still make progress? Output a NEW plan that first clears the hazard, then resumes the
 objective. The old queue is discarded — your new plan fully replaces it.
 ```
+
+---
+## Perception stack: llm_cv_track / llm_cv_scene (2026-08-20)
+Two sibling apps share one perception spine; only the HIGHLIGHT localizer differs.
+
+Layers (both apps):
+1. **Ears** — ROS2 `asr_server` (Parakeet) transcribes on push-to-talk (H) -> topic -> `Ears` subscriber.
+2. **Background** — YOLO26n-seg draws faint always-on boxes (worker thread).
+3. **Highlight (the difference):**
+   - `llm_cv_scene` (backup): **Qwen3-VL** localizes the phrase itself (slow, static box).
+   - `llm_cv_track` (star): **OmDet-Turbo** open-vocab detector re-detects each frame (box follows).
+4. **Segment** — SAM2.1 masks the highlighted box; whole-frame garbage masks dropped, box tightened to mask.
+5. **Reason** — Qwen3-VL (llama-server) answers spoken questions; runs OFF the ASR thread.
+
+Threading: a display thread at camera FPS + a perception worker + the ASR callback thread + a VLM thread.
+Portability: torch device is vendor-neutral (CUDA/ROCm/CPU); the VLM is llama.cpp/Vulkan.
+Input: webcam index, RTSP (drone via DJI Fly Custom RTMP -> MediaMTX), or a GStreamer pipeline.
+OmDet loads from a local vendored copy offline (~1s); see source/llm_cv_track/README.md.
+
+Not fully AGPL-free yet: YOLO26 + SAM2 + BoT-SORT (Ultralytics) remain AGPL; OmDet-Turbo is Apache.
+
+---
+
+## Integration MVD — voice -> 4-tier router -> DJI backend + perception (2026-08-25)
+
+> **Status:** DONE / the Demo-Day system. Lives in `source/integration/` (self-contained). A PARALLEL
+> subsystem to the FMU above — the FMU (`llm_to_action`) remains the destination C++ product; this
+> Python MVD is the shipped prototype. Full detail: `docs/active/2026-08-25-mvd-integration-handoff.md`.
+
+**Data flow.** `voice (laptop mic / phone ASR) -> on_text -> Router.classify (4 tiers) -> {BASIC verb ->
+DjiWire -> DJI REST (POST /c/...) | COMPLEX -> perception (Qwen-VL + OmDet/SAM2)}`. Drone camera ->
+phone `:5600` raw-H.264/TCP -> `gstreamer_rx` -> ROS `camera/stream` -> perception window. Perception
+answer -> LONG (screen) + SHORT (spoken: phone `/tts` + laptop espeak).
+
+**Control authority model.** Total user control: deterministic verbs move the drone; the VLM never
+drives motion. Tiers: EMERGENCY (`stop`=`POST /c/fly [{delay:0}]`, preempts + keeps control) >
+OVERRIDE (`manual`=`/c/stop` RC handoff) / RESUME > BASIC verbs > COMPLEX (perception, no drone POST).
+`controller.fly{}` cancels the prior mission and re-`takeControl()`s, so missions naturally preempt.
+
+**Interfaces.** `dji_wire.py` is the sole aircraft client (full REST/WS: `/c/fly` mission actions,
+`/key`, `/tts`, `/status`, `/c/ws/sticks`). Inbound phone ASR via `phone_ears.py` (laptop `:8080`,
+`/input` + raw TCP, matches `GroundStationSpeechResolver.kt`). VLM on `llama-server :18090` (`-np 1`).
+Ports: phone `:8080` (control+tts) / laptop `:8080` (phone_ears) / `:5600` (video) / `:18090` (VLM).
+
+**Backend gaps (DJI app dev):** dynamic groundstation-IP discovery; gimbal commands (broken backend-side);
+API-Server foreground-service reliability. See the handoff §9.

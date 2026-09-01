@@ -4,12 +4,13 @@
 /* 
     k = constant 
     h = handle i.e. pointer to a resource
-    UDPCam - Camera that is connected via UDP.
+    CameraPipeline - the receiver's decoded-frame output. The SOURCE varies by
+    backend (UDP for PX4/Tello, TCP for DJI); the published frames are uniform.
     Figure out the rest on your own    
 */
-using UDPCamMsgType   = sensor_msgs::msg::Image;
-using hUDPCamMsgType  = UDPCamMsgType::SharedPtr;
-using khUDPCamMsgType = UDPCamMsgType::ConstSharedPtr;
-constexpr const char* kOutUDPCameraGstSinkName   = "completely_random_sink056";
-constexpr const char* kOutUDPCameraRawFrameID    = "camera_link";
-constexpr const char* kOutUDPCameraRawFrameTopic = "camera/stream";
+using CameraPipelineMsgType   = sensor_msgs::msg::Image;
+using hCameraPipelineMsgType  = CameraPipelineMsgType::SharedPtr;
+using khCameraPipelineMsgType = CameraPipelineMsgType::ConstSharedPtr;
+constexpr const char* kOutCameraPipelineGstSinkName   = "completely_random_sink056";
+constexpr const char* kOutCameraPipelineRawFrameID    = "camera_link";
+constexpr const char* kOutCameraPipelineRawFrameTopic = "camera/stream";

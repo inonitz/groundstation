@@ -33,7 +33,7 @@ Usage: $0 <build_type> <library_type> <backend> <action>
 Arguments:
   build_type   - Type of build: debug, release, release_dbginfo, debug_perf, release_perf
   library_type - Type of library: shared (.dll/.so), static (.lib/.a)
-  backend      - FMU flight backend: px4, tello, all
+  backend      - FMU flight backend: px4, tello, dji, all
   action       - Action to take: cleanbuild, configure, build
 
 Options:
@@ -90,11 +90,14 @@ if [[ "$3" == "px4" ]]; then
 elif [[ "$3" == "tello" ]]; then
     CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_TELLO=ON"
     CMAKE_INTRMD_BUILD_DIR+="tello/"
+elif [[ "$3" == "dji" ]]; then
+    CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_DJI=ON"
+    CMAKE_INTRMD_BUILD_DIR+="dji/"
 elif [[ "$3" == "all" ]]; then
     CMAKE_ARGLIST+=" -DGROUNDSTATION_BUILD_BACKEND_ALL=ON"
     CMAKE_INTRMD_BUILD_DIR+="all/"
 else
-    printf "Unknown Argument %s - valid values are: px4, tello, all\nExiting...\n" "$3"
+    printf "Unknown Argument %s - valid values are: px4, tello, dji, all\nExiting...\n" "$3"
     exit 1
 fi
 
@@ -103,7 +106,7 @@ if [[ "$4" == "cleanbuild" ]]; then
 
 elif [[ "$4" == "configure" ]]; then
     CONFIGURE_CMAKE_FLAG="true"
-    CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON"
+    CMAKE_ARGLIST+=" -DGIT_SUBMODULE=ON" # Since we've moved on from Git submodules to CPM then is obsolete (for now...)
 
 elif [[ "$4" == "build" ]]; then
     BUILD_BINARIES_FLAG="true"

@@ -2,6 +2,9 @@
 HostPathProjectPath="$HOME/workspaces/groundstation"
 ContainerPathProjectPath="/root/groundstation"
 
+HostPathDjiBackendProjectPath="$HOME/workspaces/DJI-android-sdk-v5-recon-swarm"
+ContainerPathDjiBackendProjectPath="/root/DJI-android-sdk-v5-recon-swarm"
+
 HostPathASRModel="$HOME/models/asr"
 ContainerPathASRModelPath="/root/models/asr"
 
@@ -29,6 +32,7 @@ set -- "$@" --net=host
 
 # Folder Mounts
 set -- "$@" -v "${HostPathProjectPath}:${ContainerPathProjectPath}"
+set -- "$@" -v "${HostPathDjiBackendProjectPath}:${ContainerPathDjiBackendProjectPath}"
 set -- "$@" -v "/run/user/$(id -u)/pulse/native:/tmp/pulse-socket"
 set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
@@ -37,6 +41,11 @@ set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
 set -- "$@" -v "${HostPathVisionModel}:${ContainerPathVisionModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
 set -- "$@" -v "$HOME/.claude:/root/.claude"
+
+# Git auth that works IDENTICALLY on host or in-container: reuse the host SSH key + identity
+# (read-only). With SSH remotes this bypasses the flaky VS Code credential bridge entirely.
+[ -d "$HOME/.ssh" ]       && set -- "$@" -v "$HOME/.ssh:/root/.ssh:ro"
+[ -f "$HOME/.gitconfig" ] && set -- "$@" -v "$HOME/.gitconfig:/root/.gitconfig:ro"
 
 # Bind-mounted, not --device: docker snapshots /dev at creation, so a keyboard plugged in
 # later would otherwise have no node here.

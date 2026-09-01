@@ -27,7 +27,7 @@ include_cpm()
 enable_coloured_diagnostics_if_available()
 use_ccache_program_if_exists()
 define_aggregate_output_artifact_directory()
-update_submodules_on_cmake_configure("dependencies")
+# update_submodules_on_cmake_configure("dependencies")
 
 
 OPTION(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS      "Enable AddressSanitizer"                       OFF)
@@ -41,26 +41,25 @@ OPTION(GROUNDSTATION_BUILD_SLAM                    "Build the stella_vslam bring
 # FMU drone backend selection: exactly one of these must be ON (checked below).
 OPTION(GROUNDSTATION_BUILD_BACKEND_PX4   "Build the Groundstation against the PX4 backend"        OFF)
 OPTION(GROUNDSTATION_BUILD_BACKEND_TELLO "Build the Groundstation against the Tello backend"      OFF)
-OPTION(GROUNDSTATION_BUILD_BACKEND_ALL   "Build the Groundstation against all backends (px4+tello)" OFF)
+OPTION(GROUNDSTATION_BUILD_BACKEND_DJI   "Build the Groundstation against the DJI (LAN app) backend" OFF)
+OPTION(GROUNDSTATION_BUILD_BACKEND_ALL   "Build the Groundstation against all backends (px4+tello+dji)" OFF)
 
 
 if(GROUNDSTATION_ENABLE_SANITIZER_ADDRESS AND GROUNDSTATION_ENABLE_SANITIZER_MEMORY)
     message(FATAL_ERROR "ASan and MSan are mutually exclusive.")
 endif()
 
-if( 
-    ( GROUNDSTATION_BUILD_BACKEND_PX4 AND GROUNDSTATION_BUILD_BACKEND_TELLO )
-    OR
-    ( GROUNDSTATION_BUILD_BACKEND_PX4 AND GROUNDSTATION_BUILD_BACKEND_ALL )
-    OR
-    ( GROUNDSTATION_BUILD_BACKEND_TELLO AND GROUNDSTATION_BUILD_BACKEND_ALL )
-    OR
-            (NOT GROUNDSTATION_BUILD_BACKEND_PX4) 
-        AND (NOT GROUNDSTATION_BUILD_BACKEND_TELLO) 
-        AND (NOT GROUNDSTATION_BUILD_BACKEND_ALL)
-)
-    message(FATAL_ERROR 
-        "You can Only Enable a single Backend Option at a time - PX4 Flight-Controller, DJI Tello or ALL of them"
+# Exactly ONE backend option must be ON (PX4 / TELLO / DJI / ALL).
+set(_GROUNDSTATION_BACKEND_COUNT 0)
+foreach(_bk GROUNDSTATION_BUILD_BACKEND_PX4 GROUNDSTATION_BUILD_BACKEND_TELLO
+            GROUNDSTATION_BUILD_BACKEND_DJI GROUNDSTATION_BUILD_BACKEND_ALL)
+    if(${_bk})
+        math(EXPR _GROUNDSTATION_BACKEND_COUNT "${_GROUNDSTATION_BACKEND_COUNT}+1")
+    endif()
+endforeach()
+if(NOT _GROUNDSTATION_BACKEND_COUNT EQUAL 1)
+    message(FATAL_ERROR
+        "Enable EXACTLY ONE backend option: -DGROUNDSTATION_BUILD_BACKEND_{PX4|TELLO|DJI|ALL}=ON"
     )
 endif()
 

@@ -15,7 +15,7 @@ cd "$(dirname "$0")" || exit 1
 
 # ---- VOICE MODE (default): real reasoning, spoken trigger --------------------
 # Empty objective => idle in STANDBY until the first spoken transcript launches it.
-FMU_OBJECTIVE=""
+FMU_OBJECTIVE="Take off, approach the car ahead of you, and land near it. Do not orbit, search, rotate, or go anywhere else."
 LAUNCH_ASR="1"
 
 # ---- TYPED FALLBACK (if the mic flakes on a take): still VLM-driven ----------
@@ -24,7 +24,7 @@ LAUNCH_ASR="1"
 # FMU_OBJECTIVE="Take off, approach the car ahead of you, and land near it. Do not orbit, search, rotate, or go anywhere else."
 # LAUNCH_ASR="0"
 
-FMU_CANNED_FLAG=""          # "" = VLM-driven (REAL reasoning). Do NOT set --canned-* for the demo.
+FMU_SCENARIO_FLAG=""          # "" = VLM-driven (REAL reasoning). Do NOT set --scenario-* for the demo.
 WORLD_NAME="rubicon_targets"  # Rubicon terrain + a blue hatchback (YOLO "car") + 2 people for scene.
 SPAWN_POSE="0,3,3"          # facing +X; blue hatchback at (6,2) is ~6m dead ahead (~9deg right): clean car lock.
 LAUNCH_VLM="1"              # llama-server (prewarmed on boot)

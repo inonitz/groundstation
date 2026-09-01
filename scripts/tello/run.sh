@@ -26,7 +26,7 @@ cd "$(dirname "$0")" || exit 1
 
 # --- knobs (override on the command line, e.g. FMU_OBJECTIVE="..." ./run.sh) ---
 : "${FMU_OBJECTIVE:=Take off, yaw-scan the area, describe what you see, then land.}"
-: "${FMU_FLAG:=}"   # optional canned-plan flag, e.g. --canned-rotate (no-VLM airframe+ROTATE test). Empty = VLM-driven.
+: "${FMU_FLAG:=}"   # optional canned-plan flag, e.g. --canned-cross (no-VLM airframe+ROTATE test). Empty = VLM-driven.
 : "${SESSION_NAME:=tello}"
 # Per-drone runtime tuning profile (ROADMAP 9.14). Defaults to the apartment-scale Tello
 # profile so ./run.sh flies indoor-safe constants with NO rebuild -- edit config/tello.yaml

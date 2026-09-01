@@ -7,7 +7,7 @@
 #
 # Caller knobs (set BEFORE sourcing; defaults below):
 #   FMU_OBJECTIVE    mission string handed to the FMU.
-#   FMU_CANNED_FLAG  canned-plan flag, e.g. --canned-rotate ("" = VLM-driven).
+#   FMU_SCENARIO_FLAG  scenario flag, e.g. --scenario-cross ("" = VLM-driven).
 #   WORLD_NAME       sim world basename in dependencies/ (default: default_car).
 #   SPAWN_POSE       drone spawn x,y,z (default: 0,7,3).
 #   LAUNCH_VLM       1 => also start the Qwen3-VL llama-server pane (default: 0).
@@ -17,7 +17,7 @@
 # ==============================================================================
 
 : "${FMU_OBJECTIVE=Canned SITL test.}"   # NO colon: default only when UNSET; keep an explicit empty (voice mode: idle until spoken)
-FMU_CANNED_FLAG="${FMU_CANNED_FLAG-}"   # allow an explicit empty (VLM) value
+FMU_SCENARIO_FLAG="${FMU_SCENARIO_FLAG-}"   # allow an explicit empty (VLM) value
 : "${WORLD_NAME:=default_car}"
 : "${SPAWN_POSE:=0,7,3}"
 : "${LAUNCH_VLM:=0}"
@@ -94,7 +94,7 @@ if [ "${DRAIN_BATTERY:-0}" = "1" ]; then
     echo "[INFO] DRAIN_BATTERY=1 -> PX4 SIM_BAT_MIN_PCT=0.0 SIM_BAT_DRAIN=1.5"
 else
     # PX4 SITL's sim battery drains to ~16% within ~10s of takeoff, tripping the RTH
-    # failsafe (kBatteryReturnPct=20) and hijacking every canned plan (takeoff -> GO home
+    # failsafe (kBatteryReturnPct=20) and hijacking every scenario (takeoff -> GO home
     # -> land). Pin the battery full for normal runs. ':=' so a test that sets its own
     # battery params first (e.g. battery/run.sh) is NOT overridden.
     : "${PX4_PARAM_SIM_BAT_MIN_PCT:=100.0}"
@@ -135,7 +135,7 @@ CMD_FMU="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:$ONNXRUNTIME_LIB_DIR:\$LD_LIBR
     export DRONE_CONFIG=\"$DRONE_CONFIG\" && \
     export FMU_OBSERVABILITY=\"${FMU_OBSERVABILITY:-}\" && \
     sleep $DELAY_FMU && \
-    ($BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_CANNED_FLAG 2>&1 | tee \"$LOG_FILE\"); \
+    ($BUILD_BINARY_DIR/llm_to_action_fmu_px4 \"$FMU_OBJECTIVE\" $FMU_SCENARIO_FLAG 2>&1 | tee \"$LOG_FILE\"); \
     echo 'FMU stopped'; read"
 CMD_KEYBOARD="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     sleep $DELAY_FMU && $BUILD_BINARY_DIR/llm_to_action_keyboard_hook; \
@@ -145,8 +145,9 @@ CMD_KEYBOARD="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
 # unattended runs was pure cost with a real bug attached: LAUNCH_VLM=1 scenarios (override,
 # vlm, approach-real) push the pane count high enough that tmux can fail to allocate the bag
 # pane ("no space for new pane"), which silently skipped recording with no error at all.
-# Override explicitly with RECORD_BAG=1 if you want a bag from a headless run.
-: "${RECORD_BAG:=$([ "${HEADLESS:-0}" = "1" ] && echo 0 || echo 1)}"
+# Bags are OFF by default -- they pile up (e.g. rubicon_orbit hoarded 15). Opt in with
+# RECORD_BAG=1 only when you need to inspect internal state from a run afterwards.
+: "${RECORD_BAG:=0}"
 : "${BAG_DIR:=$(pwd)/bag_$(date +%Y%m%d_%H%M%S)}"
 CMD_BAG="ros2 bag record -o \"$BAG_DIR\" \
     /fmu/out/vehicle_odometry \
@@ -164,8 +165,8 @@ CMD_BAG_HEADLESS="ros2 bag record -o \"$BAG_DIR\" \
     /fmu/out/battery_status_v1"
 CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
-    -m /root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf \
-    --mmproj /root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf \
+    -m ${VLM_MODEL:-/root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf} \
+    --mmproj ${VLM_MMPROJ:-/root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf} \
     -dev Vulkan0 ${VLM_NGL_ARG- -ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG- --cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 
@@ -231,7 +232,11 @@ fi
 if [ "$LAUNCH_ASR" = "1" ]; then
     tmux new-window -t "$SESSION_NAME" -n asr "$CMD_ASR"
 fi
-tmux new-window -t "$SESSION_NAME" -n keys "$CMD_KEYBOARD"
+# Keyboard hook is a GLOBAL key grabber -> stray keystrokes (you typing elsewhere) toggle
+# /fmu/in/override, whose handback WIPES a scripted plan. Only the override test needs it.
+if [ "${LAUNCH_KEYBOARD:-0}" = "1" ]; then
+    tmux new-window -t "$SESSION_NAME" -n keys "$CMD_KEYBOARD"
+fi
 if [ "$RECORD_BAG" = "1" ]; then
     if [ "${HEADLESS:-0}" = "1" ]; then
         eval "$CMD_BAG_HEADLESS" > /dev/null 2>&1 < /dev/null &
@@ -256,7 +261,7 @@ if [ "${HEADLESS:-0}" = "1" ]; then
     echo "[INFO] HEADLESS=1 -- no attach; waiting on ground truth (mode=$HEADLESS_COMPLETION, timeout=${HEADLESS_TIMEOUT_SECONDS}s)"
     "$(dirname "${BASH_SOURCE[0]}")/wait_for_ground_truth.sh" "$HEADLESS_COMPLETION" "$HEADLESS_TIMEOUT_SECONDS"
 else
-    if [ "${RECORD_BAG:-1}" = "1" ]; then
+    if [ "${RECORD_BAG:-0}" = "1" ]; then
         echo "[INFO] Attached. When done: press Ctrl-B then D to DETACH (not Ctrl-C) --"
         echo "[INFO] detaching is what lets this script reach cleanup() and finalize the bag."
         echo "[INFO] Ctrl-C only interrupts whatever pane has focus; the session (and the bag"

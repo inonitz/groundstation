@@ -2,7 +2,7 @@
 
 Cross pattern: fwd/left/back/right 1m, returning to start after each leg (FLU sanity).
 
-- **Canned plan flag:** `--canned-cross`
+- **Scenario flag:** `--scenario-cross`
 - **World:** `default_car`   **Spawn:** `0,7,3`
 - **Filter:** milestone digest (per-leg GO activated/complete) — no PASS/FAIL.
 

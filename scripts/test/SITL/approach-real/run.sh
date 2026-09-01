@@ -4,7 +4,7 @@
 # Then watch the drone; in a 2nd terminal after it lands: ./filter.sh
 cd "$(dirname "$0")" || exit 1
 FMU_OBJECTIVE="Approach the car, then land."
-FMU_CANNED_FLAG="--canned-approach-real"
+FMU_SCENARIO_FLAG="--scenario-approach-real"
 WORLD_NAME="default_car"
 SPAWN_POSE="0,7,3"
 source ../../lib/sim_core.sh
