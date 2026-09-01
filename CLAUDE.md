@@ -25,6 +25,18 @@ motors spun and the human was injured stopping it by hand. Never again.
   any control tool; if the host is a real phone IP, stop and hand the command to the human.
 
 <!-- Workspace Instructions -->
+# Owner Interaction Protocol (hard-earned in prior sessions; violating these caused real friction)
+
+- **Multi-point messages: address EVERY point, by number, none skipped.** If a point is unclear, say so under its number - never silently drop it. The owner audits replies against their list.
+- **One idea per bullet, in docs and replies.** Never fuse unrelated points into one line; the owner reasons and assigns priorities per-item.
+- **Decisions go into repo docs IMMEDIATELY, not just chat.** Chat is lost to compaction and agent-notification noise; the agent gets amnesia, the docs do not. When the owner rules on something, write it into the relevant doc in the same turn.
+- **Recommendations are not decisions.** Anything the owner has not explicitly ruled stays OPEN; never cite your own suggestion as settled.
+- **Concrete over high-level.** When execution is requested, give copy-paste-ready commands with absolute paths - the owner will not translate an overview into steps.
+- **Real tests over canned mocks.** A predefined-output mock proves nothing; claims of "working" require the real path exercised, and unmeasured numbers are labeled unverified.
+- **Background agents report to files, not chat.** Relaying bulk agent output into the conversation destroys the owner's scrollback; keep chat replies to short summaries.
+- **Script every install.** The dev container wipes ad-hoc installs on rebuild (it has eaten working tools before).
+- **`source/integration/` is FROZEN** - the proven demo fallback. Changes land in forks, never there.
+
 # Tool Execution Rules
 
 CRITICAL: Do NOT use native file reading or search tools (View, Read, Grep, Glob).
