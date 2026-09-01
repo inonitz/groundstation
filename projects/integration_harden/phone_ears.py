@@ -85,12 +85,12 @@ class PhoneEars:
             else:
                 # --- raw TCP, newline-delimited JSON lines (persistent) ---
                 print(f"[phone_ears] TCP client {peer} connected", flush=True)
-                self._feed(self._extract(line), "TCP")
+                self._feed(self._extract(line))
                 while True:
                     l = await reader.readline()
                     if not l:
                         break
-                    self._feed(self._extract(l.decode("utf-8", "replace").rstrip("\r\n")), "TCP")
+                    self._feed(self._extract(l.decode("utf-8", "replace").rstrip("\r\n")))
                 print(f"[phone_ears] TCP client {peer} disconnected", flush=True)
                 writer.close()
         except Exception as e:

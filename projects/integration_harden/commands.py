@@ -46,9 +46,25 @@ MAX_BASIC_WORDS = int(os.environ.get("MVD_MAX_CMD_WORDS", "4"))
 # --- Tier 4 / Tier 3 vocab -------------------------------------------------------------
 # Emergency is deliberately broad and word-bounded. "stop" is the dev's own WS kill word
 # (ApiServer.kt: Regex("bye|x|stop")). These take priority over every other tier.
-_EMERGENCY_RE = re.compile(r"\b(stop|emergency|abort|halt|freeze|mayday|kill|cut)\b", re.I)
-_OVERRIDE_RE = re.compile(r"\b(manual|override|take over|i have control|my control|disengage)\b", re.I)
-_RESUME_RE = re.compile(r"\b(resume|auto|autonomous|you have control|take control)\b", re.I)
+# Hebrew alternates match DIRECTLY, before any translation hop -- a stop shout must never wait
+# on translation (sprint handoff B). Python's \b treats Hebrew letters as word chars, so the
+# boundaries hold. Emergency is broad on purpose: a false hover is safer than a missed stop.
+# HE emergency: imperative stop (m/f/pl + colloquial t-forms), transliterated "stop", emergency.
+_EMERGENCY_RE = re.compile(
+    r"\b(stop|emergency|abort|halt|freeze|mayday|kill|cut"
+    r"|\u05e2\u05e6\u05d5\u05e8|\u05e2\u05e6\u05e8\u05d9|\u05e2\u05e6\u05e8\u05d5"          # עצור עצרי עצרו
+    r"|\u05ea\u05e2\u05e6\u05d5\u05e8|\u05ea\u05e2\u05e6\u05e8\u05d9|\u05ea\u05e2\u05e6\u05e8\u05d5"  # תעצור תעצרי תעצרו
+    r"|\u05e1\u05d8\u05d5\u05e4|\u05d7\u05d9\u05e8\u05d5\u05dd)\b", re.I)                     # סטופ חירום
+# HE override: "manual"/"manually", "I am in control".
+_OVERRIDE_RE = re.compile(
+    r"\b(manual|override|take over|i have control|my control|disengage"
+    r"|\u05d9\u05d3\u05e0\u05d9|\u05d9\u05d3\u05e0\u05d9\u05ea"                                 # ידני ידנית
+    r"|\u05d0\u05e0\u05d9 \u05d1\u05e9\u05dc\u05d9\u05d8\u05d4)\b", re.I)                      # אני בשליטה
+# HE resume: "automatic"/"autonomous", "continue".
+_RESUME_RE = re.compile(
+    r"\b(resume|auto|autonomous|you have control|take control"
+    r"|\u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9|\u05d0\u05d5\u05d8\u05d5\u05e0\u05d5\u05de\u05d9"   # אוטומטי אוטונומי
+    r"|\u05d4\u05de\u05e9\u05da)\b", re.I)                                                          # המשך
 # A movement intent ("go/move/head ...") that matches NO direction -> a no-op with feedback,
 # so "go dance"/a mis-heard word never falls through to the perception engine (scene-describe).
 _MOVE_INTENT_RE = re.compile(r"^\s*(go|move|head)\b", re.I)

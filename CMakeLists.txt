@@ -79,13 +79,13 @@ endif()
 # Required Dependency for OpenVINS
 find_package(Eigen3          REQUIRED)
 find_package(OpenCV          REQUIRED)
-if(${GLOBAL_WORKSPACE_LINUX_IS_WSL})
+if(GLOBAL_WORKSPACE_LINUX_IS_WSL)
     find_package(X11 REQUIRED)
 endif()
 
 define_library_fetch_of_llama_cpp_with_external_project()
 define_library_fetch_of_gstreamer()
-define_library_fetch_of_stella_vslam_with_external_project()
+# define_library_fetch_of_stella_vslam_with_external_project()
 
 # ---------------------------------------------------------------------------
 # Local Subdirectories 
@@ -99,7 +99,7 @@ define_library_fetch_of_stella_vslam_with_external_project()
 safe_cpm_add_package(
     NAME sttserver
     GIT_REPOSITORY https://github.com/inonitz/sttserv.git
-    GIT_TAG        feature-multimodel
+    GIT_TAG        main
     GIT_SHALLOW    TRUE
     OPTIONS
         "STTSERVER_FORCE_COLOURED_OUTPUT OFF"
@@ -186,16 +186,17 @@ safe_cpm_add_package(
     GIT_SHALLOW    TRUE
 )
 
-# ctello: DOWNLOAD_ONLY so we compile only its client .cpp (see
-# projects/llm_to_action/source/tello_backend/CMakeLists.txt) and skip its examples.
-safe_cpm_add_package(
-    NAME ctello
-    GIT_REPOSITORY https://github.com/carlospzlz/ctello.git
-    GIT_TAG        master
-    GIT_SHALLOW    TRUE
-    DOWNLOAD_ONLY  YES
-)
-
+if(GROUNDSTATION_BUILD_BACKEND_TELLO OR GROUNDSTATION_BUILD_BACKEND_ALL)
+    # ctello: DOWNLOAD_ONLY so we compile only its client .cpp (see
+    # projects/llm_to_action/source/tello_backend/CMakeLists.txt) and skip its examples.
+    safe_cpm_add_package(
+        NAME ctello
+        GIT_REPOSITORY https://github.com/carlospzlz/ctello.git
+        GIT_TAG        master
+        GIT_SHALLOW    TRUE
+        DOWNLOAD_ONLY  YES
+    )
+endif()
 
 # ---------------------------------------------------------------------------
 # Local Project

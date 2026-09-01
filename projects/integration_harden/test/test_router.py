@@ -133,3 +133,25 @@ def test_unknown_move_guard():
     assert res.action.startswith("didn't catch") and res.dispatched is False
     assert not r.wire.log                        # NOTHING sent to the drone
     assert r.handle("what do you see").tier is Tier.COMPLEX   # real questions still reach perception
+
+
+def test_hebrew_emergency_tiers():
+    # Hebrew must hit the emergency/override/resume tiers DIRECTLY (no translation hop).
+    for w in ("עצור", "עצרי", "עצרו", "תעצור", "סטופ", "חירום", "עצור עכשיו"):
+        assert _c(w).tier is Tier.EMERGENCY, w
+    assert _c("שליטה ידנית").tier is Tier.OVERRIDE
+    assert _c("ידני").tier is Tier.OVERRIDE
+    assert _c("אני בשליטה").tier is Tier.OVERRIDE
+    assert _c("המשך").tier is Tier.RESUME
+    assert _c("אוטומטי").tier is Tier.RESUME
+    # emergency embedded in a longer Hebrew sentence still fires (length-independent tier)
+    assert _c("רחפן תעצור מיד בבקשה").tier is Tier.EMERGENCY
+
+
+def test_hebrew_emergency_dispatch():
+    r = Router(_StubWire())
+    res = r.handle("עצור")
+    assert res.tier is Tier.EMERGENCY
+    assert any(e[0] == "halt" for e in r.wire.log), "Hebrew stop must halt on the wire"
+    # Hebrew question does NOT trip emergency and reaches the complex tier
+    assert _c("מה אתה רואה עכשיו").tier is Tier.COMPLEX
