@@ -1,68 +1,46 @@
 # Build output
 build/
 
-# Python Venv Files
+# Python
 venv
 */venv
+__pycache__/
+*.py[cod]
 
-# Makefiles
+# Make / Ninja
 Makefile
-
-# Ninja Build Files
 .ninja_deps
 .ninja_log
 *.ninja
 
-# Visual Studio Code files
-# .vscode/launch.json
-# .vscode/settings.json
-
-# clangd Compilation Database
-.vscode/compile_commands
+# IDE / clangd
 .cache
-
-# Visual Studio files
 .vs/
 *.sln
-*.vcxproj
-*.vcxproj.filters
-*.vcxproj.user
-
+*.vcxproj*
+compile_commands.json
 
 # misc
 imgui.ini
 
-
-# Python bytecode cache
-__pycache__/
-*.py[cod]
-
-# Log files
+# Logs & test-run captures
 *.log
-*/slam_check.log
-
-# Stella vSLAM config calibration 
-frame*.png
-
-# Test-run pane captures (not caught by *.log)
 captured_panes_log.txt
 *.out
 gs_sessions_*.tgz
 vlm_logs/
 *.wav
-scripts/test/SITL/**/bag_*/
-scripts/test/SITL/rubicon_orbit/
-vlm_logs/
-*.wav
-scripts/test/SITL/**/bag_*/
-scripts/test/SITL/rubicon_orbit/
+projects/llm_to_action/test/sitl-legacy/**/bag_*/
 
-# Models
+# Model weights
 *.pt
-# ad-hoc recognize.py test artifacts (may be private imagery; public repo)
+
+# private imagery / transfer artifacts (public repo)
 test_img*
-scripts/test/dji_mock/out/
-compile_commands.json
+tools/dji_mock/out/
 m2.zip
 *.apk
 _exo_transfer/
+
+# SITL per-run workdirs
+projects/llm_to_action/test/sitl/runs/

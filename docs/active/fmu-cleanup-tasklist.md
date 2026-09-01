@@ -60,12 +60,12 @@ before flying a real drone -- the demo runs on DJI hardware, SITL is the behavio
       removed. `bash -n` clean.
 
 ## Test workflow (as-built, cold-start reference)
-- Engine: `scripts/test/lib/sim_core.sh` (sourced by every `<feature>/run.sh`; sets objective +
+- Engine: `projects/llm_to_action/test/lib/sim_core.sh` (sourced by every `<feature>/run.sh`; sets objective +
   `FMU_CANNED_FLAG`, launches tmux sim; HEADLESS path waits on `wait_for_ground_truth.sh`).
 - Per feature: `<feature>/run.sh` + `filter.sh` (grep FMU log -> verdict) + `README.md`.
-- Interactive: `cd scripts/test/SITL/<feature> && ./run.sh` then `./filter.sh`; or `./logtest.sh <f>`
+- Interactive: `cd projects/llm_to_action/test/sitl-legacy/<feature> && ./run.sh` then `./filter.sh`; or `./logtest.sh <f>`
   (timestamped log under runs/) then `./digest.sh`.
-- Headless regression: `scripts/test/run_all.sh` (folder-driven; `--only <f>`, `--include-unverifiable`).
+- Headless regression: `projects/llm_to_action/test/sitl/run.sh --all` (config-driven, replaces run_all.sh).
 - `scripts/simenv.sh` is OUTDATED/reference-only -- do NOT use it (user, 2026-08-17).
 - Per-command coverage GAP: HOVER/ROTATE/STOP have no dedicated folder; ORBIT (`rubicon_orbit`) +
   SEARCH (`search_follow`) folders lack a verdict `filter.sh`. No fast isolated unit test of any
@@ -84,7 +84,7 @@ before flying a real drone -- the demo runs on DJI hardware, SITL is the behavio
 - [x] **Added scenarios Hover/Rotate/Orbit** (enum + parse + JSON + runScenario + unit-test CHECKs).
       Gotcha hit + fixed: a `(...)` immediately before the closing `"` made `)"` which terminates a
       `R"(...)"` raw string early -> reworded. Watch for `)"` inside scenario JSON.
-- [x] **New SITL folders** scripts/test/SITL/{hover,rotate,orbit}/:
+- [x] **New SITL folders** projects/llm_to_action/test/sitl-legacy/{hover,rotate,orbit}/:
       - hover/ (NEW): scenario [takeoff, go +1.5m, hover, go -1.5m, land]. HOVER never completes so
         the back-go can't dequeue; filter.sh AUTO-verdicts PASS iff NO GO activity after
         'HOVER activated' (absence of the reversal proves the hold). Drives the extracted stepHover.
@@ -112,7 +112,7 @@ before flying a real drone -- the demo runs on DJI hardware, SITL is the behavio
 - [x] **Orbit fixed.** Was a fixed 7m circle in rubicon_tree (wrong world, too big, ignored the
       VLM's radius_cm). Now the law HONOURS radius_cm (clamped [kOrbitMinRadiusM=3, kOrbitMaxRadiusM=12];
       unset -> 7m fallback) with centre still R-ahead (starts ON the circle). New world
-      dependencies/orbit_car.sdf = default_car with the car at (4,7) = the 4m orbit centre; scenario
+      assets/gz_world/orbit_car.sdf = default_car with the car at (4,7) = the 4m orbit centre; scenario
       radius_cm=400. orbit/filter.sh now AUTO-verdicts radius-hold error (max<1.0m, mean<0.5m) + full
       sweep -> orbit removed from UNVERIFIABLE. NOTE: the demo VLM already emits radius_cm=600, so the
       building demo now orbits at 6m (was 7m) -- more correct (does what it commands), flag for re-demo.
@@ -166,7 +166,7 @@ before flying a real drone -- the demo runs on DJI hardware, SITL is the behavio
 - MUST (new/changed, no Gazebo yet): follow, search.
 - SMOKE (rename touched every run.sh flag + binary rebuilt shared; not run today): cross, approach,
   approach-real, approach-impact, battery-rth, battery-landnow, boundary, flood, flood-airborne,
-  interrupt-storm, override. Run headless: cd scripts/test && ./run_all.sh (SKIP_HIGH_VRAM=1 to skip
+  interrupt-storm, override. Run headless: projects/llm_to_action/test/sitl/run.sh --all (SKIP_HIGH_VRAM=1 to skip
   the 3 VLM-heavy ones). hover/rotate/orbit already verified.
 
 ## Gazebo feedback round 3 (2026-08-17) -- follow spin + search world
@@ -245,8 +245,8 @@ still a touch slow per the user (canned uses budget, fill-brake only bites the r
 
 ## Verify
 - Build: `cmake --build build/release/shared/px4 -- -j4` (must link)
-- Unit test: `g++ -std=c++17 -I<util2/include> -Isource/llm_to_action source/llm_to_action/fmu/test/fmu_translate_test.cpp -o /tmp/t && /tmp/t`
-- Behaviour: Gazebo/SITL scenarios under `scripts/test/SITL/` -- **human runs these.**
+- Unit test: `g++ -std=c++17 -I<util2/include> -Iprojects/llm_to_action/source projects/llm_to_action/source/fmu/test/fmu_translate_test.cpp -o /tmp/t && /tmp/t`
+- Behaviour: Gazebo/SITL scenarios under `projects/llm_to_action/test/sitl-legacy/` -- **human runs these.**
 
 ## Key context (cold-start — read after a compaction)
 - **Project**: voice-commanded drone demo, Israeli MOD contest 2026-08-27. Linux stack
@@ -263,7 +263,7 @@ still a touch slow per the user (canned uses budget, fill-brake only bites the r
 - **Docs**: mission-brief-2026-08-15.md (platform + goals), spec-fmu-cleanup.md (this refactor's
   plan A-G), spec-dji-backend.md (agent spec), dji-apiserver-review.md (punch list for the app
   author), spec-dji-websocket-protocol.md (FROZEN wire contract), spec-android-docker-bridge.md,
-  fmu-node-split-map.md. Mock: scripts/test/dji_mock/{mock_apiserver.py, ws_latency.py}.
+  fmu-node-split-map.md. Mock: tools/dji_mock/{mock_apiserver.py, ws_latency.py}.
 - **Env**: this box HAS colcon/cmake/g++/ROS jazzy + a warm `build/release/shared/px4`. Build ~3 min.
 - **Gotchas**: switch @ ~L1924 = `activateTask` (one-time SETUP), not the per-tick laws; speed config
   is mixed cm/s vs m and DUPLICATED across drone_config.hpp + fmu_node_base.hpp; `medianDepthCmInRect`
@@ -274,7 +274,7 @@ The recon-swarm app now streams camera (2026-08-17 commits above) -- our #1 bloc
 Agent action items:
 1. **VIDEO (critical)**: inspect the new streaming route in `ApiServer.kt` + the camera code. Pin:
    (a) endpoint path, (b) WS or HTTP, (c) codec (H264 NAL / MJPEG / JPEG frames / RTMP). Add that exact
-   endpoint to `scripts/test/dji_mock/mock_apiserver.py` (serve a looped test clip, same transport) so
+   endpoint to `tools/dji_mock/mock_apiserver.py` (serve a looped test clip, same transport) so
    DjiBackend's video consumer builds + tests against the mock.
 2. Re-check the other review items in the new commits: did takeoff/land gain response bodies? is there
    velocity clamping? `status listening` = telemetry -- confirm `/status` still matches the protocol.

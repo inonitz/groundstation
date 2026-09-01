@@ -24,12 +24,12 @@ correct it in message 2, and the manager kept re-deriving "08-28" from docs afte
 every doc saying 08-28 (including the filename `demo-roadmap-2026-08-28.md`) is WRONG.
 
 ### A2. "SELF-CONTAINED" WITHOUT THE BUILD COUPLING. **[CRITICAL — caused the worst error]**
-Brief said: *"The source/integration/ ... IS the Demo-Day system. Treat source/integration/ as the
+Brief said: *"The projects/integration/ ... IS the Demo-Day system. Treat projects/integration/ as the
 single source of truth."* The 08-25 handoff reinforces it with *"self-contained (no
 llm_cv_scene/llm_cv_track traces)"*.
 Reality: `run_mvd.sh:23` sets `BIN=build/release/shared/dji/bin` and the MVD RUNS
 `llm_to_action_asr_server`, `llm_to_action_keyboard_hook`, `llm_to_action_gstreamer_rx`, and
-`$BIN/llama-server`. **`source/integration/` shares a build tree with `source/llm_to_action/`.**
+`$BIN/llama-server`. **`projects/integration/` shares a build tree with `projects/llm_to_action/source/`.**
 Effect: the manager built a mental model of two disjoint lanes, proposed an agent division on that
 basis, and declared a C++ build "isolated, cannot affect the demo". That build relinked the demo's
 ASR server and VLM server. (Both verified still functional — same source — but the claim was false.)
@@ -39,15 +39,15 @@ the C++ relinks the demo's ASR and VLM. The isolation boundary is the build OUTP
 source dir."*
 
 ### A3. POINTED THE DASHBOARD TRACK AT DEAD CODE. **[HIGH — caused repeated user anger]**
-Brief said: *"(4) Diagnostic dashboard (spec + source/llm_to_action/dashboard/ ...)"* and
-*"the dashboard now lives at source/llm_to_action/dashboard/ (moved from scripts/)"*.
+Brief said: *"(4) Diagnostic dashboard (spec + projects/llm_to_action/source/dashboard/ ...)"* and
+*"the dashboard now lives at projects/llm_to_action/source/dashboard/ (moved from scripts/)"*.
 Reality: that directory contains the **dead FMU/SITL-era dashboard** (subscribes `/fmu/*` topics,
 gated behind `FMU_OBSERVABILITY=1`, needs a C++ FMU that was not even built). The dashboard actually
 wanted is a **NEW MVD dashboard** consuming `/tmp/mvd_app.log` + `scene_omdet.py`'s annotated frame.
 Effect: the manager anchored on the dead code as the starting point, described it as the design
 reference, and re-anchored on it even after being told it was dead — the single most repeated error
 of the session.
-**Fix:** *"The dashboard track is a NEW build for the MVD. `source/llm_to_action/dashboard/` is DEAD
+**Fix:** *"The dashboard track is a NEW build for the MVD. `projects/llm_to_action/source/dashboard/` is DEAD
 FMU-era code — not the target, not a reference. Do not open it. Target dir: `source/mvd_dashboard/`."*
 
 ### A4. REFERENCED A LAYOUT THAT WAS NEVER RECORDED. **[HIGH]**

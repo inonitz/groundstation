@@ -7,9 +7,9 @@
 > (interrupt + emergency boundary + APPROACH motion-gate, Spec 1) and the ORBIT / SEARCH motion verbs
 > (Spec 2) shipped and are SITL-verified (2026-08-09); live-YOLO GO and safe-land stay deferred.
 >
-> **Scope:** `FlightManagementUnitNode` (`source/llm_to_action/fmu/`) — high-level VLM
+> **Scope:** `FlightManagementUnitNode` (`projects/llm_to_action/source/fmu/`) — high-level VLM
 > planner + deterministic 20 Hz control loop, plus an in-process offboard translator (§7).
-> Primary target = **DJI drone** (Tello DROPPED 2026; video via DJI Fly Custom RTMP); PX4 SITL for flight-core dev. NOTE (2026-08-20): the gate/Demo-Day demo is the STANDALONE **perception stack** (see the 'Perception stack' section at the end + source/llm_cv_track/README.md) — a parallel subsystem to this FMU, which is currently DEFERRED. See docs/ROADMAP.md CURRENT PHASE banner.
+> Primary target = **DJI drone** (Tello DROPPED 2026; video via DJI Fly Custom RTMP); PX4 SITL for flight-core dev. NOTE (2026-08-20): the gate/Demo-Day demo is the STANDALONE **perception stack** (see the 'Perception stack' section at the end + archive/llm_cv_track/README.md) — a parallel subsystem to this FMU, which is currently DEFERRED. See docs/ROADMAP.md CURRENT PHASE banner.
 
 ---
 
@@ -20,7 +20,7 @@
 > `Odometry` ENU convention; FORK-C collapsed into the concrete backends (no separate offboard node).
 > The bullets below keep the original reasoning for history.
 >
-> **Update (2026-08-06):** the live launch harness (`scripts/test/*/run.sh` over `scripts/test/lib/sim_core.sh`) invokes
+> **Update (2026-08-06):** the live launch harness (`projects/llm_to_action/test/sitl/run.sh <scenario>` over `projects/llm_to_action/test/lib/sim_core.sh`) invokes
 > `llama-server` with `-c 65536`, not the `-c 4096` this doc and §16 originally marked DONE.
 > This is a deliberate temporary overshoot (user-confirmed) -- generous headroom to avoid
 > context-blowup failures while the rest of the stack (perception, APPROACH) is still under
@@ -316,7 +316,7 @@ time-to-contact / looming threshold until metric depth exists.
 - **Cross-hw odometry migration** debt (§8).
 - Reassess latency window (1–2 s) on drifting odom; interrupt oscillation (needs hysteresis +
   max-retries → land/abort); odom drift vs 0.20 m bar; ceiling-blind takeoff; SEARCH 2-D off-plane blindness.
-- **Sim integration debt: resolved.** The launch harness is now `scripts/test/*/run.sh` over `scripts/test/lib/sim_core.sh` (one
+- **Sim integration debt: resolved.** The launch harness is now `projects/llm_to_action/test/sitl/run.sh <scenario>` over `projects/llm_to_action/test/lib/sim_core.sh` (one
   folder per feature; `simenv_llm.sh` was removed, its logic folded into `sim_core.sh`). It runs
   the `llm_to_action_*` binaries, an FMU pane, a `llama-server` pane, and camera (`rx_node`)
   wiring end-to-end (the 2026-08-06 real-hardware Tello flight + the 20-test SITL suite).
@@ -326,7 +326,7 @@ time-to-contact / looming threshold until metric depth exists.
 ## 14. POC Build Slice — usable today, PX4 Gazebo sim
 
 > **STATUS (realized):** this section describes the original Phase-1 bring-up plan.
-> **Prereqs done** -- `scripts/test/*/run.sh` (over `scripts/test/lib/sim_core.sh`) runs the FMU
+> **Prereqs done** -- `projects/llm_to_action/test/sitl/run.sh <scenario>` (over `projects/llm_to_action/test/lib/sim_core.sh`) runs the FMU
 > pane, llama-server pane, `llm_to_action_*` binaries, and `rx_node`. **FORK-A** raised to `-c 65536`
 > as deliberate testing headroom, real tuning still open (§0); **FORK-C** collapsed into the
 > concrete backends, no retained `px4_offboard_node` (§7).
@@ -375,7 +375,7 @@ the FMU and confirmed working end-to-end against a real object with a live VLM p
 (2026-08-06) -- see ROADMAP 4.2 and 5.1.5. Also shipped + SITL-verified 2026-08-08 (Spec 3/4):
 the battery/failsafe supervisor + reversible manual override (§11), bounded SPSC backpressure (§3),
 the ROTATE accumulated-angle law and the LAND flare (§4) — all covered by the 15-test
-`scripts/test/` suite (ROADMAP §SITL test matrix).
+`projects/llm_to_action/test/sitl/` suite (ROADMAP §SITL test matrix).
 
 ---
 
@@ -393,7 +393,7 @@ the ROTATE accumulated-angle law and the LAND flare (§4) — all covered by the
 - [x] Rephrase kSystemPrompt interruption text → Appendix A -- installed in `llm_base.hpp`
       (see Appendix A below; the INTERRUPT behavior it describes is still unbuilt, §5.1).
 - [x] Sim launch migrated to FMU + `llm_to_action` binaries -- now the per-feature
-      `scripts/test/*/run.sh` harness over `scripts/test/lib/sim_core.sh` (`simenv_llm.sh` removed).
+      `projects/llm_to_action/test/sitl/run.sh <scenario>` harness over `projects/llm_to_action/test/lib/sim_core.sh` (`simenv_llm.sh` removed).
 
 ## 17. Dev Environment Networking (real-hardware bring-up, 2026-08-06)
 
@@ -466,7 +466,7 @@ Layers (both apps):
 Threading: a display thread at camera FPS + a perception worker + the ASR callback thread + a VLM thread.
 Portability: torch device is vendor-neutral (CUDA/ROCm/CPU); the VLM is llama.cpp/Vulkan.
 Input: webcam index, RTSP (drone via DJI Fly Custom RTMP -> MediaMTX), or a GStreamer pipeline.
-OmDet loads from a local vendored copy offline (~1s); see source/llm_cv_track/README.md.
+OmDet loads from a local vendored copy offline (~1s); see archive/llm_cv_track/README.md.
 
 Not fully AGPL-free yet: YOLO26 + SAM2 + BoT-SORT (Ultralytics) remain AGPL; OmDet-Turbo is Apache.
 
@@ -474,7 +474,7 @@ Not fully AGPL-free yet: YOLO26 + SAM2 + BoT-SORT (Ultralytics) remain AGPL; OmD
 
 ## Integration MVD — voice -> 4-tier router -> DJI backend + perception (2026-08-25)
 
-> **Status:** DONE / the Demo-Day system. Lives in `source/integration/` (self-contained). A PARALLEL
+> **Status:** DONE / the Demo-Day system. Lives in `projects/integration/` (self-contained). A PARALLEL
 > subsystem to the FMU above — the FMU (`llm_to_action`) remains the destination C++ product; this
 > Python MVD is the shipped prototype. Full detail: `docs/active/2026-08-25-mvd-integration-handoff.md`.
 

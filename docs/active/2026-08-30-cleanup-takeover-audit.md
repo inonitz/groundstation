@@ -10,6 +10,10 @@ Status: `[x]` done, `[~]` partial/in progress, `[ ]` open.
 ---
 
 ## 0. SPRINT FREEZE (2026-09-01) — read before using this list
+RESTRUCTURE NOTE (2026-09-01, same day): the owner overrode the freeze for a repo restructure
+(monorepo `projects/` layout) executed before backlog A. Items it completed are flipped to `[x]`
+below; the full record is `2026-09-01-repo-restructure.md`. Paths in older items may predate the
+restructure — translate `source/` -> `projects/`, `scripts/test/` -> `projects/llm_to_action/test/`.
 Change of plans: two more technical interviews inside ~1.5 weeks (see
 `2026-09-01-interview-sprint-handoff.md`). This tasklist is FROZEN for the sprint except:
 C3 (phone strip finish), S1/E (notify live test), and anything directly serving backlog A-E.
@@ -32,7 +36,7 @@ The restructure remains a stated necessity - postponed, not cancelled.
   + C result into the kill-switch doc table.
 - `[ ]` **[PAIR] S1 — notify fork webcam test** (owner, commands in the run guide).
 - `[x]` **[AGENT] C1 — repo protection**: CLAUDE.md rule live; owner: no further action needed.
-- `[ ]` **[PAIR] S11 — merge to master + open `feature-cleanup-reorg`** (commands issued 2026-08-31).
+- `[x]` **[PAIR] S11 (DONE 2026-09-01) — merge to master + open `feature-cleanup-reorg`** (commands issued 2026-08-31).
 
 ### The rewrite (all [OWNER] — agent supplies a per-verb behavior map before each slice, reviews after)
 Keep in mind, applying to every item: a refactor is imminent; agent code-notes below describe the
@@ -86,7 +90,7 @@ CURRENT tree so the owner knows what they are rewriting, not fixes for the agent
 - `[ ]` **[AGENT] H1 — Hebrew ASR bench**: whisper-large-v3-turbo + VAD, q4/q5/q6/q8 or ONNX, vs
   Parakeet on the same recordings.
 - `[x]` **[AGENT] research-1 — DONE:** reading list delivered ->
-  `docs/active/2026-08-31-vlm-bt-reading-list.md` (12 entries, ranked by studyable source; BTGenBot,
+  `docs/research/2026-08-31-vlm-bt-reading-list.md` (12 entries, ranked by studyable source; BTGenBot,
   Dendron, and the Microsoft VLM-BT planner are the top three for our stack).
 - `[x]` **[AGENT] research-2 — DONE:** 7 gaps found; adopted as the subsection below.
 
@@ -113,35 +117,35 @@ CURRENT tree so the owner knows what they are rewriting, not fixes for the agent
   owner writes the understanding parts (architecture summary, module verdicts from G1). Owner decides.
 
 ### Repo & scripts (agent executes on `feature-cleanup-reorg`; owner reviews + commits)
-- `[ ]` **C5 — preflight script**: ONE script checks every required model/binary/asset and prints what
+- `[x]` **C5 — preflight script (DONE 2026-09-01: `tools/preflight.sh`)**: ONE script checks every required model/binary/asset and prints what
   is missing (owner: no manual checking). Note: models live in `/root/models`, volume-mounted and
   carried between demo machines — replication by outsiders is a README concern only (fold into C5d).
 - `[ ]` **C5c — TTS install scripted** (piper + voice + espeak-ng + aplay).
-- `[ ]` **C5d — root README rewrite**: real quickstart, 4-arg build.sh, models/replication section.
-- `[ ]` **R1a — `config/` -> `assets/` repoints** (script callers; the 2 compiled defaults are A5b).
-- `[ ]` **R1b+R2 — repoint `sim_core.sh` at `assets/`, delete `dependencies/`** + submodule fossils.
-- `[ ]` **R1c — fix the 6 dead `scripts/dashboard/` callers.**
-- `[ ]` **R3 — .gitignore cleanup**: drop the duplicate block, the rubicon_orbit dir rule, dead
+- `[x]` **C5d — root README rewrite (DONE 2026-09-01)**: real quickstart, 4-arg build.sh, models/replication section.
+- `[x]` **R1a (n/a — no config/ dir existed; compiled defaults remain A5b) — `config/` -> `assets/` repoints** (script callers; the 2 compiled defaults are A5b).
+- `[x]` **R1b+R2 (DONE 2026-09-01: sim_core points at assets/, dependencies/ deleted) — repoint `sim_core.sh` at `assets/`, delete `dependencies/`** + submodule fossils.
+- `[x]` **R1c (DONE 2026-09-01: launcher ported to source/dashboard/run_sitl_demo.sh) — fix the 6 dead `scripts/dashboard/` callers.**
+- `[x]` **R3 (DONE 2026-09-01: .gitignore rewritten) — .gitignore cleanup**: drop the duplicate block, the rubicon_orbit dir rule, dead
   patterns, and (owner-approved R3c) every build-artifact pattern already covered by `build/`.
-- `[ ]` **R4 — run_all.sh**: remove 6 phantom scenarios, fix the 8-vs-4 comment, dead lib guard;
+- `[x]` **R4 (DONE 2026-09-01: run_all.sh replaced by test/sitl/run.sh --all; phantoms dropped, verdict quality labeled in scenarios.conf) — run_all.sh**: remove 6 phantom scenarios, fix the 8-vs-4 comment, dead lib guard;
   then write the 6 missing `filter.sh` verdicts or mark those scenarios unverifiable explicitly.
 - `[ ]` **R8 — rotate: tests in test_router.py, docs in the command table + README, JSON bodies
   documented**; one mock sign check ([PAIR] for the live half).
-- `[ ]` **R10c — write `build-devenv.ps1` mirroring build-devenv.sh; delete the stale one-line pair.**
-- `[ ]` **R10e — dji_check.sh: derive the NIC from `ip route`.**
-- `[ ]` **R10g — create the one-off home** (`scripts/oneoff/`, date+purpose header rule); move
+- `[~]` **R10c (stale stub pair deleted 2026-09-01; build-devenv.ps1 mirror still open) — write `build-devenv.ps1` mirroring build-devenv.sh; delete the stale one-line pair.**
+- `[x]` **R10e (DONE 2026-09-01) — dji_check.sh: derive the NIC from `ip route`.**
+- `[x]` **R10g (superseded 2026-09-01: owner ruled spent one-offs get DELETED, no oneoff home; mix_noisebed + yolo-quality removed) — create the one-off home** (`scripts/oneoff/`, date+purpose header rule); move
   mix_noisebed.py (purpose: ASR noise-cutoff bench) and friends into it.
-- `[ ]` **R12 — root-derivation sweep**: ~25 scripts get `ROOT="$(dirname ...)"` instead of
+- `[x]` **R12 (DONE 2026-09-01 for all live scripts; frozen integration/ keeps corrected absolute paths) — root-derivation sweep**: ~25 scripts get `ROOT="$(dirname ...)"` instead of
   `/root/groundstation`.
 - `[ ]` **[PAIR] R11 — renames** (`gstreamer_udp_cam_rx` -> `gstreamer_cam_rx`, canned->synthetic):
   touch C++ dirs + CMake, so owner runs them with agent-prepared commands.
-- `[ ]` **[PAIR] P6 — Tello archive**: agent prepares the `git mv` block (scripts/tello, slam tests,
+- `[x]` **[PAIR] P6 — Tello archive (DONE 2026-09-01: archive/tello, archive/slam-tests)**: agent prepares the `git mv` block (scripts/tello, slam tests,
   rviz), owner runs.
-- `[ ]` **[PAIR] R6 — llm_cv_track**: archive with P2, or agent vendors its 7 cross-package refs if
+- `[x]` **[PAIR] R6 — llm_cv_track (DONE 2026-09-01: archived with llm_cv_scene; zero live refs) **: archive with P2, or agent vendors its 7 cross-package refs if
   the owner wants it runnable.
 
 ### Docs (owner ruling: docs are the AGENT'S context insurance -> agent does nearly all of it)
-- `[ ]` **[AGENT] D1 — the 15 stale moves**: agent prepares the exact `git mv` block, owner pastes it.
+- `[x]` **[AGENT] D1 (DONE 2026-09-01: stale sweep + docs reorganized into runbooks/specs/research) — the 15 stale moves**: agent prepares the exact `git mv` block, owner pastes it.
 - `[ ]` **[AGENT] D2a-i + D3 + D5 — all in-place corrections** (indexes, contradictions, ports,
   machine roles, dates, stale claims): agent edits, owner reviews the diff.
 - `[ ]` **[AGENT-draft/OWNER-author] C7-doc — the onboarding doc** (clone -> build -> run, C5 models
@@ -172,7 +176,7 @@ measurement. A and B: PASSED. C: pending.
 part. The closing command block is in chat; result to be recorded above.
 
 **Q3 (A13, "which dead node?").** Yes — a compiled executable: `llm_to_action_offboard_mode`, built
-from `source/llm_to_action/offboard_ctrl/` on every PX4 configure. It is an early standalone offboard
+from `projects/llm_to_action/source/offboard_ctrl/` on every PX4 configure. It is an early standalone offboard
 node, superseded when `px4_backend` moved inside the FMU binary; no script launches it. It carries
 its own copies of the PX4 topic strings and sysIDs — deleting it removes the A8 duplication in the
 same stroke. One check first: its copy says `vehicle_status_v1`, the live backend says

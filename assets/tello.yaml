@@ -8,7 +8,7 @@
 # to re-tune: edit a value here, re-run ./run.sh.
 #
 # Format: flat `key: value`, one per line, '#' starts a comment. Keys match the
-# DroneConfig fields in source/llm_to_action/fmu/drone_config.hpp. Any field left
+# DroneConfig fields in projects/llm_to_action/source/fmu/drone_config.hpp. Any field left
 # out keeps its compiled default. Unknown keys are warned-and-skipped.
 # ==============================================================================
 

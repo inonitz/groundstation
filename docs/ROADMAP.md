@@ -17,7 +17,7 @@ Last synced: 2026-08-20 (perception-first pivot; see the CURRENT PHASE banner be
 > (prove smart, live, voice-driven CV) was PASSED** — with the perception demo, NOT flight. So:
 > **the flight-core objective tree below (blocks 1-9: FMU, guidance, ROTATE/APPROACH/ORBIT/SEARCH,
 > backends) is DEFERRED until after Demo Day.** It is real, SITL-verified work, but it is NOT the current
-> priority and does NOT gate the demo. The perception stack (`source/llm_cv_track` + `llm_cv_scene`) runs
+> priority and does NOT gate the demo. The perception stack (`archive/llm_cv_track` + `llm_cv_scene`) runs
 > STANDALONE, not through the FMU. **Current priority + full plan = the `## 2026-08-20 — GATE PASSED`
 > section at the END of this file.**
 
@@ -38,7 +38,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
              full magnitude is swept -- granular incl. >=180 deg (270 cw really turns 270 cw;
              360 = full turn), not shortest-path. SITL-verified 2026-08-07: 90 cw swept -86 deg,
              200 ccw swept +195 deg (long way CCW, not shortest-path).
-             Regression test: `scripts/test/rotate-land/filter.sh` captures all sim panes and
+             Regression test: `projects/llm_to_action/test/sitl-legacy/rotate-land/filter.sh` captures all sim panes and
              asserts the swept angle/direction of the canned 90 cw + 200 ccw turns.
              2026-08-11 (agent3): rotation testing on the REAL airframe is reframed
              as [GATE Agent-5 SLAM], not a yaw fix. The airframe drifts through space
@@ -162,7 +162,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
        5.1.2 yaw-center + range-decel servo, recomputed per tick [x]
        5.1.3 done at standoff / lost = FAIL                      [x]
        5.1.4 tests (no YOLO needed)                              [x]  detection_query_test +
-             canned rig (--canned-approach / scripts/test/approach/run.sh); SITL-verified both
+             canned rig (--canned-approach / projects/llm_to_action/test/sitl-legacy/approach/run.sh); SITL-verified both
              paths -- lost-target FAIL and reached-standoff approach_ok (2026-08-06)
        5.1.5 real-perception + VLM-driven end-to-end SITL         [~]  2026-08-06: real
              YOLO seg+depth (model paths were wrong since 4.2, never actually loaded
@@ -212,7 +212,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
        to catch is the remaining real-world unknown -> 5.1.5.
 
 7. Advanced navigation = "Being B"                               [DEFER]  horizon
-   7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, source/slam/)     [~]  tracking verified live
+   7.1 SLAM/VIO pose (Stella-VSLAM / OpenVINS, projects/slam/source/)     [~]  tracking verified live
          in SITL 2026-08-09 after an OpenMP threading fix -- best case 2 PASS/1 FAIL (spread_ratio
          0.60-0.86) with VLM idling, marginal not solid. SITL-only (clean Gazebo render), untested
          on real camera; not yet wired to control (B3 -- see docs/NOTES.md 2026-08-09).
@@ -221,7 +221,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
    7.4 local-to-global tf2 anchor                                [ ]
 
 8. Sim / tooling                                                 [~]
-   8.1 PX4 Gazebo SITL (scripts/test/*/run.sh)                [x]
+   8.1 PX4 Gazebo SITL (projects/llm_to_action/test/sitl/run.sh <scenario>)                [x]
    8.2 camera TX to RX to FMU proven                             [x]
    8.3 simenv.sh migration to llm_to_action binaries            [ ]  (ARCH 14/16)
    8.4 canned rigs (cross/speed)                                 [x]
@@ -259,14 +259,14 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
         vLand tapered -0.500 -> -0.139 toward touchdown as altitude dropped, reached STANDBY. Refined
         2026-08-09 to a quadratic (t*t) taper -- brakes harder near the ground than the original linear
         ramp; operator-confirmed a softer touch.
-        Regression test: `scripts/test/land-flare/filter.sh` captures all sim panes and asserts
+        Regression test: `projects/llm_to_action/test/sitl-legacy/land-flare/filter.sh` captures all sim panes and asserts
         vLand tapers toward touchdown (not a constant -0.5).
    9.12 Landing altitude is height-above-origin, not AGL          [ ]  2026-08-07 terrain-land
         finding (the "AGL gap"): LAND/flare key on `od.pos.z` = height above the takeoff ORIGIN,
         not height above ground. Over uneven terrain the ground is not at z=0, so the flare taper
         (9.11) mis-triggers -- starts too early/late and "touchdown" can be declared above the
         slope or into it. Exposed by `--canned-terrain-land` + the Rubicon world
-        (`scripts/test/terrain-land/`). Fix (open): key landing on a rangefinder / terrain-relative
+        (`projects/llm_to_action/test/sitl-legacy/terrain-land/`). Fix (open): key landing on a rangefinder / terrain-relative
         altitude, not origin-relative z.
    9.13 GO/forward travels off-commanded-heading in SITL          [ ]  2026-08-07 terrain-land:
         takeoff -> GO forward -> land, the drone tracked ~10-30 deg clockwise off the commanded
@@ -282,7 +282,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
         finding: LAUNCH_VLM=1 loads Qwen3-VL-2B (-ngl 99 -c 65536, full GPU offload,
         64k context) on top of the seg+depth ONNX perception models every scenario
         already loads -- confirmed ~12GiB on the operator's machine, too much for a
-        laptop-class GPU. scripts/test/run_all.sh (A1) gets a SKIP_HIGH_VRAM=1 knob
+        laptop-class GPU. projects/llm_to_action/test/sitl-legacy/run_all.sh (A1) gets a SKIP_HIGH_VRAM=1 knob
         to skip these three; not a fix, just a documented escape hatch for
         constrained hardware. A real fix (smaller VLM quant, lower context, or a
         low-VRAM SITL profile) is unscoped.
@@ -292,7 +292,7 @@ ROOT: Off-board VLM-driven autonomous system (DJI drone via RTMP; Tello DROPPED 
 
 ## SITL test matrix (2026-08-08)
 
-All 20 `scripts/test/<feature>/` runs are green in PX4 Gazebo SITL: the 15 baseline rows (operator-run, 2026-08-08) plus the 3 spec-1 + 2 spec-2 rows at the bottom, which were new the same day and have since run to PASS too (see their Status column) -- nothing in this matrix is still pending a run. **Type:**
+All 20 `projects/llm_to_action/test/sitl-legacy/<feature>/` runs are green in PX4 Gazebo SITL: the 15 baseline rows (operator-run, 2026-08-08) plus the 3 spec-1 + 2 spec-2 rows at the bottom, which were new the same day and have since run to PASS too (see their Status column) -- nothing in this matrix is still pending a run. **Type:**
 Auto = `filter.sh` asserts PASS/FAIL from the captured log; Milestone = operator confirms the digest
 against expected behavior. Per-run pane captures are git-ignored (regenerated each run).
 
@@ -390,10 +390,10 @@ Timeline: today Thu 08-20. Integration-ready target Sat 08-22. RIGOROUS TESTING 
 Sun 08-23 + Mon 08-24. Demo Day ~08-28. Land-platform integration ONLY if time remains after Monday.
 
 ## WHERE WE ARE (done / working)
-- **STAR — source/llm_cv_track/scene_omdet.py.** Voice -> OmDet-Turbo open-vocab detect (box follows) ->
+- **STAR — archive/llm_cv_track/scene_omdet.py.** Voice -> OmDet-Turbo open-vocab detect (box follows) ->
   SAM2.1 mask -> Qwen3-VL Q&A, full chat-pane UI. Loads OmDet locally/offline in ~1s. Runs on webcam +
   drone RTMP. Validated headless; verified live at the gate (with fixes below). See llm_cv_track/README.md.
-- **BACKUP — source/llm_cv_scene.** Voice -> Qwen3-VL describes+localizes -> SAM2. 100% local, always
+- **BACKUP — archive/llm_cv_scene.** Voice -> Qwen3-VL describes+localizes -> SAM2. 100% local, always
   loads. The safety net.
 - **Static tools** — recognize_omdet.py (OmDet) + recognize.py (VLM): image + prompt -> boxes/masks + log.
 - **Drone feed** — DJI RC2 + DJI Fly Custom RTMP -> MediaMTX -> RTSP -> app. Working.
@@ -408,7 +408,7 @@ Sun 08-23 + Mon 08-24. Demo Day ~08-28. Land-platform integration ONLY if time r
   Productization needs permissive replacements (D-FINE bg, a permissive tracker). Not a Demo Day blocker.
 - **Control side (command -> platform).** The perception demo does NOT fly/drive anything yet; flight was
   cut for the gate. Real drone control (llm_to_action DjiBackend over the real link) is separate,
-  unfinished work — see docs/active/spec-dji-endtoend-bringup.md.
+  unfinished work — see docs/specs/spec-dji-endtoend-bringup.md.
 - **Live reliability** under demo conditions (stream drops, mic, warmup) is only lightly hardened.
 
 ## DEMO DAY PLAN
@@ -459,7 +459,7 @@ Sources: dji-sdk/RoboMaster-SDK (GitHub), dji.com/robomaster-s1/programming-guid
 ## 2026-08-25 — MVD INTEGRATION DONE (voice -> router -> DJI + smart CV)
 
 Full detail + command table + next tracks: `docs/active/2026-08-25-mvd-integration-handoff.md`.
-The `source/integration/` MVD is **DONE and considered effective**. Demo-Day system is the perception +
+The `projects/integration/` MVD is **DONE and considered effective**. Demo-Day system is the perception +
 voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED as the destination product).
 
 - [x] 4-tier deterministic router (EMERGENCY>OVERRIDE/RESUME>BASIC>COMPLEX), voice + phone ASR.
@@ -471,7 +471,7 @@ voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED 
 - [x] TTS out (`voice.py`): phone `/tts` + laptop espeak; LONG (screen) / SHORT (spoken) split.
 - [x] Perception hardened: OmDet offline load, executor starvation, VLM `-np 1`, VLM `:18090`, video
       watchdog/doctor, live `[dji]`/`[phone_ears]`/`[voice]` logging. 7 router tests pass.
-- [x] Self-contained `source/integration/` (no llm_cv_scene/llm_cv_track traces).
+- [x] Self-contained `projects/integration/` (no llm_cv_scene/llm_cv_track traces).
 
 - [ ] `[GATE]` **BACKEND (DJI app dev):** dynamic groundstation-IP discovery; fix gimbal commands
       (broken backend-side; `fly_by` works); `ApiServerService` foreground-service reliability.

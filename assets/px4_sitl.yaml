@@ -6,12 +6,12 @@
 # is byte-for-byte identical to running with NO profile at all (the FMU's built-in
 # constants ARE these SITL numbers). Copy it to start a new per-drone profile.
 #
-# The SITL harness (scripts/test/lib/sim_core.sh) does NOT set DRONE_CONFIG, so it
+# The SITL harness (projects/llm_to_action/test/lib/sim_core.sh) does NOT set DRONE_CONFIG, so it
 # runs on the compiled defaults directly. This file exists for documentation and
 # for anyone who wants to tweak a single SITL value without a rebuild.
 #
 # Every value here MUST equal the matching `constexpr k*` in
-# source/llm_to_action/fmu/fmu_node_base.hpp. If a constant changes, change it here
+# projects/llm_to_action/source/fmu/fmu_node_base.hpp. If a constant changes, change it here
 # too (or delete the line to fall back to the compiled value).
 # ==============================================================================
 

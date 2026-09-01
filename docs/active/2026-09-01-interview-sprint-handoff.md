@@ -91,11 +91,11 @@ and absolute.
 ## 4. Technical anchors for the new session
 - Repo: /root/groundstation. Branch state: feature-llm-smart-scene merged/merging to master;
   sprint work on a new branch (owner runs git; agent NEVER writes git — CLAUDE.md).
-- MVD run: `bash /root/groundstation/source/integration_tts/run_mvd.sh dji real` (PHONE_IP auto from
+- MVD run: `bash /root/groundstation/projects/integration_tts/run_mvd.sh dji real` (PHONE_IP auto from
   gateway; ASR_CAPTUREID default 1). Mock control: `... dji` + mock_apiserver on 127.0.0.1:8079.
 - Phone: IP = WiFi gateway, :8080 control/status/tts, :5600 raw H.264. App = exoskeletons repo.
 - VLM: Qwen3-VL-4B via llama-server :18090 (Vulkan). 2B is the SITL-safe fallback.
-- Wire: `source/integration*/dji_wire.py`; router tiers in `commands.py`/`router.py`; phone ASR in
+- Wire: `projects/integration*/dji_wire.py`; router tiers in `commands.py`/`router.py`; phone ASR in
   `phone_ears.py`; TTS client in `voice.py`.
 - Models live in /root/models (volume-mounted, travels between machines).
 - The container loses ad-hoc installs on rebuild (it ate the TTS binaries once) — script every
@@ -119,7 +119,7 @@ and absolute.
 >    Owner Interaction Protocol are absolute), then
 >    `docs/active/2026-09-01-interview-sprint-handoff.md` (situation, goal hierarchy, backlog),
 >    then `docs/active/2026-08-30-cleanup-takeover-audit.md` (frozen tasklist) and
->    `docs/active/2026-08-27-run-guide.md` (how the MVD runs).
+>    `docs/runbooks/2026-08-27-run-guide.md` (how the MVD runs).
 > 2. Situation: two technical interviews - #1 in 1-2 days or less, #2 (the important one) at the
 >    end of ~1.5 weeks. This is a race against another team's MVD.
 > 3. Work the backlog in order: A phone-first Hebrew ASR -> B Hebrew->English translation before

@@ -94,8 +94,6 @@ define_library_fetch_of_stella_vslam_with_external_project()
 # Reserving the order between "Migrated VLMNav" & "Local Subdirectories"
 # will cause a duplicate target error
 # ---------------------------------------------------------------------------
-# add_subdirectory(dependencies/util2)
-# add_subdirectory(dependencies/sttserver)
 
 
 safe_cpm_add_package(
@@ -189,7 +187,7 @@ safe_cpm_add_package(
 )
 
 # ctello: DOWNLOAD_ONLY so we compile only its client .cpp (see
-# source/llm_to_action/tello_backend/CMakeLists.txt) and skip its examples.
+# projects/llm_to_action/source/tello_backend/CMakeLists.txt) and skip its examples.
 safe_cpm_add_package(
     NAME ctello
     GIT_REPOSITORY https://github.com/carlospzlz/ctello.git
@@ -203,10 +201,10 @@ safe_cpm_add_package(
 # Local Project
 # ---------------------------------------------------------------------------
 if(GROUNDSTATION_BUILD_EXECUTABLE)
-    add_subdirectory(source/llm_to_action)
+    add_subdirectory(projects/llm_to_action/source)
     # add_subdirectory(source/nav)
 endif()
 
 if(GROUNDSTATION_BUILD_SLAM)
-    add_subdirectory(source/slam)
+    add_subdirectory(projects/slam/source)
 endif()

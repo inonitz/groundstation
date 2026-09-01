@@ -1,151 +1,67 @@
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![MIT][license-shield]][license-url]
+# Groundstation
 
-<!-- PROJECT LOGO -->
-<div align="center">
-<h3 align="center">Groundstation</h3>
-  <p align="center">
-    Off-Board, VLM-Driven Autonomous Drone Control
-  </p>
-</div>
+**Voice-commanded autonomous camera drone: the VLM plans, deterministic verbs fly.**
 
-## NOTE
+All perception, planning, and control run on a ground-station computer. The aircraft is a dumb
+peripheral streaming H.264 video and telemetry; a local Vision-Language Model (Qwen3-VL via
+`llama-server`) answers scene questions and plans bounded verb sequences, and deterministic
+code -- never the LLM -- produces every motor command.
 
-**This `README.md` requires cleanup since it doesn't address the DJI Mobile SDK Support, The new Perception Engine developed, and so much more. The current Documentation is generally correct but requires fine-tuning for proper build & usage.**
+Two living systems share this repo:
 
-## About The Project
+- **The MVD (Python, `projects/integration*`)** -- the field-tested demo: phone-connected DJI
+  drone, push-to-talk ASR, a 4-tier command router (emergency regex -> override -> verbs ->
+  VLM perception), YOLO26-seg + OmDet-Turbo + SAM2.1 + VLM-gated highlighting, spoken answers.
+- **`projects/llm_to_action` (C++17 / ROS 2)** -- the real system being built: FMU with a 20 Hz
+  control loop and flight state machine behind a compile-time backend (PX4 SITL in Gazebo / DJI),
+  YOLO seg + metric depth perception, VLM objective planning. Owner-written.
 
-Groundstation is a C++17 / ROS 2 off-board autonomous flight stack for small drones (primary
-target: DJI Tello; PX4 software-in-the-loop in Gazebo as the simulation fallback). The aircraft is
-a dumb peripheral — it only streams H.264 video and telemetry over the local network. All
-perception, planning, and control run on a ground-station computer.
+## Layout
 
-The control philosophy is **"the VLM plans, deterministic math executes."** A local
-Vision-Language Model (Qwen3-VL, served by `llama-server`) acts as a high-level, event-driven
-planner: when the task queue drains it is shown the current camera frame, vehicle state, a YOLO
-perception JSON (detections + metric depth), and the executed-command history, and it returns a
-plan — a JSON array of discrete verbs (`takeoff`, `go`, `land`, `stop`, `approach`, plus
-`rotate`/`orbit`/`search` still specced-only). A deterministic **20 Hz control loop** consumes
-that plan one task at a time, owns the flight state machine, and streams setpoints to the flight
-controller.
-
-The two flight controllers are hidden behind a compile-time backend interface (CRTP,
-`GenericBackend<Derived>`) so the same FMU logic drives either PX4 (SITL) or a real Tello. See
-[docs/project_overview.md](docs/project_overview.md) for the full architectural framing and
-[docs/ROADMAP.md](docs/ROADMAP.md) for current status of every objective.
-
-<br></br>
-
-### Project Structure
-
-The project is structured around ROS 2 nodes that communicate via standard topics, under
-`source/llm_to_action/`:
-
-* `fmu/`: The Flight Management Unit — the VLM planner + 20 Hz deterministic control loop and
-  flight state machine. The core of the system.
-* `generic_backend/`, `px4_backend/`, `tello_backend/`: The compile-time backend abstraction and
-  its two concrete implementations (PX4 SITL, DJI Tello).
-* `perception/`: YOLO segmentation + metric depth integration (`PerceptionRuntime`), feeding the
-  VLM's prompt and the `approach` servo.
-* `asr/`: Whisper/Sherpa speech-to-text server node (retained as a component; not the primary
-  demonstrated pipeline — see below).
-* `keyboard/`: X11 push-to-talk / manual-override keyboard hook.
-* `frame/`, `offboard_ctrl/`, `gstreamer_gz_udp_tx/`, `gstreamer_tello_udp_tx/`,
-  `gstreamer_udp_cam_rx/`, `util/`: camera transport, offboard streaming, and shared utilities.
-
-Outside `llm_to_action/`:
-
-* `source/slam/`: work-in-progress monocular VSLAM/VIO (Stella-VSLAM / OpenVINS) and OctoMap
-  scaffolding for the longer-horizon SLAM + A* navigation plan ("Being B" in
-  [docs/project_overview.md](docs/project_overview.md)).
-* `scripts/` & `cmake/`: build utilities, CMake configurations, and CPM dependency management.
-
-> This branch (`feature-llm-driver`) is intentionally self-contained: the earlier
-> `speech_to_action`/`nav` pipeline has been removed from it to keep scope focused on the
-> VLM-driven `llm_to_action` stack described above.
-
-<br></br>
-
-## Getting Started
-
-### Prerequisites
-
-* ROS 2 (Humble recommended)
-* CMake 3.16 or higher
-* A working C++17 compiler toolchain (e.g., Clang or GCC)
-* Core dependencies: Eigen3, OpenCV, GStreamer, ONNX Runtime, X11 (if building in a WSL
-  environment)
-* PX4-Autopilot + Gazebo (for SITL) and/or a DJI Tello on the same network (for real hardware)
-
-### Downloading the Source
-
-```sh
-git clone https://github.com/inonitz/groundstation.git
-cd groundstation
+```
+projects/
+  integration/           frozen field-tested MVD fallback -- never edited
+  integration_notify/    MVD fork: person-notify demo + dashboard
+  integration_tts/       MVD fork: voice-out; the going-forward base
+  integration_harden/    MVD fork: the current interview-sprint work (+ test/)
+  llm_to_action/         C++ stack: source/ + test/sitl (consolidated SITL suite)
+  slam/                  C++ VSLAM/VIO work (source/)
+tools/       dji_mock (mock API server) · devenv (Dockerfile + installs) · preflight.sh
+assets/      gazebo worlds/models, drone configs
+docs/        active/ · runbooks/ · specs/ · research/ · stale/  -- start at docs/README.md
+archive/     dead-but-revivable code (tello, cv prototypes)
 ```
 
-### Configuring & Building
+## Quickstart
 
-`build.sh` (Linux/WSL) / `build.ps1` (Windows) abstract the CMake configure + Ninja build steps.
+```bash
+bash tools/preflight.sh              # checks every model/binary/tool, prints what's missing
+bash tools/devenv/install-runtime-deps.sh   # after any container rebuild
 
-```sh
-./build.sh <build_type> <library_type> <action>
+# C++ build (backend: px4 | tello | dji | all):
+./build.sh release shared dji build
+
+# MVD desk test, no drone (mock control + webcam):
+python3 tools/dji_mock/mock_apiserver.py 127.0.0.1 8079     # terminal 1
+bash projects/integration/run_mvd.sh webcam mock            # terminal 2
+
+# SITL (PX4 + Gazebo + FMU):
+projects/llm_to_action/test/sitl/run.sh --list
+projects/llm_to_action/test/sitl/run.sh hover
 ```
 
-- `build_type`: `debug`, `release`, `release_dbginfo`, `debug_perf`, `release_perf`
-- `library_type`: `shared`, `static`
-- `action`: `configure`, `build`, `cleanbuild`, `rungs`, `runsim`
+Real-drone runs are **human-only** with the aircraft secured -- read the safety rules in
+[CLAUDE.md](CLAUDE.md) and [docs/runbooks/2026-08-27-run-guide.md](docs/runbooks/2026-08-27-run-guide.md)
+first, and know the kill switch before arming.
 
-```sh
-./build.sh release static configure
-./build.sh release static build
-```
-
-Backend selection (PX4, Tello, or both) is a CMake option
-(`GROUNDSTATION_BUILD_BACKEND_PX4` / `_TELLO` / `_ALL`); see `CMakeLists.txt`.
-
-<br></br>
-
-## Usage
-
-The fastest way to see the stack fly is the PX4 SITL rig:
-
-```sh
-./scripts/simenv_llm.sh              # canned plan: takeoff -> forward 1m -> land, no VLM
-./scripts/simenv_llm.sh cross        # per-axis FLU sanity check
-./scripts/simenv_llm.sh approach     # closed-loop APPROACH against a synthesized detection
-./scripts/simenv_llm.sh approach-real # APPROACH against real YOLO seg+depth in-sim
-./scripts/simenv_llm.sh vlm          # full stack: Qwen3-VL plans, no canned commands
-```
-
-Each mode launches PX4 + Gazebo + the FMU (and, for `vlm`, `llama-server`) in a tmux session; tear
-it down with `Ctrl+B` then `:kill-session`. See the script header for full details and
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for what each FMU verb actually does.
-
-For real-hardware (Tello) bring-up notes, see
-[docs/tello_backend_notes.md](docs/tello_backend_notes.md).
-
-<br></br>
+Models live in `/root/models` (volume-mounted, travels between machines) -- `tools/preflight.sh`
+tells you what belongs there.
 
 ## Documentation
 
-Start in [docs/README.md](docs/README.md) — it indexes the roadmap, architecture spec,
-development log, and task docs.
-
-<br></br>
+[docs/README.md](docs/README.md) indexes everything: architecture, roadmap, runbooks, specs,
+and the running development log.
 
 ## License
 
-Distributed under the GNU GPLv3 License. See `LICENSE` file for more information.
-
-<!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/inonitz/groundstation?style=for-the-badge&color=blue
-[contributors-url]: https://github.com/inonitz/groundstation/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/inonitz/groundstation?style=for-the-badge&color=blue
-[forks-url]: https://github.com/inonitz/groundstation/network/members
-[stars-shield]: https://img.shields.io/github/stars/inonitz/groundstation?style=for-the-badge&color=blue
-[stars-url]: https://github.com/inonitz/groundstation/stargazers
-[license-shield]: https://img.shields.io/github/license/inonitz/groundstation?style=for-the-badge
-[license-url]: https://github.com/inonitz/groundstation/blob/main/LICENSE
+GNU GPLv3 -- see `LICENSE`.

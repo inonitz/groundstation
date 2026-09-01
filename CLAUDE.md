@@ -35,7 +35,7 @@ motors spun and the human was injured stopping it by hand. Never again.
 - **Real tests over canned mocks.** A predefined-output mock proves nothing; claims of "working" require the real path exercised, and unmeasured numbers are labeled unverified.
 - **Background agents report to files, not chat.** Relaying bulk agent output into the conversation destroys the owner's scrollback; keep chat replies to short summaries.
 - **Script every install.** The dev container wipes ad-hoc installs on rebuild (it has eaten working tools before).
-- **`source/integration/` is FROZEN** - the proven demo fallback. Changes land in forks, never there.
+- **`projects/integration/` is FROZEN** - the proven demo fallback. Changes land in forks, never there.
 
 # Tool Execution Rules
 

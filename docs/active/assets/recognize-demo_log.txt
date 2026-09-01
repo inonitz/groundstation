@@ -1,5 +1,5 @@
 [recognize] 2026-08-27 11:39:16
-[recognize] argv    : /root/groundstation/source/integration_notify/recognize.py /tmp/claude-0/-root-groundstation/34dcdba1-7c22-42b4-8c36-e28b6b5fb197/scratchpad/testimg/people.jpg what do you see --notify a man in a red shirt --mask -o /root/groundstation/docs/active/assets/recognize-demo.jpg
+[recognize] argv    : /root/groundstation/projects/integration_notify/recognize.py /tmp/claude-0/-root-groundstation/34dcdba1-7c22-42b4-8c36-e28b6b5fb197/scratchpad/testimg/people.jpg what do you see --notify a man in a red shirt --mask -o /root/groundstation/docs/active/assets/recognize-demo.jpg
 [recognize] image   : /tmp/claude-0/-root-groundstation/34dcdba1-7c22-42b4-8c36-e28b6b5fb197/scratchpad/testimg/people.jpg  (810x1080)
 [recognize] prompt  : what do you see
 [recognize] backend : Qwen3-VL @ http://127.0.0.1:18090   mask=True  notify='a man in a red shirt'

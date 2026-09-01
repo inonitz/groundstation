@@ -1,7 +1,7 @@
 # MVD Voice Command Table — Laptop/Phone ASR → DjiWire → DJI Backend POST
 
 Definitive, current reference. Same pipeline for laptop mic (press H) and phone ASR (`POST :8080/input`).
-Source of truth: `source/integration/commands.py` (patterns) + `router.py` (dispatch) + `dji_wire.py`.
+Source of truth: `projects/integration/commands.py` (patterns) + `router.py` (dispatch) + `dji_wire.py`.
 Full context: `docs/active/2026-08-25-mvd-integration-handoff.md`.
 
 ## Tiers (checked first, length-INDEPENDENT)

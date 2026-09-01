@@ -14,11 +14,11 @@ A drone a human commands by **voice**, that **understands the scene** it sees, a
 **Thu 2026-08-27.** The working demo is BUILT (below).
 
 ## Built MVD vs destination vs platform-agnostic proof
-- **BUILT — the MVD (`source/integration/`).** Voice → 4-tier deterministic router → {simple verbs →
+- **BUILT — the MVD (`projects/integration/`).** Voice → 4-tier deterministic router → {simple verbs →
   DJI REST | complex queries → Python perception (Qwen-VL + OmDet/SAM2)}. English ASR. This IS the
   demo. Done and field-tested >3 h on 2026-08-25. Reference: `2026-08-26-manager-brief.md` +
   `2026-08-25-mvd-integration-handoff.md`.
-- **Destination — the C++ `source/llm_to_action/` engine.** The real product: an FMU 20 Hz control
+- **Destination — the C++ `projects/llm_to_action/source/` engine.** The real product: an FMU 20 Hz control
   loop over a `GenericBackend` (CRTP); `DjiBackend` is our aircraft's backend. The Python router is the
   MVD prototype; the C++ engine is where it is headed. Do not confuse them.
 - **Platform-agnostic proof — RoboMaster (`source/robomaster/`).** Same perception brain pointed at a
