@@ -1,0 +1,170 @@
+[
+ {
+  "case": "up10",
+  "lang": "HE",
+  "score": "wrong-verb(takeoffvsfly_by)",
+  "sec": 1.1,
+  "out": "[{\"type\": \"takeoff\"}]"
+ },
+ {
+  "case": "up10",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.5,
+  "out": "[{\"type\": \"fly_by\", \"z\": 10}]"
+ },
+ {
+  "case": "fwd5",
+  "lang": "HE",
+  "score": "CORRECT",
+  "sec": 0.3,
+  "out": "[{\"type\": \"fly_by\", \"x\": 5, \"y\": 0, \"z\": 0}]"
+ },
+ {
+  "case": "fwd5",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"fly_by\", \"x\": 5}]"
+ },
+ {
+  "case": "spin90cw",
+  "lang": "HE",
+  "score": "wrong-degrees(80vs90)",
+  "sec": 0.2,
+  "out": "[{\"type\": \"spin_by\", \"degrees\": 80}]"
+ },
+ {
+  "case": "spin90cw",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"spin_by\", \"degrees\": 90}]"
+ },
+ {
+  "case": "takeoff",
+  "lang": "HE",
+  "score": "wrong-len(0vs1)",
+  "sec": 0.7,
+  "out": "[]"
+ },
+ {
+  "case": "takeoff",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"takeoff\"}]"
+ },
+ {
+  "case": "land",
+  "lang": "HE",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"land\"}]"
+ },
+ {
+  "case": "land",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.7,
+  "out": "[{\"type\": \"land\"}]"
+ },
+ {
+  "case": "combo3",
+  "lang": "HE",
+  "score": "wrong-z(0vs10)",
+  "sec": 1.0,
+  "out": "[{\"type\": \"fly_by\", \"x\": 5, \"y\": 0, \"z\": 0}, {\"type\": \"spin_by\", \"degrees\": 30}, {\"type\": \"fly_by\", \"x\": 5, \"y\": 0, \"z\": 0}]"
+ },
+ {
+  "case": "combo3",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.5,
+  "out": "[{\"type\": \"fly_by\", \"z\": 10}, {\"type\": \"spin_by\", \"degrees\": 90}, {\"type\": \"fly_by\", \"x\": 5}]"
+ },
+ {
+  "case": "combo_tl",
+  "lang": "HE",
+  "score": "invalid",
+  "sec": 0.6,
+  "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":5},{\"type\":\"delay\",\"seconds\":3},{\"typ"
+ },
+ {
+  "case": "combo_tl",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.5,
+  "out": "[{\"type\": \"takeoff\"}, {\"type\": \"fly_by\", \"z\": 5}, {\"type\": \"delay\", \"seconds\": 3}, {\"type\": \"land\"}]"
+ },
+ {
+  "case": "back2left3",
+  "lang": "HE",
+  "score": "wrong-len(1vs2)",
+  "sec": 0.3,
+  "out": "[{\"type\": \"fly_by\", \"x\": -2, \"y\": 3}]"
+ },
+ {
+  "case": "back2left3",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.6,
+  "out": "[{\"type\": \"fly_by\", \"x\": -2, \"y\": 0, \"z\": 0}, {\"type\": \"fly_by\", \"x\": 0, \"y\": -3, \"z\": 0}]"
+ },
+ {
+  "case": "ccw45",
+  "lang": "HE",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"spin_by\", \"degrees\": -45}]"
+ },
+ {
+  "case": "ccw45",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"spin_by\", \"degrees\": -45}]"
+ },
+ {
+  "case": "down3",
+  "lang": "HE",
+  "score": "wrong-z(0vs-3)",
+  "sec": 0.3,
+  "out": "[{\"type\": \"fly_by\", \"x\": 3, \"y\": 0, \"z\": 0}]"
+ },
+ {
+  "case": "down3",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.2,
+  "out": "[{\"type\": \"fly_by\", \"z\": -3}]"
+ },
+ {
+  "case": "question",
+  "lang": "HE",
+  "score": "CORRECT",
+  "sec": 0.1,
+  "out": "[]"
+ },
+ {
+  "case": "question",
+  "lang": "EN",
+  "score": "CORRECT",
+  "sec": 0.1,
+  "out": "[]"
+ },
+ {
+  "case": "square",
+  "lang": "HE",
+  "score": "valid(open)",
+  "sec": 0.3,
+  "out": "[{\"type\": \"fly_by\", \"x\": 2, \"y\": 0, \"z\": 0}]"
+ },
+ {
+  "case": "square",
+  "lang": "EN",
+  "score": "valid(open)",
+  "sec": 1.1,
+  "out": "[{\"type\": \"fly_by\", \"x\": 2, \"y\": 0, \"z\": 0}, {\"type\": \"fly_by\", \"x\": 0, \"y\": 2, \"z\": 0}, {\"type\": \"fly_by\", \"x\": -2, \"y\": 0, \"z\": 0}, {\"type\": \"fly_by\", \"x\": 0, \"y\": -2, \"z\": 0}]"
+ }
+]

@@ -1,0 +1,120 @@
+"""Hand-authored REALISTIC cases -- how a person actually talks to a camera drone: polite
+indirects, fillers, ASR-style run-ons (no punctuation), colloquial imperatives, qualitative
+amounts, distractor verbs. Expected-value specs: exact number | None (any) | "+"/"-" (sign
+only) | ("abs", x) (magnitude only). Expected None = open-ended, scored for validity only.
+NOTE: emergency words (עצור etc.) are deliberately absent -- the router's Tier-4 intercepts
+them before any planner in production."""
+
+REALISTIC_CASES = [
+ # --- takeoff / land, natural forms ---
+ ("r_takeoff1",  "תמריא",                                    "take off",                        [("takeoff",None,None)]),
+ ("r_takeoff2",  "בוא נמריא",                                "let's take off",                  [("takeoff",None,None)]),
+ ("r_takeoff3",  "אפשר להמריא",                              "you can take off",                [("takeoff",None,None)]),
+ ("r_takeoff4",  "יאללה תמריא",                              "come on, take off",               [("takeoff",None,None)]),
+ ("r_takeoff5",  "תמריא בבקשה",                              "take off please",                 [("takeoff",None,None)]),
+ ("r_land1",     "תנחת",                                     "land",                            [("land",None,None)]),
+ ("r_land2",     "בוא ננחת",                                 "let's land",                      [("land",None,None)]),
+ ("r_land3",     "תנחת בבקשה",                               "please land",                     [("land",None,None)]),
+ ("r_land4",     "אפשר לנחות",                               "you can land",                    [("land",None,None)]),
+ ("r_land5",     "סיימנו, תנחת",                             "we're done, land",                [("land",None,None)]),
+ # --- polite / indirect singles ---
+ ("r_pol_up5",   "אתה יכול לעלות חמישה מטרים בבקשה",          "can you go up 5 meters please",   [("fly_by","z",5)]),
+ ("r_pol_fwd3",  "תוכל לטוס קדימה שלושה מטרים",              "could you fly forward 3 meters",  [("fly_by","x",3)]),
+ ("r_pol_left2", "אם אפשר, שני מטרים שמאלה",                 "if possible, 2 meters to the left",[("fly_by","y",-2)]),
+ ("r_pol_down1", "רד בבקשה מטר אחד",                         "please descend 1 meter",          [("fly_by","z",-1)]),
+ ("r_pol_spin",  "תסתובב בבקשה תשעים מעלות ימינה",            "please turn 90 degrees right",    [("spin_by","degrees",90)]),
+ # --- fillers / ASR-style run-ons ---
+ ("r_fill1",     "אה טוס קדימה שלושה מטרים בבקשה",           "uh fly forward 3 meters please",  [("fly_by","x",3)]),
+ ("r_fill2",     "אוקיי עכשיו תעלה ארבעה מטרים",             "okay now climb 4 meters",         [("fly_by","z",4)]),
+ ("r_fill3",     "טוב אז בוא נטוס אחורה שני מטרים",          "alright so let's fly back 2 meters",[("fly_by","x",-2)]),
+ ("r_fill4",     "רגע רגע קודם תעלה שני מטרים",              "wait wait first go up 2 meters",  [("fly_by","z",2)]),
+ ("r_fill5",     "כן תמשיך ימינה עוד שלושה מטרים",            "yes continue right another 3 meters",[("fly_by","y",3)]),
+ # --- altitude phrasing ---
+ ("r_alt10",     "עלה לגובה עשרה מטרים",                     "climb to a height of 10 meters",  [("fly_by","z",10)]),
+ ("r_alt20",     "תעלה לגובה עשרים מטר",                     "go up to 20 meters altitude",     [("fly_by","z",20)]),
+ ("r_low",       "תנמיך שני מטרים",                          "descend 2 meters lower",          [("fly_by","z",-2)]),
+ ("r_rise3",     "תתרומם שלושה מטרים",                       "rise 3 meters",                   [("fly_by","z",3)]),
+ ("r_updown",    "רד למטה ארבעה מטרים",                      "go down 4 meters",                [("fly_by","z",-4)]),
+ # --- qualitative amounts (sign-only scoring) ---
+ ("r_bit_left",  "טוס טיפה שמאלה",                           "fly a bit to the left",           [("fly_by","y","-")]),
+ ("r_bit_up",    "תעלה קצת",                                 "go up a little",                  [("fly_by","z","+")]),
+ ("r_bit_back",  "זוז קצת אחורה",                            "move back a little",              [("fly_by","x","-")]),
+ ("r_higher",    "תעוף קצת יותר גבוה",                       "fly a bit higher",                [("fly_by","z","+")]),
+ ("r_bit_fwd",   "תתקדם עוד קצת",                            "move forward a bit more",         [("fly_by","x","+")]),
+ # --- turns, natural ---
+ ("r_turn_r90",  "סובב את הרחפן תשעים מעלות ימינה",           "turn the drone 90 degrees right", [("spin_by","degrees",90)]),
+ ("r_turn_l45",  "תפנה ארבעים וחמש מעלות שמאלה",             "turn 45 degrees left",            [("spin_by","degrees",-45)]),
+ ("r_half_turn", "תעשה חצי סיבוב",                           "do a half turn",                  [("spin_by","degrees",("abs",180))]),
+ ("r_quart_r",   "רבע סיבוב ימינה",                          "quarter turn to the right",       [("spin_by","degrees",90)]),
+ ("r_full",      "תעשה סיבוב שלם",                           "do a full turn",                  [("spin_by","degrees",("abs",360))]),
+ ("r_around",    "תסתובב אליי",                              "turn around toward me",           None),
+ # --- number forms: word/digit mixes, halves, number-first order ---
+ ("r_num_first", "שלושים מטר קדימה",                         "30 meters forward",               [("fly_by","x",30)]),
+ ("r_m_half",    "מטר וחצי למעלה",                           "a meter and a half up",           [("fly_by","z",1.5)]),
+ ("r_2_half",    "שניים וחצי מטרים ימינה",                   "two and a half meters right",     [("fly_by","y",2.5)]),
+ ("r_digit50",   "טוס קדימה 50 מטר",                         "fly forward 50 meters",           [("fly_by","x",50)]),
+ ("r_digit7",    "7 מטרים למעלה",                            "7 meters up",                     [("fly_by","z",7)]),
+ ("r_meter1",    "זוז מטר ימינה",                            "move a meter to the right",       [("fly_by","y",1)]),
+ # --- realistic multi-step missions ---
+ ("r_mis1",      "תמריא ותעלה לגובה חמישה מטרים",            "take off and climb to 5 meters",
+                 [("takeoff",None,None),("fly_by","z",5)]),
+ ("r_mis2",      "תמריא, עלה שלושה מטרים ותישאר שם",         "take off, go up 3 meters and stay there",
+                 [("takeoff",None,None),("fly_by","z",3)]),
+ ("r_mis3",      "טוס ימינה שלושה מטרים ואחרי זה שמאלה שלושה מטרים בחזרה",
+                 "fly right 3 meters and then 3 meters left back",
+                 [("fly_by","y",3),("fly_by","y",-3)]),
+ ("r_mis4",      "עלה חמישה מטרים, חכה שתי שניות ורד בחזרה",  "go up 5 meters, wait 2 seconds and come back down",
+                 [("fly_by","z",5),("delay","seconds",2),("fly_by","z",-5)]),
+ ("r_mis5",      "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+                 "take off, fly forward 10 meters, do a half turn and come back",
+                 [("takeoff",None,None),("fly_by","x",10),("spin_by","degrees",("abs",180)),("fly_by","x",10)]),
+ ("r_mis6",      "קדימה שני מטרים ואז למעלה שני מטרים ואז אחורה שני מטרים",
+                 "forward 2 meters then up 2 meters then back 2 meters",
+                 [("fly_by","x",2),("fly_by","z",2),("fly_by","x",-2)]),
+ ("r_mis7",      "תעלה עשרה מטרים ואז תסתובב לאט סיבוב שלם",  "climb 10 meters then slowly do a full turn",
+                 [("fly_by","z",10),("spin_by","degrees",("abs",360))]),
+ ("r_mis8",      "אחורה חמישה מטרים ולמטה שני מטרים",         "back 5 meters and down 2 meters",
+                 [("fly_by","x",-5),("fly_by","z",-2)]),
+ ("r_mis9",      "תמריא ואז תנחת",                            "take off and then land",
+                 [("takeoff",None,None),("land",None,None)]),
+ ("r_mis10",     "עלה שני מטרים, ימינה ארבעה מטרים, שמאלה ארבעה מטרים ורד שני מטרים",
+                 "up 2 meters, right 4 meters, left 4 meters and down 2 meters",
+                 [("fly_by","z",2),("fly_by","y",4),("fly_by","y",-4),("fly_by","z",-2)]),
+ # --- distractor verbs (non-whitelist actions mixed in): open-ended, validity-only ---
+ ("r_dis1",      "טוס קדימה חמישה מטרים ותצלם את הבית",       "fly forward 5 meters and photograph the house", None),
+ ("r_dis2",      "תעלה שלושה מטרים ותסתכל מסביב",             "go up 3 meters and look around",  None),
+ ("r_dis3",      "תמריא ותחפש את המכונית",                    "take off and search for the car", None),
+ ("r_dis4",      "טוס ימינה שני מטרים ותגיד לי מה אתה רואה",  "fly right 2 meters and tell me what you see", None),
+ # --- questions / status (must plan NOTHING) ---
+ ("r_q1",        "מה מצב הסוללה",                             "what's the battery status",       []),
+ ("r_q2",        "איפה אתה עכשיו",                            "where are you now",               []),
+ ("r_q3",        "כמה גבוה אתה",                              "how high are you",                []),
+ ("r_q4",        "אתה מצלם",                                  "are you recording",               []),
+ ("r_q5",        "ספר לי מה אתה רואה",                        "tell me what you see",            []),
+ ("r_q6",        "יש שם מישהו",                               "is anyone there",                 []),
+ ("r_q7",        "כמה זמן נשאר לך באוויר",                    "how much flight time do you have left", []),
+ ("r_q8",        "אתה שומע אותי",                             "can you hear me",                 []),
+ # --- negations / do-nothing ---
+ ("r_neg1",      "אל תעלה יותר",                              "don't go up any more",            []),
+ ("r_neg2",      "אל תזוז",                                   "don't move",                      []),
+ ("r_neg3",      "לא לטוס קדימה",                             "do not fly forward",              []),
+ ("r_neg4",      "בלי להסתובב בבקשה",                         "without turning please",          []),
+ ("r_neg5",      "אל תנחת עדיין",                             "don't land yet",                  []),
+ # --- waits ---
+ ("r_wait1",     "חכה רגע",                                   "wait a moment",                   [("delay","seconds","+")]),
+ ("r_wait2",     "שנייה אחת",                                 "one second",                      [("delay","seconds","+")]),
+ ("r_wait3",     "תמתין חמש שניות ואז רד מטר",                "wait 5 seconds and then descend a meter",
+                 [("delay","seconds",5),("fly_by","z",-1)]),
+ ("r_wait4",     "עצור שם לעשר שניות",                        "hold there for ten seconds",      [("delay","seconds",10)]),
+ # --- number-heavy / edge amounts ---
+ ("r_big100",    "טוס קדימה מאה מטר",                         "fly forward 100 meters",          [("fly_by","x",100)]),
+ ("r_deg10",     "תסתובב עשר מעלות ימינה",                    "turn 10 degrees right",           [("spin_by","degrees",10)]),
+ ("r_deg135",    "פנה מאה שלושים וחמש מעלות שמאלה",           "turn 135 degrees left",           [("spin_by","degrees",-135)]),
+ ("r_z_03",      "תעלה שלושים סנטימטר",                       "go up 30 centimeters",            [("fly_by","z",0.3)]),
+ ("r_back15",    "סע אחורה חמישה עשר מטרים",                  "go back 15 meters",               [("fly_by","x",-15)]),
+ # --- word-order variety ---
+ ("r_ord1",      "חמישה מטרים קדימה טוס",                     "five meters forward, fly",        [("fly_by","x",5)]),
+ ("r_ord2",      "ימינה שני מטרים",                           "right 2 meters",                  [("fly_by","y",2)]),
+ ("r_ord3",      "למעלה, שלושה מטרים",                        "upward, 3 meters",                [("fly_by","z",3)]),
+ ("r_ord4",      "אחורה קצת",                                 "backward a little",               [("fly_by","x","-")]),
+]

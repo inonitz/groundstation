@@ -42,8 +42,24 @@ and absolute.
   (C3) has no effect on the demo speech stack.
 - Groundstation Hebrew ASR is the secondary path: whisper-large-v3-turbo + VAD, quantized q4-q8 or
   ONNX, benchmarked vs Parakeet (the old H1 plan). Build only if the phone path needs a fallback.
+- STATUS 2026-09-01: groundstation side DONE (phone_ears TCP-channel bug fixed, Hebrew
+  emergency/override/resume tiers live with tests, Hebrew desk loop verified over both channels).
+  Remaining is HARDWARE, owner-run:
+  1. Demo phone: app language set to Hebrew (the in-app picker, Locale he-IL), phone hotspot ON,
+     laptop joined to that hotspot, NO third device on it (the app connects to the FIRST subnet
+     device it finds - VoiceControlFragment:186).
+  2. Start the MVD (`bash /root/groundstation/projects/integration_harden/run_mvd.sh dji mock`),
+     press the app's mic button, say "עצור" - expect the [phone_ears] line in the router pane and
+     an EMERGENCY tier hit.
+  3. Then one Hebrew movement phrase - until backlog B lands it will fall to the COMPLEX tier;
+     that is expected, not a bug.
 
 ### B. Hebrew -> English translation before Qwen
+- STATUS 2026-09-01: measured across 4 bench rounds (tools/bench/hebrew-command-bench/, README +
+  ROUND4-PLAN.md there). Winner so far: DictaLM-3.0-1.7B (2-shot + line grammar) -> Qwen planner
+  with few-shot = 93% vs opus 76% (McNemar p<1e-4); translate stage p50 45ms. opus disqualified
+  by climb-verb homographs; nllb worse; madlad parked (serving garbage); TranslateGemma queued
+  round-4. Round 4 staged, awaiting owner go; then owner review; then the ASR round.
 - Insert a translation hop so Qwen receives English and emits higher-quality commands. One
   bidirectional model or two one-way models — owner is indifferent.
 - Candidate models TO VERIFY (do not trust until measured on our box): Helsinki-NLP
@@ -59,7 +75,9 @@ and absolute.
   server, explicitly NOT the llm_to_action POC.
 - KEY SHORTCUT: the wire already speaks arrays. `POST /c/fly` accepts `{"mission":[Action...]}` and
   `dji_wire.fly_mission()` sends it — so the example above is ONE post:
-  `[{"type":"fly_by","z":10},{"type":"spin_by","degrees":90},{"type":"fly_by","x":5}, ...]`.
+  `[{"type":"fly_by","dz":10},{"type":"spin_by","degrees":90},{"type":"fly_by","dx":5}, ...]`
+  (CORRECTED 2026-09-01: the wire schema is dx/dy/dz + optional velocity — app FlyBy.kt and
+  dji_wire.py agree; an earlier version of this line wrongly said x/y/z).
   Most of C is a Qwen planner prompt + a validator, not new wire code.
 - DOCTRINE UPDATE (owner, 2026-09-01): "LLM out of the control loop" is RELAXED, deliberately: Qwen
   may PLAN a bounded sequence of deterministic verbs. It still never streams sticks/velocities.

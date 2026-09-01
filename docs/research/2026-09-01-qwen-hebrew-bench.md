@@ -26,6 +26,16 @@ Hebrew failure modes (all semantic, none formatting):
 - Assume the same for D (EN->HE for voice-out) pending its own check.
 - Caveats: n=12, one model/quant, temp 0. Big enough gap that more samples won't flip it.
 
+## Follow-up (same day): full pipeline comparison
+
+Owner directed a proper comparison including DictaLM-3.0-1.7B (2026). Harness + full table:
+`tools/bench/hebrew-command-bench/` (isolated, nothing integrated). Outcome: opus-mt->Qwen
+10/12 @ 263ms median wins; its only failures are isolated single-word commands ("המראה",
+"נחת") that Tier-1 Hebrew verb patterns would catch before translation. DictaLM fails as a
+direct Hebrew planner (2/12) and trails as a translator (8/12). RECOMMENDATION (not a
+decision): opus-mt-tc-big-he-en translation hop + Hebrew Tier-1 fast path for the short
+imperatives. Owner rules before any integration.
+
 ## Consequences
 - Tier-4 EMERGENCY regex must match Hebrew DIRECTLY (never behind the translation hop) --
   done in `integration_harden/commands.py` same day.

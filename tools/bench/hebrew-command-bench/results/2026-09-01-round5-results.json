@@ -1,0 +1,1726 @@
+{
+ "arms": [
+  {
+   "arm": "hebrew->dictalm->english",
+   "ok": 31,
+   "n": 45,
+   "wilson95": [
+    0.543,
+    0.805
+   ],
+   "groups_kept": 210,
+   "groups_total": 227,
+   "latency_ms": {
+    "p25": 92,
+    "p50": 99,
+    "p75": 120,
+    "p95": 137,
+    "p99": 142,
+    "max": 142
+   },
+   "by_depth": {
+    "1": {
+     "n": 1,
+     "ok": 0,
+     "groups_kept": 3,
+     "groups_total": 4
+    },
+    "2": {
+     "n": 15,
+     "ok": 13,
+     "groups_kept": 61,
+     "groups_total": 63
+    },
+    "3": {
+     "n": 29,
+     "ok": 18,
+     "groups_kept": 146,
+     "groups_total": 160
+    }
+   },
+   "cases": [
+    {
+     "case": "i_mid_windows",
+     "hops": 2,
+     "he": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+     "en": "Focus on the middle windows of the rightmost building",
+     "t_ms": 120,
+     "missed": [
+      "highlight|mark"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_third_door",
+     "hops": 2,
+     "he": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+     "en": "Mark the front door of the third house on the left",
+     "t_ms": 111,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_rear_wheel",
+     "hops": 2,
+     "he": "התמקד בגלגל האחורי של האופנוע החונה",
+     "en": "Focus on the rear wheel of the parked motorcycle",
+     "t_ms": 96,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_top_windows",
+     "hops": 3,
+     "he": "ספור את החלונות בקומה העליונה של המגדל",
+     "en": "Count the windows on the top floor of the skyscraper",
+     "t_ms": 112,
+     "missed": [
+      "tower|building"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_roof_corner",
+     "hops": 3,
+     "he": "סמן את הפינה השמאלית העליונה של הגג האדום",
+     "en": "Mark the top-left corner of the red roof",
+     "t_ms": 97,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_chimney",
+     "hops": 2,
+     "he": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+     "en": "Focus on the chimney of the lowest house on the street",
+     "t_ms": 113,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_back_entrance",
+     "hops": 2,
+     "he": "מצא את הכניסה האחורית של המחסן הגדול",
+     "en": "Find the back entrance of the large warehouse",
+     "t_ms": 87,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_ladder_pickup",
+     "hops": 3,
+     "he": "סמן את הסולם שעל הגג של הטנדר הלבן",
+     "en": "Mark the ladder on the white truck's roof",
+     "t_ms": 94,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_car_by_red",
+     "hops": 2,
+     "he": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+     "en": "Focus on the red-clad car parked next to the person",
+     "t_ms": 117,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_orange_cap",
+     "hops": 1,
+     "he": "עקוב אחרי האדם עם הכובע הכתום",
+     "en": "Follow the person wearing the red hat",
+     "t_ms": 80,
+     "missed": [
+      "orange"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_door_by_coat",
+     "hops": 3,
+     "he": "סמן את הדלת שליד האיש עם המעיל השחור",
+     "en": "Mark the man's door with the black coat",
+     "t_ms": 93,
+     "missed": [
+      "next|beside|near"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_bike_fence",
+     "hops": 3,
+     "he": "התמקד באופניים שנשענים על הגדר של הבית הצהוב",
+     "en": "Focus on the bicycles leaning against the yellow house fence",
+     "t_ms": 102,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_dog_by_dress",
+     "hops": 3,
+     "he": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+     "en": "Follow the dog that is walking beside the woman wearing the white dress",
+     "t_ms": 119,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_kid_bag",
+     "hops": 3,
+     "he": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+     "en": "Hold the toy with the green shirt",
+     "t_ms": 79,
+     "missed": [
+      "bag|backpack",
+      "child|kid|boy"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_tree_truck",
+     "hops": 2,
+     "he": "סמן את העץ שמאחורי המשאית הצהובה",
+     "en": "Mark the tree behind the red truck",
+     "t_ms": 78,
+     "missed": [
+      "yellow"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_win_over_door",
+     "hops": 2,
+     "he": "מצא את החלון שמעל הדלת הכחולה",
+     "en": "Find the window above the blue door",
+     "t_ms": 78,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_cars_by_flag",
+     "hops": 3,
+     "he": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+     "en": "Count the parked cars with the flag",
+     "t_ms": 78,
+     "missed": [
+      "front|opposite|facing|across",
+      "building"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_bench_trees",
+     "hops": 2,
+     "he": "הדגש את הספסל שבין שני העצים הגבוהים",
+     "en": "Emphasize the bench between the two tall trees",
+     "t_ms": 98,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_behind_moto",
+     "hops": 3,
+     "he": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+     "en": "Follow the red motorcycle that is behind the car",
+     "t_ms": 94,
+     "missed": [
+      "driv|mov|travel"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_man_on_roof",
+     "hops": 3,
+     "he": "סמן את האיש שעומד על הגג של הבניין הלבן",
+     "en": "Mark the person standing on the white building's roof",
+     "t_ms": 99,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_box_by_man",
+     "hops": 3,
+     "he": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+     "en": "Stop in place, highlighting the box next to the man standing on the white building",
+     "t_ms": 142,
+     "missed": [
+      "roof"
+     ],
+     "ok": false,
+     "groups_total": 7,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_girl_balloon",
+     "hops": 3,
+     "he": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+     "en": "Follow the girl with the balloon as she walks by the woman with the cart",
+     "t_ms": 134,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_car_between",
+     "hops": 3,
+     "he": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+     "en": "Mark the parked car between the white truck and the red truck",
+     "t_ms": 113,
+     "missed": [
+      "pickup|van"
+     ],
+     "ok": false,
+     "groups_total": 7,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_door_by_tree",
+     "hops": 3,
+     "he": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+     "en": "Find the door of the house opposite the tallest tree",
+     "t_ms": 98,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_sign_awning",
+     "hops": 3,
+     "he": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+     "en": "Focus on the sign above the store entrance with the green awning",
+     "t_ms": 120,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_front_tire",
+     "hops": 3,
+     "he": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+     "en": "Focus on the front tire of the car parked closest to the gate",
+     "t_ms": 120,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_bench_fountain",
+     "hops": 3,
+     "he": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+     "en": "Count the number of people sitting on benches to the left of the fountain",
+     "t_ms": 126,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_exit_gray",
+     "hops": 3,
+     "he": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+     "en": "Follow the person who just exited the gray building",
+     "t_ms": 93,
+     "missed": [
+      "door"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_second_car",
+     "hops": 3,
+     "he": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+     "en": "Mark the second car to the left in the front row of the parking garage",
+     "t_ms": 137,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_dark_stain",
+     "hops": 3,
+     "he": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+     "en": "Locate the dark spot on the wall to the right of the large window",
+     "t_ms": 134,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_glasses_talk",
+     "hops": 3,
+     "he": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+     "en": "The man with the glasses is speaking to the woman in the yellow shirt.",
+     "t_ms": 136,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_truck_boat",
+     "hops": 2,
+     "he": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+     "en": "Follow the white boat being towed by the truck",
+     "t_ms": 99,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_empty_chair",
+     "hops": 2,
+     "he": "סמן את הכיסא הריק ליד השולחן העגול",
+     "en": "Mark the empty chair next to the round table",
+     "t_ms": 92,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_bird_cable",
+     "hops": 3,
+     "he": "התמקד בציפור שיושבת על הכבל בין שני העמודים",
+     "en": "Focus on the bird sitting on the wire between the two poles",
+     "t_ms": 113,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_fence_gap",
+     "hops": 3,
+     "he": "מצא את הפתח בגדר שמאחורי המכולה הכחולה",
+     "en": "Find the gate behind the blue shipping container",
+     "t_ms": 85,
+     "missed": [
+      "opening|gap|hole|breach",
+      "fence"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_main_steps",
+     "hops": 3,
+     "he": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+     "en": "Count the steps at the main entrance of the tallest building",
+     "t_ms": 106,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_helmet_mid",
+     "hops": 3,
+     "he": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+     "en": "Fly left six meters, with the yellow helmet rider in the center of the team",
+     "t_ms": 141,
+     "missed": [
+      "group"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_cat_climb",
+     "hops": 3,
+     "he": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+     "en": "Follow the cat climbing the tree beside the wall",
+     "t_ms": 93,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_lean_silver",
+     "hops": 2,
+     "he": "סמן את הבחור שנשען על המכונית הכסופה",
+     "en": "Mark the guy leaning against the silver car",
+     "t_ms": 85,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_flag_low",
+     "hops": 3,
+     "he": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+     "en": "Find the flag that is flying above the roof of the low building",
+     "t_ms": 120,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_broken_window",
+     "hops": 3,
+     "he": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+     "en": "Focus on the shattered window on the lower floor of the abandoned building",
+     "t_ms": 120,
+     "missed": [
+      "broken"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_last_convoy",
+     "hops": 2,
+     "he": "עקוב אחרי המכונית האחרונה בשיירה",
+     "en": "Follow the last car in the convoy",
+     "t_ms": 77,
+     "missed": [],
+     "ok": true,
+     "groups_total": 3,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_big_tent",
+     "hops": 2,
+     "he": "סמן את האוהל הגדול ביותר בקצה השדה",
+     "en": "Mark the largest tent at the field's end",
+     "t_ms": 92,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_crane_arm",
+     "hops": 3,
+     "he": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+     "en": "Focus on the crane arm above the construction site",
+     "t_ms": 92,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_boats_pier",
+     "hops": 2,
+     "he": "ספור את הסירות הקשורות למזח הצפוני",
+     "en": "Count the boats tied to the northern wharf",
+     "t_ms": 91,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    }
+   ]
+  },
+  {
+   "arm": "hebrew->translategemma->english",
+   "ok": 38,
+   "n": 45,
+   "wilson95": [
+    0.712,
+    0.923
+   ],
+   "groups_kept": 218,
+   "groups_total": 227,
+   "latency_ms": {
+    "p25": 275,
+    "p50": 293,
+    "p75": 336,
+    "p95": 367,
+    "p99": 375,
+    "max": 381
+   },
+   "by_depth": {
+    "1": {
+     "n": 1,
+     "ok": 0,
+     "groups_kept": 3,
+     "groups_total": 4
+    },
+    "2": {
+     "n": 15,
+     "ok": 12,
+     "groups_kept": 59,
+     "groups_total": 63
+    },
+    "3": {
+     "n": 29,
+     "ok": 26,
+     "groups_kept": 156,
+     "groups_total": 160
+    }
+   },
+   "cases": [
+    {
+     "case": "i_mid_windows",
+     "hops": 2,
+     "he": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+     "en": "Focus on the central windows of the furthest right building.",
+     "t_ms": 291,
+     "missed": [
+      "highlight|mark",
+      "middle|center"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_third_door",
+     "hops": 2,
+     "he": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+     "en": "Mark the front door of the third house from the left.",
+     "t_ms": 293,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_rear_wheel",
+     "hops": 2,
+     "he": "התמקד בגלגל האחורי של האופנוע החונה",
+     "en": "Focus on the rear wheel of the parked motorcycle.",
+     "t_ms": 261,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_top_windows",
+     "hops": 3,
+     "he": "ספור את החלונות בקומה העליונה של המגדל",
+     "en": "Count the windows on the top floor of the tower.",
+     "t_ms": 275,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_roof_corner",
+     "hops": 3,
+     "he": "סמן את הפינה השמאלית העליונה של הגג האדום",
+     "en": "Mark the top-left corner of the red roof.",
+     "t_ms": 275,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_chimney",
+     "hops": 2,
+     "he": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+     "en": "Highlight the chimney of the lowest house on the street.",
+     "t_ms": 275,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_back_entrance",
+     "hops": 2,
+     "he": "מצא את הכניסה האחורית של המחסן הגדול",
+     "en": "Find the back entrance to the large warehouse.",
+     "t_ms": 246,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_ladder_pickup",
+     "hops": 3,
+     "he": "סמן את הסולם שעל הגג של הטנדר הלבן",
+     "en": "Mark the ladder on the white van.",
+     "t_ms": 229,
+     "missed": [
+      "roof"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_car_by_red",
+     "hops": 2,
+     "he": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+     "en": "Focus on the car that is next to the person wearing the red clothing.",
+     "t_ms": 334,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_orange_cap",
+     "hops": 1,
+     "he": "עקוב אחרי האדם עם הכובע הכתום",
+     "en": "Follow the man wearing the red hat.",
+     "t_ms": 230,
+     "missed": [
+      "orange"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_door_by_coat",
+     "hops": 3,
+     "he": "סמן את הדלת שליד האיש עם המעיל השחור",
+     "en": "Mark the door next to the man wearing the black coat.",
+     "t_ms": 290,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_bike_fence",
+     "hops": 3,
+     "he": "התמקד באופניים שנשענים על הגדר של הבית הצהוב",
+     "en": "Focus on the bicycle leaning against the fence of the yellow house.",
+     "t_ms": 307,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_dog_by_dress",
+     "hops": 3,
+     "he": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+     "en": "Follow the dog walking next to the woman wearing a white dress.",
+     "t_ms": 307,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_kid_bag",
+     "hops": 3,
+     "he": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+     "en": "Focus on the backpack that the child is holding, the one with the green shirt.",
+     "t_ms": 367,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_tree_truck",
+     "hops": 2,
+     "he": "סמן את העץ שמאחורי המשאית הצהובה",
+     "en": "Mark the tree behind the yellow truck.",
+     "t_ms": 231,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_win_over_door",
+     "hops": 2,
+     "he": "מצא את החלון שמעל הדלת הכחולה",
+     "en": "Find the window above the blue door.",
+     "t_ms": 230,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_cars_by_flag",
+     "hops": 3,
+     "he": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+     "en": "Count the parked cars facing the building with the flag.",
+     "t_ms": 281,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_bench_trees",
+     "hops": 2,
+     "he": "הדגש את הספסל שבין שני העצים הגבוהים",
+     "en": "Focus on the bench located between the two tall trees.",
+     "t_ms": 278,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_behind_moto",
+     "hops": 3,
+     "he": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+     "en": "Follow the vehicle that is traveling behind the red motorcycle.",
+     "t_ms": 278,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_man_on_roof",
+     "hops": 3,
+     "he": "סמן את האיש שעומד על הגג של הבניין הלבן",
+     "en": "Point to the man standing on the roof of the white building.",
+     "t_ms": 312,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_box_by_man",
+     "hops": 3,
+     "he": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+     "en": "Highlight the box next to the man standing on the roof of the white building.",
+     "t_ms": 352,
+     "missed": [],
+     "ok": true,
+     "groups_total": 7,
+     "groups_kept": 7
+    },
+    {
+     "case": "i_girl_balloon",
+     "hops": 3,
+     "he": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+     "en": "Follow the little girl with the balloon as she walks beside the woman with the cart.",
+     "t_ms": 368,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_car_between",
+     "hops": 3,
+     "he": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+     "en": "Mark the car that is parked between the white pickup truck and the red truck.",
+     "t_ms": 353,
+     "missed": [],
+     "ok": true,
+     "groups_total": 7,
+     "groups_kept": 7
+    },
+    {
+     "case": "i_door_by_tree",
+     "hops": 3,
+     "he": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+     "en": "Find the front door of the house that faces the tallest tree.",
+     "t_ms": 303,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_sign_awning",
+     "hops": 3,
+     "he": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+     "en": "Focus on the sign above the entrance to the store, which has the green awning.",
+     "t_ms": 365,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_front_tire",
+     "hops": 3,
+     "he": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+     "en": "Focus on the front tire of the car that is parked closest to the gate.",
+     "t_ms": 353,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_bench_fountain",
+     "hops": 3,
+     "he": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+     "en": "Count the number of people sitting on the benches to the left of the fountain.",
+     "t_ms": 353,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_exit_gray",
+     "hops": 3,
+     "he": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+     "en": "Follow the person who exited the door of the gray building.",
+     "t_ms": 292,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_second_car",
+     "hops": 3,
+     "he": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+     "en": "Mark the second vehicle from the left in the front row of the parking lot.",
+     "t_ms": 355,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_dark_stain",
+     "hops": 3,
+     "he": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+     "en": "Find the dark stain on the wall to the right of the large window.",
+     "t_ms": 336,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_glasses_talk",
+     "hops": 3,
+     "he": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+     "en": "Focus on the man wearing glasses who is talking to the woman in the yellow shirt.",
+     "t_ms": 367,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_truck_boat",
+     "hops": 2,
+     "he": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+     "en": "Follow the truck that is towing the white boat.",
+     "t_ms": 265,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_empty_chair",
+     "hops": 2,
+     "he": "סמן את הכיסא הריק ליד השולחן העגול",
+     "en": "Please indicate the empty chair next to the round table.",
+     "t_ms": 274,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_bird_cable",
+     "hops": 3,
+     "he": "התמקד בציפור שיושבת על הכבל בין שני העמודים",
+     "en": "Focus on the bird that is perched on the cable between the two posts.",
+     "t_ms": 334,
+     "missed": [
+      "sit"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_fence_gap",
+     "hops": 3,
+     "he": "מצא את הפתח בגדר שמאחורי המכולה הכחולה",
+     "en": "Find the entrance to the fence behind the blue grocery store.",
+     "t_ms": 293,
+     "missed": [
+      "opening|gap|hole|breach",
+      "container"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_main_steps",
+     "hops": 3,
+     "he": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+     "en": "Count the steps in the main entrance of the high-rise building.",
+     "t_ms": 320,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_helmet_mid",
+     "hops": 3,
+     "he": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+     "en": "Focus on the cyclist wearing the yellow helmet, who is in the center of the group.",
+     "t_ms": 381,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_cat_climb",
+     "hops": 3,
+     "he": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+     "en": "Watch the cat that is climbing the tree next to the wall.",
+     "t_ms": 309,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_lean_silver",
+     "hops": 2,
+     "he": "סמן את הבחור שנשען על המכונית הכסופה",
+     "en": "Point out the boy who is leaning against the silver car.",
+     "t_ms": 291,
+     "missed": [
+      "guy|man|person"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_flag_low",
+     "hops": 3,
+     "he": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+     "en": "Find the flag that is flying above the roof of the low-rise building.",
+     "t_ms": 352,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_broken_window",
+     "hops": 3,
+     "he": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+     "en": "Highlight the broken window on the ground floor of the abandoned building.",
+     "t_ms": 308,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_last_convoy",
+     "hops": 2,
+     "he": "עקוב אחרי המכונית האחרונה בשיירה",
+     "en": "Follow the last car in the convoy.",
+     "t_ms": 233,
+     "missed": [],
+     "ok": true,
+     "groups_total": 3,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_big_tent",
+     "hops": 2,
+     "he": "סמן את האוהל הגדול ביותר בקצה השדה",
+     "en": "Mark the largest tent at the edge of the field.",
+     "t_ms": 274,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_crane_arm",
+     "hops": 3,
+     "he": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+     "en": "Focus on the arm of the crane that is above the construction site.",
+     "t_ms": 322,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_boats_pier",
+     "hops": 2,
+     "he": "ספור את הסירות הקשורות למזח הצפוני",
+     "en": "Count the boats docked at the northern pier.",
+     "t_ms": 246,
+     "missed": [
+      "tie|moor"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    }
+   ]
+  },
+  {
+   "arm": "hebrew->qwen3vl->english",
+   "ok": 19,
+   "n": 45,
+   "wilson95": [
+    0.29,
+    0.567
+   ],
+   "groups_kept": 188,
+   "groups_total": 227,
+   "latency_ms": {
+    "p25": 162,
+    "p50": 188,
+    "p75": 204,
+    "p95": 235,
+    "p99": 243,
+    "max": 244
+   },
+   "by_depth": {
+    "1": {
+     "n": 1,
+     "ok": 0,
+     "groups_kept": 3,
+     "groups_total": 4
+    },
+    "2": {
+     "n": 15,
+     "ok": 9,
+     "groups_kept": 52,
+     "groups_total": 63
+    },
+    "3": {
+     "n": 29,
+     "ok": 10,
+     "groups_kept": 133,
+     "groups_total": 160
+    }
+   },
+   "cases": [
+    {
+     "case": "i_mid_windows",
+     "hops": 2,
+     "he": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+     "en": "Highlight the middle windows of the rightmost building",
+     "t_ms": 244,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_third_door",
+     "hops": 2,
+     "he": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+     "en": "Mark the front door of the third house from the left",
+     "t_ms": 228,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_rear_wheel",
+     "hops": 2,
+     "he": "התמקד בגלגל האחורי של האופנוע החונה",
+     "en": "Focus on the rear wheel of the driving vehicle",
+     "t_ms": 195,
+     "missed": [
+      "motorcycle|motorbike",
+      "park"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 2
+    },
+    {
+     "case": "i_top_windows",
+     "hops": 3,
+     "he": "ספור את החלונות בקומה העליונה של המגדל",
+     "en": "Count the windows on the top floor of the building",
+     "t_ms": 211,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_roof_corner",
+     "hops": 3,
+     "he": "סמן את הפינה השמאלית העליונה של הגג האדום",
+     "en": "Mark the top-left corner of the red ceiling",
+     "t_ms": 196,
+     "missed": [
+      "roof"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_chimney",
+     "hops": 2,
+     "he": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+     "en": "Highlight the lowest house in the street",
+     "t_ms": 165,
+     "missed": [
+      "chimney"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_back_entrance",
+     "hops": 2,
+     "he": "מצא את הכניסה האחורית של המחסן הגדול",
+     "en": "Find the back entrance of the large warehouse",
+     "t_ms": 182,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_ladder_pickup",
+     "hops": 3,
+     "he": "סמן את הסולם שעל הגג של הטנדר הלבן",
+     "en": "Mark the ladder on the white tender's roof",
+     "t_ms": 195,
+     "missed": [
+      "pickup|van|truck"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_car_by_red",
+     "hops": 2,
+     "he": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+     "en": "Highlight the vehicle adjacent to the person wearing red clothing",
+     "t_ms": 181,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_orange_cap",
+     "hops": 1,
+     "he": "עקוב אחרי האדם עם הכובע הכתום",
+     "en": "Follow the person with the yellow hat",
+     "t_ms": 135,
+     "missed": [
+      "orange"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_door_by_coat",
+     "hops": 3,
+     "he": "סמן את הדלת שליד האיש עם המעיל השחור",
+     "en": "Mark the door next to the man with the black coat",
+     "t_ms": 185,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_bike_fence",
+     "hops": 3,
+     "he": "התמקד באופניים שנשענים על הגדר של הבית הצהוב",
+     "en": "Focus on the bike leaning against the yellow house's fence",
+     "t_ms": 183,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_dog_by_dress",
+     "hops": 3,
+     "he": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+     "en": "Follow the dog walking beside the woman in the white shirt",
+     "t_ms": 201,
+     "missed": [
+      "dress"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_kid_bag",
+     "hops": 3,
+     "he": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+     "en": "Highlight the bag the child is holding, which is green",
+     "t_ms": 198,
+     "missed": [
+      "shirt"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_tree_truck",
+     "hops": 2,
+     "he": "סמן את העץ שמאחורי המשאית הצהובה",
+     "en": "Mark the tree behind the yellow truck",
+     "t_ms": 130,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_win_over_door",
+     "hops": 2,
+     "he": "מצא את החלון שמעל הדלת הכחולה",
+     "en": "Find the window above the blue door",
+     "t_ms": 126,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_cars_by_flag",
+     "hops": 3,
+     "he": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+     "en": "Count the vehicles passing the building with the flag",
+     "t_ms": 148,
+     "missed": [
+      "park",
+      "front|opposite|facing|across"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_bench_trees",
+     "hops": 2,
+     "he": "הדגש את הספסל שבין שני העצים הגבוהים",
+     "en": "Highlight the sapling between the two tall trees",
+     "t_ms": 148,
+     "missed": [
+      "bench"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_behind_moto",
+     "hops": 3,
+     "he": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+     "en": "Follow the car driving behind the red scooter",
+     "t_ms": 146,
+     "missed": [
+      "motorcycle|motorbike"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_man_on_roof",
+     "hops": 3,
+     "he": "סמן את האיש שעומד על הגג של הבניין הלבן",
+     "en": "Mark the man standing on the roof of the white building",
+     "t_ms": 196,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_box_by_man",
+     "hops": 3,
+     "he": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+     "en": "Highlight the box next to the man standing on the roof of the white building",
+     "t_ms": 233,
+     "missed": [],
+     "ok": true,
+     "groups_total": 7,
+     "groups_kept": 7
+    },
+    {
+     "case": "i_girl_balloon",
+     "hops": 3,
+     "he": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+     "en": "Follow the girl with the balloon who is walking beside the woman with the cart",
+     "t_ms": 236,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_car_between",
+     "hops": 3,
+     "he": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+     "en": "Mark the vehicle parked between the white trailer and the red truck",
+     "t_ms": 199,
+     "missed": [
+      "pickup|van"
+     ],
+     "ok": false,
+     "groups_total": 7,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_door_by_tree",
+     "hops": 3,
+     "he": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+     "en": "Find the house door under the tallest tree",
+     "t_ms": 150,
+     "missed": [
+      "opposite|facing|front|across"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_sign_awning",
+     "hops": 3,
+     "he": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+     "en": "Focus on the sign above the store entrance with the green driver",
+     "t_ms": 204,
+     "missed": [
+      "awning|canopy"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_front_tire",
+     "hops": 3,
+     "he": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+     "en": "Highlight the front bumper of the vehicle closest to the gate",
+     "t_ms": 192,
+     "missed": [
+      "tire|tyre|wheel",
+      "park"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_bench_fountain",
+     "hops": 3,
+     "he": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+     "en": "Count the people sitting on the seats to the left of the aisle",
+     "t_ms": 210,
+     "missed": [
+      "bench",
+      "fountain"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_exit_gray",
+     "hops": 3,
+     "he": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+     "en": "Follow the person who exited the gray building's door",
+     "t_ms": 176,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_second_car",
+     "hops": 3,
+     "he": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+     "en": "Mark the second vehicle on the left in the front row of the dock",
+     "t_ms": 226,
+     "missed": [
+      "parking"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_dark_stain",
+     "hops": 3,
+     "he": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+     "en": "Find the dark mark on the wall to the right of the large window",
+     "t_ms": 227,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_glasses_talk",
+     "hops": 3,
+     "he": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+     "en": "Highlight the man with glasses who is talking to the woman in the yellow sweater",
+     "t_ms": 241,
+     "missed": [
+      "shirt"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_truck_boat",
+     "hops": 2,
+     "he": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+     "en": "Follow the white boat that is slowing down",
+     "t_ms": 146,
+     "missed": [
+      "truck|lorry",
+      "tow|pull|haul"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 2
+    },
+    {
+     "case": "i_empty_chair",
+     "hops": 2,
+     "he": "סמן את הכיסא הריק ליד השולחן העגול",
+     "en": "Mark the empty chair next to the round table",
+     "t_ms": 159,
+     "missed": [],
+     "ok": true,
+     "groups_total": 5,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_bird_cable",
+     "hops": 3,
+     "he": "התמקד בציפור שיושבת על הכבל בין שני העמודים",
+     "en": "Focus on the cable between the two poles where the cable is suspended",
+     "t_ms": 211,
+     "missed": [
+      "bird",
+      "sit"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_fence_gap",
+     "hops": 3,
+     "he": "מצא את הפתח בגדר שמאחורי המכולה הכחולה",
+     "en": "Find the door in the blue warehouse's back wall",
+     "t_ms": 175,
+     "missed": [
+      "opening|gap|hole|breach",
+      "fence",
+      "behind",
+      "container"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 1
+    },
+    {
+     "case": "i_main_steps",
+     "hops": 3,
+     "he": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+     "en": "Count the stairs at the main entrance of the high-rise building",
+     "t_ms": 201,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_helmet_mid",
+     "hops": 3,
+     "he": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+     "en": "Highlight the drone with the yellow beacon located at the center of the group",
+     "t_ms": 225,
+     "missed": [
+      "rider|cyclist",
+      "helmet"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_cat_climb",
+     "hops": 3,
+     "he": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+     "en": "Follow the cat perched on the tree beside the wall",
+     "t_ms": 185,
+     "missed": [
+      "climb"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_lean_silver",
+     "hops": 2,
+     "he": "סמן את הבחור שנשען על המכונית הכסופה",
+     "en": "Mark the boy who is leaning on the broken car",
+     "t_ms": 172,
+     "missed": [
+      "guy|man|person",
+      "silver"
+     ],
+     "ok": false,
+     "groups_total": 4,
+     "groups_kept": 2
+    },
+    {
+     "case": "i_flag_low",
+     "hops": 3,
+     "he": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+     "en": "Find the flag waving above the ceiling of the low building",
+     "t_ms": 188,
+     "missed": [
+      "roof"
+     ],
+     "ok": false,
+     "groups_total": 6,
+     "groups_kept": 5
+    },
+    {
+     "case": "i_broken_window",
+     "hops": 3,
+     "he": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+     "en": "Highlight the broken window on the lower floor of the abandoned building",
+     "t_ms": 202,
+     "missed": [],
+     "ok": true,
+     "groups_total": 6,
+     "groups_kept": 6
+    },
+    {
+     "case": "i_last_convoy",
+     "hops": 2,
+     "he": "עקוב אחרי המכונית האחרונה בשיירה",
+     "en": "Follow the last vehicle in the convoy",
+     "t_ms": 136,
+     "missed": [],
+     "ok": true,
+     "groups_total": 3,
+     "groups_kept": 3
+    },
+    {
+     "case": "i_big_tent",
+     "hops": 2,
+     "he": "סמן את האוהל הגדול ביותר בקצה השדה",
+     "en": "Mark the largest tent at the field's edge",
+     "t_ms": 162,
+     "missed": [],
+     "ok": true,
+     "groups_total": 4,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_crane_arm",
+     "hops": 3,
+     "he": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+     "en": "Focus on the flag of the crane above the construction site",
+     "t_ms": 185,
+     "missed": [
+      "arm|boom|jib"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 4
+    },
+    {
+     "case": "i_boats_pier",
+     "hops": 2,
+     "he": "ספור את הסירות הקשורות למזח הצפוני",
+     "en": "Count the ships related to the northern port",
+     "t_ms": 148,
+     "missed": [
+      "boat",
+      "tie|moor",
+      "pier|dock|jetty|wharf"
+     ],
+     "ok": false,
+     "groups_total": 5,
+     "groups_kept": 2
+    }
+   ]
+  }
+ ],
+ "smoke": false,
+ "wall_s": 35
+}

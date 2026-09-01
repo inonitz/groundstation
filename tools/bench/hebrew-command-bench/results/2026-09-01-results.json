@@ -1,0 +1,626 @@
+[
+ {
+  "pipeline": "qwen-en",
+  "ok": 12,
+  "n": 12,
+  "median_ms": 246,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 254,
+    "out": "[{\"type\":\"fly_by\",\"z\":10}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 246,
+    "out": "[{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 242,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 178,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "land",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 149,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 542,
+    "out": "[{\"type\":\"fly_by\",\"z\":10},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 499,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"z\":5},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 601,
+    "out": "[{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-3,\"z\":0}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 243,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 224,
+    "out": "[{\"type\":\"fly_by\",\"z\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 75,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 1107,
+    "out": "[{\"type\":\"fly_by\",\"x\":2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":2,\"z\":0},{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-2,\"z\":0}]"
+   }
+  ]
+ },
+ {
+  "pipeline": "qwen-he",
+  "ok": 5,
+  "n": 12,
+  "median_ms": 346,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "wrong-z(0vs10)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 358,
+    "out": "[{\"type\":\"fly_by\",\"x\":10,\"y\":0,\"z\":0}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 347,
+    "out": "[{\"type\":\"fly_by\",\"x\":5,\"y\":0,\"z\":0}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "wrong-degrees(80vs90)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 262,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":80}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "wrong-len(0vs1)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 60,
+    "out": "[]"
+   },
+   {
+    "case": "land",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 160,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "combo3",
+    "score": "wrong-z(0vs10)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 761,
+    "out": "[{\"type\":\"fly_by\",\"x\":5,\"y\":0,\"z\":0},{\"type\":\"spin_by\",\"degrees\":30},{\"type\":\"fly_by\",\"x\":5,\"y\":0,\"z\":0}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 614,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":5},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}"
+   },
+   {
+    "case": "back2left3",
+    "score": "wrong-len(1vs2)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 291,
+    "out": "[{\"type\":\"fly_by\",\"x\":-2,\"y\":3}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 244,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "down3",
+    "score": "wrong-z(0vs-3)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 346,
+    "out": "[{\"type\":\"fly_by\",\"x\":3,\"y\":0,\"z\":0}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 77,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 349,
+    "out": "[{\"type\":\"fly_by\",\"x\":2,\"y\":0,\"z\":0}]"
+   }
+  ]
+ },
+ {
+  "pipeline": "opus->qwen",
+  "ok": 10,
+  "n": 12,
+  "median_ms": 263,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "translation": "Rise 10 metres",
+    "t_translate_ms": 383,
+    "t_plan_ms": 354,
+    "out": "[{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":10}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": "Fly forward five meters",
+    "t_translate_ms": 21,
+    "t_plan_ms": 219,
+    "out": "[{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "translation": "Rotate 90 degrees clockwise",
+    "t_translate_ms": 23,
+    "t_plan_ms": 235,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "wrong-len(0vs1)",
+    "translation": "The Mirror",
+    "t_translate_ms": 14,
+    "t_plan_ms": 66,
+    "out": "[]"
+   },
+   {
+    "case": "land",
+    "score": "wrong-len(0vs1)",
+    "translation": "Marine",
+    "t_translate_ms": 10,
+    "t_plan_ms": 65,
+    "out": "[]"
+   },
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "translation": "Climb ten meters, turn 90 degrees clockwise and then fly forward five meters",
+    "t_translate_ms": 46,
+    "t_plan_ms": 516,
+    "out": "[{\"type\":\"fly_by\",\"z\":10},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "CORRECT",
+    "translation": "Lift off, rise five meters, wait three seconds and land",
+    "t_translate_ms": 38,
+    "t_plan_ms": 489,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"z\":5},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "translation": "Fly backwards two meters and then left three meters",
+    "t_translate_ms": 33,
+    "t_plan_ms": 587,
+    "out": "[{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-3,\"z\":0}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "translation": "Rotate forty-five degrees counterclockwise",
+    "t_translate_ms": 30,
+    "t_plan_ms": 233,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "translation": "Down three meters.",
+    "t_translate_ms": 18,
+    "t_plan_ms": 217,
+    "out": "[{\"type\":\"fly_by\",\"z\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "translation": "What do you see now?",
+    "t_translate_ms": 23,
+    "t_plan_ms": 73,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "translation": "Fly a square of two meters",
+    "t_translate_ms": 23,
+    "t_plan_ms": 1326,
+    "out": "[{\"type\":\"fly_by\",\"x\":2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":2,\"z\":0},{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-2,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":0}]"
+   }
+  ]
+ },
+ {
+  "pipeline": "nllb->qwen",
+  "ok": 9,
+  "n": 12,
+  "median_ms": 1825,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "translation": "He went up ten meters.",
+    "t_translate_ms": 1603,
+    "t_plan_ms": 358,
+    "out": "[{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":10}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": "Fly forward five meters",
+    "t_translate_ms": 1242,
+    "t_plan_ms": 224,
+    "out": "[{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "translation": "Turn 90 degrees clockwise.",
+    "t_translate_ms": 1584,
+    "t_plan_ms": 241,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "wrong-len(0vs1)",
+    "translation": "The mirror",
+    "t_translate_ms": 843,
+    "t_plan_ms": 68,
+    "out": "[]"
+   },
+   {
+    "case": "land",
+    "score": "CORRECT",
+    "translation": "Landed",
+    "t_translate_ms": 682,
+    "t_plan_ms": 159,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "translation": "He went up ten meters, turned ninety degrees clockwise, then flew forward five meters.",
+    "t_translate_ms": 4157,
+    "t_plan_ms": 528,
+    "out": "[{\"type\":\"fly_by\",\"z\":10},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "wrong-len(1vs4)",
+    "translation": "The mirror, five meters high, three seconds long and landed.",
+    "t_translate_ms": 3119,
+    "t_plan_ms": 168,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "translation": "Fly back two meters and then left three meters",
+    "t_translate_ms": 2216,
+    "t_plan_ms": 558,
+    "out": "[{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-3,\"z\":0}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "wrong-degrees(45vs-45)",
+    "translation": "Turn 45 degrees clockwise.",
+    "t_translate_ms": 1604,
+    "t_plan_ms": 204,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":45}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "translation": "Down three meters.",
+    "t_translate_ms": 1248,
+    "t_plan_ms": 175,
+    "out": "[{\"type\":\"fly_by\",\"z\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "translation": "What do you see now?",
+    "t_translate_ms": 1397,
+    "t_plan_ms": 57,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "translation": "Flying in a square of two meters",
+    "t_translate_ms": 1943,
+    "t_plan_ms": 940,
+    "out": "[{\"type\":\"fly_by\",\"x\":2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":2,\"z\":0},{\"type\":\"fly_by\",\"x\":0,\"y\":-2,\"z\":0}]"
+   }
+  ]
+ },
+ {
+  "pipeline": "dicta-he",
+  "ok": 2,
+  "n": 12,
+  "median_ms": 286,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 1504,
+    "out": "{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":10}"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 415,
+    "out": "[\n  {\"type\":\"fly_by\",\"x\":5}\n]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 96,
+    "out": "{\"type\":\"spin_by\",\"degrees\":90}"
+   },
+   {
+    "case": "takeoff",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 508,
+    "out": "{\"type\":\"takeoff\"}"
+   },
+   {
+    "case": "land",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 593,
+    "out": "{\"type\":\"land\"}"
+   },
+   {
+    "case": "combo3",
+    "score": "wrong-z(0vs10)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 581,
+    "out": "[\n  {\"type\":\"fly_by\",\"x\":0,\"y\":5,\"z\":0},\n  {\"type\":\"spin_by\",\"degrees\":90},\n  {\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":5}\n]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "wrong-len(3vs4)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 247,
+    "out": "[\n  {\"type\":\"fly_by\",\"x\":0,\"y\":5,\"z\":0},\n  {\"type\":\"delay\",\"seconds\":3},\n  {\"type\":\"land\"}\n]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 286,
+    "out": "[\n  {\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0},\n  {\"type\":\"fly_by\",\"x\":0,\"y\":-3,\"z\":0}\n]"
+   },
+   {
+    "case": "ccw45",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 97,
+    "out": "{\"type\":\"spin_by\",\"degrees\":-45}"
+   },
+   {
+    "case": "down3",
+    "score": "wrong-z(0vs-3)",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 178,
+    "out": "```json\n[\n  {\"type\":\"fly_by\",\"x\":0,\"y\":-3,\"z\":0}\n]\n```"
+   },
+   {
+    "case": "question",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 143,
+    "out": "{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":0}"
+   },
+   {
+    "case": "square",
+    "score": "invalid",
+    "translation": null,
+    "t_translate_ms": 0,
+    "t_plan_ms": 128,
+    "out": "{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":2}"
+   }
+  ]
+ },
+ {
+  "pipeline": "dicta->qwen",
+  "ok": 8,
+  "n": 12,
+  "median_ms": 338,
+  "cases": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "translation": "Raise ten meters.",
+    "t_translate_ms": 86,
+    "t_plan_ms": 306,
+    "out": "[{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":10}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "translation": "Fly forward five meters.",
+    "t_translate_ms": 53,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "translation": "Turn right 90 degrees with the hands of the clock.",
+    "t_translate_ms": 103,
+    "t_plan_ms": 203,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "wrong-len(0vs1)",
+    "translation": "The show",
+    "t_translate_ms": 42,
+    "t_plan_ms": 55,
+    "out": "[]"
+   },
+   {
+    "case": "land",
+    "score": "wrong-len(0vs1)",
+    "translation": "You have landed.",
+    "t_translate_ms": 48,
+    "t_plan_ms": 57,
+    "out": "[]"
+   },
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "translation": "Fly up 10 meters, turn 90 degrees clockwise, then fly forward 5 meters.",
+    "t_translate_ms": 142,
+    "t_plan_ms": 442,
+    "out": "[{\"type\":\"fly_by\",\"z\":10},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"x\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "wrong-len(2vs4)",
+    "translation": "The drone, a five-meter tall platform, waited for three seconds, then landed.",
+    "t_translate_ms": 133,
+    "t_plan_ms": 244,
+    "out": "[{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "wrong-verb(spin_byvsfly_by)",
+    "translation": "Turn left three meters, then fly back two meters.",
+    "t_translate_ms": 94,
+    "t_plan_ms": 410,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-90},{\"type\":\"fly_by\",\"x\":-2,\"y\":0,\"z\":0}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "translation": "Turn 45 degrees counter-clockwise.",
+    "t_translate_ms": 104,
+    "t_plan_ms": 214,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "translation": "Fly down three meters.",
+    "t_translate_ms": 56,
+    "t_plan_ms": 282,
+    "out": "[{\"type\":\"fly_by\",\"x\":0,\"y\":0,\"z\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "translation": "I see a computer screen displaying text and images.",
+    "t_translate_ms": 82,
+    "t_plan_ms": 66,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "translation": "Fly at the square of two meters.",
+    "t_translate_ms": 70,
+    "t_plan_ms": 286,
+    "out": "[{\"type\":\"fly_by\",\"x\":2,\"y\":0,\"z\":0}]"
+   }
+  ]
+ }
+]
