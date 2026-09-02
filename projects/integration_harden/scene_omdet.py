@@ -16,12 +16,14 @@ os.environ.setdefault("SCENE_HL_BACKEND", "vlm")          # Eyes: no YOLOE load;
 import cv2, numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # self-contained: import only local modules
-import config, vlm
+import config
+from perception import PerceptionEngine, parse_highlight, ascii_only
+from perception import vlm_client as vlm
+from perception.detectors import Eyes, OmDet
+from camera_stream import open_capture
 from router import Router
 from commands import Tier
 from dji_wire import DjiWire
-from eyes import Eyes
-import highlight_seg as HS                                 # OmDet, _apply_masks, parse_highlight, _ascii, open_capture
 try:
     from ears import Ears; _HAVE_EARS = True
 except Exception:
@@ -29,6 +31,7 @@ except Exception:
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 OM = {"det": None}
+ENGINE = {"e": None}       # PerceptionEngine, built in main() once eyes exist
 
 
 class Shared:
@@ -70,27 +73,10 @@ def worker(eyes):
             time.sleep(0.005); continue
         bg = eyes.background(frame) if show_bg else []
         hl, masks = [], []
-        det = OM["det"]
-        if target and det is not None:
-            floor     = float(os.environ.get("SCENE_DETECT_FLOOR", "0.12"))   # see ALL candidates
-            draw_conf = float(os.environ.get("SCENE_HL_CONF", "0.30"))        # gate guards FPs, so draw low
-            try: raw = det.detect(frame, target, conf=floor)
-            except Exception as e: raw = []; print("omdet err:", e)
-            rel  = float(os.environ.get("SCENE_HL_REL", "0.65"))   # keep only within 65% of the TOP score
-            best = raw[0]["conf"] if raw else 0.0                    # raw is sorted desc by conf
-            thr  = max(draw_conf, best * rel)                        # relative gate: 0.48 dies next to 0.90; two real windows both survive
-            _hl_debug(target, raw, frame.shape, thr)
-            keep = [d for d in raw if d["conf"] >= thr]
-            hl, masks = HS._apply_masks(keep, frame, eyes.mask_for_box, use_sam, mk)
-            if not hl and vbox_px is not None:          # OmDet whiffed -> fall back to the VLM's own box + SAM2
-                try: m = eyes.mask_for_box(frame, vbox_px)
-                except Exception as e: m = None; print("sam err:", e)
-                d = {"label": f"{target} (vlm)", "conf": 1.0, "box": vbox_px}
-                if m is not None and m.sum() > 0:
-                    ys, xs = np.where(m); d["box"] = (int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max()))
-                    hl, masks = [d], [m]
-                else:
-                    hl, masks = [d], []
+        engine = ENGINE["e"]
+        if target and engine is not None:
+            hl, masks, dbg = engine.highlight_step(frame, target, vbox_px, use_sam)
+            _hl_debug(target, dbg.get("raw", []), frame.shape, dbg.get("threshold", 0.0))
         with S.lock:
             S.bg_dets = bg
             if target: S.hl_dets, S.hl_masks = hl, masks
@@ -125,7 +111,7 @@ def render_chat(height):
     legend(config.COL_BACKGROUND, "background", f"b: {'on' if show_bg else 'off'}")
     legend(config.COL_YOLOE_HL, "highlight (OmDet open-vocab)")
     legend(config.COL_SAM2_HL, "SAM2 mask", f"t: {'on' if use_sam else 'off'}")
-    cv2.putText(panel, f"target: {HS._ascii(target or '(none)')}", (12, y), FONT, 0.46, (0, 215, 255), 1, cv2.LINE_AA); y += 20
+    cv2.putText(panel, f"target: {ascii_only(target or '(none)')}", (12, y), FONT, 0.46, (0, 215, 255), 1, cv2.LINE_AA); y += 20
     cv2.putText(panel, "Press H: record on/off", (12, y), FONT, 0.5, config.COL_HUD, 1, cv2.LINE_AA); y += 20
     cv2.putText(panel, "keys: c clear  x chat  Esc/q quit", (12, y), FONT, 0.44, (150, 150, 150), 1, cv2.LINE_AA)
     y += 10; cv2.line(panel, (0, y), (w, y), (70, 70, 70), 1); conv_top = y + 8
@@ -133,7 +119,7 @@ def render_chat(height):
     maxchars = max(int((w - 26) / 9), 12)
     lines = []
     for role, text in chat:
-        text = HS._ascii(text)
+        text = ascii_only(text)
         if role == "spoken":
             lines.append(("Spoken:", (0, 215, 255)))                 # amber label -> what the drone SAYS aloud
             body = (150, 210, 245)
@@ -170,9 +156,19 @@ def main():
     eyes = Eyes()
     we_started_llama = subprocess.run(["pgrep", "-f", "llama-server"], capture_output=True).returncode != 0
     def _load(dev):
-        try: OM["det"] = HS.OmDet(dev); print("[scene_omdet] OmDet ready", flush=True)
+        try: OM["det"] = OmDet(dev); print("[scene_omdet] OmDet ready", flush=True)
         except Exception as e: print("[scene_omdet] OmDet load FAILED:", e, flush=True)
     threading.Thread(target=_load, args=(eyes.tdevice,), daemon=True).start()
+
+    # The engine is pure logic; the detector arrives on its background thread, so the detect
+    # callable checks OM at call time. Env knobs are read once here, not per frame.
+    ENGINE["e"] = PerceptionEngine(
+        detect=lambda f, p, c: OM["det"].detect(f, p, conf=c) if OM["det"] else [],
+        mask_for_box=eyes.mask_for_box,
+        vlm_ask=vlm.ask,
+        floor=float(os.environ.get("SCENE_DETECT_FLOOR", "0.12")),
+        draw_conf=float(os.environ.get("SCENE_HL_CONF", "0.30")),
+        rel=float(os.environ.get("SCENE_HL_REL", "0.65")))
 
     router = None
     if os.environ.get("MVD_DRONE"):
@@ -206,7 +202,7 @@ def main():
             if res.tier is not Tier.COMPLEX:      # basic/emergency/override handled -> done
                 with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
                 return
-        ph = HS.parse_highlight(text)
+        ph = parse_highlight(text)
         if ph == "":
             with S.lock:
                 S.target = None; S.hl_dets = []; S.hl_masks = []
@@ -219,18 +215,9 @@ def main():
             with S.lock:
                 gframe = None if S.frame is None else S.frame.copy(); S.thinking = True
             def _gate(fr, tgt):
-                present, vbox, px = True, None, None
-                if fr is not None:
-                    try:
-                        ans, vt, vb, _ = vlm.ask(fr, f"Point at and highlight the {tgt}.", [])
-                        present = vt is not None      # VLM writes HIGHLIGHT: none when absent
-                        vbox = vb
-                    except Exception as e:
-                        present = True; print("[scene_omdet] gate VLM err:", e, flush=True)
-                    if vbox and fr is not None:
-                        Hf, Wf = fr.shape[:2]
-                        sc = 1000.0 if max(vbox) > 1.5 else 1.0   # auto-detect 0-1 vs 0-1000 coords
-                        px = (int(vbox[0]/sc*Wf), int(vbox[1]/sc*Hf), int(vbox[2]/sc*Wf), int(vbox[3]/sc*Hf))
+                present, px = True, None
+                if fr is not None and ENGINE["e"] is not None:
+                    present, px = ENGINE["e"].presence_gate(fr, tgt)
                 with S.lock:
                     S.thinking = False
                     if present:
@@ -238,7 +225,7 @@ def main():
                     else:
                         S.target = None; S.vlm_box = None; S.hl_dets = []; S.hl_masks = []
                         S.chat.append(("model", f"I don't see a {tgt} in view."))
-                print(f"[scene_omdet] gate '{tgt}': present={present} vlm_box={vbox} -> px={px}", flush=True)
+                print(f"[scene_omdet] gate '{tgt}': present={present} -> px={px}", flush=True)
             threading.Thread(target=_gate, args=(gframe, ph), daemon=True).start()
             return
         with S.lock:
@@ -273,9 +260,9 @@ def main():
     if a.target:
         with S.lock: S.target = a.target
 
-    cap = HS.open_capture(a.source); t0 = time.time()
+    cap = open_capture(a.source); t0 = time.time()
     while not cap.isOpened() and time.time() - t0 < config.OPEN_TIMEOUT:
-        print("[scene_omdet] waiting for input", a.source, flush=True); time.sleep(1.5); cap.release(); cap = HS.open_capture(a.source)
+        print("[scene_omdet] waiting for input", a.source, flush=True); time.sleep(1.5); cap.release(); cap = open_capture(a.source)
     if not cap.isOpened():
         print("cannot open", a.source); return
 

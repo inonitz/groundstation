@@ -44,3 +44,6 @@ _exo_transfer/
 
 # SITL per-run workdirs
 projects/llm_to_action/test/sitl/runs/
+
+# recognizer traces: transcripts + audio, never committed
+projects/integration_harden/traces/

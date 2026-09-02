@@ -1,14 +1,76 @@
-"""Real-time eyes. YOLO26-seg draws always-on background detections. The on-demand HIGHLIGHT has two
-selectable backends (SCENE_HL_BACKEND):
-  - "yoloe" (DEFAULT, demo-safe): YOLOE-2026 open-vocab, confidence-GATED -- when the prompted thing
-    isn't there it shows NOTHING instead of hallucinating a box. This is what you want live.
-  - "grounder": LLMDet/MM-Grounding-DINO via transformers. Higher recall on esoteric ground-level
-    objects, but as a phrase grounder it returns a box even when absent -> can look confidently-wrong
-    on out-of-distribution (e.g. aerial/blurry) footage. Opt-in for tuned/ground-level use.
-The highlighter is LOADED + WARMED on a BACKGROUND THREAD so the video window opens in seconds; until
-it is ready, background detection + VLM chat work and highlight is a quiet no-op. SAM2 is lazy."""
+"""Model-owning detectors for the perception engine. This file loads the vision models;
+engine.py stays model-free. Contents moved verbatim from highlight_seg.py (OmDet) and eyes.py
+(Eyes + the legacy Grounder/YOLOE backends) on 2026-09-02 -- behavior unchanged.
+
+  OmDet  open-vocab detector, the live highlight backend (stateless, phrase per call)
+  Eyes   background YOLO26-seg + lazy SAM2 mask_for_box + the config-selected legacy backends
+"""
 import threading
-import config
+
+import torch
+
+import config      # integration_harden root is on sys.path for every consumer of this package
+
+
+class OmDet:
+    """OmDet-Turbo open-vocab detector (Apache, transformers). Stateless: pass the phrase each call.
+    Loads from a LOCAL, offline copy (/root/models/omdet-turbo-swin-tiny) in ~1s -- see README 'OmDet
+    offline' -- so it never hangs fetching the Swin backbone from the HF Hub."""
+    LOCAL = "/root/models/vision/omdet-turbo-swin-tiny"
+    def __init__(self, device):
+        import os, inspect, timm
+        from transformers import AutoProcessor, OmDetTurboForObjectDetection
+        if os.path.isdir(self.LOCAL):                       # baked config + weights -> fully offline
+            os.environ["HF_HUB_OFFLINE"] = "1"; os.environ["TRANSFORMERS_OFFLINE"] = "1"
+            r, lo = self.LOCAL, True
+        else:
+            r, lo = "omlab/omdet-turbo-swin-tiny-hf", False   # fallback: fetch from the hub (needs net)
+        # transformers 5.x probes the hub (backbone_utils.consolidate_backbone_kwargs_to_config ->
+        # HfApi.repo_exists) to decide timm-vs-hub backbone. With no internet (phone hotspot) that call
+        # resets/raises and is NOT caught -> OmDet load fails. Make the probe fail-safe to False so
+        # transformers uses the timm backbone (builds fully offline). Mirrors the desk-with-internet 404.
+        try:
+            import huggingface_hub as _hh
+            if not getattr(_hh.HfApi.repo_exists, "_mvd_safe", False):
+                _re = _hh.HfApi.repo_exists
+                def _safe_repo_exists(self, *a, **k):
+                    try: return _re(self, *a, **k)
+                    except Exception: return False
+                _safe_repo_exists._mvd_safe = True
+                _hh.HfApi.repo_exists = _safe_repo_exists
+        except Exception:
+            pass
+        _o = timm.create_model                              # backbone weights are in the checkpoint;
+        timm.create_model = lambda *a, **k: _o(*a, **{**k, "pretrained": False})  # don't fetch ImageNet ones
+        try:
+            self.proc = AutoProcessor.from_pretrained(r, local_files_only=lo)
+            self.model = OmDetTurboForObjectDetection.from_pretrained(r, local_files_only=lo).to(device).eval()
+        finally:
+            timm.create_model = _o
+        self.device = device
+        self._sig = inspect.signature(self.proc.post_process_grounded_object_detection).parameters
+    def detect(self, frame_bgr, phrase, conf=0.30, topk=8):
+        if not phrase: return []
+        from PIL import Image
+        pil=Image.fromarray(frame_bgr[:,:,::-1])
+        prompts=[p.strip() for p in phrase.split(",") if p.strip()] or [phrase]
+        inp=self.proc(pil, text=prompts, return_tensors="pt").to(self.device)
+        with torch.no_grad(): out=self.model(**inp)
+        kw={"target_sizes":[(pil.height,pil.width)]}
+        if "text_labels" in self._sig: kw["text_labels"]=prompts
+        elif "classes" in self._sig: kw["classes"]=[prompts]
+        if "threshold" in self._sig: kw["threshold"]=conf
+        elif "score_threshold" in self._sig: kw["score_threshold"]=conf
+        if "nms_threshold" in self._sig: kw["nms_threshold"]=0.5
+        res=self.proc.post_process_grounded_object_detection(out, **kw)[0]
+        labels=res.get("text_labels", res.get("labels"))
+        dets=[]
+        for sc,lb,bx in zip(res["scores"],labels,res["boxes"]):
+            lab=lb if isinstance(lb,str) else (prompts[int(lb)] if int(lb)<len(prompts) else str(lb))
+            x1,y1,x2,y2=(int(v) for v in bx)
+            dets.append({"label":str(lab),"conf":float(sc),"box":(x1,y1,x2,y2)})
+        dets.sort(key=lambda d:-d["conf"])
+        return dets[:topk]
 
 
 class Grounder:

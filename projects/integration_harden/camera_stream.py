@@ -81,3 +81,21 @@ class CameraStream:
         except Exception: pass
         try: self._node.destroy_node()
         except Exception: pass
+
+
+def open_capture(src):
+    """One opener for every source kind: ROS topic, webcam index, GStreamer pipe, or URL/file.
+    Moved from highlight_seg.py on 2026-09-02."""
+    import cv2
+    import config
+    src = str(src)
+    if src in ("ros", "camera_stream", "camera/stream"):
+        return CameraStream()
+    if src.isdigit():
+        cap = cv2.VideoCapture(int(src))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAM_W)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAM_H)
+        return cap
+    if "!" in src:
+        return cv2.VideoCapture(src, cv2.CAP_GSTREAMER)
+    return cv2.VideoCapture(src)
