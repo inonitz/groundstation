@@ -481,3 +481,18 @@ voice-controlled drone stack (NOT the FMU/`llm_to_action`, which stays DEFERRED 
 assessment + possible end-to-end VLM flight (connect current Python perception to the C++ FMU);
 (3) Robomaster backend + acquisition (S1 has no remote SDK -> buy EP/EP Core; video-in is the cheap
 path); (4) diagnostic dashboard (spec only — youtu.be/vO6SWG-jxvE ~1:25; consumes the stdout logging).
+
+## After the Recognizer alpha (updated 2026-09-02, pre-compaction)
+
+1. Live desk-loop smoke of the extracted perception package (needs camera/RTSP; code-level
+   checks all pass, live video not yet run).
+2. ASR round in tools/bench/model-cpu-or-gpu: whisper quant ladder ready (q4_0/q5_1/q8_0),
+   wav2vec2+KenLM challenger downloaded; gates = faster-whisper + pyctcdecode/kenlm scripted
+   installs, team recordings per RECORDING-SPEC.md. Deferred until Recognizer alpha by ruling.
+3. Group integration_harden top-level into control/ audio/ video/ packages (deferred: run_mvd.sh
+   path references + live smoke required; do not do this blind).
+4. Backlog D: TTS out; give the Recognizer's reject path a voice (text/EN-TTS interim ruled).
+5. Recognizer residue: chain-initial takeoff rewrite; planner "a second after that" delay-shot;
+   perception-58% ceiling revisit when TranslateGemma returns (E2E ASR system).
+6. LoRA data collection per docs/research/2026-09-02-finetune-data-plan.md (1k-5k pairs) if the
+   deterministic ceiling stops being enough.

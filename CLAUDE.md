@@ -270,3 +270,20 @@ Then:
 - Apply the test: "would I still recommend this if it weren't the user's idea?"
 - If we have spent several turns on one sub-problem without progress, STOP and re-evaluate against the objective instead of trying fix #4.
 - Brevity is signal. No ego-massaging, no re-confirming what the user already said.
+
+# Components & measurement (added 2026-09-02, owner-ruled; project-agnostic)
+
+- A component has exactly ONE home in the repo. Benchmarks and consumers import it in place;
+  never keep a second copy anywhere.
+- No integration of a component into a larger system until the owner declares it closed and
+  merge-ready.
+- Measurement invariants: deterministic sampling (temperature 0; prove determinism once, then
+  one pass per case), proper intervals (Wilson 95%) and paired tests (exact McNemar), latency
+  percentiles as table columns, one model resident on the GPU at a time, a duration estimate
+  stated BEFORE every benchmark run, and full result tables in chat — never abbreviated.
+- Deterministic guard/rewrite rules ship only with measured evidence, positive cases, and
+  adversarial negative cases; zero false fires is the gate.
+- After any refactor of measured code, re-run the full measurement and compare counts before
+  claiming equivalence. A summary claim without a re-run is an unverified claim.
+- Before working on a benchmarked component, check for and invoke its project skill
+  (see `.claude/skills/`).

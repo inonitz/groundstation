@@ -495,3 +495,17 @@ Ports: phone `:8080` (control+tts) / laptop `:8080` (phone_ears) / `:5600` (vide
 
 **Backend gaps (DJI app dev):** dynamic groundstation-IP discovery; gimbal commands (broken backend-side);
 API-Server foreground-service reliability. See the handoff §9.
+
+## Voice pipeline components (2026-09-02)
+
+System chain: **ASR => RECOGNIZER => VLM/LLM => REST API (MSDK server)**.
+
+- `projects/integration_harden/recognizer/` — Hebrew utterance in; mission JSON, planner-bound
+  English, VLM-bound English, or a spoken rejection out. Six deterministic stages around one
+  injected translator call. Details + diagram: its README and tools/bench/hebrew-command-bench/README.md.
+- `projects/integration_harden/perception/` — detection/masking/VLM-gating logic with injected
+  models. Details: its README.
+- Remaining top-level integration_harden files are three not-yet-clustered components plus glue:
+  drone control (router.py, commands.py, dji_wire.py), audio I/O (ears.py, phone_ears.py,
+  voice.py), video plumbing (camera_stream.py, video_doctor.py, video_watchdog.py), and the app
+  glue (scene_omdet.py, config.py, run scripts). Clustering them is roadmapped, not urgent.

@@ -2546,3 +2546,26 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   - Superpowers: untouched during the sprint; post-sprint, fold the systematic-debugging habit into CLAUDE.md and drop the plugin.
   - Review lanes: correctness bugs -> /code-review; over-engineering -> /ponytail-review or /ponytail-audit; whole-repo architecture -> /architecture-survey; pre-merge harsh audit -> /thermo-nuclear-code-quality-review.
   - Infra fact: devenv.sh bind-mounts $HOME/.claude into the container, so skills/plugins SURVIVE rebuilds — no install-script entry needed for them.
+
+## The Recognizer + perception engine become components (2026-09-02, agent)
+- **Recognizer** = the named pipeline for Hebrew input, single home `projects/integration_harden/recognizer/`:
+  stage 0 emergency (greedy by ruling: עצור always stops; wait-intent stays expressible via חכה) ->
+  bypass (full-match sentences -> mission, no model, 79/189 std coverage) -> Hebrew rewrites
+  (number-words->digits; measured trouble words inlined as English, DictaLM passes Latin through;
+  verb insertion; glossary) -> DictaLM translate (injected callable; CPU p50 199 ms) -> output
+  guards (copy-echo retry; number check -> retry -> digit patch -> REJECT and read back to the
+  user, per ruling) -> English rewrites -> route() (deterministic; movement verb beats perception
+  clause; 100/100 + 240/243 offline).
+- Measured, complete pipeline, 370 sentences: emergency 6/6, std 98% (planner ceiling), verbose
+  85% (ceiling), perception 58% (DictaLM), military 55%; ALL 301/364. Bench: tools/bench/hebrew-command-bench.
+- **Perception engine** extracted to `projects/integration_harden/perception/`: engine.py = pure
+  logic w/ injected models (relative-confidence gate, mask hygiene, VLM-box fallback, VLM presence
+  gate); detectors.py = OmDet + Eyes moved verbatim; vlm_client.py = vlm.py + testable parse_reply.
+  scene_omdet.py stays the glue. highlight_seg/eyes/vlm deleted (moved, git history keeps them).
+- **Dedup ruling:** components live ONLY in integration_harden; the bench imports and measures
+  them in place. No second copies.
+- **Deployment topology (measured):** GPU = Qwen3-VL 3.8 GiB + OmDet 0.9 + SAM2.1 0.7 + ASR 0.1
+  = 5.5 of 8 GiB; CPU = translators. Model split (tgemma) deferred to the future E2E ASR system;
+  direct-Hebrew planning parked (the VLM must be resident for flight anyway).
+- Tests: 26/26 (router 13, recognizer wiring 7, perception 6), all model calls faked.
+  Trace recorder: traces/*.jsonl per utterance, gitignored.
