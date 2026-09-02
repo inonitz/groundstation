@@ -1,0 +1,52 @@
+{
+ "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+ "baseline": {
+  "total": 8151,
+  "used": 111,
+  "free": 7598
+ },
+ "solo": {
+  "dicta": {
+   "resident_mb": 1582,
+   "free_after_mb": 6015
+  },
+  "tgemma": {
+   "resident_mb": 3035,
+   "free_after_mb": 4563
+  },
+  "qwen3vl": {
+   "resident_mb": 3821,
+   "free_after_mb": 3777
+  }
+ },
+ "pairs": {
+  "qwen3vl+dicta": {
+   "fits": true,
+   "used_mb": 5401,
+   "free_mb": 2196
+  },
+  "qwen3vl+tgemma": {
+   "fits": false,
+   "free_mb": 3777,
+   "need_mb": 4059
+  }
+ },
+ "cpu": {
+  "dicta": {
+   "threads": 16,
+   "n": 20,
+   "p50_ms": 199,
+   "p95_ms": 430,
+   "max_ms": 502,
+   "ram_after_avail_mb": 8722
+  },
+  "tgemma": {
+   "threads": 16,
+   "n": 20,
+   "p50_ms": 624,
+   "p95_ms": 1228,
+   "max_ms": 1348,
+   "ram_after_avail_mb": 8673
+  }
+ }
+}

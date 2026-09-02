@@ -1,0 +1,1555 @@
+{
+ "arm": {
+  "ok": 168,
+  "n": 190,
+  "acc": 0.8842105263157894,
+  "wilson95": [
+   0.831,
+   0.922
+  ],
+  "latency_e2e_ms": {
+   "p25": 112,
+   "p50": 115,
+   "p75": 128,
+   "p95": 262,
+   "p99": 331,
+   "max": 571
+  },
+  "cases": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "input": "עלה עשרה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 307,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "input": "טוס קדימה חמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 116,
+    "out": "[{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "wrong-degrees(-90vs90)",
+    "input": "הסתובב תשעים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 125,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-90}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "CORRECT",
+    "input": "המראה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 92,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "land",
+    "score": "wrong-len(0vs1)",
+    "input": "נחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 41,
+    "out": "[]"
+   },
+   {
+    "case": "combo3",
+    "score": "wrong-degrees(-90vs90)",
+    "input": "עלה עשרה מטרים, הסתובב תשעים מעלות עם כיוון השעון ואז טוס קדימה חמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 270,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10},{\"type\":\"spin_by\",\"degrees\":-90},{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "CORRECT",
+    "input": "המראה, עלה חמישה מטרים, המתן שלוש שניות ונחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 252,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "input": "טוס אחורה שני מטרים ואז שמאלה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-2},{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "input": "הסתובב ארבעים וחמש מעלות נגד כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 125,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "input": "רד שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 116,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "wrong-len(1vs0)",
+    "input": "מה אתה רואה עכשיו?",
+    "t_translate_ms": 0,
+    "t_plan_ms": 106,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "input": "טוס בריבוע של שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 188,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2},{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "up2",
+    "score": "CORRECT",
+    "input": "עלה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2}]"
+   },
+   {
+    "case": "right4",
+    "score": "CORRECT",
+    "input": "טוס ימינה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":4}]"
+   },
+   {
+    "case": "left7",
+    "score": "CORRECT",
+    "input": "זוז שמאלה שבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-7}]"
+   },
+   {
+    "case": "back10",
+    "score": "CORRECT",
+    "input": "טוס אחורה עשרה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-10}]"
+   },
+   {
+    "case": "fwd15",
+    "score": "CORRECT",
+    "input": "התקדם חמישה עשר מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 126,
+    "out": "[{\"type\":\"fly_by\",\"dx\":15}]"
+   },
+   {
+    "case": "spin180cw",
+    "score": "wrong-degrees(-180vs180)",
+    "input": "הסתובב מאה שמונים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 134,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-180}]"
+   },
+   {
+    "case": "spin360",
+    "score": "CORRECT",
+    "input": "עשה סיבוב שלם עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 138,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":360}]"
+   },
+   {
+    "case": "wait5",
+    "score": "CORRECT",
+    "input": "חכה חמש שניות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 111,
+    "out": "[{\"type\":\"delay\",\"seconds\":5}]"
+   },
+   {
+    "case": "up_half",
+    "score": "CORRECT",
+    "input": "עלה חצי מטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 131,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.5}]"
+   },
+   {
+    "case": "combo2b",
+    "score": "CORRECT",
+    "input": "המראה ואז עלה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 154,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "combo4",
+    "score": "CORRECT",
+    "input": "טוס קדימה ארבעה מטרים, ימינה שני מטרים, אחורה ארבעה מטרים ואז שמאלה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 329,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":2},{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "combo5",
+    "score": "CORRECT",
+    "input": "המראה, עלה שני מטרים, הסתובב תשעים מעלות עם כיוון השעון, טוס קדימה שלושה מטרים ונחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 343,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "digit12",
+    "score": "CORRECT",
+    "input": "עלה 12 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"fly_by\",\"dz\":12}]"
+   },
+   {
+    "case": "digit45deg",
+    "score": "CORRECT",
+    "input": "פנה ימינה 45 מעלות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":45}]"
+   },
+   {
+    "case": "question2",
+    "score": "CORRECT",
+    "input": "כמה אנשים אתה רואה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 37,
+    "out": "[]"
+   },
+   {
+    "case": "q_land_trap",
+    "score": "CORRECT",
+    "input": "האם אתה מתכוון לנחות בקרוב",
+    "t_translate_ms": 0,
+    "t_plan_ms": 39,
+    "out": "[]"
+   },
+   {
+    "case": "neg_trap",
+    "score": "CORRECT",
+    "input": "אל תטוס קדימה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 39,
+    "out": "[]"
+   },
+   {
+    "case": "colloq_up",
+    "score": "CORRECT",
+    "input": "תעלה עשרה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10}]"
+   },
+   {
+    "case": "land_now",
+    "score": "wrong-len(0vs1)",
+    "input": "נחת עכשיו",
+    "t_translate_ms": 0,
+    "t_plan_ms": 41,
+    "out": "[]"
+   },
+   {
+    "case": "takeoff_ctx",
+    "score": "CORRECT",
+    "input": "בצע המראה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 92,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "g_up1",
+    "score": "CORRECT",
+    "input": "עלה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1}]"
+   },
+   {
+    "case": "g_up2",
+    "score": "CORRECT",
+    "input": "תעלה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2}]"
+   },
+   {
+    "case": "g_up3",
+    "score": "CORRECT",
+    "input": "עלה 3 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "g_up4",
+    "score": "CORRECT",
+    "input": "תעלה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4}]"
+   },
+   {
+    "case": "g_up6",
+    "score": "CORRECT",
+    "input": "עלה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 112,
+    "out": "[{\"type\":\"fly_by\",\"dz\":6}]"
+   },
+   {
+    "case": "g_up8",
+    "score": "CORRECT",
+    "input": "תעלה 8 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":8}]"
+   },
+   {
+    "case": "g_up9",
+    "score": "CORRECT",
+    "input": "עלה תשעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":9}]"
+   },
+   {
+    "case": "g_up20",
+    "score": "CORRECT",
+    "input": "תעלה עשרים מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "g_up25",
+    "score": "CORRECT",
+    "input": "עלה 25 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dz\":25}]"
+   },
+   {
+    "case": "g_down1",
+    "score": "CORRECT",
+    "input": "תרד מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "g_down2",
+    "score": "CORRECT",
+    "input": "רד 2 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "g_down3",
+    "score": "CORRECT",
+    "input": "תרד שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-3}]"
+   },
+   {
+    "case": "g_down4",
+    "score": "CORRECT",
+    "input": "רד ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-4}]"
+   },
+   {
+    "case": "g_down6",
+    "score": "CORRECT",
+    "input": "תרד 6 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-6}]"
+   },
+   {
+    "case": "g_down8",
+    "score": "CORRECT",
+    "input": "רד שמונה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-8}]"
+   },
+   {
+    "case": "g_down9",
+    "score": "CORRECT",
+    "input": "תרד תשעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-9}]"
+   },
+   {
+    "case": "g_down20",
+    "score": "CORRECT",
+    "input": "רד 20 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-20}]"
+   },
+   {
+    "case": "g_down25",
+    "score": "CORRECT",
+    "input": "תרד עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-25}]"
+   },
+   {
+    "case": "g_fwd1",
+    "score": "CORRECT",
+    "input": "טוס קדימה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1}]"
+   },
+   {
+    "case": "g_fwd2",
+    "score": "CORRECT",
+    "input": "התקדם שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2}]"
+   },
+   {
+    "case": "g_fwd3",
+    "score": "CORRECT",
+    "input": "טוס קדימה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":3}]"
+   },
+   {
+    "case": "g_fwd4",
+    "score": "CORRECT",
+    "input": "התקדם 4 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4}]"
+   },
+   {
+    "case": "g_fwd6",
+    "score": "CORRECT",
+    "input": "טוס קדימה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":6}]"
+   },
+   {
+    "case": "g_fwd8",
+    "score": "CORRECT",
+    "input": "התקדם שמונה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":8}]"
+   },
+   {
+    "case": "g_fwd9",
+    "score": "CORRECT",
+    "input": "טוס קדימה 9 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":9}]"
+   },
+   {
+    "case": "g_fwd20",
+    "score": "CORRECT",
+    "input": "התקדם עשרים מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dx\":20}]"
+   },
+   {
+    "case": "g_fwd25",
+    "score": "CORRECT",
+    "input": "טוס קדימה עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 124,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25}]"
+   },
+   {
+    "case": "g_back1",
+    "score": "CORRECT",
+    "input": "זוז אחורה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "g_back2",
+    "score": "CORRECT",
+    "input": "טוס אחורה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-2}]"
+   },
+   {
+    "case": "g_back3",
+    "score": "CORRECT",
+    "input": "זוז אחורה 3 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-3}]"
+   },
+   {
+    "case": "g_back4",
+    "score": "CORRECT",
+    "input": "טוס אחורה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4}]"
+   },
+   {
+    "case": "g_back6",
+    "score": "CORRECT",
+    "input": "זוז אחורה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-6}]"
+   },
+   {
+    "case": "g_back8",
+    "score": "CORRECT",
+    "input": "טוס אחורה 8 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-8}]"
+   },
+   {
+    "case": "g_back9",
+    "score": "CORRECT",
+    "input": "זוז אחורה תשעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-9}]"
+   },
+   {
+    "case": "g_back20",
+    "score": "CORRECT",
+    "input": "טוס אחורה עשרים מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-20}]"
+   },
+   {
+    "case": "g_back25",
+    "score": "CORRECT",
+    "input": "זוז אחורה 25 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-25}]"
+   },
+   {
+    "case": "g_right1",
+    "score": "CORRECT",
+    "input": "טוס ימינה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dy\":1}]"
+   },
+   {
+    "case": "g_right2",
+    "score": "CORRECT",
+    "input": "זוז ימינה 2 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "g_right3",
+    "score": "CORRECT",
+    "input": "טוס ימינה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":3}]"
+   },
+   {
+    "case": "g_right4",
+    "score": "CORRECT",
+    "input": "זוז ימינה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 112,
+    "out": "[{\"type\":\"fly_by\",\"dy\":4}]"
+   },
+   {
+    "case": "g_right6",
+    "score": "CORRECT",
+    "input": "טוס ימינה 6 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "g_right8",
+    "score": "CORRECT",
+    "input": "זוז ימינה שמונה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":8}]"
+   },
+   {
+    "case": "g_right9",
+    "score": "CORRECT",
+    "input": "טוס ימינה תשעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 117,
+    "out": "[{\"type\":\"fly_by\",\"dy\":9}]"
+   },
+   {
+    "case": "g_right20",
+    "score": "CORRECT",
+    "input": "זוז ימינה 20 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dy\":20}]"
+   },
+   {
+    "case": "g_right25",
+    "score": "CORRECT",
+    "input": "טוס ימינה עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dy\":25}]"
+   },
+   {
+    "case": "g_left1",
+    "score": "CORRECT",
+    "input": "זוז שמאלה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-1}]"
+   },
+   {
+    "case": "g_left2",
+    "score": "CORRECT",
+    "input": "טוס שמאלה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "g_left3",
+    "score": "CORRECT",
+    "input": "זוז שמאלה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "g_left4",
+    "score": "CORRECT",
+    "input": "טוס שמאלה 4 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-4}]"
+   },
+   {
+    "case": "g_left6",
+    "score": "CORRECT",
+    "input": "זוז שמאלה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-6}]"
+   },
+   {
+    "case": "g_left8",
+    "score": "CORRECT",
+    "input": "טוס שמאלה שמונה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-8}]"
+   },
+   {
+    "case": "g_left9",
+    "score": "CORRECT",
+    "input": "זוז שמאלה 9 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-9}]"
+   },
+   {
+    "case": "g_left20",
+    "score": "CORRECT",
+    "input": "טוס שמאלה עשרים מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-20}]"
+   },
+   {
+    "case": "g_left25",
+    "score": "CORRECT",
+    "input": "זוז שמאלה עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 125,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-25}]"
+   },
+   {
+    "case": "g_cw30",
+    "score": "wrong-degrees(-30vs30)",
+    "input": "הסתובב שלושים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 124,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-30}]"
+   },
+   {
+    "case": "g_ccw30",
+    "score": "CORRECT",
+    "input": "הסתובב שלושים מעלות נגד כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-30}]"
+   },
+   {
+    "case": "g_cw60",
+    "score": "wrong-degrees(-60vs60)",
+    "input": "הסתובב שישים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-60}]"
+   },
+   {
+    "case": "g_ccw60",
+    "score": "CORRECT",
+    "input": "הסתובב שישים מעלות נגד כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-60}]"
+   },
+   {
+    "case": "g_cw120",
+    "score": "wrong-degrees(-120vs120)",
+    "input": "הסתובב מאה עשרים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 131,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-120}]"
+   },
+   {
+    "case": "g_ccw120",
+    "score": "CORRECT",
+    "input": "הסתובב מאה עשרים מעלות נגד כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 131,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-120}]"
+   },
+   {
+    "case": "g_cw270",
+    "score": "wrong-degrees(-270vs270)",
+    "input": "הסתובב מאתיים שבעים מעלות עם כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 130,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-270}]"
+   },
+   {
+    "case": "g_ccw270",
+    "score": "CORRECT",
+    "input": "הסתובב מאתיים שבעים מעלות נגד כיוון השעון",
+    "t_translate_ms": 0,
+    "t_plan_ms": 131,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-270}]"
+   },
+   {
+    "case": "g_wait2",
+    "score": "CORRECT",
+    "input": "המתן שתי שניות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 104,
+    "out": "[{\"type\":\"delay\",\"seconds\":2}]"
+   },
+   {
+    "case": "g_wait10",
+    "score": "CORRECT",
+    "input": "המתן עשר שניות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 112,
+    "out": "[{\"type\":\"delay\",\"seconds\":10}]"
+   },
+   {
+    "case": "g_combo2_0",
+    "score": "CORRECT",
+    "input": "עלה מטר אחד ואז תעלה עשרים מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 191,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1},{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "g_combo2_1",
+    "score": "CORRECT",
+    "input": "תעלה ארבעה מטרים ואז רד ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dz\":-4}]"
+   },
+   {
+    "case": "g_combo2_2",
+    "score": "missing-z",
+    "input": "עלה תשעה מטרים ואז תרד עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dz\":9},{\"type\":\"fly_by\",\"dy\":-25}]"
+   },
+   {
+    "case": "g_combo2_3",
+    "score": "CORRECT",
+    "input": "תרד מטר אחד ואז טוס קדימה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 185,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1},{\"type\":\"fly_by\",\"dx\":6}]"
+   },
+   {
+    "case": "g_combo2_4",
+    "score": "CORRECT",
+    "input": "רד ארבעה מטרים ואז זוז אחורה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 191,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-4},{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "g_combo2_5",
+    "score": "CORRECT",
+    "input": "תרד תשעה מטרים ואז טוס אחורה 8 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-9},{\"type\":\"fly_by\",\"dx\":-8}]"
+   },
+   {
+    "case": "g_combo2_6",
+    "score": "CORRECT",
+    "input": "טוס קדימה מטר אחד ואז זוז ימינה 2 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1},{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "g_combo2_7",
+    "score": "CORRECT",
+    "input": "התקדם 4 מטרים ואז טוס ימינה תשעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 186,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":9}]"
+   },
+   {
+    "case": "g_combo3_0",
+    "score": "CORRECT",
+    "input": "עלה מטר אחד, תעלה ארבעה מטרים ואז תעלה 8 מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 256,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1},{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dz\":8}]"
+   },
+   {
+    "case": "g_combo3_1",
+    "score": "CORRECT",
+    "input": "תעלה עשרים מטרים, רד שמונה מטרים ואז טוס קדימה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 262,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"fly_by\",\"dz\":-8},{\"type\":\"fly_by\",\"dx\":1}]"
+   },
+   {
+    "case": "g_combo3_2",
+    "score": "CORRECT",
+    "input": "רד שמונה מטרים, התקדם עשרים מטרים ואז זוז אחורה שישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 266,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-8},{\"type\":\"fly_by\",\"dx\":20},{\"type\":\"fly_by\",\"dx\":-6}]"
+   },
+   {
+    "case": "g_combo3_3",
+    "score": "CORRECT",
+    "input": "התקדם 4 מטרים, טוס ימינה מטר אחד ואז טוס ימינה עשרים וחמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 263,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":1},{\"type\":\"fly_by\",\"dy\":25}]"
+   },
+   {
+    "case": "r_takeoff1",
+    "score": "CORRECT",
+    "input": "תמריא",
+    "t_translate_ms": 0,
+    "t_plan_ms": 94,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff2",
+    "score": "CORRECT",
+    "input": "בוא נמריא",
+    "t_translate_ms": 0,
+    "t_plan_ms": 91,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff3",
+    "score": "wrong-len(0vs1)",
+    "input": "אפשר להמריא",
+    "t_translate_ms": 0,
+    "t_plan_ms": 38,
+    "out": "[]"
+   },
+   {
+    "case": "r_takeoff4",
+    "score": "CORRECT",
+    "input": "יאללה תמריא",
+    "t_translate_ms": 0,
+    "t_plan_ms": 92,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff5",
+    "score": "CORRECT",
+    "input": "תמריא בבקשה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 92,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_land1",
+    "score": "CORRECT",
+    "input": "תנחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 86,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land2",
+    "score": "CORRECT",
+    "input": "בוא ננחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 84,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land3",
+    "score": "CORRECT",
+    "input": "תנחת בבקשה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 82,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land4",
+    "score": "CORRECT",
+    "input": "אפשר לנחות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 86,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land5",
+    "score": "CORRECT",
+    "input": "סיימנו, תנחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 82,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_pol_up5",
+    "score": "CORRECT",
+    "input": "אתה יכול לעלות חמישה מטרים בבקשה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "r_pol_fwd3",
+    "score": "CORRECT",
+    "input": "תוכל לטוס קדימה שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dx\":3}]"
+   },
+   {
+    "case": "r_pol_left2",
+    "score": "CORRECT",
+    "input": "אם אפשר, שני מטרים שמאלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "r_pol_down1",
+    "score": "CORRECT",
+    "input": "רד בבקשה מטר אחד",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "r_pol_spin",
+    "score": "CORRECT",
+    "input": "תסתובב בבקשה תשעים מעלות ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 125,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_fill1",
+    "score": "CORRECT",
+    "input": "אה טוס קדימה שלושה מטרים בבקשה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 118,
+    "out": "[{\"type\":\"fly_by\",\"dx\":3}]"
+   },
+   {
+    "case": "r_fill2",
+    "score": "CORRECT",
+    "input": "אוקיי עכשיו תעלה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 115,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4}]"
+   },
+   {
+    "case": "r_fill3",
+    "score": "CORRECT",
+    "input": "טוב אז בוא נטוס אחורה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 117,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-2}]"
+   },
+   {
+    "case": "r_fill4",
+    "score": "CORRECT",
+    "input": "רגע רגע קודם תעלה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 116,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2}]"
+   },
+   {
+    "case": "r_fill5",
+    "score": "CORRECT",
+    "input": "כן תמשיך ימינה עוד שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 118,
+    "out": "[{\"type\":\"fly_by\",\"dy\":3}]"
+   },
+   {
+    "case": "r_alt10",
+    "score": "CORRECT",
+    "input": "עלה לגובה עשרה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10}]"
+   },
+   {
+    "case": "r_alt20",
+    "score": "CORRECT",
+    "input": "תעלה לגובה עשרים מטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 120,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "r_low",
+    "score": "CORRECT",
+    "input": "תנמיך שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_rise3",
+    "score": "CORRECT",
+    "input": "תתרומם שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_updown",
+    "score": "CORRECT",
+    "input": "רד למטה ארבעה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-4}]"
+   },
+   {
+    "case": "r_bit_left",
+    "score": "CORRECT",
+    "input": "טוס טיפה שמאלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 128,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-0.1}]"
+   },
+   {
+    "case": "r_bit_up",
+    "score": "CORRECT",
+    "input": "תעלה קצת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 129,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.5}]"
+   },
+   {
+    "case": "r_bit_back",
+    "score": "CORRECT",
+    "input": "זוז קצת אחורה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 111,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "r_higher",
+    "score": "wrong-len(2vs1)",
+    "input": "תעוף קצת יותר גבוה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 179,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dz\":4}]"
+   },
+   {
+    "case": "r_bit_fwd",
+    "score": "CORRECT",
+    "input": "תתקדם עוד קצת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 112,
+    "out": "[{\"type\":\"fly_by\",\"dx\":6}]"
+   },
+   {
+    "case": "r_turn_r90",
+    "score": "CORRECT",
+    "input": "סובב את הרחפן תשעים מעלות ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_turn_l45",
+    "score": "CORRECT",
+    "input": "תפנה ארבעים וחמש מעלות שמאלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "r_half_turn",
+    "score": "CORRECT",
+    "input": "תעשה חצי סיבוב",
+    "t_translate_ms": 0,
+    "t_plan_ms": 130,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":180}]"
+   },
+   {
+    "case": "r_quart_r",
+    "score": "CORRECT",
+    "input": "רבע סיבוב ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 121,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_full",
+    "score": "CORRECT",
+    "input": "תעשה סיבוב שלם",
+    "t_translate_ms": 0,
+    "t_plan_ms": 130,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":360}]"
+   },
+   {
+    "case": "r_around",
+    "score": "valid(open)",
+    "input": "תסתובב אליי",
+    "t_translate_ms": 0,
+    "t_plan_ms": 39,
+    "out": "[]"
+   },
+   {
+    "case": "r_num_first",
+    "score": "CORRECT",
+    "input": "שלושים מטר קדימה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 122,
+    "out": "[{\"type\":\"fly_by\",\"dx\":30}]"
+   },
+   {
+    "case": "r_m_half",
+    "score": "CORRECT",
+    "input": "מטר וחצי למעלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 129,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1.5}]"
+   },
+   {
+    "case": "r_2_half",
+    "score": "CORRECT",
+    "input": "שניים וחצי מטרים ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 130,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2.5}]"
+   },
+   {
+    "case": "r_digit50",
+    "score": "CORRECT",
+    "input": "טוס קדימה 50 מטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 123,
+    "out": "[{\"type\":\"fly_by\",\"dx\":50}]"
+   },
+   {
+    "case": "r_digit7",
+    "score": "CORRECT",
+    "input": "7 מטרים למעלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 113,
+    "out": "[{\"type\":\"fly_by\",\"dz\":7}]"
+   },
+   {
+    "case": "r_meter1",
+    "score": "CORRECT",
+    "input": "זוז מטר ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 114,
+    "out": "[{\"type\":\"fly_by\",\"dy\":1}]"
+   },
+   {
+    "case": "r_mis1",
+    "score": "CORRECT",
+    "input": "תמריא ותעלה לגובה חמישה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 153,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "r_mis2",
+    "score": "CORRECT",
+    "input": "תמריא, עלה שלושה מטרים ותישאר שם",
+    "t_translate_ms": 0,
+    "t_plan_ms": 153,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_mis3",
+    "score": "CORRECT",
+    "input": "טוס ימינה שלושה מטרים ואחרי זה שמאלה שלושה מטרים בחזרה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 186,
+    "out": "[{\"type\":\"fly_by\",\"dy\":3},{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "r_mis4",
+    "score": "CORRECT",
+    "input": "עלה חמישה מטרים, חכה שתי שניות ורד בחזרה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 247,
+    "out": "[{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"delay\",\"seconds\":2},{\"type\":\"fly_by\",\"dz\":-5}]"
+   },
+   {
+    "case": "r_mis5",
+    "score": "wrong-x(-10vs10)",
+    "input": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+    "t_translate_ms": 0,
+    "t_plan_ms": 327,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dx\":10},{\"type\":\"spin_by\",\"degrees\":-180},{\"type\":\"fly_by\",\"dx\":-10}]"
+   },
+   {
+    "case": "r_mis6",
+    "score": "CORRECT",
+    "input": "קדימה שני מטרים ואז למעלה שני מטרים ואז אחורה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 254,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2},{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"fly_by\",\"dx\":-2}]"
+   },
+   {
+    "case": "r_mis7",
+    "score": "CORRECT",
+    "input": "תעלה עשרה מטרים ואז תסתובב לאט סיבוב שלם",
+    "t_translate_ms": 0,
+    "t_plan_ms": 209,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10},{\"type\":\"spin_by\",\"degrees\":360}]"
+   },
+   {
+    "case": "r_mis8",
+    "score": "missing-x",
+    "input": "אחורה חמישה מטרים ולמטה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 184,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-5},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_mis9",
+    "score": "CORRECT",
+    "input": "תמריא ואז תנחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 120,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_mis10",
+    "score": "missing-y",
+    "input": "עלה שני מטרים, ימינה ארבעה מטרים, שמאלה ארבעה מטרים ורד שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 274,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"fly_by\",\"dy\":4},{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_dis1",
+    "score": "valid(open)",
+    "input": "טוס קדימה חמישה מטרים ותצלם את הבית",
+    "t_translate_ms": 0,
+    "t_plan_ms": 91,
+    "out": "[{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "r_dis2",
+    "score": "valid(open)",
+    "input": "תעלה שלושה מטרים ותסתכל מסביב",
+    "t_translate_ms": 0,
+    "t_plan_ms": 210,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3},{\"type\":\"delay\",\"seconds\":1},{\"type\":\"fly_by\",\"dy\":-1}]"
+   },
+   {
+    "case": "r_dis3",
+    "score": "valid(open)",
+    "input": "תמריא ותחפש את המכונית",
+    "t_translate_ms": 0,
+    "t_plan_ms": 29,
+    "out": "[]"
+   },
+   {
+    "case": "r_dis4",
+    "score": "valid(open)",
+    "input": "טוס ימינה שני מטרים ותגיד לי מה אתה רואה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 89,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "r_q1",
+    "score": "CORRECT",
+    "input": "מה מצב הסוללה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 28,
+    "out": "[]"
+   },
+   {
+    "case": "r_q2",
+    "score": "wrong-len(1vs0)",
+    "input": "איפה אתה עכשיו",
+    "t_translate_ms": 0,
+    "t_plan_ms": 63,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_q3",
+    "score": "CORRECT",
+    "input": "כמה גבוה אתה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 31,
+    "out": "[]"
+   },
+   {
+    "case": "r_q4",
+    "score": "CORRECT",
+    "input": "אתה מצלם",
+    "t_translate_ms": 0,
+    "t_plan_ms": 30,
+    "out": "[]"
+   },
+   {
+    "case": "r_q5",
+    "score": "wrong-len(5vs0)",
+    "input": "ספר לי מה אתה רואה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 571,
+    "out": "[{\"type\":\"fly_by\",\"dx\":0,\"dy\":0,\"dz\":0},{\"type\":\"fly_by\",\"dx\":0,\"dy\":0,\"dz\":0},{\"type\":\"fly_by\",\"dx\":0,\"dy\":0,\"dz\":0},{\"type\":\"fly_by\",\"dx\":0,\"dy\":0,\"dz\":0},{\"type\":\"fly_by\",\"dx\":0,\"dy\":0,\"dz\":0}]"
+   },
+   {
+    "case": "r_q6",
+    "score": "CORRECT",
+    "input": "יש שם מישהו",
+    "t_translate_ms": 0,
+    "t_plan_ms": 32,
+    "out": "[]"
+   },
+   {
+    "case": "r_q7",
+    "score": "CORRECT",
+    "input": "כמה זמן נשאר לך באוויר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 29,
+    "out": "[]"
+   },
+   {
+    "case": "r_q8",
+    "score": "CORRECT",
+    "input": "אתה שומע אותי",
+    "t_translate_ms": 0,
+    "t_plan_ms": 28,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg1",
+    "score": "wrong-len(2vs0)",
+    "input": "אל תעלה יותר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 118,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_neg2",
+    "score": "CORRECT",
+    "input": "אל תזוז",
+    "t_translate_ms": 0,
+    "t_plan_ms": 32,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg3",
+    "score": "CORRECT",
+    "input": "לא לטוס קדימה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 29,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg4",
+    "score": "wrong-len(4vs0)",
+    "input": "בלי להסתובב בבקשה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 210,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dx\":6},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_neg5",
+    "score": "wrong-len(5vs0)",
+    "input": "אל תנחת עדיין",
+    "t_translate_ms": 0,
+    "t_plan_ms": 261,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dx\":6},{\"type\":\"delay\",\"seconds\":1},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_wait1",
+    "score": "CORRECT",
+    "input": "חכה רגע",
+    "t_translate_ms": 0,
+    "t_plan_ms": 93,
+    "out": "[{\"type\":\"delay\",\"seconds\":1}]"
+   },
+   {
+    "case": "r_wait2",
+    "score": "CORRECT",
+    "input": "שנייה אחת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 84,
+    "out": "[{\"type\":\"delay\",\"seconds\":1}]"
+   },
+   {
+    "case": "r_wait3",
+    "score": "CORRECT",
+    "input": "תמתין חמש שניות ואז רד מטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 141,
+    "out": "[{\"type\":\"delay\",\"seconds\":5},{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "r_wait4",
+    "score": "CORRECT",
+    "input": "עצור שם לעשר שניות",
+    "t_translate_ms": 0,
+    "t_plan_ms": 93,
+    "out": "[{\"type\":\"delay\",\"seconds\":10}]"
+   },
+   {
+    "case": "r_big100",
+    "score": "CORRECT",
+    "input": "טוס קדימה מאה מטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 102,
+    "out": "[{\"type\":\"fly_by\",\"dx\":100}]"
+   },
+   {
+    "case": "r_deg10",
+    "score": "CORRECT",
+    "input": "תסתובב עשר מעלות ימינה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 97,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":10}]"
+   },
+   {
+    "case": "r_deg135",
+    "score": "CORRECT",
+    "input": "פנה מאה שלושים וחמש מעלות שמאלה",
+    "t_translate_ms": 0,
+    "t_plan_ms": 105,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-135}]"
+   },
+   {
+    "case": "r_z_03",
+    "score": "CORRECT",
+    "input": "תעלה שלושים סנטימטר",
+    "t_translate_ms": 0,
+    "t_plan_ms": 105,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.3}]"
+   },
+   {
+    "case": "r_back15",
+    "score": "CORRECT",
+    "input": "סע אחורה חמישה עשר מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 100,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-15}]"
+   },
+   {
+    "case": "r_ord1",
+    "score": "CORRECT",
+    "input": "חמישה מטרים קדימה טוס",
+    "t_translate_ms": 0,
+    "t_plan_ms": 93,
+    "out": "[{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "r_ord2",
+    "score": "CORRECT",
+    "input": "ימינה שני מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 91,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "r_ord3",
+    "score": "CORRECT",
+    "input": "למעלה, שלושה מטרים",
+    "t_translate_ms": 0,
+    "t_plan_ms": 90,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_ord4",
+    "score": "missing-x",
+    "input": "אחורה קצת",
+    "t_translate_ms": 0,
+    "t_plan_ms": 91,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-1}]"
+   }
+  ]
+ },
+ "mcnemar": {
+  "direct vs dictalm-alone": {
+   "only_a": 7,
+   "only_b": 18,
+   "p": 0.043285
+  },
+  "direct vs control-perfect-english": {
+   "only_a": 0,
+   "only_b": 21,
+   "p": 1e-06
+  }
+ },
+ "vs": "/root/groundstation/tools/bench/hebrew-command-bench/results/2026-09-02-bench-results.json",
+ "wall_s": 27
+}

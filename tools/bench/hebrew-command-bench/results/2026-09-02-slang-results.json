@@ -1,0 +1,686 @@
+{
+ "arms": {
+  "hebrew->dictalm->english": {
+   "ok": 11,
+   "n": 20,
+   "by_class": {
+    "idiom": [
+     7,
+     10
+    ],
+    "acronym": [
+     4,
+     10
+    ]
+   },
+   "cases": [
+    {
+     "case": "s_indian_circle",
+     "class": "idiom",
+     "he": "תבצע מעגל אינדיאני על המטרה מולך",
+     "en": "Perform an Indian circle around the target in front of you",
+     "t_ms": 88,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_sitrep",
+     "class": "idiom",
+     "he": "טפס לגובה ותן לי תמונת מצב",
+     "en": "Ascend to a height and provide a situational overview",
+     "t_ms": 79,
+     "missed": [
+      "climb"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_jump_point",
+     "class": "idiom",
+     "he": "קפוץ לנקודה ותשאר עליה",
+     "en": "Jump to a point and stay there",
+     "t_ms": 57,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_gentle_scan",
+     "class": "idiom",
+     "he": "תעשה לי סריקה עדינה על הגזרה",
+     "en": "Perform a gentle scan on the contour",
+     "t_ms": 57,
+     "missed": [
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_eye_junction",
+     "class": "idiom",
+     "he": "שים עין על הצומת ואל תרד ממנו",
+     "en": "Keep an eye on the intersection and do not descend from it",
+     "t_ms": 83,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_zoom_suspect",
+     "class": "idiom",
+     "he": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+     "en": "Zoom in on the suspicious vehicle and center it",
+     "t_ms": 70,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_route_escort",
+     "class": "idiom",
+     "he": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+     "en": "Advance along the traffic axis and follow it to the turn",
+     "t_ms": 79,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_dead_ground",
+     "class": "idiom",
+     "he": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+     "en": "Take off, you have space behind the hill",
+     "t_ms": 69,
+     "missed": [
+      "altitude|height|climb",
+      "dead"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_give_distance",
+     "class": "idiom",
+     "he": "רחפן שני נכנס לגזרה שלך, תן לו מרחק",
+     "en": "Second drone enters the zone, give it distance",
+     "t_ms": 71,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_one_more_pass",
+     "class": "idiom",
+     "he": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+     "en": "Make another loop over the neighborhood and then return home",
+     "t_ms": 74,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_grid_out",
+     "class": "acronym",
+     "he": "עבור לנ.צ. שנתתי לך, סוף",
+     "en": "Navigate to the given location, end",
+     "t_ms": 59,
+     "missed": [
+      "grid|coordinates|reference|waypoint"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_roger_over",
+     "class": "acronym",
+     "he": "רות, ממשיך בסריקה, עבור",
+     "en": "Continue scanning, for",
+     "t_ms": 48,
+     "missed": [
+      "roger|copy|acknowledged",
+      "over"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_cp_visual",
+     "class": "acronym",
+     "he": "יש לי קשר עין עם החפ\"ק ליד המבנה",
+     "en": "I have visual contact with the HQ near the building",
+     "t_ms": 102,
+     "missed": [
+      "command|post|headquarters"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_eyes_on",
+     "class": "acronym",
+     "he": "תדווח כשיש לך עיניים על המטרה",
+     "en": "Keep eyes on the target",
+     "t_ms": 56,
+     "missed": [
+      "report"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_rally_point",
+     "class": "acronym",
+     "he": "קיבלתי, חוזר לנק' האיסוף",
+     "en": "Got it, returning to pickup point",
+     "t_ms": 60,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_feet_hold",
+     "class": "acronym",
+     "he": "תעלה לשמונה מאות רגל ותחכה בהמתנה מעל האזור",
+     "en": "Ascend to eight hundred feet and wait in the area",
+     "t_ms": 82,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_lost_uav",
+     "class": "acronym",
+     "he": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית",
+     "en": "Lost connection with the drone, initiating a scan in the northern sector",
+     "t_ms": 93,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_scramble",
+     "class": "acronym",
+     "he": "המראה מיידית, יש הקפצה",
+     "en": "Take off immediately, with a jump",
+     "t_ms": 64,
+     "missed": [
+      "scramble|alert|emergency"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_obs_report",
+     "class": "acronym",
+     "he": "החזק תצפית על הבית הלבן, דווח כל תזוזה, עבור",
+     "en": "Maintain surveillance on the White House, report any movement, for",
+     "t_ms": 100,
+     "missed": [
+      "over"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_wadi_route",
+     "class": "acronym",
+     "he": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+     "en": "Fly low along the ravine until the intersection with the axis, where you will wait",
+     "t_ms": 139,
+     "missed": [],
+     "ok": true
+    }
+   ]
+  },
+  "hebrew->translategemma->english": {
+   "ok": 5,
+   "n": 20,
+   "by_class": {
+    "idiom": [
+     2,
+     10
+    ],
+    "acronym": [
+     3,
+     10
+    ]
+   },
+   "cases": [
+    {
+     "case": "s_indian_circle",
+     "class": "idiom",
+     "he": "תבצע מעגל אינדיאני על המטרה מולך",
+     "en": "We will perform a traditional Native American ceremony around the target.",
+     "t_ms": 311,
+     "missed": [
+      "circle",
+      "front"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_sitrep",
+     "class": "idiom",
+     "he": "טפס לגובה ותן לי תמונת מצב",
+     "en": "Climb up and give me an update.",
+     "t_ms": 249,
+     "missed": [
+      "situation|status|picture"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_jump_point",
+     "class": "idiom",
+     "he": "קפוץ לנקודה ותשאר עליה",
+     "en": "Jump to the point and stay there.",
+     "t_ms": 234,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_gentle_scan",
+     "class": "idiom",
+     "he": "תעשה לי סריקה עדינה על הגזרה",
+     "en": "Please perform a gentle scan of my body.",
+     "t_ms": 249,
+     "missed": [
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_eye_junction",
+     "class": "idiom",
+     "he": "שים עין על הצומת ואל תרד ממנו",
+     "en": "Pay close attention to the intersection and do not leave it unattended.",
+     "t_ms": 305,
+     "missed": [
+      "eye|watch|monitor|observe"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_zoom_suspect",
+     "class": "idiom",
+     "he": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+     "en": "Zoom in on the vehicle in question and secure it in the center.",
+     "t_ms": 322,
+     "missed": [
+      "suspicious|suspect"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_route_escort",
+     "class": "idiom",
+     "he": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+     "en": "Get on the moving platform and follow it until the turn.",
+     "t_ms": 294,
+     "missed": [
+      "route|axis|road"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_dead_ground",
+     "class": "idiom",
+     "he": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+     "en": "Take advantage of the elevation; you have a large, undeveloped area behind the hill.",
+     "t_ms": 365,
+     "missed": [
+      "altitude|height|climb",
+      "dead"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_give_distance",
+     "class": "idiom",
+     "he": "רחפן שני נכנס לגזרה שלך, תן לו מרחק",
+     "en": "If a second drone enters your airspace, give it space.",
+     "t_ms": 291,
+     "missed": [
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_one_more_pass",
+     "class": "idiom",
+     "he": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+     "en": "Take another lap around the neighborhood, and then return home.",
+     "t_ms": 295,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_grid_out",
+     "class": "acronym",
+     "he": "עבור לנ.צ. שנתתי לך, סוף",
+     "en": "Dear Mr. Netanyahu, thank you, goodbye.",
+     "t_ms": 389,
+     "missed": [
+      "grid|coordinates|reference|waypoint",
+      "out|over|end"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_roger_over",
+     "class": "acronym",
+     "he": "רות, ממשיך בסריקה, עבור",
+     "en": "Ruth, continuing the scan, for",
+     "t_ms": 214,
+     "missed": [
+      "roger|copy|acknowledged",
+      "over"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_cp_visual",
+     "class": "acronym",
+     "he": "יש לי קשר עין עם החפ\"ק ליד המבנה",
+     "en": "I have a direct line of sight to the command post near the building.",
+     "t_ms": 337,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_eyes_on",
+     "class": "acronym",
+     "he": "תדווח כשיש לך עיניים על המטרה",
+     "en": "Please provide feedback once you have a clear understanding of the goal.",
+     "t_ms": 309,
+     "missed": [
+      "report",
+      "eyes",
+      "target"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_rally_point",
+     "class": "acronym",
+     "he": "קיבלתי, חוזר לנק' האיסוף",
+     "en": "I am returning to the pickup location.",
+     "t_ms": 231,
+     "missed": [
+      "roger|received|copy|got",
+      "point"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_feet_hold",
+     "class": "acronym",
+     "he": "תעלה לשמונה מאות רגל ותחכה בהמתנה מעל האזור",
+     "en": "Ascend to 800 feet and wait above the area.",
+     "t_ms": 323,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_lost_uav",
+     "class": "acronym",
+     "he": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית",
+     "en": "We have lost contact with the \"Ktabam\" unit. Begin a search in the northern sector.",
+     "t_ms": 429,
+     "missed": [
+      "uav|drone|unmanned|aircraft",
+      "scan"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_scramble",
+     "class": "acronym",
+     "he": "המראה מיידית, יש הקפצה",
+     "en": "Instant effect, immediate results.",
+     "t_ms": 202,
+     "missed": [
+      "takeoff|take off",
+      "scramble|alert|emergency"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_obs_report",
+     "class": "acronym",
+     "he": "החזק תצפית על הבית הלבן, דווח כל תזוזה, עבור",
+     "en": "Maintain a constant watch over the White House, report any movement.",
+     "t_ms": 308,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_wadi_route",
+     "class": "acronym",
+     "he": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+     "en": "Fly low over the valley until you reach the intersection, where you will wait.",
+     "t_ms": 356,
+     "missed": [
+      "route|axis|road"
+     ],
+     "ok": false
+    }
+   ]
+  },
+  "hebrew->qwen3vl->english": {
+   "ok": 7,
+   "n": 20,
+   "by_class": {
+    "idiom": [
+     5,
+     10
+    ],
+    "acronym": [
+     2,
+     10
+    ]
+   },
+   "cases": [
+    {
+     "case": "s_indian_circle",
+     "class": "idiom",
+     "he": "תבצע מעגל אינדיאני על המטרה מולך",
+     "en": "Perform an Indian circle around the target in front of you",
+     "t_ms": 270,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_sitrep",
+     "class": "idiom",
+     "he": "טפס לגובה ותן לי תמונת מצב",
+     "en": "Climb to altitude and send me a status image",
+     "t_ms": 216,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_jump_point",
+     "class": "idiom",
+     "he": "קפוץ לנקודה ותשאר עליה",
+     "en": "Jump to the point and stay there",
+     "t_ms": 168,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_gentle_scan",
+     "class": "idiom",
+     "he": "תעשה לי סריקה עדינה על הגזרה",
+     "en": "Perform a fine scan along the path",
+     "t_ms": 168,
+     "missed": [
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_eye_junction",
+     "class": "idiom",
+     "he": "שים עין על הצומת ואל תרד ממנו",
+     "en": "Keep an eye on the junction and don't let him pass",
+     "t_ms": 245,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_zoom_suspect",
+     "class": "idiom",
+     "he": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+     "en": "Give the target vehicle a heading and keep it centered",
+     "t_ms": 210,
+     "missed": [
+      "zoom",
+      "suspicious|suspect"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_route_escort",
+     "class": "idiom",
+     "he": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+     "en": "Take off on the movement axis and follow it until the turn",
+     "t_ms": 238,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_dead_ground",
+     "class": "idiom",
+     "he": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+     "en": "Take height, you have space behind the hill",
+     "t_ms": 195,
+     "missed": [
+      "dead"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_give_distance",
+     "class": "idiom",
+     "he": "רחפן שני נכנס לגזרה שלך, תן לו מרחק",
+     "en": "Turn left, enter your lane, give it space",
+     "t_ms": 211,
+     "missed": [
+      "drone",
+      "second",
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_one_more_pass",
+     "class": "idiom",
+     "he": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+     "en": "Do another loop above the building, then return home",
+     "t_ms": 210,
+     "missed": [
+      "neighborhood"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_grid_out",
+     "class": "acronym",
+     "he": "עבור לנ.צ. שנתתי לך, סוף",
+     "en": "Go to the location I gave you, end",
+     "t_ms": 195,
+     "missed": [
+      "grid|coordinates|reference|waypoint"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_roger_over",
+     "class": "acronym",
+     "he": "רות, ממשיך בסריקה, עבור",
+     "en": "Rotate, continue scanning, retreat",
+     "t_ms": 151,
+     "missed": [
+      "roger|copy|acknowledged",
+      "over"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_cp_visual",
+     "class": "acronym",
+     "he": "יש לי קשר עין עם החפ\"ק ליד המבנה",
+     "en": "I have eye contact with the sign near the building",
+     "t_ms": 211,
+     "missed": [
+      "command|post|headquarters"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_eyes_on",
+     "class": "acronym",
+     "he": "תדווח כשיש לך עיניים על המטרה",
+     "en": "Report when you have eyes on the target",
+     "t_ms": 179,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_rally_point",
+     "class": "acronym",
+     "he": "קיבלתי, חוזר לנק' האיסוף",
+     "en": "Received, returning to pickup point",
+     "t_ms": 151,
+     "missed": [],
+     "ok": true
+    },
+    {
+     "case": "s_feet_hold",
+     "class": "acronym",
+     "he": "תעלה לשמונה מאות רגל ותחכה בהמתנה מעל האזור",
+     "en": "Ascend to 800 feet and hover above the area",
+     "t_ms": 256,
+     "missed": [
+      "hold|wait|loiter"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_lost_uav",
+     "class": "acronym",
+     "he": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית",
+     "en": "Lost contact with the CTB, begin sweep in the north direction",
+     "t_ms": 255,
+     "missed": [
+      "uav|drone|unmanned|aircraft",
+      "scan",
+      "sector|zone|area"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_scramble",
+     "class": "acronym",
+     "he": "המראה מיידית, יש הקפצה",
+     "en": "The view is immediate, there is a cutoff",
+     "t_ms": 195,
+     "missed": [
+      "takeoff|take off",
+      "scramble|alert|emergency"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_obs_report",
+     "class": "acronym",
+     "he": "החזק תצפית על הבית הלבן, דווח כל תזוזה, עבור",
+     "en": "Maintain visual contact with the White House, report any movement, standby",
+     "t_ms": 271,
+     "missed": [
+      "observ|watch|surveill",
+      "over"
+     ],
+     "ok": false
+    },
+    {
+     "case": "s_wadi_route",
+     "class": "acronym",
+     "he": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+     "en": "Fly low over the wedge until you meet the axis, then wait",
+     "t_ms": 257,
+     "missed": [
+      "wadi|valley|ravine|riverbed"
+     ],
+     "ok": false
+    }
+   ]
+  }
+ },
+ "wall_s": 20
+}

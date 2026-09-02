@@ -1,11 +1,46 @@
 # hebrew-command-bench
 
-Isolated (nothing here is wired into the MVD): which pipeline turns a spoken HEBREW command
-into a correct `/c/fly` mission array? 12 paired HE/EN cases, one scorer for every row.
+Isolated (nothing here is wired into the MVD): which pipeline turns a spoken HEBREW command into
+a correct `/c/fly` mission array, and which keeps multi-hop perception commands intact for the
+VLM? 190 command cases + 100 perception cases, one scorer per half for every arm.
 
-Run: Qwen3-VL-4B on :18090 (`projects/integration_harden/run_llama_server.sh`), DictaLM on
-:18091 for its rows (llama-server on `/root/models/asr/dictalm-3-1.7b/*.gguf`), then
-`python3 run_bench.py [row ...]`. Results land in `results/`.
+## Files
+
+- `bench.py` — the whole benchmark. Run this.
+- `prompts.py` — every prompt, grammar, and few-shot set. `python3 prompts.py` regenerates PROMPTS.md.
+- `cases_commands.py` — the 190 command cases + the mission scorer.
+- `cases_perception.py` — the 100 multi-hop perception cases (with hand-written English references) + the keyword scorer.
+- `results/` — one JSON + one dump per run, date-stamped. `PROMPTS.md` — readable copy of the prompts.
+- History: rounds 1–6 ran from per-round scripts, consolidated into bench.py on 2026-09-02.
+  The old scripts live in git history; their raw outputs stay in `results/` and the round
+  sections below.
+
+## Running
+
+Prerequisites: models on disk (`tools/devenv/install-translation-models.sh`), llama-server built
+under `build/release/shared/dji/bin`, GPU free, no llama-server already running.
+
+```
+cd /root/groundstation/tools/bench/hebrew-command-bench
+python3 bench.py            # full run, ~6 min: prints the table, writes results/<date>-bench-results.json + -bench-dump.md
+python3 bench.py --smoke    # ~30 s plumbing check (6+6 cases)
+python3 bench.py --refine   # adds the refine arm (measured worse in round 6; kept for reruns)
+python3 bench.py --audit    # offline scorer audit, no GPU
+```
+
+The printed table is the same table the round-6 section below shows. Temp 0 means a rerun on
+unchanged code reproduces the numbers exactly.
+
+## Modifying
+
+- Add a command case: append to `CASES` in cases_commands.py. The expected-format contract is in
+  that file's docstring. Rerun `python3 bench.py`.
+- Add a perception case: append to `PERC100` in cases_perception.py — Hebrew, a hand-written
+  English reference, keyword groups, depth tag. Run `python3 bench.py --audit` first; the
+  reference must satisfy its own groups.
+- Change a prompt or grammar: edit prompts.py, then `python3 prompts.py` to refresh PROMPTS.md.
+- Add or change an arm: `main()` in bench.py — copy an existing arm block; keep one model on GPU
+  at a time and route new rows into `arms[...]` so the table, JSON, and dump pick them up.
 
 ## 2026-09-01 ROUND-3 results — 190 cases (82 realistic authored), 8 arms, sequential + GBNF
 
@@ -265,3 +300,14 @@ McNemar, paired and exact:
 Open, owner to rule: adopt the split in production (recommendation: yes, it is the measured
 winner); drop the refine lane (measured worse); color-glossary guard; ONNX/CPU-offload lane
 staged in ROUND4-PLAN.md.
+
+## Direct-Hebrew planning lane (2026-09-02, `bench.py --direct`)
+
+Hebrew text straight into DictaLM as the planner — no translation, no Qwen. Three iterations:
+revised prompt + Hebrew shots 161/190 (84.7%), + Hebrew sign addendum 165/190, + an explicit
+clockwise-idiom shot 168/190 (88.4%, p50 121 ms). Still significantly behind the
+dicta→qwen3vl pipeline (94.2%): McNemar 18–7, p=0.043. The trade on the table: −5.8 pp accuracy
+for a command path that is one 1.6 GiB CPU-capable model with no translation stage. Residual
+failure classes: large clockwise degrees still flip sometimes, some combo steps drop an axis,
+polite takeoff forms refused. Next levers: more Hebrew shots, then LoRA (see
+docs/research/2026-09-02-finetune-data-plan.md). Raw: results/2026-09-02-direct-results.json.
