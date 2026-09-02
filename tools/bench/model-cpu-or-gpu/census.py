@@ -17,7 +17,20 @@ import json, os, subprocess, sys, time, datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 BENCH = os.path.abspath(os.path.join(HERE, "..", "hebrew-command-bench"))
 sys.path.insert(0, BENCH)
-from bench import LlamaServer, chat, completion, translate_all, tgemma_translate_all, MODELS, QWEN3VL_EXTRA, PORT, pct, port_up
+from llama import LlamaServer, chat, port_up, MODELS, QWEN3VL_EXTRA, PORT
+
+# TranslateGemma left the bench when it was deferred; the census still measures it.
+TGEMMA_GGUF = "/root/models/translate/translategemma-4b-it-gguf/translategemma-4b-it.Q4_K_M.gguf"
+
+
+def pct(xs, p):
+    import math
+    xs = sorted(xs)
+    k = (len(xs) - 1) * p / 100.0
+    f = math.floor(k)
+    c2 = min(f + 1, len(xs) - 1)
+    return xs[f] + (xs[c2] - xs[f]) * (k - f)
+
 from prompts import TRANSLATE_SYS, TRANSLATE_SHOTS, LINE_GRAMMAR, TGEMMA_PROMPT
 from cases_commands import CASES
 
@@ -41,7 +54,7 @@ def warm(kind):
         chat(PORT, TRANSLATE_SYS, "טוס קדימה חמישה מטרים", max_tokens=40,
              grammar=LINE_GRAMMAR, shots=TRANSLATE_SHOTS)
 
-SPECS = {"dicta": (MODELS["dicta"], ()), "tgemma": (MODELS["tgemma"], ("--chat-template", "gemma")),
+SPECS = {"dicta": (MODELS["dicta"], ()), "tgemma": (TGEMMA_GGUF, ("--chat-template", "gemma")),
          "qwen3vl": (MODELS["qwen3vl"], QWEN3VL_EXTRA)}
 
 def main():
@@ -96,7 +109,23 @@ def main():
         threads = str(max(4, os.cpu_count() // 2))
         i = srv.args.index("--threads"); srv.args[i+1] = threads
         with srv:
-            tr = tgemma_translate_all(PORT, sub) if kind == "tgemma" else translate_all(PORT, sub)
+            tr = []
+            for case in sub:
+                if kind == "tgemma":
+                    payload = {"prompt": TGEMMA_PROMPT.format(he=case[1]), "n_predict": 80,
+                               "temperature": 0.0, "grammar": LINE_GRAMMAR}
+                    import urllib.request as _u
+                    req = _u.Request(f"http://127.0.0.1:{PORT}/completion",
+                                     __import__("json").dumps(payload).encode(),
+                                     {"Content-Type": "application/json"})
+                    t0_ = time.time()
+                    with _u.urlopen(req, timeout=180) as r_:
+                        text = __import__("json").load(r_)["content"]
+                    tr.append((case[0], text.strip(), time.time() - t0_))
+                else:
+                    text, dt = chat(PORT, TRANSLATE_SYS, case[1], max_tokens=80,
+                                    grammar=LINE_GRAMMAR, shots=TRANSLATE_SHOTS)
+                    tr.append((case[0], text.strip(), dt))
             lats = [round(dt*1000) for _, _, dt in tr]
             res["cpu"][kind] = {"threads": int(threads), "n": len(lats),
                                 "p50_ms": round(pct(lats, 50)), "p95_ms": round(pct(lats, 95)),
@@ -109,5 +138,62 @@ def main():
     json.dump(res, open(out, "w"), indent=1)
     print(f"\nresults -> {out}", flush=True)
 
+def stack_census():
+    import torch
+    steps, prev = [], vram()
+    base = prev
+    def mark(name):
+        nonlocal prev
+        time.sleep(1); v = vram()
+        steps.append({"step": name, "delta_mb": v["used"] - prev["used"],
+                      "total_used_mb": v["used"] - base["used"], "free_mb": v["free"]})
+        print(f"  {name:28s} +{v['used']-prev['used']:>5d} MiB  total {v['used']-base['used']:>5d}  free {v['free']:>5d}", flush=True)
+        prev = v
+
+    print(f"baseline: {base}", flush=True)
+    with LlamaServer(MODELS["qwen3vl"], extra=QWEN3VL_EXTRA):
+        chat(PORT, TRANSLATE_SYS, "טוס קדימה חמישה מטרים", max_tokens=30, grammar=LINE_GRAMMAR, shots=TRANSLATE_SHOTS)
+        mark("qwen3vl (llama-server)")
+
+        from transformers import AutoProcessor, OmDetTurboForObjectDetection
+        r = "/root/models/vision/omdet-turbo-swin-tiny"
+        proc = AutoProcessor.from_pretrained(r, local_files_only=True)
+        omdet = OmDetTurboForObjectDetection.from_pretrained(r, local_files_only=True).to("cuda").eval()
+        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
+        with torch.no_grad():
+            inp = proc(images=img, text=["person", "car"], return_tensors="pt").to("cuda")
+            omdet(**inp)
+        mark("omdet-turbo swin-tiny")
+
+        from ultralytics import SAM
+        sam = SAM("/root/models/vision/sam2.1_b.pt")
+        sam.to("cuda")
+        sam(img, bboxes=[[100, 100, 300, 300]], verbose=False)
+        mark("sam2.1-base (ultralytics)")
+
+        try:
+            from transformers import Wav2Vec2ForCTC
+            w2v = Wav2Vec2ForCTC.from_pretrained("/root/models/asr/wav2vec2-xls-r-300m-lm-hebrew",
+                                                 local_files_only=True, torch_dtype=torch.float16).to("cuda").eval()
+            with torch.no_grad():
+                w2v(torch.randn(1, 16000, dtype=torch.float16, device="cuda"))
+            mark("wav2vec2-300m fp16 (ASR)")
+        except Exception as e:
+            print(f"  wav2vec2 skipped: {e}", flush=True)
+
+        print("\nall resident together:", vram(), flush=True)
+    stamp = datetime.date.today().isoformat()
+    out = os.path.join(HERE, "results", f"{stamp}-census2.json")
+    json.dump({"baseline": base, "steps": steps}, open(out, "w"), indent=1)
+    print(f"results -> {out}", flush=True)
+
+
+
 if __name__ == "__main__":
-    main()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--stack", action="store_true",
+                    help="demo-stack co-residency: qwen3vl + omdet + sam2.1 + wav2vec2")
+    if ap.parse_args().stack: stack_census()
+    else: main()
+

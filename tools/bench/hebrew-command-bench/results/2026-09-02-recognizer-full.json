@@ -1,0 +1,5338 @@
+{
+ "results": {
+  "emergency": {
+   "ok": 6,
+   "n": 6
+  },
+  "perception": {
+   "ok": 58,
+   "n": 100
+  },
+  "military": {
+   "ok": 11,
+   "n": 20
+  },
+  "std190": {
+   "ok": 186,
+   "n": 189,
+   "acc": 0.9841269841269841,
+   "wilson95": [
+    0.954,
+    0.995
+   ],
+   "latency_e2e_ms": {
+    "p25": 0,
+    "p50": 171,
+    "p75": 274,
+    "p95": 588,
+    "p99": 735,
+    "max": 883
+   }
+  },
+  "verbose": {
+   "ok": 46,
+   "n": 54,
+   "acc": 0.8518518518518519,
+   "wilson95": [
+    0.734,
+    0.923
+   ],
+   "latency_e2e_ms": {
+    "p25": 566,
+    "p50": 682,
+    "p75": 866,
+    "p95": 1106,
+    "p99": 1290,
+    "max": 1432
+   }
+  }
+ },
+ "stage0_false_positives": [
+  [
+   "std190",
+   "r_wait4",
+   "עצור שם לעשר שניות"
+  ]
+ ],
+ "detail": {
+  "std190": [
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "input": "Fly up ten meters, turn right 90 degrees, then fly forward five meters",
+    "t_translate_ms": 124,
+    "t_plan_ms": 759,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "combo_tl",
+    "score": "CORRECT",
+    "input": "Take off, ascend five meters, wait three seconds, and land",
+    "t_translate_ms": 96,
+    "t_plan_ms": 478,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "input": "Fly back two meters, then move left three meters",
+    "t_translate_ms": 74,
+    "t_plan_ms": 299,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-2},{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "question",
+    "score": "CORRECT",
+    "input": "I see a small, flat rock.",
+    "t_translate_ms": 61,
+    "t_plan_ms": 61,
+    "out": "[]"
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "input": "Fly in a square of 2 meters",
+    "t_translate_ms": 64,
+    "t_plan_ms": 559,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2},{\"type\":\"fly_by\",\"dy\":2},{\"type\":\"fly_by\",\"dx\":-2},{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "fwd15",
+    "score": "CORRECT",
+    "input": "Move forward fifteen meters",
+    "t_translate_ms": 45,
+    "t_plan_ms": 200,
+    "out": "[{\"type\":\"fly_by\",\"dx\":15}]"
+   },
+   {
+    "case": "up_half",
+    "score": "CORRECT",
+    "input": "Ascend half a meter",
+    "t_translate_ms": 45,
+    "t_plan_ms": 213,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.5}]"
+   },
+   {
+    "case": "combo2b",
+    "score": "CORRECT",
+    "input": "Take off and then ascend three meters",
+    "t_translate_ms": 56,
+    "t_plan_ms": 255,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "combo4",
+    "score": "CORRECT",
+    "input": "Fly forward four meters, move right two meters, fly back four meters, then move left two meters",
+    "t_translate_ms": 132,
+    "t_plan_ms": 555,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":2},{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "combo5",
+    "score": "wrong-verb(landvstakeoff)",
+    "input": "Perform a landing, rise 2 meters, turn 90 degrees clockwise, fly forward 3 meters, and land",
+    "t_translate_ms": 180,
+    "t_plan_ms": 552,
+    "out": "[{\"type\":\"land\"},{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "question2",
+    "score": "CORRECT",
+    "input": "I see three people",
+    "t_translate_ms": 126,
+    "t_plan_ms": 64,
+    "out": "[]"
+   },
+   {
+    "case": "q_land_trap",
+    "score": "CORRECT",
+    "input": "I am currently hovering in the air. To land, please specify the desired landing point or altitude.",
+    "t_translate_ms": 192,
+    "t_plan_ms": 67,
+    "out": "[]"
+   },
+   {
+    "case": "neg_trap",
+    "score": "CORRECT",
+    "input": "Do not fly forward",
+    "t_translate_ms": 59,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "g_up1",
+    "score": "CORRECT",
+    "input": "Ascend one meter",
+    "t_translate_ms": 59,
+    "t_plan_ms": 189,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1}]"
+   },
+   {
+    "case": "g_down1",
+    "score": "CORRECT",
+    "input": "Descend one meter",
+    "t_translate_ms": 58,
+    "t_plan_ms": 188,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "g_fwd1",
+    "score": "CORRECT",
+    "input": "Fly forward one meter",
+    "t_translate_ms": 62,
+    "t_plan_ms": 189,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1}]"
+   },
+   {
+    "case": "g_fwd2",
+    "score": "CORRECT",
+    "input": "Move forward two meters",
+    "t_translate_ms": 66,
+    "t_plan_ms": 193,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2}]"
+   },
+   {
+    "case": "g_fwd4",
+    "score": "CORRECT",
+    "input": "Move forward four meters",
+    "t_translate_ms": 59,
+    "t_plan_ms": 195,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4}]"
+   },
+   {
+    "case": "g_fwd8",
+    "score": "CORRECT",
+    "input": "Move forward eight meters",
+    "t_translate_ms": 58,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dx\":8}]"
+   },
+   {
+    "case": "g_fwd20",
+    "score": "CORRECT",
+    "input": "Move forward 20 meters",
+    "t_translate_ms": 74,
+    "t_plan_ms": 202,
+    "out": "[{\"type\":\"fly_by\",\"dx\":20}]"
+   },
+   {
+    "case": "g_back1",
+    "score": "CORRECT",
+    "input": "Move back one meter",
+    "t_translate_ms": 60,
+    "t_plan_ms": 204,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "g_right1",
+    "score": "CORRECT",
+    "input": "Fly right one meter",
+    "t_translate_ms": 59,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dy\":1}]"
+   },
+   {
+    "case": "g_left1",
+    "score": "CORRECT",
+    "input": "Move left one meter",
+    "t_translate_ms": 61,
+    "t_plan_ms": 194,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-1}]"
+   },
+   {
+    "case": "g_combo2_0",
+    "score": "CORRECT",
+    "input": "First, ascend one meter, then ascend another twenty meters",
+    "t_translate_ms": 115,
+    "t_plan_ms": 322,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1},{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "g_combo2_1",
+    "score": "CORRECT",
+    "input": "Ascend four meters, then descend four meters",
+    "t_translate_ms": 99,
+    "t_plan_ms": 306,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dz\":-4}]"
+   },
+   {
+    "case": "g_combo2_2",
+    "score": "CORRECT",
+    "input": "Ascend nine meters, then descend twenty-five meters",
+    "t_translate_ms": 107,
+    "t_plan_ms": 319,
+    "out": "[{\"type\":\"fly_by\",\"dz\":9},{\"type\":\"fly_by\",\"dz\":-25}]"
+   },
+   {
+    "case": "g_combo2_3",
+    "score": "CORRECT",
+    "input": "First, descend one meter, then fly six meters forward",
+    "t_translate_ms": 116,
+    "t_plan_ms": 311,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1},{\"type\":\"fly_by\",\"dx\":6}]"
+   },
+   {
+    "case": "g_combo2_4",
+    "score": "CORRECT",
+    "input": "Fly down four meters, then move one meter back",
+    "t_translate_ms": 106,
+    "t_plan_ms": 307,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-4},{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "g_combo2_5",
+    "score": "CORRECT",
+    "input": "Descend nine meters, then fly eight meters back",
+    "t_translate_ms": 107,
+    "t_plan_ms": 309,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-9},{\"type\":\"fly_by\",\"dx\":-8}]"
+   },
+   {
+    "case": "g_combo2_6",
+    "score": "CORRECT",
+    "input": "Fly forward one meter, then move right two meters",
+    "t_translate_ms": 108,
+    "t_plan_ms": 312,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1},{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "g_combo2_7",
+    "score": "CORRECT",
+    "input": "Move forward four meters, then fly right nine meters",
+    "t_translate_ms": 108,
+    "t_plan_ms": 309,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":9}]"
+   },
+   {
+    "case": "g_combo3_0",
+    "score": "CORRECT",
+    "input": "First, ascend one meter. Then, ascend four more meters. Finally, ascend eight more meters.",
+    "t_translate_ms": 180,
+    "t_plan_ms": 428,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1},{\"type\":\"fly_by\",\"dz\":4},{\"type\":\"fly_by\",\"dz\":8}]"
+   },
+   {
+    "case": "g_combo3_1",
+    "score": "CORRECT",
+    "input": "Ascend 20 meters, descend 8 meters, then fly forward 1 meter",
+    "t_translate_ms": 167,
+    "t_plan_ms": 441,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"fly_by\",\"dz\":-8},{\"type\":\"fly_by\",\"dx\":1}]"
+   },
+   {
+    "case": "g_combo3_2",
+    "score": "CORRECT",
+    "input": "Fly 8 meters down, then 20 meters forward, and finally 6 meters back",
+    "t_translate_ms": 178,
+    "t_plan_ms": 437,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-8},{\"type\":\"fly_by\",\"dx\":20},{\"type\":\"fly_by\",\"dx\":-6}]"
+   },
+   {
+    "case": "g_combo3_3",
+    "score": "CORRECT",
+    "input": "Move forward four meters, fly right one meter, then fly right twenty-five meters",
+    "t_translate_ms": 149,
+    "t_plan_ms": 440,
+    "out": "[{\"type\":\"fly_by\",\"dx\":4},{\"type\":\"fly_by\",\"dy\":1},{\"type\":\"fly_by\",\"dy\":25}]"
+   },
+   {
+    "case": "r_takeoff2",
+    "score": "CORRECT",
+    "input": "Take off",
+    "t_translate_ms": 43,
+    "t_plan_ms": 152,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff3",
+    "score": "CORRECT",
+    "input": "You can take off",
+    "t_translate_ms": 58,
+    "t_plan_ms": 150,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff4",
+    "score": "CORRECT",
+    "input": "Take off",
+    "t_translate_ms": 44,
+    "t_plan_ms": 146,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_takeoff5",
+    "score": "CORRECT",
+    "input": "Take off please",
+    "t_translate_ms": 49,
+    "t_plan_ms": 143,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_land2",
+    "score": "CORRECT",
+    "input": "Land",
+    "t_translate_ms": 36,
+    "t_plan_ms": 129,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land3",
+    "score": "CORRECT",
+    "input": "Land please",
+    "t_translate_ms": 43,
+    "t_plan_ms": 128,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land4",
+    "score": "CORRECT",
+    "input": "You can land",
+    "t_translate_ms": 53,
+    "t_plan_ms": 141,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_land5",
+    "score": "CORRECT",
+    "input": "We're done, land",
+    "t_translate_ms": 67,
+    "t_plan_ms": 140,
+    "out": "[{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_pol_up5",
+    "score": "CORRECT",
+    "input": "I can fly up five meters",
+    "t_translate_ms": 78,
+    "t_plan_ms": 189,
+    "out": "[{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "r_pol_fwd3",
+    "score": "CORRECT",
+    "input": "Fly forward three meters",
+    "t_translate_ms": 61,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dx\":3}]"
+   },
+   {
+    "case": "r_pol_left2",
+    "score": "CORRECT",
+    "input": "Fly left two meters",
+    "t_translate_ms": 62,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-2}]"
+   },
+   {
+    "case": "r_pol_down1",
+    "score": "CORRECT",
+    "input": "Descend one meter",
+    "t_translate_ms": 58,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "r_pol_spin",
+    "score": "CORRECT",
+    "input": "Turn right 90 degrees",
+    "t_translate_ms": 75,
+    "t_plan_ms": 205,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_fill1",
+    "score": "CORRECT",
+    "input": "Fly forward three meters",
+    "t_translate_ms": 61,
+    "t_plan_ms": 188,
+    "out": "[{\"type\":\"fly_by\",\"dx\":3}]"
+   },
+   {
+    "case": "r_fill2",
+    "score": "CORRECT",
+    "input": "Okay, now fly up four meters",
+    "t_translate_ms": 83,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dz\":4}]"
+   },
+   {
+    "case": "r_fill3",
+    "score": "CORRECT",
+    "input": "Fly back two meters",
+    "t_translate_ms": 61,
+    "t_plan_ms": 188,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-2}]"
+   },
+   {
+    "case": "r_fill4",
+    "score": "CORRECT",
+    "input": "First, ascend two meters",
+    "t_translate_ms": 68,
+    "t_plan_ms": 189,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2}]"
+   },
+   {
+    "case": "r_fill5",
+    "score": "CORRECT",
+    "input": "Yes, continue right for another three meters",
+    "t_translate_ms": 91,
+    "t_plan_ms": 194,
+    "out": "[{\"type\":\"fly_by\",\"dy\":3}]"
+   },
+   {
+    "case": "r_alt10",
+    "score": "CORRECT",
+    "input": "Ascend to a height of 10 meters",
+    "t_translate_ms": 104,
+    "t_plan_ms": 204,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10}]"
+   },
+   {
+    "case": "r_alt20",
+    "score": "CORRECT",
+    "input": "Ascend to a height of 20 meters",
+    "t_translate_ms": 107,
+    "t_plan_ms": 205,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "r_low",
+    "score": "CORRECT",
+    "input": "Lower 2 meters",
+    "t_translate_ms": 60,
+    "t_plan_ms": 191,
+    "out": "[{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_rise3",
+    "score": "CORRECT",
+    "input": "Ascend three meters",
+    "t_translate_ms": 61,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_bit_left",
+    "score": "CORRECT",
+    "input": "Fly a little bit to the left",
+    "t_translate_ms": 82,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-1}]"
+   },
+   {
+    "case": "r_bit_up",
+    "score": "CORRECT",
+    "input": "Rise a bit",
+    "t_translate_ms": 60,
+    "t_plan_ms": 214,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.5}]"
+   },
+   {
+    "case": "r_bit_back",
+    "score": "CORRECT",
+    "input": "Move back a bit",
+    "t_translate_ms": 59,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "r_higher",
+    "score": "CORRECT",
+    "input": "Fly a bit higher",
+    "t_translate_ms": 58,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1}]"
+   },
+   {
+    "case": "r_bit_fwd",
+    "score": "CORRECT",
+    "input": "Move a bit further",
+    "t_translate_ms": 57,
+    "t_plan_ms": 217,
+    "out": "[{\"type\":\"fly_by\",\"dx\":0.5}]"
+   },
+   {
+    "case": "r_turn_r90",
+    "score": "CORRECT",
+    "input": "Turn the drone 90 degrees to the right",
+    "t_translate_ms": 105,
+    "t_plan_ms": 206,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_turn_l45",
+    "score": "CORRECT",
+    "input": "Turn left 45 degrees",
+    "t_translate_ms": 76,
+    "t_plan_ms": 201,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-45}]"
+   },
+   {
+    "case": "r_half_turn",
+    "score": "CORRECT",
+    "input": "Make a half turn",
+    "t_translate_ms": 58,
+    "t_plan_ms": 215,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":180}]"
+   },
+   {
+    "case": "r_quart_r",
+    "score": "CORRECT",
+    "input": "Make a right quarter turn",
+    "t_translate_ms": 67,
+    "t_plan_ms": 203,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "r_full",
+    "score": "CORRECT",
+    "input": "Make a full turn",
+    "t_translate_ms": 60,
+    "t_plan_ms": 212,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":360}]"
+   },
+   {
+    "case": "r_around",
+    "score": "valid(open)",
+    "input": "Turn towards you",
+    "t_translate_ms": 51,
+    "t_plan_ms": 216,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":180}]"
+   },
+   {
+    "case": "r_num_first",
+    "score": "CORRECT",
+    "input": "Fly 30 meters forward",
+    "t_translate_ms": 77,
+    "t_plan_ms": 203,
+    "out": "[{\"type\":\"fly_by\",\"dx\":30}]"
+   },
+   {
+    "case": "r_m_half",
+    "score": "CORRECT",
+    "input": "Fly one and a half meters up",
+    "t_translate_ms": 185,
+    "t_plan_ms": 217,
+    "out": "[{\"type\":\"fly_by\",\"dz\":1.5}]"
+   },
+   {
+    "case": "r_2_half",
+    "score": "CORRECT",
+    "input": "Fly right two and a half meters",
+    "t_translate_ms": 98,
+    "t_plan_ms": 219,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2.5}]"
+   },
+   {
+    "case": "r_digit7",
+    "score": "CORRECT",
+    "input": "Fly up seven meters",
+    "t_translate_ms": 58,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dz\":7}]"
+   },
+   {
+    "case": "r_meter1",
+    "score": "CORRECT",
+    "input": "Move one meter to the right",
+    "t_translate_ms": 167,
+    "t_plan_ms": 190,
+    "out": "[{\"type\":\"fly_by\",\"dy\":1}]"
+   },
+   {
+    "case": "r_mis1",
+    "score": "CORRECT",
+    "input": "Take off and ascend to a height of five meters",
+    "t_translate_ms": 118,
+    "t_plan_ms": 255,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "r_mis2",
+    "score": "wrong-len(3vs2)",
+    "input": "Take off, ascend three meters, and remain stationary",
+    "t_translate_ms": 108,
+    "t_plan_ms": 357,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":3},{\"type\":\"delay\",\"seconds\":1}]"
+   },
+   {
+    "case": "r_mis3",
+    "score": "CORRECT",
+    "input": "Fly right three meters, then fly left three meters",
+    "t_translate_ms": 109,
+    "t_plan_ms": 310,
+    "out": "[{\"type\":\"fly_by\",\"dy\":3},{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "r_mis4",
+    "score": "CORRECT",
+    "input": "Ascend five meters, wait two seconds, then descend back",
+    "t_translate_ms": 124,
+    "t_plan_ms": 412,
+    "out": "[{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"delay\",\"seconds\":2},{\"type\":\"fly_by\",\"dz\":-5}]"
+   },
+   {
+    "case": "r_mis5",
+    "score": "wrong-x(-10vs10)",
+    "input": "Take off, fly forward ten meters, turn half a circle, and return",
+    "t_translate_ms": 150,
+    "t_plan_ms": 542,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dx\":10},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dx\":-10}]"
+   },
+   {
+    "case": "r_mis6",
+    "score": "CORRECT",
+    "input": "Move forward two meters, then move up two meters, then move back two meters",
+    "t_translate_ms": 159,
+    "t_plan_ms": 427,
+    "out": "[{\"type\":\"fly_by\",\"dx\":2},{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"fly_by\",\"dx\":-2}]"
+   },
+   {
+    "case": "r_mis7",
+    "score": "CORRECT",
+    "input": "Ascend ten meters and then make a full rotation",
+    "t_translate_ms": 109,
+    "t_plan_ms": 347,
+    "out": "[{\"type\":\"fly_by\",\"dz\":10},{\"type\":\"spin_by\",\"degrees\":360}]"
+   },
+   {
+    "case": "r_mis8",
+    "score": "CORRECT",
+    "input": "Back five meters and down two meters",
+    "t_translate_ms": 87,
+    "t_plan_ms": 309,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-5},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_mis9",
+    "score": "CORRECT",
+    "input": "Take off and then land",
+    "t_translate_ms": 69,
+    "t_plan_ms": 203,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "r_mis10",
+    "score": "CORRECT",
+    "input": "Fly up two meters, then move right four meters, then move left four meters, and finally fly down two meters",
+    "t_translate_ms": 205,
+    "t_plan_ms": 549,
+    "out": "[{\"type\":\"fly_by\",\"dz\":2},{\"type\":\"fly_by\",\"dy\":4},{\"type\":\"fly_by\",\"dy\":-4},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "r_dis1",
+    "score": "valid(open)",
+    "input": "Fly forward five meters and take a photo of the house",
+    "t_translate_ms": 121,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "r_dis2",
+    "score": "valid(open)",
+    "input": "Ascend three meters and survey your surroundings",
+    "t_translate_ms": 93,
+    "t_plan_ms": 193,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_dis3",
+    "score": "valid(open)",
+    "input": "Take off and search for the car",
+    "t_translate_ms": 86,
+    "t_plan_ms": 152,
+    "out": "[{\"type\":\"takeoff\"}]"
+   },
+   {
+    "case": "r_dis4",
+    "score": "valid(open)",
+    "input": "Fly right two meters and then say what you see",
+    "t_translate_ms": 110,
+    "t_plan_ms": 64,
+    "out": "[]"
+   },
+   {
+    "case": "r_q1",
+    "score": "CORRECT",
+    "input": "What's the battery status?",
+    "t_translate_ms": 75,
+    "t_plan_ms": 61,
+    "out": "[]"
+   },
+   {
+    "case": "r_q2",
+    "score": "CORRECT",
+    "input": "I am currently at the position where I stopped",
+    "t_translate_ms": 97,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "r_q3",
+    "score": "CORRECT",
+    "input": "I am at an altitude of 100 meters.",
+    "t_translate_ms": 216,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "r_q4",
+    "score": "CORRECT",
+    "input": "I'm capturing",
+    "t_translate_ms": 55,
+    "t_plan_ms": 55,
+    "out": "[]"
+   },
+   {
+    "case": "r_q5",
+    "score": "CORRECT",
+    "input": "Describe what you see",
+    "t_translate_ms": 55,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "r_q6",
+    "score": "CORRECT",
+    "input": "There's someone there",
+    "t_translate_ms": 57,
+    "t_plan_ms": 60,
+    "out": "[]"
+   },
+   {
+    "case": "r_q7",
+    "score": "CORRECT",
+    "input": "How long do you have in the air?",
+    "t_translate_ms": 92,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "r_q8",
+    "score": "CORRECT",
+    "input": "I hear you",
+    "t_translate_ms": 50,
+    "t_plan_ms": 59,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg1",
+    "score": "CORRECT",
+    "input": "Do not ascend further",
+    "t_translate_ms": 57,
+    "t_plan_ms": 63,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg2",
+    "score": "CORRECT",
+    "input": "Do not move",
+    "t_translate_ms": 52,
+    "t_plan_ms": 51,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg3",
+    "score": "CORRECT",
+    "input": "Do not fly forward",
+    "t_translate_ms": 59,
+    "t_plan_ms": 58,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg4",
+    "score": "CORRECT",
+    "input": "Please do not turn",
+    "t_translate_ms": 62,
+    "t_plan_ms": 61,
+    "out": "[]"
+   },
+   {
+    "case": "r_neg5",
+    "score": "CORRECT",
+    "input": "Do not land yet",
+    "t_translate_ms": 56,
+    "t_plan_ms": 59,
+    "out": "[]"
+   },
+   {
+    "case": "r_wait1",
+    "score": "CORRECT",
+    "input": "Wait a moment",
+    "t_translate_ms": 48,
+    "t_plan_ms": 177,
+    "out": "[{\"type\":\"delay\",\"seconds\":1}]"
+   },
+   {
+    "case": "r_wait2",
+    "score": "CORRECT",
+    "input": "One second",
+    "t_translate_ms": 42,
+    "t_plan_ms": 175,
+    "out": "[{\"type\":\"delay\",\"seconds\":1}]"
+   },
+   {
+    "case": "r_wait3",
+    "score": "CORRECT",
+    "input": "Wait five seconds, then descend one meter",
+    "t_translate_ms": 182,
+    "t_plan_ms": 292,
+    "out": "[{\"type\":\"delay\",\"seconds\":5},{\"type\":\"fly_by\",\"dz\":-1}]"
+   },
+   {
+    "case": "r_deg10",
+    "score": "CORRECT",
+    "input": "Turn right 10 degrees",
+    "t_translate_ms": 84,
+    "t_plan_ms": 206,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":10}]"
+   },
+   {
+    "case": "r_deg135",
+    "score": "CORRECT",
+    "input": "Turn left 135 degrees",
+    "t_translate_ms": 81,
+    "t_plan_ms": 215,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":-135}]"
+   },
+   {
+    "case": "r_z_03",
+    "score": "CORRECT",
+    "input": "Ascend 30 centimeters",
+    "t_translate_ms": 81,
+    "t_plan_ms": 214,
+    "out": "[{\"type\":\"fly_by\",\"dz\":0.3}]"
+   },
+   {
+    "case": "r_ord1",
+    "score": "CORRECT",
+    "input": "Fly five meters forward",
+    "t_translate_ms": 59,
+    "t_plan_ms": 191,
+    "out": "[{\"type\":\"fly_by\",\"dx\":5}]"
+   },
+   {
+    "case": "r_ord2",
+    "score": "CORRECT",
+    "input": "Fly right two meters",
+    "t_translate_ms": 59,
+    "t_plan_ms": 191,
+    "out": "[{\"type\":\"fly_by\",\"dy\":2}]"
+   },
+   {
+    "case": "r_ord3",
+    "score": "CORRECT",
+    "input": "Fly up three meters",
+    "t_translate_ms": 59,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dz\":3}]"
+   },
+   {
+    "case": "r_ord4",
+    "score": "CORRECT",
+    "input": "Back a bit",
+    "t_translate_ms": 52,
+    "t_plan_ms": 192,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-1}]"
+   },
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 10.0}]"
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 5.0}]"
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 90.0}]"
+   },
+   {
+    "case": "takeoff",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"takeoff\"}]"
+   },
+   {
+    "case": "land",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"land\"}]"
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": -45.0}]"
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -3.0}]"
+   },
+   {
+    "case": "up2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 2.0}]"
+   },
+   {
+    "case": "right4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 4.0}]"
+   },
+   {
+    "case": "left7",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -7.0}]"
+   },
+   {
+    "case": "back10",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -10.0}]"
+   },
+   {
+    "case": "spin180cw",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 180.0}]"
+   },
+   {
+    "case": "spin360",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 360.0}]"
+   },
+   {
+    "case": "wait5",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"delay\", \"seconds\": 5.0}]"
+   },
+   {
+    "case": "digit12",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 12.0}]"
+   },
+   {
+    "case": "digit45deg",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 45.0}]"
+   },
+   {
+    "case": "colloq_up",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 10.0}]"
+   },
+   {
+    "case": "land_now",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"land\"}]"
+   },
+   {
+    "case": "takeoff_ctx",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"takeoff\"}]"
+   },
+   {
+    "case": "g_up2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 2.0}]"
+   },
+   {
+    "case": "g_up3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 3.0}]"
+   },
+   {
+    "case": "g_up4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 4.0}]"
+   },
+   {
+    "case": "g_up6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 6.0}]"
+   },
+   {
+    "case": "g_up8",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 8.0}]"
+   },
+   {
+    "case": "g_up9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 9.0}]"
+   },
+   {
+    "case": "g_up20",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 20.0}]"
+   },
+   {
+    "case": "g_up25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": 25.0}]"
+   },
+   {
+    "case": "g_down2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -2.0}]"
+   },
+   {
+    "case": "g_down3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -3.0}]"
+   },
+   {
+    "case": "g_down4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -4.0}]"
+   },
+   {
+    "case": "g_down6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -6.0}]"
+   },
+   {
+    "case": "g_down8",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -8.0}]"
+   },
+   {
+    "case": "g_down9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -9.0}]"
+   },
+   {
+    "case": "g_down20",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -20.0}]"
+   },
+   {
+    "case": "g_down25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -25.0}]"
+   },
+   {
+    "case": "g_fwd3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 3.0}]"
+   },
+   {
+    "case": "g_fwd6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 6.0}]"
+   },
+   {
+    "case": "g_fwd9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 9.0}]"
+   },
+   {
+    "case": "g_fwd25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 25.0}]"
+   },
+   {
+    "case": "g_back2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -2.0}]"
+   },
+   {
+    "case": "g_back3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -3.0}]"
+   },
+   {
+    "case": "g_back4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -4.0}]"
+   },
+   {
+    "case": "g_back6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -6.0}]"
+   },
+   {
+    "case": "g_back8",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -8.0}]"
+   },
+   {
+    "case": "g_back9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -9.0}]"
+   },
+   {
+    "case": "g_back20",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -20.0}]"
+   },
+   {
+    "case": "g_back25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -25.0}]"
+   },
+   {
+    "case": "g_right2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 2.0}]"
+   },
+   {
+    "case": "g_right3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 3.0}]"
+   },
+   {
+    "case": "g_right4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 4.0}]"
+   },
+   {
+    "case": "g_right6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 6.0}]"
+   },
+   {
+    "case": "g_right8",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 8.0}]"
+   },
+   {
+    "case": "g_right9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 9.0}]"
+   },
+   {
+    "case": "g_right20",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 20.0}]"
+   },
+   {
+    "case": "g_right25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": 25.0}]"
+   },
+   {
+    "case": "g_left2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -2.0}]"
+   },
+   {
+    "case": "g_left3",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -3.0}]"
+   },
+   {
+    "case": "g_left4",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -4.0}]"
+   },
+   {
+    "case": "g_left6",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -6.0}]"
+   },
+   {
+    "case": "g_left8",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -8.0}]"
+   },
+   {
+    "case": "g_left9",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -9.0}]"
+   },
+   {
+    "case": "g_left20",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -20.0}]"
+   },
+   {
+    "case": "g_left25",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dy\": -25.0}]"
+   },
+   {
+    "case": "g_cw30",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 30.0}]"
+   },
+   {
+    "case": "g_ccw30",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": -30.0}]"
+   },
+   {
+    "case": "g_cw60",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 60.0}]"
+   },
+   {
+    "case": "g_ccw60",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": -60.0}]"
+   },
+   {
+    "case": "g_cw120",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 120.0}]"
+   },
+   {
+    "case": "g_ccw120",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": -120.0}]"
+   },
+   {
+    "case": "g_cw270",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": 270.0}]"
+   },
+   {
+    "case": "g_ccw270",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"spin_by\", \"degrees\": -270.0}]"
+   },
+   {
+    "case": "g_wait2",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"delay\", \"seconds\": 2.0}]"
+   },
+   {
+    "case": "g_wait10",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"delay\", \"seconds\": 10.0}]"
+   },
+   {
+    "case": "r_takeoff1",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"takeoff\"}]"
+   },
+   {
+    "case": "r_land1",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"land\"}]"
+   },
+   {
+    "case": "r_updown",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dz\": -4.0}]"
+   },
+   {
+    "case": "r_digit50",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 50.0}]"
+   },
+   {
+    "case": "r_big100",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": 100.0}]"
+   },
+   {
+    "case": "r_back15",
+    "score": "CORRECT",
+    "input": "[bypass]",
+    "t_translate_ms": 0,
+    "t_plan_ms": 0,
+    "out": "[{\"type\": \"fly_by\", \"dx\": -15.0}]"
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "score": "wrong-verb(fly_byvstakeoff)",
+    "input": "Okay, here's the command: \"Fly forward, then ascend five meters, then turn right 90 degrees.\"",
+    "t_translate_ms": 201,
+    "t_plan_ms": 447,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_listen3_g1",
+    "score": "CORRECT",
+    "input": "Okay, here's the command: \"Fly up 20 meters, then turn right 45 degrees, and finally fly forward 12 meters.\"",
+    "t_translate_ms": 259,
+    "t_plan_ms": 469,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12}]"
+   },
+   {
+    "case": "v_listen3_g2",
+    "score": "CORRECT",
+    "input": "Okay, here's the command: Fly back 4 meters, then fly left 3 meters, and finally fly down 2 meters.",
+    "t_translate_ms": 230,
+    "t_plan_ms": 430,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_listen3_g3",
+    "score": "CORRECT",
+    "input": "Here's the translated command in English: \"Fly forward 25 meters, then turn right 180 degrees, and then fly right 6 meters.\"",
+    "t_translate_ms": 324,
+    "t_plan_ms": 465,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_finish3_g0",
+    "score": "CORRECT",
+    "input": "Take off, when you finish, rise 5 meters, and at the end, turn 90 degrees clockwise",
+    "t_translate_ms": 200,
+    "t_plan_ms": 394,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_finish3_g1",
+    "score": "missing-z",
+    "input": "Fly forward 12 meters, then turn right 45 degrees, and finally fly forward 20 meters",
+    "t_translate_ms": 194,
+    "t_plan_ms": 467,
+    "out": "[{\"type\":\"fly_by\",\"dx\":12},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":20}]"
+   },
+   {
+    "case": "v_finish3_g2",
+    "score": "CORRECT",
+    "input": "Fly back four meters, then move left three meters, and finally descend two meters.",
+    "t_translate_ms": 149,
+    "t_plan_ms": 433,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_finish3_g3",
+    "score": "CORRECT",
+    "input": "Fly forward 25 meters, then turn right 180 degrees, and finally fly right 6 meters.",
+    "t_translate_ms": 201,
+    "t_plan_ms": 466,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_start4_g0",
+    "score": "CORRECT",
+    "input": "Okay, let's start: Lift off. Now, ascend 5 meters. Great, now turn 90 degrees clockwise and fly forward 10 meters.",
+    "t_translate_ms": 276,
+    "t_plan_ms": 521,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":10}]"
+   },
+   {
+    "case": "v_start4_g1",
+    "score": "CORRECT",
+    "input": "Okay, let's start: Fly up 20 meters. Now turn right 45 degrees. Great, now fly forward 12 meters and also wait 3 seconds.",
+    "t_translate_ms": 302,
+    "t_plan_ms": 566,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12},{\"type\":\"delay\",\"seconds\":3}]"
+   },
+   {
+    "case": "v_start4_g2",
+    "score": "CORRECT",
+    "input": "Okay, let's start: Fly back 4 meters. Now move left 3 meters. Nice, now descend 2 meters. And finally, turn left 30 degrees.",
+    "t_translate_ms": 299,
+    "t_plan_ms": 561,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2},{\"type\":\"spin_by\",\"degrees\":-30}]"
+   },
+   {
+    "case": "v_start4_g3",
+    "score": "wrong-len(3vs4)",
+    "input": "Okay, let's start: Fly forward 25 meters. Now turn right 180 degrees with the hands of the clock. Great, now move to the right 6 meters and also ascend 15 meters.",
+    "t_translate_ms": 369,
+    "t_plan_ms": 535,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6,\"dz\":15}]"
+   },
+   {
+    "case": "v_okso4_g0",
+    "score": "wrong-verb(fly_byvstakeoff)",
+    "input": "Here's the command translated into English: \"Fly forward, then ascend five meters, then turn right 90 degrees clockwise, and finally fly forward ten meters.\"",
+    "t_translate_ms": 597,
+    "t_plan_ms": 568,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":10}]"
+   },
+   {
+    "case": "v_okso4_g1",
+    "score": "CORRECT",
+    "input": "Here's the command in English: \"Fly up 20 meters, then turn right 45 degrees, then fly forward 12 meters, then wait 3 seconds.\"",
+    "t_translate_ms": 344,
+    "t_plan_ms": 563,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12},{\"type\":\"delay\",\"seconds\":3}]"
+   },
+   {
+    "case": "v_okso4_g2",
+    "score": "CORRECT",
+    "input": "Here's the command translated into English: \"Fly back 4 meters, then move left 3 meters, then descend 2 meters, then turn left 30 degrees.\"",
+    "t_translate_ms": 330,
+    "t_plan_ms": 548,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2},{\"type\":\"spin_by\",\"degrees\":-30}]"
+   },
+   {
+    "case": "v_okso4_g3",
+    "score": "CORRECT",
+    "input": "Here's the command in English: \"Fly forward 25 meters, then turn right 180 degrees, then fly right 6 meters, then fly up 15 meters.\"",
+    "t_translate_ms": 339,
+    "t_plan_ms": 590,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6},{\"type\":\"fly_by\",\"dz\":15}]"
+   },
+   {
+    "case": "v_first3_g0",
+    "score": "CORRECT",
+    "input": "First, take off, then ascend five meters, and finally turn 90 degrees clockwise.",
+    "t_translate_ms": 170,
+    "t_plan_ms": 384,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_first3_g1",
+    "score": "CORRECT",
+    "input": "First, ascend 20 meters. Then, turn right 45 degrees. Finally, fly forward 12 meters.",
+    "t_translate_ms": 217,
+    "t_plan_ms": 465,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12}]"
+   },
+   {
+    "case": "v_first3_g2",
+    "score": "CORRECT",
+    "input": "First, fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_translate_ms": 189,
+    "t_plan_ms": 426,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_first3_g3",
+    "score": "CORRECT",
+    "input": "First, fly forward 25 meters. Then, turn 180 degrees clockwise. Finally, fly right 6 meters.",
+    "t_translate_ms": 222,
+    "t_plan_ms": 467,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_favor4_g0",
+    "score": "CORRECT",
+    "input": "Here's the translated command in English: \"Take off, then fly up 5 meters, then turn 90 degrees clockwise, and finally fly forward 10 meters, thank you.\"",
+    "t_translate_ms": 388,
+    "t_plan_ms": 512,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":10}]"
+   },
+   {
+    "case": "v_favor4_g1",
+    "score": "CORRECT",
+    "input": "Okay, here's the command: \"Fly up 20 meters, then turn right 45 degrees, then fly forward 12 meters, and finally wait 3 seconds and thank you.\"",
+    "t_translate_ms": 329,
+    "t_plan_ms": 566,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12},{\"type\":\"delay\",\"seconds\":3}]"
+   },
+   {
+    "case": "v_favor4_g2",
+    "score": "CORRECT",
+    "input": "Here's the command: \"Fly back 4 meters, then move left 3 meters, then descend 2 meters, and finally turn left 30 degrees, thank you.\"",
+    "t_translate_ms": 297,
+    "t_plan_ms": 549,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2},{\"type\":\"spin_by\",\"degrees\":-30}]"
+   },
+   {
+    "case": "v_favor4_g3",
+    "score": "CORRECT",
+    "input": "Okay, here's the flight plan: fly forward 25 meters, then turn right 180 degrees, then fly right 6 meters, and finally fly up 15 meters. Please follow the instructions.",
+    "t_translate_ms": 394,
+    "t_plan_ms": 591,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6},{\"type\":\"fly_by\",\"dz\":15}]"
+   },
+   {
+    "case": "v_mission3_g0",
+    "score": "CORRECT",
+    "input": "Here's the command translated into English: \"Take off, then ascend five meters, and then turn 90 degrees clockwise.\"",
+    "t_translate_ms": 279,
+    "t_plan_ms": 389,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_mission3_g1",
+    "score": "CORRECT",
+    "input": "Here's the drone command translated into English for your mission: \"Fly up 20 meters, then turn right 45 degrees, and finally fly forward 12 meters.\"",
+    "t_translate_ms": 372,
+    "t_plan_ms": 460,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12}]"
+   },
+   {
+    "case": "v_mission3_g2",
+    "score": "CORRECT",
+    "input": "Here's the translation of your drone command into English: Fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_translate_ms": 286,
+    "t_plan_ms": 420,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_mission3_g3",
+    "score": "CORRECT",
+    "input": "Here's the translated command in English: Fly forward 25 meters, then turn right 180 degrees, and finally fly right 6 meters.",
+    "t_translate_ms": 314,
+    "t_plan_ms": 461,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_yalla2_g0",
+    "score": "CORRECT",
+    "input": "Take off and then ascend five meters",
+    "t_translate_ms": 87,
+    "t_plan_ms": 252,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "v_yalla2_g1",
+    "score": "wrong-len(3vs2)",
+    "input": "Take off 20 meters, then turn right 45 degrees",
+    "t_translate_ms": 130,
+    "t_plan_ms": 396,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45}]"
+   },
+   {
+    "case": "v_yalla2_g2",
+    "score": "CORRECT",
+    "input": "Fly back four meters, then move left three meters",
+    "t_translate_ms": 105,
+    "t_plan_ms": 304,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3}]"
+   },
+   {
+    "case": "v_yalla2_g3",
+    "score": "CORRECT",
+    "input": "Fly forward 25 meters, then turn 180 degrees clockwise",
+    "t_translate_ms": 140,
+    "t_plan_ms": 344,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180}]"
+   },
+   {
+    "case": "v_ready3_g0",
+    "score": "CORRECT",
+    "input": "Ready? Take off, then ascend five meters, and turn 90 degrees clockwise.",
+    "t_translate_ms": 158,
+    "t_plan_ms": 384,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_ready3_g1",
+    "score": "wrong-len(5vs3)",
+    "input": "Okay, here's the plan: first, fly left six meters; then, stop in place; next, fly up 20 meters; then, turn right 45 degrees; finally, fly forward 12 meters.",
+    "t_translate_ms": 750,
+    "t_plan_ms": 682,
+    "out": "[{\"type\":\"fly_by\",\"dy\":-6},{\"type\":\"delay\",\"seconds\":1},{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12}]"
+   },
+   {
+    "case": "v_ready3_g2",
+    "score": "CORRECT",
+    "input": "Okay, here's the sequence: first, fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_translate_ms": 244,
+    "t_plan_ms": 430,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_ready3_g3",
+    "score": "CORRECT",
+    "input": "Okay, here's the plan: first, fly forward 25 meters, then turn 180 degrees clockwise, and finally fly right 6 meters.",
+    "t_translate_ms": 263,
+    "t_plan_ms": 458,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_seq5_g0",
+    "score": "wrong-verb(fly_byvstakeoff)",
+    "input": "Here's the sequence you requested: Fly forward, ascend 5 meters, turn 90 degrees clockwise, fly forward 10 meters, land.",
+    "t_translate_ms": 305,
+    "t_plan_ms": 637,
+    "out": "[{\"type\":\"fly_by\",\"dx\":1},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":10},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "v_seq5_g1",
+    "score": "CORRECT",
+    "input": "Here's the sequence you requested: Fly up 20 meters, turn right 45 degrees, fly forward 12 meters, wait 3 seconds, land.",
+    "t_translate_ms": 327,
+    "t_plan_ms": 632,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12},{\"type\":\"delay\",\"seconds\":3},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "v_seq5_g2",
+    "score": "CORRECT",
+    "input": "Here is the sequence of commands for your drone to follow, based on your request: fly back 4 meters, move left 3 meters, descend 2 meters, turn left 30 degrees, wait 5 seconds.",
+    "t_translate_ms": 432,
+    "t_plan_ms": 655,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2},{\"type\":\"spin_by\",\"degrees\":-30},{\"type\":\"delay\",\"seconds\":5}]"
+   },
+   {
+    "case": "v_seq5_g3",
+    "score": "CORRECT",
+    "input": "Here is the sequence of commands for your drone to follow, based on your instructions: fly forward 25 meters, turn 180 degrees clockwise, move right 6 meters, ascend 15 meters, descend 8 meters.",
+    "t_translate_ms": 437,
+    "t_plan_ms": 703,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6},{\"type\":\"fly_by\",\"dz\":15},{\"type\":\"fly_by\",\"dz\":-8}]"
+   },
+   {
+    "case": "v_note3_g0",
+    "score": "CORRECT",
+    "input": "Take off, then ascend five meters, and while doing so, turn 90 degrees clockwise at a slow and careful pace",
+    "t_translate_ms": 169,
+    "t_plan_ms": 391,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90}]"
+   },
+   {
+    "case": "v_note3_g1",
+    "score": "CORRECT",
+    "input": "Fly up 20 meters, then turn right 45 degrees, and fly forward 12 meters slowly and carefully",
+    "t_translate_ms": 156,
+    "t_plan_ms": 544,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12,\"velocity\":0.5}]"
+   },
+   {
+    "case": "v_note3_g2",
+    "score": "CORRECT",
+    "input": "Fly back four meters, then move left three meters, and then descend two meters carefully and cautiously",
+    "t_translate_ms": 119,
+    "t_plan_ms": 422,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_note3_g3",
+    "score": "CORRECT",
+    "input": "Fly forward 25 meters, then turn right 180 degrees clockwise, and then fly right 6 meters slowly and carefully",
+    "t_translate_ms": 171,
+    "t_plan_ms": 544,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6,\"velocity\":0.5}]"
+   },
+   {
+    "case": "v_round3_g0",
+    "score": "wrong-len(4vs3)",
+    "input": "Okay, let's do a little loop: take off, ascend five meters, then turn 90 degrees clockwise and land back where you started.",
+    "t_translate_ms": 234,
+    "t_plan_ms": 448,
+    "out": "[{\"type\":\"takeoff\"},{\"type\":\"fly_by\",\"dz\":5},{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"land\"}]"
+   },
+   {
+    "case": "v_round3_g1",
+    "score": "CORRECT",
+    "input": "Okay, let's do a little loop: fly up 20 meters, turn right 45 degrees, then fly forward 12 meters.",
+    "t_translate_ms": 195,
+    "t_plan_ms": 464,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20},{\"type\":\"spin_by\",\"degrees\":45},{\"type\":\"fly_by\",\"dx\":12}]"
+   },
+   {
+    "case": "v_round3_g2",
+    "score": "CORRECT",
+    "input": "Okay, let's do a little loop: fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_translate_ms": 178,
+    "t_plan_ms": 423,
+    "out": "[{\"type\":\"fly_by\",\"dx\":-4},{\"type\":\"fly_by\",\"dy\":-3},{\"type\":\"fly_by\",\"dz\":-2}]"
+   },
+   {
+    "case": "v_round3_g3",
+    "score": "CORRECT",
+    "input": "Here's the command: Fly forward 25 meters, turn 180 degrees clockwise, then fly right 6 meters.",
+    "t_translate_ms": 165,
+    "t_plan_ms": 466,
+    "out": "[{\"type\":\"fly_by\",\"dx\":25},{\"type\":\"spin_by\",\"degrees\":180},{\"type\":\"fly_by\",\"dy\":6}]"
+   },
+   {
+    "case": "v_neg1",
+    "score": "CORRECT",
+    "input": "Okay, I will fly up five meters but I won't turn around right now.",
+    "t_translate_ms": 119,
+    "t_plan_ms": 196,
+    "out": "[{\"type\":\"fly_by\",\"dz\":5}]"
+   },
+   {
+    "case": "v_neg2",
+    "score": "CORRECT",
+    "input": "Fly forward ten meters, but do not land yet",
+    "t_translate_ms": 80,
+    "t_plan_ms": 202,
+    "out": "[{\"type\":\"fly_by\",\"dx\":10}]"
+   },
+   {
+    "case": "v_q1",
+    "score": "CORRECT",
+    "input": "How much battery life do you have?",
+    "t_translate_ms": 73,
+    "t_plan_ms": 62,
+    "out": "[]"
+   },
+   {
+    "case": "v_q2",
+    "score": "CORRECT",
+    "input": "I'm sorry, I can only translate commands. I can't see you from here.",
+    "t_translate_ms": 133,
+    "t_plan_ms": 66,
+    "out": "[]"
+   },
+   {
+    "case": "v_mix1",
+    "score": "CORRECT",
+    "input": "I will fly up 20 meters and describe what I see from that direction.",
+    "t_translate_ms": 121,
+    "t_plan_ms": 202,
+    "out": "[{\"type\":\"fly_by\",\"dz\":20}]"
+   },
+   {
+    "case": "v_mix2",
+    "score": "CORRECT",
+    "input": "Turn right 90 degrees, and if you hear me well, fly forward 5 meters",
+    "t_translate_ms": 127,
+    "t_plan_ms": 319,
+    "out": "[{\"type\":\"spin_by\",\"degrees\":90},{\"type\":\"fly_by\",\"dx\":5}]"
+   }
+  ]
+ },
+ "recognizer_rows": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "e_stopstop",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "e_stop_now",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "e_emergency",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "e_stop_all",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "e_english",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "fwd5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 5.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "spin90cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 90.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "takeoff",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "land",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "combo3",
+    "kind": "english",
+    "payload": "Fly up ten meters, turn right 90 degrees, then fly forward five meters",
+    "t_ms": 124,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "combo_tl",
+    "kind": "english",
+    "payload": "Take off, ascend five meters, wait three seconds, and land",
+    "t_ms": 96,
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph"
+    ]
+   },
+   {
+    "case": "back2left3",
+    "kind": "english",
+    "payload": "Fly back two meters, then move left three meters",
+    "t_ms": 74,
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ]
+   },
+   {
+    "case": "ccw45",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -45.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "question",
+    "kind": "english",
+    "payload": "I see a small, flat rock.",
+    "t_ms": 61,
+    "flags": []
+   },
+   {
+    "case": "square",
+    "kind": "english",
+    "payload": "Fly in a square of 2 meters",
+    "t_ms": 64,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "left7",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -7.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "back10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -10.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "fwd15",
+    "kind": "english",
+    "payload": "Move forward fifteen meters",
+    "t_ms": 45,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "spin180cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 180.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "spin360",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 360.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "wait5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 5.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "up_half",
+    "kind": "english",
+    "payload": "Ascend half a meter",
+    "t_ms": 45,
+    "flags": []
+   },
+   {
+    "case": "combo2b",
+    "kind": "english",
+    "payload": "Take off and then ascend three meters",
+    "t_ms": 56,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "combo4",
+    "kind": "english",
+    "payload": "Fly forward four meters, move right two meters, fly back four meters, then move left two meters",
+    "t_ms": 132,
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ]
+   },
+   {
+    "case": "combo5",
+    "kind": "english",
+    "payload": "Perform a landing, rise 2 meters, turn 90 degrees clockwise, fly forward 3 meters, and land",
+    "t_ms": 180,
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph"
+    ]
+   },
+   {
+    "case": "digit12",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 12.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "digit45deg",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 45.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "question2",
+    "kind": "english",
+    "payload": "I see three people",
+    "t_ms": 126,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "q_land_trap",
+    "kind": "english",
+    "payload": "I am currently hovering in the air. To land, please specify the desired landing point or altitude.",
+    "t_ms": 192,
+    "flags": []
+   },
+   {
+    "case": "neg_trap",
+    "kind": "english",
+    "payload": "Do not fly forward",
+    "t_ms": 59,
+    "flags": []
+   },
+   {
+    "case": "colloq_up",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "land_now",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "takeoff_ctx",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up1",
+    "kind": "english",
+    "payload": "Ascend one meter",
+    "t_ms": 59,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 8.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 20.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_up25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down1",
+    "kind": "english",
+    "payload": "Descend one meter",
+    "t_ms": 58,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_down2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -8.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -20.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_down25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_fwd1",
+    "kind": "english",
+    "payload": "Fly forward one meter",
+    "t_ms": 62,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_fwd2",
+    "kind": "english",
+    "payload": "Move forward two meters",
+    "t_ms": 66,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_fwd3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_fwd4",
+    "kind": "english",
+    "payload": "Move forward four meters",
+    "t_ms": 59,
+    "flags": []
+   },
+   {
+    "case": "g_fwd6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_fwd8",
+    "kind": "english",
+    "payload": "Move forward eight meters",
+    "t_ms": 58,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_fwd9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_fwd20",
+    "kind": "english",
+    "payload": "Move forward 20 meters",
+    "t_ms": 74,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_fwd25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back1",
+    "kind": "english",
+    "payload": "Move back one meter",
+    "t_ms": 60,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_back2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -20.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_back25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right1",
+    "kind": "english",
+    "payload": "Fly right one meter",
+    "t_ms": 59,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_right2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 8.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 20.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_right25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left1",
+    "kind": "english",
+    "payload": "Move left one meter",
+    "t_ms": 61,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_left2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -3.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -6.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -8.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -9.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -20.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_left25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -25.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_cw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 30.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_ccw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -30.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_cw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 60.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_ccw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -60.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_cw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 120.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_ccw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -120.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_cw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 270.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_ccw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -270.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_wait2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 2.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_wait10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 10.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "g_combo2_0",
+    "kind": "english",
+    "payload": "First, ascend one meter, then ascend another twenty meters",
+    "t_ms": 115,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_1",
+    "kind": "english",
+    "payload": "Ascend four meters, then descend four meters",
+    "t_ms": 99,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_2",
+    "kind": "english",
+    "payload": "Ascend nine meters, then descend twenty-five meters",
+    "t_ms": 107,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_3",
+    "kind": "english",
+    "payload": "First, descend one meter, then fly six meters forward",
+    "t_ms": 116,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_4",
+    "kind": "english",
+    "payload": "Fly down four meters, then move one meter back",
+    "t_ms": 106,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_5",
+    "kind": "english",
+    "payload": "Descend nine meters, then fly eight meters back",
+    "t_ms": 107,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_6",
+    "kind": "english",
+    "payload": "Fly forward one meter, then move right two meters",
+    "t_ms": 108,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo2_7",
+    "kind": "english",
+    "payload": "Move forward four meters, then fly right nine meters",
+    "t_ms": 108,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo3_0",
+    "kind": "english",
+    "payload": "First, ascend one meter. Then, ascend four more meters. Finally, ascend eight more meters.",
+    "t_ms": 180,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo3_1",
+    "kind": "english",
+    "payload": "Ascend 20 meters, descend 8 meters, then fly forward 1 meter",
+    "t_ms": 167,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo3_2",
+    "kind": "english",
+    "payload": "Fly 8 meters down, then 20 meters forward, and finally 6 meters back",
+    "t_ms": 178,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "g_combo3_3",
+    "kind": "english",
+    "payload": "Move forward four meters, fly right one meter, then fly right twenty-five meters",
+    "t_ms": 149,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_takeoff1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_takeoff2",
+    "kind": "english",
+    "payload": "Take off",
+    "t_ms": 43,
+    "flags": []
+   },
+   {
+    "case": "r_takeoff3",
+    "kind": "english",
+    "payload": "You can take off",
+    "t_ms": 58,
+    "flags": []
+   },
+   {
+    "case": "r_takeoff4",
+    "kind": "english",
+    "payload": "Take off",
+    "t_ms": 44,
+    "flags": []
+   },
+   {
+    "case": "r_takeoff5",
+    "kind": "english",
+    "payload": "Take off please",
+    "t_ms": 49,
+    "flags": []
+   },
+   {
+    "case": "r_land1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_land2",
+    "kind": "english",
+    "payload": "Land",
+    "t_ms": 36,
+    "flags": []
+   },
+   {
+    "case": "r_land3",
+    "kind": "english",
+    "payload": "Land please",
+    "t_ms": 43,
+    "flags": []
+   },
+   {
+    "case": "r_land4",
+    "kind": "english",
+    "payload": "You can land",
+    "t_ms": 53,
+    "flags": []
+   },
+   {
+    "case": "r_land5",
+    "kind": "english",
+    "payload": "We're done, land",
+    "t_ms": 67,
+    "flags": []
+   },
+   {
+    "case": "r_pol_up5",
+    "kind": "english",
+    "payload": "I can fly up five meters",
+    "t_ms": 78,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_pol_fwd3",
+    "kind": "english",
+    "payload": "Fly forward three meters",
+    "t_ms": 61,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_pol_left2",
+    "kind": "english",
+    "payload": "Fly left two meters",
+    "t_ms": 62,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_pol_down1",
+    "kind": "english",
+    "payload": "Descend one meter",
+    "t_ms": 58,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_pol_spin",
+    "kind": "english",
+    "payload": "Turn right 90 degrees",
+    "t_ms": 75,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_fill1",
+    "kind": "english",
+    "payload": "Fly forward three meters",
+    "t_ms": 61,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_fill2",
+    "kind": "english",
+    "payload": "Okay, now fly up four meters",
+    "t_ms": 83,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_fill3",
+    "kind": "english",
+    "payload": "Fly back two meters",
+    "t_ms": 61,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_fill4",
+    "kind": "english",
+    "payload": "First, ascend two meters",
+    "t_ms": 68,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_fill5",
+    "kind": "english",
+    "payload": "Yes, continue right for another three meters",
+    "t_ms": 91,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_alt10",
+    "kind": "english",
+    "payload": "Ascend to a height of 10 meters",
+    "t_ms": 104,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_alt20",
+    "kind": "english",
+    "payload": "Ascend to a height of 20 meters",
+    "t_ms": 107,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_low",
+    "kind": "english",
+    "payload": "Lower 2 meters",
+    "t_ms": 60,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_rise3",
+    "kind": "english",
+    "payload": "Ascend three meters",
+    "t_ms": 61,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_updown",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_bit_left",
+    "kind": "english",
+    "payload": "Fly a little bit to the left",
+    "t_ms": 82,
+    "flags": []
+   },
+   {
+    "case": "r_bit_up",
+    "kind": "english",
+    "payload": "Rise a bit",
+    "t_ms": 60,
+    "flags": []
+   },
+   {
+    "case": "r_bit_back",
+    "kind": "english",
+    "payload": "Move back a bit",
+    "t_ms": 59,
+    "flags": []
+   },
+   {
+    "case": "r_higher",
+    "kind": "english",
+    "payload": "Fly a bit higher",
+    "t_ms": 58,
+    "flags": []
+   },
+   {
+    "case": "r_bit_fwd",
+    "kind": "english",
+    "payload": "Move a bit further",
+    "t_ms": 57,
+    "flags": []
+   },
+   {
+    "case": "r_turn_r90",
+    "kind": "english",
+    "payload": "Turn the drone 90 degrees to the right",
+    "t_ms": 105,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_turn_l45",
+    "kind": "english",
+    "payload": "Turn left 45 degrees",
+    "t_ms": 76,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_half_turn",
+    "kind": "english",
+    "payload": "Make a half turn",
+    "t_ms": 58,
+    "flags": []
+   },
+   {
+    "case": "r_quart_r",
+    "kind": "english",
+    "payload": "Make a right quarter turn",
+    "t_ms": 67,
+    "flags": []
+   },
+   {
+    "case": "r_full",
+    "kind": "english",
+    "payload": "Make a full turn",
+    "t_ms": 60,
+    "flags": []
+   },
+   {
+    "case": "r_around",
+    "kind": "english",
+    "payload": "Turn towards you",
+    "t_ms": 51,
+    "flags": []
+   },
+   {
+    "case": "r_num_first",
+    "kind": "english",
+    "payload": "Fly 30 meters forward",
+    "t_ms": 77,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_m_half",
+    "kind": "english",
+    "payload": "Fly one and a half meters up",
+    "t_ms": 185,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "r_2_half",
+    "kind": "english",
+    "payload": "Fly right two and a half meters",
+    "t_ms": 98,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_digit50",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 50.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_digit7",
+    "kind": "english",
+    "payload": "Fly up seven meters",
+    "t_ms": 58,
+    "flags": []
+   },
+   {
+    "case": "r_meter1",
+    "kind": "english",
+    "payload": "Move one meter to the right",
+    "t_ms": 167,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "r_mis1",
+    "kind": "english",
+    "payload": "Take off and ascend to a height of five meters",
+    "t_ms": 118,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis2",
+    "kind": "english",
+    "payload": "Take off, ascend three meters, and remain stationary",
+    "t_ms": 108,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis3",
+    "kind": "english",
+    "payload": "Fly right three meters, then fly left three meters",
+    "t_ms": 109,
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ]
+   },
+   {
+    "case": "r_mis4",
+    "kind": "english",
+    "payload": "Ascend five meters, wait two seconds, then descend back",
+    "t_ms": 124,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis5",
+    "kind": "english",
+    "payload": "Take off, fly forward ten meters, turn half a circle, and return",
+    "t_ms": 150,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis6",
+    "kind": "english",
+    "payload": "Move forward two meters, then move up two meters, then move back two meters",
+    "t_ms": 159,
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ]
+   },
+   {
+    "case": "r_mis7",
+    "kind": "english",
+    "payload": "Ascend ten meters and then make a full rotation",
+    "t_ms": 109,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis8",
+    "kind": "english",
+    "payload": "Back five meters and down two meters",
+    "t_ms": 87,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_mis9",
+    "kind": "english",
+    "payload": "Take off and then land",
+    "t_ms": 69,
+    "flags": []
+   },
+   {
+    "case": "r_mis10",
+    "kind": "english",
+    "payload": "Fly up two meters, then move right four meters, then move left four meters, and finally fly down two meters",
+    "t_ms": 205,
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ]
+   },
+   {
+    "case": "r_dis1",
+    "kind": "english",
+    "payload": "Fly forward five meters and take a photo of the house",
+    "t_ms": 121,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_dis2",
+    "kind": "english",
+    "payload": "Ascend three meters and survey your surroundings",
+    "t_ms": 93,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_dis3",
+    "kind": "english",
+    "payload": "Take off and search for the car",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "r_dis4",
+    "kind": "english",
+    "payload": "Fly right two meters and then say what you see",
+    "t_ms": 110,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_q1",
+    "kind": "english",
+    "payload": "What's the battery status?",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "r_q2",
+    "kind": "english",
+    "payload": "I am currently at the position where I stopped",
+    "t_ms": 97,
+    "flags": []
+   },
+   {
+    "case": "r_q3",
+    "kind": "english",
+    "payload": "I am at an altitude of 100 meters.",
+    "t_ms": 216,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "r_q4",
+    "kind": "english",
+    "payload": "I'm capturing",
+    "t_ms": 55,
+    "flags": []
+   },
+   {
+    "case": "r_q5",
+    "kind": "english",
+    "payload": "Describe what you see",
+    "t_ms": 55,
+    "flags": []
+   },
+   {
+    "case": "r_q6",
+    "kind": "english",
+    "payload": "There's someone there",
+    "t_ms": 57,
+    "flags": []
+   },
+   {
+    "case": "r_q7",
+    "kind": "english",
+    "payload": "How long do you have in the air?",
+    "t_ms": 92,
+    "flags": []
+   },
+   {
+    "case": "r_q8",
+    "kind": "english",
+    "payload": "I hear you",
+    "t_ms": 50,
+    "flags": []
+   },
+   {
+    "case": "r_neg1",
+    "kind": "english",
+    "payload": "Do not ascend further",
+    "t_ms": 57,
+    "flags": []
+   },
+   {
+    "case": "r_neg2",
+    "kind": "english",
+    "payload": "Do not move",
+    "t_ms": 52,
+    "flags": []
+   },
+   {
+    "case": "r_neg3",
+    "kind": "english",
+    "payload": "Do not fly forward",
+    "t_ms": 59,
+    "flags": []
+   },
+   {
+    "case": "r_neg4",
+    "kind": "english",
+    "payload": "Please do not turn",
+    "t_ms": 62,
+    "flags": []
+   },
+   {
+    "case": "r_neg5",
+    "kind": "english",
+    "payload": "Do not land yet",
+    "t_ms": 56,
+    "flags": []
+   },
+   {
+    "case": "r_wait1",
+    "kind": "english",
+    "payload": "Wait a moment",
+    "t_ms": 48,
+    "flags": []
+   },
+   {
+    "case": "r_wait2",
+    "kind": "english",
+    "payload": "One second",
+    "t_ms": 42,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_wait3",
+    "kind": "english",
+    "payload": "Wait five seconds, then descend one meter",
+    "t_ms": 182,
+    "flags": [
+     "hebnum-digits",
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "r_wait4",
+    "kind": "emergency",
+    "payload": null,
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_big100",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 100.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_deg10",
+    "kind": "english",
+    "payload": "Turn right 10 degrees",
+    "t_ms": 84,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_deg135",
+    "kind": "english",
+    "payload": "Turn left 135 degrees",
+    "t_ms": 81,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_z_03",
+    "kind": "english",
+    "payload": "Ascend 30 centimeters",
+    "t_ms": 81,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_back15",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -15.0
+     }
+    ],
+    "t_ms": 0,
+    "flags": []
+   },
+   {
+    "case": "r_ord1",
+    "kind": "english",
+    "payload": "Fly five meters forward",
+    "t_ms": 59,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_ord2",
+    "kind": "english",
+    "payload": "Fly right two meters",
+    "t_ms": 59,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_ord3",
+    "kind": "english",
+    "payload": "Fly up three meters",
+    "t_ms": 59,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "r_ord4",
+    "kind": "english",
+    "payload": "Back a bit",
+    "t_ms": 52,
+    "flags": []
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "kind": "english",
+    "payload": "Okay, here's the command: \"Fly forward, then ascend five meters, then turn right 90 degrees.\"",
+    "t_ms": 201,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_listen3_g1",
+    "kind": "english",
+    "payload": "Okay, here's the command: \"Fly up 20 meters, then turn right 45 degrees, and finally fly forward 12 meters.\"",
+    "t_ms": 259,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_listen3_g2",
+    "kind": "english",
+    "payload": "Okay, here's the command: Fly back 4 meters, then fly left 3 meters, and finally fly down 2 meters.",
+    "t_ms": 230,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_listen3_g3",
+    "kind": "english",
+    "payload": "Here's the translated command in English: \"Fly forward 25 meters, then turn right 180 degrees, and then fly right 6 meters.\"",
+    "t_ms": 324,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_finish3_g0",
+    "kind": "english",
+    "payload": "Take off, when you finish, rise 5 meters, and at the end, turn 90 degrees clockwise",
+    "t_ms": 200,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_finish3_g1",
+    "kind": "english",
+    "payload": "Fly forward 12 meters, then turn right 45 degrees, and finally fly forward 20 meters",
+    "t_ms": 194,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_finish3_g2",
+    "kind": "english",
+    "payload": "Fly back four meters, then move left three meters, and finally descend two meters.",
+    "t_ms": 149,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_finish3_g3",
+    "kind": "english",
+    "payload": "Fly forward 25 meters, then turn right 180 degrees, and finally fly right 6 meters.",
+    "t_ms": 201,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_start4_g0",
+    "kind": "english",
+    "payload": "Okay, let's start: Lift off. Now, ascend 5 meters. Great, now turn 90 degrees clockwise and fly forward 10 meters.",
+    "t_ms": 276,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_start4_g1",
+    "kind": "english",
+    "payload": "Okay, let's start: Fly up 20 meters. Now turn right 45 degrees. Great, now fly forward 12 meters and also wait 3 seconds.",
+    "t_ms": 302,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_start4_g2",
+    "kind": "english",
+    "payload": "Okay, let's start: Fly back 4 meters. Now move left 3 meters. Nice, now descend 2 meters. And finally, turn left 30 degrees.",
+    "t_ms": 299,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_start4_g3",
+    "kind": "english",
+    "payload": "Okay, let's start: Fly forward 25 meters. Now turn right 180 degrees with the hands of the clock. Great, now move to the right 6 meters and also ascend 15 meters.",
+    "t_ms": 369,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_okso4_g0",
+    "kind": "english",
+    "payload": "Here's the command translated into English: \"Fly forward, then ascend five meters, then turn right 90 degrees clockwise, and finally fly forward ten meters.\"",
+    "t_ms": 597,
+    "flags": [
+     "hebnum-digits",
+     "number-retry"
+    ]
+   },
+   {
+    "case": "v_okso4_g1",
+    "kind": "english",
+    "payload": "Here's the command in English: \"Fly up 20 meters, then turn right 45 degrees, then fly forward 12 meters, then wait 3 seconds.\"",
+    "t_ms": 344,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_okso4_g2",
+    "kind": "english",
+    "payload": "Here's the command translated into English: \"Fly back 4 meters, then move left 3 meters, then descend 2 meters, then turn left 30 degrees.\"",
+    "t_ms": 330,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_okso4_g3",
+    "kind": "english",
+    "payload": "Here's the command in English: \"Fly forward 25 meters, then turn right 180 degrees, then fly right 6 meters, then fly up 15 meters.\"",
+    "t_ms": 339,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_first3_g0",
+    "kind": "english",
+    "payload": "First, take off, then ascend five meters, and finally turn 90 degrees clockwise.",
+    "t_ms": 170,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_first3_g1",
+    "kind": "english",
+    "payload": "First, ascend 20 meters. Then, turn right 45 degrees. Finally, fly forward 12 meters.",
+    "t_ms": 217,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_first3_g2",
+    "kind": "english",
+    "payload": "First, fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_ms": 189,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_first3_g3",
+    "kind": "english",
+    "payload": "First, fly forward 25 meters. Then, turn 180 degrees clockwise. Finally, fly right 6 meters.",
+    "t_ms": 222,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_favor4_g0",
+    "kind": "english",
+    "payload": "Here's the translated command in English: \"Take off, then fly up 5 meters, then turn 90 degrees clockwise, and finally fly forward 10 meters, thank you.\"",
+    "t_ms": 388,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_favor4_g1",
+    "kind": "english",
+    "payload": "Okay, here's the command: \"Fly up 20 meters, then turn right 45 degrees, then fly forward 12 meters, and finally wait 3 seconds and thank you.\"",
+    "t_ms": 329,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_favor4_g2",
+    "kind": "english",
+    "payload": "Here's the command: \"Fly back 4 meters, then move left 3 meters, then descend 2 meters, and finally turn left 30 degrees, thank you.\"",
+    "t_ms": 297,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_favor4_g3",
+    "kind": "english",
+    "payload": "Okay, here's the flight plan: fly forward 25 meters, then turn right 180 degrees, then fly right 6 meters, and finally fly up 15 meters. Please follow the instructions.",
+    "t_ms": 394,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_mission3_g0",
+    "kind": "english",
+    "payload": "Here's the command translated into English: \"Take off, then ascend five meters, and then turn 90 degrees clockwise.\"",
+    "t_ms": 279,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_mission3_g1",
+    "kind": "english",
+    "payload": "Here's the drone command translated into English for your mission: \"Fly up 20 meters, then turn right 45 degrees, and finally fly forward 12 meters.\"",
+    "t_ms": 372,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_mission3_g2",
+    "kind": "english",
+    "payload": "Here's the translation of your drone command into English: Fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_ms": 286,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_mission3_g3",
+    "kind": "english",
+    "payload": "Here's the translated command in English: Fly forward 25 meters, then turn right 180 degrees, and finally fly right 6 meters.",
+    "t_ms": 314,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_yalla2_g0",
+    "kind": "english",
+    "payload": "Take off and then ascend five meters",
+    "t_ms": 87,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_yalla2_g1",
+    "kind": "english",
+    "payload": "Take off 20 meters, then turn right 45 degrees",
+    "t_ms": 130,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_yalla2_g2",
+    "kind": "english",
+    "payload": "Fly back four meters, then move left three meters",
+    "t_ms": 105,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_yalla2_g3",
+    "kind": "english",
+    "payload": "Fly forward 25 meters, then turn 180 degrees clockwise",
+    "t_ms": 140,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_ready3_g0",
+    "kind": "english",
+    "payload": "Ready? Take off, then ascend five meters, and turn 90 degrees clockwise.",
+    "t_ms": 158,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_ready3_g1",
+    "kind": "english",
+    "payload": "Okay, here's the plan: first, fly left six meters; then, stop in place; next, fly up 20 meters; then, turn right 45 degrees; finally, fly forward 12 meters.",
+    "t_ms": 750,
+    "flags": [
+     "hebnum-digits",
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "v_ready3_g2",
+    "kind": "english",
+    "payload": "Okay, here's the sequence: first, fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_ms": 244,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_ready3_g3",
+    "kind": "english",
+    "payload": "Okay, here's the plan: first, fly forward 25 meters, then turn 180 degrees clockwise, and finally fly right 6 meters.",
+    "t_ms": 263,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_seq5_g0",
+    "kind": "english",
+    "payload": "Here's the sequence you requested: Fly forward, ascend 5 meters, turn 90 degrees clockwise, fly forward 10 meters, land.",
+    "t_ms": 305,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_seq5_g1",
+    "kind": "english",
+    "payload": "Here's the sequence you requested: Fly up 20 meters, turn right 45 degrees, fly forward 12 meters, wait 3 seconds, land.",
+    "t_ms": 327,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_seq5_g2",
+    "kind": "english",
+    "payload": "Here is the sequence of commands for your drone to follow, based on your request: fly back 4 meters, move left 3 meters, descend 2 meters, turn left 30 degrees, wait 5 seconds.",
+    "t_ms": 432,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_seq5_g3",
+    "kind": "english",
+    "payload": "Here is the sequence of commands for your drone to follow, based on your instructions: fly forward 25 meters, turn 180 degrees clockwise, move right 6 meters, ascend 15 meters, descend 8 meters.",
+    "t_ms": 437,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_note3_g0",
+    "kind": "english",
+    "payload": "Take off, then ascend five meters, and while doing so, turn 90 degrees clockwise at a slow and careful pace",
+    "t_ms": 169,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_note3_g1",
+    "kind": "english",
+    "payload": "Fly up 20 meters, then turn right 45 degrees, and fly forward 12 meters slowly and carefully",
+    "t_ms": 156,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_note3_g2",
+    "kind": "english",
+    "payload": "Fly back four meters, then move left three meters, and then descend two meters carefully and cautiously",
+    "t_ms": 119,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_note3_g3",
+    "kind": "english",
+    "payload": "Fly forward 25 meters, then turn right 180 degrees clockwise, and then fly right 6 meters slowly and carefully",
+    "t_ms": 171,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_round3_g0",
+    "kind": "english",
+    "payload": "Okay, let's do a little loop: take off, ascend five meters, then turn 90 degrees clockwise and land back where you started.",
+    "t_ms": 234,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_round3_g1",
+    "kind": "english",
+    "payload": "Okay, let's do a little loop: fly up 20 meters, turn right 45 degrees, then fly forward 12 meters.",
+    "t_ms": 195,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_round3_g2",
+    "kind": "english",
+    "payload": "Okay, let's do a little loop: fly back 4 meters, then move left 3 meters, and finally descend 2 meters.",
+    "t_ms": 178,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_round3_g3",
+    "kind": "english",
+    "payload": "Here's the command: Fly forward 25 meters, turn 180 degrees clockwise, then fly right 6 meters.",
+    "t_ms": 165,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_neg1",
+    "kind": "english",
+    "payload": "Okay, I will fly up five meters but I won't turn around right now.",
+    "t_ms": 119,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_neg2",
+    "kind": "english",
+    "payload": "Fly forward ten meters, but do not land yet",
+    "t_ms": 80,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_q1",
+    "kind": "english",
+    "payload": "How much battery life do you have?",
+    "t_ms": 73,
+    "flags": []
+   },
+   {
+    "case": "v_q2",
+    "kind": "english",
+    "payload": "I'm sorry, I can only translate commands. I can't see you from here.",
+    "t_ms": 133,
+    "flags": []
+   },
+   {
+    "case": "v_mix1",
+    "kind": "english",
+    "payload": "I will fly up 20 meters and describe what I see from that direction.",
+    "t_ms": 121,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "v_mix2",
+    "kind": "english",
+    "payload": "Turn right 90 degrees, and if you hear me well, fly forward 5 meters",
+    "t_ms": 127,
+    "flags": [
+     "hebnum-digits"
+    ]
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "kind": "english",
+    "payload": "Focus on the middle windows of the rightmost building",
+    "t_ms": 78,
+    "flags": []
+   },
+   {
+    "case": "i_third_door",
+    "kind": "english",
+    "payload": "Mark the front door of the third house on the left",
+    "t_ms": 81,
+    "flags": []
+   },
+   {
+    "case": "i_rear_wheel",
+    "kind": "english",
+    "payload": "Focus on the rear wheel of the parked motorcycle",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "i_top_windows",
+    "kind": "english",
+    "payload": "Count the windows on the top floor of the skyscraper",
+    "t_ms": 85,
+    "flags": []
+   },
+   {
+    "case": "i_roof_corner",
+    "kind": "english",
+    "payload": "Mark the top-left corner of the red roof",
+    "t_ms": 76,
+    "flags": []
+   },
+   {
+    "case": "i_chimney",
+    "kind": "english",
+    "payload": "Focus on the chimney of the lowest house on the street",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "i_back_entrance",
+    "kind": "english",
+    "payload": "Find the back entrance of the large warehouse",
+    "t_ms": 71,
+    "flags": []
+   },
+   {
+    "case": "i_ladder_pickup",
+    "kind": "english",
+    "payload": "Mark the ladder on the white truck's roof",
+    "t_ms": 78,
+    "flags": []
+   },
+   {
+    "case": "i_car_by_red",
+    "kind": "english",
+    "payload": "Focus on the red-clad car parked next to the person",
+    "t_ms": 94,
+    "flags": []
+   },
+   {
+    "case": "i_orange_cap",
+    "kind": "english",
+    "payload": "Follow the person wearing the orange hat",
+    "t_ms": 64,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "i_door_by_coat",
+    "kind": "english",
+    "payload": "Mark the man's door with the black coat",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "i_bike_fence",
+    "kind": "english",
+    "payload": "Focus on the bicycles leaning against the yellow house fence",
+    "t_ms": 82,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "i_dog_by_dress",
+    "kind": "english",
+    "payload": "Follow the dog that is walking beside the woman wearing the white dress",
+    "t_ms": 97,
+    "flags": []
+   },
+   {
+    "case": "i_kid_bag",
+    "kind": "english",
+    "payload": "Hold the toy with the green shirt",
+    "t_ms": 64,
+    "flags": []
+   },
+   {
+    "case": "i_tree_truck",
+    "kind": "english",
+    "payload": "Mark the tree behind the red truck",
+    "t_ms": 62,
+    "flags": []
+   },
+   {
+    "case": "i_win_over_door",
+    "kind": "english",
+    "payload": "Find the window above the blue door",
+    "t_ms": 62,
+    "flags": []
+   },
+   {
+    "case": "i_cars_by_flag",
+    "kind": "english",
+    "payload": "Count the parked cars with the flag",
+    "t_ms": 63,
+    "flags": []
+   },
+   {
+    "case": "i_bench_trees",
+    "kind": "english",
+    "payload": "Emphasize the bench between the two tall trees",
+    "t_ms": 81,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "i_behind_moto",
+    "kind": "english",
+    "payload": "Follow the red motorcycle that is behind the car",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "i_man_on_roof",
+    "kind": "english",
+    "payload": "Mark the person standing on the white building's roof",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "i_box_by_man",
+    "kind": "english",
+    "payload": "Stop in place, highlighting the box next to the man standing on the white building",
+    "t_ms": 117,
+    "flags": []
+   },
+   {
+    "case": "i_girl_balloon",
+    "kind": "english",
+    "payload": "Follow the girl with the balloon as she walks by the woman with the cart",
+    "t_ms": 113,
+    "flags": []
+   },
+   {
+    "case": "i_car_between",
+    "kind": "english",
+    "payload": "Mark the parked car between the white truck and the red truck",
+    "t_ms": 94,
+    "flags": []
+   },
+   {
+    "case": "i_door_by_tree",
+    "kind": "english",
+    "payload": "Find the door of the house opposite the tallest tree",
+    "t_ms": 81,
+    "flags": []
+   },
+   {
+    "case": "i_sign_awning",
+    "kind": "english",
+    "payload": "Focus on the sign above the store entrance with the green awning",
+    "t_ms": 102,
+    "flags": []
+   },
+   {
+    "case": "i_front_tire",
+    "kind": "english",
+    "payload": "Focus on the front tire of the car parked closest to the gate",
+    "t_ms": 98,
+    "flags": []
+   },
+   {
+    "case": "i_bench_fountain",
+    "kind": "english",
+    "payload": "Count the number of people sitting on benches to the left of the fountain",
+    "t_ms": 106,
+    "flags": []
+   },
+   {
+    "case": "i_exit_gray",
+    "kind": "english",
+    "payload": "Follow the person who just exited the gray building",
+    "t_ms": 76,
+    "flags": []
+   },
+   {
+    "case": "i_second_car",
+    "kind": "english",
+    "payload": "Mark the second car to the left in the front row of the parking garage",
+    "t_ms": 111,
+    "flags": []
+   },
+   {
+    "case": "i_dark_stain",
+    "kind": "english",
+    "payload": "Locate the dark spot on the wall to the right of the large window",
+    "t_ms": 114,
+    "flags": []
+   },
+   {
+    "case": "i_glasses_talk",
+    "kind": "english",
+    "payload": "The man with the glasses is speaking to the woman in the yellow shirt.",
+    "t_ms": 112,
+    "flags": []
+   },
+   {
+    "case": "i_truck_boat",
+    "kind": "english",
+    "payload": "Follow the white boat being towed by the truck",
+    "t_ms": 83,
+    "flags": []
+   },
+   {
+    "case": "i_empty_chair",
+    "kind": "english",
+    "payload": "Mark the empty chair next to the round table",
+    "t_ms": 76,
+    "flags": []
+   },
+   {
+    "case": "i_bird_cable",
+    "kind": "english",
+    "payload": "Focus on the bird sitting on the wire between the two poles",
+    "t_ms": 93,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "i_fence_gap",
+    "kind": "english",
+    "payload": "Find the gate in the fence behind the blue shipping container",
+    "t_ms": 87,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "i_main_steps",
+    "kind": "english",
+    "payload": "Count the steps at the main entrance of the tallest building",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "i_helmet_mid",
+    "kind": "english",
+    "payload": "Fly left six meters, with the yellow helmet rider in the center of the team",
+    "t_ms": 253,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "i_cat_climb",
+    "kind": "english",
+    "payload": "Follow the cat climbing the tree beside the wall",
+    "t_ms": 82,
+    "flags": []
+   },
+   {
+    "case": "i_lean_silver",
+    "kind": "english",
+    "payload": "Mark the guy leaning against the silver car",
+    "t_ms": 68,
+    "flags": []
+   },
+   {
+    "case": "i_flag_low",
+    "kind": "english",
+    "payload": "Find the flag that is flying above the roof of the low building",
+    "t_ms": 98,
+    "flags": []
+   },
+   {
+    "case": "i_broken_window",
+    "kind": "english",
+    "payload": "Focus on the shattered window on the lower floor of the abandoned building",
+    "t_ms": 99,
+    "flags": []
+   },
+   {
+    "case": "i_last_convoy",
+    "kind": "english",
+    "payload": "Follow the last car in the convoy",
+    "t_ms": 63,
+    "flags": []
+   },
+   {
+    "case": "i_big_tent",
+    "kind": "english",
+    "payload": "Mark the largest tent at the field's end",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "i_crane_arm",
+    "kind": "english",
+    "payload": "Focus on the crane arm above the construction site",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "i_boats_pier",
+    "kind": "english",
+    "payload": "Count the boats tied to the northern wharf",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "j_bag_chain",
+    "kind": "english",
+    "payload": "Focus on the bag placed beside the blue awninged chair behind the shop counter",
+    "t_ms": 115,
+    "flags": []
+   },
+   {
+    "case": "j_bird_branch",
+    "kind": "english",
+    "payload": "Mark the bird on the branch of the tree next to the gray building",
+    "t_ms": 106,
+    "flags": []
+   },
+   {
+    "case": "j_kid_ball",
+    "kind": "english",
+    "payload": "Follow the child with the ball running near the fence behind the school",
+    "t_ms": 100,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "j_win_gas",
+    "kind": "english",
+    "payload": "Focus on the broken window on the second floor of the house across from the gas station",
+    "t_ms": 122,
+    "flags": []
+   },
+   {
+    "case": "j_hat_bench",
+    "kind": "english",
+    "payload": "Locate the hat that fell near the bench under the big tree at the park corner",
+    "t_ms": 123,
+    "flags": []
+   },
+   {
+    "case": "j_flag_mast",
+    "kind": "english",
+    "payload": "Mark the small flag on the dockside of the boat tied to the southern pier",
+    "t_ms": 118,
+    "flags": []
+   },
+   {
+    "case": "j_sticker",
+    "kind": "english",
+    "payload": "Focus on the sticker on the back of the green truck",
+    "t_ms": 89,
+    "flags": []
+   },
+   {
+    "case": "j_dog_steps",
+    "kind": "english",
+    "payload": "Follow the little dog playing near the girl sitting on the steps of the White House",
+    "t_ms": 118,
+    "flags": []
+   },
+   {
+    "case": "j_lock_gate",
+    "kind": "english",
+    "payload": "Focus on the lock on the gate surrounding the empty field",
+    "t_ms": 89,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "j_helmet_seat",
+    "kind": "english",
+    "payload": "Find the helmet lying on the motorcycle seat next to the entrance to the parking lot",
+    "t_ms": 118,
+    "flags": []
+   },
+   {
+    "case": "j_sign_between",
+    "kind": "english",
+    "payload": "Mark the small sign above the door between the restaurant and the bank",
+    "t_ms": 101,
+    "flags": []
+   },
+   {
+    "case": "j_drainpipe",
+    "kind": "english",
+    "payload": "Focus on the pipe descending from the roof of the house next to the tall power pole",
+    "t_ms": 124,
+    "flags": []
+   },
+   {
+    "case": "j_umbrella_x",
+    "kind": "english",
+    "payload": "Follow the red umbrella-wielding woman across the street by the red traffic light",
+    "t_ms": 114,
+    "flags": []
+   },
+   {
+    "case": "j_hole_wall",
+    "kind": "english",
+    "payload": "Focus on the hole in the wall behind the old building",
+    "t_ms": 90,
+    "flags": []
+   },
+   {
+    "case": "j_tilt_sign",
+    "kind": "english",
+    "payload": "Find the traffic sign that is leaning to the side near the intersection with the tree-lined street",
+    "t_ms": 130,
+    "flags": []
+   },
+   {
+    "case": "j_crate_trunk",
+    "kind": "english",
+    "payload": "Mark the box peeking out of the cargo area of the car parked next to the yellow gate",
+    "t_ms": 137,
+    "flags": []
+   },
+   {
+    "case": "j_mural",
+    "kind": "english",
+    "payload": "Focus on the mural on the wall to the right of the pedestrian bridge",
+    "t_ms": 107,
+    "flags": []
+   },
+   {
+    "case": "j_cat_jump",
+    "kind": "english",
+    "payload": "Follow the cat jumping from the fence to the roof of the garage in the backyard",
+    "t_ms": 117,
+    "flags": []
+   },
+   {
+    "case": "j_faucet",
+    "kind": "english",
+    "payload": "Focus on the faucet on the side of the house next to the red flower bed",
+    "t_ms": 117,
+    "flags": []
+   },
+   {
+    "case": "j_truck_text",
+    "kind": "english",
+    "payload": "The sign on the side of the truck that stops near the enclosed bus stop reads: \"Stop here\"",
+    "t_ms": 149,
+    "flags": []
+   },
+   {
+    "case": "j_pin_busstop",
+    "kind": "english",
+    "payload": "Follow the person wearing the blue shirt, standing near the bus stop, on the left side of the screen, close to the bench",
+    "t_ms": 173,
+    "flags": []
+   },
+   {
+    "case": "j_pin_notmoving",
+    "kind": "english",
+    "payload": "Mark the white car parked by the curb with the open door, not the one in motion",
+    "t_ms": 257,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_antennas",
+    "kind": "english",
+    "payload": "Focus on the tall building with antennas on the roof, located behind the playground, a bit to the right of the center",
+    "t_ms": 167,
+    "flags": []
+   },
+   {
+    "case": "j_pin_drone2",
+    "kind": "english",
+    "payload": "Follow the smaller drone, flying lower over the field, near the tree line",
+    "t_ms": 111,
+    "flags": []
+   },
+   {
+    "case": "j_pin_leash",
+    "kind": "english",
+    "payload": "Find the red leash dog, brown in color, playing on the grass, between the two benches, near the path",
+    "t_ms": 157,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "j_pin_window3",
+    "kind": "english",
+    "payload": "Focus on the third window from the right, on the second floor, of the building with yellow walls, next to the café",
+    "t_ms": 168,
+    "flags": []
+   },
+   {
+    "case": "j_pin_notphone",
+    "kind": "english",
+    "payload": "Mark the person standing closest to the entrance, with the large bag, not the one with the phone",
+    "t_ms": 291,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_2riders",
+    "kind": "english",
+    "payload": "Follow the black motorcycle with two riders, traveling on the right lane, towards the intersection",
+    "t_ms": 127,
+    "flags": [
+     "hebnum-digits"
+    ]
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "kind": "english",
+    "payload": "Highlight the third blue door from the left in the shop row, next to the fruit stall",
+    "t_ms": 128,
+    "flags": []
+   },
+   {
+    "case": "j_pin_smallbike",
+    "kind": "english",
+    "payload": "Find the boy with a red hat, who rides a small bicycle, on the path, near the tap",
+    "t_ms": 148,
+    "flags": []
+   },
+   {
+    "case": "j_pin_roofnear",
+    "kind": "english",
+    "payload": "Mark the roof of the house closest to you, which has a ladder leaning against it",
+    "t_ms": 122,
+    "flags": []
+   },
+   {
+    "case": "j_pin_leaving",
+    "kind": "english",
+    "payload": "Follow the orange truck that just left the site, with the open box",
+    "t_ms": 105,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "j_pin_flagman",
+    "kind": "english",
+    "payload": "Focus on the individual at the far right of the group, wearing a hat, who is holding the flag",
+    "t_ms": 145,
+    "flags": []
+   },
+   {
+    "case": "j_pin_notsail",
+    "kind": "english",
+    "payload": "Focus on the small boat with the engine, not the sailboat, as it is closer to the shore",
+    "t_ms": 149,
+    "flags": []
+   },
+   {
+    "case": "j_pin_bushes",
+    "kind": "english",
+    "payload": "Find the gate in the fence, roughly in the middle, where the bushes are low",
+    "t_ms": 124,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "j_pin_campole",
+    "kind": "english",
+    "payload": "Take a photo of the sign at the corner of the parking lot, near the exit",
+    "t_ms": 124,
+    "flags": []
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "kind": "english",
+    "payload": "Follow the woman with the long coat, who is running fast, on the far side of the square",
+    "t_ms": 143,
+    "flags": []
+   },
+   {
+    "case": "j_pin_planks",
+    "kind": "english",
+    "payload": "Focus on the stack of planks, near the back wall, under the window",
+    "t_ms": 116,
+    "flags": []
+   },
+   {
+    "case": "j_pin_halfgate",
+    "kind": "english",
+    "payload": "Focus on the blue gate at the end of the path, which is half-open",
+    "t_ms": 240,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_spare",
+    "kind": "english",
+    "payload": "Locate the spare tire attached to the rear of the grey pickup truck",
+    "t_ms": 113,
+    "flags": []
+   },
+   {
+    "case": "j_pin_stage3",
+    "kind": "english",
+    "payload": "To identify the three individuals standing closest to the stage, starting from the left of the large speaker, I would need to see the current scene or have access to a visual representation of the scene.",
+    "t_ms": 472,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_hay",
+    "kind": "english",
+    "payload": "Follow the green tractor working in the field, the one pulling the hay barge",
+    "t_ms": 250,
+    "flags": [
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_fullbin",
+    "kind": "english",
+    "payload": "Emphasize the orange dumpster near the back entrance, which is overflowing to the top",
+    "t_ms": 128,
+    "flags": [
+     "inline-english"
+    ]
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "kind": "english",
+    "payload": "Focus on birds perched on wires above the road, not those on the sidewalk",
+    "t_ms": 114,
+    "flags": []
+   },
+   {
+    "case": "j_pin_extstairs",
+    "kind": "english",
+    "payload": "Find the exterior stairs on the side of the building that leads to the roof",
+    "t_ms": 111,
+    "flags": []
+   },
+   {
+    "case": "j_pin_wrongway",
+    "kind": "english",
+    "payload": "Park the single vehicle in the garage facing the exit, with the front facing the exit",
+    "t_ms": 124,
+    "flags": []
+   },
+   {
+    "case": "j_pin_firstrun",
+    "kind": "english",
+    "payload": "Follow the group of runners, specifically the one wearing the yellow vest who runs first",
+    "t_ms": 240,
+    "flags": [
+     "inline-english",
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "j_pin_barrel",
+    "kind": "english",
+    "payload": "Focus on the barrel lying on its side, near the sand pile, behind the bunkers",
+    "t_ms": 136,
+    "flags": []
+   },
+   {
+    "case": "j_pin_puddle",
+    "kind": "english",
+    "payload": "Focus on the large pond in the middle, reflecting the building",
+    "t_ms": 94,
+    "flags": []
+   },
+   {
+    "case": "j_pin_scaffold",
+    "kind": "english",
+    "payload": "To find the highest ladder among those leaning against the scaffold on the western side, you would need to visually inspect the ladder positions. The ladder that is the tallest in height, as it extends the farthest from the scaffold, would be the highest.",
+    "t_ms": 340,
+    "flags": []
+   },
+   {
+    "case": "j_pin_idledozer",
+    "kind": "english",
+    "payload": "Mark the yellow bulldozer that is stationary, not moving, near the large pit",
+    "t_ms": 277,
+    "flags": [
+     "number-retry"
+    ]
+   },
+   {
+    "case": "j_pin_cart",
+    "kind": "english",
+    "payload": "Follow the shopping cart being pushed up the street, near parked cars",
+    "t_ms": 107,
+    "flags": []
+   },
+   {
+    "case": "j_pin_graffiti",
+    "kind": "english",
+    "payload": "Stop in place, under the second window on the left",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "j_pin_ferris",
+    "kind": "english",
+    "payload": "Focus on the giant wheel at the park's end, specifically the bottom section",
+    "t_ms": 111,
+    "flags": []
+   },
+   {
+    "case": "j_pin_planters",
+    "kind": "english",
+    "payload": "Locate the two largest plants on either side of the main entrance of the hotel",
+    "t_ms": 117,
+    "flags": [
+     "hebnum-digits"
+    ]
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "kind": "english",
+    "payload": "Perform an Indian circle around the target directly in front of you",
+    "t_ms": 93,
+    "flags": []
+   },
+   {
+    "case": "s_sitrep",
+    "kind": "english",
+    "payload": "Ascend to a height and provide a situational overview",
+    "t_ms": 86,
+    "flags": []
+   },
+   {
+    "case": "s_jump_point",
+    "kind": "english",
+    "payload": "Jump to a point and stay there",
+    "t_ms": 62,
+    "flags": []
+   },
+   {
+    "case": "s_gentle_scan",
+    "kind": "english",
+    "payload": "Perform a gentle scan on the area",
+    "t_ms": 62,
+    "flags": [
+     "slang-sector"
+    ]
+   },
+   {
+    "case": "s_eye_junction",
+    "kind": "english",
+    "payload": "Keep an eye on the intersection and do not descend from it",
+    "t_ms": 91,
+    "flags": []
+   },
+   {
+    "case": "s_zoom_suspect",
+    "kind": "english",
+    "payload": "Zoom in on the suspicious vehicle and center it",
+    "t_ms": 76,
+    "flags": []
+   },
+   {
+    "case": "s_route_escort",
+    "kind": "english",
+    "payload": "Advance along the traffic axis and follow it to the turn",
+    "t_ms": 88,
+    "flags": []
+   },
+   {
+    "case": "s_dead_ground",
+    "kind": "english",
+    "payload": "Take off, you have space behind the hill",
+    "t_ms": 75,
+    "flags": []
+   },
+   {
+    "case": "s_give_distance",
+    "kind": "english",
+    "payload": "Enter the area with a distance of two meters",
+    "t_ms": 75,
+    "flags": [
+     "hebnum-digits",
+     "slang-sector"
+    ]
+   },
+   {
+    "case": "s_one_more_pass",
+    "kind": "english",
+    "payload": "Make another loop over the neighborhood and then return home",
+    "t_ms": 81,
+    "flags": []
+   },
+   {
+    "case": "s_grid_out",
+    "kind": "english",
+    "payload": "Go to the point you've given me",
+    "t_ms": 69,
+    "flags": [
+     "acronym-grid",
+     "proc-out-final"
+    ]
+   },
+   {
+    "case": "s_roger_over",
+    "kind": "english",
+    "payload": "Okay, continuing the scan",
+    "t_ms": 52,
+    "flags": [
+     "proc-roger",
+     "proc-over-final"
+    ]
+   },
+   {
+    "case": "s_cp_visual",
+    "kind": "english",
+    "payload": "I have visual contact with the command post near the building",
+    "t_ms": 88,
+    "flags": [
+     "acronym-cp"
+    ]
+   },
+   {
+    "case": "s_eyes_on",
+    "kind": "english",
+    "payload": "Keep eyes on the target",
+    "t_ms": 51,
+    "flags": []
+   },
+   {
+    "case": "s_rally_point",
+    "kind": "english",
+    "payload": "Got it, returning to pickup point",
+    "t_ms": 64,
+    "flags": [
+     "abbrev-point"
+    ]
+   },
+   {
+    "case": "s_feet_hold",
+    "kind": "english",
+    "payload": "Ascend to eight hundred feet and wait in the area",
+    "t_ms": 181,
+    "flags": [
+     "feet-unit",
+     "number-retry",
+     "REJECT-number"
+    ]
+   },
+   {
+    "case": "s_lost_uav",
+    "kind": "english",
+    "payload": "Lost connection with the unmanned drone. Initiating search in the northern area",
+    "t_ms": 113,
+    "flags": [
+     "acronym-uav",
+     "slang-sector"
+    ]
+   },
+   {
+    "case": "s_scramble",
+    "kind": "english",
+    "payload": "Immediate landing, emergency mission",
+    "t_ms": 53,
+    "flags": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ]
+   },
+   {
+    "case": "s_obs_report",
+    "kind": "english",
+    "payload": "Maintain surveillance on the White House, report any movement",
+    "t_ms": 87,
+    "flags": [
+     "proc-over-final"
+    ]
+   },
+   {
+    "case": "s_wadi_route",
+    "kind": "english",
+    "payload": "Fly low along the ravine until the intersection with the axis, where you will wait",
+    "t_ms": 123,
+    "flags": []
+   }
+  ]
+ },
+ "wall_s": 96
+}

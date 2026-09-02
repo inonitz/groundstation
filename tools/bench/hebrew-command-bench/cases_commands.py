@@ -222,3 +222,99 @@ def score(arr, expected):
                 if abs(abs(g) - v[1]) > 0.01: return f"wrong-abs-{k}({got}vs{v[1]})"
             elif abs(g - float(v)) > 0.01: return f"wrong-{k}({got}vs{v})"
     return "CORRECT"
+
+
+# ---- verbose multi-step set (54 cases) ----
+"""Verbose concatenated command cases (owner refocus 2026-09-02): simple actions with numeric
+arguments, chained the way a person actually talks to a machine -- fillers, connectives,
+politeness, mixed word/digit numbers (including the measured-weak עשרים family). 12 hand-written
+frames x 4 argument fills = 48 linear missions, plus 6 negation/question traps embedded in
+verbose phrasing. Deterministic composition, no randomness.
+Case = (name, hebrew, english_reference, expected)."""
+
+def _up(n, w, ew):    return (f"עלה {w} מטרים", f"climb {ew} meters", ("fly_by", "z", n))
+def _down(n, w, ew):  return (f"רד {w} מטרים", f"descend {ew} meters", ("fly_by", "z", -n))
+def _fwd(n, w, ew):   return (f"טוס קדימה {w} מטרים", f"fly forward {ew} meters", ("fly_by", "x", n))
+def _back(n, w, ew):  return (f"טוס אחורה {w} מטרים", f"fly backward {ew} meters", ("fly_by", "x", -n))
+def _right(n, w, ew): return (f"זוז ימינה {w} מטרים", f"move right {ew} meters", ("fly_by", "y", n))
+def _left(n, w, ew):  return (f"זוז שמאלה {w} מטרים", f"move left {ew} meters", ("fly_by", "y", -n))
+def _cw(n, w, ew):    return (f"הסתובב {w} מעלות עם כיוון השעון", f"rotate {ew} degrees clockwise", ("spin_by", "degrees", n))
+def _turn_r(n, w, ew):return (f"פנה ימינה {w} מעלות", f"turn right {ew} degrees", ("spin_by", "degrees", n))
+def _turn_l(n, w, ew):return (f"פנה שמאלה {w} מעלות", f"turn left {ew} degrees", ("spin_by", "degrees", -n))
+def _wait(n, w, ew):  return (f"חכה {w} שניות", f"wait {ew} seconds", ("delay", "seconds", n))
+TAKEOFF = ("תמריא", "take off", ("takeoff", None, None))
+LAND    = ("תנחת", "land", ("land", None, None))
+
+N = {2:("שני","two"), 3:("שלושה","three"), 4:("ארבעה","four"), 5:("חמישה","five"), 6:("שישה","six"),
+     7:("שבעה","seven"), 8:("שמונה","eight"), 10:("עשרה","ten"), 12:("12","12"), 15:("חמישה עשר","fifteen"),
+     20:("עשרים","twenty"), 25:("עשרים וחמישה","twenty five"), 30:("שלושים","thirty"),
+     45:("45","45"), 60:("שישים","sixty"), 90:("תשעים","ninety"), 120:("מאה עשרים","one hundred twenty"),
+     180:("מאה שמונים","one hundred eighty")}
+def A(fn, n): w, ew = N[n]; return fn(n, w, ew)
+
+# frame = (name-prefix, hebrew format, english format); {0..} are clause slots
+FRAMES = [
+ ("v_listen3",  "תקשיב, אני רוצה שקודם כל {0}, אחרי זה {1} ואז {2}",
+                "Listen, I want you to first {0}, after that {1} and then {2}"),
+ ("v_finish3",  "{0}, כשתסיים {1}, ובסוף {2} בבקשה",
+                "{0}, when you finish {1}, and at the end {2} please"),
+ ("v_start4",   "בוא נתחיל: {0}. עכשיו {1}. יופי, עכשיו {2} וגם {3}",
+                "Let's start: {0}. Now {1}. Good, now {2} and also {3}"),
+ ("v_okso4",    "אוקיי אז ככה, {0} ואז {1} ואז {2} ואז {3}",
+                "Okay so, {0} and then {1} and then {2} and then {3}"),
+ ("v_first3",   "קודם {0}, שנייה אחרי זה {1}, ולסיום {2}",
+                "First {0}, a second after that {1}, and to finish {2}"),
+ ("v_favor4",   "תעשה לי טובה, {0}, אחר כך {1}, אחר כך {2}, ובסוף {3} ותודה",
+                "Do me a favor, {0}, afterwards {1}, afterwards {2}, and finally {3}, thanks"),
+ ("v_mission3", "המשימה היא כזאת: {0}, לאחר מכן {1}, ואז {2}",
+                "The mission is this: {0}, then {1}, and then {2}"),
+ ("v_yalla2",   "יאללה {0} ואז {1}",
+                "Come on, {0} and then {1}"),
+ ("v_ready3",   "רגע, תוודא שאתה מוכן. עכשיו {0}, אחרי זה {1} ואז {2}",
+                "Wait, make sure you are ready. Now {0}, after that {1} and then {2}"),
+ ("v_seq5",     "אני צריך שתבצע את הרצף הבא: {0}, {1}, {2}, {3}, {4}",
+                "I need you to perform the following sequence: {0}, {1}, {2}, {3}, {4}"),
+ ("v_note3",    "{0} ואז {1}, ושים לב, {2} לאט ובזהירות",
+                "{0} and then {1}, and pay attention, {2} slowly and carefully"),
+ ("v_round3",   "טוב, בוא נעשה סיבוב קטן: {0}, {1} ואז {2} וזהו",
+                "Alright, let's do a small round: {0}, {1} and then {2} and that's it"),
+]
+FILLS = [
+ [TAKEOFF, A(_up, 5), A(_cw, 90), A(_fwd, 10), LAND],
+ [A(_up, 20), A(_turn_r, 45), A(_fwd, 12), A(_wait, 3), LAND],
+ [A(_back, 4), A(_left, 3), A(_down, 2), A(_turn_l, 30), A(_wait, 5)],
+ [A(_fwd, 25), A(_cw, 180), A(_right, 6), A(_up, 15), A(_down, 8)],
+]
+VERBOSE_CASES = []
+for fi, (name, hf, ef) in enumerate(FRAMES):
+    for gi, fill in enumerate(FILLS):
+        k = hf.count("{")
+        atoms = fill[:k]
+        VERBOSE_CASES.append((f"{name}_g{gi}",
+            hf.format(*[a[0] for a in atoms]),
+            ef.format(*[a[1] for a in atoms]),
+            [a[2] for a in atoms]))
+
+VERBOSE_CASES += [
+ ("v_neg1", "תקשיב, עלה חמישה מטרים אבל אל תסתובב בינתיים",
+            "Listen, climb five meters but do not rotate in the meantime", [("fly_by","z",5)]),
+ ("v_neg2", "אוקיי טוס קדימה עשרה מטרים, ובבקשה אל תנחת עדיין",
+            "Okay fly forward ten meters, and please do not land yet", [("fly_by","x",10)]),
+ ("v_q1",   "לפני שנמשיך, כמה סוללה נשארה לך?",
+            "Before we continue, how much battery do you have left?", []),
+ ("v_q2",   "רגע רגע, אתה בכלל רואה אותי מפה?",
+            "Wait wait, can you even see me from here?", []),
+ ("v_mix1", "עלה עשרים מטרים ותגיד לי מה אתה רואה משם",
+            "Climb twenty meters and tell me what you see from there", [("fly_by","z",20)]),
+ ("v_mix2", "פנה ימינה תשעים מעלות, ואם אתה שומע אותי טוב אז גם טוס קדימה חמישה מטרים",
+            "Turn right ninety degrees, and if you hear me well then also fly forward five meters",
+            [("spin_by","degrees",90),("fly_by","x",5)]),
+]
+assert len(VERBOSE_CASES) == 54 and len({c[0] for c in VERBOSE_CASES}) == 54
+
+
+# ---- stage-0 emergency set: must be caught by the emergency filter, never reach a model ----
+EMERGENCY_CASES = [
+ ("e_stop", "עצור"), ("e_stopstop", "עצור עצור"), ("e_stop_now", "תעצור עכשיו"),
+ ("e_emergency", "חירום חירום"), ("e_stop_all", "עצור הכל בבקשה"), ("e_english", "stop stop stop"),
+]

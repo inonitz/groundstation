@@ -1,0 +1,2242 @@
+{
+ "dicta/perception": {
+  "ok": 58,
+  "n": 100,
+  "cases": [
+   {
+    "case": "i_mid_windows",
+    "he2": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+    "en": "Focus on the middle windows of the rightmost building",
+    "rules": [],
+    "missed": [
+     "highlight|mark"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_third_door",
+    "he2": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+    "en": "Mark the front door of the third house on the left",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_rear_wheel",
+    "he2": "התמקד בגלגל האחורי של האופנוע החונה",
+    "en": "Focus on the rear wheel of the parked motorcycle",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_top_windows",
+    "he2": "ספור את החלונות בקומה העליונה של המגדל",
+    "en": "Count the windows on the top floor of the skyscraper",
+    "rules": [],
+    "missed": [
+     "tower|building"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_roof_corner",
+    "he2": "סמן את הפינה השמאלית העליונה של הגג האדום",
+    "en": "Mark the top-left corner of the red roof",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_chimney",
+    "he2": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+    "en": "Focus on the chimney of the lowest house on the street",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_back_entrance",
+    "he2": "מצא את הכניסה האחורית של המחסן הגדול",
+    "en": "Find the back entrance of the large warehouse",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_ladder_pickup",
+    "he2": "סמן את הסולם שעל הגג של הטנדר הלבן",
+    "en": "Mark the ladder on the white truck's roof",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_car_by_red",
+    "he2": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+    "en": "Focus on the red-clad car parked next to the person",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_orange_cap",
+    "he2": "עקוב אחרי האדם עם הכובע ה-orange",
+    "en": "Follow the person wearing the orange hat",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_door_by_coat",
+    "he2": "סמן את הדלת שליד האיש עם המעיל השחור",
+    "en": "Mark the man's door with the black coat",
+    "rules": [],
+    "missed": [
+     "next|beside|near"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_bike_fence",
+    "he2": "התמקד באופניים שנשענים על ה-fence של הבית הצהוב",
+    "en": "Focus on the bicycles leaning against the yellow house fence",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_dog_by_dress",
+    "he2": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+    "en": "Follow the dog that is walking beside the woman wearing the white dress",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_kid_bag",
+    "he2": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+    "en": "Hold the toy with the green shirt",
+    "rules": [],
+    "missed": [
+     "bag|backpack",
+     "child|kid|boy"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_tree_truck",
+    "he2": "סמן את העץ שמאחורי המשאית הצהובה",
+    "en": "Mark the tree behind the red truck",
+    "rules": [],
+    "missed": [
+     "yellow"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_win_over_door",
+    "he2": "מצא את החלון שמעל הדלת הכחולה",
+    "en": "Find the window above the blue door",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_cars_by_flag",
+    "he2": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+    "en": "Count the parked cars with the flag",
+    "rules": [],
+    "missed": [
+     "front|opposite|facing|across",
+     "building"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_bench_trees",
+    "he2": "הדגש את הספסל שבין 2 העצים הגבוהים",
+    "en": "Emphasize the bench between the two tall trees",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_behind_moto",
+    "he2": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+    "en": "Follow the red motorcycle that is behind the car",
+    "rules": [],
+    "missed": [
+     "driv|mov|travel"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_man_on_roof",
+    "he2": "סמן את האיש שעומד על הגג של הבניין הלבן",
+    "en": "Mark the person standing on the white building's roof",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_box_by_man",
+    "he2": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+    "en": "Stop in place, highlighting the box next to the man standing on the white building",
+    "rules": [],
+    "missed": [
+     "roof"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_girl_balloon",
+    "he2": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+    "en": "Follow the girl with the balloon as she walks by the woman with the cart",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_car_between",
+    "he2": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+    "en": "Mark the parked car between the white truck and the red truck",
+    "rules": [],
+    "missed": [
+     "pickup|van"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_door_by_tree",
+    "he2": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+    "en": "Find the door of the house opposite the tallest tree",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_sign_awning",
+    "he2": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+    "en": "Focus on the sign above the store entrance with the green awning",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_front_tire",
+    "he2": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+    "en": "Focus on the front tire of the car parked closest to the gate",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bench_fountain",
+    "he2": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+    "en": "Count the number of people sitting on benches to the left of the fountain",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_exit_gray",
+    "he2": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+    "en": "Follow the person who just exited the gray building",
+    "rules": [],
+    "missed": [
+     "door"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_second_car",
+    "he2": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+    "en": "Mark the second car to the left in the front row of the parking garage",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_dark_stain",
+    "he2": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+    "en": "Locate the dark spot on the wall to the right of the large window",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_glasses_talk",
+    "he2": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+    "en": "The man with the glasses is speaking to the woman in the yellow shirt.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_truck_boat",
+    "he2": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+    "en": "Follow the white boat being towed by the truck",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_empty_chair",
+    "he2": "סמן את הכיסא הריק ליד השולחן העגול",
+    "en": "Mark the empty chair next to the round table",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bird_cable",
+    "he2": "התמקד בציפור שיושבת על הכבל בין 2 העמודים",
+    "en": "Focus on the bird sitting on the wire between the two poles",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_fence_gap",
+    "he2": "מצא את הפתח בfence שמאחורי המכולה הכחולה",
+    "en": "Find the gate in the fence behind the blue shipping container",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "opening|gap|hole|breach"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_main_steps",
+    "he2": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+    "en": "Count the steps at the main entrance of the tallest building",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_helmet_mid",
+    "he2": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+    "en": "Fly left six meters, with the yellow helmet rider in the center of the team",
+    "rules": [],
+    "missed": [
+     "group"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_cat_climb",
+    "he2": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+    "en": "Follow the cat climbing the tree beside the wall",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_lean_silver",
+    "he2": "סמן את הבחור שנשען על המכונית הכסופה",
+    "en": "Mark the guy leaning against the silver car",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_flag_low",
+    "he2": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+    "en": "Find the flag that is flying above the roof of the low building",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_broken_window",
+    "he2": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+    "en": "Focus on the shattered window on the lower floor of the abandoned building",
+    "rules": [],
+    "missed": [
+     "broken"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_last_convoy",
+    "he2": "עקוב אחרי המכונית האחרונה בשיירה",
+    "en": "Follow the last car in the convoy",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_big_tent",
+    "he2": "סמן את האוהל הגדול ביותר בקצה השדה",
+    "en": "Mark the largest tent at the field's end",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_crane_arm",
+    "he2": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+    "en": "Focus on the crane arm above the construction site",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_boats_pier",
+    "he2": "ספור את הסירות הקשורות למזח הצפוני",
+    "en": "Count the boats tied to the northern wharf",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_bag_chain",
+    "he2": "הדגש את התיק שמונח ליד הכיסא שמאחורי הדלפק של החנות עם הסוכך הכחול",
+    "en": "Focus on the bag placed beside the blue awninged chair behind the shop counter",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_bird_branch",
+    "he2": "סמן את הציפור שעל הענף של העץ שליד הכניסה לבניין האפור",
+    "en": "Mark the bird on the branch of the tree next to the gray building",
+    "rules": [],
+    "missed": [
+     "entrance|door"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_kid_ball",
+    "he2": "עקוב אחרי הילד עם הכדור שרץ ליד ה-fence של המגרש שמאחורי בית הספר",
+    "en": "Follow the child with the ball running near the fence behind the school",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "field|court|lot"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_win_gas",
+    "he2": "התמקד בחלון השבור בקומה השנייה של הבית שמול תחנת הדלק",
+    "en": "Focus on the broken window on the second floor of the house across from the gas station",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_hat_bench",
+    "he2": "מצא את הכובע שנפל ליד הספסל שמתחת לעץ הגדול בפינת הפארק",
+    "en": "Locate the hat that fell near the bench under the big tree at the park corner",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_flag_mast",
+    "he2": "סמן את הדגל הקטן שעל התורן של הסירה שקשורה למזח הדרומי",
+    "en": "Mark the small flag on the dockside of the boat tied to the southern pier",
+    "rules": [],
+    "missed": [
+     "mast|pole"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_sticker",
+    "he2": "הדגש את המדבקה שעל הפגוש של המכונית שחונה מאחורי המשאית הירוקה",
+    "en": "Focus on the sticker on the back of the green truck",
+    "rules": [],
+    "missed": [
+     "bumper",
+     "car|vehicle",
+     "park",
+     "behind"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_dog_steps",
+    "he2": "עקוב אחרי הכלב הקטן שמשחק ליד הילדה שיושבת על המדרגות של הבית הלבן",
+    "en": "Follow the little dog playing near the girl sitting on the steps of the White House",
+    "rules": [],
+    "missed": [
+     "small"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_lock_gate",
+    "he2": "התמקד במנעול שעל השער של ה-fence שמקיפה את המגרש הריק",
+    "en": "Focus on the lock on the gate surrounding the empty field",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "fence"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_helmet_seat",
+    "he2": "מצא את הקסדה שמונחת על המושב של האופנוע שחונה ליד הכניסה לחניון",
+    "en": "Find the helmet lying on the motorcycle seat next to the entrance to the parking lot",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_sign_between",
+    "he2": "סמן את השלט הקטן שמעל הדלת של החנות שבין המסעדה לבנק",
+    "en": "Mark the small sign above the door between the restaurant and the bank",
+    "rules": [],
+    "missed": [
+     "store|shop"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_drainpipe",
+    "he2": "הדגש את הצינור שיורד מהגג של הבית שליד עמוד החשמל הגבוה",
+    "en": "Focus on the pipe descending from the roof of the house next to the tall power pole",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_umbrella_x",
+    "he2": "עקוב אחרי האישה עם המטרייה האדומה שחוצה את הכביש ליד הרמזור",
+    "en": "Follow the red umbrella-wielding woman across the street by the red traffic light",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_hole_wall",
+    "he2": "התמקד בחור שבקיר של המבנה הישן שמאחורי מגרש החניה",
+    "en": "Focus on the hole in the wall behind the old building",
+    "rules": [],
+    "missed": [
+     "parking"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_tilt_sign",
+    "he2": "מצא את התמרור שנוטה הצידה ליד הפנייה לרחוב עם העצים",
+    "en": "Find the traffic sign that is leaning to the side near the intersection with the tree-lined street",
+    "rules": [],
+    "missed": [
+     "turn|junction|corner"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_crate_trunk",
+    "he2": "סמן את הארגז שמציץ מתא המטען של הרכב שחונה מול השער הצהוב",
+    "en": "Mark the box peeking out of the cargo area of the car parked next to the yellow gate",
+    "rules": [],
+    "missed": [
+     "opposite|facing|front|across"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_mural",
+    "he2": "הדגש את הציור שעל הקיר של הבניין שמימין לגשר להולכי הרגל",
+    "en": "Focus on the mural on the wall to the right of the pedestrian bridge",
+    "rules": [],
+    "missed": [
+     "building"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_cat_jump",
+    "he2": "עקוב אחרי החתול שקופץ מהגדר אל הגג של המחסן שבחצר האחורית",
+    "en": "Follow the cat jumping from the fence to the roof of the garage in the backyard",
+    "rules": [],
+    "missed": [
+     "shed|warehouse|storage"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_faucet",
+    "he2": "התמקד בברז שבצד של הבית שליד הערוגה עם הפרחים האדומים",
+    "en": "Focus on the faucet on the side of the house next to the red flower bed",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_truck_text",
+    "he2": "מצא את הכיתוב שעל הדופן של המשאית שעוצרת ליד תחנת האוטובוס המקורה",
+    "en": "The sign on the side of the truck that stops near the enclosed bus stop reads: \"Stop here\"",
+    "rules": [],
+    "missed": [
+     "letter|text|writ|inscription",
+     "cover|shelter|roof"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_busstop",
+    "he2": "עקוב אחרי האיש עם החולצה הכחולה, זה שעומד ליד תחנת האוטובוס, בצד השמאלי של המסך, קרוב לספסל",
+    "en": "Follow the person wearing the blue shirt, standing near the bus stop, on the left side of the screen, close to the bench",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_notmoving",
+    "he2": "סמן את המכונית הלבנה, לא זו שנוסעת, זו שחונה ליד המדרכה, עם הדלת הפתוחה",
+    "en": "Mark the white car parked by the curb with the open door, not the one in motion",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_antennas",
+    "he2": "הדגש את הבניין הגבוה, זה עם האנטנות על הגג, שנמצא מאחורי מגרש המשחקים, קצת ימינה מהמרכז",
+    "en": "Focus on the tall building with antennas on the roof, located behind the playground, a bit to the right of the center",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_drone2",
+    "he2": "עקוב אחרי הרחפן השני, הקטן יותר, שטס נמוך מעל השדה, ליד קו העצים",
+    "en": "Follow the smaller drone, flying lower over the field, near the tree line",
+    "rules": [],
+    "missed": [
+     "second"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_leash",
+    "he2": "מצא את הכלב החום, עם הרצועה האדומה, שמשחק על הדשא, בין 2 הספסלים, ליד השביל",
+    "en": "Find the red leash dog, brown in color, playing on the grass, between the two benches, near the path",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_window3",
+    "he2": "התמקד בחלון השלישי מימין, בקומה השנייה, של הבניין עם הקירות הצהובים, זה שליד בית הקפה",
+    "en": "Focus on the third window from the right, on the second floor, of the building with yellow walls, next to the café",
+    "rules": [],
+    "missed": [
+     "coffee|cafe"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_notphone",
+    "he2": "סמן את האדם שעומד הכי קרוב לכניסה, עם התיק הגדול, לא זה עם הטלפון",
+    "en": "Mark the person standing closest to the entrance, with the large bag, not the one with the phone",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_2riders",
+    "he2": "עקוב אחרי האופנוע השחור, זה עם 2 הרוכבים, שנוסע בנתיב הימני, לכיוון הצומת",
+    "en": "Follow the black motorcycle with two riders, traveling on the right lane, towards the intersection",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "he2": "הדגש את הדלת הכחולה, השלישית משמאל, בשורת החנויות, ליד הדוכן של הפירות",
+    "en": "Highlight the third blue door from the left in the shop row, next to the fruit stall",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_smallbike",
+    "he2": "מצא את הילד עם הכובע האדום, זה שרוכב על אופניים קטנים, על השביל, ליד הברזייה",
+    "en": "Find the boy with a red hat, who rides a small bicycle, on the path, near the tap",
+    "rules": [],
+    "missed": [
+     "fountain"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_roofnear",
+    "he2": "סמן את הגג של הבית הכי קרוב אליך, זה עם הסולם שנשען עליו",
+    "en": "Mark the roof of the house closest to you, which has a ladder leaning against it",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_leaving",
+    "he2": "עקוב אחרי המשאית ה-orange שיוצאת עכשיו מהאתר, זו עם הארגז הפתוח",
+    "en": "Follow the orange truck that just left the site, with the open box",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "leav|exit|pull"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_flagman",
+    "he2": "הדגש את האיש בקצה הימני של הקבוצה, זה עם הכובע, שמחזיק את הדגל",
+    "en": "Focus on the individual at the far right of the group, wearing a hat, who is holding the flag",
+    "rules": [],
+    "missed": [
+     "man|person",
+     "edge|end"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_notsail",
+    "he2": "התמקד בסירה הקטנה עם המנוע, לא במפרשית, זו שקרובה יותר לחוף",
+    "en": "Focus on the small boat with the engine, not the sailboat, as it is closer to the shore",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_bushes",
+    "he2": "מצא את הפתח בfence, בערך באמצע שלה, איפה שהשיחים נמוכים",
+    "en": "Find the gate in the fence, roughly in the middle, where the bushes are low",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "gap|opening|hole|breach"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_campole",
+    "he2": "סמן את העמוד עם המצלמה, זה שנמצא בפינה של החניון, ליד היציאה",
+    "en": "Take a photo of the sign at the corner of the parking lot, near the exit",
+    "rules": [],
+    "missed": [
+     "pole|post",
+     "camera"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "he2": "עקוב אחרי האישה עם המעיל הארוך, זו שהולכת מהר, בצד הרחוק של הכיכר",
+    "en": "Follow the woman with the long coat, who is running fast, on the far side of the square",
+    "rules": [],
+    "missed": [
+     "walk"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_planks",
+    "he2": "הדגש את הערימה של הקרשים, ליד הקיר האחורי, מתחת לחלון",
+    "en": "Focus on the stack of planks, near the back wall, under the window",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_halfgate",
+    "he2": "התמקד בשער הכחול בקצה השביל, זה שחצי פתוח",
+    "en": "Focus on the blue gate at the end of the path, which is half-open",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_spare",
+    "he2": "מצא את הצמיג הרזרבי שמחובר לחלק האחורי של הגיפ האפור",
+    "en": "Locate the spare tire attached to the rear of the grey pickup truck",
+    "rules": [],
+    "missed": [
+     "jeep|suv|vehicle"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_stage3",
+    "he2": "סמן את הקבוצה של שלושת האנשים שעומדים הכי קרוב לבמה, משמאל לרמקול הגדול",
+    "en": "To identify the three individuals standing closest to the stage, starting from the left of the large speaker, I would need to see the current scene or have access to a visual representation of the scene.",
+    "rules": [],
+    "missed": [
+     "group",
+     "people"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_hay",
+    "he2": "עקוב אחרי הטרקטור הירוק שעובד בשדה, זה שגורר את העגלה עם החציר",
+    "en": "Follow the green tractor working in the field, the one pulling the hay barge",
+    "rules": [],
+    "missed": [
+     "cart|trailer|wagon"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_fullbin",
+    "he2": "הדגש את הפח ה-orange ליד הכניסה האחורית, זה שמלא עד למעלה",
+    "en": "Emphasize the orange dumpster near the back entrance, which is overflowing to the top",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "full"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "he2": "התמקד בציפורים שיושבות על החוטים, רק אלה שמעל הכביש, לא אלה שמעל המדרכה",
+    "en": "Focus on birds perched on wires above the road, not those on the sidewalk",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_extstairs",
+    "he2": "מצא את המדרגות החיצוניות בצד של הבניין, אלה שמובילות לגג",
+    "en": "Find the exterior stairs on the side of the building that leads to the roof",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_wrongway",
+    "he2": "סמן את הרכב היחיד בחניון שחונה הפוך, עם הפנים ליציאה",
+    "en": "Park the single vehicle in the garage facing the exit, with the front facing the exit",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_firstrun",
+    "he2": "עקוב אחרי הקבוצה של הרצים, ספציפית אחרי זה עם ה-vest הצהוב שרץ ראשון",
+    "en": "Follow the group of runners, specifically the one wearing the yellow vest who runs first",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_barrel",
+    "he2": "הדגש את החבית שמונחת על הצד, ליד ערימת החול, מאחורי הבטונדות",
+    "en": "Focus on the barrel lying on its side, near the sand pile, behind the bunkers",
+    "rules": [],
+    "missed": [
+     "concrete|barrier|block"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_puddle",
+    "he2": "התמקד בשלולית הגדולה באמצע הדרך, זו שמשקפת את הבניין",
+    "en": "Focus on the large pond in the middle, reflecting the building",
+    "rules": [],
+    "missed": [
+     "puddle|pool|water",
+     "road|street|path"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_scaffold",
+    "he2": "מצא את הסולם הכי גבוה בין אלה שנשענים על הפיגום, בצד המערבי",
+    "en": "To find the highest ladder among those leaning against the scaffold on the western side, you would need to visually inspect the ladder positions. The ladder that is the tallest in height, as it extends the farthest from the scaffold, would be the highest.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_idledozer",
+    "he2": "סמן את הדחפור הצהוב שעומד בלי לזוז ליד הבור הגדול, לא את זה שעובד",
+    "en": "Mark the yellow bulldozer that is stationary, not the one in operation, near the large pit",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_cart",
+    "he2": "עקוב אחרי העגלה של הקניות שמישהו דוחף במעלה הרחוב, ליד המכוניות החונות",
+    "en": "Follow the shopping cart being pushed up the street, near parked cars",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_graffiti",
+    "he2": "הדגש את הכתובת שרשומה על הקיר, מתחת לחלון השני משמאל",
+    "en": "Stop in place, under the second window on the left",
+    "rules": [],
+    "missed": [
+     "writ|graffiti|text|inscription",
+     "wall"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_ferris",
+    "he2": "התמקד בגלגל הענק בקצה הפארק, ספציפית בתא התחתון שלו",
+    "en": "Focus on the giant wheel at the park's end, specifically the bottom section",
+    "rules": [],
+    "missed": [
+     "cabin|car|gondola|pod"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_planters",
+    "he2": "מצא את 2 העציצים הגדולים משני צידי הדלת הראשית של המלון",
+    "en": "Locate the two largest plants on either side of the main entrance of the hotel",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   }
+  ]
+ },
+ "dicta/military": {
+  "ok": 11,
+  "n": 20,
+  "cases": [
+   {
+    "case": "s_indian_circle",
+    "he2": "תבצע מעגל אינדיאני על המטרה מולך",
+    "en": "Perform an Indian circle around the target directly in front of you",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_sitrep",
+    "he2": "טפס לגובה ותן לי תמונת מצב",
+    "en": "Ascend to a height and provide a situational overview",
+    "rules": [],
+    "missed": [
+     "climb"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_jump_point",
+    "he2": "קפוץ לנקודה ותשאר עליה",
+    "en": "Jump to a point and stay there",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_gentle_scan",
+    "he2": "תעשה לי סריקה עדינה על האזור",
+    "en": "Perform a gentle scan on the area",
+    "rules": [
+     "slang-sector"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_eye_junction",
+    "he2": "שים עין על הצומת ואל תרד ממנו",
+    "en": "Keep an eye on the intersection and do not descend from it",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_zoom_suspect",
+    "he2": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+    "en": "Zoom in on the suspicious vehicle and center it",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_route_escort",
+    "he2": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+    "en": "Advance along the traffic axis and follow it to the turn",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_dead_ground",
+    "he2": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+    "en": "Take off, you have space behind the hill",
+    "rules": [],
+    "missed": [
+     "altitude|height|climb",
+     "dead"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_give_distance",
+    "he2": "רחפן 2 נכנס לאזור שלך, תן לו מרחק",
+    "en": "Enter the area with a distance of two meters",
+    "rules": [
+     "hebnum-digits",
+     "slang-sector"
+    ],
+    "missed": [
+     "drone",
+     "second"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_one_more_pass",
+    "he2": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+    "en": "Make another loop over the neighborhood and then return home",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_grid_out",
+    "he2": "עבור לנקודת הציון שנתתי לך",
+    "en": "Go to the point you've given me",
+    "rules": [
+     "acronym-grid",
+     "proc-out-final"
+    ],
+    "missed": [
+     "grid|coordinates|reference|waypoint",
+     "out|over|end"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_roger_over",
+    "he2": "קיבלתי, ממשיך בסריקה",
+    "en": "Okay, continuing the scan",
+    "rules": [
+     "proc-roger",
+     "proc-over-final"
+    ],
+    "missed": [
+     "roger|copy|acknowledged",
+     "over"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_cp_visual",
+    "he2": "יש לי קשר עין עם עמדת הפיקוד ליד המבנה",
+    "en": "I have visual contact with the command post near the building",
+    "rules": [
+     "acronym-cp"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_eyes_on",
+    "he2": "תדווח כשיש לך עיניים על המטרה",
+    "en": "Keep eyes on the target",
+    "rules": [],
+    "missed": [
+     "report"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_rally_point",
+    "he2": "קיבלתי, חוזר לנקודת האיסוף",
+    "en": "Got it, returning to pickup point",
+    "rules": [
+     "abbrev-point"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_feet_hold",
+    "he2": "תעלה לשמונה מאות פיט ותחכה בהמתנה מעל האזור",
+    "en": "Ascend to eight hundred feet and wait in the area",
+    "rules": [
+     "feet-unit"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_lost_uav",
+    "he2": "אבד קשר עם כלי הטיס הבלתי מאויש, תתחיל סריקה באזור הצפונית",
+    "en": "Lost connection with the unmanned drone. Initiating search in the northern area",
+    "rules": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "missed": [
+     "scan"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_scramble",
+    "he2": "בצע המראה מיידית, יש משימת חירום",
+    "en": "Immediate landing, emergency mission",
+    "rules": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ],
+    "missed": [
+     "takeoff|take off"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_obs_report",
+    "he2": "החזק תצפית על הבית הלבן, דווח כל תזוזה",
+    "en": "Maintain surveillance on the White House, report any movement",
+    "rules": [
+     "proc-over-final"
+    ],
+    "missed": [
+     "over"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_wadi_route",
+    "he2": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+    "en": "Fly low along the ravine until the intersection with the axis, where you will wait",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   }
+  ]
+ },
+ "tgemma/perception": {
+  "ok": 82,
+  "n": 100,
+  "cases": [
+   {
+    "case": "i_mid_windows",
+    "he2": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+    "en": "Focus on the central windows of the furthest right building.",
+    "rules": [],
+    "missed": [
+     "highlight|mark",
+     "middle|center"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_third_door",
+    "he2": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+    "en": "Mark the front door of the third house from the left.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_rear_wheel",
+    "he2": "התמקד בגלגל האחורי של האופנוע החונה",
+    "en": "Focus on the rear wheel of the parked motorcycle.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_top_windows",
+    "he2": "ספור את החלונות בקומה העליונה של המגדל",
+    "en": "Count the windows on the top floor of the tower.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_roof_corner",
+    "he2": "סמן את הפינה השמאלית העליונה של הגג האדום",
+    "en": "Mark the top-left corner of the red roof.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_chimney",
+    "he2": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+    "en": "Highlight the chimney of the lowest house on the street.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_back_entrance",
+    "he2": "מצא את הכניסה האחורית של המחסן הגדול",
+    "en": "Find the back entrance to the large warehouse.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_ladder_pickup",
+    "he2": "סמן את הסולם שעל הגג של הטנדר הלבן",
+    "en": "Mark the ladder on the white van.",
+    "rules": [],
+    "missed": [
+     "roof"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_car_by_red",
+    "he2": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+    "en": "Focus on the car that is next to the person wearing the red clothing.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_orange_cap",
+    "he2": "עקוב אחרי האדם עם הכובע ה-orange",
+    "en": "Follow the man wearing the orange hat.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_door_by_coat",
+    "he2": "סמן את הדלת שליד האיש עם המעיל השחור",
+    "en": "Mark the door next to the man wearing the black coat.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bike_fence",
+    "he2": "התמקד באופניים שנשענים על ה-fence של הבית הצהוב",
+    "en": "Focus on the bicycle that is leaning against the fence of the yellow house.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_dog_by_dress",
+    "he2": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+    "en": "Follow the dog walking next to the woman wearing a white dress.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_kid_bag",
+    "he2": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+    "en": "Focus on the backpack that the child is holding, the one with the green shirt.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_tree_truck",
+    "he2": "סמן את העץ שמאחורי המשאית הצהובה",
+    "en": "Mark the tree behind the yellow truck.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_win_over_door",
+    "he2": "מצא את החלון שמעל הדלת הכחולה",
+    "en": "Find the window above the blue door.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_cars_by_flag",
+    "he2": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+    "en": "Count the parked cars facing the building with the flag.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bench_trees",
+    "he2": "הדגש את הספסל שבין 2 העצים הגבוהים",
+    "en": "Focus on the bench located between the two tall trees.",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_behind_moto",
+    "he2": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+    "en": "Follow the vehicle that is traveling behind the red motorcycle.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_man_on_roof",
+    "he2": "סמן את האיש שעומד על הגג של הבניין הלבן",
+    "en": "Point to the man standing on the roof of the white building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_box_by_man",
+    "he2": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+    "en": "Highlight the box next to the man standing on the roof of the white building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_girl_balloon",
+    "he2": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+    "en": "Follow the little girl with the balloon as she walks beside the woman with the cart.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_car_between",
+    "he2": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+    "en": "Mark the car that is parked between the white pickup truck and the red truck.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_door_by_tree",
+    "he2": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+    "en": "Find the front door of the house that faces the tallest tree.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_sign_awning",
+    "he2": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+    "en": "Focus on the sign above the entrance to the store, which has the green awning.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_front_tire",
+    "he2": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+    "en": "Focus on the front tire of the car that is parked closest to the gate.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bench_fountain",
+    "he2": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+    "en": "Count the number of people sitting on the benches to the left of the fountain.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_exit_gray",
+    "he2": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+    "en": "Follow the person who exited the door of the gray building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_second_car",
+    "he2": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+    "en": "Mark the second vehicle from the left in the front row of the parking lot.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_dark_stain",
+    "he2": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+    "en": "Find the dark stain on the wall to the right of the large window.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_glasses_talk",
+    "he2": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+    "en": "Focus on the man wearing glasses who is talking to the woman in the yellow shirt.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_truck_boat",
+    "he2": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+    "en": "Follow the truck that is towing the white boat.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_empty_chair",
+    "he2": "סמן את הכיסא הריק ליד השולחן העגול",
+    "en": "Please indicate the empty chair next to the round table.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_bird_cable",
+    "he2": "התמקד בציפור שיושבת על הכבל בין 2 העמודים",
+    "en": "Focus on the bird that is sitting on the cable between the two posts.",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_fence_gap",
+    "he2": "מצא את הפתח בfence שמאחורי המכולה הכחולה",
+    "en": "Find the opening in the fence behind the blue container.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_main_steps",
+    "he2": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+    "en": "Count the steps in the main entrance of the high-rise building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_helmet_mid",
+    "he2": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+    "en": "Focus on the cyclist wearing the yellow helmet, who is in the center of the group.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_cat_climb",
+    "he2": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+    "en": "Watch the cat that is climbing the tree next to the wall.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_lean_silver",
+    "he2": "סמן את הבחור שנשען על המכונית הכסופה",
+    "en": "Point out the boy who is leaning against the silver car.",
+    "rules": [],
+    "missed": [
+     "guy|man|person"
+    ],
+    "ok": false
+   },
+   {
+    "case": "i_flag_low",
+    "he2": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+    "en": "Find the flag that is flying above the roof of the low-rise building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_broken_window",
+    "he2": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+    "en": "Highlight the broken window on the ground floor of the abandoned building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_last_convoy",
+    "he2": "עקוב אחרי המכונית האחרונה בשיירה",
+    "en": "Follow the last car in the convoy.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_big_tent",
+    "he2": "סמן את האוהל הגדול ביותר בקצה השדה",
+    "en": "Mark the largest tent at the edge of the field.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_crane_arm",
+    "he2": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+    "en": "Focus on the arm of the crane that is above the construction site.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "i_boats_pier",
+    "he2": "ספור את הסירות הקשורות למזח הצפוני",
+    "en": "Count the boats docked at the northern pier.",
+    "rules": [],
+    "missed": [
+     "tie|moor"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_bag_chain",
+    "he2": "הדגש את התיק שמונח ליד הכיסא שמאחורי הדלפק של החנות עם הסוכך הכחול",
+    "en": "Highlight the briefcase that is located next to the chair behind the counter of the shop, under the blue umbrella.",
+    "rules": [],
+    "missed": [
+     "bag|backpack",
+     "awning|canopy"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_bird_branch",
+    "he2": "סמן את הציפור שעל הענף של העץ שליד הכניסה לבניין האפור",
+    "en": "Point to the bird on the branch of the tree next to the entrance to the gray building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_kid_ball",
+    "he2": "עקוב אחרי הילד עם הכדור שרץ ליד ה-fence של המגרש שמאחורי בית הספר",
+    "en": "Follow the boy running with the ball near the fence of the field behind the school.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_win_gas",
+    "he2": "התמקד בחלון השבור בקומה השנייה של הבית שמול תחנת הדלק",
+    "en": "Focus on the broken window on the second floor of the house, which faces the gas station.",
+    "rules": [],
+    "missed": [
+     "opposite|facing|across|front"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_hat_bench",
+    "he2": "מצא את הכובע שנפל ליד הספסל שמתחת לעץ הגדול בפינת הפארק",
+    "en": "Please find the hat that fell near the bench under the large tree in the park corner.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_flag_mast",
+    "he2": "סמן את הדגל הקטן שעל התורן של הסירה שקשורה למזח הדרומי",
+    "en": "Mark the small flag on the mast of the boat that is tied to the southern pier.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_sticker",
+    "he2": "הדגש את המדבקה שעל הפגוש של המכונית שחונה מאחורי המשאית הירוקה",
+    "en": "Highlight the sticker on the car's bumper that is behind the green truck.",
+    "rules": [],
+    "missed": [
+     "park"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_dog_steps",
+    "he2": "עקוב אחרי הכלב הקטן שמשחק ליד הילדה שיושבת על המדרגות של הבית הלבן",
+    "en": "Follow the small dog playing near the girl sitting on the steps of the White House.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_lock_gate",
+    "he2": "התמקד במנעול שעל השער של ה-fence שמקיפה את המגרש הריק",
+    "en": "Focus on the lock on the gate of the fence that surrounds the empty lot.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_helmet_seat",
+    "he2": "מצא את הקסדה שמונחת על המושב של האופנוע שחונה ליד הכניסה לחניון",
+    "en": "Find the helmet that is lying on the motorcycle parked near the parking lot entrance.",
+    "rules": [],
+    "missed": [
+     "seat"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_sign_between",
+    "he2": "סמן את השלט הקטן שמעל הדלת של החנות שבין המסעדה לבנק",
+    "en": "Locate the small sign above the shop door between the restaurant and the bank.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_drainpipe",
+    "he2": "הדגש את הצינור שיורד מהגג של הבית שליד עמוד החשמל הגבוה",
+    "en": "Highlight the pipe that runs down from the roof of my house, next to the tall electrical pole.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_umbrella_x",
+    "he2": "עקוב אחרי האישה עם המטרייה האדומה שחוצה את הכביש ליד הרמזור",
+    "en": "Follow the woman with the red umbrella as she crosses the street near the traffic light.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_hole_wall",
+    "he2": "התמקד בחור שבקיר של המבנה הישן שמאחורי מגרש החניה",
+    "en": "Focus on the boy standing against the wall of the old building behind the parking lot.",
+    "rules": [],
+    "missed": [
+     "hole|gap|opening"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_tilt_sign",
+    "he2": "מצא את התמרור שנוטה הצידה ליד הפנייה לרחוב עם העצים",
+    "en": "Find the sign that is angled to the side near the turn onto the street with the trees.",
+    "rules": [],
+    "missed": [
+     "lean|tilt|bent"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_crate_trunk",
+    "he2": "סמן את הארגז שמציץ מתא המטען של הרכב שחונה מול השער הצהוב",
+    "en": "Mark the box that is visible from the car's trunk, which is parked in front of the yellow gate.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_mural",
+    "he2": "הדגש את הציור שעל הקיר של הבניין שמימין לגשר להולכי הרגל",
+    "en": "Highlight the painting on the wall of the building to the right of the pedestrian bridge.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_cat_jump",
+    "he2": "עקוב אחרי החתול שקופץ מהגדר אל הגג של המחסן שבחצר האחורית",
+    "en": "Watch the cat jump from the fence to the roof of the shed in the backyard.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_faucet",
+    "he2": "התמקד בברז שבצד של הבית שליד הערוגה עם הפרחים האדומים",
+    "en": "Focus on the faucet located on the side of my house, next to the flower bed.",
+    "rules": [],
+    "missed": [
+     "red"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_truck_text",
+    "he2": "מצא את הכיתוב שעל הדופן של המשאית שעוצרת ליד תחנת האוטובוס המקורה",
+    "en": "Find the writing on the side of the truck that is parked near the bus stop.",
+    "rules": [],
+    "missed": [
+     "cover|shelter|roof"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_busstop",
+    "he2": "עקוב אחרי האיש עם החולצה הכחולה, זה שעומד ליד תחנת האוטובוס, בצד השמאלי של המסך, קרוב לספסל",
+    "en": "Follow the man in the blue shirt, who is standing next to the bus stop on the left side of the screen, near the bench.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_notmoving",
+    "he2": "סמן את המכונית הלבנה, לא זו שנוסעת, זו שחונה ליד המדרכה, עם הדלת הפתוחה",
+    "en": "Point to the white car, not the one that's moving, but the one parked next to the sidewalk, with the door open.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_antennas",
+    "he2": "הדגש את הבניין הגבוה, זה עם האנטנות על הגג, שנמצא מאחורי מגרש המשחקים, קצת ימינה מהמרכז",
+    "en": "Focus on the tall building, the one with antennas on the roof, which is located behind the playground, slightly to the right of the center.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_drone2",
+    "he2": "עקוב אחרי הרחפן השני, הקטן יותר, שטס נמוך מעל השדה, ליד קו העצים",
+    "en": "Follow the second drone, the smaller one, which is flying low over the field, near the tree line.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_leash",
+    "he2": "מצא את הכלב החום, עם הרצועה האדומה, שמשחק על הדשא, בין 2 הספסלים, ליד השביל",
+    "en": "Find the brown dog, wearing a red leash, playing in the grass between the two benches, near the path.",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_window3",
+    "he2": "התמקד בחלון השלישי מימין, בקומה השנייה, של הבניין עם הקירות הצהובים, זה שליד בית הקפה",
+    "en": "Focus on the third window on the right, on the second floor, of the building with the yellow walls, which is next to the cafe.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_notphone",
+    "he2": "סמן את האדם שעומד הכי קרוב לכניסה, עם התיק הגדול, לא זה עם הטלפון",
+    "en": "Point to the person who is closest to the entrance, the one with the large bag, not the one with the phone.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_2riders",
+    "he2": "עקוב אחרי האופנוע השחור, זה עם 2 הרוכבים, שנוסע בנתיב הימני, לכיוון הצומת",
+    "en": "Follow the black motorcycle, the one with two riders, which is traveling on the right lane, heading towards the intersection.",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "he2": "הדגש את הדלת הכחולה, השלישית משמאל, בשורת החנויות, ליד הדוכן של הפירות",
+    "en": "Highlight the blue door, the third one from the left, in the row of shops, next to the fruit stand.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_smallbike",
+    "he2": "מצא את הילד עם הכובע האדום, זה שרוכב על אופניים קטנים, על השביל, ליד הברזייה",
+    "en": "Find the boy wearing the red hat, the one riding a small bicycle, on the path, near the water fountain.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_roofnear",
+    "he2": "סמן את הגג של הבית הכי קרוב אליך, זה עם הסולם שנשען עליו",
+    "en": "Identify the roof of the house closest to you, the one with the ladder leaning against it.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_leaving",
+    "he2": "עקוב אחרי המשאית ה-orange שיוצאת עכשיו מהאתר, זו עם הארגז הפתוח",
+    "en": "Follow the orange truck that is just leaving the site; it's the one with the open container.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_flagman",
+    "he2": "הדגש את האיש בקצה הימני של הקבוצה, זה עם הכובע, שמחזיק את הדגל",
+    "en": "Emphasize the man on the right side of the group, the one wearing the hat, who is holding the flag.",
+    "rules": [],
+    "missed": [
+     "edge|end"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_notsail",
+    "he2": "התמקד בסירה הקטנה עם המנוע, לא במפרשית, זו שקרובה יותר לחוף",
+    "en": "Focus on the small boat with the engine, not the sailboat, which is closer to the shore.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_bushes",
+    "he2": "מצא את הפתח בfence, בערך באמצע שלה, איפה שהשיחים נמוכים",
+    "en": "Find the opening in the fence, roughly in the middle, where the low-growing plants are.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [
+     "bush|shrub"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_campole",
+    "he2": "סמן את העמוד עם המצלמה, זה שנמצא בפינה של החניון, ליד היציאה",
+    "en": "Mark the column with the camera, which is located in the corner of the parking lot, near the exit.",
+    "rules": [],
+    "missed": [
+     "pole|post"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "he2": "עקוב אחרי האישה עם המעיל הארוך, זו שהולכת מהר, בצד הרחוק של הכיכר",
+    "en": "Follow the woman in the long coat, the one who is walking quickly, on the far side of the square.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_planks",
+    "he2": "הדגש את הערימה של הקרשים, ליד הקיר האחורי, מתחת לחלון",
+    "en": "Emphasize the pile of boards, near the back wall, underneath the window.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_halfgate",
+    "he2": "התמקד בשער הכחול בקצה השביל, זה שחצי פתוח",
+    "en": "Focus on the blue gate at the end of the path, the one that is only partially open.",
+    "rules": [],
+    "missed": [
+     "half"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_spare",
+    "he2": "מצא את הצמיג הרזרבי שמחובר לחלק האחורי של הגיפ האפור",
+    "en": "Find the spare tire that is attached to the rear of the gray jeep.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_stage3",
+    "he2": "סמן את הקבוצה של שלושת האנשים שעומדים הכי קרוב לבמה, משמאל לרמקול הגדול",
+    "en": "Identify the group of three people who are standing closest to the stage, to the left of the large speaker.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_hay",
+    "he2": "עקוב אחרי הטרקטור הירוק שעובד בשדה, זה שגורר את העגלה עם החציר",
+    "en": "Follow the green tractor working in the field, the one that is pulling the wagon filled with hay.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_fullbin",
+    "he2": "הדגש את הפח ה-orange ליד הכניסה האחורית, זה שמלא עד למעלה",
+    "en": "Highlight the orange trash can near the back entrance, the one that is completely full.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "he2": "התמקד בציפורים שיושבות על החוטים, רק אלה שמעל הכביש, לא אלה שמעל המדרכה",
+    "en": "Focus on the birds that are perched on the wires, but only those that are above the road, not those that are above the sidewalk.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_extstairs",
+    "he2": "מצא את המדרגות החיצוניות בצד של הבניין, אלה שמובילות לגג",
+    "en": "Find the exterior staircase on the side of the building, which leads to the roof.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_wrongway",
+    "he2": "סמן את הרכב היחיד בחניון שחונה הפוך, עם הפנים ליציאה",
+    "en": "Identify the only vehicle parked facing outwards in the parking lot, with its front facing the exit.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_firstrun",
+    "he2": "עקוב אחרי הקבוצה של הרצים, ספציפית אחרי זה עם ה-vest הצהוב שרץ ראשון",
+    "en": "Follow the group of runners, specifically the one wearing the yellow vest who is running first.",
+    "rules": [
+     "inline-english"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_barrel",
+    "he2": "הדגש את החבית שמונחת על הצד, ליד ערימת החול, מאחורי הבטונדות",
+    "en": "Focus on the barrel that is lying on its side, next to the pile of sand, behind the concrete blocks.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_puddle",
+    "he2": "התמקד בשלולית הגדולה באמצע הדרך, זו שמשקפת את הבניין",
+    "en": "Focus on the large puddle in the middle of the path, the one that reflects the building.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_scaffold",
+    "he2": "מצא את הסולם הכי גבוה בין אלה שנשענים על הפיגום, בצד המערבי",
+    "en": "Find the highest ladder among those leaning against the platform, on the west side.",
+    "rules": [],
+    "missed": [
+     "scaffold"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_idledozer",
+    "he2": "סמן את הדחפור הצהוב שעומד בלי לזוז ליד הבור הגדול, לא את זה שעובד",
+    "en": "Point to the yellow excavator that is standing still next to the large hole, not the one that is in operation.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_cart",
+    "he2": "עקוב אחרי העגלה של הקניות שמישהו דוחף במעלה הרחוב, ליד המכוניות החונות",
+    "en": "Watch the shopping cart someone is pushing up the street, near the parked cars.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_graffiti",
+    "he2": "הדגש את הכתובת שרשומה על הקיר, מתחת לחלון השני משמאל",
+    "en": "Highlight the address written on the wall, located below the second window on the left.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "j_pin_ferris",
+    "he2": "התמקד בגלגל הענק בקצה הפארק, ספציפית בתא התחתון שלו",
+    "en": "Focus on the large wheel at the edge of the park, specifically in its lower compartment.",
+    "rules": [],
+    "missed": [
+     "cabin|car|gondola|pod"
+    ],
+    "ok": false
+   },
+   {
+    "case": "j_pin_planters",
+    "he2": "מצא את 2 העציצים הגדולים משני צידי הדלת הראשית של המלון",
+    "en": "Find the two largest potted plants on either side of the main hotel entrance door.",
+    "rules": [
+     "hebnum-digits"
+    ],
+    "missed": [],
+    "ok": true
+   }
+  ]
+ },
+ "tgemma/military": {
+  "ok": 6,
+  "n": 20,
+  "cases": [
+   {
+    "case": "s_indian_circle",
+    "he2": "תבצע מעגל אינדיאני על המטרה מולך",
+    "en": "We will perform a traditional Native American ceremony around the target.",
+    "rules": [],
+    "missed": [
+     "circle",
+     "front"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_sitrep",
+    "he2": "טפס לגובה ותן לי תמונת מצב",
+    "en": "Climb up and give me an update.",
+    "rules": [],
+    "missed": [
+     "situation|status|picture"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_jump_point",
+    "he2": "קפוץ לנקודה ותשאר עליה",
+    "en": "Jump to the point and stay there.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_gentle_scan",
+    "he2": "תעשה לי סריקה עדינה על האזור",
+    "en": "Please perform a gentle scan of the area.",
+    "rules": [
+     "slang-sector"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_eye_junction",
+    "he2": "שים עין על הצומת ואל תרד ממנו",
+    "en": "Pay close attention to the intersection and do not leave it unattended.",
+    "rules": [],
+    "missed": [
+     "eye|watch|monitor|observe"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_zoom_suspect",
+    "he2": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+    "en": "Zoom in on the vehicle in question and secure it in the center.",
+    "rules": [],
+    "missed": [
+     "suspicious|suspect"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_route_escort",
+    "he2": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+    "en": "Get on the moving platform and follow it until the turn.",
+    "rules": [],
+    "missed": [
+     "route|axis|road"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_dead_ground",
+    "he2": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+    "en": "Take advantage of the elevation; you have a large, undeveloped area behind the hill.",
+    "rules": [],
+    "missed": [
+     "altitude|height|climb",
+     "dead"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_give_distance",
+    "he2": "רחפן 2 נכנס לאזור שלך, תן לו מרחק",
+    "en": "Drone 2 is entering your airspace, give it space.",
+    "rules": [
+     "hebnum-digits",
+     "slang-sector"
+    ],
+    "missed": [
+     "second",
+     "sector|zone|area"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_one_more_pass",
+    "he2": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+    "en": "Take another lap around the neighborhood, and then return home.",
+    "rules": [],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_grid_out",
+    "he2": "עבור לנקודת הציון שנתתי לך",
+    "en": "Please refer to the point I indicated earlier.",
+    "rules": [
+     "acronym-grid",
+     "proc-out-final"
+    ],
+    "missed": [
+     "grid|coordinates|reference|waypoint",
+     "out|over|end"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_roger_over",
+    "he2": "קיבלתי, ממשיך בסריקה",
+    "en": "I have received, and will continue scanning.",
+    "rules": [
+     "proc-roger",
+     "proc-over-final"
+    ],
+    "missed": [
+     "roger|copy|acknowledged",
+     "over"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_cp_visual",
+    "he2": "יש לי קשר עין עם עמדת הפיקוד ליד המבנה",
+    "en": "I have a clear line of sight to the command post near the building.",
+    "rules": [
+     "acronym-cp"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_eyes_on",
+    "he2": "תדווח כשיש לך עיניים על המטרה",
+    "en": "Please provide feedback once you have a clear understanding of the goal.",
+    "rules": [],
+    "missed": [
+     "report",
+     "eyes",
+     "target"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_rally_point",
+    "he2": "קיבלתי, חוזר לנקודת האיסוף",
+    "en": "I am returning to the pickup point.",
+    "rules": [
+     "abbrev-point"
+    ],
+    "missed": [
+     "roger|received|copy|got"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_feet_hold",
+    "he2": "תעלה לשמונה מאות פיט ותחכה בהמתנה מעל האזור",
+    "en": "Climb to eight hundred feet and wait there, above the area.",
+    "rules": [
+     "feet-unit"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_lost_uav",
+    "he2": "אבד קשר עם כלי הטיס הבלתי מאויש, תתחיל סריקה באזור הצפונית",
+    "en": "We have lost contact with the unmanned aircraft. Please begin a search in the northern area.",
+    "rules": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "missed": [
+     "scan"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_scramble",
+    "he2": "בצע המראה מיידית, יש משימת חירום",
+    "en": "Achieve an immediate transformation; there's an emergency situation.",
+    "rules": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ],
+    "missed": [
+     "takeoff|take off"
+    ],
+    "ok": false
+   },
+   {
+    "case": "s_obs_report",
+    "he2": "החזק תצפית על הבית הלבן, דווח כל תזוזה",
+    "en": "Maintain a constant watch over the White House, and report any movement.",
+    "rules": [
+     "proc-over-final"
+    ],
+    "missed": [],
+    "ok": true
+   },
+   {
+    "case": "s_wadi_route",
+    "he2": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+    "en": "Fly low over the valley until you reach the intersection, where you will wait.",
+    "rules": [],
+    "missed": [
+     "route|axis|road"
+    ],
+    "ok": false
+   }
+  ]
+ }
+}

@@ -1,0 +1,33 @@
+{
+ "baseline": {
+  "total": 8151,
+  "used": 110,
+  "free": 7598
+ },
+ "steps": [
+  {
+   "step": "qwen3vl (llama-server)",
+   "delta_mb": 3822,
+   "total_used_mb": 3822,
+   "free_mb": 3777
+  },
+  {
+   "step": "omdet-turbo swin-tiny",
+   "delta_mb": 863,
+   "total_used_mb": 4685,
+   "free_mb": 2913
+  },
+  {
+   "step": "sam2.1-base (ultralytics)",
+   "delta_mb": 728,
+   "total_used_mb": 5413,
+   "free_mb": 2185
+  },
+  {
+   "step": "wav2vec2-300m fp16 (ASR)",
+   "delta_mb": 104,
+   "total_used_mb": 5517,
+   "free_mb": 2081
+  }
+ ]
+}

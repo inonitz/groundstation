@@ -1,7 +1,17 @@
 #!/bin/bash
 # install-translation-models.sh -- fetch the HE<->EN translation models (backlog B/D) into
-# /root/models/translate (volume-mounted, survives container rebuilds). Idempotent.
+# /root/models/translate. WARNING (learned 2026-09-02): that path is NOT volume-mounted --
+# only models/asr, models/vlm, models/vision are. Without a host-side mount the downloads die
+# on every devenv rebuild. Host fix: mkdir /home/swapgs/models/translate and add it to the
+# devcontainer mounts like the asr/vlm entries; then this script is a one-time restore.
 set -euo pipefail
+if ! mountpoint -q /root/models/translate; then
+  echo "WARNING: /root/models/translate is NOT a mount -- downloads will be wiped on rebuild." >&2
+  if [ "${FORCE_EPHEMERAL:-0}" != "1" ]; then
+    echo "Add the host mount first (see header), or rerun with FORCE_EPHEMERAL=1 to accept ephemeral." >&2
+    exit 1
+  fi
+fi
 python3 - << 'PY'
 from huggingface_hub import snapshot_download
 for repo in ("Helsinki-NLP/opus-mt-tc-big-he-en",

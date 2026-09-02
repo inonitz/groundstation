@@ -1,400 +1,292 @@
-#!/usr/bin/env python3
-"""The Hebrew command-and-perception benchmark. One file, one command:
+"""Benchmark for the Recognizer. Run `python3 bench.py` for the full measurement.
 
-    python3 bench.py            full run, ~6 min: prints the table, writes
-                                results/<date>-bench-results.json + -bench-dump.md
-    python3 bench.py --smoke    ~30 s plumbing check on a 6+6 case slice
-    python3 bench.py --refine   adds the refine arm (measured worse in round 6; kept for reruns)
-    python3 bench.py --audit    offline scorer audit only (no GPU): every hand-written English
-                                reference must satisfy its own keyword groups
+Lanes (see main() at the bottom):
+    (default)   every sentence set through the complete Recognizer, then the planner
+    --smoke     the same lane on a 6-case slice per set, ~40 s
+    --audit     offline scorer audit, no GPU
+    --cases     regenerate CASES.md
 
-What it measures (the round-6 design; earlier rounds live in git history + results/):
-  COMMANDS   the 190 movement cases (cases_commands.py).
-             Flow: text -> [translator] -> REVISED_PROMPT on Qwen3-VL -> mission JSON -> scorer.
-  PERCEPTION the 100 multi-hop cases (cases_perception.py).
-             Flow: Hebrew -> [translator] -> English -> keyword-group scorer.
-             No planner: these route to the VLM in the real system.
-
-Arms: control-perfect-english (hand-written EN into the planner; reference text for perception),
-dictalm-alone, translategemma-alone, qwen3vl-alone, split-dictalm-commands+translategemma-
-perception (re-aggregation of cached rows, zero new compute), and optionally refine.
-
-Method invariants (established rounds 1-6): temp 0, one pass per case (determinism proven:
-10 identical requests -> 1 output), GBNF on every planning call, strictly sequential GPU
-(3 model loads: DictaLM, TranslateGemma, Qwen3-VL), Wilson 95% + exact McNemar, latency
-percentiles as columns. Prompts and grammars live in prompts.py."""
-import argparse, datetime, json, math, os, subprocess, sys, time, urllib.request
+Method invariants: temperature 0, one pass per case (determinism proven: 10 identical
+requests -> 1 output), GBNF grammar on every planning call, one model on GPU at a time,
+Wilson 95% intervals. Superseded lanes (rounds 1-6, the ablations) live in git history;
+their results stay under results/ and results/HISTORY.md.
+"""
+import argparse
+import datetime
+import json
+import math
+import os
+import re
+import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+# The component lives in integration_harden; the bench measures it IN PLACE (dedup ruling
+# 2026-09-02: no copies in two homes).
+sys.path.insert(0, os.path.join(ROOT, "projects", "integration_harden", "recognizer"))
 sys.path.insert(0, HERE)
-from prompts import (REVISED_PROMPT, PLANNER_SHOTS_D, PLANNER_SHOTS_D_HE, HE_SIGN_ADDENDUM, WIRE_GRAMMAR, LINE_GRAMMAR,
-                     TRANSLATE_SYS, TRANSLATE_SHOTS, TGEMMA_PROMPT, TGEMMA_REFINE)
-from cases_commands import CASES as CMD_CASES, score
+
+import recognizer
+from llama import LlamaServer, chat, port_up, MODELS, QWEN3VL_EXTRA, PORT
+from prompts import (REVISED_PROMPT, PLANNER_SHOTS_D, WIRE_GRAMMAR, LINE_GRAMMAR,
+                     TRANSLATE_SYS, TRANSLATE_SHOTS)
+from cases_commands import CASES as CMD_CASES, VERBOSE_CASES, EMERGENCY_CASES, score
 from cases_perception import PERC100, SLANG20, score_perception, check_refs
 
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
-BIN = os.path.join(ROOT, "build", "release", "shared", "dji", "bin")
-PORT, PORT2 = 18091, 18090
-MODELS = {
- "dicta":   "/root/models/asr/dictalm-3-1.7b/dictalm-3.0-1.7b-instruct-q4_k_m.gguf",
- "tgemma":  "/root/models/translate/translategemma-4b-it-gguf/translategemma-4b-it.Q4_K_M.gguf",
- "qwen3vl": "/root/models/vlm/Qwen3-VL-4B-Instruct/Qwen3-VL-4B-Instruct-Q4_K_M.gguf",
-}
-QWEN3VL_EXTRA = ("--mmproj", "/root/models/vlm/Qwen3-VL-4B-Instruct/mmproj-BF16.gguf",
-                 "--flash-attn", "on", "--cache-type-k", "q4_0", "--cache-type-v", "q4_0")
+RESULTS_DIR = os.path.join(HERE, "results")
 
-# ---------- server + request plumbing ----------
-def port_up(port):
-    try:
-        urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1)
-        return True
-    except Exception:
-        return False
+# The planner speaks the wire schema (dx/dy/dz); the scorer speaks x/y/z.
+PLANNER_KEYS = {"takeoff": set(), "land": set(), "fly_by": {"dx", "dy", "dz", "velocity"},
+                "spin_by": {"degrees"}, "delay": {"seconds"}}
+SCORER_KEY = {"dx": "x", "dy": "y", "dz": "z", "degrees": "degrees", "seconds": "seconds"}
 
-class LlamaServer:
-    def __init__(self, model, port=PORT, extra=()):
-        self.args = [os.path.join(BIN, "llama-server"), "-m", model,
-                     "-dev", "Vulkan0", "-ngl", "99", "-c", "4096", "--temp", "0.0",
-                     "--host", "127.0.0.1", "--port", str(port), "--threads", "1", *extra]
-        self.port, self.proc = port, None
-    def __enter__(self):
-        env = dict(os.environ, LD_LIBRARY_PATH=BIN + ":" + os.environ.get("LD_LIBRARY_PATH", ""))
-        self.proc = subprocess.Popen(self.args, env=env,
-                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        for _ in range(120):
-            if port_up(self.port): return self
-            if self.proc.poll() is not None:
-                raise RuntimeError(f"llama-server died on startup (port {self.port})")
-            time.sleep(1)
-        raise RuntimeError(f"llama-server not healthy after 120s (port {self.port})")
-    def __exit__(self, *a):
-        self.proc.terminate()
-        try: self.proc.wait(timeout=15)
-        except Exception: self.proc.kill(); self.proc.wait()
-        for _ in range(20):
-            if not port_up(self.port): break
-            time.sleep(0.5)
-        time.sleep(1)
 
-def _request(url, payload, retries=90):
-    req = urllib.request.Request(url, json.dumps(payload).encode(),
-                                 {"Content-Type": "application/json"})
-    for i in range(retries):                       # 503 while the model loads
-        t0 = time.time()
-        try:
-            with urllib.request.urlopen(req, timeout=180) as r:
-                return json.load(r), time.time() - t0
-        except urllib.error.HTTPError as e:
-            if e.code == 503 and i < retries - 1: time.sleep(1); continue
-            raise
-    raise RuntimeError("server never ready")
+# ------------------------------- model call wrappers -------------------------------
 
-def chat(port, system, user, max_tokens=300, grammar=None, shots=()):
-    msgs = [{"role": "system", "content": system}]
-    for u, a in shots:
-        msgs += [{"role": "user", "content": u}, {"role": "assistant", "content": a}]
-    msgs.append({"role": "user", "content": user})
-    payload = {"messages": msgs, "max_tokens": max_tokens, "temperature": 0.0}
-    if grammar: payload["grammar"] = grammar
-    out, dt = _request(f"http://127.0.0.1:{port}/v1/chat/completions", payload)
-    return out["choices"][0]["message"]["content"], dt
+def make_translator(port):
+    """The stage-3 callable injected into recognize(). On the number-guard retry the
+    required numbers are named to the model."""
+    def translate(he, required_numbers=None):
+        system = TRANSLATE_SYS
+        if required_numbers:
+            listed = ", ".join(str(int(x)) if x == int(x) else str(x) for x in required_numbers)
+            system += "\nThe English MUST contain exactly these numbers: " + listed
+        text, _ = chat(port, system, he, max_tokens=200, grammar=LINE_GRAMMAR,
+                       shots=TRANSLATE_SHOTS)
+        text = text.strip()
+        # Copy guard: an output identical to a few-shot answer is an echo, not a translation.
+        if any(text == answer for question, answer in TRANSLATE_SHOTS if question != he):
+            retry, _ = chat(port, TRANSLATE_SYS + "\nTranslate ONLY the given sentence.",
+                            he, max_tokens=200, grammar=LINE_GRAMMAR)
+            if retry.strip():
+                text = retry.strip()
+        return text
+    return translate
 
-def completion(port, prompt, max_tokens=80, grammar=None):
-    payload = {"prompt": prompt, "n_predict": max_tokens, "temperature": 0.0}
-    if grammar: payload["grammar"] = grammar
-    out, dt = _request(f"http://127.0.0.1:{port}/completion", payload)
-    return out["content"], dt
 
-# ---------- stages ----------
-def translate_all(port, cases):
-    out = []
-    for c in cases:
-        t, dt = chat(port, TRANSLATE_SYS, c[1], max_tokens=80,
-                     grammar=LINE_GRAMMAR, shots=TRANSLATE_SHOTS)
-        out.append((c[0], t.strip(), dt))
-    return out
-
-def tgemma_translate_all(port, cases):
-    out = []
-    for c in cases:
-        t, dt = completion(port, TGEMMA_PROMPT.format(he=c[1]), max_tokens=80, grammar=LINE_GRAMMAR)
-        out.append((c[0], t.strip(), dt))
-    return out
-
-ALLOWED_D = {"takeoff": set(), "land": set(), "fly_by": {"dx","dy","dz","velocity"},
-             "spin_by": {"degrees"}, "delay": {"seconds"}}
-import re
-def parse_d(out):
+def plan(port, english):
+    """One planner call: English command in, wire-schema mission out (or None on bad JSON)."""
+    out, dt = chat(port, REVISED_PROMPT, english, grammar=WIRE_GRAMMAR, shots=PLANNER_SHOTS_D)
     m = re.search(r"\[.*\]", out or "", re.S)
-    if not m: return None
-    try: arr = json.loads(m.group(0))
-    except Exception: return None
-    if not isinstance(arr, list): return None
-    norm = []
-    for a in arr:
-        if not isinstance(a, dict) or a.get("type") not in ALLOWED_D: return None
-        if any(k != "type" and k not in ALLOWED_D[a["type"]] for k in a): return None
-        b = {"type": a["type"]}
-        for src, dst in (("dx","x"), ("dy","y"), ("dz","z"), ("degrees","degrees"), ("seconds","seconds")):
-            if src in a: b[dst] = a[src]
-        norm.append(b)          # velocity dropped: scorer judges geometry, the app clamps velocity
-    return norm
+    if not m:
+        return None, dt
+    try:
+        mission = json.loads(m.group(0))
+    except Exception:
+        return None, dt
+    if not isinstance(mission, list):
+        return None, dt
+    for step in mission:
+        if not isinstance(step, dict) or step.get("type") not in PLANNER_KEYS:
+            return None, dt
+        if any(k != "type" and k not in PLANNER_KEYS[step["type"]] for k in step):
+            return None, dt
+    return mission, dt
 
-def plan_all(port, texts, cmd_cases):
-    rows, by_name = [], {c[0]: c for c in cmd_cases}
-    for name, text, t_tr in texts:
-        out, t_plan = chat(port, REVISED_PROMPT, text, grammar=WIRE_GRAMMAR, shots=PLANNER_SHOTS_D)
-        rows.append({"case": name, "score": score(parse_d(out), by_name[name][3]), "input": text,
-                     "t_translate_ms": round(t_tr * 1000), "t_plan_ms": round(t_plan * 1000),
-                     "out": (out or "")[:200]})
-    return rows
 
-# ---------- stats ----------
+def to_scorer_schema(mission):
+    """dx/dy/dz -> x/y/z; velocity is dropped (the scorer judges geometry, the app clamps it)."""
+    out = []
+    for step in mission:
+        converted = {"type": step["type"]}
+        for k, v in step.items():
+            if k in SCORER_KEY:
+                converted[SCORER_KEY[k]] = v
+        out.append(converted)
+    return out
+
+
+# ------------------------------------ statistics ------------------------------------
+
 def pct(xs, p):
-    xs = sorted(xs); k = (len(xs) - 1) * p / 100.0
-    f = math.floor(k); c = min(f + 1, len(xs) - 1)
-    return xs[f] + (xs[c] - xs[f]) * (k - f)
+    xs = sorted(xs)
+    k = (len(xs) - 1) * p / 100.0
+    f = math.floor(k)
+    c = min(f + 1, len(xs) - 1)
+    return round(xs[f] + (xs[c] - xs[f]) * (k - f))
+
 
 def wilson(ok, n, z=1.96):
-    p = ok / n; d = 1 + z * z / n
+    p = ok / n
+    d = 1 + z * z / n
     centre = (p + z * z / (2 * n)) / d
     half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
     return centre - half, centre + half
 
-def mcnemar(rows_a, rows_b, okfn):
-    a = {r["case"]: okfn(r) for r in rows_a}; b = {r["case"]: okfn(r) for r in rows_b}
-    n01 = sum(1 for c in a if a[c] and not b[c]); n10 = sum(1 for c in a if not a[c] and b[c])
-    n = n01 + n10
-    p = 1.0 if n == 0 else min(1.0, sum(math.comb(n, k) for k in range(min(n01, n10)+1)) / 2**n * 2)
-    return {"only_a": n01, "only_b": n10, "p": round(p, 6)}
 
-def cmd_summarize(arm, rows):
-    n = len(rows)
-    ok = sum(1 for r in rows if r["score"].startswith(("CORRECT", "valid")))
-    lo, hi = wilson(ok, n)
-    e2e = [r["t_translate_ms"] + r["t_plan_ms"] for r in rows]
-    lat = {f"p{p}": round(pct(e2e, p)) for p in (25, 50, 75, 95, 99)}; lat["max"] = max(e2e)
-    print(f"  commands {arm}: {ok}/{n} ({ok/n:.1%}) wilson95 [{lo:.1%},{hi:.1%}]  "
-          + "  ".join(f"{k}={v}" for k, v in lat.items()), flush=True)
-    fails = [r for r in rows if not r["score"].startswith(("CORRECT", "valid"))]
-    for r in fails[:12]:
-        print(f"    FAIL {r['case']:14s} {r['score']:24s} in={r['input'][:55]!r}", flush=True)
-    if len(fails) > 12: print(f"    ... +{len(fails)-12} more fails (see json)", flush=True)
-    return {"ok": ok, "n": n, "acc": ok / n, "wilson95": [round(lo,3), round(hi,3)],
-            "latency_e2e_ms": lat, "cases": rows}
+def latency_row(label, xs):
+    cells = " | ".join(str(pct(xs, p)) for p in (25, 50, 75, 95, 99))
+    return f"| {label} | {cells} | {max(xs)} |"
 
-def perc_summarize(arm, translations, perc_cases):
-    rows, by = [], {c[0]: c for c in perc_cases}
-    for name, en, dt in translations:
-        _, he, ref, groups, hops = by[name]
-        missed = score_perception(en, groups)
-        rows.append({"case": name, "hops": hops, "he": he, "en": en, "t_ms": round(dt*1000),
-                     "missed": ["|".join(g) for g in missed], "ok": not missed,
-                     "groups_total": len(groups), "groups_kept": len(groups) - len(missed)})
-    n, ok = len(rows), sum(1 for r in rows if r["ok"])
-    lo, hi = wilson(ok, n)
-    gt = sum(r["groups_total"] for r in rows); gk = sum(r["groups_kept"] for r in rows)
-    lat = [r["t_ms"] for r in rows]
-    pcts = {f"p{p}": round(pct(lat, p)) for p in (25, 50, 75, 95, 99)}; pcts["max"] = max(lat)
-    by_hops = {h: {"n": len(hr), "ok": sum(1 for r in hr if r["ok"])}
-               for h in sorted({r["hops"] for r in rows})
-               for hr in [[r for r in rows if r["hops"] == h]]}
-    print(f"  perception {arm}: {ok}/{n} ({ok/n:.0%}) wilson95 [{lo:.0%},{hi:.0%}] "
-          f"groups {gk}/{gt} ({gk/gt:.0%}) depth " +
-          " ".join(f"d{h}:{s['ok']}/{s['n']}" for h, s in by_hops.items()), flush=True)
-    return {"ok": ok, "n": n, "wilson95": [round(lo,3), round(hi,3)],
-            "groups_kept": gk, "groups_total": gt, "latency_ms": pcts,
-            "by_depth": by_hops, "cases": rows}
 
-def direct_probe():
-    """Hebrew text straight into DictaLM as the PLANNER (no translation, no Qwen). The
-    intent-parser lane's step 1: round 3 scored 80% with the old prompt; this is the revised
-    prompt + Hebrew shots + dx grammar. Paired against the stored round-6 command rows."""
+# ------------------------------- the measurement lane -------------------------------
+
+def run_recognizer(smoke=False):
+    """Every sentence set through the complete Recognizer; command sets continue to the
+    planner. Prints the scorecard, writes the raw JSON."""
+    assert not port_up(PORT), "a llama-server is already running; this bench is sequential"
+    cut = 6 if smoke else None
+    sets = {"emergency": EMERGENCY_CASES[:cut], "std190": CMD_CASES[:cut],
+            "verbose": VERBOSE_CASES[:cut], "perception": PERC100[:cut],
+            "military": SLANG20[:cut]}
     t0 = time.time()
-    print(f"== direct-Hebrew planning on DictaLM: {len(CMD_CASES)} commands ==", flush=True)
-    rows, by_name = [], {c[0]: c for c in CMD_CASES}
-    with LlamaServer(MODELS["dicta"]):
-        for name, he, en, exp in CMD_CASES:
-            out, dt = chat(PORT, REVISED_PROMPT + HE_SIGN_ADDENDUM, he, grammar=WIRE_GRAMMAR, shots=PLANNER_SHOTS_D_HE)
-            rows.append({"case": name, "score": score(parse_d(out), exp), "input": he,
-                         "t_translate_ms": 0, "t_plan_ms": round(dt*1000), "out": (out or "")[:200]})
-    s = cmd_summarize("dictalm-direct-plan", rows)
-    ref = None
-    for f in sorted(os.listdir(os.path.join(HERE, "results"))):
-        if f.endswith("-bench-results.json"): ref = os.path.join(HERE, "results", f)
-    ok_cmd = lambda r: r["score"].startswith(("CORRECT", "valid"))
-    mn = {}
-    if ref:
-        R = json.load(open(ref))["arms"]
-        for base in ("dictalm-alone", "control-perfect-english"):
-            mn[f"direct vs {base}"] = mcnemar(rows, R[base]["commands"]["cases"], ok_cmd)
-            print(f"McNemar direct vs {base}: {mn[f'direct vs {base}']}", flush=True)
-    stamp = datetime.date.today().isoformat()
-    out = os.path.join(HERE, "results", f"{stamp}-direct-results.json")
-    json.dump({"arm": s, "mcnemar": mn, "vs": ref, "wall_s": round(time.time()-t0)},
-              open(out, "w"), ensure_ascii=False, indent=1)
-    print(f"results -> {out}\nwall {round(time.time()-t0)}s", flush=True)
 
-def slang_probe():
-    """Hebrew military phraseology -> each translator once -> keyword scorer, split by class."""
-    t0 = time.time()
-    out = {}
-    print(f"== slang probe: {len(SLANG20)} sentences x 3 translators ==", flush=True)
+    # Pass 1, DictaLM resident: stages 0-6 on everything. Stage-0 fires on non-emergency
+    # sentences are false positives and are reported, not hidden.
+    recognized = {}
+    stage0_false = []
+    print("== Recognizer pass (DictaLM resident) ==", flush=True)
     with LlamaServer(MODELS["dicta"]):
-        out["hebrew->dictalm->english"] = translate_all(PORT, SLANG20)
-    with LlamaServer(MODELS["tgemma"], extra=("--chat-template", "gemma")):
-        out["hebrew->translategemma->english"] = tgemma_translate_all(PORT, SLANG20)
+        translate = make_translator(PORT)
+        for set_name, cases in sets.items():
+            rows = []
+            for case in cases:
+                name, hebrew = case[0], case[1]
+                t_start = time.time()
+                kind, payload, flags = recognizer.recognize(hebrew, translate)
+                if kind == "emergency" and set_name != "emergency":
+                    stage0_false.append((set_name, name, hebrew))
+                rows.append({"case": name, "kind": kind, "payload": payload,
+                             "flags": flags, "t_ms": round((time.time() - t_start) * 1000)})
+            recognized[set_name] = rows
+            print(f"  {set_name}: {len(rows)} sentences", flush=True)
+
+    results = {"emergency": {
+        "ok": sum(1 for r in recognized["emergency"] if r["kind"] == "emergency"),
+        "n": len(recognized["emergency"])}}
+
+    # Perception sets are scored on the Recognizer's English; the VLM is not simulated.
+    for set_name, cases in (("perception", sets["perception"]), ("military", sets["military"])):
+        groups = {c[0]: c[3] for c in cases}
+        ok = sum(1 for r in recognized[set_name]
+                 if r["kind"] == "english" and not score_perception(r["payload"], groups[r["case"]]))
+        results[set_name] = {"ok": ok, "n": len(recognized[set_name])}
+
+    # Pass 2, Qwen3-VL resident: command sets continue to the planner and mission scoring.
+    print("== planner pass (Qwen3-VL resident) ==", flush=True)
     with LlamaServer(MODELS["qwen3vl"], extra=QWEN3VL_EXTRA):
-        out["hebrew->qwen3vl->english"] = translate_all(PORT, SLANG20)
+        for set_name, cases in (("std190", sets["std190"]), ("verbose", sets["verbose"])):
+            expected = {c[0]: c[3] for c in cases}
+            rows = []
+            for r in recognized[set_name]:
+                if r["kind"] == "mission":
+                    verdict = score(to_scorer_schema(r["payload"]), expected[r["case"]])
+                    rows.append({"case": r["case"], "score": verdict, "t_total_ms": 0})
+                elif r["kind"] == "english":
+                    mission, t_plan = plan(PORT, r["payload"])
+                    verdict = score(to_scorer_schema(mission) if mission is not None else None,
+                                    expected[r["case"]])
+                    rows.append({"case": r["case"], "score": verdict,
+                                 "t_total_ms": r["t_ms"] + round(t_plan * 1000)})
+                else:                            # rejected or false-positive emergency
+                    rows.append({"case": r["case"], "score": f"routed:{r['kind']}",
+                                 "t_total_ms": r["t_ms"]})
+            ok = sum(1 for r in rows if r["score"].startswith(("CORRECT", "valid")))
+            n = len([r for r in rows if not r["score"].startswith("routed:")])
+            results[set_name] = {"ok": ok, "n": n, "rows": rows}
+            fails = [r for r in rows if not r["score"].startswith(("CORRECT", "valid", "routed:"))]
+            for r in fails[:8]:
+                print(f"    FAIL {r['case']:16s} {r['score']}", flush=True)
 
-    by = {c[0]: c for c in SLANG20}
-    arms = {}
-    for arm, tr in out.items():
-        rows = []
-        for name, en, dt in tr:
-            _, he, ref, groups, klass = by[name]
-            missed = score_perception(en, groups)
-            rows.append({"case": name, "class": klass, "he": he, "en": en, "t_ms": round(dt*1000),
-                         "missed": ["|".join(g) for g in missed], "ok": not missed})
-        n, ok = len(rows), sum(1 for r in rows if r["ok"])
-        byc = {k: (sum(1 for r in rows if r["class"] == k and r["ok"]),
-                   sum(1 for r in rows if r["class"] == k)) for k in ("idiom", "acronym")}
-        print(f"  {arm}: {ok}/{n}  idiom {byc['idiom'][0]}/{byc['idiom'][1]}  "
-              f"acronym {byc['acronym'][0]}/{byc['acronym'][1]}", flush=True)
-        arms[arm] = {"ok": ok, "n": n, "by_class": byc, "cases": rows}
-
+    _print_scorecard(results, recognized, stage0_false)
     stamp = datetime.date.today().isoformat()
-    outp = os.path.join(HERE, "results", f"{stamp}-slang-results.json")
-    json.dump({"arms": arms, "wall_s": round(time.time()-t0)}, open(outp, "w"),
-              ensure_ascii=False, indent=1)
-    dump = os.path.join(HERE, "results", f"{stamp}-slang-dump.md")
-    with open(dump, "w") as f:
-        f.write("# Military-phraseology translations -- full dump for owner review\n\n")
-        f.write("| case | class | Hebrew | reference | dictalm | translategemma | qwen3vl | missed d/t/q |\n")
-        f.write("|---|---|---|---|---|---|---|---|\n")
-        P = {a: {r["case"]: r for r in arms[a]["cases"]} for a in arms}
-        d, t, q = (P[a] for a in ("hebrew->dictalm->english", "hebrew->translategemma->english",
-                                  "hebrew->qwen3vl->english"))
-        for name, he, ref, groups, klass in SLANG20:
-            miss = " / ".join((", ".join(x[name]["missed"]) or "-") for x in (d, t, q))
-            f.write(f"| {name} | {klass} | {he} | {ref} | {d[name]['en']} | {t[name]['en']} | {q[name]['en']} | {miss} |\n")
-    print(f"\nresults -> {outp}\ndump -> {dump}\nwall {round(time.time()-t0)}s", flush=True)
+    out = os.path.join(RESULTS_DIR, f"{stamp}-recognizer{'-smoke' if smoke else ''}.json")
+    json.dump({"results": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                           for k, v in results.items()},
+               "stage0_false_positives": stage0_false, "recognized": recognized,
+               "wall_s": round(time.time() - t0)},
+              open(out, "w"), ensure_ascii=False, indent=1)
+    print(f"raw -> {out}\nwall {round(time.time() - t0)}s", flush=True)
 
-# ---------- main ----------
+
+def _print_scorecard(results, recognized, stage0_false):
+    print("\n| set | result |")
+    print("|---|---|")
+    total_ok = total_n = 0
+    for name in ("emergency", "std190", "verbose", "perception", "military"):
+        r = results[name]
+        total_ok += r["ok"]
+        total_n += r["n"]
+        print(f"| {name} | {r['ok']}/{r['n']} ({r['ok']/r['n']:.0%}) |")
+    print(f"| ALL | {total_ok}/{total_n} ({total_ok/total_n:.0%}) |")
+    print("\n| set / stage | p25 | p50 | p75 | p95 | p99 | max (ms) |")
+    print("|---|---|---|---|---|---|---|")
+    for name in ("std190", "verbose"):
+        if "rows" in results[name]:
+            print(latency_row(f"{name}: Recognizer + planner",
+                              [r["t_total_ms"] for r in results[name]["rows"]]))
+    for name in ("perception", "military"):
+        print(latency_row(f"{name}: Recognizer only",
+                          [r["t_ms"] for r in recognized[name]]))
+    print(f"\nstage-0 false positives: {len(stage0_false)} {stage0_false or ''}")
+
+
+# --------------------------------- secondary lanes ---------------------------------
+
+def audit():
+    """No GPU: every hand-written English reference must satisfy its own keyword groups,
+    and the component self-test must be clean."""
+    bad = check_refs() + recognizer.selftest()
+    if bad:
+        print("\n".join(str(b) for b in bad))
+        raise SystemExit(1)
+    print("audit CLEAN: scorer references and recognizer self-test all pass")
+
+
+def write_cases_md():
+    """Regenerate CASES.md, the human-readable inventory of every tested sentence."""
+    def expected_text(e):
+        if e is None:
+            return "open-ended (validity only)"
+        if e == []:
+            return "[] (no action)"
+        return "; ".join(f"{t}" + (f" {k}={v}" if k else "") for t, k, v in e)
+
+    with open(os.path.join(HERE, "CASES.md"), "w") as f:
+        f.write("# Every sentence the bench tests\n\nGenerated by `python3 bench.py --cases`"
+                " -- edit the cases_*.py files, not this.\n")
+        f.write(f"\n## Commands ({len(CMD_CASES)}) -- scored as mission JSON\n\n"
+                "| # | id | Hebrew | English reference | expected |\n|---|---|---|---|---|\n")
+        for i, (name, he, en, exp) in enumerate(CMD_CASES, 1):
+            f.write(f"| {i} | {name} | {he} | {en} | {expected_text(exp)} |\n")
+        f.write(f"\n## Verbose commands ({len(VERBOSE_CASES)})\n\n"
+                "| # | id | Hebrew | English reference | expected |\n|---|---|---|---|---|\n")
+        for i, (name, he, en, exp) in enumerate(VERBOSE_CASES, 1):
+            f.write(f"| {i} | {name} | {he} | {en} | {expected_text(exp)} |\n")
+        f.write(f"\n## Emergency ({len(EMERGENCY_CASES)}) -- must be caught by stage 0\n\n"
+                "| # | id | Hebrew |\n|---|---|---|\n")
+        for i, (name, he) in enumerate(EMERGENCY_CASES, 1):
+            f.write(f"| {i} | {name} | {he} |\n")
+        f.write(f"\n## Perception ({len(PERC100)}) -- scored by keyword preservation\n\n"
+                "| # | id | depth | Hebrew | English reference |\n|---|---|---|---|---|\n")
+        for i, (name, he, en, g, depth) in enumerate(PERC100, 1):
+            f.write(f"| {i} | {name} | {depth} | {he} | {en} |\n")
+        f.write(f"\n## Military phraseology ({len(SLANG20)})\n\n"
+                "| # | id | class | Hebrew | English reference |\n|---|---|---|---|---|\n")
+        for i, (name, he, en, g, klass) in enumerate(SLANG20, 1):
+            f.write(f"| {i} | {name} | {klass} | {he} | {en} |\n")
+    print(f"CASES.md written: {len(CMD_CASES)}+{len(VERBOSE_CASES)} commands, "
+          f"{len(EMERGENCY_CASES)} emergency, {len(PERC100)} perception, {len(SLANG20)} military")
+
+
+# --------------------------------------- main ---------------------------------------
+
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--smoke", action="store_true", help="6+6 case slice, ~30 s")
-    ap.add_argument("--refine", action="store_true", help="add the refine arm (rejected round 6)")
-    ap.add_argument("--audit", action="store_true", help="offline scorer audit, no GPU")
-    ap.add_argument("--direct", action="store_true", help="direct-Hebrew planning on DictaLM "
-                    "(revised prompt + Hebrew shots, no translation) vs stored round-6 rows")
-    ap.add_argument("--slang", action="store_true", help="military-phraseology probe only (~3 min): "
-                    "SLANG20 through the three translators, split idiom vs acronym class")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--smoke", action="store_true", help="6-case slice per set, ~40 s")
+    parser.add_argument("--audit", action="store_true", help="offline checks only, no GPU")
+    parser.add_argument("--cases", action="store_true", help="regenerate CASES.md and exit")
+    args = parser.parse_args()
 
-    bad = check_refs()
-    assert not bad, f"reference/group mismatch: {bad}"
     if args.audit:
-        print("scorer audit CLEAN: all 100 references satisfy their own keyword groups")
-        return
-    assert not port_up(PORT) and not port_up(PORT2), \
-        "a llama-server is already running -- stop it first; this bench is strictly sequential"
-    if args.slang:
-        return slang_probe()
-    if args.direct:
-        return direct_probe()
-    CMD = CMD_CASES[:6] if args.smoke else CMD_CASES
-    PERC = PERC100[:6] if args.smoke else PERC100
-    t0 = time.time()
+        audit()
+    elif args.cases:
+        write_cases_md()
+    else:
+        audit()                                  # never measure with a broken scorer
+        run_recognizer(smoke=args.smoke)
 
-    print(f"== [1/3] DictaLM: translate {len(CMD)} commands + {len(PERC)} perception ==", flush=True)
-    with LlamaServer(MODELS["dicta"]):
-        cmd_dicta = translate_all(PORT, CMD)
-        perc_dicta = translate_all(PORT, PERC)
-
-    print(f"== [2/3] TranslateGemma: translate {len(CMD)}+{len(PERC)}"
-          + (f", refine {len(PERC)} drafts" if args.refine else "") + " ==", flush=True)
-    with LlamaServer(MODELS["tgemma"], extra=("--chat-template", "gemma")):
-        cmd_tg = tgemma_translate_all(PORT, CMD)
-        perc_tg = tgemma_translate_all(PORT, PERC)
-        perc_refine = []
-        if args.refine:
-            draft = {n: (en, dt) for n, en, dt in perc_dicta}
-            for name, he, ref, groups, hops in PERC:
-                t, dt = completion(PORT, TGEMMA_REFINE.format(he=he, draft=draft[name][0]),
-                                   max_tokens=100, grammar=LINE_GRAMMAR)
-                perc_refine.append((name, t.strip(), dt + draft[name][1]))  # latency: draft + refine
-
-    print(f"== [3/3] Qwen3-VL: translate {len(CMD)}+{len(PERC)}, then plan the command sets ==", flush=True)
-    arms = {}
-    with LlamaServer(MODELS["qwen3vl"], extra=QWEN3VL_EXTRA):
-        cmd_qw = translate_all(PORT, CMD)
-        perc_qw = translate_all(PORT, PERC)
-        en_ref = [(c[0], c[2], 0.0) for c in CMD]
-        for arm, cmd_texts, perc_rows in (
-                ("control-perfect-english", en_ref, [(c[0], c[2], 0.0) for c in PERC]),
-                ("dictalm-alone", cmd_dicta, perc_dicta),
-                ("translategemma-alone", cmd_tg, perc_tg),
-                ("qwen3vl-alone", cmd_qw, perc_qw)):
-            print(f"-- arm {arm}", flush=True)
-            arms[arm] = {"commands": cmd_summarize(arm, plan_all(PORT, cmd_texts, CMD)),
-                         "perception": perc_summarize(arm, perc_rows, PERC)}
-        if args.refine:
-            print("-- arm refine (perception only new; commands shared with dictalm-alone)", flush=True)
-            arms["refine-dictalm-draft->translategemma-final"] = {
-                "commands": arms["dictalm-alone"]["commands"],
-                "perception": perc_summarize("refine", perc_refine, PERC),
-                "note": "commands shared with dictalm-alone"}
-        arms["split-dictalm-commands+translategemma-perception"] = {
-            "commands": arms["dictalm-alone"]["commands"],
-            "perception": arms["translategemma-alone"]["perception"],
-            "note": "re-aggregation of cached rows, zero new compute"}
-
-    ok_cmd = lambda r: r["score"].startswith(("CORRECT", "valid"))
-    ok_perc = lambda r: r["ok"]
-    mn = {
-     "commands control vs dictalm": mcnemar(arms["control-perfect-english"]["commands"]["cases"],
-                                            arms["dictalm-alone"]["commands"]["cases"], ok_cmd),
-     "commands dictalm vs translategemma": mcnemar(arms["dictalm-alone"]["commands"]["cases"],
-                                                   arms["translategemma-alone"]["commands"]["cases"], ok_cmd),
-     "commands dictalm vs qwen3vl": mcnemar(arms["dictalm-alone"]["commands"]["cases"],
-                                            arms["qwen3vl-alone"]["commands"]["cases"], ok_cmd),
-     "perception translategemma vs dictalm": mcnemar(arms["translategemma-alone"]["perception"]["cases"],
-                                                     arms["dictalm-alone"]["perception"]["cases"], ok_perc),
-    }
-    if args.refine:
-        R = arms["refine-dictalm-draft->translategemma-final"]["perception"]["cases"]
-        mn["perception refine vs translategemma"] = mcnemar(R, arms["translategemma-alone"]["perception"]["cases"], ok_perc)
-        mn["perception refine vs dictalm"] = mcnemar(R, arms["dictalm-alone"]["perception"]["cases"], ok_perc)
-    for k, v in mn.items(): print(f"McNemar {k}: {v}", flush=True)
-
-    stamp = datetime.date.today().isoformat()
-    out = os.path.join(HERE, "results", f"{stamp}-bench-results.json")
-    json.dump({"arms": arms, "mcnemar": mn, "smoke": args.smoke, "wall_s": round(time.time()-t0)},
-              open(out, "w"), ensure_ascii=False, indent=1)
-
-    dump = os.path.join(HERE, "results", f"{stamp}-bench-dump.md")
-    with open(dump, "w") as f:
-        f.write("# Perception translations -- full dump for owner review\n\n")
-        f.write("Check relation inversions here; the keyword scorer cannot see them.\n\n")
-        cols = ["dictalm-alone", "translategemma-alone", "qwen3vl-alone"] + \
-               (["refine-dictalm-draft->translategemma-final"] if args.refine else [])
-        f.write("| case | depth | Hebrew | reference | " + " | ".join(cols) + " | missed |\n")
-        f.write("|" + "---|" * (5 + len(cols)) + "\n")
-        P = {a: {c["case"]: c for c in arms[a]["perception"]["cases"]} for a in cols}
-        for name, he, ref, groups, hops in PERC:
-            ens = " | ".join(P[a][name]["en"] for a in cols)
-            miss = " / ".join((", ".join(P[a][name]["missed"]) or "-") for a in cols)
-            f.write(f"| {name} | {hops} | {he} | {ref} | {ens} | {miss} |\n")
-
-    print("\n| arm | commands acc | perception all-groups | perception groups kept | cmd p50 | perc p50 (ms) |")
-    print("|---|---|---|---|---|---|")
-    for name, a in arms.items():
-        c, p = a["commands"], a["perception"]
-        print(f"| {name} | {c['ok']}/{c['n']} ({c['acc']:.0%}) | {p['ok']}/{p['n']} ({p['ok']/p['n']:.0%}) "
-              f"| {p['groups_kept']}/{p['groups_total']} ({p['groups_kept']/p['groups_total']:.0%}) "
-              f"| {c['latency_e2e_ms']['p50']} | {p['latency_ms']['p50']} |")
-    print(f"\nresults -> {out}\ndump -> {dump}\nwall {round(time.time()-t0)}s", flush=True)
 
 if __name__ == "__main__":
     main()

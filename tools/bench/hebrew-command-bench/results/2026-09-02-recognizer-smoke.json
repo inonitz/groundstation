@@ -1,0 +1,317 @@
+{
+ "results": {
+  "emergency": {
+   "ok": 6,
+   "n": 6
+  },
+  "perception": {
+   "ok": 4,
+   "n": 6
+  },
+  "military": {
+   "ok": 5,
+   "n": 6
+  },
+  "std190": {
+   "ok": 6,
+   "n": 6
+  },
+  "verbose": {
+   "ok": 4,
+   "n": 6
+  }
+ },
+ "stage0_false_positives": [],
+ "recognized": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stopstop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_now",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_emergency",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_all",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_english",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin90cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 90.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "combo3",
+    "kind": "english",
+    "payload": "Fly up ten meters, turn right 90 degrees, then fly forward five meters",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 137
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "kind": "english",
+    "payload": "Okay, here's the command: \"Fly forward, then ascend five meters, then turn right 90 degrees.\"",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 164
+   },
+   {
+    "case": "v_listen3_g1",
+    "kind": "english",
+    "payload": "Okay, here's the command: \"Fly up 20 meters, then turn right 45 degrees, and finally fly forward 12 meters.\"",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 212
+   },
+   {
+    "case": "v_listen3_g2",
+    "kind": "english",
+    "payload": "Okay, here's the command: Fly back 4 meters, then fly left 3 meters, and finally fly down 2 meters.",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 184
+   },
+   {
+    "case": "v_listen3_g3",
+    "kind": "english",
+    "payload": "Here's the translated command in English: \"Fly forward 25 meters, then turn right 180 degrees, and then fly right 6 meters.\"",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 297
+   },
+   {
+    "case": "v_finish3_g0",
+    "kind": "english",
+    "payload": "Take off, when you finish, rise 5 meters, and at the end, turn 90 degrees clockwise",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 165
+   },
+   {
+    "case": "v_finish3_g1",
+    "kind": "english",
+    "payload": "Fly forward 12 meters, then turn right 45 degrees, and finally fly forward 20 meters",
+    "flags": [
+     "hebnum-digits",
+     "route:command"
+    ],
+    "t_ms": 170
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "kind": "english",
+    "payload": "Focus on the middle windows of the rightmost building",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 109
+   },
+   {
+    "case": "i_third_door",
+    "kind": "english",
+    "payload": "Mark the front door of the third house on the left",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 113
+   },
+   {
+    "case": "i_rear_wheel",
+    "kind": "english",
+    "payload": "Focus on the rear wheel of the parked motorcycle",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 97
+   },
+   {
+    "case": "i_top_windows",
+    "kind": "english",
+    "payload": "Count the windows on the top floor of the skyscraper",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 113
+   },
+   {
+    "case": "i_roof_corner",
+    "kind": "english",
+    "payload": "Mark the top-left corner of the red roof",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 100
+   },
+   {
+    "case": "i_chimney",
+    "kind": "english",
+    "payload": "Focus on the chimney of the lowest house on the street",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 113
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "kind": "english",
+    "payload": "Perform an Indian circle around the target directly in front of you",
+    "flags": [
+     "route:command"
+    ],
+    "t_ms": 123
+   },
+   {
+    "case": "s_sitrep",
+    "kind": "english",
+    "payload": "Ascend to a height and provide a situational overview",
+    "flags": [
+     "route:command"
+    ],
+    "t_ms": 113
+   },
+   {
+    "case": "s_jump_point",
+    "kind": "english",
+    "payload": "Jump to a point and stay there",
+    "flags": [
+     "route:command"
+    ],
+    "t_ms": 82
+   },
+   {
+    "case": "s_gentle_scan",
+    "kind": "english",
+    "payload": "Perform a gentle scan on the area",
+    "flags": [
+     "slang-sector",
+     "route:command"
+    ],
+    "t_ms": 83
+   },
+   {
+    "case": "s_eye_junction",
+    "kind": "english",
+    "payload": "Keep an eye on the intersection and do not descend from it",
+    "flags": [
+     "route:command"
+    ],
+    "t_ms": 119
+   },
+   {
+    "case": "s_zoom_suspect",
+    "kind": "english",
+    "payload": "Zoom in on the suspicious vehicle and center it",
+    "flags": [
+     "route:perception"
+    ],
+    "t_ms": 99
+   }
+  ]
+ },
+ "wall_s": 15
+}
