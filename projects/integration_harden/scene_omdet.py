@@ -100,6 +100,11 @@ class TextHandler:
         with S.lock: S.chat.append(("user", text))
         if self._handle_drone(text):
             return
+        self.perceive(text)
+
+    def perceive(self, text):
+        """The perception dispatch: highlight / clear / VLM ask. Reused as the Recognizer
+        Pipeline's vlm_query, so a Hebrew see-question (translated to English) lands here."""
         phrase = parse_highlight(text)
         if phrase == "":
             self._handle_clear()
@@ -110,8 +115,9 @@ class TextHandler:
 
     # --- branches -------------------------------------------------------------------
     def _handle_drone(self, text):
-        """-> True when the drone router consumed the turn. Basic/emergency/override are done here;
-        COMPLEX falls through to perception, which is what actually answers questions."""
+        """-> True when a router is present (it consumes every turn). Basic/emergency/override act on
+        the wire here; COMPLEX is handled inside router.handle by the Recognizer (on_complex). With no
+        router, return False so perceive() runs directly -- the no-drone perception path."""
         if self.router is None:
             return False
         try:
@@ -119,10 +125,9 @@ class TextHandler:
         except Exception as e:
             with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
             return True
-        if res.tier is Tier.COMPLEX:
-            return False
-        with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
-        return True
+        if res.tier is not Tier.COMPLEX:                 # basic/emergency/override acted on the wire
+            with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
+        return True                                      # COMPLEX handled by the Recognizer (on_complex)
 
     def _handle_clear(self):
         with S.lock:
@@ -258,16 +263,6 @@ def main():
         draw_conf=float(os.environ.get("SCENE_HL_CONF", "0.30")),
         rel=float(os.environ.get("SCENE_HL_REL", "0.65")))
 
-    router = None
-    if os.environ.get("MVD_DRONE"):
-        try:
-            router = Router(DjiWire.from_env())
-            print("[scene_omdet] MVD drone router ON ->",
-                  os.environ.get("MVD_WIRE_HOST", "127.0.0.1"),
-                  "(real)" if os.environ.get("MVD_WIRE_REAL") else "(mock)", flush=True)
-        except Exception as e:
-            print("[scene_omdet] drone router DISABLED:", e, flush=True)
-
     voice = None
     if os.environ.get("MVD_TTS", "1") != "0":
         try:
@@ -276,7 +271,25 @@ def main():
         except Exception as e:
             print("[scene_omdet] voice/TTS unavailable:", e, flush=True)
 
-    on_text = TextHandler(router, voice)
+    on_text = TextHandler(None, voice)          # router assigned below (breaks the wiring cycle)
+
+    if os.environ.get("MVD_DRONE"):
+        try:
+            wire = DjiWire.from_env()
+            from recognizer import Pipeline
+            def _say(msg):
+                with S.lock: S.chat.append(("model", msg))
+                voice.say(msg) if voice is not None else print(msg, flush=True)
+            # COMPLEX text now runs the Recognizer: a Hebrew command becomes a mission on the
+            # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
+            pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say)
+            router = Router(wire, on_complex=pipe.handle)
+            on_text.router = router
+            print("[scene_omdet] MVD drone router ON ->",
+                  os.environ.get("MVD_WIRE_HOST", "127.0.0.1"),
+                  "(real)" if os.environ.get("MVD_WIRE_REAL") else "(mock)", flush=True)
+        except Exception as e:
+            print("[scene_omdet] drone router DISABLED:", e, flush=True)
 
     ears = None
     if _HAVE_EARS and not a.no_ears:

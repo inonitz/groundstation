@@ -23,7 +23,7 @@ imports them in place. Python speaks the frozen ApiServer wire — no C++ FMU en
 | video/ | camera_stream.py (every frame source behind a cv2.VideoCapture-like surface), video_doctor.py (layer-by-layer path diagnosis), video_watchdog.py (stall monitor + gst respawn) |
 | recognizer/ | the Hebrew Recognizer, stages 0-6 (own README, sync rule inside) |
 | perception/ | the perception engine, injected models (own README) |
-| test/ | 26 wiring tests (models faked) + live_mock_smoke.py (all 4 tiers over real HTTP vs the mock) |
+| test/ | 32 wiring tests (models faked) + live_mock_smoke.py (all 4 tiers over real HTTP vs the mock) |
 | top-level glue | scene_omdet.py (the app), config.py, run_mvd.sh, run_router.py, run_llama_server.sh |
 
 ## Data flow
@@ -33,7 +33,11 @@ asr_node (H = push-to-talk) -> /asr_server/transcribe      phone mic -> :8080 (R
         └── audio/ros2_asr.py ──┐                              └── audio/phone_asr.py ──┐
                             ▼                                                        ▼
               control/router.py (4-tier) ── basic verbs ──► control/dji_wire.py ──► ApiServer :8080
-                            └── COMPLEX ──► scene_omdet.py (perception/ + recognizer/)
+                            └── COMPLEX ──► recognizer/pipeline.py (the Recognizer)
+                                              ├── mission    ──► control/dji_wire.py ──► ApiServer
+                                              ├── perception ──► scene_omdet.py perceive (perception/, VLM)
+                                              └── reject     ──► spoken / printed back to the user
+              recognizer: translate on DictaLM (CPU :18091) · plan on Qwen3-VL (:18090)
 
 video:  llm_to_action_gstreamer_rx --dji ──► ROS2 camera/stream ──► video/camera_stream.py ──► scene_omdet
 voice:  scene_omdet ──► audio/tts_io.py ──► phone /tts (or local piper/espeak)
@@ -42,7 +46,7 @@ voice:  scene_omdet ──► audio/tts_io.py ──► phone /tts (or local pip
 ## Verification
 
 ```bash
-python3 -m pytest /root/groundstation/projects/integration_harden/test/ -q         # 26 wiring tests
+python3 -m pytest /root/groundstation/projects/integration_harden/test/ -q         # 32 wiring tests
 python3 /root/groundstation/projects/integration_harden/recognizer/recognizer.py   # Recognizer self-test
 python3 /root/groundstation/projects/integration_harden/perception/engine.py       # perception self-test
 cd /root/groundstation/projects/integration_harden && python3 -m video.camera_stream 0   # webcam frames, no ROS
@@ -60,6 +64,9 @@ bash /root/groundstation/projects/integration_harden/run_mvd.sh webcam mock
 PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden/run_mvd.sh dji real
 ```
 `dji` video flows gstreamer_rx -> camera/stream -> CameraStream (sole :5600 client).
+
+Panes (tmux windows): `vlm` (Qwen3-VL :18090) · `dicta` (DictaLM CPU :18091, log
+`${TMPDIR:-/tmp}/mvd_dicta.log`) · `keys` · `asr` · (`gst` + `dog` in dji mode) · `app`.
 
 External binaries: `build/release/shared/dji/bin/llm_to_action_{gstreamer_rx,asr_server,keyboard_hook}`.
 

@@ -163,6 +163,7 @@ CMD_ASR="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH PULS
 CMD_GST="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH && $BIN/llm_to_action_gstreamer_rx --dji $PHONE_IP"
 
 tmux new-session -d -s "$SESSION" -n vlm "bash -c '$SCENE/run_llama_server.sh; echo [vlm exited]; exec bash'"
+tmux new-window -t "$SESSION" -n dicta "bash -c '$SCENE/recognizer/run_dicta_server.sh 2>&1 | tee ${TMPDIR:-/tmp}/mvd_dicta.log; echo [dicta exited]; exec bash'"
 [ "$RTMP" = "1" ] && tmux new-window -t "$SESSION" -n rtmp "bash -c 'mediamtx; echo [rtmp exited]; exec bash'"
 tmux new-window -t "$SESSION" -n keys "bash -c '$CMD_KEYS; echo [keys exited]; exec bash'"
 tmux new-window -t "$SESSION" -n asr  "bash -c '$CMD_ASR; echo [asr exited]; exec bash'"
