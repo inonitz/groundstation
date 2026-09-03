@@ -500,6 +500,11 @@ API-Server foreground-service reliability. See the handoff §9.
 
 System chain: **ASR => RECOGNIZER => VLM/LLM => REST API (MSDK server)**.
 
+Wired live in the app (2026-09-03): `scene_omdet.py` runs COMPLEX text through the Recognizer
+(`Pipeline` as `Router.on_complex`) -> mission on the wire / perception / spoken reject. Translate =
+DictaLM on CPU `:18091` (`run_mvd.sh` `dicta` pane); plan + VLM = Qwen3-VL on GPU `:18090`. This is
+the live wiring of the frozen-proven pattern; production app boot is the live-test session's step.
+
 - `projects/integration_harden/recognizer/` — Hebrew utterance in; mission JSON, planner-bound
   English, VLM-bound English, or a spoken rejection out. Six deterministic stages around one
   injected translator call. Details + diagram: its README and tools/bench/hebrew-command-bench/README.md.
