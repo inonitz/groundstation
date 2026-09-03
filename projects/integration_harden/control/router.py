@@ -16,9 +16,9 @@ try:
     from .commands import Tier
     from .dji_wire import DEFAULT_NUDGE_S, DEFAULT_SPEED_MPS, DEFAULT_YAW_DEG_S
 except ImportError:            # run flat from inside integration/ (python3 scene_omdet.py)
-    import commands
-    from commands import Tier
-    from dji_wire import DEFAULT_NUDGE_S, DEFAULT_SPEED_MPS, DEFAULT_YAW_DEG_S
+    from control import commands
+    from control.commands import Tier
+    from control.dji_wire import DEFAULT_NUDGE_S, DEFAULT_SPEED_MPS, DEFAULT_YAW_DEG_S
 
 
 # Unit direction per verb, scaled at dispatch. Body-frame: vx fwd+, vy right+, vz up+.

@@ -42,5 +42,5 @@ python3 -m pytest projects/integration_harden/test/ -q       # 26 wiring tests, 
 - Hebrew clitic prefixes (ו/ב/ל/ה) break naive \b boundaries; number-words compose (עשרים
   וחמישה=25) and the number can FOLLOW the unit (מטר אחד=1). שנייה and מעלה are homographs —
   never treat them as bare units.
-- The emergency regex source of truth is projects/integration_harden/commands.py; stage 0
-  mirrors it and stays greedy by ruling.
+- The emergency regex source of truth is the Recognizer's stage 0 (EMERGENCY_RE in
+  recognizer/recognizer.py); control/commands.py imports it. Greedy by ruling.

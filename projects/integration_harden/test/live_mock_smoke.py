@@ -19,8 +19,10 @@ import urllib.request
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "projects"))
-from integration_harden.dji_wire import DjiWire      # noqa: E402
-from integration_harden.router import Router          # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "projects", "integration_harden"))  # house rule: the
+# integration_harden root is on sys.path for every consumer (commands.py imports recognizer.*)
+from integration_harden.control.dji_wire import DjiWire      # noqa: E402
+from integration_harden.control.router import Router          # noqa: E402
 
 MOCK = os.path.join(ROOT, "tools", "dji_mock", "mock_apiserver.py")
 
@@ -42,10 +44,11 @@ def wait_up(deadline_s=12):
 
 
 def main():
+    log = open(os.path.join(os.environ.get("TMPDIR", "/tmp"), "mock_apiserver.log"), "w")
     proc = subprocess.Popen([sys.executable, MOCK, "127.0.0.1", "8080"],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            stdout=log, stderr=subprocess.STDOUT)  # never DEVNULL: it hid a missing-aiohttp error
     try:
-        assert wait_up(), "mock did not come up"
+        assert wait_up(), f"mock did not come up -- see {log.name}"
         wire = DjiWire()  # defaults to 127.0.0.1:8080
         r = Router(wire, on_complex=lambda t: print(f"  [perception stub] {t!r}"))
 

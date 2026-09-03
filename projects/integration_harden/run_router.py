@@ -8,12 +8,8 @@ engine via on_complex. Press H in the asr_node terminal to talk (push-to-talk).
 """
 import argparse
 
-try:
-    from .dji_wire import DjiWire
-    from .router import Router
-except ImportError:
-    from dji_wire import DjiWire
-    from router import Router
+from control.dji_wire import DjiWire
+from control.router import Router
 
 
 def _make_perception_handler():
@@ -39,7 +35,7 @@ def main():
     wire = DjiWire(host=args.host, port=args.port, allow_real=args.real)
     router = Router(wire, on_complex=_make_perception_handler())
 
-    from ears import Ears  # ROS2 subscriber to /asr_server/transcribe
+    from audio.ros2_asr import Ears  # ROS2 subscriber to /asr_server/transcribe
 
     def on_text(text):
         r = router.handle(text)

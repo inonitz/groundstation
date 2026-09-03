@@ -2569,3 +2569,44 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   direct-Hebrew planning parked (the VLM must be resident for flight anyway).
 - Tests: 26/26 (router 13, recognizer wiring 7, perception 6), all model calls faked.
   Trace recorder: traces/*.jsonl per utterance, gitignored.
+- **Module clustering executed (2026-09-02, later):** integration_harden top level -> `control/`
+  (commands, router, dji_wire: transcript->verb, deterministic, emergency-regex source of truth),
+  `audio/` (ears, phone_ears, voice: the transcript inlets + the TTS outlet; ASR itself stays
+  EXTERNAL in asr_node/sttserv), `video/` (camera_stream + doctor + watchdog). Glue stays top:
+  scene_omdet.py, config.py, run scripts. Files moved verbatim, imports updated; camera_stream
+  gained a self-contained webcam self-test (`python3 video/camera_stream.py 0`).
+- **Verified after the move:** 26/26 tests, bench audit CLEAN, recognizer + perception self-tests
+  CLEAN, scene_omdet imports OK, webcam self-test 18 frames/3 s, live_mock_smoke PASSED (all 4
+  router tiers over real HTTP vs the mock). integration_harden README rewritten to match (it
+  still described deleted files).
+- **DEVNULL trap again:** live_mock_smoke spawned the mock with stderr=DEVNULL, which hid a
+  missing-aiohttp error after a container rebuild. Mock output now goes to a log. Missing deps
+  fix = tools/devenv/install-runtime-deps.sh (already scripted); tools/preflight.sh checks it.
+- **Rulings 2026-09-02 (later), all executed:** (a) audio modules renamed to say what they are:
+  ears.py -> ros2_asr.py, phone_ears.py -> phone_asr.py, voice.py -> tts_io.py (class names
+  unchanged). (b) Emergency vocabulary single-homed: the Recognizer's stage 0 EMERGENCY_RE is
+  the source of truth; control/commands.py now imports it instead of keeping a copy (direction
+  FLIPPED from the old comment, which said commands.py was the source). (c) Top-level
+  integration_harden/__init__.py deleted -- the top level is glue, not a module; tests run on
+  the namespace package. (d) Runtime pip deps (aiohttp, sentencepiece) baked into
+  tools/devenv/Dockerfile; install-runtime-deps.sh stays as the stopgap for running containers.
+- **E2E Hebrew text-path verified live (2026-09-02, later):** full go-live wiring (Router ->
+  Pipeline -> dicta CPU + Qwen3-VL GPU -> mock wire over real HTTP; VLM leg on a live webcam
+  frame). 19 bench sentences, all four outcomes correct except the two KNOWN residues, both
+  reproduced live: chain-initial takeoff planned as land; DictaLM answered a see-question
+  instead of translating it. ASR session brief: docs/active/2026-09-02-asr-session-brief.md.
+- **LLMDet bake removed from tools/devenv/Dockerfile (ruled 2026-09-02):** the model was
+  demoted from the live system; pre-baking its weights only inflated every image build.
+- **Ruling 2026-09-02 (late): the router-level emergency check STAYS.** The rule (EMERGENCY_RE)
+  lives once, in the Recognizer; the router's one-line check is position, not duplication --
+  it alone runs before the basic-verb matcher. Measured without it: "stop going forward" flies
+  forward, "stop the spin" spins, "kill/abort landing" lands; in manual mode those stops are
+  dropped with no halt at all. Recognizer stage 0 remains the net for COMPLEX text and for
+  consumers that use Pipeline without the router (the bench). Follow-up (OPEN, ROADMAP item 7):
+  single command catalogue post-sprint.
+- **Residue rules measured (2026-09-02, latest): 301 -> 306/364.** takeoff-verb/noun-inline
+  (chain-initial המראה/תמריא carried through as inline Latin "take off"; המראה homograph guarded
+  against the-mirror readings) and stay-there-strip (duration-less closing "stay there" no longer
+  becomes a planner {"delay":1}). std 184/185, verbose 50/53. Military -1 = probe artifact
+  (open owner call); found a ±1-2 cross-run noise band on model-dependent sets — dicta restarts
+  flip identical translations english<->reject; determinism is per-server-session only.

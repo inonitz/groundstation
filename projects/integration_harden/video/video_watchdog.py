@@ -10,7 +10,7 @@ from sensor_msgs.msg import Image
 STALL_SEC = float(os.environ.get("WATCHDOG_STALL_SEC", "6"))
 RETRY_SEC = float(os.environ.get("WATCHDOG_RETRY_SEC", "15"))
 SESSION   = os.environ.get("SCENE_TMUX_SESSION", "mvd")
-BIN       = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build", "release", "shared", "dji", "bin"))
+BIN       = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "build", "release", "shared", "dji", "bin"))
 
 def gateway():
     try:

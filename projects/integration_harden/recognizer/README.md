@@ -27,7 +27,8 @@ Servers: run_dicta_server.sh (CPU) + the already-resident Qwen3-VL on 18090.
 
 ## Sync rule (do not break it)
 
-tools/bench/hebrew-command-bench is the development home: rules change there, get measured
-there (`python3 bench.py`), and are then re-copied here. Files in this folder are never edited
-in place. Measured state at copy time (2026-09-02): 301/364 overall, commands 98% at the
-planner ceiling; scorecard in the bench README.
+This folder is the component's SINGLE home (dedup ruling): the bench imports it from here
+and measures it in place. Rules change HERE, then
+`python3 /root/groundstation/tools/bench/hebrew-command-bench/bench.py` re-measures; a rule
+without a full re-measure is unverified. Measured state (2026-09-02): 301/364 overall,
+commands 98% at the planner ceiling; scorecard in the bench README.

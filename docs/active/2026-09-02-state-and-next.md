@@ -4,15 +4,14 @@
 
 Pipeline: stage 0 emergency (production regex) -> bypass -> Hebrew rewrites -> DictaLM
 translate -> output guards -> English rewrites. Output: mission JSON | command English |
-perception English | rejection. Code: tools/bench/hebrew-command-bench/recognizer.py
-(the component, no model deps) + prompts.py. Diagram + scorecard: that directory's README.
+perception English | rejection. Code: projects/integration_harden/recognizer/recognizer.py (the component, no model deps; the bench imports it in place) + prompts.py. Diagram + scorecard: that directory's README.
 
 System chain: ASR => Recognizer => VLM/LLM => REST API (MSDK server).
 
 ## Measured state (all 370 sentences, complete pipeline)
 
 emergency 6/6 | std-190 98% | verbose 85% | perception 58% (DictaLM) | military 55% |
-ALL 307/369 (83%). Command core is at the planner ceiling. One stage-0 false positive
+ALL 306/364 (84%); with emergency 312/370 (after the 2026-09-02 residue rules). Command core is at the planner ceiling. One stage-0 false positive
 ("עצור שם לעשר שניות" emergency-stops; keep-greedy recommended, ruling pending).
 
 ## Rulings in force (2026-09-02)
@@ -72,3 +71,42 @@ audio path into traces (with ASR).
   an alternative architecture. Chain-initial takeoff rewrite; planner "a second" delay trap.
 - VRAM topology is measured and closed: GPU = Qwen3-VL + OmDet + SAM2.1 + ASR (5.5 GiB of 8);
   CPU = translators (where-models-run/README.md).
+
+## Clustered (2026-09-02, later)
+integration_harden top level -> control/ (commands, router, dji_wire), audio/ (ears, phone_ears,
+voice; ASR stays external), video/ (camera_stream + doctor + watchdog; camera self-test added).
+Glue stays top: scene_omdet, config, run scripts. Verified: 26/26, audit CLEAN, both self-tests,
+scene_omdet import, webcam frames live, live_mock_smoke PASSED (aiohttp reinstalled via the
+scripted installer; smoke's DEVNULL replaced with a log). README rewritten to the new layout.
+
+## E2E Hebrew verified on the go-live wiring (2026-09-02, later)
+Router(wire->mock, on_complex=Pipeline(dicta CPU :18091, Qwen3-VL :18090, vlm_query=real VLM
+with live webcam frame).handle): 19 sentences from the bench sets, all four outcomes exercised.
+Bypass missions POSTed at 0 ms; translated+planned missions 1.2-2.9 s; VLM queries 2.7-4.2 s
+with correct presence-negative answers; OOD chat correctly refused (empty plan, no flight);
+Hebrew emergency fired tier-4 via the imported EMERGENCY_RE. Both known residues reproduced
+live: chain-initial takeoff planned as land (combo_tl) and DictaLM answering instead of
+translating a see-question (question -> "I see a red car."). Trace JSONLs recorded in traces/.
+ASR delegated-session brief written: docs/active/2026-09-02-asr-session-brief.md.
+
+## Parallel workstreams (2026-09-02, late)
+Three lanes: (1) this manager session on integration_harden; (2) ASR round, delegated to an
+Opus 4.8 agent, brief = docs/active/2026-09-02-asr-session-brief.md (kicked off by the owner);
+(3) SAM 3.x mask evaluation, brief = docs/active/2026-09-02-sam3-session-brief.md (facebook/
+sam3.1 access GRANTED 2026-09-02; official quantized variants + community SAM 3 ONNX
+ports both get measured). RULED (2026-09-02, late): the router-level emergency check STAYS. The regex lives once
+(Recognizer); the router's one-line check is position, not duplication -- it alone runs
+before the basic-verb matcher (measured: without it, "stop going forward" -> go_forward,
+"stop the spin" -> spin, "kill/abort landing" -> land; in manual mode those stops are
+dropped entirely). Recognizer stage 0 stays the net for COMPLEX text and router-less
+consumers. Follow-up recommendation, OPEN, in ROADMAP: single command catalogue post-sprint.
+
+## Residue rules measured (2026-09-02, latest)
+Three sieve rules landed and re-measured on all 370: takeoff-verb-inline + takeoff-noun-inline
+(chain-initial takeoff no longer becomes land/fly-forward; combo5 and all verbose chain openers
+fixed) and stay-there-strip (planner's invented {"delay":1} gone; r_mis2 fixed). 301 -> 306/364;
+std 184/185 (99%), verbose 50/53 (94%). Military -1 is a probe artifact (s_jump_point requires
+the very words the strip removes; mission behaviorally correct) -- probe amendment is an OPEN
+owner call. Discovered and documented: ±1-2 cross-run noise on model-dependent sets (identical
+translations flipped english<->reject across dicta restarts); determinism holds within one
+server session only. Scorecard updated in place; old numbers in results/HISTORY.md.

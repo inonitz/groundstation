@@ -1,6 +1,7 @@
 #!/bin/bash
 # install-runtime-deps.sh -- python/runtime deps the demos need that the devenv image does not
-# bake yet. The container WIPES ad-hoc installs on rebuild -- run this after every rebuild, and
+# bake yet. Baked into tools/devenv/Dockerfile on 2026-09-02 -- this script covers
+# already-built containers until their next image rebuild. The container WIPES ad-hoc installs on rebuild -- run this after every rebuild, and
 # add to it instead of installing by hand (CLAUDE.md: script every install).
 set -euo pipefail
 pip install aiohttp        # tools/dji_mock/mock_apiserver.py

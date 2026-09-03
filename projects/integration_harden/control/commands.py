@@ -50,11 +50,8 @@ MAX_BASIC_WORDS = int(os.environ.get("MVD_MAX_CMD_WORDS", "4"))
 # on translation (sprint handoff B). Python's \b treats Hebrew letters as word chars, so the
 # boundaries hold. Emergency is broad on purpose: a false hover is safer than a missed stop.
 # HE emergency: imperative stop (m/f/pl + colloquial t-forms), transliterated "stop", emergency.
-_EMERGENCY_RE = re.compile(
-    r"\b(stop|emergency|abort|halt|freeze|mayday|kill|cut"
-    r"|\u05e2\u05e6\u05d5\u05e8|\u05e2\u05e6\u05e8\u05d9|\u05e2\u05e6\u05e8\u05d5"          # עצור עצרי עצרו
-    r"|\u05ea\u05e2\u05e6\u05d5\u05e8|\u05ea\u05e2\u05e6\u05e8\u05d9|\u05ea\u05e2\u05e6\u05e8\u05d5"  # תעצור תעצרי תעצרו
-    r"|\u05e1\u05d8\u05d5\u05e4|\u05d7\u05d9\u05e8\u05d5\u05dd)\b", re.I)                     # סטופ חירום
+from recognizer.recognizer import EMERGENCY_RE as _EMERGENCY_RE  # noqa: E402 -- single home:
+# the Recognizer's stage 0 OWNS the emergency vocabulary (EN + HE, greedy); ruled 2026-09-02.
 # HE override: "manual"/"manually", "I am in control".
 _OVERRIDE_RE = re.compile(
     r"\b(manual|override|take over|i have control|my control|disengage"

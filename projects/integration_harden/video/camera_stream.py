@@ -99,3 +99,21 @@ def open_capture(src):
     if "!" in src:
         return cv2.VideoCapture(src, cv2.CAP_GSTREAMER)
     return cv2.VideoCapture(src)
+
+
+if __name__ == "__main__":
+    # Self-contained smoke: read frames from any source for 3 s and report. No ROS needed
+    # for webcam/file sources. Run from the integration_harden root: python3 video/camera_stream.py 0
+    import os, sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    src = sys.argv[1] if len(sys.argv) > 1 else "0"
+    cap = open_capture(src)
+    frames, shape, t0 = 0, None, time.time()
+    while time.time() - t0 < 3.0:
+        ok, frame = cap.read()
+        if ok:
+            frames += 1
+            shape = frame.shape
+    cap.release()
+    print(f"[camera_stream selftest] source={src} frames_in_3s={frames} shape={shape}")
+    sys.exit(0 if frames > 0 else 1)

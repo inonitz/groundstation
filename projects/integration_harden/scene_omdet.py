@@ -20,12 +20,12 @@ import config
 from perception import PerceptionEngine, parse_highlight, ascii_only
 from perception import vlm_client as vlm
 from perception.detectors import Eyes, OmDet
-from camera_stream import open_capture
-from router import Router
-from commands import Tier
-from dji_wire import DjiWire
+from video.camera_stream import open_capture
+from control.router import Router
+from control.commands import Tier
+from control.dji_wire import DjiWire
 try:
-    from ears import Ears; _HAVE_EARS = True
+    from audio.ros2_asr import Ears; _HAVE_EARS = True
 except Exception:
     _HAVE_EARS = False
 
@@ -183,7 +183,7 @@ def main():
     voice = None
     if os.environ.get("MVD_TTS", "1") != "0":
         try:
-            from voice import Voice
+            from audio.tts_io import Voice
             voice = Voice()
         except Exception as e:
             print("[scene_omdet] voice/TTS unavailable:", e, flush=True)
@@ -253,7 +253,7 @@ def main():
     phone_ears = None                                  # the PHONE as the user's mic (inbound ASR socket)
     if os.environ.get("MVD_PHONE_ASR", "1") != "0" and not a.no_ears:
         try:
-            from phone_ears import PhoneEars
+            from audio.phone_asr import PhoneEars
             phone_ears = PhoneEars(on_text, port=int(os.environ.get("MVD_PHONE_ASR_PORT", "8080")))
         except Exception as e:
             print("[scene_omdet] PhoneEars unavailable:", e, flush=True)
