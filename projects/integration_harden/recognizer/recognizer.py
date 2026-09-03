@@ -37,7 +37,7 @@ class Rule:
 
 # ============================= stage 0: emergency filter =============================
 # Copied verbatim from the production router (projects/integration_harden/commands.py,
-# _EMERGENCY_RE) -- that file stays the source of truth. Greedy by ruling: עצור always stops,
+# _EMERGENCY_RE) -- THIS regex is now the source of truth; control/commands.py imports it (flipped by ruling 2026-09-02). Greedy by ruling: עצור always stops,
 # even mid-sentence; the same intent stays expressible through חכה/המתן.
 
 EMERGENCY_RE = re.compile(
@@ -215,6 +215,20 @@ HE_RULES = [
          positives=["סריקה בגזרה הצפונית", "הגזרה שלך", "נכנס לגזרה שלך"]),
     Rule("slang-scramble", r"\bיש הקפצה\b", "יש משימת חירום",
          negatives=[], positives=["המראה מיידית, יש הקפצה"]),
+# Chain-initial takeoff: DictaLM mistranslates the takeoff verb that OPENS a chain
+# ("המראה," became "Perform a landing"; verbose chains became "Fly forward"). Measured:
+# combo5, r_mis2-class, v_listen3/v_okso4/v_seq5, live combo_tl 2026-09-02. The inline-English
+# mechanism carries the fix: DictaLM copies Latin tokens through verbatim.
+    Rule("takeoff-verb-inline", r"\b(?:תמריא|המרא)\b", "take off",
+         negatives=["ההמראה הייתה חלקה", "המראה, עלה 2 מטרים"],
+         positives=["תמריא, עלה 3 מטרים ותישאר שם", "המרא ואז טוס קדימה"]),
+# המראה is a homograph (takeoff / the-mirror): fire only as a chain opener (followed by
+# a comma or ואז) and never after על/אל/את (looking AT the mirror).
+    Rule("takeoff-noun-inline", r"(?<!על )(?<!אל )(?<!את )\bהמראה(?=\s*,|\s+ואז\b)",
+         "take off",
+         negatives=["תסתכל על המראה, ואז זוז ימינה", "המראה נמצאת שם", "המראה של הבניין יפה"],
+         positives=["המראה, עלה 2 מטרים ונחת", "קודם כל המראה, אחרי זה עלה 5 מטרים",
+                    "בצע המראה ואז טוס קדימה"]),
 ]
 
 
@@ -354,6 +368,18 @@ EN_RULES = [
          r"move \1 \2",
          negatives=["turn right 45 degrees", "turn left at the corner", "turn right and fly 3 meters"],
          positives=["then turn left three meters", "turn right 2 meters", "Turn right nine meters"]),
+# The planner turns a duration-less closing "stay there / remain stationary" into a
+# {"delay": 1} step (measured: r_mis2; live E2E 2026-09-02 planner shots). Hovering is the
+# drone's default; strip the clause. A duration ("stay there for 5 seconds") never matches:
+# the pattern is end-anchored right after the verb phrase.
+    Rule("stay-there-strip",
+         r"(?i)(?:,|;)?\s*\b(?:and|then)\s+(?:remain|stay|stop)\s+(?:stationary|still|there|put|in\s+place)\s*\.?\s*$",
+         "",
+         negatives=["go up 3 meters and stay there for 5 seconds",
+                    "climb 2 meters and wait 3 seconds", "stay there"],
+         positives=["Take off, go up 3 meters and stay there",
+                    "climb 2 meters, then remain stationary.",
+                    "fly forward and stop in place"]),
 ]
 
 

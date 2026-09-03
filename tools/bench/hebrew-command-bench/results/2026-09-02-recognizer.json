@@ -9,15 +9,15 @@
    "n": 100
   },
   "military": {
-   "ok": 10,
+   "ok": 9,
    "n": 20
   },
   "std190": {
-   "ok": 182,
+   "ok": 184,
    "n": 185
   },
   "verbose": {
-   "ok": 46,
+   "ok": 50,
    "n": 53
   }
  },
@@ -140,7 +140,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 133
+    "t_ms": 145
    },
    {
     "case": "combo_tl",
@@ -149,9 +149,10 @@
     "flags": [
      "hebnum-digits",
      "takeoff-homograph",
+     "takeoff-noun-inline",
      "route:command"
     ],
-    "t_ms": 102
+    "t_ms": 96
    },
    {
     "case": "back2left3",
@@ -163,7 +164,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 82
+    "t_ms": 77
    },
    {
     "case": "ccw45",
@@ -196,7 +197,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 68
+    "t_ms": 62
    },
    {
     "case": "square",
@@ -206,7 +207,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 73
+    "t_ms": 63
    },
    {
     "case": "up2",
@@ -264,7 +265,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 47
+    "t_ms": 43
    },
    {
     "case": "spin180cw",
@@ -309,7 +310,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 49
+    "t_ms": 47
    },
    {
     "case": "combo2b",
@@ -317,9 +318,10 @@
     "payload": "Take off and then ascend three meters",
     "flags": [
      "hebnum-digits",
+     "takeoff-noun-inline",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 59
    },
    {
     "case": "combo4",
@@ -331,18 +333,19 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 138
+    "t_ms": 145
    },
    {
     "case": "combo5",
     "kind": "english",
-    "payload": "Perform a landing, rise 2 meters, turn 90 degrees clockwise, fly forward 3 meters, and land",
+    "payload": "Take off, ascend two meters, turn right 90 degrees, fly forward three meters, and land",
     "flags": [
      "hebnum-digits",
      "takeoff-homograph",
+     "takeoff-noun-inline",
      "route:command"
     ],
-    "t_ms": 199
+    "t_ms": 163
    },
    {
     "case": "digit12",
@@ -377,7 +380,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 80
+    "t_ms": 96
    },
    {
     "case": "q_land_trap",
@@ -386,7 +389,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 151
+    "t_ms": 179
    },
    {
     "case": "neg_trap",
@@ -395,7 +398,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 60
+    "t_ms": 61
    },
    {
     "case": "colloq_up",
@@ -439,7 +442,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 59
    },
    {
     "case": "g_up2",
@@ -545,7 +548,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 59
+    "t_ms": 60
    },
    {
     "case": "g_down2",
@@ -661,7 +664,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 59
+    "t_ms": 60
    },
    {
     "case": "g_fwd3",
@@ -682,7 +685,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 57
    },
    {
     "case": "g_fwd6",
@@ -704,7 +707,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 57
    },
    {
     "case": "g_fwd9",
@@ -854,7 +857,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 62
+    "t_ms": 60
    },
    {
     "case": "g_right2",
@@ -960,7 +963,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 60
    },
    {
     "case": "g_left2",
@@ -1186,7 +1189,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 113
+    "t_ms": 114
    },
    {
     "case": "g_combo2_1",
@@ -1196,7 +1199,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 98
+    "t_ms": 102
    },
    {
     "case": "g_combo2_2",
@@ -1206,7 +1209,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 107
+    "t_ms": 114
    },
    {
     "case": "g_combo2_3",
@@ -1226,7 +1229,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 108
+    "t_ms": 114
    },
    {
     "case": "g_combo2_5",
@@ -1236,7 +1239,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 106
+    "t_ms": 120
    },
    {
     "case": "g_combo2_6",
@@ -1247,7 +1250,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 109
+    "t_ms": 111
    },
    {
     "case": "g_combo2_7",
@@ -1257,7 +1260,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 107
+    "t_ms": 109
    },
    {
     "case": "g_combo3_0",
@@ -1269,7 +1272,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 400
+    "t_ms": 405
    },
    {
     "case": "g_combo3_1",
@@ -1289,7 +1292,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 181
+    "t_ms": 182
    },
    {
     "case": "g_combo3_3",
@@ -1299,7 +1302,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 152
+    "t_ms": 143
    },
    {
     "case": "r_takeoff1",
@@ -1319,7 +1322,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 44
+    "t_ms": 41
    },
    {
     "case": "r_takeoff3",
@@ -1328,25 +1331,27 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 59
+    "t_ms": 55
    },
    {
     "case": "r_takeoff4",
     "kind": "english",
     "payload": "Take off",
     "flags": [
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 47
+    "t_ms": 42
    },
    {
     "case": "r_takeoff5",
     "kind": "english",
-    "payload": "Take off please",
+    "payload": "Take off",
     "flags": [
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 53
+    "t_ms": 47
    },
    {
     "case": "r_land1",
@@ -1366,7 +1371,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 37
+    "t_ms": 35
    },
    {
     "case": "r_land3",
@@ -1384,7 +1389,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 55
+    "t_ms": 54
    },
    {
     "case": "r_land5",
@@ -1393,7 +1398,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 66
+    "t_ms": 64
    },
    {
     "case": "r_pol_up5",
@@ -1403,7 +1408,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 75
+    "t_ms": 73
    },
    {
     "case": "r_pol_fwd3",
@@ -1413,7 +1418,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 63
+    "t_ms": 58
    },
    {
     "case": "r_pol_left2",
@@ -1423,7 +1428,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 57
    },
    {
     "case": "r_pol_down1",
@@ -1433,7 +1438,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 56
    },
    {
     "case": "r_pol_spin",
@@ -1443,7 +1448,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 75
+    "t_ms": 81
    },
    {
     "case": "r_fill1",
@@ -1453,7 +1458,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 60
    },
    {
     "case": "r_fill2",
@@ -1463,7 +1468,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 84
+    "t_ms": 83
    },
    {
     "case": "r_fill3",
@@ -1473,7 +1478,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 62
+    "t_ms": 60
    },
    {
     "case": "r_fill4",
@@ -1483,7 +1488,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 69
+    "t_ms": 68
    },
    {
     "case": "r_fill5",
@@ -1493,7 +1498,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 93
+    "t_ms": 88
    },
    {
     "case": "r_alt10",
@@ -1503,7 +1508,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 108
+    "t_ms": 109
    },
    {
     "case": "r_alt20",
@@ -1513,7 +1518,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 105
+    "t_ms": 113
    },
    {
     "case": "r_low",
@@ -1523,7 +1528,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 66
    },
    {
     "case": "r_rise3",
@@ -1533,7 +1538,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 60
+    "t_ms": 61
    },
    {
     "case": "r_updown",
@@ -1554,7 +1559,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 82
+    "t_ms": 79
    },
    {
     "case": "r_bit_up",
@@ -1563,7 +1568,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 60
+    "t_ms": 58
    },
    {
     "case": "r_bit_back",
@@ -1572,7 +1577,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 56
    },
    {
     "case": "r_higher",
@@ -1581,7 +1586,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 59
+    "t_ms": 56
    },
    {
     "case": "r_bit_fwd",
@@ -1600,7 +1605,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 111
+    "t_ms": 112
    },
    {
     "case": "r_turn_l45",
@@ -1610,7 +1615,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 77
+    "t_ms": 73
    },
    {
     "case": "r_half_turn",
@@ -1619,7 +1624,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 62
+    "t_ms": 57
    },
    {
     "case": "r_quart_r",
@@ -1628,7 +1633,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 70
+    "t_ms": 71
    },
    {
     "case": "r_full",
@@ -1637,7 +1642,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 63
+    "t_ms": 61
    },
    {
     "case": "r_around",
@@ -1646,7 +1651,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 53
+    "t_ms": 51
    },
    {
     "case": "r_num_first",
@@ -1656,7 +1661,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 77
+    "t_ms": 76
    },
    {
     "case": "r_m_half",
@@ -1667,7 +1672,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 197
+    "t_ms": 187
    },
    {
     "case": "r_2_half",
@@ -1677,7 +1682,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 99
+    "t_ms": 96
    },
    {
     "case": "r_digit50",
@@ -1698,7 +1703,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 60
+    "t_ms": 58
    },
    {
     "case": "r_meter1",
@@ -1707,7 +1712,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 76
+    "t_ms": 75
    },
    {
     "case": "r_mis1",
@@ -1715,19 +1720,22 @@
     "payload": "Take off and ascend to a height of five meters",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 106
+    "t_ms": 110
    },
    {
     "case": "r_mis2",
     "kind": "english",
-    "payload": "Take off, ascend three meters, and remain stationary",
+    "payload": "Take off, fly up three meters",
     "flags": [
      "hebnum-digits",
-     "route:command"
+     "takeoff-verb-inline",
+     "route:command",
+     "stay-there-strip"
     ],
-    "t_ms": 105
+    "t_ms": 102
    },
    {
     "case": "r_mis3",
@@ -1738,7 +1746,7 @@
      "missing-verb",
      "route:command"
     ],
-    "t_ms": 107
+    "t_ms": 104
    },
    {
     "case": "r_mis4",
@@ -1748,7 +1756,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 126
+    "t_ms": 122
    },
    {
     "case": "r_mis5",
@@ -1756,9 +1764,10 @@
     "payload": "Take off, fly forward ten meters, turn half a circle, and return",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 145
+    "t_ms": 144
    },
    {
     "case": "r_mis6",
@@ -1769,7 +1778,7 @@
      "missing-verb",
      "route:command"
     ],
-    "t_ms": 153
+    "t_ms": 149
    },
    {
     "case": "r_mis7",
@@ -1779,7 +1788,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 107
+    "t_ms": 108
    },
    {
     "case": "r_mis8",
@@ -1789,16 +1798,17 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 87
+    "t_ms": 85
    },
    {
     "case": "r_mis9",
     "kind": "english",
     "payload": "Take off and then land",
     "flags": [
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 65
+    "t_ms": 66
    },
    {
     "case": "r_mis10",
@@ -1809,7 +1819,7 @@
      "missing-verb",
      "route:command"
     ],
-    "t_ms": 207
+    "t_ms": 194
    },
    {
     "case": "r_dis1",
@@ -1819,7 +1829,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 115
+    "t_ms": 109
    },
    {
     "case": "r_dis2",
@@ -1829,16 +1839,17 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 91
+    "t_ms": 86
    },
    {
     "case": "r_dis3",
     "kind": "english",
-    "payload": "Take off and search for the car",
+    "payload": "Take off and look for the car",
     "flags": [
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 84
+    "t_ms": 79
    },
    {
     "case": "r_dis4",
@@ -1848,7 +1859,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 107
+    "t_ms": 102
    },
    {
     "case": "r_q1",
@@ -1857,7 +1868,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 74
+    "t_ms": 77
    },
    {
     "case": "r_q2",
@@ -1866,7 +1877,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 94
+    "t_ms": 96
    },
    {
     "case": "r_q3",
@@ -1877,7 +1888,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 218
+    "t_ms": 210
    },
    {
     "case": "r_q4",
@@ -1895,7 +1906,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 59
+    "t_ms": 58
    },
    {
     "case": "r_q6",
@@ -1913,7 +1924,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 97
+    "t_ms": 95
    },
    {
     "case": "r_q8",
@@ -1931,7 +1942,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 57
    },
    {
     "case": "r_neg2",
@@ -1940,7 +1951,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 53
+    "t_ms": 52
    },
    {
     "case": "r_neg3",
@@ -1949,7 +1960,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 58
+    "t_ms": 59
    },
    {
     "case": "r_neg4",
@@ -1958,7 +1969,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 60
+    "t_ms": 64
    },
    {
     "case": "r_neg5",
@@ -1967,7 +1978,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 57
+    "t_ms": 67
    },
    {
     "case": "r_wait1",
@@ -1976,7 +1987,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 51
+    "t_ms": 55
    },
    {
     "case": "r_wait2",
@@ -1986,7 +1997,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 43
+    "t_ms": 42
    },
    {
     "case": "r_wait3",
@@ -1996,7 +2007,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 90
+    "t_ms": 88
    },
    {
     "case": "r_wait4",
@@ -2025,7 +2036,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 76
+    "t_ms": 72
    },
    {
     "case": "r_deg135",
@@ -2035,7 +2046,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 84
+    "t_ms": 83
    },
    {
     "case": "r_z_03",
@@ -2045,7 +2056,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 82
+    "t_ms": 80
    },
    {
     "case": "r_back15",
@@ -2067,7 +2078,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 61
+    "t_ms": 57
    },
    {
     "case": "r_ord2",
@@ -2077,7 +2088,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 62
+    "t_ms": 63
    },
    {
     "case": "r_ord3",
@@ -2087,7 +2098,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 62
+    "t_ms": 61
    },
    {
     "case": "r_ord4",
@@ -2103,12 +2114,13 @@
    {
     "case": "v_listen3_g0",
     "kind": "english",
-    "payload": "Okay, here's the command: \"Fly forward, then ascend five meters, then turn right 90 degrees.\"",
+    "payload": "Here's the translated command in English: \"Take off, then fly up five meters, and then turn 90 degrees clockwise.\"",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 209
+    "t_ms": 316
    },
    {
     "case": "v_listen3_g1",
@@ -2118,7 +2130,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 269
+    "t_ms": 290
    },
    {
     "case": "v_listen3_g2",
@@ -2128,7 +2140,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 241
+    "t_ms": 235
    },
    {
     "case": "v_listen3_g3",
@@ -2138,17 +2150,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 341
+    "t_ms": 334
    },
    {
     "case": "v_finish3_g0",
     "kind": "english",
-    "payload": "Take off, when you finish, rise 5 meters, and at the end, turn 90 degrees clockwise",
+    "payload": "Take off, when you finish, go up five meters, and at the end, turn 90 degrees clockwise.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 216
+    "t_ms": 211
    },
    {
     "case": "v_finish3_g1",
@@ -2158,7 +2171,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 202
+    "t_ms": 196
    },
    {
     "case": "v_finish3_g2",
@@ -2169,7 +2182,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 161
+    "t_ms": 159
    },
    {
     "case": "v_finish3_g3",
@@ -2179,17 +2192,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 212
+    "t_ms": 204
    },
    {
     "case": "v_start4_g0",
     "kind": "english",
-    "payload": "Okay, let's start: Lift off. Now, ascend 5 meters. Great, now turn 90 degrees clockwise and fly forward 10 meters.",
+    "payload": "Okay, let's start: take off. Now fly up five meters. Great, now turn right 90 degrees with the direction of the clock and fly forward ten meters.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 291
+    "t_ms": 303
    },
    {
     "case": "v_start4_g1",
@@ -2199,7 +2213,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 320
+    "t_ms": 335
    },
    {
     "case": "v_start4_g2",
@@ -2209,7 +2223,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 324
+    "t_ms": 315
    },
    {
     "case": "v_start4_g3",
@@ -2219,18 +2233,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 403
+    "t_ms": 392
    },
    {
     "case": "v_okso4_g0",
     "kind": "english",
-    "payload": "Here's the command translated into English: \"Fly forward, then ascend five meters, then turn right 90 degrees clockwise, and finally fly forward ten meters.\"",
+    "payload": "Here's the command: \"Take off, then ascend 5 meters, then turn right 90 degrees clockwise, then fly forward 10 meters.\"",
     "flags": [
      "hebnum-digits",
-     "route:command",
-     "number-flag"
+     "takeoff-verb-inline",
+     "route:command"
     ],
-    "t_ms": 656
+    "t_ms": 287
    },
    {
     "case": "v_okso4_g1",
@@ -2240,7 +2254,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 358
+    "t_ms": 386
    },
    {
     "case": "v_okso4_g2",
@@ -2251,7 +2265,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 336
+    "t_ms": 359
    },
    {
     "case": "v_okso4_g3",
@@ -2261,17 +2275,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 355
+    "t_ms": 401
    },
    {
     "case": "v_first3_g0",
     "kind": "english",
-    "payload": "First, take off, then ascend five meters, and finally turn 90 degrees clockwise.",
+    "payload": "First, take off. Then, ascend five meters. Finally, turn 90 degrees clockwise.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 178
+    "t_ms": 179
    },
    {
     "case": "v_first3_g1",
@@ -2281,7 +2296,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 217
+    "t_ms": 224
    },
    {
     "case": "v_first3_g2",
@@ -2292,7 +2307,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 189
+    "t_ms": 192
    },
    {
     "case": "v_first3_g3",
@@ -2302,17 +2317,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 225
+    "t_ms": 231
    },
    {
     "case": "v_favor4_g0",
     "kind": "english",
-    "payload": "Here's the translated command in English: \"Take off, then fly up 5 meters, then turn 90 degrees clockwise, and finally fly forward 10 meters, thank you.\"",
+    "payload": "Okay, here's the flight plan: take off, then ascend 5 meters, turn 90 degrees clockwise, and finally fly forward 10 meters. Thank you!",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 403
+    "t_ms": 336
    },
    {
     "case": "v_favor4_g1",
@@ -2322,7 +2338,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 336
+    "t_ms": 363
    },
    {
     "case": "v_favor4_g2",
@@ -2333,7 +2349,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 316
+    "t_ms": 325
    },
    {
     "case": "v_favor4_g3",
@@ -2343,17 +2359,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 395
+    "t_ms": 422
    },
    {
     "case": "v_mission3_g0",
     "kind": "english",
-    "payload": "Here's the command translated into English: \"Take off, then ascend five meters, and then turn 90 degrees clockwise.\"",
+    "payload": "Take off, then ascend five meters, and finally turn 90 degrees clockwise.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 283
+    "t_ms": 169
    },
    {
     "case": "v_mission3_g1",
@@ -2363,7 +2380,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 381
+    "t_ms": 441
    },
    {
     "case": "v_mission3_g2",
@@ -2374,7 +2391,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 297
+    "t_ms": 351
    },
    {
     "case": "v_mission3_g3",
@@ -2392,6 +2409,7 @@
     "payload": "Take off and then ascend five meters",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
     "t_ms": 89
@@ -2404,7 +2422,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 131
+    "t_ms": 139
    },
    {
     "case": "v_yalla2_g2",
@@ -2425,7 +2443,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 138
+    "t_ms": 140
    },
    {
     "case": "v_ready3_g0",
@@ -2433,9 +2451,10 @@
     "payload": "Ready? Take off, then ascend five meters, and turn 90 degrees clockwise.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 158
+    "t_ms": 173
    },
    {
     "case": "v_ready3_g1",
@@ -2447,7 +2466,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 761
+    "t_ms": 823
    },
    {
     "case": "v_ready3_g2",
@@ -2457,7 +2476,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 252
+    "t_ms": 275
    },
    {
     "case": "v_ready3_g3",
@@ -2467,17 +2486,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 268
+    "t_ms": 285
    },
    {
     "case": "v_seq5_g0",
     "kind": "english",
-    "payload": "Here's the sequence you requested: Fly forward, ascend 5 meters, turn 90 degrees clockwise, fly forward 10 meters, land.",
+    "payload": "Here is the sequence of commands translated into English drone language: take off, ascend 5 meters, turn 90 degrees clockwise, fly forward 10 meters, land.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 318
+    "t_ms": 419
    },
    {
     "case": "v_seq5_g1",
@@ -2487,7 +2507,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 325
+    "t_ms": 357
    },
    {
     "case": "v_seq5_g2",
@@ -2497,7 +2517,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 445
+    "t_ms": 486
    },
    {
     "case": "v_seq5_g3",
@@ -2507,7 +2527,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 445
+    "t_ms": 402
    },
    {
     "case": "v_note3_g0",
@@ -2515,9 +2535,10 @@
     "payload": "Take off, then ascend five meters, and while doing so, turn 90 degrees clockwise at a slow and careful pace",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 183
+    "t_ms": 170
    },
    {
     "case": "v_note3_g1",
@@ -2527,7 +2548,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 167
+    "t_ms": 172
    },
    {
     "case": "v_note3_g2",
@@ -2538,7 +2559,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 135
+    "t_ms": 130
    },
    {
     "case": "v_note3_g3",
@@ -2548,17 +2569,18 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 219
+    "t_ms": 199
    },
    {
     "case": "v_round3_g0",
     "kind": "english",
-    "payload": "Okay, let's do a little loop: take off, ascend five meters, then turn 90 degrees clockwise and land back where you started.",
+    "payload": "Take off, ascend five meters, then turn 90 degrees clockwise.",
     "flags": [
      "hebnum-digits",
+     "takeoff-verb-inline",
      "route:command"
     ],
-    "t_ms": 213
+    "t_ms": 130
    },
    {
     "case": "v_round3_g1",
@@ -2568,7 +2590,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 204
+    "t_ms": 222
    },
    {
     "case": "v_round3_g2",
@@ -2579,7 +2601,7 @@
      "route:command",
      "turn-meters"
     ],
-    "t_ms": 192
+    "t_ms": 194
    },
    {
     "case": "v_round3_g3",
@@ -2589,7 +2611,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 186
+    "t_ms": 195
    },
    {
     "case": "v_neg1",
@@ -2599,7 +2621,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 145
+    "t_ms": 150
    },
    {
     "case": "v_neg2",
@@ -2609,7 +2631,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 90
+    "t_ms": 89
    },
    {
     "case": "v_q1",
@@ -2618,7 +2640,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 74
+    "t_ms": 84
    },
    {
     "case": "v_q2",
@@ -2627,7 +2649,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 128
+    "t_ms": 130
    },
    {
     "case": "v_mix1",
@@ -2637,7 +2659,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 123
+    "t_ms": 126
    },
    {
     "case": "v_mix2",
@@ -2647,7 +2669,7 @@
      "hebnum-digits",
      "route:command"
     ],
-    "t_ms": 130
+    "t_ms": 147
    }
   ],
   "perception": [
@@ -2658,7 +2680,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 82
+    "t_ms": 91
    },
    {
     "case": "i_third_door",
@@ -2667,7 +2689,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 86
+    "t_ms": 92
    },
    {
     "case": "i_rear_wheel",
@@ -2676,7 +2698,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 76
+    "t_ms": 75
    },
    {
     "case": "i_top_windows",
@@ -2694,7 +2716,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 80
+    "t_ms": 78
    },
    {
     "case": "i_chimney",
@@ -2703,7 +2725,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 92
+    "t_ms": 90
    },
    {
     "case": "i_back_entrance",
@@ -2712,7 +2734,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 73
+    "t_ms": 71
    },
    {
     "case": "i_ladder_pickup",
@@ -2721,7 +2743,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 77
+    "t_ms": 76
    },
    {
     "case": "i_car_by_red",
@@ -2740,7 +2762,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 63
+    "t_ms": 64
    },
    {
     "case": "i_door_by_coat",
@@ -2749,7 +2771,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 74
+    "t_ms": 76
    },
    {
     "case": "i_bike_fence",
@@ -2759,7 +2781,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 80
+    "t_ms": 81
    },
    {
     "case": "i_dog_by_dress",
@@ -2768,7 +2790,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 97
+    "t_ms": 104
    },
    {
     "case": "i_kid_bag",
@@ -2777,7 +2799,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 63
+    "t_ms": 65
    },
    {
     "case": "i_tree_truck",
@@ -2786,7 +2808,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 63
+    "t_ms": 66
    },
    {
     "case": "i_win_over_door",
@@ -2795,7 +2817,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 63
+    "t_ms": 65
    },
    {
     "case": "i_cars_by_flag",
@@ -2804,7 +2826,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 65
+    "t_ms": 70
    },
    {
     "case": "i_bench_trees",
@@ -2814,7 +2836,7 @@
      "hebnum-digits",
      "route:perception"
     ],
-    "t_ms": 84
+    "t_ms": 83
    },
    {
     "case": "i_behind_moto",
@@ -2823,7 +2845,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 78
+    "t_ms": 79
    },
    {
     "case": "i_man_on_roof",
@@ -2832,7 +2854,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 88
+    "t_ms": 89
    },
    {
     "case": "i_box_by_man",
@@ -2841,7 +2863,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 120
+    "t_ms": 119
    },
    {
     "case": "i_girl_balloon",
@@ -2868,7 +2890,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 82
+    "t_ms": 81
    },
    {
     "case": "i_sign_awning",
@@ -2877,7 +2899,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 100
+    "t_ms": 103
    },
    {
     "case": "i_front_tire",
@@ -2886,7 +2908,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 100
+    "t_ms": 101
    },
    {
     "case": "i_bench_fountain",
@@ -2895,7 +2917,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 106
+    "t_ms": 112
    },
    {
     "case": "i_exit_gray",
@@ -2904,7 +2926,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 78
+    "t_ms": 83
    },
    {
     "case": "i_second_car",
@@ -2913,7 +2935,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 113
+    "t_ms": 114
    },
    {
     "case": "i_dark_stain",
@@ -2922,7 +2944,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 117
+    "t_ms": 116
    },
    {
     "case": "i_glasses_talk",
@@ -2931,7 +2953,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 113
+    "t_ms": 118
    },
    {
     "case": "i_truck_boat",
@@ -2940,7 +2962,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 82
+    "t_ms": 92
    },
    {
     "case": "i_empty_chair",
@@ -2949,7 +2971,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 75
+    "t_ms": 83
    },
    {
     "case": "i_bird_cable",
@@ -2959,7 +2981,7 @@
      "hebnum-digits",
      "route:perception"
     ],
-    "t_ms": 93
+    "t_ms": 92
    },
    {
     "case": "i_fence_gap",
@@ -2969,7 +2991,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 87
+    "t_ms": 89
    },
    {
     "case": "i_main_steps",
@@ -2978,7 +3000,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 87
+    "t_ms": 93
    },
    {
     "case": "i_helmet_mid",
@@ -2989,7 +3011,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 220
+    "t_ms": 224
    },
    {
     "case": "i_cat_climb",
@@ -2998,7 +3020,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 77
+    "t_ms": 79
    },
    {
     "case": "i_lean_silver",
@@ -3016,7 +3038,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 105
+    "t_ms": 104
    },
    {
     "case": "i_broken_window",
@@ -3034,7 +3056,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 64
+    "t_ms": 67
    },
    {
     "case": "i_big_tent",
@@ -3043,7 +3065,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 75
+    "t_ms": 80
    },
    {
     "case": "i_crane_arm",
@@ -3052,7 +3074,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 76
+    "t_ms": 79
    },
    {
     "case": "i_boats_pier",
@@ -3079,7 +3101,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 106
+    "t_ms": 108
    },
    {
     "case": "j_kid_ball",
@@ -3089,7 +3111,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 102
+    "t_ms": 105
    },
    {
     "case": "j_win_gas",
@@ -3098,7 +3120,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 125
+    "t_ms": 132
    },
    {
     "case": "j_hat_bench",
@@ -3107,7 +3129,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 128
+    "t_ms": 136
    },
    {
     "case": "j_flag_mast",
@@ -3116,7 +3138,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 120
+    "t_ms": 126
    },
    {
     "case": "j_sticker",
@@ -3125,7 +3147,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 90
+    "t_ms": 95
    },
    {
     "case": "j_dog_steps",
@@ -3134,7 +3156,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 119
+    "t_ms": 126
    },
    {
     "case": "j_lock_gate",
@@ -3144,7 +3166,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 90
+    "t_ms": 105
    },
    {
     "case": "j_helmet_seat",
@@ -3153,7 +3175,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 118
+    "t_ms": 127
    },
    {
     "case": "j_sign_between",
@@ -3162,7 +3184,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 101
+    "t_ms": 106
    },
    {
     "case": "j_drainpipe",
@@ -3171,7 +3193,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 125
+    "t_ms": 129
    },
    {
     "case": "j_umbrella_x",
@@ -3180,7 +3202,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 122
+    "t_ms": 127
    },
    {
     "case": "j_hole_wall",
@@ -3189,7 +3211,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 88
+    "t_ms": 91
    },
    {
     "case": "j_tilt_sign",
@@ -3198,7 +3220,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 127
+    "t_ms": 134
    },
    {
     "case": "j_crate_trunk",
@@ -3207,7 +3229,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 137
+    "t_ms": 136
    },
    {
     "case": "j_mural",
@@ -3216,7 +3238,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 112
+    "t_ms": 123
    },
    {
     "case": "j_cat_jump",
@@ -3225,7 +3247,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 118
+    "t_ms": 119
    },
    {
     "case": "j_faucet",
@@ -3234,7 +3256,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 119
+    "t_ms": 121
    },
    {
     "case": "j_truck_text",
@@ -3243,7 +3265,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 147
+    "t_ms": 150
    },
    {
     "case": "j_pin_busstop",
@@ -3252,7 +3274,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 177
+    "t_ms": 179
    },
    {
     "case": "j_pin_notmoving",
@@ -3261,7 +3283,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 129
+    "t_ms": 131
    },
    {
     "case": "j_pin_antennas",
@@ -3270,7 +3292,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 164
+    "t_ms": 168
    },
    {
     "case": "j_pin_drone2",
@@ -3279,7 +3301,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 117
+    "t_ms": 115
    },
    {
     "case": "j_pin_leash",
@@ -3298,7 +3320,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 169
+    "t_ms": 173
    },
    {
     "case": "j_pin_notphone",
@@ -3307,7 +3329,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 145
+    "t_ms": 146
    },
    {
     "case": "j_pin_2riders",
@@ -3326,7 +3348,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 128
+    "t_ms": 133
    },
    {
     "case": "j_pin_smallbike",
@@ -3335,7 +3357,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 146
+    "t_ms": 147
    },
    {
     "case": "j_pin_roofnear",
@@ -3344,7 +3366,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 124
+    "t_ms": 138
    },
    {
     "case": "j_pin_leaving",
@@ -3354,7 +3376,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 107
+    "t_ms": 106
    },
    {
     "case": "j_pin_flagman",
@@ -3363,7 +3385,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 149
+    "t_ms": 151
    },
    {
     "case": "j_pin_notsail",
@@ -3382,7 +3404,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 125
+    "t_ms": 128
    },
    {
     "case": "j_pin_campole",
@@ -3391,7 +3413,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 125
+    "t_ms": 132
    },
    {
     "case": "j_pin_fastwalk",
@@ -3400,7 +3422,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 146
+    "t_ms": 154
    },
    {
     "case": "j_pin_planks",
@@ -3409,7 +3431,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 119
+    "t_ms": 123
    },
    {
     "case": "j_pin_halfgate",
@@ -3420,7 +3442,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 220
+    "t_ms": 229
    },
    {
     "case": "j_pin_spare",
@@ -3429,7 +3451,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 107
+    "t_ms": 105
    },
    {
     "case": "j_pin_stage3",
@@ -3438,7 +3460,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 274
+    "t_ms": 277
    },
    {
     "case": "j_pin_hay",
@@ -3447,7 +3469,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 123
+    "t_ms": 121
    },
    {
     "case": "j_pin_fullbin",
@@ -3457,7 +3479,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 124
+    "t_ms": 130
    },
    {
     "case": "j_pin_wirebirds",
@@ -3466,7 +3488,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 116
+    "t_ms": 123
    },
    {
     "case": "j_pin_extstairs",
@@ -3475,7 +3497,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 113
+    "t_ms": 119
    },
    {
     "case": "j_pin_wrongway",
@@ -3484,7 +3506,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 128
+    "t_ms": 143
    },
    {
     "case": "j_pin_firstrun",
@@ -3494,7 +3516,7 @@
      "inline-english",
      "route:perception"
     ],
-    "t_ms": 118
+    "t_ms": 137
    },
    {
     "case": "j_pin_barrel",
@@ -3503,7 +3525,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 131
+    "t_ms": 133
    },
    {
     "case": "j_pin_puddle",
@@ -3512,7 +3534,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 95
+    "t_ms": 94
    },
    {
     "case": "j_pin_scaffold",
@@ -3521,7 +3543,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 342
+    "t_ms": 345
    },
    {
     "case": "j_pin_idledozer",
@@ -3530,7 +3552,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 149
+    "t_ms": 161
    },
    {
     "case": "j_pin_cart",
@@ -3539,7 +3561,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 101
+    "t_ms": 104
    },
    {
     "case": "j_pin_graffiti",
@@ -3567,7 +3589,7 @@
      "hebnum-digits",
      "route:perception"
     ],
-    "t_ms": 119
+    "t_ms": 120
    }
   ],
   "military": [
@@ -3578,7 +3600,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 95
+    "t_ms": 101
    },
    {
     "case": "s_sitrep",
@@ -3587,16 +3609,17 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 88
+    "t_ms": 103
    },
    {
     "case": "s_jump_point",
     "kind": "english",
-    "payload": "Jump to a point and stay there",
+    "payload": "Jump to a point",
     "flags": [
-     "route:command"
+     "route:command",
+     "stay-there-strip"
     ],
-    "t_ms": 67
+    "t_ms": 68
    },
    {
     "case": "s_gentle_scan",
@@ -3606,7 +3629,7 @@
      "slang-sector",
      "route:command"
     ],
-    "t_ms": 64
+    "t_ms": 70
    },
    {
     "case": "s_eye_junction",
@@ -3615,7 +3638,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 93
+    "t_ms": 99
    },
    {
     "case": "s_zoom_suspect",
@@ -3624,7 +3647,7 @@
     "flags": [
      "route:perception"
     ],
-    "t_ms": 76
+    "t_ms": 84
    },
    {
     "case": "s_route_escort",
@@ -3633,7 +3656,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 87
+    "t_ms": 95
    },
    {
     "case": "s_dead_ground",
@@ -3642,7 +3665,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 78
+    "t_ms": 81
    },
    {
     "case": "s_give_distance",
@@ -3653,7 +3676,7 @@
      "slang-sector",
      "route:command"
     ],
-    "t_ms": 79
+    "t_ms": 81
    },
    {
     "case": "s_one_more_pass",
@@ -3662,7 +3685,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 85
+    "t_ms": 83
    },
    {
     "case": "s_grid_out",
@@ -3673,7 +3696,7 @@
      "proc-out-final",
      "route:command"
     ],
-    "t_ms": 71
+    "t_ms": 72
    },
    {
     "case": "s_roger_over",
@@ -3684,7 +3707,7 @@
      "proc-over-final",
      "route:command"
     ],
-    "t_ms": 53
+    "t_ms": 56
    },
    {
     "case": "s_cp_visual",
@@ -3703,7 +3726,7 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 51
+    "t_ms": 54
    },
    {
     "case": "s_rally_point",
@@ -3725,7 +3748,7 @@
      "number-flag",
      "REJECT-number"
     ],
-    "t_ms": 157
+    "t_ms": 169
    },
    {
     "case": "s_lost_uav",
@@ -3736,7 +3759,7 @@
      "slang-sector",
      "route:command"
     ],
-    "t_ms": 106
+    "t_ms": 107
    },
    {
     "case": "s_scramble",
@@ -3747,7 +3770,7 @@
      "slang-scramble",
      "route:command"
     ],
-    "t_ms": 53
+    "t_ms": 51
    },
    {
     "case": "s_obs_report",
@@ -3757,7 +3780,7 @@
      "proc-over-final",
      "route:command"
     ],
-    "t_ms": 87
+    "t_ms": 88
    },
    {
     "case": "s_wadi_route",
@@ -3766,9 +3789,9 @@
     "flags": [
      "route:command"
     ],
-    "t_ms": 122
+    "t_ms": 125
    }
   ]
  },
- "wall_s": 89
+ "wall_s": 98
 }

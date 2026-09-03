@@ -314,3 +314,8 @@ clause, and takeoff/land paraphrases — the last class is covered by the regex 
 measured separately (above) but not yet combined with this stack in one run. The
 military/acronym HE rules fired zero times on these corpora (their register does not occur in
 them); their end-to-end effect requires the perception rerun with TranslateGemma.
+
+## Superseded 2026-09-02 (later run replaced it): pre-residue-rules scorecard
+Raw: 2026-09-02-recognizer-full.json. emergency 6/6, std 182/185 (98%), verbose 46/53 (87%),
+perception 57/100 (raw json counted 58), military 10/20 (raw 11), ALL 301/364 (83%).
+Superseded by the run after the takeoff-chain + stay-there rules (README scorecard).
