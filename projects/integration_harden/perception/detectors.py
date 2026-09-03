@@ -1,12 +1,10 @@
 """Model-owning detectors for the perception engine. This file loads the vision models;
-engine.py stays model-free. Contents moved verbatim from highlight_seg.py (OmDet) and eyes.py
-(Eyes + the legacy Grounder/YOLOE backends) on 2026-09-02 -- behavior unchanged.
+engine.py stays model-free. Contents moved from highlight_seg.py (OmDet) and eyes.py (Eyes) on
+2026-09-02; the unreachable yoloe/grounder highlight backends were deleted on 2026-09-03.
 
   OmDet  open-vocab detector, the live highlight backend (stateless, phrase per call)
-  Eyes   background YOLO26-seg + lazy SAM2 mask_for_box + the config-selected legacy backends
+  Eyes   background YOLO26-seg + lazy SAM2 mask_for_box (the highlight decision lives in engine.py)
 """
-import threading
-
 import torch
 
 import config      # integration_harden root is on sys.path for every consumer of this package
@@ -14,8 +12,8 @@ import config      # integration_harden root is on sys.path for every consumer o
 
 class OmDet:
     """OmDet-Turbo open-vocab detector (Apache, transformers). Stateless: pass the phrase each call.
-    Loads from a LOCAL, offline copy (/root/models/omdet-turbo-swin-tiny) in ~1s -- see README 'OmDet
-    offline' -- so it never hangs fetching the Swin backbone from the HF Hub."""
+    Loads from a LOCAL, offline copy (see LOCAL below) in ~1s -- see README 'OmDet offline' -- so it
+    never hangs fetching the Swin backbone from the HF Hub."""
     LOCAL = "/root/models/vision/omdet-turbo-swin-tiny"
     def __init__(self, device):
         import os, inspect, timm
@@ -73,121 +71,15 @@ class OmDet:
         return dets[:topk]
 
 
-class Grounder:
-    """LLMDet / MM-Grounding-DINO (transformers), opt-in. Portable across GPU vendors (pure-PyTorch
-    deformable-attention path -> ROCm/CUDA/CPU). Grounds the stored phrase; may fire on absent objects."""
-    def __init__(self, repo, device):
-        import torch
-        from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
-        self._torch = torch
-        self.device = device
-        self._phrase = None
-        self.proc = AutoProcessor.from_pretrained(repo)
-        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(repo).to(device).eval()
-
-    def set_target(self, phrase):
-        self._phrase = phrase or None
-
-    def detect(self, frame_bgr):
-        if not self._phrase:
-            return []
-        torch = self._torch
-        from PIL import Image
-        pil = Image.fromarray(frame_bgr[:, :, ::-1])
-        cap = self._phrase.lower().strip().rstrip(".") + "."
-        inp = self.proc(images=pil, text=cap, return_tensors="pt").to(self.device)
-        with torch.no_grad():
-            out = self.model(**inp)
-        kw = dict(threshold=config.GND_BOX_THR, target_sizes=[(pil.height, pil.width)])
-        try:
-            res = self.proc.post_process_grounded_object_detection(out, text_threshold=config.GND_TEXT_THR, **kw)[0]
-        except TypeError:
-            res = self.proc.post_process_grounded_object_detection(out, **kw)[0]
-        boxes, scores = res["boxes"], res["scores"]
-        dets = []
-        for i in range(len(scores)):
-            x1, y1, x2, y2 = (int(v) for v in boxes[i].tolist())
-            dets.append({"label": self._phrase, "conf": float(scores[i]), "box": (x1, y1, x2, y2)})
-        dets.sort(key=lambda d: -d["conf"])
-        return dets[:config.GND_TOPK]
-
-
-class YoloeHighlighter:
-    """YOLOE-2026 open-vocab highlight (Ultralytics). DEMO DEFAULT: confidence-gated, so an absent
-    prompt yields NO box rather than a hallucinated one. set_classes re-encodes the phrase; do it on
-    target change (ASR thread), predict on the worker thread -- lock-guarded so they don't overlap."""
-    def __init__(self, weights, device):
-        from ultralytics import YOLOE
-        self.m = YOLOE(weights)
-        self.device = device
-        self._lock = threading.Lock()
-
-    def set_target(self, phrase):
-        with self._lock:
-            if phrase:
-                try:
-                    self.m.set_classes([phrase], self.m.get_text_pe([phrase]))
-                except (TypeError, AttributeError):
-                    self.m.set_classes([phrase])
-
-    def detect(self, frame_bgr):
-        with self._lock:
-            r = self.m.predict(frame_bgr, verbose=False, device=self.device, imgsz=config.DETECT_IMGSZ)[0]
-        out = []
-        if r.boxes is not None:
-            for b in r.boxes:
-                c = float(b.conf[0])
-                if c < config.CONF_HL:
-                    continue
-                x1, y1, x2, y2 = (int(v) for v in b.xyxy[0])
-                out.append({"label": r.names[int(b.cls[0])], "conf": c, "box": (x1, y1, x2, y2)})
-        out.sort(key=lambda d: -d["conf"])
-        return out[:config.GND_TOPK]
-
-
 class Eyes:
     def __init__(self):
         from ultralytics import YOLO
         self._bg = YOLO(config.BG_SEG_MODEL)                    # closed-set YOLO26-seg: fast background
         self.device = config.resolve_device()                   # ultralytics device ("0"/"cpu"/"mps")
         self.tdevice = config.resolve_torch_device()            # torch device ("cuda"/"cpu"/"mps")
-        self._hl = None                                         # highlighter, loaded off-thread
         self._sam = None                                        # lazy
-        self._lock = threading.Lock()
-        self.target = None
-        print(f"[integration] eyes bg={config.BG_SEG_MODEL} highlight={config.HIGHLIGHT_BACKEND} "
+        print(f"[integration] eyes bg={config.BG_SEG_MODEL} "
               f"dev={self.device}/{self.tdevice}", flush=True)
-        threading.Thread(target=self._init_highlighter, daemon=True).start()
-
-    def _init_highlighter(self):
-        """Load + warm the chosen highlight backend off the critical path (first GPU kernel compile is
-        the slow part). Until this sets self._hl, highlight() is a quiet no-op."""
-        try:
-            b = config.HIGHLIGHT_BACKEND.lower()
-            if b == "vlm":
-                print("[integration] highlight backend 'vlm' (Qwen3-VL grounding); no detector to load, SAM2 lazy.", flush=True)
-                return
-            print(f"[integration] highlight backend '{b}' loading in background...", flush=True)
-            if b == "grounder":
-                hl = Grounder(config.GROUNDER_REPO, self.tdevice)
-            else:
-                hl = YoloeHighlighter(config.OPENVOCAB_MODEL, self.device)
-            if config.WARMUP:
-                import numpy as np
-                blank = np.zeros((config.CAM_H, config.CAM_W, 3), dtype="uint8")
-                try:
-                    hl.set_target("object"); hl.detect(blank); hl.set_target(None)
-                except Exception as e:
-                    print("warmup highlight:", e)
-            with self._lock:
-                t = self.target
-            if t:                                               # target set while we were loading
-                try: hl.set_target(t)
-                except Exception: pass
-            self._hl = hl
-            print("[integration] highlight READY.", flush=True)
-        except Exception as e:
-            print("highlight init failed:", e)
 
     def _ensure_sam(self):
         if self._sam is None:
@@ -230,33 +122,3 @@ class Eyes:
             return self._dets(r, config.CONF_BG)
         except Exception as e:
             print("bg detect error:", e); return []
-
-    def set_target(self, phrase):
-        with self._lock:
-            self.target = phrase or None
-        if self._hl is not None:
-            try:
-                self._hl.set_target(phrase or None)
-            except Exception as e:
-                print("set_target error:", e)
-
-    def highlight(self, frame, want_mask=True):
-        """-> (dets, mask). Uses the current backend; mask only when want_mask + SAM2 up."""
-        with self._lock:
-            target = self.target
-        if not target or self._hl is None:
-            return [], None
-        try:
-            dets = self._hl.detect(frame)                       # heavy call OUTSIDE the lock
-        except Exception as e:
-            print("highlight error:", e); return [], None
-        mask = None
-        if dets and want_mask and self._ensure_sam() is not None:
-            x1, y1, x2, y2 = dets[0]["box"]
-            try:
-                r = self._sam(frame, bboxes=[x1, y1, x2, y2], verbose=False, device=self.device)
-                if r and r[0].masks is not None and len(r[0].masks.data) > 0:
-                    mask = r[0].masks.data[0].cpu().numpy().astype(bool)
-            except Exception as e:
-                print("sam2 error:", e)
-        return dets, mask

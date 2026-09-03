@@ -9,7 +9,7 @@ threads, ASR wiring) stays in scene_omdet.py; this package holds the logic and t
 | file | role |
 |---|---|
 | `engine.py` | THE COMPONENT: relative-confidence gate, mask hygiene, VLM fallback, presence gate, highlight-phrase parsing. Models are injected callables. `python3 engine.py` = self-test, no GPU. |
-| `detectors.py` | the model owners: OmDet (open-vocab detector, offline-safe loading) and Eyes (background YOLO26-seg + lazy SAM2 + legacy backends). Moved verbatim from highlight_seg.py / eyes.py. |
+| `detectors.py` | the model owners: OmDet (open-vocab detector, offline-safe loading) and Eyes (background YOLO26-seg + lazy SAM2; the legacy yoloe/grounder backends were deleted 2026-09-03). Moved verbatim from highlight_seg.py / eyes.py. |
 | `vlm_client.py` | Qwen3-VL client: ask / analyze / ground / ensure_server. `parse_reply()` is split out so the reply parsing is testable without a server. Moved from vlm.py. |
 
 ## Wiring (what scene_omdet.py does)

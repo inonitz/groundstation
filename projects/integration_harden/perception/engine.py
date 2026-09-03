@@ -9,7 +9,7 @@ The three measured mechanisms this file owns (evidence: the live desk loop):
   2. Mask hygiene. Each kept box gets a SAM2 mask; whole-frame garbage masks are dropped, boxes
      are tightened to their mask, and a near-full-frame box with no clean mask is discarded.
   3. VLM fallback + presence gate. When the detector whiffs, the VLM's own box (from the
-     presence gate) is masked instead. The presence gate asks the VLM whether the target is
+     presence gate) goes through the SAME apply_masks hygiene (garbage-mask drop included). The presence gate asks the VLM whether the target is
      visible at all before any box is drawn -- open-vocab detectors ground absent phrases onto
      salient objects, and the gate is what stops that.
 """
@@ -111,17 +111,7 @@ class PerceptionEngine:
         dets, masks = self.apply_masks(frame, kept, use_sam)
         if not dets and vlm_box_px is not None:     # detector whiffed: fall back to the VLM's box
             fallback = {"label": f"{target} (vlm)", "conf": 1.0, "box": vlm_box_px}
-            mask = None
-            try:
-                mask = self.mask_for_box(frame, vlm_box_px)
-            except Exception as e:
-                print("sam err:", e)
-            if mask is not None and mask.sum() > 0:
-                ys, xs = np.where(mask)
-                fallback["box"] = (int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max()))
-                dets, masks = [fallback], [mask]
-            else:
-                dets, masks = [fallback], []
+            dets, masks = self.apply_masks(frame, [fallback], use_sam)   # SAME hygiene as the primary path
         return dets, masks, {"raw": raw, "threshold": threshold}
 
     def presence_gate(self, frame, phrase):

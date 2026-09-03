@@ -167,7 +167,7 @@ tmux new-session -d -s "$SESSION" -n vlm "bash -c '$SCENE/run_llama_server.sh; e
 tmux new-window -t "$SESSION" -n keys "bash -c '$CMD_KEYS; echo [keys exited]; exec bash'"
 tmux new-window -t "$SESSION" -n asr  "bash -c '$CMD_ASR; echo [asr exited]; exec bash'"
 [ "$VIDEO" = "dji" ] && tmux new-window -t "$SESSION" -n gst  "bash -c '$CMD_GST; echo [gst exited]; exec bash'" || true   # sole :5600 receiver -> camera/stream
-[ "$VIDEO" = "dji" ] && tmux new-window -t "$SESSION" -n dog  "bash -c 'source $ROS_SETUP && SCENE_TMUX_SESSION=$SESSION python3 $HERE/video/video_watchdog.py; echo [watchdog exited]; exec bash'" || true   # detect stall -> notify + auto-reconnect gst
+[ "$VIDEO" = "dji" ] && tmux new-window -t "$SESSION" -n dog  "bash -c 'source $ROS_SETUP && cd $HERE && SCENE_TMUX_SESSION=$SESSION python3 -m video.video_watchdog; echo [watchdog exited]; exec bash'" || true   # detect stall -> notify + auto-reconnect gst
 tmux new-window -t "$SESSION" -n app  "bash -c '$APP_LAUNCH; echo [app exited]; exec bash'"
 tmux select-window -t "$SESSION:app"
 echo "[run_mvd] up: video=$VIDEO control=$CONTROL wire=$WIRE_HOST:$WIRE_PORT. Ctrl-b then 0-4 to switch panes."

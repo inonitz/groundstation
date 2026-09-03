@@ -2,29 +2,22 @@
 
 Speaks the FROZEN protocol (docs/specs/spec-dji-websocket-protocol.md):
   POST /c/takeoff, /c/land, /c/stop        discrete verbs
-  WS   /c/ws/sticks  {vx,vy,vz,yaw}        body-frame m/s + yaw rate (deg/s), 18 Hz
-  GET  /status/                            telemetry
+  POST /c/fly {mission:[Action...]}        native flight actions
 
-SAFETY (CLAUDE.md): sending sticks/takeoff/land ARMS a real drone. This client defaults
+Telemetry (GET /status/) is NOT spoken here: it is read-only, and its consumers
+(test/live_mock_smoke.py, video/video_doctor.py, tools/dji_mock/*) each call it directly over
+urllib/curl. This client is the command path only.
+
+SAFETY (CLAUDE.md): sending takeoff/land/fly ARMS a real drone. This client defaults
 to the mock at 127.0.0.1 and REFUSES any non-loopback host unless allow_real=True is
 passed explicitly. The assistant only ever runs this against 127.0.0.1; the human runs
 it against the phone. The surest kill is always the aircraft power button, not software.
 """
-import asyncio
 import ipaddress
 import os
 import json
 import urllib.request
 import urllib.error
-
-# Conservative indoor envelope. Well under the app's kDjiMaxSpeedMps=2.0.
-# NOTE: indoors the drone's VPS often refuses lateral/vertical sticks (see
-# docs/NOTES / indoor-vps-denial); yaw + slow vertical are the reliable axes.
-DEFAULT_SPEED_MPS = 0.5
-DEFAULT_YAW_DEG_S = 45.0     # deg/s -- the app reads ANGULAR_VELOCITY in degrees, not rad
-DEFAULT_NUDGE_S = 1.5        # bounded motion, then auto-hover
-STREAM_HZ = 18
-
 
 def _is_loopback(host: str) -> bool:
     if host == "localhost":
@@ -33,7 +26,6 @@ def _is_loopback(host: str) -> bool:
         return ipaddress.ip_address(host).is_loopback
     except ValueError:
         return False
-
 
 class DjiWire:
     def __init__(self, host="127.0.0.1", port=8080, allow_real=False, timeout=3.0):
@@ -83,29 +75,6 @@ class DjiWire:
         mission verb (/c/fly) re-takes stick control automatically (controller.fly -> takeControl)."""
         return self._post("/c/stop")
 
-    def status(self) -> dict:
-        with urllib.request.urlopen(
-                f"http://{self.host}:{self.port}/status/", timeout=self.timeout) as r:
-            return json.loads(r.read().decode())
-
-    # --- bounded velocity nudge --------------------------------------------------------
-    async def _stream_sticks(self, vx, vy, vz, yaw, duration):
-        import aiohttp  # lazy: only the WS nudge needs it
-        url = f"ws://{self.host}:{self.port}/c/ws/sticks"
-        period = 1.0 / STREAM_HZ
-        async with aiohttp.ClientSession() as s:
-            async with s.ws_connect(url) as ws:
-                for _ in range(max(1, int(duration * STREAM_HZ))):
-                    await ws.send_str(json.dumps({"vx": vx, "vy": vy, "vz": vz, "yaw": yaw}))
-                    await asyncio.sleep(period)
-                # Always end on an explicit hover so a dropped verb never runs away.
-                await ws.send_str(json.dumps({"vx": 0.0, "vy": 0.0, "vz": 0.0, "yaw": 0.0}))
-
-    def nudge(self, vx=0.0, vy=0.0, vz=0.0, yaw=0.0, duration=DEFAULT_NUDGE_S):
-        """Body-frame: vx fwd+, vy right+, vz up+, yaw CW+ (deg/s). Streams for `duration`
-        then hovers. Synchronous wrapper so the ASR callback thread can call it directly."""
-        asyncio.run(self._stream_sticks(vx, vy, vz, yaw, duration))
-
     # --- mission / action API (POST /c/fly {mission:[Action...]}) ----------------------
     def _post_json(self, path: str, obj) -> int:
         payload = json.dumps(obj)
@@ -154,32 +123,10 @@ class DjiWire:
     @staticmethod
     def _loc2(lat, lng):      return {"latitude": lat, "longitude": lng}
 
-    def fly_to(self, lat, lng, alt, max_velocity=8.0) -> int:
-        """fly_gps: go to an absolute GPS point (lat/lng/alt), <=10 m/s."""
-        return self.fly_mission([{"type": "fly_gps", "target": self._loc3(lat, lng, alt),
-                                  "maxVelocity": float(max_velocity)}])
-
-    def fly_circle(self, radius, velocity, count=1.0, clockwise=True, facing="INWARDS") -> int:
-        """Orbit: radius (m), 1..6 m/s, count laps, facing INWARDS|OUTWARDS."""
-        return self.fly_mission([{"type": "fly_circle", "radius": float(radius),
-                                  "velocity": float(velocity), "count": float(count),
-                                  "clockwise": bool(clockwise), "facing": facing}])
-
-    def fly_square(self, side, velocity, clockwise=True) -> int:
-        """Fly a square: side (m), 1..6 m/s."""
-        return self.fly_mission([{"type": "fly_square", "side": float(side),
-                                  "velocity": float(velocity), "clockwise": bool(clockwise)}])
-
     def scan_ground(self, radius=3.0, velocity=4.0, height=None, facing="OUTWARDS", clockwise=True) -> int:
         """Gimbal down + orbit to scan the ground."""
         a = {"type": "scan_ground", "radius": float(radius), "velocity": float(velocity),
              "facing": facing, "clockwise": bool(clockwise)}
-        if height is not None: a["height"] = float(height)
-        return self.fly_mission([a])
-
-    def look_at(self, lat, lng, height=None) -> int:
-        """Aim the gimbal (with body spin) at a GPS point."""
-        a = {"type": "look_at", "target": self._loc2(lat, lng)}
         if height is not None: a["height"] = float(height)
         return self.fly_mission([a])
 
@@ -199,48 +146,3 @@ class DjiWire:
     def wave(self, count=2) -> int:
         """Greet the user by waving the camera."""
         return self.fly_mission([{"type": "wave", "count": int(count)}])
-
-    def delay(self, seconds) -> int:
-        """Insert a wait (only meaningful mid-mission via fly_mission)."""
-        return self.fly_mission([{"type": "delay", "seconds": float(seconds)}])
-
-    REPORT_METRICS = ("battery", "user_location", "aircraft_location", "speed", "distance")
-
-    def report_status(self, of=()) -> int:
-        """Speak status via the aircraft TTS. of=[] -> all metrics. Valid: REPORT_METRICS."""
-        return self.fly_mission([{"type": "report_status", "of": list(of)}])
-
-    # -- direct (non-mission) endpoints -------------------------------------------------
-    def fly_to_gps(self, lat, lng, alt, max_velocity=8.0) -> int:
-        """POST /c/flyTo (dedicated route; same as the fly_gps action)."""
-        return self._post_json("/c/flyTo", {"target": self._loc3(lat, lng, alt),
-                                            "maxVelocity": float(max_velocity)})
-
-    def look_at_gps(self, lat, lng, height=None) -> int:
-        """POST /c/lookAt (dedicated route)."""
-        body = {"target": self._loc2(lat, lng)}
-        if height is not None: body["height"] = float(height)
-        return self._post_json("/c/lookAt", body)
-
-    def tts(self, text, lang="en", country=None, rate=1.0) -> int:
-        """POST /tts -- make the phone speak."""
-        body = {"text": text, "lang": lang, "rate": float(rate)}
-        if country is not None: body["country"] = country
-        return self._post_json("/tts", body)
-
-    def key(self, group, key, func="GET", args=None) -> dict:
-        """POST /key -- generic DJI SDK key access. func: GET|SET|ACTION. group e.g.
-        'FlightControllerKey'/'GimbalKey'/'CameraKey', key e.g. 'KeyGoHome'. Returns the JSON."""
-        body = {"group": group, "key": key, "func": func}
-        if args is not None: body["args"] = args
-        req = urllib.request.Request(f"http://{self.host}:{self.port}/key", method="POST",
-                                     data=json.dumps(body).encode(),
-                                     headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=self.timeout) as r:
-            return json.loads(r.read().decode())
-
-    def status_sub(self, which="battery") -> dict:
-        """GET /status/<which> -- 'battery' or 'gps' detail blocks."""
-        with urllib.request.urlopen(
-                f"http://{self.host}:{self.port}/status/{which}", timeout=self.timeout) as r:
-            return json.loads(r.read().decode())

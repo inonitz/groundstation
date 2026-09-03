@@ -20,6 +20,83 @@ except Exception as _e:          # ROS2 not sourced -> fail loudly only when act
     _IMPORT_ERR = _e
 
 TOPIC = "camera/stream"          # == gstreamer_udp_cam_rx kOutCameraPipelineRawFrameTopic
+ROS_SOURCES = ("ros", "camera_stream", TOPIC)   # source strings that mean "subscribe to the topic"
+
+
+def _teardown(spin, executor, node):
+    """Shut a spin thread + node down in the ONE order that does not core-dump on exit: JOIN the
+    spin loop first, then remove and destroy the node. Destroying a node while its executor is
+    still spinning is what dumped core. Shared by CameraStream and FrameCounter so the fix cannot
+    drift out of one of them again."""
+    try: spin.join(timeout=1.5)
+    except Exception: pass
+    try: executor.remove_node(node)
+    except Exception: pass
+    try: node.destroy_node()
+    except Exception: pass
+
+
+class FrameCounter:
+    """Counts frames arriving on a ROS2 topic, in its OWN SingleThreadedExecutor and spin thread
+    (never the global executor -- that contends with Ears). Context manager, so teardown always
+    goes through _teardown.
+
+        with FrameCounter() as fc:
+            time.sleep(3)
+            print(fc.frames, fc.gap)
+
+    video_doctor and video_watchdog each hand-rolled this subscription in a different lifecycle
+    style; only one of them had the teardown fix. This is the single home."""
+
+    def __init__(self, topic=TOPIC, node_name="frame_counter"):
+        if not _HAVE_ROS:
+            raise RuntimeError(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
+        if not rclpy.ok():
+            rclpy.init()
+        self.frames = 0
+        self.last = time.time()          # wall time of the most recent frame
+        self.topic = topic
+        self._node = rclpy.create_node(node_name)
+        self._sub = self._node.create_subscription(Image, topic, self._cb, 10)
+        from rclpy.executors import SingleThreadedExecutor
+        self._exec = SingleThreadedExecutor()
+        self._exec.add_node(self._node)
+        self._stop = False
+        self._spin = threading.Thread(target=self._spin_loop, daemon=True)
+        self._spin.start()
+
+    def _cb(self, _msg):
+        self.frames += 1
+        self.last = time.time()
+
+    def _spin_loop(self):
+        try:
+            while not self._stop and rclpy.ok():
+                self._exec.spin_once(timeout_sec=0.1)
+        except Exception:
+            pass
+
+    @property
+    def gap(self):
+        """Seconds since the last frame arrived."""
+        return time.time() - self.last
+
+    @property
+    def alive(self):
+        """False once ROS shuts down or the counter is closed -- the loop condition for a monitor."""
+        return (not self._stop) and rclpy.ok()
+
+    def close(self):
+        self._stop = True
+        _teardown(self._spin, self._exec, self._node)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+        return False
+
 
 class CameraStream:
     def __init__(self, topic=TOPIC, first_frame_timeout=15.0):
@@ -75,12 +152,7 @@ class CameraStream:
 
     def release(self):
         self._stop = True
-        try: self._spin.join(timeout=1.5)          # let the spin loop exit BEFORE destroying the node (was the core dump)
-        except Exception: pass
-        try: self._exec.remove_node(self._node)
-        except Exception: pass
-        try: self._node.destroy_node()
-        except Exception: pass
+        _teardown(self._spin, self._exec, self._node)   # join-before-destroy: the core-dump fix
 
 
 def open_capture(src):
@@ -89,7 +161,7 @@ def open_capture(src):
     import cv2
     import config
     src = str(src)
-    if src in ("ros", "camera_stream", "camera/stream"):
+    if src in ROS_SOURCES:
         return CameraStream()
     if src.isdigit():
         cap = cv2.VideoCapture(int(src))
@@ -102,10 +174,11 @@ def open_capture(src):
 
 
 if __name__ == "__main__":
-    # Self-contained smoke: read frames from any source for 3 s and report. No ROS needed
-    # for webcam/file sources. Run from the integration_harden root: python3 video/camera_stream.py 0
-    import os, sys
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # Self-contained smoke: read frames from any source for 3 s and report. No ROS needed for
+    # webcam/file sources. Run as a MODULE from the integration_harden root, which puts that root
+    # on sys.path for free -- no path shim:
+    #     cd /root/groundstation/projects/integration_harden && python3 -m video.camera_stream 0
+    import sys
     src = sys.argv[1] if len(sys.argv) > 1 else "0"
     cap = open_capture(src)
     frames, shape, t0 = 0, None, time.time()

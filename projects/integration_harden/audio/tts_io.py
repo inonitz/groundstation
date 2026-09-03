@@ -7,7 +7,8 @@ speech queue per request, so the latest answer wins. Never raises into the calle
 
 Local espeak/piper backends exist ONLY for desk debugging with no phone attached.
 
-Select:  SCENE_TTS = phone | espeak | piper | off             (default: phone)
+Select:  SCENE_TTS = phone | espeak | piper | both | off      (default: phone)
+         "both" = phone AND laptop, i.e. every answer spoken twice -- opt in on purpose.
 Phone:   SCENE_TTS_HOST=<ip>  (default: host= from the video SCENE_INPUT, else WiFi gateway)
          SCENE_TTS_PORT=8080  SCENE_TTS_LANG=en  SCENE_TTS_RATE=1.0
 """
@@ -26,18 +27,12 @@ def _resolve_phone_host():
     m = re.search(r"host=(\S+)", str(config.INPUT))
     if m:
         return m.group(1)
-    try:
-        for ln in subprocess.check_output(["ip", "route"], text=True).splitlines():
-            if ln.startswith("default"):
-                return ln.split()[2]
-    except Exception:
-        pass
-    return ""
+    return config.default_gateway() or ""
 
 
 class Voice:
     def __init__(self):
-        b = (config.TTS_BACKEND or "both").lower()
+        b = (config.TTS_BACKEND or "phone").lower()
         self._phone = b in ("phone", "both")
         # laptop engine: prefer piper (natural voice) when bin+model are ready, else espeak fallback.
         self._piper_bin = config.TTS_PIPER_BIN if os.path.exists(config.TTS_PIPER_BIN) else (shutil.which("piper") or "")

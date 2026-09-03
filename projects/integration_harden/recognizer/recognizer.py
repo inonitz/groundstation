@@ -101,6 +101,16 @@ def bypass(s):
     return None
 
 
+HE = "֐-׿"                       # the Hebrew Unicode block: ONE home for the range
+
+
+def he_word(core, prefixes=""):
+    """Canonical Hebrew word boundary: clitic prefixes break \\b, so the boundary is a
+    non-Hebrew lookaround on both sides. Hand-rolled (?<![HE])...(?![HE]) patterns in the
+    rule tables must stay in sync with this shape."""
+    return rf"(?<![{HE}]){prefixes}{core}(?![{HE}])"
+
+
 # ============================ stage 2: Hebrew rewrites ============================
 # Everything here exists because a measured failure demanded it. Order matters:
 # digits first (the other rules then only handle digits), inline words, verb insertion,
@@ -172,8 +182,8 @@ INLINE_WORDS = [("כתומה", "orange"), ("כתום", "orange"), ("גדר", "fe
 
 def inline_english(s):
     for he, en in INLINE_WORDS:
-        s = re.sub(rf"(?<![֐-׿])ה{he}(?![֐-׿])", f"ה-{en}", s)
-        s = re.sub(rf"(?<![֐-׿])(ב|ל|מ)?{he}(?![֐-׿])", lambda m: (m.group(1) or "") + en, s)
+        s = re.sub(he_word(f"ה{he}"), f"ה-{en}", s)
+        s = re.sub(he_word(f"{he}", "(ב|ל|מ)?"), lambda m: (m.group(1) or "") + en, s)
     return s
 
 
@@ -251,14 +261,14 @@ def apply_he(s):
 
 
 # ============================= stage 4: output guards =============================
-# The guards verify, they do not trust. Number reading uses two tables: the Hebrew one also
-# accepts standalone עשר/מאה/חצי that the stage-2 digitizer deliberately leaves alone.
+# The guards verify, they do not trust. Hebrew numbers are read by the SAME composer that
+# stage 2 uses (the old ad-hoc summer could not compose hundreds: שלוש מאות read as 3).
+# The guard only pre-normalizes vocabulary the digitizer deliberately leaves alone:
+# construct-state numerals, חצי, and the bare-מטר rule.
 
-# Construct-state numerals (שלושת האנשים = the three people) join the plain forms.
-HEB_NUM = dict(NUM_UNITS, **NUM_TENS,
-               **{"עשרה": 10, "עשר": 10, "מאה": 100, "מאתיים": 200, "חצי": 0.5,
-                  "שלושת": 3, "ארבעת": 4, "חמשת": 5, "ששת": 6, "שבעת": 7,
-                  "שמונת": 8, "תשעת": 9, "עשרת": 10})
+# Construct-state numerals (שלושת האנשים = the three people) -> plain forms for the composer.
+CONSTRUCT_NUM = {"שלושת": "שלושה", "ארבעת": "ארבעה", "חמשת": "חמישה", "ששת": "שישה",
+                 "שבעת": "שבעה", "שמונת": "שמונה", "תשעת": "תשעה", "עשרת": "עשרה"}
 EN_NUM = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
           "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
           "fourteen": 14, "fifteen": 15, "twenty": 20, "thirty": 30, "forty": 40,
@@ -270,38 +280,46 @@ EN_NUM_REV = {v: k for k, v in EN_NUM.items()}
 def _nums_he(s):
     """Every number in a Hebrew sentence, digits and composed number words, sorted.
     A bare singular unit counts as one (מטר = 1, מטר וחצי = 1.5) -- both were measured
-    causes of false rejections."""
+    causes of false rejections. Composition is delegated to hebnum_to_digits, so hundreds
+    (שלוש מאות = 300) and the article exclusion behave exactly as in stage 2."""
     s = s.replace("מטר וחצי", "1.5 מטר")
-    vals = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", s)]
     toks = s.split()
+
+    def is_number(t):
+        core = t.lstrip("ו")
+        return (bool(re.fullmatch(r"\d+(?:\.\d+)?", t)) or core in NUM_WORDS
+                or core in CONSTRUCT_NUM or core == "חצי")
+
+    bare_meters = 0
     for i, tok in enumerate(toks):
         # Only מטר: the other unit words are homographs (שנייה = a moment, מעלה = upward).
         # Hebrew allows the number on either side (שני מטרים / מטר אחד), so both neighbors
         # must be number-free before מטר counts as a bare one.
         if tok == "מטר":
-            def is_number(t):
-                return bool(re.fullmatch(r"\d+(?:\.\d+)?", t)) or t.lstrip("ו") in HEB_NUM
             prev = toks[i - 1] if i else ""
             nxt = toks[i + 1] if i + 1 < len(toks) else ""
             if not is_number(prev) and not is_number(nxt):
-                vals.append(1.0)
-    heb_toks = re.findall(r"[֐-׿]+", s)
-    i = 0
-    while i < len(heb_toks):
-        if heb_toks[i].lstrip("ו") in HEB_NUM:
-            total = 0
-            while i < len(heb_toks) and heb_toks[i].lstrip("ו") in HEB_NUM:
-                total += HEB_NUM[heb_toks[i].lstrip("ו")]
-                i += 1
-            vals.append(float(total))
+                bare_meters += 1
+
+    norm = []
+    for t in toks:
+        core = t.lstrip("ו")
+        if core in CONSTRUCT_NUM:
+            norm.append(("ו" if t != core else "") + CONSTRUCT_NUM[core])
         else:
-            i += 1
-    return sorted(vals)
+            norm.append(t)
+    s = hebnum_to_digits(" ".join(norm))
+    s = re.sub(r"(\d+(?:\.\d+)?)\s+וחצי(?!\S)", lambda m: str(float(m.group(1)) + 0.5), s)
+    s = re.sub(r"(?<!\S)ו?חצי(?!\S)", "0.5", s)
+    vals = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", s)]
+    return sorted(vals + [1.0] * bare_meters)
 
 
 def _nums_en(s):
     """Every number in an English sentence; adjacent number words compose (twenty five,
-    one hundred twenty)."""
+    one hundred twenty, two and a half -- mirroring the Hebrew composer's וחצי)."""
+    s = re.sub(r"(\d+(?:\.\d+)?)\s+and\s+a\s+half\b",
+               lambda m: str(float(m.group(1)) + 0.5), s)
     vals = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", s)]
     toks = re.findall(r"[a-zA-Z]+", s.lower())
     i = 0
@@ -315,7 +333,7 @@ def _nums_en(s):
             continue
         total = EN_NUM[toks[i]]
         i += 1
-        while i < len(toks) and (toks[i] in EN_NUM or toks[i] == "and"):
+        while i < len(toks) and (toks[i] in EN_NUM or toks[i] in ("and", "a")):
             if toks[i] in EN_NUM:
                 total = total * 100 if EN_NUM[toks[i]] == 100 else total + EN_NUM[toks[i]]
             i += 1
@@ -338,6 +356,25 @@ def patch_number(en, wrong, right):
     if word and re.search(rf"\b{word}\b", en, re.I):
         return re.sub(rf"\b{word}\b", digits, en, count=1, flags=re.I)
     return None
+
+
+def _resolve_numbers(he2, text, translate, flags):
+    """Stage 4's retry ladder: pass -> guided retry -> single-token patch -> reject.
+    Returns (text, flags, rejected)."""
+    if check_numbers(he2, text):
+        return text, flags, False
+    flags.append("number-flag")
+    retry = translate(he2, required_numbers=_nums_he(he2))
+    if check_numbers(he2, retry):
+        return retry, flags, False
+    he_nums, en_nums = _nums_he(he2), _nums_en(text)
+    extra = [x for x in en_nums if x not in he_nums]
+    missing = [x for x in he_nums if x not in en_nums]
+    patched = (patch_number(text, extra[0], missing[0])
+               if len(extra) == 1 and len(missing) == 1 else None)
+    if patched and check_numbers(he2, patched):
+        return patched, flags + ["number-patched"], False
+    return text, flags + ["REJECT-number"], True
 
 
 COLORS = {"אדום": "red", "אדומה": "red", "כחול": "blue", "כחולה": "blue",
@@ -400,13 +437,13 @@ def apply_en(s):
 # 240/243 commands (the 3 are see-questions, correctly sent to the VLM).
 
 PERCEPTION_RE = re.compile(
-    r"(?<![֐-׿])(סמן|תסמן|הדגש|תדגיש|עקוב|תעקוב|ספור|תספור|התמקד|תתמקד|תאר|הסתכל|תסתכל"
-    r"|צלם|תצלם|זהה|תזהה|חפש|תחפש)(?![֐-׿])"
-    r"|מה (אתה רואה|נמצא|יש)|כמה [֐-׿]+ (יש|אתה רואה|מחכים|עומדים)|האם יש"
-    r"|(?<![֐-׿])(מצא|תמצא)(?![֐-׿])|זום|התקרב ל")
+    he_word("(סמן|תסמן|הדגש|תדגיש|עקוב|תעקוב|ספור|תספור|התמקד|תתמקד|תאר|הסתכל|תסתכל"
+            "|צלם|תצלם|זהה|תזהה|חפש|תחפש)")
+    + rf"|מה (אתה רואה|נמצא|יש)|כמה [{HE}]+ (יש|אתה רואה|מחכים|עומדים)|האם יש"
+    + "|" + he_word("(מצא|תמצא)") + "|זום|התקרב ל")
 MOVEMENT_RE = re.compile(
-    r"(?<![֐-׿])(טוס|תטוס|עלה|תעלה|רד|תרד|פנה|תפנה|הסתובב|תסתובב|זוז|תזוז|התקדם|תתקדם"
-    r"|סע|טפס|תמריא|המרא|נחת|תנחת|חכה|תחכה|המתן|תמתין|עצור)(?![֐-׿])")
+    he_word("(טוס|תטוס|עלה|תעלה|רד|תרד|פנה|תפנה|הסתובב|תסתובב|זוז|תזוז|התקדם|תתקדם"
+            "|סע|טפס|תמריא|המרא|נחת|תנחת|חכה|תחכה|המתן|תמתין|עצור)"))
 
 
 def route(he):
@@ -428,7 +465,8 @@ def recognize(he, translate):
     Returns (kind, payload, flags):
         ("emergency", None,  [])      stage 0 fired; act immediately
         ("mission",   steps, [])      bypass answered; no model ran
-        ("english",   text,  flags)   translated; flags carry route:command / route:perception
+        ("command",   text,  flags)   translated English, planner-bound
+        ("perception", text,  flags)   translated English, VLM-bound
         ("reject",    text,  flags)   numbers unrecoverable; read the text back to the user
     """
     if emergency(he):
@@ -439,28 +477,15 @@ def recognize(he, translate):
         return ("mission", mission, [])
 
     he2, flags = apply_he(he)
-    flags.append(f"route:{route(he)}")
+    dest = route(he)                     # first-class routing decision, returned as the kind
 
     text = translate(he2, required_numbers=None)
-    if not check_numbers(he2, text):
-        flags.append("number-flag")
-        retry = translate(he2, required_numbers=_nums_he(he2))
-        if check_numbers(he2, retry):
-            text = retry
-        else:
-            he_nums, en_nums = _nums_he(he2), _nums_en(text)
-            extra = [x for x in en_nums if x not in he_nums]
-            missing = [x for x in he_nums if x not in en_nums]
-            patched = (patch_number(text, extra[0], missing[0])
-                       if len(extra) == 1 and len(missing) == 1 else None)
-            if patched and check_numbers(he2, patched):
-                text = patched
-                flags.append("number-patched")
-            else:
-                return ("reject", text, flags + ["REJECT-number"])
+    text, flags, rejected = _resolve_numbers(he2, text, translate, flags)
+    if rejected:
+        return ("reject", text, flags)
 
     text, en_fired = apply_en(text)
-    return ("english", text.strip(), flags + en_fired)
+    return (dest, text.strip(), flags + en_fired)
 
 
 # ==================================== selftest ====================================
@@ -498,10 +523,49 @@ def selftest():
         if got != want:
             bad.append(f"hebnum: {he!r} -> {got!r}, want {want!r}")
 
-    if inline_english("סמן את הכובע הכתום") != "סמן את הכובע ה-orange":
-        bad.append("inline he-prefix")
-    if inline_english("עקוב אחרי גדר הבטחון") != "עקוב אחרי fence הבטחון":
-        bad.append("inline bare")
+    for s_in, want in (("סמן את הכובע הכתום", "סמן את הכובע ה-orange"),      # he-prefix
+                       ("עקוב אחרי גדר הבטחון", "עקוב אחרי fence הבטחון"),     # bare
+                       ("הכתומים רצים לשם", "הכתומים רצים לשם"),               # negative: plural
+                       ("תתקרב לגדרות", "תתקרב לגדרות")):                      # negative: suffix
+        if inline_english(s_in) != want:
+            bad.append(f"inline_english: {s_in!r} -> {inline_english(s_in)!r}, want {want!r}")
+
+    for he_s, want in (("טוס קדימה חמישה מטרים", "command"),
+                       ("סמן את המכונית הלבנה ליד העץ", "perception"),
+                       ("מה אתה רואה עכשיו", "perception"),
+                       ("כמה אנשים יש בכיכר", "perception"),
+                       ("טוס אל האיש עם האפוד ותסתכל עליו", "command"),   # movement wins dual intent
+                       ("התקרב לבניין הגבוה", "perception"),
+                       ("חכה שלוש שניות", "command")):
+        if route(he_s) != want:
+            bad.append(f"route: {he_s!r} -> {route(he_s)!r}, want {want}")
+
+    assert _nums_he("שלוש מאות מטר קדימה") == [300.0]      # the old summer read this as [1, 3]
+    assert _nums_he("חצי סיבוב") == [0.5]
+    assert _nums_he("טוס 20 וחצי מעלות") == [20.5]
+    assert _nums_he("חמשת המטרים") == [5.0]
+    assert _nums_en("two and a half meters") == [2.5]
+    assert _nums_en("turn 20 and a half degrees") == [20.5]
+    assert check_numbers("שניים וחצי מטרים ימינה", "two and a half meters to the right")
+
+    for he_s, want in (("המראה", [{"type": "takeoff"}]),                     # bypass positives
+                       ("בצע המראה עכשיו", [{"type": "takeoff"}]),
+                       ("נחת", [{"type": "land"}]),
+                       ("עלה 10 מטרים", [{"type": "fly_by", "dz": 10.0}]),
+                       ("רד 3 מטרים", [{"type": "fly_by", "dz": -3.0}]),
+                       ("טוס קדימה 5 מטרים", [{"type": "fly_by", "dx": 5.0}]),
+                       ("טוס 5 מטרים", None),                               # neutral verb, no direction
+                       ("עלה קצת", None),                                   # no number
+                       ("מה אתה רואה", None),                               # question
+                       ("טוס אחורה 2 מטרים ואז שמאלה 3 מטרים", None)):      # chains go to the model
+        got = bypass(hebnum_to_digits(he_s))
+        if got != want:
+            bad.append(f"bypass: {he_s!r} -> {got!r}, want {want!r}")
+
+    for s_in, want in (("ואז ימינה 3 מטרים", "ואז זוז ימינה 3 מטרים"),      # bare direction gets a verb
+                       ("ואז פנה ימינה 45 מעלות", "ואז פנה ימינה 45 מעלות")):  # negative: verb present
+        if add_missing_verb(s_in) != want:
+            bad.append(f"add_missing_verb: {s_in!r} -> {add_missing_verb(s_in)!r}, want {want!r}")
     if add_missing_verb(hebnum_to_digits("פנה ימינה ואז ימינה שני מטרים")) != \
             "פנה ימינה ואז זוז ימינה 2 מטרים":
         bad.append("missing-verb")

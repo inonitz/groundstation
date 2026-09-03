@@ -5,8 +5,8 @@ tiers 4/3/1 (emergency, override, basic verbs) exactly as today, and everything 
 COMPLEX lands here. handle() runs recognize(), then acts on the result:
 
     mission            -> wire.fly_mission(steps)           bypass answered, no model ran
-    english + command  -> planner (Qwen3-VL) -> wire.fly_mission(mission)
-    english + perception -> vlm_query(text)
+    command            -> planner (Qwen3-VL) -> wire.fly_mission(mission)
+    perception         -> vlm_query(text)
     reject             -> say() the recognized text back to the user (ruling 2026-09-02)
     emergency          -> wire.halt()   (backup net only: the router's own emergency tier acts
                           first and this branch should never run)
@@ -67,16 +67,18 @@ class Pipeline:
         elif kind == "reject":
             self.say(REJECT_PREFIX + payload)
             action = "reject"
-        elif "route:perception" in flags:
+        elif kind == "perception":
             self.vlm_query(payload)
             action = "perception"
-        else:
+        elif kind == "command":
             mission = self.plan_fn(payload)
             if mission:                                # an empty mission is a refusal: no flight
                 self.wire.fly_mission(mission)
                 action = f"mission({len(mission)} steps, planned)"
             else:
                 action = "planned-empty"
+        else:                                          # unknown kind: never fall through to flight
+            action = f"unknown-kind({kind})"
 
         self.trace.record(text=text, kind=kind, flags=flags, action=action,
                           payload=payload, ms=round((time.time() - t0) * 1000))

@@ -45,7 +45,7 @@ voice:  scene_omdet ──► audio/tts_io.py ──► phone /tts (or local pip
 python3 -m pytest /root/groundstation/projects/integration_harden/test/ -q         # 26 wiring tests
 python3 /root/groundstation/projects/integration_harden/recognizer/recognizer.py   # Recognizer self-test
 python3 /root/groundstation/projects/integration_harden/perception/engine.py       # perception self-test
-python3 /root/groundstation/projects/integration_harden/video/camera_stream.py 0   # webcam frames, no ROS
+cd /root/groundstation/projects/integration_harden && python3 -m video.camera_stream 0   # webcam frames, no ROS
 python3 /root/groundstation/projects/integration_harden/test/live_mock_smoke.py    # 4 tiers vs the mock
 ```
 After a container rebuild run `bash /root/groundstation/tools/devenv/install-runtime-deps.sh`

@@ -1,50 +1,86 @@
-"""Central config: model paths, the llama-server endpoint, and the colour code that lets
-you tell the four overlay sources apart on screen (the whole point of this demo)."""
+"""Config for integration_harden -- the single home for every tunable and default.
+
+Contract: every module does `import config; config.X`. This file imports no sibling module, so it
+also loads from a bare script. It is organized into seven sections; to jump, search the banner for
+the number (e.g. "3. Ears").
+
+    1. VLM brain          Qwen3-VL endpoint + timeout
+    2. Eyes / detectors   background + highlight models, detector knobs
+    3. Ears (ASR)         the transcript topic we subscribe to
+    4. Camera + window    video input source and window sizing
+    5. Overlay colours    BGR colours for the on-screen overlays
+    6. Voice out (TTS)    how spoken answers are produced
+    7. Resolvers          device + gateway lookups (functions, not constants)
+"""
 import os
 
 # ROCm/MIOpen: fast kernel-search so the one-time GPU kernel compile at startup is short (harmless
 # on non-AMD backends). Must be set before torch initializes the GPU.
 os.environ.setdefault("MIOPEN_FIND_MODE", "2")
 
-# --- VLM brain: Qwen3-VL-4B on the repo's llama-server (run_llama_server.sh) ---
+
+# ============================== 1. VLM brain ==============================
+# Qwen3-VL-4B on the repo's llama-server (run_llama_server.sh).
 LLAMA_URL   = os.environ.get("SCENE_LLAMA_URL", "http://127.0.0.1:18090")
 VLM_TIMEOUT = 30                      # a warm 4B describe call is ~1-3 s
 
-# --- Real-time eyes: YOLOE (Ultralytics). Prompt-free = always-on background;
-#     promptable = on-demand highlight of a phrase. Swap to YOLOE-26 weights when local. ---
-# Background (always-on, subtle): fast closed-set YOLO26 segmentation. You already have this
-# locally; referenced by name it auto-downloads anywhere (point SCENE_BG at the local path to skip).
-BG_SEG_MODEL    = os.environ.get("SCENE_BG",        "yolo26n-seg.pt")
-# Highlight (on-demand, open-vocab): YOLOE-26 -- the 2026 model (arXiv 2602.00168), NOT the 2025
-# yoloe-11. "l" scale; drop to yoloe-26s/m-seg.pt for less compute.
-OPENVOCAB_MODEL = os.environ.get("SCENE_OPENVOCAB", "yoloe-26l-seg.pt")
-SAM2_WEIGHTS    = os.environ.get("SCENE_SAM2",      "sam2.1_b.pt")
-DEVICE           = os.environ.get("SCENE_DEVICE", "")   # "" = Ultralytics auto. torch reports "cuda" for the active GPU (NVIDIA RTX 5070 / CUDA 12.8 here, or ROCm/HIP on the RX7900). Force "cpu" to be safe.
-CONF_BG = float(os.environ.get("SCENE_CONF_BG", "0.35"))
-CONF_HL = float(os.environ.get("SCENE_CONF_HL", "0.10"))   # open-vocab conf runs low; be lenient
-HIGHLIGHT_HZ = float(os.environ.get("SCENE_HL_HZ", "2"))   # open-vocab highlight re-runs/sec (throttled)
-DETECT_IMGSZ = int(os.environ.get("SCENE_IMGSZ", "640"))   # detector input size (speed knob)
 
-# --- Ears: the EXISTING ROS2 asr_node publishes transcripts here (sttserv backend,
-#     push-to-talk on the H key). We SUBSCRIBE; we never capture or transcribe in Python. ---
+# =========================== 2. Eyes / detectors ==========================
+# Background = always-on closed-set YOLO26-seg (Eyes.background). Highlight = OmDet-Turbo open-vocab
+# detection gated by the VLM presence check, then a SAM2 mask (perception/engine.py owns that
+# decision). YOLOE and LLMDet/grounder were both removed on 2026-09-03.
+BG_SEG_MODEL = os.environ.get("SCENE_BG",   "yolo26n-seg.pt")
+SAM2_WEIGHTS = os.environ.get("SCENE_SAM2", "sam2.1_b.pt")
+CONF_BG      = float(os.environ.get("SCENE_CONF_BG", "0.35"))   # background-detector confidence floor
+DETECT_IMGSZ = int(os.environ.get("SCENE_IMGSZ", "640"))        # detector input size (speed knob)
+DEVICE       = os.environ.get("SCENE_DEVICE", "")               # "" = auto (see resolve_device); "cpu" to force
+
+
+# ============================== 3. Ears (ASR) =============================
+# The EXISTING ROS2 asr_node publishes transcripts here (sttserv backend, push-to-talk on the H
+# key). We SUBSCRIBE; we never capture or transcribe in Python.
 ASR_TOPIC = os.environ.get("SCENE_ASR_TOPIC", "/asr_server/transcribe")
 
-# --- Camera / window ---
-# Input: a webcam index ("0"), a video-file path, or a GStreamer pipeline. The drone stream
-# drops in here for Phase 6, e.g.:
-#   SCENE_INPUT='tcpclientsrc host=<phone-ip> port=5600 ! h264parse ! avdec_h264 ! videoconvert ! appsink'
-INPUT = os.environ.get("SCENE_INPUT", os.environ.get("SCENE_CAM", "0"))
-WIN_NAME  = "integration"
-CHAT_W    = int(os.environ.get("SCENE_CHAT_W", "460"))     # ChatGPT-style side pane width (px)
-RECORD    = os.environ.get("SCENE_RECORD", "")             # set to /path/out.mp4 to record the session
 
-# --- Colour code (BGR). Four distinct sources, compared at a glance. ---
-COL_BACKGROUND = (130, 130, 130)   # subtle grey  : always-on detector (thin)
-COL_YOLOE_HL   = ( 60, 220,  60)   # vibrant green: YOLOE real-time highlight
-COL_SAM2_HL    = (220,  60, 220)   # magenta      : SAM2 mask (other selection method)
-COL_VLM_BOX    = (  0, 215, 255)   # amber        : the VLM's OWN one-shot grounding box
-COL_TEXT       = (255, 255, 255)
-COL_HUD        = (  0, 255, 255)
+# ============================ 4. Camera + window ==========================
+# Input: "ros" (the camera/stream topic), a webcam index ("0"), a video file, a URL, or a
+# GStreamer pipeline, e.g.
+#   SCENE_INPUT='tcpclientsrc host=<phone-ip> port=5600 ! h264parse ! avdec_h264 ! videoconvert ! appsink'
+INPUT        = os.environ.get("SCENE_INPUT", os.environ.get("SCENE_CAM", "0"))
+CAM_W        = int(os.environ.get("SCENE_CAM_W", "1280"))          # requested webcam width (falls to nearest supported)
+CAM_H        = int(os.environ.get("SCENE_CAM_H", "720"))           # requested webcam height
+CHAT_W       = int(os.environ.get("SCENE_CHAT_W", "460"))          # chat side-pane width (px)
+OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", "180"))  # secs to keep retrying a not-yet-live input
+READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", "150"))      # consecutive read failures tolerated (network jitter)
+
+
+# ============================ 5. Overlay colours ==========================
+# BGR. Three overlay sources, told apart at a glance, plus the chat-pane labels.
+COL_BACKGROUND = (130, 130, 130)   # subtle grey  : always-on background detector (thin boxes)
+COL_YOLOE_HL   = ( 60, 220,  60)   # vibrant green: OmDet open-vocab highlight (name kept; drawn by scene_omdet)
+COL_SAM2_HL    = (220,  60, 220)   # magenta      : SAM2 mask
+COL_HUD        = (  0, 255, 255)   # cyan         : fps / status line
+COL_CHAT_USER  = (255, 210, 120)   # 'You:' label
+COL_CHAT_MODEL = (160, 235, 160)   # 'Scene:' label
+
+
+# ============================ 6. Voice out (TTS) ==========================
+# The PHONE app (DJI backend) OWNS TTS and speaks via POST /tts. LOCAL only, no cloud.
+TTS_BACKEND = os.environ.get("SCENE_TTS", "phone")            # phone (default) | espeak | piper | both | off
+# "both" speaks every answer TWICE (phone + laptop). It stays available for desk debugging with a
+# phone attached, but it must be asked for explicitly -- it is not the default.
+TTS_HOST    = os.environ.get("SCENE_TTS_HOST", "")            # phone IP; "" -> host= from SCENE_INPUT, else default_gateway()
+TTS_PORT    = int(os.environ.get("SCENE_TTS_PORT", "8080"))   # app ApiServer port
+TTS_LANG    = os.environ.get("SCENE_TTS_LANG", "en")          # POST /tts lang (country omitted)
+TTS_RATE    = float(os.environ.get("SCENE_TTS_RATE", "1.0"))  # POST /tts speech rate (1.0 = normal)
+TTS_TIMEOUT = float(os.environ.get("SCENE_TTS_TIMEOUT", "3")) # POST timeout (s)
+# desk-debug fallbacks only (no phone): piper voice model, its binary, and its raw sample rate
+TTS_MODEL     = os.environ.get("SCENE_TTS_MODEL", "/root/models/tts/voices/en_US-lessac-medium.onnx")
+TTS_PIPER_BIN = os.environ.get("SCENE_TTS_PIPER_BIN", "/root/models/tts/piper/piper")
+TTS_SR        = int(os.environ.get("SCENE_TTS_SR", "22050"))
+
+
+# =============================== 7. Resolvers =============================
 
 def resolve_device():
     """Best available compute device -- vendor-neutral, CPU fallback, never raises. This is the
@@ -65,26 +101,6 @@ def resolve_device():
         pass
     return "cpu"
 
-# --- chat pane colours + requested webcam resolution (appended) ---
-COL_CHAT_USER  = (255, 210, 120)   # 'You:' label (BGR)
-COL_CHAT_MODEL = (160, 235, 160)   # 'Scene:' label (BGR)
-CAM_W = int(os.environ.get("SCENE_CAM_W", "1280"))   # requested webcam width (falls to nearest supported)
-CAM_H = int(os.environ.get("SCENE_CAM_H", "720"))    # requested webcam height
-
-DETECT_HZ = float(os.environ.get("SCENE_DETECT_HZ", "15"))   # cap background detection so it can't starve the display
-PERF      = os.environ.get("SCENE_PERF", "0") not in ("", "0", "false", "False")
-
-
-# --- On-demand highlight grounder (REPLACES YOLOE for highlight). LLMDet-tiny: open-vocab PHRASE
-#     grounding, 2025 SOTA on rare/long-tail classes -- built for exactly the esoteric/small/described
-#     objects YOLOE could not find. Loads via the transformers MM-Grounding-DINO implementation, whose
-#     deformable attention has a pure-PyTorch fallback -> runs on ROCm/CUDA/CPU identically. Swap to a
-#     lighter/stable-only checkpoint with e.g.
-#     SCENE_GROUNDER=openmmlab-community/mm_grounding_dino_tiny_o365v1_goldg_grit_v3det ---
-GROUNDER_REPO = os.environ.get("SCENE_GROUNDER", "iSEE-Laboratory/llmdet_tiny")
-GND_BOX_THR   = float(os.environ.get("SCENE_GND_BOX",  "0.30"))   # box-confidence gate
-GND_TEXT_THR  = float(os.environ.get("SCENE_GND_TEXT", "0.25"))   # phrase-match gate
-GND_TOPK      = int(os.environ.get("SCENE_GND_TOPK", "1"))        # keep at most this many matches
 
 def resolve_torch_device():
     """torch-style device string ('cuda'/'mps'/'cpu') for transformers/HF models. Same portability
@@ -93,24 +109,17 @@ def resolve_torch_device():
     dev = resolve_device()
     return dev if dev in ("cpu", "mps") else "cuda"   # "0"/"1" (CUDA or ROCm/HIP) -> torch "cuda"
 
-WARMUP = os.environ.get("SCENE_WARMUP", "1") not in ("", "0", "false", "False")   # front-load the GPU kernel compile at startup
 
-OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", "180"))  # secs to keep retrying a not-yet-live input (drone RTMP)
-READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", "150"))        # consecutive read failures tolerated (network jitter)
-
-HIGHLIGHT_BACKEND = os.environ.get("SCENE_HL_BACKEND", "vlm")   # "vlm"=Qwen3-VL grounds the described referent (understands "red hat", refuses if absent) + SAM2 mask; "yoloe"/"grounder"=detector highlight
-
-VLM_COORD_SCALE = float(os.environ.get("SCENE_VLM_COORD_SCALE", "1000"))  # Qwen3-VL(llama.cpp) returns boxes on a 0-1000 scale -> scale to frame pixels
-VLM_MAX_OBJECTS = int(os.environ.get("SCENE_VLM_MAX_OBJECTS", "8"))          # cap boxes per query so a general "what do you see" does not clutter
-
-# --- Voice out (TTS): the PHONE app (DJI backend) speaks via POST /tts. LOCAL only, no cloud. ---
-TTS_BACKEND = os.environ.get("SCENE_TTS", "both")             # both | phone | espeak | piper | off
-TTS_HOST    = os.environ.get("SCENE_TTS_HOST", "")            # phone IP; "" -> host= from SCENE_INPUT, else gateway
-TTS_PORT    = int(os.environ.get("SCENE_TTS_PORT", "8080"))   # app ApiServer port
-TTS_LANG    = os.environ.get("SCENE_TTS_LANG", "en")          # POST /tts lang (country omitted)
-TTS_RATE    = float(os.environ.get("SCENE_TTS_RATE", "1.0"))  # POST /tts speech rate (1.0 = normal)
-TTS_TIMEOUT = float(os.environ.get("SCENE_TTS_TIMEOUT", "3")) # POST timeout (s)
-# desk-debug fallbacks only (no phone): piper voice model + its raw sample rate
-TTS_MODEL     = os.environ.get("SCENE_TTS_MODEL", "/root/models/tts/voices/en_US-lessac-medium.onnx")
-TTS_PIPER_BIN = os.environ.get("SCENE_TTS_PIPER_BIN", "/root/models/tts/piper/piper")
-TTS_SR        = int(os.environ.get("SCENE_TTS_SR", "22050"))
+def default_gateway():
+    """The workstation's default-route gateway. On the phone's hotspot that IS the phone's IP, which
+    is how tts_io, video_doctor and video_watchdog find the app. Returns None when there is no
+    default route -- callers MUST handle that (a literal "None" in a command line is a real bug we
+    already shipped once). This is the one home for the lookup; all three used to hand-roll it."""
+    try:
+        for line in open("/proc/net/route").readlines()[1:]:
+            f = line.split()
+            if f[1] == "00000000":              # destination 0.0.0.0 = the default route
+                return ".".join(str(int(f[2][i:i + 2], 16)) for i in (6, 4, 2, 0))
+    except Exception:
+        pass
+    return None

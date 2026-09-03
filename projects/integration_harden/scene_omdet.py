@@ -12,7 +12,6 @@ vlm.py/ears.py/eyes.py.
 Keys: q/Esc quit | c clear highlight | t SAM2 masks on/off | b background on/off | x clear chat
 """
 import os, sys, time, threading, textwrap, collections, subprocess, argparse
-os.environ.setdefault("SCENE_HL_BACKEND", "vlm")          # Eyes: no YOLOE load; we supply OmDet
 import cv2, numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # self-contained: import only local modules
@@ -20,7 +19,7 @@ import config
 from perception import PerceptionEngine, parse_highlight, ascii_only
 from perception import vlm_client as vlm
 from perception.detectors import Eyes, OmDet
-from video.camera_stream import open_capture
+from video.camera_stream import open_capture, ROS_SOURCES
 from control.router import Router
 from control.commands import Tier
 from control.dji_wire import DjiWire
@@ -82,6 +81,95 @@ def worker(eyes):
             if target: S.hl_dets, S.hl_masks = hl, masks
             else: S.hl_dets, S.hl_masks = [], []
         time.sleep(0.003)
+
+
+class TextHandler:
+    """One transcript in, one action out. The dispatch is __call__; each branch is its own method,
+    and the two slow branches (VLM presence gate, VLM answer) run on their own threads so the ASR
+    callback never blocks. Holds the router and voice it was built with; all shared state is S."""
+
+    def __init__(self, router, voice):
+        self.router = router
+        self.voice = voice
+
+    def __call__(self, text):
+        text = (text or "").strip()
+        if not text:
+            return
+        print("[scene_omdet] you:", text, flush=True)
+        with S.lock: S.chat.append(("user", text))
+        if self._handle_drone(text):
+            return
+        phrase = parse_highlight(text)
+        if phrase == "":
+            self._handle_clear()
+        elif phrase is not None:
+            self._handle_highlight(phrase)
+        else:
+            self._handle_ask(text)
+
+    # --- branches -------------------------------------------------------------------
+    def _handle_drone(self, text):
+        """-> True when the drone router consumed the turn. Basic/emergency/override are done here;
+        COMPLEX falls through to perception, which is what actually answers questions."""
+        if self.router is None:
+            return False
+        try:
+            res = self.router.handle(text)
+        except Exception as e:
+            with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
+            return True
+        if res.tier is Tier.COMPLEX:
+            return False
+        with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
+        return True
+
+    def _handle_clear(self):
+        with S.lock:
+            S.target = None; S.hl_dets = []; S.hl_masks = []
+            S.chat.append(("model", "Cleared the highlight."))
+
+    def _handle_highlight(self, phrase):
+        """Snapshot the frame and gate off-thread. The VLM presence GATE exists because OmDet (like
+        any open-vocab detector) returns a confident box even when the object is absent -- it grounds
+        'red backpack' onto the salient person. Ask the strong VLM first; suppress if not visible."""
+        with S.lock:
+            frame = None if S.frame is None else S.frame.copy(); S.thinking = True
+        threading.Thread(target=self._gate_thread, args=(frame, phrase), daemon=True).start()
+
+    def _handle_ask(self, text):
+        with S.lock:
+            frame = None if S.frame is None else S.frame.copy(); S.thinking = True
+        if frame is None:
+            with S.lock: S.thinking = False
+            return
+        threading.Thread(target=self._ask_thread, args=(frame, text), daemon=True).start()
+
+    # --- thread bodies --------------------------------------------------------------
+    def _gate_thread(self, fr, tgt):
+        present, px = True, None
+        if fr is not None and ENGINE["e"] is not None:
+            present, px = ENGINE["e"].presence_gate(fr, tgt)
+        with S.lock:
+            S.thinking = False
+            if present:
+                S.target = tgt; S.vlm_box = px; S.chat.append(("model", f"Highlighting: {tgt}"))
+            else:
+                S.target = None; S.vlm_box = None; S.hl_dets = []; S.hl_masks = []
+                S.chat.append(("model", f"I don't see a {tgt} in view."))
+        print(f"[scene_omdet] gate '{tgt}': present={present} -> px={px}", flush=True)
+
+    def _ask_thread(self, fr, q):
+        try: desc, _, _, spoken = vlm.ask(fr, q, [])
+        except Exception as e: desc = f"[VLM err: {e}]"; spoken = ""
+        with S.lock:
+            S.chat.append(("model", desc))                       # long -> Scene:
+            if spoken and spoken != desc and not desc.startswith("["):
+                S.chat.append(("spoken", spoken))                # short -> Spoken: (also on screen)
+            S.thinking = False
+        print("[scene_omdet] scene:", desc, "|| spoken:", spoken, flush=True)
+        if self.voice is not None and spoken and not desc.startswith("["):   # screen shows both; speak the SHORT
+            self.voice.say(spoken)
 
 
 def draw_box(img, box, color, label=None, thick=2):
@@ -188,63 +276,7 @@ def main():
         except Exception as e:
             print("[scene_omdet] voice/TTS unavailable:", e, flush=True)
 
-    def on_text(text):
-        text = (text or "").strip()
-        if not text: return
-        print("[scene_omdet] you:", text, flush=True)
-        with S.lock: S.chat.append(("user", text))
-        if router is not None:
-            try:
-                res = router.handle(text)
-            except Exception as e:
-                with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
-                return
-            if res.tier is not Tier.COMPLEX:      # basic/emergency/override handled -> done
-                with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
-                return
-        ph = parse_highlight(text)
-        if ph == "":
-            with S.lock:
-                S.target = None; S.hl_dets = []; S.hl_masks = []
-                S.chat.append(("model", "Cleared the highlight."))
-            return
-        if ph is not None:
-            # VLM presence GATE: OmDet (like any open-vocab detector) returns a confident box even when
-            # the object is absent -- it grounds "red backpack" onto the salient person. Before letting
-            # OmDet draw, ask the strong VLM whether the target is actually visible; suppress if not.
-            with S.lock:
-                gframe = None if S.frame is None else S.frame.copy(); S.thinking = True
-            def _gate(fr, tgt):
-                present, px = True, None
-                if fr is not None and ENGINE["e"] is not None:
-                    present, px = ENGINE["e"].presence_gate(fr, tgt)
-                with S.lock:
-                    S.thinking = False
-                    if present:
-                        S.target = tgt; S.vlm_box = px; S.chat.append(("model", f"Highlighting: {tgt}"))
-                    else:
-                        S.target = None; S.vlm_box = None; S.hl_dets = []; S.hl_masks = []
-                        S.chat.append(("model", f"I don't see a {tgt} in view."))
-                print(f"[scene_omdet] gate '{tgt}': present={present} -> px={px}", flush=True)
-            threading.Thread(target=_gate, args=(gframe, ph), daemon=True).start()
-            return
-        with S.lock:
-            frame = None if S.frame is None else S.frame.copy(); S.thinking = True
-        if frame is None:
-            with S.lock: S.thinking = False
-            return
-        def _ask(fr, q):                      # run OFF the ASR thread so voice never blocks
-            try: desc, _, _, spoken = vlm.ask(fr, q, [])
-            except Exception as e: desc = f"[VLM err: {e}]"; spoken = ""
-            with S.lock:
-                S.chat.append(("model", desc))                       # long -> Scene:
-                if spoken and spoken != desc and not desc.startswith("["):
-                    S.chat.append(("spoken", spoken))                # short -> Spoken: (also on screen)
-                S.thinking = False
-            print("[scene_omdet] scene:", desc, "|| spoken:", spoken, flush=True)
-            if voice is not None and spoken and not desc.startswith("["):   # screen shows both; speak the SHORT
-                voice.say(spoken)
-        threading.Thread(target=_ask, args=(frame, text), daemon=True).start()
+    on_text = TextHandler(router, voice)
 
     ears = None
     if _HAVE_EARS and not a.no_ears:
@@ -269,7 +301,7 @@ def main():
     threading.Thread(target=worker, args=(eyes,), daemon=True).start()
     win = "integration:scene_omdet"; cv2.namedWindow(win, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
     tprev = time.time(); readfail = 0
-    live = str(a.source) in ("ros","camera_stream","camera/stream") or "://" in str(a.source) or "!" in str(a.source)
+    live = str(a.source) in ROS_SOURCES or "://" in str(a.source) or "!" in str(a.source)
     try:
         while True:
             ok, frame = cap.read()

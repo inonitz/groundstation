@@ -11,14 +11,16 @@ The LLM/VLM never reaches this dispatcher -- only deterministic verbs move the d
 """
 from dataclasses import dataclass
 
-try:
-    from . import commands
-    from .commands import Tier
-    from .dji_wire import DEFAULT_NUDGE_S, DEFAULT_SPEED_MPS, DEFAULT_YAW_DEG_S
-except ImportError:            # run flat from inside integration/ (python3 scene_omdet.py)
-    from control import commands
-    from control.commands import Tier
-    from control.dji_wire import DEFAULT_NUDGE_S, DEFAULT_SPEED_MPS, DEFAULT_YAW_DEG_S
+from . import commands
+from .commands import Tier
+
+# Conservative indoor envelope: the Router() defaults, and their only consumer. They used to live in
+# dji_wire.py, which never read them itself.
+# NOTE: indoors the drone's VPS often refuses lateral/vertical motion (see docs/NOTES /
+# indoor-vps-denial); yaw + slow vertical are the reliable axes.
+DEFAULT_SPEED_MPS = 0.5      # m/s, well under the app's kDjiMaxSpeedMps=2.0
+DEFAULT_YAW_DEG_S = 45.0     # deg/s -- the app reads ANGULAR_VELOCITY in degrees, not rad
+DEFAULT_NUDGE_S = 1.5        # seconds of bounded motion per verb
 
 
 # Unit direction per verb, scaled at dispatch. Body-frame: vx fwd+, vy right+, vz up+.
