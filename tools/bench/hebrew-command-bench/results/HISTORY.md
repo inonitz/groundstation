@@ -319,3 +319,9 @@ them); their end-to-end effect requires the perception rerun with TranslateGemma
 Raw: 2026-09-02-recognizer-full.json. emergency 6/6, std 182/185 (98%), verbose 46/53 (87%),
 perception 57/100 (raw json counted 58), military 10/20 (raw 11), ALL 301/364 (83%).
 Superseded by the run after the takeoff-chain + stay-there rules (README scorecard).
+
+## Superseded 2026-09-03: post-residue-rules scorecard (301->306/364)
+Raw: 2026-09-02-recognizer.json; routing-refactor equivalence twin:
+2026-09-03-recognizer-routing-eq.json (byte-identical). Superseded by the guard-unification
+run: one Hebrew composer + EN and-a-half composition -> 308/366 (two false rejects became
+correct missions). Scorecard in the README.

@@ -160,7 +160,7 @@ def run_recognizer(smoke=False):
     for set_name, cases in (("perception", sets["perception"]), ("military", sets["military"])):
         groups = {c[0]: c[3] for c in cases}
         ok = sum(1 for r in recognized[set_name]
-                 if r["kind"] == "english" and not score_perception(r["payload"], groups[r["case"]]))
+                 if r["kind"] in ("command", "perception") and not score_perception(r["payload"], groups[r["case"]]))
         results[set_name] = {"ok": ok, "n": len(recognized[set_name])}
 
     # Pass 2, Qwen3-VL resident: command sets continue to the planner and mission scoring.
@@ -173,7 +173,7 @@ def run_recognizer(smoke=False):
                 if r["kind"] == "mission":
                     verdict = score(to_scorer_schema(r["payload"]), expected[r["case"]])
                     rows.append({"case": r["case"], "score": verdict, "t_total_ms": 0})
-                elif r["kind"] == "english":
+                elif r["kind"] in ("command", "perception"):
                     mission, t_plan = plan(PORT, r["payload"])
                     verdict = score(to_scorer_schema(mission) if mission is not None else None,
                                     expected[r["case"]])
