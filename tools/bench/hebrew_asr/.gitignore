@@ -1,0 +1,9 @@
+# Regenerable or dataset artifacts — never commit these.
+# data/ holds FLEURS wav clips + downloaded CT2 model; hf_cache/ is the HF download cache.
+data/
+venv/
+hf_cache/
+logs/
+__pycache__/
+*.pyc
+*.wav
