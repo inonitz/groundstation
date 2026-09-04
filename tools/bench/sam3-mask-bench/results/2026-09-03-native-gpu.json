@@ -1,0 +1,158 @@
+{
+  "date": "2026-09-03",
+  "model": "facebook/sam3 (transformers-native)",
+  "dtype": "bfloat16",
+  "device": "cuda RTX 5070 8GiB",
+  "frame_source": "recorded desk frames (static single scene)",
+  "vram": {
+    "weights_torch_mib": 1645,
+    "peak_torch_mib": 2006,
+    "process_total_mib_nvidia_smi": 2348
+  },
+  "load_s": 1.9,
+  "latency_ms_text_detect": {
+    "p25": 434.2,
+    "p50": 434.9,
+    "p75": 435.6,
+    "p95": 438.5,
+    "max": 441.2
+  },
+  "detection": {
+    "present": {
+      "keyboard": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "monitor": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "cup": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "chair": {
+        "det_per_frame": [
+          2,
+          2,
+          2
+        ],
+        "top_score": [
+          0.812,
+          0.754,
+          0.715
+        ]
+      },
+      "hand": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "person": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "laptop": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "absent": {
+      "elephant": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "airplane": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "zebra": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "giraffe": {
+        "det_per_frame": [
+          0,
+          0,
+          0
+        ],
+        "top_score": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  }
+}

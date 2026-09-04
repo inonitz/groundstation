@@ -1,0 +1,3 @@
+{"cfg": "bf16", "weights_mib": 1645, "peak_mib": 2006, "proc_mib": 2348, "load_s": 3.5, "lat_p50_ms": 332.9, "chair_dets": 2, "chair_top": 0.812, "elephant_dets": 0, "elephant_top": 0.0}
+{"cfg": "nf4", "weights_mib": 526, "peak_mib": 886, "proc_mib": 1152, "load_s": 3.7, "lat_p50_ms": 458.5, "chair_dets": 2, "chair_top": 0.812, "elephant_dets": 0, "elephant_top": 0.0}
+{"cfg": "fp4", "weights_mib": 526, "peak_mib": 886, "proc_mib": 1152, "load_s": 3.8, "lat_p50_ms": 459.1, "chair_dets": 2, "chair_top": 0.727, "elephant_dets": 0, "elephant_top": 0.0}

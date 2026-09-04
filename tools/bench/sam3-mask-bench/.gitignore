@@ -1,0 +1,5 @@
+samexporter/
+overlays/
+__pycache__/
+*.pyc
+candidates/

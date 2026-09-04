@@ -1,0 +1,406 @@
+{
+  "date": "2026-09-03",
+  "model": "facebook/sam3 bf16",
+  "tests": [
+    {
+      "id": "t1_building_render",
+      "image": "img0.png",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight the leftmost window on the top floor of the building",
+          "n_det": 1,
+          "top_score": 0.844,
+          "latency_ms": 1149.7,
+          "overlay": "t1_building_render__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the windows of the building",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 318.8,
+          "overlay": "t1_building_render__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight the top floor of the building",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 321.4,
+          "overlay": "t1_building_render__var1.jpg"
+        }
+      ],
+      "reference": {
+        "source": "test_img2 log",
+        "image_size": [
+          1000,
+          563
+        ],
+        "objects": [
+          [
+            "Leftmost window on the top floor",
+            108,
+            181,
+            246,
+            239
+          ]
+        ]
+      }
+    },
+    {
+      "id": "t2_tower_damaged",
+      "image": "img1.png",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight the top-most and left-most tower windows in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 380.9,
+          "overlay": "t2_tower_damaged__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the windows of the tower",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 326.3,
+          "overlay": "t2_tower_damaged__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight the balconies of the tower",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 345.8,
+          "overlay": "t2_tower_damaged__var1.jpg"
+        }
+      ],
+      "reference": {
+        "source": "test_img3 log",
+        "image_size": [
+          1110,
+          1480
+        ],
+        "objects": [
+          [
+            "top-most & left-most tower window",
+            11,
+            74,
+            111,
+            148
+          ]
+        ]
+      }
+    },
+    {
+      "id": "t3_two_buildings_people",
+      "image": "img2.png",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight all the people, and highlight the boilers at the top of the left building",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 365.6,
+          "overlay": "t3_two_buildings_people__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the people in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 323.7,
+          "overlay": "t3_two_buildings_people__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight the boilers at the top of the left building",
+          "n_det": 1,
+          "top_score": 0.633,
+          "latency_ms": 347.9,
+          "overlay": "t3_two_buildings_people__var1.jpg"
+        }
+      ],
+      "reference": {
+        "source": "test_img4 log",
+        "image_size": [
+          1024,
+          768
+        ],
+        "objects": [
+          [
+            "people",
+            567,
+            616,
+            599,
+            718
+          ],
+          [
+            "people",
+            626,
+            609,
+            672,
+            719
+          ],
+          [
+            "people",
+            547,
+            544,
+            582,
+            585
+          ]
+        ],
+        "note": "boilers correctly NOT highlighted (absent) -- adversarial negative"
+      }
+    },
+    {
+      "id": "t4_man_tree_suit",
+      "image": "img3.png",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Create a bounding box around the person",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 345.8,
+          "overlay": "t4_man_tree_suit__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight the person in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 325.0,
+          "overlay": "t4_man_tree_suit__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "How many people are in the image?",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 356.6,
+          "overlay": "t4_man_tree_suit__var1.jpg"
+        }
+      ],
+      "reference": {
+        "source": "test_img0 log",
+        "image_size": [
+          459,
+          612
+        ],
+        "objects": [
+          [
+            "person",
+            151,
+            212,
+            315,
+            610
+          ]
+        ]
+      }
+    },
+    {
+      "id": "t5_cinema_audience",
+      "image": "img4.png",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "What is the precise number of people present in the image?",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 344.7,
+          "overlay": "t5_cinema_audience__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the people in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 330.2,
+          "overlay": "t5_cinema_audience__var0.jpg"
+        }
+      ],
+      "reference": {
+        "source": "test_img1 log",
+        "image_size": [
+          612,
+          408
+        ],
+        "vlm_count": "at least 15",
+        "objects": [
+          [
+            "person",
+            0,
+            0,
+            612,
+            408
+          ]
+        ],
+        "note": "current pipeline returned ONE whole-image box -- a failure mode; SAM3 open-vocab should return per-person instances"
+      }
+    },
+    {
+      "id": "t6_convoy_trucks",
+      "image": "img5.jpeg",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight all the people in the scene in great detail",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 357.3,
+          "overlay": "t6_convoy_trucks__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the trucks in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 346.2,
+          "overlay": "t6_convoy_trucks__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight the person holding a weapon",
+          "n_det": 1,
+          "top_score": 0.684,
+          "latency_ms": 342.2,
+          "overlay": "t6_convoy_trucks__var1.jpg"
+        },
+        {
+          "tag": "notify",
+          "prompt": "a person holding a weapon",
+          "n_det": 4,
+          "top_score": 0.602,
+          "latency_ms": 359.8,
+          "overlay": "t6_convoy_trucks__notify.jpg"
+        }
+      ],
+      "reference": {
+        "source": "none (no log for this frame)"
+      }
+    },
+    {
+      "id": "t7_truck_armed_men",
+      "image": "img6.jpeg",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight all the people in the scene in great detail",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 340.9,
+          "overlay": "t7_truck_armed_men__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight the person holding a weapon",
+          "n_det": 2,
+          "top_score": 0.684,
+          "latency_ms": 345.1,
+          "overlay": "t7_truck_armed_men__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight all the sacks on the truck",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 360.7,
+          "overlay": "t7_truck_armed_men__var1.jpg"
+        },
+        {
+          "tag": "notify",
+          "prompt": "a person holding a weapon",
+          "n_det": 7,
+          "top_score": 0.801,
+          "latency_ms": 358.0,
+          "overlay": "t7_truck_armed_men__notify.jpg"
+        }
+      ],
+      "reference": {
+        "source": "img93 log",
+        "image_size": [
+          1536,
+          992
+        ],
+        "people": 8,
+        "notify_matched": "2/6 matched 'a person holding a weapon'"
+      }
+    },
+    {
+      "id": "t8_overhead_rpg",
+      "image": "img7.jpeg",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight the person aiming the weapon",
+          "n_det": 1,
+          "top_score": 0.77,
+          "latency_ms": 343.3,
+          "overlay": "t8_overhead_rpg__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight the person in the scene",
+          "n_det": 0,
+          "top_score": 0.0,
+          "latency_ms": 346.6,
+          "overlay": "t8_overhead_rpg__var0.jpg"
+        },
+        {
+          "tag": "var1",
+          "prompt": "Highlight the weapon",
+          "n_det": 1,
+          "top_score": 0.508,
+          "latency_ms": 351.8,
+          "overlay": "t8_overhead_rpg__var1.jpg"
+        }
+      ],
+      "reference": {
+        "source": "img94 log",
+        "image_size": [
+          1024,
+          767
+        ],
+        "objects": [
+          [
+            "person",
+            351,
+            411,
+            478,
+            605
+          ]
+        ]
+      }
+    },
+    {
+      "id": "t9_street_scene_ocr",
+      "image": "img10_highlight_windows_from_event_perform_ocr.jpeg",
+      "prompts": [
+        {
+          "tag": "matched",
+          "prompt": "Highlight the windows of the left building",
+          "n_det": 2,
+          "top_score": 0.797,
+          "latency_ms": 372.1,
+          "overlay": "t9_street_scene_ocr__matched.jpg"
+        },
+        {
+          "tag": "var0",
+          "prompt": "Highlight all the cars in the scene",
+          "n_det": 7,
+          "top_score": 0.906,
+          "latency_ms": 365.9,
+          "overlay": "t9_street_scene_ocr__var0.jpg"
+        }
+      ],
+      "reference": {
+        "source": "img10 OCR",
+        "prompt_ocr": "windows of the right building on the middle floor",
+        "note": "already marked in source (magenta); test a different target"
+      }
+    }
+  ]
+}

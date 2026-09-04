@@ -1,0 +1,10 @@
+{
+  "date": "2026-09-03", "path": "embedl/sam3 QDQ ONNX -> TensorRT 11.2.1 strongly-typed engine",
+  "precision": "INT8/FP16 (mixed, from QDQ)", "input_res": 924,
+  "engine_build_s": 94.3,
+  "inputs": {"image": "(1,3,924,924) float", "tokenized_text": "(1,32) int64"},
+  "latency_ms_engine_only": {"p50": 262.5, "p95": 302.5, "min": 227.6},
+  "process_vram_mib": 4218,
+  "vram_caveat": "includes torch CUDA context + TRT workspace/activation arena; NOT the deployable footprint (engine weights ~1GB)",
+  "compare": {"transformers_bf16_p50_ms": 345.3, "transformers_nf4_p50_ms": 366.4}
+}

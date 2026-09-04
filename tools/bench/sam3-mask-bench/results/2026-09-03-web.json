@@ -1,0 +1,166 @@
+{
+  "date": "2026-09-03",
+  "model": "facebook/sam3 bf16",
+  "images": [
+    {
+      "image": "market-0.jpg",
+      "prompts": [
+        {
+          "prompt": "person",
+          "n": 25,
+          "top": 0.945
+        },
+        {
+          "prompt": "person carrying a bag",
+          "n": 2,
+          "top": 0.801
+        },
+        {
+          "prompt": "person wearing a hat",
+          "n": 7,
+          "top": 0.867
+        }
+      ]
+    },
+    {
+      "image": "market-1.jpg",
+      "prompts": [
+        {
+          "prompt": "person",
+          "n": 20,
+          "top": 0.949
+        },
+        {
+          "prompt": "person carrying a bag",
+          "n": 2,
+          "top": 0.789
+        },
+        {
+          "prompt": "person wearing a hat",
+          "n": 3,
+          "top": 0.734
+        }
+      ]
+    },
+    {
+      "image": "market-2.jpg",
+      "prompts": [
+        {
+          "prompt": "person",
+          "n": 51,
+          "top": 0.949
+        },
+        {
+          "prompt": "person carrying a bag",
+          "n": 0,
+          "top": 0.0
+        },
+        {
+          "prompt": "person wearing a hat",
+          "n": 15,
+          "top": 0.934
+        }
+      ]
+    },
+    {
+      "image": "street-crowd-0.jpg",
+      "prompts": [
+        {
+          "prompt": "person",
+          "n": 30,
+          "top": 0.941
+        },
+        {
+          "prompt": "person wearing a backpack",
+          "n": 3,
+          "top": 0.586
+        },
+        {
+          "prompt": "bicycle",
+          "n": 0,
+          "top": 0.0
+        }
+      ]
+    },
+    {
+      "image": "street-crowd-1.jpg",
+      "prompts": [
+        {
+          "prompt": "person",
+          "n": 41,
+          "top": 0.941
+        },
+        {
+          "prompt": "person wearing a backpack",
+          "n": 7,
+          "top": 0.91
+        },
+        {
+          "prompt": "bicycle",
+          "n": 0,
+          "top": 0.0
+        }
+      ]
+    },
+    {
+      "image": "street-scene-0.jpg",
+      "prompts": [
+        {
+          "prompt": "car",
+          "n": 9,
+          "top": 0.848
+        },
+        {
+          "prompt": "van",
+          "n": 3,
+          "top": 0.734
+        },
+        {
+          "prompt": "window",
+          "n": 17,
+          "top": 0.859
+        }
+      ]
+    },
+    {
+      "image": "street-scene-1.jpg",
+      "prompts": [
+        {
+          "prompt": "car",
+          "n": 6,
+          "top": 0.957
+        },
+        {
+          "prompt": "van",
+          "n": 0,
+          "top": 0.0
+        },
+        {
+          "prompt": "window",
+          "n": 6,
+          "top": 0.926
+        }
+      ]
+    },
+    {
+      "image": "street-scene-2.jpg",
+      "prompts": [
+        {
+          "prompt": "car",
+          "n": 6,
+          "top": 0.902
+        },
+        {
+          "prompt": "van",
+          "n": 2,
+          "top": 0.695
+        },
+        {
+          "prompt": "window",
+          "n": 17,
+          "top": 0.926
+        }
+      ]
+    }
+  ]
+}

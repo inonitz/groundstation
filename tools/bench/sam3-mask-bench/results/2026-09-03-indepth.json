@@ -1,0 +1,158 @@
+{
+  "date": "2026-09-03",
+  "rows": [
+    {
+      "image": "img0.png",
+      "concept": "window",
+      "sam3_n": 26,
+      "sam3_top": 0.918,
+      "omdet_n": 0,
+      "omdet_top": 0.0,
+      "mask_iou_mean": 0.896
+    },
+    {
+      "image": "img1.png",
+      "concept": "window",
+      "sam3_n": 47,
+      "sam3_top": 0.922,
+      "omdet_n": 0,
+      "omdet_top": 0.0,
+      "mask_iou_mean": 0.796
+    },
+    {
+      "image": "img2.png",
+      "concept": "person",
+      "sam3_n": 4,
+      "sam3_top": 0.941,
+      "omdet_n": 5,
+      "omdet_top": 0.88,
+      "mask_iou_mean": 0.854
+    },
+    {
+      "image": "img3.png",
+      "concept": "person",
+      "sam3_n": 1,
+      "sam3_top": 0.977,
+      "omdet_n": 1,
+      "omdet_top": 0.914,
+      "mask_iou_mean": 0.981
+    },
+    {
+      "image": "img4.png",
+      "concept": "person",
+      "sam3_n": 17,
+      "sam3_top": 0.965,
+      "omdet_n": 7,
+      "omdet_top": 0.612,
+      "mask_iou_mean": 0.938
+    },
+    {
+      "image": "img5.jpeg",
+      "concept": "person",
+      "sam3_n": 30,
+      "sam3_top": 0.953,
+      "omdet_n": 6,
+      "omdet_top": 0.877,
+      "mask_iou_mean": 0.832
+    },
+    {
+      "image": "img6.jpeg",
+      "concept": "person",
+      "sam3_n": 10,
+      "sam3_top": 0.961,
+      "omdet_n": 11,
+      "omdet_top": 0.818,
+      "mask_iou_mean": 0.868
+    },
+    {
+      "image": "img7.jpeg",
+      "concept": "person",
+      "sam3_n": 1,
+      "sam3_top": 0.867,
+      "omdet_n": 1,
+      "omdet_top": 0.626,
+      "mask_iou_mean": 0.863
+    },
+    {
+      "image": "img10_highlight_windows_from_event_perform_ocr.jpeg",
+      "concept": "car",
+      "sam3_n": 8,
+      "sam3_top": 0.977,
+      "omdet_n": 8,
+      "omdet_top": 0.898,
+      "mask_iou_mean": 0.949
+    },
+    {
+      "image": "market-0.jpg",
+      "concept": "person",
+      "sam3_n": 25,
+      "sam3_top": 0.945,
+      "omdet_n": 10,
+      "omdet_top": 0.665,
+      "mask_iou_mean": 0.827
+    },
+    {
+      "image": "market-1.jpg",
+      "concept": "person",
+      "sam3_n": 20,
+      "sam3_top": 0.949,
+      "omdet_n": 7,
+      "omdet_top": 0.682,
+      "mask_iou_mean": 0.811
+    },
+    {
+      "image": "market-2.jpg",
+      "concept": "person",
+      "sam3_n": 51,
+      "sam3_top": 0.949,
+      "omdet_n": 6,
+      "omdet_top": 0.513,
+      "mask_iou_mean": 0.848
+    },
+    {
+      "image": "street-crowd-0.jpg",
+      "concept": "person",
+      "sam3_n": 30,
+      "sam3_top": 0.941,
+      "omdet_n": 13,
+      "omdet_top": 0.53,
+      "mask_iou_mean": 0.786
+    },
+    {
+      "image": "street-crowd-1.jpg",
+      "concept": "person",
+      "sam3_n": 41,
+      "sam3_top": 0.941,
+      "omdet_n": 10,
+      "omdet_top": 0.788,
+      "mask_iou_mean": 0.8
+    },
+    {
+      "image": "street-scene-0.jpg",
+      "concept": "car",
+      "sam3_n": 9,
+      "sam3_top": 0.848,
+      "omdet_n": 5,
+      "omdet_top": 0.557,
+      "mask_iou_mean": 0.881
+    },
+    {
+      "image": "street-scene-1.jpg",
+      "concept": "car",
+      "sam3_n": 6,
+      "sam3_top": 0.957,
+      "omdet_n": 5,
+      "omdet_top": 0.776,
+      "mask_iou_mean": 0.86
+    },
+    {
+      "image": "street-scene-2.jpg",
+      "concept": "car",
+      "sam3_n": 6,
+      "sam3_top": 0.902,
+      "omdet_n": 6,
+      "omdet_top": 0.882,
+      "mask_iou_mean": 0.868
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[recognize] 2026-08-27 11:49:09
+[recognize] argv    : /root/groundstation/source/integration_notify/recognize.py /root/groundstation/img93.jpeg Highlight all the people in the scene in great detail --notify a person holding a weapon --mask -o /root/groundstation/img93_fixed.jpg
+[recognize] image   : /root/groundstation/img93.jpeg  (1536x992)
+[recognize] prompt  : Highlight all the people in the scene in great detail
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:18090   mask=True  notify='a person holding a weapon'
+[recognize] querying VLM...
+
+=== VLM ANSWER  (5.9s) ===
+The image shows a group of men, mostly in dark clothing, on and around a large truck loaded with white sacks. Some are seated on the truck bed, one is standing on the back holding a rifle, and another is leaning against the driver's side door. A man in a black shirt is visible in the foreground on the left, and another is partially visible inside the truck's cab.
+
+=== OBJECTS (8) ===
+  person                   (133, 759, 268, 992)
+  person                   (333, 513, 419, 619)
+  person                   (496, 532, 591, 632)
+  person                   (663, 538, 726, 609)
+  person                   (764, 526, 846, 622)
+  person                   (887, 440, 978, 613)
+  person                   (975, 464, 1036, 593)
+  person                   (1018, 529, 1118, 595)
+
+=== NOTIFY: people matching 'a person holding a weapon' ===
+  person (137, 758, 266, 992) -> 'no' match=False
+  person (1169, 681, 1285, 941) -> 'no' match=False
+  person (333, 516, 412, 618) -> 'yes' match=True
+  person (771, 524, 846, 633) -> 'no' match=False
+  person (894, 428, 1000, 612) -> 'yes' match=True
+  person (500, 531, 588, 628) -> 'no' match=False
+[recognize] notify: 2/6 people matched 'a person holding a weapon'
+
+[recognize] saved image -> /root/groundstation/img93_fixed.jpg

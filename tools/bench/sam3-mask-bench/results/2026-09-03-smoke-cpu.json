@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-03",
+  "kind": "harness smoke, not a measurement",
+  "model": "vietanhdev SAM3 ONNX ViT-H (FP32)",
+  "path": "box->mask, language encoder NOT loaded",
+  "device": "CPUExecutionProvider",
+  "frames": 1,
+  "frame_source": "live webcam (smoke only)",
+  "box": "fixed center rectangle (smoke only, not a detection)",
+  "load_s": 3.5,
+  "encode_s": 10.81,
+  "decode_s": 2.04,
+  "mask_shape": [2, 1, 480, 640],
+  "mask_dtype": "bool",
+  "note": "proves the harness runs end to end and returns original-resolution masks; latency is CPU and single-frame"
+}

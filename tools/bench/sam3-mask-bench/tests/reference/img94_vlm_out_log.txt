@@ -1,0 +1,14 @@
+[recognize] 2026-08-27 12:10:20
+[recognize] argv    : /root/groundstation/source/integration_notify/recognize.py /root/groundstation/img94.jpeg Highlight the person aiming the weapon --mask -o /root/groundstation/img94_vlm_out.jpg
+[recognize] image   : /root/groundstation/img94.jpeg  (1024x767)
+[recognize] prompt  : Highlight the person aiming the weapon
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:18090   mask=True  notify=None
+[recognize] querying VLM...
+
+=== VLM ANSWER  (3.0s) ===
+A person is aiming a large weapon from a makeshift position, with smoke and debris visible nearby.
+
+=== OBJECTS (1) ===
+  person                   (351, 411, 478, 605)
+
+[recognize] saved image -> /root/groundstation/img94_vlm_out.jpg
