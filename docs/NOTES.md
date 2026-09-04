@@ -2610,3 +2610,61 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   becomes a planner {"delay":1}). std 184/185, verbose 50/53. Military -1 = probe artifact
   (open owner call); found a ±1-2 cross-run noise band on model-dependent sets — dicta restarts
   flip identical translations english<->reject; determinism is per-server-session only.
+- **Routing is first-class (2026-09-03, review Tier-2 fix):** recognize() kinds are now
+  emergency|mission|reject|command|perception; pipeline dispatches on kind and an unknown kind
+  never reaches the flight path. Bench gates widened to the two new kinds (same behavior).
+  Equivalence proven by full re-measure: 306/364, zero payload diffs vs the prior run.
+- **Tier-1 dead-code purge landed (2026-09-03, subagent, verified by the manager):** +31/-374
+  across 7 files (detectors 268->124, dji_wire 246->157, vlm_client 200->116, config 116->88);
+  four real bugs fixed (TTS "both" double-speak default -> phone, watchdog --dji None guard,
+  VLM-box fallback now mask-checked like the primary path, docstring path). Two documented
+  skips: DjiWire.status() (typed home for a 3x hand-rolled SAFE endpoint) and DEFAULT_*
+  (live caller router.py:44). Full report: docs/active/2026-09-03-deadcode-purge-report.md.
+  NOTE for the desk test: the engine fallback-mask change alters live highlight behavior.
+- **Review items 7-15 done (2026-09-03): Recognizer guard unified + structure pass.** One
+  Hebrew number composer for stage 2 and the guard (hundreds compose; מטר אחד no longer
+  double-counts) with symmetric and-a-half on the English side — full recheck 308/366, the
+  +2 are two false rejects that became correct missions, zero other diffs. he_word() is the
+  one home for the Hebrew boundary idiom; route regexes carry self-test evidence. Structure:
+  on_text dispatch, sectioned config, one default_gateway(), shared FrameCounter, dead import
+  fallback gone. Deliberate skips + reasons: the two 2026-09-03 reports in docs/active/.
+- **ASR ruling (2026-09-03, owner):** ivrit-ai whisper-large-v3-turbo, Q5 quant, is the ASR
+  choice for now — fast enough, among the most accurate measured. In-domain validation
+  (team recordings -> transfer metric) stays open and is owner-paced; the pick may be
+  revisited when that data exists.
+- **Go-live wiring landed in production (2026-09-03, agent):** scene_omdet.py now runs the
+  Recognizer on COMPLEX text -- Pipeline is the Router's on_complex, vlm_query=TextHandler.perceive
+  (the live-frame perception path), say=voice/print. Hebrew commands become missions on the wire;
+  see-questions route back to perception (UX unchanged, English-keyed); rejects are spoken. run_mvd.sh
+  gained a DictaLM CPU pane (:18091, log ${TMPDIR:-/tmp}/mvd_dicta.log). Tests 26 -> 32 (added
+  test/test_scene_wiring.py: 6 scene-level wiring cases, models faked). Gates green: pytest 32,
+  import, live_mock_smoke, one real DictaLM translate ("Ascend ten meters"), parse_highlight
+  English-safe. HONEST SCOPE: the wiring PATTERN was already E2E-proven via a harness (the
+  2026-09-02 entry above); what is NOT yet booted is the production scene_omdet.py app end-to-end --
+  deferred to the live-test session, runbook in docs/active/2026-09-03-golive-wiring-report.md sec 6b.
+- **SAM verdict (2026-09-03/04, owner-ruled): adopt SAM3 int4-nf4 as ONE model replacing OmDet +
+  SAM2.1.** Measured: nf4 886 MiB < the current pair 1273 MiB; 3.3x detections (332 vs 101 on 17
+  images); masks on par (IoU 0.862); on-demand p50 366 ms. SAM3 is a CONCEPT segmenter (bare nouns,
+  not instructions; no car->van generalization -> synonym fan-out). SAM3.1 video tracking SHELVED
+  (activation-bound peak, infeasible on the 8 GiB RTX 5070). Follow-on: integrate nf4 + build the
+  VLM->concept front-end. Evidence + load recipe: tools/bench/sam3-mask-bench/INTEGRATION-HANDOFF.md.
+- **Go-live fragilities flagged at close (2026-09-04, d4, read-verified not measured):** COMPLEX
+  now runs SYNCHRONOUSLY on the ASR callback thread (translate + Qwen plan + fly_mission block it);
+  the real-model command chain (DictaLM->Qwen->mission) has ZERO automated coverage (fakes only) --
+  the desk test must exercise it; real DictaLM says "Ascend ten meters" not "go up 10 meters"
+  (planner mapping untested); a reject TTS error shows as "[drone unreachable]". Detail: the
+  go-live section of the 2026-09-03 manager handoff.
+- **SAM3 integration module perception2/ committed (2026-09-04):** Sam3Backend (nf4|bf16|fp8 +
+  torch.compile) + VLM->concept front-end + chain_demo, not yet wired into scene_omdet. Key finding:
+  torch.compile is the speed lever, not the weight format (SAM3 is compute-bound). SAM3.1 tracking
+  shelved (activation-bound ~7 GiB peak, infeasible on the 8 GiB RTX 5070).
+- **SAM3.1 is a PRIORITIZED future task, NOT abandoned (2026-09-04, owner ruling — supersedes the
+  "SAM3.1 SHELVED" framing in the two entries above):** SAM3.1 (video multi-object tracking) is the
+  better production model and IS wanted; the open problem is quantizing it to fit the 8 GiB RTX 5070.
+  The owner will spawn a dedicated session (~2026-09-05) to crack it. Starting point, measured this
+  session: weight quantization does NOT lower the ~7 GiB tracking peak (activation/state-bound); the
+  fix is true int4/fp8 COMPUTE (gemlite/marlin, blocked by the repo's mixed-precision forward + a
+  direct .weight transpose) OR the AOTInductor route (compile off-box, specialize the spatial_shapes
+  grid symint), OR a Hopper-class GPU. A custom llama.cpp fork can also run BASE SAM3 (one of several
+  alt methods), but SAM3.1 is preferred. Detail: tools/bench/sam3-mask-bench/results/sam3-quantization.md
+  and INTEGRATION-HANDOFF.md; memory sam3-quantization-insights.
