@@ -5,8 +5,8 @@
 The orchestrator wipes and isolates the caches before each subprocess:
   TORCHINDUCTOR_CACHE_DIR + TRITON_CACHE_DIR -> fresh empty dirs, removed before each run.
 
-    python3 quant_cold.py                # run all modes cold, write the table
-    python3 quant_cold.py <mode> <out>   # worker (caches set by the orchestrator)
+    python3 quant_bench.py                # run all modes cold, write the table
+    python3 quant_bench.py <mode> <out>   # worker (caches set by the orchestrator)
 """
 import os, sys, json, time, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -79,7 +79,7 @@ def main():
             L.append(f"| {r['name']} | {r['load_s']} | {r['cold_first_s']} | {r['to_first_result_s']} "
                      f"| {r['warm_detect_p50_ms']} | {r['vram_mib']} | {r['dets']} |")
     rep = "\n".join(L) + "\n"
-    rp = os.path.join(HERE, "results", "2026-09-03-sam3-cold-timing.md")
+    rp = os.path.join(HERE, "results", "quant-bench-latest.md")
     open(rp, "w").write(rep)
     print("\n" + rep + f"\n(written to {rp})")
 

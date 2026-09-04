@@ -3,3 +3,6 @@ overlays/
 __pycache__/
 *.pyc
 candidates/
+*.pt
+*.pt2
+*.onnx

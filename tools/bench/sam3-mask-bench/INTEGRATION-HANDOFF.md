@@ -133,7 +133,7 @@ Purpose: turn an instruction into concept(s) + class-synonym sets for SAM3.
 - Do not run any drone/arm/motor command. Do not stage or commit git.
 
 ## FUTURE WORK (owner-flagged 2026-09-03): SAM3.1 quantization
-SAM3.1 quantization for on-8GB video tracking is DEFERRED to a future session, NOT abandoned.
+SAM3.1 quantization for on-8GB video tracking is PRIORITIZED (owner 2026-09-04): a dedicated session (~2026-09-05) will crack it. NOT abandoned, NOT merely deferred.
 State to resume from (all in RESULTS.md, "SAM3.1 quantization" + Updates 1-4):
 - SAM3.1 runs via the facebookresearch/sam3 repo, build_sam3_multiplex_video_predictor(use_fa3=False);
   its per-frame add_prompt IS image detection; tracking = start_session + add_prompt + propagate_in_video.
