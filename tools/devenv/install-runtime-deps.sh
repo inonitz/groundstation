@@ -6,6 +6,7 @@
 set -euo pipefail
 pip install aiohttp        # tools/dji_mock/mock_apiserver.py
 pip install sentencepiece  # Marian/NLLB tokenizers (HE<->EN translation, backlog B/D)
+pip install python-bidi   # RTL Hebrew rendering in the scene_omdet chat overlay
 # TTS chain (projects/integration_tts voice-out) -- piper + espeak-ng + aplay; the piper voice
 # files live outside the repo. TODO(C5c): fold the full TTS install (binary + voice + alsa) here.
 echo "[install-runtime-deps] done"

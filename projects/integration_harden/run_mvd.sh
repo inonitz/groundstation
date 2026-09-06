@@ -21,7 +21,16 @@ SESSION=mvd
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCENE="$(cd "$(dirname "$0")" && pwd)"
 BIN="$(cd "$(dirname "$0")/../.." && pwd)"/build/release/shared/dji/bin
-ASR_MODEL="${ASR_MODEL_PATH:-/root/models/asr/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-q4_k.bin}"
+# ASR: Hebrew whisper by default (desk test). Backend/language/model are env-overridable so
+# English can be restored WITHOUT editing this file:
+#   ASR_BACKEND=whisper-parakeet ASR_LANGUAGE=en \
+#   ASR_MODEL_PATH=/root/models/asr/nvidia--parakeet-tdt-0.6b-v3/ggml-parakeet-tdt-0.6b-v3-q4_k.bin bash run_mvd.sh ...
+# The default model is produced by tools/desk-test/quantize_hebrew_asr.sh (see the desk-test report).
+ASR_MODEL="${ASR_MODEL_PATH:-/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin}"
+ASR_BACKEND="${ASR_BACKEND:-whisper-whisper}"
+ASR_LANGUAGE="${ASR_LANGUAGE:-he}"
+ASR_RECORD="${ASR_RECORD:-0}"                 # 1 = save each utterance as a .wav (dataset)
+ASR_RECORD_DIR="${ASR_RECORD_DIR:-}"          # clip output dir (up.sh points this at the session folder)
 ROS_SETUP=/opt/ros/jazzy/setup.bash
 APP_LAUNCH="${TMPDIR:-/tmp}/mvd_app_launch.sh"
 
@@ -139,6 +148,8 @@ export TRANSFORMERS_OFFLINE=1  # (the phone hotspot has no internet -> a fetch =
 export SCENE_TMUX_SESSION=$SESSION
 export MVD_DRONE=1
 export SCENE_SAM2=/root/models/vision/sam2.1_b.pt
+export SCENE_BG=/root/models/vision/yolo26n-seg.pt   # pin local; else ultralytics downloads it (fails on the internet-less phone hotspot)
+export MVD_SESSION_DIR=$MVD_SESSION_DIR   # shared dataset session folder (utterances.jsonl + clips/), set by up.sh
 export MVD_WIRE_HOST=$WIRE_HOST
 export MVD_WIRE_PORT=$WIRE_PORT
 export MVD_WIRE_REAL=$WIRE_REAL
@@ -159,7 +170,12 @@ if [ "$RTMP" = "1" ]; then
 fi
 
 CMD_KEYS="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH && $BIN/llm_to_action_keyboard_hook"
-CMD_ASR="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH PULSE_SERVER=${PULSE_SERVER:-unix:/tmp/pulse-socket} && $BIN/llm_to_action_asr_server --backend=whisper-parakeet --model=$ASR_MODEL --fa --language=en --threads=1 --gid=0 --captureid=${ASR_CAPTUREID:-1}"
+# Capture device: system DEFAULT mic unless ASR_CAPTUREID is set (owner ruling 2026-09-04).
+ASR_CAPTURE_ARG=""
+[ -n "${ASR_CAPTUREID:-}" ] && ASR_CAPTURE_ARG="--captureid=$ASR_CAPTUREID"
+ASR_RECORD_ARG=""
+[ "$ASR_RECORD" = "1" ] && ASR_RECORD_ARG="--record --recordDir=$ASR_RECORD_DIR"
+CMD_ASR="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH PULSE_SERVER=${PULSE_SERVER:-unix:/tmp/pulse-socket} && $BIN/llm_to_action_asr_server --backend=$ASR_BACKEND --model=$ASR_MODEL --fa --language=$ASR_LANGUAGE --threads=1 --gid=0 $ASR_CAPTURE_ARG $ASR_RECORD_ARG"
 CMD_GST="source $ROS_SETUP && export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH && $BIN/llm_to_action_gstreamer_rx --dji $PHONE_IP"
 
 tmux new-session -d -s "$SESSION" -n vlm "bash -c '$SCENE/run_llama_server.sh; echo [vlm exited]; exec bash'"

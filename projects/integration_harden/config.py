@@ -50,6 +50,8 @@ INPUT        = os.environ.get("SCENE_INPUT", os.environ.get("SCENE_CAM", "0"))
 CAM_W        = int(os.environ.get("SCENE_CAM_W", "1280"))          # requested webcam width (falls to nearest supported)
 CAM_H        = int(os.environ.get("SCENE_CAM_H", "720"))           # requested webcam height
 CHAT_W       = int(os.environ.get("SCENE_CHAT_W", "460"))          # chat side-pane width (px)
+HE_FONT_PATH = os.environ.get("SCENE_HE_FONT", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")  # has Hebrew glyphs
+HE_FONT_SIZE = int(os.environ.get("SCENE_HE_FONT_SIZE", "17"))
 OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", "180"))  # secs to keep retrying a not-yet-live input
 READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", "150"))      # consecutive read failures tolerated (network jitter)
 
@@ -115,11 +117,18 @@ def default_gateway():
     is how tts_io, video_doctor and video_watchdog find the app. Returns None when there is no
     default route -- callers MUST handle that (a literal "None" in a command line is a real bug we
     already shipped once). This is the one home for the lookup; all three used to hand-roll it."""
+    routes = []
     try:
         for line in open("/proc/net/route").readlines()[1:]:
             f = line.split()
-            if f[1] == "00000000":              # destination 0.0.0.0 = the default route
-                return ".".join(str(int(f[2][i:i + 2], 16)) for i in (6, 4, 2, 0))
+            if len(f) > 2 and f[1] == "00000000":     # destination 0.0.0.0 = a default route
+                routes.append((f[0], ".".join(str(int(f[2][i:i + 2], 16)) for i in (6, 4, 2, 0))))
     except Exception:
-        pass
+        return None
+    # The phone is the WiFi gateway. Return ONLY a wireless interface's default route; a wired
+    # default route (USB-ethernet) is NOT the phone, so returning it would be a nonsensical state.
+    # No wireless default route -> None, and callers MUST error rather than use a wrong IP.
+    for iface, gw in routes:
+        if os.path.isdir("/sys/class/net/" + iface + "/wireless"):
+            return gw
     return None

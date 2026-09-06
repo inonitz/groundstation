@@ -11,6 +11,7 @@ vlm.py/ears.py/eyes.py.
   python3 scene_omdet.py                                       # drone RTSP + live ASR
 Keys: q/Esc quit | c clear highlight | t SAM2 masks on/off | b background on/off | x clear chat
 """
+import json
 import os, sys, time, threading, textwrap, collections, subprocess, argparse
 import cv2, numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +30,122 @@ except Exception:
     _HAVE_EARS = False
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
+
+# Hebrew/RTL for the chat overlay. OpenCV's Hershey font is ASCII-only, so Hebrew is drawn with a
+# TrueType font (DejaVuSans has Hebrew glyphs) and python-bidi for correct right-to-left order.
+# If PIL/bidi/font are missing the overlay degrades to ASCII-only Hershey text (no crash).
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    from bidi.algorithm import get_display
+    _HE_FONT = ImageFont.truetype(config.HE_FONT_PATH, config.HE_FONT_SIZE)
+    _HAVE_HE = True
+except Exception as _he_err:
+    print("[scene_omdet] Hebrew overlay off (PIL/bidi/font missing):", _he_err, flush=True)
+    _HAVE_HE = False
+
+
+def _is_ascii(s):
+    return all(ord(c) < 128 for c in s)
+
+
+def _fmt_cmd(c):
+    """One mission Action -> compact 'type k=v k=v' for the overlay Cmd List."""
+    if not isinstance(c, dict):
+        return str(c)
+    t = c.get("type", "?")
+    rest = " ".join(f"{k}={v}" for k, v in c.items() if k != "type")
+    return (t + " " + rest).strip()
+
+
+def _draw_conv(panel, lines, conv_top, height):
+    """Draw the conversation bottom-up. With PIL+bidi, Hebrew renders RTL and English/labels render
+    the same way; without them, falls back to ASCII-only Hershey text."""
+    if not _HAVE_HE:
+        yy = height - 14
+        for text, col in reversed(lines):
+            if yy < conv_top + 14:
+                break
+            indent = 12 if text.endswith(":") else 22
+            cv2.putText(panel, ascii_only(text), (indent, yy), FONT, 0.5, col, 1, cv2.LINE_AA); yy -= 20
+        return panel
+    img = Image.fromarray(panel)                      # byte-identical: no channel swap, BGR stays BGR
+    d = ImageDraw.Draw(img)
+    yy = height - 14 - _HE_FONT.size
+    for text, col in reversed(lines):
+        if yy < conv_top:
+            break
+        indent = 12 if text.endswith(":") else 22
+        vis = text if _is_ascii(text) else get_display(text)
+        d.text((indent, yy), vis, font=_HE_FONT, fill=tuple(int(x) for x in col))
+        yy -= 20
+    return np.array(img)
+
+
+class SessionLog:
+    """Passive per-session recorder for the test dataset. One JSONL line per utterance:
+    timestamp, what the ASR heard (Hebrew), the English translation, the routed kind/action, and
+    the mission put on the wire. A human-readable .log is written alongside. Transcripts are
+    private, so the sessions/ dir is gitignored. Override the root with MVD_SESSION_DIR."""
+
+    def __init__(self, root=None):
+        import socket
+        host = socket.gethostname()
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        exact = os.environ.get("MVD_SESSION_DIR")          # up.sh sets the shared session dir (clips + metadata)
+        if exact:
+            self.dir = exact
+        else:
+            base = root or os.path.join(os.path.dirname(__file__), "sessions")
+            self.dir = os.path.join(base, f"session-{stamp}-{host}")
+        os.makedirs(self.dir, exist_ok=True)
+        self.jsonl = os.path.join(self.dir, "utterances.jsonl")
+        self.logtxt = os.path.join(self.dir, "utterances.log")
+        self._lock = threading.Lock()
+        self._tl = threading.local()
+        try:
+            with open(os.path.join(self.dir, "meta.json"), "w") as f:
+                json.dump({"session": os.path.basename(self.dir), "host": host,
+                           "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                           "asr_backend": os.environ.get("ASR_BACKEND", ""),
+                           "asr_language": os.environ.get("ASR_LANGUAGE", ""),
+                           "asr_model": os.environ.get("ASR_MODEL_PATH", "")}, f, indent=2)
+        except Exception:
+            pass
+        print(f"[scene_omdet] session log -> {self.dir}", flush=True)
+
+    def begin(self, heard, source="local"):
+        self._tl.rec = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "epoch": round(time.time(), 3),
+                        "source": source, "heard_he": heard, "english": None,
+                        "kind": None, "action": None, "mission": None}
+
+    def set(self, **kw):
+        rec = getattr(self._tl, "rec", None)
+        if rec is not None:
+            rec.update(kw)
+
+    def commit(self):
+        rec = getattr(self._tl, "rec", None)
+        if rec is None:
+            return
+        self._tl.rec = None
+        try:
+            with self._lock:
+                with open(self.jsonl, "a") as f:
+                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                with open(self.logtxt, "a") as f:
+                    f.write(f'{rec["ts"]}  [{rec.get("kind") or "?"}]  heard: {rec["heard_he"]}\n')
+                    if rec.get("english"):
+                        f.write(f'                       en:    {rec["english"]}\n')
+                    if rec.get("mission") is not None:
+                        f.write(f'                       wire:  {json.dumps(rec["mission"], ensure_ascii=False)}\n')
+                    if rec.get("action"):
+                        f.write(f'                       action:{rec["action"]}\n')
+                    f.write("\n")
+        except Exception as e:
+            print("[scene_omdet] session log write failed:", e, flush=True)
+
+
+SESSION = None
 OM = {"det": None}
 ENGINE = {"e": None}       # PerceptionEngine, built in main() once eyes exist
 
@@ -98,9 +215,31 @@ class TextHandler:
             return
         print("[scene_omdet] you:", text, flush=True)
         with S.lock: S.chat.append(("user", text))
-        if self._handle_drone(text):
-            return
-        self.perceive(text)
+        if SESSION: SESSION.begin(text)
+        try:
+            if self._handle_drone(text):
+                return
+            self.perceive(text)
+        finally:
+            if SESSION:
+                rec = getattr(SESSION._tl, "rec", None)
+                if rec:
+                    en = rec.get("english")
+                    mis = rec.get("mission")
+                    with S.lock:
+                        S.chat.append(("meta", "En: " + (en if en else "(direct)")))
+                        if rec.get("kind"):
+                            S.chat.append(("meta", "kind: " + str(rec["kind"])))
+                        if mis:
+                            S.chat.append(("meta", "Cmd List:"))
+                            S.chat.append(("meta", "{"))
+                            for i, c in enumerate(mis):
+                                S.chat.append(("cmd", "  " + str(i) + "  " + _fmt_cmd(c)))
+                            S.chat.append(("meta", "}"))
+                        if rec.get("action"):
+                            S.chat.append(("meta", "-> " + str(rec["action"])))
+                        S.chat.append(("meta", ""))
+                SESSION.commit()
 
     def perceive(self, text):
         """The perception dispatch: highlight / clear / VLM ask. Reused as the Recognizer
@@ -124,7 +263,9 @@ class TextHandler:
             res = self.router.handle(text)
         except Exception as e:
             with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
+            if SESSION: SESSION.set(action=f"error: {e}")
             return True
+        if SESSION: SESSION.set(kind=str(getattr(res, "tier", "")).split(".")[-1], action=getattr(res, "action", None))
         if res.tier is not Tier.COMPLEX:                 # basic/emergency/override acted on the wire
             with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
         return True                                      # COMPLEX handled by the Recognizer (on_complex)
@@ -205,16 +346,23 @@ def render_chat(height):
     legend(config.COL_YOLOE_HL, "highlight (OmDet open-vocab)")
     legend(config.COL_SAM2_HL, "SAM2 mask", f"t: {'on' if use_sam else 'off'}")
     cv2.putText(panel, f"target: {ascii_only(target or '(none)')}", (12, y), FONT, 0.46, (0, 215, 255), 1, cv2.LINE_AA); y += 20
-    cv2.putText(panel, "Press H: record on/off", (12, y), FONT, 0.5, config.COL_HUD, 1, cv2.LINE_AA); y += 20
+    cv2.putText(panel, "Press F5: record on/off", (12, y), FONT, 0.5, config.COL_HUD, 1, cv2.LINE_AA); y += 20
     cv2.putText(panel, "keys: c clear  x chat  Esc/q quit", (12, y), FONT, 0.44, (150, 150, 150), 1, cv2.LINE_AA)
     y += 10; cv2.line(panel, (0, y), (w, y), (70, 70, 70), 1); conv_top = y + 8
 
     maxchars = max(int((w - 26) / 9), 12)
     lines = []
     for role, text in chat:
-        text = ascii_only(text)
+        if role in ("meta", "cmd"):
+            col = (170, 200, 235) if role == "meta" else (150, 235, 245)
+            for wl in (textwrap.wrap(text, maxchars) or [""]):
+                lines.append((wl, col))
+            continue
         if role == "spoken":
             lines.append(("Spoken:", (0, 215, 255)))                 # amber label -> what the drone SAYS aloud
+            body = (150, 210, 245)
+        elif role == "english":
+            lines.append(("En:", (120, 210, 255)))
             body = (150, 210, 245)
         else:
             lines.append(("You:" if role == "user" else "Scene:",
@@ -226,13 +374,8 @@ def render_chat(height):
     if thinking:
         lines.append(("Scene: thinking...", config.COL_CHAT_MODEL))
     if not lines:
-        lines = [("press H, speak, press H.", (150, 150, 150)), ('e.g. "highlight the red backpack"', (150, 150, 150))]
-    yy = height - 14
-    for text, col in reversed(lines):
-        if yy < conv_top + 14:
-            break
-        indent = 12 if text.endswith(":") else 22
-        cv2.putText(panel, text, (indent, yy), FONT, 0.5, col, 1, cv2.LINE_AA); yy -= 20
+        lines = [("press F5, speak, press F5.", (150, 150, 150)), ('e.g. "highlight the red backpack"', (150, 150, 150))]
+    panel = _draw_conv(panel, lines, conv_top, height)
     return panel
 
 
@@ -244,6 +387,12 @@ def main():
     ap.add_argument("--keep-llama", action="store_true")
     a = ap.parse_args()
     os.environ.setdefault("OPENCV_FFMPEG_CAPTURE_OPTIONS", "rtsp_transport;tcp")
+
+    global SESSION
+    try:
+        SESSION = SessionLog()
+    except Exception as e:
+        print("[scene_omdet] session log disabled:", e, flush=True); SESSION = None
 
     threading.Thread(target=vlm.ensure_server, daemon=True).start()
     eyes = Eyes()
@@ -276,6 +425,16 @@ def main():
     if os.environ.get("MVD_DRONE"):
         try:
             wire = DjiWire.from_env()
+            _orig_fly = wire.fly_mission                  # record the mission the system sends
+            def _fly_rec(mission, _o=_orig_fly):
+                if SESSION: SESSION.set(mission=mission)
+                return _o(mission)
+            wire.fly_mission = _fly_rec
+            _orig_halt = wire.halt
+            def _halt_rec(_o=_orig_halt):
+                if SESSION: SESSION.set(mission=[{"delay": 0}])
+                return _o()
+            wire.halt = _halt_rec
             from recognizer import Pipeline
             def _say(msg):
                 with S.lock: S.chat.append(("model", msg))
@@ -283,6 +442,13 @@ def main():
             # COMPLEX text now runs the Recognizer: a Hebrew command becomes a mission on the
             # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
             pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say)
+            _orig_translate = pipe._translate            # show the DictaLM translation in the overlay
+            _last_en = {"v": None}
+            def _translate_show(he, required_numbers=None, _o=_orig_translate):
+                en = _o(he, required_numbers=required_numbers)
+                if SESSION: SESSION.set(english=en)
+                return en
+            pipe._translate = _translate_show
             router = Router(wire, on_complex=pipe.handle)
             on_text.router = router
             print("[scene_omdet] MVD drone router ON ->",
