@@ -45,6 +45,32 @@ LAST_STICKS_US = 0  # for the keepalive/failsafe check
 # telemetry (aircraft.isFlying), not from the HTTP reply.
 SILENT_VERBS = bool(os.environ.get("MOCK_SILENT_VERBS"))
 
+# Where received REST commands are recorded. The desk test needs the mock to SHOW what the
+# system sent (method, path, full JSON body). Default sits next to the other run logs.
+CMD_LOG = os.environ.get("MOCK_CMD_LOG") or os.path.join(os.environ.get("TMPDIR") or "/tmp",
+                                                         "mock_commands.log")
+
+
+async def log_cmd(req):
+    """Record one received REST command to console and to CMD_LOG.
+
+    Additive only: this never changes a response. The body is read here, but aiohttp caches the
+    read, so a later req.json() in the same handler still returns the same body. Fields logged:
+    an ISO-like timestamp, the HTTP method, the path, and the full raw body.
+    """
+    try:
+        raw = await req.text()
+    except Exception:
+        raw = ""
+    ts = time.strftime("%Y-%m-%dT%H:%M:%S")
+    line = f"[mock-cmd] {ts} {req.method} {req.path} {raw.strip()}"
+    print(line, flush=True)
+    try:
+        with open(CMD_LOG, "a") as fh:
+            fh.write(line + "\n")
+    except Exception as e:
+        print(f"[mock] cmd-log write failed: {e}", flush=True)
+
 
 def now_us():
     return int(time.monotonic() * 1e6)
@@ -87,67 +113,150 @@ def ok(**fields):
     return web.json_response({"ok": True, **fields})
 
 
+def stat(s):
+    """Kotlin `status { "..." }` wrapper -> {"ok": true, "status": "..."}."""
+    return web.json_response({"ok": True, "status": s})
+
+
+def err(msg):
+    return web.json_response({"ok": False, "error": msg})
+
+
+# ---- Telemetry (GET /status/*). The real server wraps these in {"ok": true, ...}. ----
 async def status(_req):
-    return web.json_response({
-        "aircraft": {
-            "isFlying": STATE["isFlying"],
-            "battery": STATE["batteryPct"],
-            "velocity3D": STATE["vel"],
-            "position3D": STATE["pos"],
-            "attitude": {"pitch": 0.0, "roll": 0.0, "yaw": STATE["yaw"]},
-            "gimbalAttitude": {"pitch": 0.0, "roll": 0.0, "yaw": 0.0},
-        },
-        "product": {"version": "mock-1.0", "connection": True},
-        "controller": {"version": "mock-1.0", "connection": True},
-    })
+    return ok(aircraft={
+                  "isFlying": STATE["isFlying"], "battery": STATE["batteryPct"],
+                  "velocity3D": STATE["vel"], "position3D": STATE["pos"],
+                  "attitude": {"pitch": 0.0, "roll": 0.0, "yaw": STATE["yaw"]},
+                  "gimbalAttitude": {"pitch": 0.0, "roll": 0.0, "yaw": 0.0},
+              },
+              product={"version": "mock-1.0", "connection": True},
+              controller={"version": "mock-1.0", "connection": True})
 
 
 async def status_battery(_req):
-    return web.json_response({"voltage": 15.2, "capacity": 2200, "remaining": 1900,
-                              "percent": STATE["batteryPct"]})
+    return ok(voltage=15.2, capacity=2200, remaining=1900, percent=STATE["batteryPct"])
 
 
 async def status_gps(_req):
-    return web.json_response({"satCount": 0, "signalLevel": 0, "valid": False, "compass": STATE["yaw"]})
+    # real: ok(build) when valid else nok(build)
+    return web.json_response({"ok": False, "satCount": 0, "signalLevel": 0,
+                              "valid": False, "compass": STATE["yaw"]})
 
 
 async def status_signal(_req):
-    return web.json_response({"connection": True, "quality": 5, "frequency": "2.4G", "range": 0})
+    return ok(connection=True, quality=5, frequency="2.4G", range=0)
 
 
-async def takeoff(_req):
-    STATE["isFlying"] = True
-    STATE["pos"]["z"] = max(STATE["pos"]["z"], 1.2)
-    if SILENT_VERBS:
-        return web.Response(status=204)   # action done, no ok body (like the real app)
-    return ok(status="takeoff")
+# ---- Root + phone services ----
+async def root(_req):
+    return web.Response(text="recon-swarm ApiServer mock -- OK")
 
 
-async def land(_req):
-    STATE["isFlying"] = False
-    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
-    STATE["pos"]["z"] = 0.0
-    if SILENT_VERBS:
-        return web.Response(status=204)   # action done, no ok body (like the real app)
-    return ok(status="landed")
+async def tts(req):
+    await log_cmd(req)
+    return ok()
 
 
-async def stop(_req):
-    """POST /c/stop = relinquishControl(): drop our virtual-stick authority. The drone
-    brakes to hover (mock: zero horizontal+vertical velocity, stay airborne). Serves the
-    projects/integration router's emergency fast-path and manual-override tier."""
-    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
-    if SILENT_VERBS:
-        return web.Response(status=204)
-    return ok(status="stopped")
+async def key(req):
+    await log_cmd(req)
+    try: body = await req.json()
+    except Exception: body = None
+    return ok(result=body)
+
+
+# ---- Control (/c). controllerRoute in the app returns 503 if no controller; the mock is always ready. ----
+async def controller_root(_req):
+    return stat("controller is ready")
+
+
+async def flyto(req):
+    await log_cmd(req)
+    try: body = await req.json()
+    except Exception: body = None
+    return ok(flyTo=body)
+
+
+async def lookat(req):
+    await log_cmd(req)
+    try: body = await req.json()
+    except Exception: body = None
+    return ok(lookAt=body)
 
 
 async def fly(req):
-    try:
-        body = await req.json()
-    except Exception:
-        body = {}
-    return ok(status="starting mission", mission_len=len(body.get("mission", [])))
+    # 2026-09-04 "better action list request parsing": accepts a JSON ARRAY of Actions OR a single
+    # Action object -- NOT the old {"mission":[...]} wrapper. Responds {"ok":true,"actions":[...]}.
+    await log_cmd(req)
+    try: body = await req.json()
+    except Exception: body = None
+    if isinstance(body, list):
+        actions = body
+    elif isinstance(body, dict):
+        actions = [body]
+    else:
+        actions = []
+    return ok(actions=actions)
+
+
+async def takeoff(req):
+    await log_cmd(req)
+    STATE["isFlying"] = True
+    STATE["pos"]["z"] = max(STATE["pos"]["z"], 1.2)
+    return stat("taking off")
+
+
+async def land(req):
+    await log_cmd(req)
+    STATE["isFlying"] = False
+    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+    STATE["pos"]["z"] = 0.0
+    return stat("landing")
+
+
+async def stop(req):
+    await log_cmd(req)
+    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+    return stat("stop")
+
+
+async def wave(_req):
+    return stat("Hello! o/")
+
+
+async def stream_start(req):
+    await log_cmd(req)
+    try: body = await req.json()
+    except Exception: body = None
+    url = body.get("rtmpUrl") if isinstance(body, dict) else None
+    if not url:
+        return err("rtmp url is required")
+    return ok(message="Stream started", url=str(url).strip('"'))
+
+
+async def stream_stop(req):
+    await log_cmd(req)
+    return ok(message="Stream stopped")
+
+
+async def stream_status(_req):
+    return ok(isStreaming=False)
+
+
+# ---- Quick actions: root-level GET discretes (get(Regex("/(fly|takeoff)")), get("/land")). ----
+async def quick_takeoff(req):
+    await log_cmd(req)
+    STATE["isFlying"] = True
+    STATE["pos"]["z"] = max(STATE["pos"]["z"], 1.2)
+    return ok()
+
+
+async def quick_land(req):
+    await log_cmd(req)
+    STATE["isFlying"] = False
+    STATE["vel"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+    STATE["pos"]["z"] = 0.0
+    return ok()
 
 
 async def ws_sticks(req):
@@ -176,6 +285,42 @@ async def ws_sticks(req):
     return ws
 
 
+async def ws_echo(req):
+    ws = web.WebSocketResponse()
+    await ws.prepare(req)
+    await ws.send_str("Echo connected")
+    async for msg in ws:
+        if msg.type == WSMsgType.TEXT:
+            if msg.data in ("bye", "x", "stop"):
+                await ws.close(); break
+            await ws.send_str(f"Hi, {msg.data}!")
+    return ws
+
+
+async def ws_gimbal(req):
+    ws = web.WebSocketResponse()
+    await ws.prepare(req)
+    await ws.send_str("Connected to gimbal websocket")
+    async for msg in ws:
+        if msg.type == WSMsgType.TEXT:
+            print(f"[mock] gimbal raw: {msg.data}")
+    return ws
+
+
+async def ws_telemetry(req):
+    ws = web.WebSocketResponse()
+    await ws.prepare(req)
+    await ws.send_str("Connected to telemetry websocket")
+    try:
+        while not ws.closed:
+            await ws.send_str(json.dumps({"isFlying": STATE["isFlying"], "position3D": STATE["pos"],
+                                          "velocity3D": STATE["vel"], "yaw": STATE["yaw"]}))
+            await asyncio.sleep(0.1)
+    except Exception:
+        pass
+    return ws
+
+
 async def on_start(app):
     app["integrator"] = asyncio.create_task(integrator(app))
 
@@ -187,15 +332,33 @@ async def on_stop(app):
 def build_app():
     app = web.Application()
     app.add_routes([
+        web.get("/", root),
         web.get("/status/", status),
+        web.get("/status", status),                       # IgnoreTrailingSlash in the real app
         web.get("/status/battery", status_battery),
         web.get("/status/gps", status_gps),
         web.get("/status/signal", status_signal),
+        web.post("/tts", tts),
+        web.post("/key", key),
+        web.get("/c/", controller_root),
+        web.get("/c", controller_root),
+        web.post("/c/flyTo", flyto),
+        web.post("/c/lookAt", lookat),
+        web.post("/c/fly", fly),
         web.post("/c/takeoff", takeoff),
         web.post("/c/land", land),
         web.post("/c/stop", stop),
-        web.post("/c/fly", fly),
+        web.get("/c/wave", wave), web.get("/c/hi", wave),
+        web.get("/c/hey", wave), web.get("/c/hello", wave),
+        web.post("/c/stream/start", stream_start),
+        web.post("/c/stream/stop", stream_stop),
+        web.get("/c/stream/status", stream_status),
+        web.get("/fly", quick_takeoff), web.get("/takeoff", quick_takeoff),
+        web.get("/land", quick_land),
+        web.get("/c/ws/echo", ws_echo),
         web.get("/c/ws/sticks", ws_sticks),
+        web.get("/c/ws/gimbal", ws_gimbal),
+        web.get("/c/ws/telemetry", ws_telemetry),
     ])
     app.on_startup.append(on_start)
     app.on_cleanup.append(on_stop)
@@ -206,4 +369,5 @@ if __name__ == "__main__":
     host = sys.argv[1] if len(sys.argv) > 1 else "0.0.0.0"
     port = int(sys.argv[2]) if len(sys.argv) > 2 else 8080
     print(f"[mock] recon-swarm ApiServer mock on {host}:{port} (LAN, no cloud)")
+    print(f"[mock] REST commands -> {CMD_LOG}", flush=True)
     web.run_app(build_app(), host=host, port=port)

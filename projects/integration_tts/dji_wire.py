@@ -126,7 +126,7 @@ class DjiWire:
         """POST /c/fly -- run native flight Actions sequentially on the aircraft. Returns
         immediately (the app runs the mission async). Each action is a dict with a 'type'
         discriminator, e.g. {'type':'spin_by','degrees':360}. Grammar: app dto/actions/*."""
-        return self._post_json("/c/fly", {"mission": list(actions)})
+        return self._post_json("/c/fly", list(actions))
 
     def halt(self) -> int:
         """Stop current motion WITHOUT /c/stop: a new mission preempts the running one

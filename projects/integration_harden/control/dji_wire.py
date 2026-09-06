@@ -2,7 +2,7 @@
 
 Speaks the FROZEN protocol (docs/specs/spec-dji-websocket-protocol.md):
   POST /c/takeoff, /c/land, /c/stop        discrete verbs
-  POST /c/fly {mission:[Action...]}        native flight actions
+  POST /c/fly [Action...]                  native flight actions (bare JSON array)
 
 Telemetry (GET /status/) is NOT spoken here: it is read-only, and its consumers
 (test/live_mock_smoke.py, video/video_doctor.py, tools/dji_mock/*) each call it directly over
@@ -75,7 +75,7 @@ class DjiWire:
         mission verb (/c/fly) re-takes stick control automatically (controller.fly -> takeControl)."""
         return self._post("/c/stop")
 
-    # --- mission / action API (POST /c/fly {mission:[Action...]}) ----------------------
+    # --- mission / action API (POST /c/fly [Action...]  -- bare JSON array) -------------
     def _post_json(self, path: str, obj) -> int:
         payload = json.dumps(obj)
         req = urllib.request.Request(
@@ -95,7 +95,7 @@ class DjiWire:
         """POST /c/fly -- run native flight Actions sequentially on the aircraft. Returns
         immediately (the app runs the mission async). Each action is a dict with a 'type'
         discriminator, e.g. {'type':'spin_by','degrees':360}. Grammar: app dto/actions/*."""
-        return self._post_json("/c/fly", {"mission": list(actions)})
+        return self._post_json("/c/fly", list(actions))
 
     def halt(self) -> int:
         """Stop current motion WITHOUT /c/stop: a new mission preempts the running one
