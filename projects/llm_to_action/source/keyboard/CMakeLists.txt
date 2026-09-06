@@ -6,7 +6,6 @@ set(KEYBOARD_NODE_SOURCES
     async_key.hpp
     async_key.cpp
     key_codes.hpp
-    key_codes.cpp
     keyboard_node.hpp
     keyboard_node.cpp
     keyboard_node_base.hpp

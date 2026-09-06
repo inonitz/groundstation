@@ -1,8 +1,7 @@
 #include "asr_node.hpp"
+#include <cxxopts.hpp>
 #include <sttserv/wav_writer.hpp>
 
-
-// static float get_transcription_confidence(struct parakeet_context* ctx);
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
@@ -61,7 +60,7 @@ void ASRStandaloneNode::captureCallbackProducer(
 }
 
 
-void ASRStandaloneNode::parse_msg_for_drone_topics(std::string const& text) {
+void ASRStandaloneNode::parse_msg_for_drone_topics(__unused std::string const& text) {
     // bool doArm = false;
     // bool newArm = false;
     // bool doTwist = false;
@@ -172,8 +171,10 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
         constexpr uint64_t kMinRecordMs = 200;
         if (m_recordTimeMs < kMinRecordMs) {
             RCLCPP_WARN(this->get_logger(),
-                "[WORKER] H held only %lu ms (< %lu) -- momentary tap, ignoring (no transcription/publish).",
-                (unsigned long)m_recordTimeMs, (unsigned long)kMinRecordMs);
+                "[WORKER] Recording Key held only %lu ms (< %lu) -- momentary tap, ignoring (no transcription/publish).",
+                static_cast<unsigned long>(m_recordTimeMs), 
+                static_cast<unsigned long>(kMinRecordMs)
+            );
             ma_pcm_rb_seek_read(m_audioMan.ringBufferHandle(),
                 ma_pcm_rb_available_read(m_audioMan.ringBufferHandle()));   /* discard so the next PTT is clean. */
             continue;
@@ -190,7 +191,12 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             while (remaining > 0) {
                 ma_uint32 chunk       = remaining;
                 void*     pReadBuffer = nullptr;
-                if (ma_pcm_rb_acquire_read(m_audioMan.ringBufferHandle(), &chunk, &pReadBuffer) != MA_SUCCESS || chunk == 0) {
+                if (ma_pcm_rb_acquire_read(
+                    m_audioMan.ringBufferHandle(), 
+                    &chunk, 
+                    &pReadBuffer
+                        ) != MA_SUCCESS || chunk == 0
+                ) {
                     break;
                 }
                 const float* in = static_cast<const float*>(pReadBuffer);
@@ -202,7 +208,11 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
 
         // Resample the FULL native buffer (native rate -> target), +1024 padding.
         ma_uint64 framesToRead64  = nativePcm.size();
-        ma_uint64 framesToWrite64 = (framesToRead64 * m_audioMan.resampleRate()) / m_audioMan.nativeSampleRate() + 1024;
+        ma_uint64 framesToWrite64 = 
+            (framesToRead64 * m_audioMan.resampleRate())
+            / 
+            m_audioMan.nativeSampleRate() + 1024;
+
         std::vector<float> resampledBuf(framesToWrite64);
         ma_resampler_process_pcm_frames(
             m_audioMan.resamplerHandle(),
@@ -211,6 +221,33 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             resampledBuf.data(),
             &framesToWrite64
         );
+
+
+        /* Optional: save the exact audio clip for the ASR test dataset (Hebrew -> English pipeline). */
+        if (m_recordAudioClips) {
+            std::time_t tnow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            std::tm tm{};
+            localtime_r(&tnow, &tm);
+
+            // Index + timestamp in one snprintf (no std::to_string). Format straight from the tm fields.
+            char name[96];
+            std::snprintf(name, sizeof(name), "/audio_%06u_%04d-%02d-%02d_%02d-%02d-%02d.wav",
+                        static_cast<unsigned>(m_audioClipIndex++),
+                        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+                        tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+            std::string path;
+            path.reserve(m_recordFolderPath.size() + std::strlen(name));
+            path += m_recordFolderPath;
+            path += name;
+
+            WavWriter wavman;
+            if (wavman.open(path, m_audioMan.channelCount(), m_audioMan.resampleRate())) {
+                wavman.write(resampledBuf.data(), framesToWrite64);
+                wavman.close();
+            }
+        }
+
 
         // Pass resampled buffer to whisper/parakeet backend
         auto transcript_time_ns = this->now().nanoseconds();
@@ -260,12 +297,34 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
 }
 
 
-// float get_transcription_confidence(struct parakeet_context* ctx) {
-//     float sum = 0; int cnt = 0;
-//     for (int s = 0; s < parakeet_full_n_segments(ctx); ++s) {
-//         for (int t = 0; t < parakeet_full_n_tokens(ctx, s); ++t, ++cnt) {
-//             sum += parakeet_full_get_token_data(ctx, s, t).plog;
-//         }
-//     }
-//     return cnt == 0 ? 0.0f : std::exp(sum / static_cast<f32>(cnt));
-// }
+bool ASRStandaloneNode::parseCommandlineArguments(int argc, char** argv,
+    bool&                     outShouldRecordAudioClips,
+    std::string&              outAudioClipDestFolder,
+    std::vector<std::string>& outSttservPassthroughArgs
+) {
+    cxxopts::Options asrNodeCliOptions(argv[0], 
+        "ROS2 ASR-Node options (the ASR backend parses the rest)"
+    );
+    asrNodeCliOptions.allow_unrecognised_options();
+    outShouldRecordAudioClips = false;
+    try {
+        asrNodeCliOptions.add_options()
+            ("record",    "Save every incoming audio clip to a .wav file",      cxxopts::value<bool>(outShouldRecordAudioClips))
+            ("recordDir", "Output directory for recorded audio (default: cwd)", cxxopts::value<std::string>(outAudioClipDestFolder));
+
+        cxxopts::ParseResult asrNodeCliResult = asrNodeCliOptions.parse(argc, argv);
+
+        outSttservPassthroughArgs = asrNodeCliResult.unmatched();   // includes --help -> sttserv shows its own
+        if (outAudioClipDestFolder.empty()) {
+            outAudioClipDestFolder = ".";
+        }
+        if (outShouldRecordAudioClips) {
+            fprintf(stdout, "--record enabled ==> clips saved under '%s'\n", outAudioClipDestFolder.c_str());
+        }
+    } catch (const cxxopts::exceptions::exception& e) {
+        fprintf(stderr, "ASR-Node CLI Parsing Error: %s\n", e.what());
+        return false;
+    }
+    return true;
+}
+

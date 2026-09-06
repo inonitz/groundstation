@@ -33,6 +33,11 @@ public:
         m_keyHook.bindKey(KeyCodeEnum::RightArrow, cb);
         m_keyHook.bindKey(KeyCodeEnum::Enter, cb);
         m_keyHook.bindKey(KeyCodeEnum::Space, cb);
+        m_keyHook.bindKey(KeyCodeEnum::F1, cb);
+        m_keyHook.bindKey(KeyCodeEnum::F2, cb);
+        m_keyHook.bindKey(KeyCodeEnum::F3, cb);
+        m_keyHook.bindKey(KeyCodeEnum::F4, cb);
+        m_keyHook.bindKey(KeyCodeEnum::F5, cb);
         return;
     }
     

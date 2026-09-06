@@ -13,18 +13,41 @@
 class ASRStandaloneNode : public rclcpp::Node {
 public:
     ASRStandaloneNode(int argc, char** argv) : Node("asr_standalone_node") {
+        std::vector<std::string> sttservPassthroughArgs;   // owns the flag strings; must outlive the backend parse
+        std::vector<char*> sttservArgv;                    // argv view the backend parser will read
+        CommandLineArguments backendArgs{};
+
         m_pubText = this->create_publisher<ASRTextType>(kOutASRServerTranscriptionTopic, 10);
-
-
-        CommandLineArguments args{};
-        if(!parse_commandline_args(argc, argv, args)) {
-            RCLCPP_ERROR(this->get_logger(), "Command-Line Argument Parsing failed");
+        if (!parseCommandlineArguments(
+            argc, 
+            argv, 
+            m_recordAudioClips, 
+            m_recordFolderPath, 
+            sttservPassthroughArgs
+        )) {
+            RCLCPP_ERROR(this->get_logger(), "Command-Line Argument Parsing failed (ROS2 Node)");
             return;
         }
-        if (!m_backend.create(args)) {
-            RCLCPP_ERROR(this->get_logger(), "Backend failed");
+
+        sttservArgv.reserve(sttservPassthroughArgs.size() + 1);
+        sttservArgv.push_back(argv[0]);
+        for (std::string& backendFlag : sttservPassthroughArgs) {
+            sttservArgv.push_back(const_cast<char*>(backendFlag.c_str()));
+        }
+        if (!parse_commandline_args(
+            static_cast<int>(sttservArgv.size()), 
+            sttservArgv.data(), 
+            backendArgs
+        )) {
+            RCLCPP_ERROR(this->get_logger(), "Command-Line Argument Parsing failed (ASR Backend)");
             return;
         }
+
+        if (!m_backend.create(backendArgs)) {
+            RCLCPP_ERROR(this->get_logger(), "ASR Backend creation failed");
+            return;
+        }
+
 
 
         // Init Audio
@@ -32,8 +55,8 @@ public:
             RCLCPP_ERROR(this->get_logger(), "Audio Driver Context failed");
         }
         if(!m_audioMan.selectDevicesAndFinalize(this, captureCallbackProducer, 1, 1, 16000, 
-            static_cast<uint8_t>(args.capture_id == -1 ? 0xFF : args.capture_id), 
-            static_cast<uint8_t>(args.playback_id == -1 ? 0xFF : args.playback_id)
+            static_cast<uint8_t>(backendArgs.capture_id == -1 ? 0xFF : backendArgs.capture_id), 
+            static_cast<uint8_t>(backendArgs.playback_id == -1 ? 0xFF : backendArgs.playback_id)
         )) {
             RCLCPP_ERROR(this->get_logger(), "Audio Driver Finalization failed");
         }
@@ -46,6 +69,7 @@ public:
             kOutKeyboardRawTopic, 
             10,
             [this](const KeyboardRawInputType::SharedPtr msg) {
+                static const char* skPushToTalkKeyBindStr = keyCodeToString(kPushToTalkKeyBind);
                 if (msg->data.size() < 2) { 
                     return;
                 }
@@ -54,12 +78,12 @@ public:
                 auto action = static_cast<KeyAction>(msg->data[1]);
 
                 /* Early Exit - We Listen to the Key H for recording */
-                if (key != KeyCodeEnum::H) {
+                if (key != kPushToTalkKeyBind) {
                     return;
                 }
 
 
-                /* TOGGLE: first H press starts recording, the next H press stops + transcribes.
+                /* TOGGLE: first keypress starts recording, the next press stops + transcribes.
                    No holding. RELEASED is ignored here, REPEATED (auto-repeat) is already filtered. */
                 if (action != KeyAction::PRESSED) {
                     return;
@@ -70,13 +94,19 @@ public:
                        empty here -- nothing to drain (the consumer flushes after each utterance). */
                     m_isRecording = true;
                     m_recordTimeMs = static_cast<uint64_t>(this->now().nanoseconds());
-                    RCLCPP_INFO(this->get_logger(), "[KEY] H -> recording ON (press H again to stop).");
+                    RCLCPP_INFO(this->get_logger(), 
+                        "[KEY] %s -> recording ON (press %s again to stop).", 
+                        skPushToTalkKeyBindStr, 
+                        skPushToTalkKeyBindStr
+                    );
                 } else {
                     /* STOP. Compute held duration and wake the consumer to transcribe. */
                     m_recordTimeMs = static_cast<uint64_t>(this->now().nanoseconds()) - m_recordTimeMs;
                     m_recordTimeMs = (m_recordTimeMs / 1000'000) + ((m_recordTimeMs % 1000'000) > 0);
-                    RCLCPP_INFO(this->get_logger(), "[KEY] H -> recording OFF (%lu ms). Transcribing.",
-                                m_recordTimeMs);
+                    RCLCPP_INFO(this->get_logger(), "[KEY] %s -> recording OFF (%lu ms). Transcribing.",
+                        skPushToTalkKeyBindStr,
+                        m_recordTimeMs
+                    );
                     {
                         std::lock_guard<std::mutex> lock(m_processMtx);
                         m_isRecording = false;
@@ -109,6 +139,8 @@ public:
     }
 
 private:
+    static constexpr KeyCodeEnum kPushToTalkKeyBind = KeyCodeEnum::F5;
+
     // Static callback passed to miniaudio. User data is 'this'.
     static void captureCallbackProducer(
         ma_device*  pDevice, 
@@ -117,6 +149,11 @@ private:
         ma_uint32   frameCount
     );
 
+    bool parseCommandlineArguments(int argc, char** argv,
+        bool&                     outShouldRecordAudioClips,
+        std::string&              outAudioClipDestFolder,
+        std::vector<std::string>& outSttservPassthroughArgs
+    );
     void audioProcessingConsumerThread();
     void parse_msg_for_drone_topics(std::string const& result);
 
@@ -133,6 +170,10 @@ private:
     std::atomic<bool>       m_exit{false};
     std::atomic<bool>       m_audioDataReady{false};
     uint64_t                m_recordTimeMs{0};
+    std::string             m_recordFolderPath;
+    std::atomic<uint32_t>   m_audioClipIndex{0}; 
+    bool                    m_recordAudioClips{false};
+
     std::thread             m_worker;
     std::mutex              m_processMtx;
     std::condition_variable m_processCV;
