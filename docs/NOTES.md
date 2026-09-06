@@ -2668,3 +2668,97 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   grid symint), OR a Hopper-class GPU. A custom llama.cpp fork can also run BASE SAM3 (one of several
   alt methods), but SAM3.1 is preferred. Detail: tools/bench/sam3-mask-bench/results/sam3-quantization.md
   and INTEGRATION-HANDOFF.md; memory sam3-quantization-insights.
+- **Desk test defined and staged (2026-09-04, owner-ruled):** the live desk test bootstraps
+  integration_harden into a real runnable system. Step 1 = the owner's desk: his microphone ->
+  Hebrew Whisper ASR -> Recognizer -> command/perception -> JSON on the REST wire -> MOCK server,
+  WITH the real drone camera feed via gstreamer_rx from the phone MSDK server (video is one-way,
+  so a powered drone on the desk is safe). Step 2 = outdoors, same chain, REAL control, run by the
+  human. Step 3 = latency and per-component performance, deliberately NOT defined yet (see below).
+- **Roles on the desk test (2026-09-04, owner ruling):** the live-test AGENT writes and adapts the
+  scripts; the OWNER runs them. The agent never boots the stack and never speaks into the mic. All
+  logs collect to files so the agent can diagnose mid-session on request.
+- **New desk-test scripts live in tools/desk-test/, NOT in integration_harden (2026-09-04, owner
+  ruling):** production files are fixed in place, but new test-harness scripts must not clutter
+  integration_harden.
+- **Two gaps block the desk test, both found 2026-09-04 by the manager:** (a) the mock discards
+  what it receives -- mock_apiserver.py fly() reads the /c/fly body and returns only a step count,
+  and takeoff/land/stop print nothing, so the mock cannot show what the system sent; (b) run_mvd.sh
+  line 162 hardcodes --backend=whisper-parakeet --language=en, which cannot transcribe Hebrew.
+  Both are ruled FIXED before step 1.
+- **ASR for the desk test: quantize ivrit whisper-large-v3-turbo to q5_k_m (2026-09-04, owner
+  ruling):** the owner chose q5_k_m over the existing q5_1. On-disk sizes for comparison: q4_0
+  452.0 MB, q5_1 595.2 MB, q8_0 833.7 MB, fp16 1549.3 MB, all under
+  /root/models/asr/ivrit_ai/whisper-large-v3-turbo/. Whether whisper.cpp's quantize tool accepts a
+  q5_k_m type for Whisper models is UNVERIFIED and is the first thing the live agent must check; a
+  q4_k Whisper GGUF does exist on disk (xviers-whisper-large-v3-turbo-gguf), so k-quants exist for
+  Whisper, but the tool's accepted type list is not confirmed.
+- **Hebrew ASR changes which path a command takes (2026-09-04, measured from the code, behavioural
+  not a bug):** the router's basic-verb table in control/commands.py is ENGLISH-keyed, so with
+  Hebrew ASR those verbs never fire and every non-emergency utterance goes COMPLEX into the
+  Recognizer. That is the intended architecture -- the Recognizer owns the Hebrew sieve. EMERGENCY_RE
+  (recognizer.py:43) is BILINGUAL (stop/halt/abort + עצור/תעצור/סטופ/חירום), so the emergency stop
+  survives the language switch. Consequence for the desk test: a model (DictaLM + Qwen) writes the
+  flight plan for most Hebrew commands, which is why the mission JSON must be read before any real
+  flight.
+- **Step 3 (end-to-end latency + per-component performance) is DEFERRED, undefined by ruling
+  (2026-09-04):** the owner ruled it is not defined enough to plan and will be scoped when reached.
+  What exists today: recognizer/trace.py writes one JSONL line per utterance and pipeline.py:83
+  records a single total `ms` plus kind/flags/action/payload. That covers the Recognizer only as one
+  number -- it does not split translate, plan, wire or perception time, and records nothing for ASR.
+  Per-component latency therefore needs new instrumentation before step 3 can run.
+- **`q5_k_m` is NOT a whisper.cpp quantize type (2026-09-04, verified by the live-test agent):**
+  the owner-ruled ASR quant `q5_k_m` does not exist in whisper.cpp's quantize tool. Accepted types
+  are q2_k q3_k q4_0 q4_1 q4_k q5_0 q5_1 q5_k q6_k q8_0; the 5-bit k-quant is `q5_k` (ftype 13).
+  `q5_k_m`/`q5_k_s` are llama.cpp mixture policies with no whisper.cpp equivalent. Passing `q5_k_m`
+  fails ("unknown ftype" -> "invalid model type -1", exit 1) and leaves a corrupt ~596 KB partial
+  file. OWNER RULED 2026-09-04: produce q5_k + q4_k + q4_0 (all three now on disk under
+  /root/models/asr/ivrit_ai/whisper-large-v3-turbo/; sizes q5_k 547.4 MB, q4_k 452.0 MB, q4_0 452.0 MB
+  -- q4_k and q4_0 tie at 4.5 bpw). Desk-test default = ggml-model-q5_k.bin. Inference-time + accuracy
+  benchmark (perhaps FLEURS) deferred. Script: tools/desk-test/quantize_hebrew_asr.sh.
+- **llm_to_action "presentable for the judges" scoped (2026-09-05, owner ruling):** DEMO POLISH is
+  primary; code-quality cleanup is secondary and BOUNDED -- the owner's words were "I lean towards
+  option 2 more than 3" and "don't be so sure we're going to perform the QC cleanup to the degree
+  that you expect". A separate "repo hygiene / CMake tidy" scope was proposed by the manager,
+  questioned by the owner, and WITHDRAWN. The fmu_node.hpp refactor is NOT in scope for this
+  session; it keeps its own tasklist. Brief: docs/active/2026-09-05-llm-to-action-presentable-brief.md.
+- **Gazebo is CHEAP, correcting a manager assumption (2026-09-05, owner):** a Gazebo/SITL run takes
+  "a couple of minutes not an hour". The manager had argued against behaviour-sensitive work on the
+  premise that per-slice Gazebo verification was expensive; that premise was wrong and the argument
+  is withdrawn. Behaviour-touching changes are verified in Gazebo per slice, as the fmu tasklist
+  already required.
+- **Judge-facing surface is the A2 dashboard (2026-09-05, manager finding):** source/dashboard/
+  serves annotated camera + depth colormap + flight HUD + VLM reasoning log to a browser. Two
+  verified defects that would break a live demo: (a) its README's run command points at
+  `scripts/dashboard/serve.py`, a path that DOES NOT EXIST -- the real file is
+  projects/llm_to_action/source/dashboard/serve.py; (b) every dashboard topic publishes only when
+  the FMU runs with FMU_OBSERVABILITY=1, so with the gate off the dashboard shows a silent blank
+  with no error. Also: llm_to_action has NO top-level README at all.
+- **Hebrew ASR quantization settled (2026-09-05):** q5_k_m is NOT a whisper.cpp ftype (verified by
+  running whisper-quantize; accepted types are q2_k q3_k q4_0 q4_1 q4_k q5_0 q5_1 q5_k q6_k q8_0,
+  and the 5-bit k-quant is spelled q5_k = ftype 13; the M/S mixture suffixes are llama.cpp-only).
+  Owner ruled q5_k plus q4_k and q4_0; all three produced. Sizes: q5_k 547.4 MB, q4_k 452.0 MB,
+  q4_0 452.0 MB. NOTE: q4_k and q4_0 are byte-identical in SIZE (473,992,235) but differ in content,
+  so q4_k bought no size saving on this model. FLEURS accuracy bench for the new quants is DEFERRED.
+- **REST API resync to the recon-swarm ApiServer (2026-09-05, owner-directed):** the Kotlin app
+  (/root/DJI-android-sdk-v5-recon-swarm, author ExoSkeleton, last 5 days) changed `POST /c/fly` to a
+  BARE JSON array of Actions (was `{"mission":[...]}`), added new endpoints (/tts, /key, /c/flyTo,
+  /c/lookAt, /c/(wave|hi|hey|hello), /c/stream/*, quick GET /takeoff|/fly|/land, WS
+  /c/ws/echo|gimbal|telemetry), and discrete verbs now return `{ok,status}` bodies.
+- **All four dji_wire clients synced to the bare-array /c/fly (2026-09-05):** integration_harden,
+  integration_notify, integration_tts, AND integration. Action `type`/field schema verified unchanged
+  against dto/actions/*.kt; only the array wrapper changed.
+- **FREEZE EXCEPTION, owner-authorized 2026-09-05:** projects/integration/ (the frozen demo fallback)
+  WAS edited for API compatibility, because it must still work if integration_harden is not ready.
+  This is a one-line compat fix, not a feature change; the freeze otherwise stands.
+- **tools/dji_mock/mock_apiserver.py rewritten to mirror the current ApiServer.kt (2026-09-05):** all
+  endpoints + response shapes, command logging preserved, smoke-tested.
+- **DEFERRED: the C++ DjiBackend REST/telemetry sync (owner-ruled 2026-09-05):** dji_backend does not
+  POST /c/fly (sticks-velocity track), so the mission change does not break it now; its /status
+  telemetry parsing must be resynced to the new Velocity3D/LocationCoordinate serializers WHEN
+  llm_to_action is integrated. Tracked, not done.
+- **Overlay Hebrew went blank = python-bidi missing in the APP's ROS python (2026-09-05):** the
+  scene_omdet overlay falls back to ASCII (strips Hebrew -> blank) when `import bidi` fails. It logs
+  `[scene_omdet] Hebrew overlay off (PIL/bidi/font missing)`. A container rebuild wipes ad-hoc pip
+  installs, so after a rebuild run tools/devenv/install-runtime-deps.sh (has python-bidi), or
+  `source /opt/ros/jazzy/setup.bash && python3 -m pip install python-bidi`. The render code is fine;
+  it is purely the missing dep. Check that log line before diagnosing "blank Hebrew".
