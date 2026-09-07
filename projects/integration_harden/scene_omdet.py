@@ -38,6 +38,11 @@ try:
     from PIL import Image, ImageDraw, ImageFont
     from bidi.algorithm import get_display
     _HE_FONT = ImageFont.truetype(config.HE_FONT_PATH, config.HE_FONT_SIZE)
+    try:
+        from PIL import features as _pil_features
+        _RAQM = bool(_pil_features.check("raqm"))   # Raqm does bidi natively -> do NOT pre-reverse
+    except Exception:
+        _RAQM = False
     _HAVE_HE = True
 except Exception as _he_err:
     print("[scene_omdet] Hebrew overlay off (PIL/bidi/font missing):", _he_err, flush=True)
@@ -75,7 +80,7 @@ def _draw_conv(panel, lines, conv_top, height):
         if yy < conv_top:
             break
         indent = 12 if text.endswith(":") else 22
-        vis = text if _is_ascii(text) else get_display(text)
+        vis = text if (_is_ascii(text) or _RAQM) else get_display(text)   # Raqm handles RTL itself
         d.text((indent, yy), vis, font=_HE_FONT, fill=tuple(int(x) for x in col))
         yy -= 20
     return np.array(img)
@@ -227,17 +232,15 @@ class TextHandler:
                     en = rec.get("english")
                     mis = rec.get("mission")
                     with S.lock:
-                        S.chat.append(("meta", "En: " + (en if en else "(direct)")))
+                        S.chat.append(("meta", f"{'En':<7}| " + (en if en else "(direct)")))
                         if rec.get("kind"):
-                            S.chat.append(("meta", "kind: " + str(rec["kind"])))
+                            S.chat.append(("meta", f"{'Kind':<7}| " + str(rec["kind"])))
                         if mis:
-                            S.chat.append(("meta", "Cmd List:"))
-                            S.chat.append(("meta", "{"))
                             for i, c in enumerate(mis):
-                                S.chat.append(("cmd", "  " + str(i) + "  " + _fmt_cmd(c)))
-                            S.chat.append(("meta", "}"))
+                                lbl = "Cmds" if i == 0 else ""
+                                S.chat.append(("cmd", f"{lbl:<7}| {i}  " + _fmt_cmd(c)))
                         if rec.get("action"):
-                            S.chat.append(("meta", "-> " + str(rec["action"])))
+                            S.chat.append(("meta", f"{'Action':<7}| " + str(rec["action"])))
                         S.chat.append(("meta", ""))
                 SESSION.commit()
 
@@ -265,7 +268,11 @@ class TextHandler:
             with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
             if SESSION: SESSION.set(action=f"error: {e}")
             return True
-        if SESSION: SESSION.set(kind=str(getattr(res, "tier", "")).split(".")[-1], action=getattr(res, "action", None))
+        if SESSION:
+            SESSION.set(kind=str(getattr(res, "tier", "")).split(".")[-1])
+            _rec = getattr(SESSION._tl, "rec", None)      # router label only as FALLBACK; the
+            if _rec is not None and not _rec.get("action"):  # pipeline wrap sets the real action
+                _rec["action"] = getattr(res, "action", None)
         if res.tier is not Tier.COMPLEX:                 # basic/emergency/override acted on the wire
             with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
         return True                                      # COMPLEX handled by the Recognizer (on_complex)
@@ -449,6 +456,12 @@ def main():
                 if SESSION: SESSION.set(english=en)
                 return en
             pipe._translate = _translate_show
+            _orig_handle = pipe.handle                    # record the pipeline's REAL action string
+            def _handle_rec(text, _o=_orig_handle):
+                out = _o(text)
+                if SESSION: SESSION.set(action=out)
+                return out
+            pipe.handle = _handle_rec
             router = Router(wire, on_complex=pipe.handle)
             on_text.router = router
             print("[scene_omdet] MVD drone router ON ->",

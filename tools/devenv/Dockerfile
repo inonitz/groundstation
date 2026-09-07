@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     dos2unix \
     netcat-openbsd \
     pulseaudio-utils \
+    fonts-freefont-ttf \
     libasound2-plugins \
     git \
     wget \

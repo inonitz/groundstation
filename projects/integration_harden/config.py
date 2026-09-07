@@ -50,7 +50,14 @@ INPUT        = os.environ.get("SCENE_INPUT", os.environ.get("SCENE_CAM", "0"))
 CAM_W        = int(os.environ.get("SCENE_CAM_W", "1280"))          # requested webcam width (falls to nearest supported)
 CAM_H        = int(os.environ.get("SCENE_CAM_H", "720"))           # requested webcam height
 CHAT_W       = int(os.environ.get("SCENE_CHAT_W", "460"))          # chat side-pane width (px)
-HE_FONT_PATH = os.environ.get("SCENE_HE_FONT", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")  # has Hebrew glyphs
+def _he_font():                                                    # mono + Hebrew glyphs; DejaVuSansMono has NO Hebrew (boxes)
+    for c in (os.environ.get("SCENE_HE_FONT"),
+              "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
+              "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):   # last resort: Hebrew ok, alignment lost
+        if c and os.path.exists(c):
+            return c
+    return "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+HE_FONT_PATH = _he_font()
 HE_FONT_SIZE = int(os.environ.get("SCENE_HE_FONT_SIZE", "17"))
 OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", "180"))  # secs to keep retrying a not-yet-live input
 READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", "150"))      # consecutive read failures tolerated (network jitter)
