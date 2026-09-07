@@ -108,8 +108,38 @@ PERC100 = [
  ('j_pin_graffiti', 'הדגש את הכתובת שרשומה על הקיר, מתחת לחלון השני משמאל', 'Highlight the writing on the wall, under the second window from the left', [['writ', 'graffiti', 'text', 'inscription'], ['wall'], ['under', 'beneath', 'below'], ['second'], ['window'], ['left']], 3),
  ('j_pin_ferris', 'התמקד בגלגל הענק בקצה הפארק, ספציפית בתא התחתון שלו', 'Focus on the ferris wheel at the edge of the park, specifically its bottom cabin', [['wheel', 'ferris'], ['park'], ['edge', 'end'], ['bottom', 'lowest', 'lower'], ['cabin', 'car', 'gondola', 'pod']], 3),
  ('j_pin_planters', 'מצא את שני העציצים הגדולים משני צידי הדלת הראשית של המלון', 'Find the two large planters on both sides of the main door of the hotel', [['two'], ['planter', 'pot', 'plant'], ['large', 'big'], ['side'], ['door', 'entrance'], ['main'], ['hotel']], 3),
+ # -- live-run additions (desk session 2026-09-06) --
+ ('lp_white_car', 'תעקוב אחרי המכונית הלבנה', 'Follow the white car', [['track', 'follow'], ['car', 'vehicle'], ['white']], 1),
+ ('lp_nearest_person', 'תדגיש את האדם שהכי קרוב אליך', 'Highlight the person closest to you', [['highlight', 'mark', 'focus'], ['person', 'man'], ['closest', 'nearest', 'close']], 1),
+ ('lp_look_down', 'תסתכל למטה בבקשה', 'Look down please', [['look'], ['down']], 1),
+ # -- see/presence/count questions (owner-ordered 2026-09-07, exercise the 2nd-person rewrite) --
+ ('pq_see_now', 'מה אתה רואה עכשיו', 'what do you see now', [['see', 'look'], ['now']], 1),
+ ('pq_see_frame', 'מה אתה רואה בפריים', 'what do you see in the frame', [['see', 'look'], ['frame', 'image', 'view']], 1),
+ ('pq_count_people_see', 'כמה אנשים אתה רואה', 'how many people do you see', [['how many', 'count'], ['people', 'person']], 1),
+ ('pq_count_cars_see', 'כמה מכוניות אתה רואה בזירה', 'how many cars do you see in the scene', [['how many', 'count'], ['car', 'vehicle'], ['scene', 'area']], 1),
+ ('pq_see_suspicious', 'מה אתה רואה חשוד בזירה', 'what suspicious thing do you see in the scene', [['see', 'look'], ['suspicious'], ['scene', 'area']], 2),
+ ('pq_count_vehicles_road', 'כמה רכבים אתה רואה על הכביש', 'how many vehicles do you see on the road', [['how many', 'count'], ['vehicle', 'car'], ['road', 'street']], 2),
+ ('pq_see_ahead', 'מה אתה רואה לפניך', 'what do you see ahead of you', [['see', 'look'], ['ahead', 'front']], 1),
+ ('pq_count_windows_see', 'כמה חלונות אתה רואה בבניין', 'how many windows do you see on the building', [['how many', 'count'], ['window'], ['building']], 2),
+ ('pq_any_person', 'האם יש אדם בתמונה', 'is there a person in the picture', [['person', 'man', 'someone'], ['picture', 'image', 'frame']], 1),
+ ('pq_any_vehicle', 'האם יש רכב בזירה', 'is there a vehicle in the scene', [['vehicle', 'car'], ['scene', 'area']], 1),
+ ('pq_any_red_car', 'האם יש מכונית אדומה בפריים', 'is there a red car in the frame', [['car', 'vehicle'], ['red'], ['frame', 'image']], 2),
+ ('pq_any_roof_person', 'האם יש מישהו על הגג', 'is there anyone on the roof', [['anyone', 'someone', 'person'], ['roof']], 2),
+ ('pq_any_weapon', 'האם יש מישהו חמוש בזירה', 'is there anyone armed in the scene', [['armed', 'weapon', 'gun'], ['someone', 'person', 'anyone'], ['scene', 'area']], 2),
+ ('pq_any_backpack_left', 'האם יש תיק גב בצד שמאל', 'is there a backpack on the left side', [['backpack', 'bag'], ['left']], 2),
+ ('pq_any_movement', 'האם יש תנועה בזירה', 'is there movement in the scene', [['movement', 'motion'], ['scene', 'area']], 1),
+ ('pq_whats_in_frame', 'מה נמצא בפריים', 'what is in the frame', [['frame', 'image', 'view']], 1),
+ ('pq_whats_ahead', 'מה נמצא לפניך', 'what is ahead of you', [['ahead', 'front']], 1),
+ ('pq_describe_scene', 'תאר את מה שאתה רואה בזירה', 'describe what you see in the scene', [['describe'], ['see', 'look'], ['scene', 'area']], 1),
+ ('pq_identify_threats', 'זהה איומים אפשריים בזירה', 'identify possible threats in the scene', [['identif', 'spot', 'detect'], ['threat', 'danger'], ['scene', 'area']], 2),
+ ('pq_find_people', 'מצא את כל האנשים בפריים', 'find all the people in the frame', [['find'], ['people', 'person'], ['frame', 'image']], 1),
+ ('pq_count_buildings', 'ספור את הבניינים בזירה', 'count the buildings in the scene', [['count'], ['building'], ['scene', 'area']], 1),
+ ('pq_search_vehicle', 'חפש רכב חשוד באזור', 'search for a suspicious vehicle in the area', [['search', 'find', 'look'], ['vehicle', 'car'], ['suspicious'], ['area', 'zone']], 2),
+ ('pq_look_ground', 'הסתכל על הקרקע ותאר מה יש', 'look at the ground and describe what is there', [['look'], ['ground'], ['describe', 'what']], 2),
+ ('pq_identify_color', 'זהה את הצבע של הרכב הקרוב ביותר', 'identify the color of the nearest vehicle', [['identif', 'spot'], ['color', 'colour'], ['vehicle', 'car'], ['near', 'nearest', 'close']], 2),
+ ('pq_focus_describe', 'התמקד באדם הקרוב ותאר אותו', 'focus on the nearest person and describe them', [['focus'], ['person', 'man'], ['near', 'nearest', 'close'], ['describe']], 2),
 ]
-assert len(PERC100) == 100 and len({c[0] for c in PERC100}) == 100
+assert len(PERC100) == 128 and len({c[0] for c in PERC100}) == 128
 
 def score_perception(translation, groups):
     t = (translation or "").lower()

@@ -2762,3 +2762,129 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   installs, so after a rebuild run tools/devenv/install-runtime-deps.sh (has python-bidi), or
   `source /opt/ros/jazzy/setup.bash && python3 -m pip install python-bidi`. The render code is fine;
   it is purely the missing dep. Check that log line before diagnosing "blank Hebrew".
+- **Qwen3-VL-4B adopted for the FMU loop (owner-decided 2026-09-05/06):** move to Qwen3-VL-4B
+  Q4_K_M, fix its issues, and ship IF the UI "looks sensible and describes what is impressive".
+  Applied in sim_core.sh (env-overridable back to 2B). 4B verified standalone on the RTX 5070
+  Laptop: 4097/8151 MiB VRAM with mmproj, text 0.078 s, vision 1.06 s per 320x240 frame.
+- **fmu_node.hpp is intentionally throwaway ("vibecoded") code (owner ruling 2026-09-05):** its
+  cleanliness is a NON-goal; do not spend effort refactoring it. The control-loop smell catalog
+  (docs/active/2026-09-05-fmu-control-loop-smell-catalog.md) documents the test hooks and the
+  real-flight hardcodes (APPROACH bbox-anchor, ORBIT fixed circle, auto-land gate) for the record.
+- **Auto-land-after-APPROACH ended every multi-step mission (measured 2026-09-06) — guard applied:**
+  the vlm pre-flight (takeoff, approach car, move back, orbit, land) collapsed to approach->auto-land->
+  "mission complete"; move-back + orbit were skipped. Guard at fmu_node.hpp:2244 now fires auto-land
+  only when the task queue is empty. Compiles; NOT yet SITL-verified end-to-end — the owner runs
+  rubicon_orbit to confirm. Log: projects/llm_to_action/test/sitl/runs/vlm/captured_panes_log.txt.
+- **Depth-model study COMPLETE; the perception fork is OPEN (2026-09-06, post-meeting decision):**
+  master table tools/bench/depth-sota-bench/DEPTH-BENCHMARKS.md. Path A = depth-anything.cpp ggml
+  in-process (same stack family as llama.cpp/whisper.cpp; DA3 metric-large q8_0 176 ms Vulkan,
+  bit-exact vs PyTorch) vs Path B = Python torch service (DA3-small GPU 38.5 ms). Root-caused: DA3
+  RELATIVE models segfault on Vulkan (metric + DA2 fine). Current prod yolo26n-depth-384 ONNX
+  CPU-2t = 44 ms / 22.5 Hz and is the "schizo" depth to replace. Quality (AbsRel) is UNMEASURED —
+  needs ground truth (Gazebo GT depth). Fixing depth removes the APPROACH/ORBIT/auto-land hacks
+  (same root cause); real target-centered orbit is impossible without reliable metric depth.
+- **Global-doc merge of the 2026-09-05/06 lane work done by the manager (2026-09-06):**
+  ARCHITECTURE.md gained the §15 "Reconciliation (2026-09-06)" block (real-flight hacks vs spec,
+  depth fork, 4B swap) + a dated status update in the Voice-pipeline section (desk-verified chain,
+  mock resync, desk-test harness, dataset recorder, overlay); the stale ~13 Hz depth-thread figure
+  is corrected in §2. Judge diagrams: docs/active/2026-09-06-architecture-diagrams.md.
+- **Whisper VRAM estimate heuristic (owner ruling 2026-09-06):** until a census rerun, a whisper
+  GGML model's resident VRAM is estimated at about its FILE SIZE, give or take a few MiB. So
+  q5_k (547.4 MB file) is carried as ~550 MiB, labeled estimate. The earlier "ASR 0.1 GiB" figure
+  was the MEASURED wav2vec2-300M (104 MiB, census 2026-09-02) and must not be carried onto whisper.
+- **Judge diagrams doc rewritten after the owner's line-by-line review (2026-09-06):** the current
+  MVD is integration/* (FROZEN, English by design; phone-Hebrew out of scope there) and gets its
+  own diagram; integration_harden is the successor and is drawn separately; the two stacks share
+  only three llm_to_action utility binaries + the ApiServer wire protocol (the "same VLM" and
+  "video integration point" cross-links were wrong and are removed -- the FMU runs its own
+  llama-server); the wire is drawn as ONE endpoint chosen at boot (mock 8079 | phone 8080), not
+  two runtime paths; router tiers + the full basic-verb dispatch table added from control/router.py;
+  Recognizer stages use the code's own names (0 emergency filter, 1 bypass, 2 Hebrew rewrites,
+  3 injected translate, 4 output guards, 5 English rewrites, 6 routing) and the Qwen planner is
+  correctly placed in pipeline.py, NOT as stages 4-6; perception + perception2 get staged diagrams
+  (presence gate -> OmDet low floor -> relative-confidence gate -> SAM2.1 -> mask hygiene -> VLM-box
+  fallback; concept extraction -> synonym fan-out -> one SAM3 forward); the desk test is a numbered
+  sequence diagram; the resource table cites the census per row and marks the whisper row estimate.
+- **Judge diagrams doc, second revision to mechanism depth (2026-09-06):** after the owner's
+  second review round, every section now carries its control flow in prose (thread, order, rate,
+  destination, and the WHY of each choice) with file:line witnesses; validated twice — a scripted
+  witness pass (37/37 citations match the code, one drifted line fixed) and a mermaid lint
+  (10 blocks, 0 issues). New code-verified facts folded in: the FMU voice inlet
+  (fmu_node.hpp:405 — deterministic emergency land/hold, grounded start, airborne user_command
+  interrupt), maybePlan's trigger conditions + first-frame/first-detection warmups
+  (fmu_node.hpp:1496), the 30 Hz offboard rationale (px4_backend_base.hpp:41-46 — PX4 needs ~1 s
+  of streamed setpoints before OFFBOARD; 40 @ 30 Hz warmup), the post-backend chain
+  (px4_backend.cpp:97-131 — sole 30 Hz publisher, ENU->NED, arm->OFFBOARD retried to confirm),
+  the two-rate vision loops (33 ms seg / 80 ms depth, fmu_node_base.hpp:87-88; depth input = the
+  same camera frameSource), the snapshot consumer split (VLM at plan time; control loop only in
+  APPROACH/FOLLOW/ORBIT/SEARCH; GO is odometry-only), and the frozen MVD's on_text fall-through
+  verified in its own code (integration/scene_omdet.py:195-215).
+- **Overlay Hebrew double-bidi (2026-09-06, root-caused live):** the app's PIL is built WITH Raqm
+  (features.check("raqm")=True), which applies the bidi algorithm natively in ImageDraw.text(); our
+  get_display() pre-reversal therefore DOUBLE-reversed -> Hebrew shown backwards. Fix in scene_omdet:
+  when Raqm is present pass the raw logical string; get_display only as the no-Raqm fallback. Overlay
+  block reformatted to an aligned label column (En/Kind/Cmds/Action, mono font DejaVuSansMono).
+- **Phone TTS dies with the drone link (2026-09-06, measured):** the recon-swarm app gates ALL routes
+  (incl /tts) behind the RC/aircraft/product connection check -> when the drone sleeps (eco), /tts
+  returns 503 and nothing is spoken (observed: early posts HTTP 200, later all 503). Options: exempt
+  /tts from the gate (app-side, dev), or a local espeak/piper fallback on phone-503 (tts_io supports
+  backends). OPEN - owner to rule.
+- **"complex->perception" was a recorder artifact (2026-09-06):** the Router labels every COMPLEX
+  res.action "complex->perception"; the SessionLog recorded that constant instead of the pipeline's
+  real outcome. Fixed: pipe.handle is wrapped to record the true action (mission/reject/perception);
+  the router label is only a fallback. The TTS "narration" heard on some commands was the REJECT
+  path speaking "לא הבנתי, שמעתי: ..." (guard rejects: DictaLM answered instead of translating, or
+  ASR-garbled numbers) -- by design, not a routing bug.
+- **EMERGENCY_RE coverage gap (2026-09-06, live):** "תפסיק הכל"/"תפסיק שליטה" are NOT caught by the
+  emergency regex (עצור/תעצור/חירום/סטופ only) -> went COMPLEX, no halt. Adding תפסיק is a
+  Recognizer change: bench-gated (recognizer-bench skill, measured, zero-false-fire). OPEN.
+- Overlay font gotcha (2026-09-06): DejaVuSansMono has NO Hebrew glyphs (boxes). Fix: fonts-freefont-ttf
+  FreeMono = the only installed mono font with Hebrew; config.py now resolves SCENE_HE_FONT -> FreeMono ->
+  DejaVuSans (fallback, alignment lost). Install scripted in install-runtime-deps.sh + Dockerfile.
+- Live-50 run (2026-09-06): report + raw at projects/integration_harden/sessions/session-20260906-231140-rog/
+  (REPORT.md). 33/48 full pass; 0 unintended flight on traps/negations; 3 wrong-motion missions, all
+  ASR-garble->LLM-confabulation or a one-off spin+0.5 magnitude flub.
+- DictaLM hallucination root (measured, same run): instruct-tuned translator flips to ASSISTANT mode when
+  the content is a question or "you"-addressed — answers instead of translating (10/14 questions; 0/30
+  imperatives). Fix candidates (bench-gated, OPEN): few-shot question exemplars, forced "English:" prefix,
+  interrogative-strict prompt.
+- Router gaps (same run, OPEN): presence/attribute questions (יש מישהו / מה הצבע) end planner-empty, VLM
+  never queried; mixed move+see drops the see-half; תפסיק gap reproduced (standing, bench-gated).
+- ASR he-forced residuals (same run): אחורה->סחורה persists; הדגש את ה->הדגשת ה prefix-merge; ארובה->ערובה.
+- Bench grew 370->388 (2026-09-07, owner-ordered live-run additions): 18 cases from the 2026-09-06 desk
+  session; full re-run 323/382 (85%), zero regressions, scorecard updated in place, old table archived.
+  NEW catch: l_land_going (האם אתה הולך לנחות בקרוב) makes the planner LAND; מתכוון phrasing passes.
+- Rethought open decisions (owner review pending, details in session REPORT.md): (1) SUPERSEDED — Qwen-as-Hebrew-front-end was already measured and REJECTED
+  (results/HISTORY.md rounds 5-6: 42% / 38% perception, unreliable Hebrew noun lexicon, "the VLM path
+  requires a translator in front of it"); remaining levers: DictaLM forced-prefix or revisit the
+  TranslateGemma deferral; (2) PERCEPTION_RE extension
+  proposal with positives/negatives, flips v_q2's file; (3) תפסיק->EMERGENCY yes / פוס-משחק no;
+  (4) interrogative-forces-empty planner guard, blocked on the polite-request-question spec.
+- Half-turn 0.5 root cause (2026-09-07): NOT the planner. Number guard patched DictaLM's correct
+  "Turn right 180 degrees" to "Turn right 0.5 degrees" (Hebrew extractor read חצי=0.5; unit idiom
+  חצי סיבוב=180 crossed). Fix direction: Hebrew-side חצי+סיבוב composition or no-patch-on-unit-words.
+  Bench l_half_cw covers only the benign path. Evidence: traces/session-20260906-231146.jsonl utt 30.
+- DictaLM temp-0 divergence within a session = llama.cpp KV-cache split nondeterminism (single slot,
+  n_past 85-95 varies with the shared prefix of the PREVIOUS request); same class as the bench README
+  ±1-2 noise band. Greedy decoding is only as deterministic as the logits.
+- Interrogative-guard proposal WITHDRAWN (owner): l_land_going is plain answer-mode (raw JSON shows the
+  hallucinated answer Qwen landed on); polite-question spec already ruled by r_pol_* cases (fly).
+  q_land_trap's bench pass is luck — it hallucinates too.
+- tgemma VRAM demystified (2026-09-07, measured): census 3,035 MiB was 4-slot x 4096-ctx f16-KV server
+  DEFAULTS; at -c 512 / 1 slot it is 2,552 MiB (q8 KV: 2,521), identical output, 50-token worst-case
+  prompt. Lean config fits the SAM3-nf4 end stack with ~370 MiB spare (mmproj/YOLO/fragmentation
+  unmeasured); Q3_K_M requant = the comfort lever, quality gate pending. Table in
+  tools/bench/model-cpu-or-gpu/README.md addendum.
+- Full VRAM census (2026-09-07, measured, supersedes yesterday's arithmetic AND the ~550 whisper
+  estimate): whisper q4_k 743 / q5_k 838 / fp16 1841; dicta lean 1187; tgemma lean 2552; qwen prod
+  3821 (lean 3738); yolo 286. Real free ceiling 7598 (440 driver carve-out). All-on-GPU at Q4 does
+  NOT fit (over by ~600); fits = tgemma-Q3+whisper-CPU (+638) or tgemma-CPU (+1850). Full scenario
+  table: tools/bench/model-cpu-or-gpu/README.md addendum. OPEN owner ruling: which component leaves
+  the GPU (tgemma vs whisper) or tgemma Q3 requant (quality gate needed).
+- REAL co-resident VRAM (2026-09-07 night): full owner stack loaded together = 7,505 MiB, 93 free of
+  8,151. SAM3-nf4 (886) does NOT fit -> over by ~793. ASR measured via the real asr_server node
+  (q4_k 734, q5_k 829), NOT whisper-server. Qwen image ask (1280x720 q80) = 1,236 prompt tokens,
+  +89 MiB transient, e2e 2,911 ms -> image path is not a residency risk. tgemma sys-prompt 74 tok,
+  worst perception input 115 tok -> -c 256 is plenty. tgemma CPU p50 1,599 ms (was quoted 624 for
+  short commands; perception is 2.6x longer). DictaLM on CPU confirmed fine. Table: census README.
+  OWNER RULING NEEDED: which model leaves the GPU so SAM3 fits (tgemma frees 2,479 / whisper 829).

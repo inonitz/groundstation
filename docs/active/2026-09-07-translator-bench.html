@@ -1,0 +1,299 @@
+<title>Voice-Loop Translator Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Hebrew:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#eceff1; --surface:#ffffff; --surface-2:#f5f7f8; --raised:#fbfcfc;
+    --ink:#16202a; --ink-2:#4a5a66; --ink-3:#7c8b95;
+    --line:#d9e1e5; --line-2:#e8eef0; --grid:#e4eaec;
+    --accent:#0e7c7b;
+    --dicta:#5a6b78; --tgemma:#c26b4a; --q4:#6fc3be; --q6:#0e7c7b; --q8:#255d5b; --q2:#9aa7ae;
+    --good:#2f7d55; --warn:#c26b4a;
+    --shadow:0 1px 2px rgba(16,32,40,.05),0 3px 12px rgba(16,32,40,.05);
+    --r:12px;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0e1318; --surface:#161d24; --surface-2:#1b232b; --raised:#1e2830;
+    --ink:#e8eef1; --ink-2:#a2b0b9; --ink-3:#6f7e88;
+    --line:#26313a; --line-2:#202a32; --grid:#222c34;
+    --accent:#37bcb5;
+    --dicta:#8697a3; --tgemma:#db8a66; --q4:#54d3cc; --q6:#37bcb5; --q8:#1d918c; --q2:#7e8c95;
+    --good:#54b07f; --warn:#db8a66;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.4);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0e1318; --surface:#161d24; --surface-2:#1b232b; --raised:#1e2830;
+    --ink:#e8eef1; --ink-2:#a2b0b9; --ink-3:#6f7e88;
+    --line:#26313a; --line-2:#202a32; --grid:#222c34;
+    --accent:#37bcb5;
+    --dicta:#8697a3; --tgemma:#db8a66; --q4:#54d3cc; --q6:#37bcb5; --q8:#1d918c; --q2:#7e8c95;
+    --good:#54b07f; --warn:#db8a66;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground); color:var(--ink); margin:0;
+    font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px; margin:0 auto; padding:44px 24px 80px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  h1{font-size:clamp(30px,4.4vw,44px); line-height:1.04; letter-spacing:-.022em; margin:0; font-weight:700; text-wrap:balance}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0 0 12px}
+  .lede{color:var(--ink-2); max-width:64ch; margin:15px 0 0; font-size:16px}
+  .conds{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px}
+  .cond{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-2); background:var(--surface); border:1px solid var(--line); border-radius:7px; padding:5px 10px}
+  .cond b{color:var(--ink); font-weight:600}
+  header{border-bottom:2px solid var(--ink); padding-bottom:22px}
+
+  section{margin-top:46px}
+  .sec-h{display:flex; align-items:baseline; gap:12px; margin:0 0 18px; padding-bottom:9px; border-bottom:1px solid var(--line)}
+  .sec-h h2{font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); font-weight:600; margin:0}
+  .sec-h .note{font-size:12.5px; color:var(--ink-3); margin-left:auto; font-family:"IBM Plex Mono",monospace}
+  .sub-h{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:26px 0 10px; font-family:"IBM Plex Mono",monospace}
+
+  /* verdict */
+  .verdict{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px}
+  .vc{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:18px 18px 16px; border-top:3px solid var(--dicta)}
+  .vc.win{border-top-color:var(--q6)} .vc.out{border-top-color:var(--tgemma)}
+  .vc .tag{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin:0 0 6px}
+  .vc h3{margin:0 0 8px; font-size:17px; font-weight:600; letter-spacing:-.01em}
+  .vc p{margin:0; font-size:13.5px; color:var(--ink-2)}
+  .vc b{color:var(--ink); font-family:"IBM Plex Mono",monospace; font-weight:600}
+
+  /* chart */
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
+  .chartcard{padding:22px 20px 12px}
+  .legend{display:flex; flex-wrap:wrap; gap:7px 18px; margin:0 2px 16px}
+  .lg{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-2)}
+  .sw{width:12px; height:12px; border-radius:3px; flex:none}
+  .lg b{color:var(--ink); font-weight:600}
+  .chart-scroll{overflow-x:auto}
+  svg.chart{display:block; width:100%; min-width:720px; height:auto}
+  .cap{font-size:12.5px; color:var(--ink-3); margin:12px 2px 0; line-height:1.5}
+
+  /* tables */
+  .tw{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:600px; font-size:13.5px}
+  th,td{padding:9px 13px; text-align:right; border-bottom:1px solid var(--line-2); white-space:nowrap; font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); background:var(--surface-2); font-weight:600; border-bottom:1px solid var(--line)}
+  tbody td{font-family:"IBM Plex Mono",monospace; color:var(--ink-2)}
+  tbody td:first-child{font-family:"IBM Plex Sans",sans-serif}
+  tbody tr:last-child td{border-bottom:none}
+  tr.total td{background:var(--surface-2); color:var(--ink); font-weight:600; border-top:2px solid var(--line)}
+  .best{color:var(--good); font-weight:600}
+  .mname{display:inline-flex; align-items:center; gap:8px}
+  .dot{width:9px; height:9px; border-radius:2px; flex:none}
+  .subtitle{color:var(--ink-3); font-family:"IBM Plex Mono",monospace; font-size:11px}
+
+  /* appendix */
+  .apx{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px}
+  .pcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column}
+  .pcard .top{display:flex; gap:11px; padding:15px 16px 13px; border-bottom:1px solid var(--line-2)}
+  .pcard .rail{width:4px; border-radius:3px; flex:none; align-self:stretch; min-height:34px}
+  .pcard h3{margin:0; font-size:15.5px; font-weight:600}
+  .pcard .id{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3); margin-top:3px; line-height:1.45}
+  .pcard .body{padding:14px 16px 16px; display:flex; flex-direction:column; gap:13px; flex:1}
+  .field .k{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:5px}
+  .prompt{font-family:"IBM Plex Mono",monospace; font-size:11.5px; line-height:1.5; color:var(--ink); background:var(--surface-2); border:1px solid var(--line-2); border-radius:8px; padding:10px 11px; white-space:pre-wrap}
+  .shot{display:flex; gap:8px; align-items:baseline; font-size:12px; padding:1px 0}
+  .shot .he{font-family:"IBM Plex Sans Hebrew","IBM Plex Sans",sans-serif; direction:rtl; unicode-bidi:isolate; color:var(--ink)}
+  .shot .ar{color:var(--ink-3)} .shot .en{color:var(--ink-2); font-style:italic}
+  .none{color:var(--ink-3); font-style:italic; font-size:12px}
+  .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:3px 8px}
+  .chip b{color:var(--ink); font-weight:600}
+  .pcard.wide{grid-column:1/-1}
+  .sgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px}
+
+  .notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px}
+  .nc{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--ink-3); border-radius:10px; padding:14px 15px}
+  .nc.ok{border-left-color:var(--good)} .nc.no{border-left-color:var(--warn)}
+  .nc h4{margin:0 0 5px; font-size:13.5px; font-weight:600}
+  .nc p{margin:0; font-size:12.5px; color:var(--ink-2); line-height:1.5}
+  footer{margin-top:48px; padding-top:16px; border-top:1px solid var(--line); font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Hebrew → English · recognizer translation stage</p>
+    <h1>Voice-Loop Translator Bench</h1>
+    <p class="lede">Choosing the Hebrew→English model for the drone voice loop. Five translators over the full corpus, each through the complete pipeline — translate → number guard → planner for commands, translate → keyword match for perception.</p>
+    <div class="conds">
+      <span class="cond"><b>413</b> cases</span><span class="cond"><b>5</b> capability sets</span>
+      <span class="cond">temp <b>0</b></span><span class="cond">RTX 5070 Laptop · <b>8&nbsp;GB</b></span>
+      <span class="cond">one model resident</span><span class="cond">2026-09-07</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-h"><h2>Verdict</h2></div>
+    <div class="verdict">
+      <div class="vc win"><p class="tag">Deployable pick</p><h3>Hy-MT2</h3><p><b>86%</b> overall, <b>96%</b> commands, <b>72%</b> perception, answer-mode <b>0</b>. The best translator that <b>fits</b> the 8 GB card (1.2–1.5 GB) and runs ~2× faster than tgemma.</p></div>
+      <div class="vc"><p class="tag">Keep for commands</p><h3>DictaLM</h3><p><b>99%</b> commands, free on the CPU. Weak on perception (<b>61%</b>) and answers questions instead of translating. Heavy CPU tail.</p></div>
+      <div class="vc"><p class="tag">Accuracy champion · VRAM-blocked</p><h3>tgemma + few-shots</h3><p><b>90%</b> overall, <b>98%</b> commands, <b>88%</b> perception — best of every model once given few-shots (the earlier 86%-command "collapse" was a zero-shot artifact). But <b>2,478 MiB</b> still won't fit beside SAM3, so it is not deployable here.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>Accuracy by capability</h2><span class="note">% of cases passed</span></div>
+    <div class="card chartcard">
+      <div class="legend" id="legend"></div>
+      <div class="chart-scroll"><svg class="chart" id="chart" viewBox="0 0 960 420" role="img" aria-label="Accuracy by capability set, five translators."></svg></div>
+    </div>
+    <div class="sub-h">Full scorecard — counts and percentages</div>
+    <div class="tw"><table id="acc"><thead></thead><tbody></tbody></table></div>
+    <p class="cap">Every model shown at its best recipe — system prompt + 2 few-shots (the decisive lever). tgemma leads accuracy at 90% overall, but is VRAM-blocked (see verdict). Denominators differ slightly because rejected cases are excluded per set. Green marks the best in each row (emergency omitted — all tie).</p>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>Performance &amp; footprint</h2><span class="note">translation stage · temp 0</span></div>
+    <div class="sub-h">Identity, footprint, and full-dataset latency</div>
+    <div class="tw"><table id="perf"><thead></thead><tbody></tbody></table></div>
+    <p class="cap">Latency over all 406 translator cases, ms. DictaLM timed GPU-resident here for comparison; it deploys on CPU — see thread scaling below.</p>
+
+    <div class="sub-h">Latency by capability (GPU, p50 / p95 ms)</div>
+    <div class="tw"><table id="persub"><thead></thead><tbody></tbody></table></div>
+    <p class="cap">Verbose (long conversational chains) is the slowest register for every model; command is the fastest.</p>
+
+    <div class="sub-h">DictaLM on CPU — thread scaling (per-subset, p50 / p95 ms)</div>
+    <div class="tw"><table id="cpu"><thead></thead><tbody></tbody></table></div>
+    <p class="cap">DictaLM Q4_K_M on CPU, full 406-case workload. Embedded target is 6–8 threads. Even at 8 threads the ALL-set p99 is 1,666 ms — the CPU tail. GPU DictaLM is ~80 ms p50, which is why perception belongs on the GPU translator.</p>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>How each model was queried</h2></div>
+    <div class="apx" id="apx"></div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>Status &amp; notes</h2></div>
+    <div class="notes">
+      <div class="nc ok"><h4>Complete</h4><p>Accuracy (413 cases, all quants), full-dataset and per-subset latency for all five GPU translators, DictaLM CPU thread sweep.</p></div>
+      <div class="nc no"><h4>Q2_K: collapses</h4><p>Self-quantized standard Q2_K (2.96 bpw, 741 MB) <b>runs but produces incoherent output</b> — "עלה עשרה מטרים" → "70 meters" repeated, system prompt leaking. A 1.8B model does not survive 2-bit. Not viable; Q4 (1,188 MiB) is the practical floor.</p></div>
+      <div class="nc no"><h4>tencent low-bit: blocked on x86</h4><p>1.25-bit needs PR #22836 (ARM NEON) and 2-bit needs PR #19357 (ARM SME2) — both unmerged, both ARM-only. This host is x86_64, so neither runs, on any llama.cpp build.</p></div>
+    </div>
+  </section>
+
+  <footer><span>recognizer bench · hebrew-command-bench</span><span>planner: Qwen3-VL-4B · guard + routing deterministic</span></footer>
+</div>
+
+<script>
+const M=[
+ {k:"dicta", name:"DictaLM", c:"--dicta", full:"DictaLM 3.0 1.7B Instruct", params:"1.7B", quant:"Q4_K_M", runs:"CPU / GPU-ref", mem:"~1.2 GB RAM", disk:"1.1 GB", load:"1.1", p50:79, p95:233, p99:346, tps:178},
+ {k:"tgemma", name:"tgemma-Q4", c:"--tgemma", full:"TranslateGemma 4B", params:"4B", quant:"Q4_K_M", runs:"GPU · Vulkan", mem:"2,478 MiB", disk:"2.4 GB", load:"3.5", p50:210, p95:505, p99:588, tps:88},
+ {k:"q4", name:"Hy-MT2-Q4", c:"--q4", full:"Hunyuan-MT-2 1.8B", params:"1.8B", quant:"Q4_K_M", runs:"GPU · Vulkan", mem:"1,188 MiB", disk:"1.1 GB", load:"1.5", p50:81, p95:207, p99:243, tps:182},
+ {k:"q6", name:"Hy-MT2-Q6", c:"--q6", full:"Hunyuan-MT-2 1.8B", params:"1.8B", quant:"Q6_K", runs:"GPU · Vulkan", mem:"1,514 MiB", disk:"1.4 GB", load:"1.5", p50:100, p95:249, p99:293, tps:157},
+ {k:"q8", name:"Hy-MT2-Q8", c:"--q8", full:"Hunyuan-MT-2 1.8B", params:"1.8B", quant:"Q8_0", runs:"GPU · Vulkan", mem:"1,928 MiB", disk:"1.8 GB", load:"3.0", p50:104, p95:295, p99:358, tps:136},
+];
+const SETS=[{k:"emg",l:"Emergency",n:"7"},{k:"std",l:"Command",n:"~199"},{k:"vrb",l:"Verbose",n:"~54"},{k:"perc",l:"Perception",n:"128"},{k:"mil",l:"Military",n:"20"},{k:"all",l:"ALL",n:"~409"}];
+const ACC={
+ dicta:{emg:[7,7],std:[197,199],vrb:[47,51],perc:[78,128],mil:[10,20],all:[339,405]},
+ tgemma:{emg:[7,7],std:[196,200],vrb:[47,54],perc:[112,128],mil:[7,20],all:[369,409]},
+ q4:{emg:[7,7],std:[193,201],vrb:[43,54],perc:[92,128],mil:[10,20],all:[345,410]},
+ q6:{emg:[7,7],std:[193,200],vrb:[48,54],perc:[92,128],mil:[12,20],all:[352,409]},
+ q8:{emg:[7,7],std:[194,200],vrb:[47,54],perc:[88,128],mil:[11,20],all:[347,409]},
+};
+const PSUB={ // p50/p95 per subset (GPU)
+ dicta:{cmd:"60/142",vrb:"196/311",perc:"98/159",mil:"78/104"},
+ tgemma:{cmd:"167/293",vrb:"456/605",perc:"264/368",mil:"227/279"},
+ q4:{cmd:"74/156",vrb:"214/300",perc:"109/170",mil:"99/113"},
+ q6:{cmd:"65/136",vrb:"223/299",perc:"127/194",mil:"114/131"},
+ q8:{cmd:"70/167",vrb:"273/368",perc:"144/223",mil:"122/152"},
+};
+const CPU=[ // threads, cmd, vrb, perc, mil, ALL p50/p95/p99
+ ["2","293/740","1104/1729","568/1054","424/578","405/1280/2025"],
+ ["4","201/579","875/1406","445/842","339/450","317/1046/1806"],
+ ["6","172/522","805/1317","410/780","311/412","290/971/1716"],
+ ["8","157/493","768/1265","387/740","296/389","273/937/1666"],
+];
+const pct=(o,d)=>Math.round(100*o/d);
+const cv=t=>getComputedStyle(document.documentElement).getPropertyValue(t).trim();
+
+// legend
+const lg=document.getElementById("legend");
+M.forEach(m=>{const e=document.createElement("div");e.className="lg";e.innerHTML='<span class="sw" style="background:var('+m.c+')"></span><b>'+m.name+'</b>';lg.appendChild(e);});
+
+// chart
+function chart(){
+ const svg=document.getElementById("chart");svg.innerHTML="";
+ const W=960,H=420,mL=40,mR=12,mT=14,mB=52,pw=W-mL-mR,ph=H-mT-mB;
+ const y=v=>mT+ph*(1-v/100),NS="http://www.w3.org/2000/svg";
+ const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+ [0,25,50,75,100].forEach(v=>{svg.appendChild(mk("line",{x1:mL,y1:y(v),x2:W-mR,y2:y(v),stroke:cv("--grid"),"stroke-width":1}));
+  const t=mk("text",{x:mL-7,y:y(v)+3.5,"text-anchor":"end",fill:cv("--ink-3"),"font-size":11,"font-family":"IBM Plex Mono,monospace"});t.textContent=v;svg.appendChild(t);});
+ const gw=pw/SETS.length,ip=gw*0.15,bw=(gw-ip*2)/M.length;
+ SETS.forEach((s,gi)=>{const gx=mL+gi*gw;
+  const gl=mk("text",{x:gx+gw/2,y:H-mB+20,"text-anchor":"middle",fill:cv("--ink"),"font-size":12.5,"font-weight":600,"font-family":"IBM Plex Sans,sans-serif"});gl.textContent=s.l;svg.appendChild(gl);
+  const gn=mk("text",{x:gx+gw/2,y:H-mB+35,"text-anchor":"middle",fill:cv("--ink-3"),"font-size":10,"font-family":"IBM Plex Mono,monospace"});gn.textContent="n="+s.n;svg.appendChild(gn);
+  M.forEach((m,mi)=>{const a=ACC[m.k][s.k],p=pct(a[0],a[1]),x=gx+ip+mi*bw;
+   svg.appendChild(mk("rect",{x:x+1,y:y(p),width:bw-2,height:ph*p/100,rx:2,fill:cv(m.c)}));
+   const vt=mk("text",{x:x+bw/2,y:y(p)-4,"text-anchor":"middle",fill:cv("--ink-3"),"font-size":9,"font-family":"IBM Plex Mono,monospace"});vt.textContent=p;svg.appendChild(vt);});});
+ svg.appendChild(mk("line",{x1:mL,y1:y(0),x2:W-mR,y2:y(0),stroke:cv("--ink-2"),"stroke-width":1.5}));
+}
+chart();
+
+// accuracy table
+(function(){const th=document.querySelector("#acc thead"),tb=document.querySelector("#acc tbody");
+ th.innerHTML="<tr><th>Set</th>"+M.map(m=>'<th><span class="mname" style="justify-content:flex-end"><span class="dot" style="background:var('+m.c+')"></span>'+m.name+'</span></th>').join("")+"</tr>";
+ SETS.forEach(s=>{let best=-1;M.forEach(m=>{best=Math.max(best,pct(...ACC[m.k][s.k]));});
+  const tr=document.createElement("tr");if(s.k==="all")tr.className="total";
+  tr.innerHTML='<td>'+s.l+' <span class="subtitle">n='+s.n+'</span></td>'+M.map(m=>{const a=ACC[m.k][s.k],p=pct(a[0],a[1]);
+    return '<td>'+a[0]+'/'+a[1]+' <span class="'+(p===best&&s.k!=="emg"?"best":"")+'">('+p+'%)</span></td>';}).join("");
+  tb.appendChild(tr);});})();
+
+// perf table
+(function(){const th=document.querySelector("#perf thead"),tb=document.querySelector("#perf tbody");const L='style="text-align:left"';
+ th.innerHTML="<tr><th>Model</th><th "+L+">Params</th><th "+L+">Quant</th><th "+L+">Runs on</th><th "+L+">Memory</th><th "+L+">Disk</th><th>Load s</th><th>p50</th><th>p95</th><th>p99</th><th>tok/s</th></tr>";
+ M.forEach(m=>{const tr=document.createElement("tr");
+  tr.innerHTML='<td><span class="mname"><span class="dot" style="background:var('+m.c+')"></span>'+m.name+'</span></td><td '+L+'>'+m.params+'</td><td '+L+'>'+m.quant+'</td><td '+L+'>'+m.runs+'</td><td '+L+'>'+m.mem+'</td><td '+L+'>'+m.disk+'</td><td>'+m.load+'</td><td>'+m.p50+'</td><td>'+m.p95+'</td><td>'+m.p99+'</td><td>'+m.tps+'</td>';
+  tb.appendChild(tr);});})();
+
+// per-subset table
+(function(){const th=document.querySelector("#persub thead"),tb=document.querySelector("#persub tbody");
+ th.innerHTML="<tr><th>Model</th><th>Command</th><th>Verbose</th><th>Perception</th><th>Military</th></tr>";
+ M.forEach(m=>{const d=PSUB[m.k];const tr=document.createElement("tr");
+  tr.innerHTML='<td><span class="mname"><span class="dot" style="background:var('+m.c+')"></span>'+m.name+'</span></td><td>'+d.cmd+'</td><td>'+d.vrb+'</td><td>'+d.perc+'</td><td>'+d.mil+'</td>';
+  tb.appendChild(tr);});})();
+
+// cpu thread table
+(function(){const th=document.querySelector("#cpu thead"),tb=document.querySelector("#cpu tbody");
+ th.innerHTML="<tr><th>Threads</th><th>Command</th><th>Verbose</th><th>Perception</th><th>Military</th><th>ALL p50/p95/p99</th></tr>";
+ CPU.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=r.map((v,i)=>'<td'+(i===0?'':'')+'>'+v+'</td>').join("");tb.appendChild(tr);});})();
+
+// appendix
+const APX=[
+ {name:"DictaLM", c:"--dicta", id:"DictaLM 3.0 1.7B Instruct · Q4_K_M · CPU (~1.2 GB RAM) · /v1/chat/completions",
+  role:"Command translator, its native recipe.",
+  sys:"You are a translation engine. Translate the user's Hebrew drone command to English. Output ONLY the English translation, nothing else.",
+  shots:[["טוס שמאלה שישה מטרים","Fly left six meters"],["עצור במקום","Stop in place"]],
+  chips:[["shots","2-shot"],["grammar","single-line"],["temp","0"],["endpoint","chat"]]},
+ {name:"tgemma-Q4", c:"--tgemma", id:"TranslateGemma 4B · Q4_K_M · GPU/Vulkan · 2,478 MiB · /completion",
+  role:"Accuracy champion with few-shots (98% cmd / 88% perc, 90% overall) — but VRAM-blocked at 2,478 MiB.",
+  sys:"You are a professional Hebrew (he) to English (en) translator. Your goal is to accurately convey the meaning and nuances of the original Hebrew text while adhering to English grammar, vocabulary, and cultural sensitivities. Produce only the English translation, without any additional explanations or commentary. Please translate the following Hebrew text into English:",
+  shots:[["טוס שמאלה שישה מטרים","Fly left six meters"],["עצור במקום","Stop in place"]],
+  note:"Few-shots built into the gemma template on /completion. These are the lever: zero-shot native scored 12 pp worse on commands (86% vs 98%).",
+  chips:[["shots","2-shot"],["grammar","gemma"],["temp","0"],["endpoint","completion"]]},
+ {name:"Hy-MT2 · Q4 / Q6 / Q8", c:"--q6", id:"Hunyuan-MT-2 1.8B · Q4_K_M / Q6_K / Q8_0 · GPU/Vulkan · 1,188 / 1,514 / 1,928 MiB · /v1/chat/completions",
+  role:"The recommended translator. Same prompt across all quants.",
+  sys:"You are a translation engine. Translate the user's Hebrew drone command to English. Output ONLY the English translation, nothing else.",
+  shots:[["טוס שמאלה שישה מטרים","Fly left six meters"],["עצור במקום","Stop in place"]],
+  note:"Our prompt — DictaLM's system + few-shots. Hunyuan ships no default system prompt; this beat its official prompt by ~7 pts.",
+  chips:[["shots","2-shot"],["grammar","none"],["temp","0"],["endpoint","chat"]]},
+ {name:"Shared stages", c:"--accent", wide:true,
+  blocks:[["Emergency","Stage-0 regex on the raw Hebrew (עצור / stop / חירום). No model; 7/7 for all."],
+   ["Number guard","After translation: numbers mismatch → retry with numbers named → single-token patch → else reject. Near-inert (fired on 1/203 commands)."],
+   ["Planner (commands)","Qwen3-VL-4B · revised prompt · 6-shot · wire-schema grammar → mission JSON, scored vs expected."],
+   ["Perception / military","Scored on the translation directly by keyword-group preservation. No planner."]]},
+];
+const apx=document.getElementById("apx");
+APX.forEach(m=>{const c=document.createElement("div");c.className="pcard"+(m.wide?" wide":"");let body;
+ if(m.wide){body='<div class="body"><div class="sgrid">'+m.blocks.map(b=>'<div class="field"><span class="k">'+b[0]+'</span><p style="margin:0;font-size:12.5px;color:var(--ink-2)">'+b[1]+'</p></div>').join("")+'</div></div>';}
+ else{const shots=m.shots.length?'<div class="field"><span class="k">Few-shot examples</span>'+m.shots.map(s=>'<div class="shot"><span class="he">'+s[0]+'</span><span class="ar">→</span><span class="en">'+s[1]+'</span></div>').join("")+(m.note?'<p class="none" style="margin-top:5px">'+m.note+'</p>':'')+'</div>':'<div class="field"><span class="k">Few-shot examples</span><p class="none">'+(m.note||"None.")+'</p></div>';
+  body='<div class="body"><div class="field"><span class="k">Role</span><p style="margin:0;font-size:12.5px;color:var(--ink-2)">'+m.role+'</p></div><div class="field"><span class="k">System prompt</span><div class="prompt">'+m.sys+'</div></div>'+shots+'<div class="chips">'+m.chips.map(ch=>'<span class="chip">'+ch[0]+' <b>'+ch[1]+'</b></span>').join("")+'</div></div>';}
+ c.innerHTML='<div class="top"><span class="rail" style="background:var('+m.c+')"></span><div><h3>'+m.name+'</h3><div class="id">'+(m.id||"applied identically for every translator")+'</div></div></div>'+body;
+ apx.appendChild(c);});
+
+const mq=window.matchMedia("(prefers-color-scheme:dark)");
+if(mq.addEventListener)mq.addEventListener("change",chart);
+new MutationObserver(chart).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>

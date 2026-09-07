@@ -24,6 +24,9 @@ WHISPER_MODELS = {                                                # ivrit turbo,
     "q8_0": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q8_0.bin",
     "q5_1": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_1.bin",
     "q4_0": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q4_0.bin",
+    "q4_k": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q4_k.bin",
+    "q5_k": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin",
+    "q6_k": "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q6_k.bin",
 }
 W2V2_DIR = "/root/models/asr/wav2vec2-xls-r-300m-lm-hebrew"       # ships its KenLM under language_model/
 CT2_REPO = "ivrit-ai/whisper-large-v3-turbo-ct2"                  # auto-downloaded to CT2_DIR
@@ -239,22 +242,33 @@ def _table(headers, rows):
 
 
 def print_stats(results):
-    import jiwer
     from scipy.stats import binomtest
 
+    def _ed(a, b):                                   # word/char edit distance, no external dep
+        m, n = len(a), len(b); d = list(range(n + 1))
+        for i in range(1, m + 1):
+            prev = d[0]; d[0] = i
+            for j in range(1, n + 1):
+                cur = d[j]; d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] != b[j - 1])); prev = cur
+        return d[n]
+
     def counts(ref, hyp):
-        o = jiwer.process_words([ref], [hyp])
-        return o.substitutions + o.deletions + o.insertions, o.hits + o.substitutions + o.deletions
+        r = ref.split(); return _ed(r, hyp.split()), max(len(r), 1)
+
+    def ccounts(ref, hyp):
+        return _ed(list(ref), list(hyp)), max(len(ref), 1)
 
     per = {ln: {p["id"]: counts(p["ref"], p["hyp"]) for p in d["pairs"]} for ln, d in results.items()}
-    order = list(dict.fromkeys(l for l in DEFAULT_LANES.split(",") + ["ct2_int8_cpu"] if l in per))
+    cer_lane = {ln: (lambda cs: 100.0 * sum(e for e, _ in cs) / sum(t for _, t in cs))(
+                    [ccounts(p["ref"], p["hyp"]) for p in d["pairs"]]) for ln, d in results.items()}
+    order = list(dict.fromkeys(l for l in DEFAULT_LANES.split(",") + ["ct2_int8_cpu","q4_k","q5_k","q6_k"] if l in per))
     exact, wer_rows, lat_rows = {}, [], []
     for ln in order:
         vals = list(per[ln].values())
         w, lo, hi = wer_ci(vals)
         exact[ln] = {i: (1 if e == 0 else 0) for i, (e, r) in per[ln].items()}
         ex = sum(1 for e, r in vals if e == 0) / len(vals) * 100
-        cer = results[ln].get("cer", 0.0)
+        cer = cer_lane.get(ln, 0.0)
         wer_rows.append([ln, f"{w:.2f}", f"[{lo:.2f}, {hi:.2f}]", f"{cer:.2f}", f"{ex:.1f}", len(vals)])
         lt = results[ln].get("lat_ms", [])
         lat_rows.append([ln, pct(lt, 25), pct(lt, 50), pct(lt, 75), pct(lt, 95),

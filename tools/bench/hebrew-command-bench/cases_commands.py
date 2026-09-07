@@ -197,8 +197,25 @@ CASES = [
  ('r_ord2', 'ימינה שני מטרים', 'right 2 meters', [('fly_by', 'y', 2)]),
  ('r_ord3', 'למעלה, שלושה מטרים', 'upward, 3 meters', [('fly_by', 'z', 3)]),
  ('r_ord4', 'אחורה קצת', 'backward a little', [('fly_by', 'x', '-')]),
+ # -- live-run additions (desk session 2026-09-06, sessions/session-20260906-231140-rog) --
+ # Question cases carry expected [] under the CURRENT routing spec (route()=command); if the
+ # owner re-rules presence/attribute questions to the VLM, they migrate to cases_perception.
+ ('l_deg_frac', 'פני שמאלה 74.5 מעלות', 'turn left 74.5 degrees', [('spin_by', 'degrees', -74.5)]),
+ ('l_deg_precise', 'תעשה סיבוב של 174.235 מעלות נגד כיוון השעון', 'make a 174.235 degree counter-clockwise turn', [('spin_by', 'degrees', -174.235)]),
+ ('l_half_cw', 'תעשה חצי סיבוב עם כיוון השעון', 'make a half turn clockwise', [('spin_by', 'degrees', 180)]),
+ ('l_dbl_neg', 'אל תפנה 90 מעלות שמאלה כנגד כיוון השעון ואז אל תפנה ימינה', "don't turn left 90 degrees counter-clockwise, then don't turn right", []),
+ ('l_postpone', 'תדחה את מה שאתה עושה לשתי דקות הקרובות', "hold off on what you're doing for the next two minutes", []),
+ ('l_pause_idiom', 'פוס משחק לארבע שניות', 'whoa, timeout for four seconds', []),
+ ('l_combo_tamtin', 'המראה, עלה חמישה מטרים, תמתין שלוש שניות ותנחת', 'take off, climb five meters, wait three seconds and land', [('takeoff', None, None), ('fly_by', 'z', 5), ('delay', 'seconds', 3), ('land', None, None)]),
+ ('l_fwd_future', 'תתקדם 15 מטרים', 'advance 15 meters', [('fly_by', 'x', 15)]),
+ ('l_land_going', 'האם אתה הולך לנחות בקרוב', 'are you going to land soon', []),
+ ('l_pres_pic', 'יש מישהו בתמונה?', 'is there anyone in the picture?', []),
+ ('l_pres_you', 'האם אתה רואה מישהו בתמונה?', 'do you see anyone in the picture?', []),
+ ('l_color_near', 'מה הצבע של המכונית הקרובה ביותר?', 'what is the color of the nearest car?', []),
+ ('l_tower_count', 'האם אתה רואה מגדל בסצנה שאתה יכול לספור בו חלונות?', 'do you see a tower in the scene where you can count windows?', []),
+ ('l_lighthouse_count', 'האם אתה רואה מגדלור בסצנה שאתה יכול לספור בו חלונות?', 'do you see a lighthouse in the scene where you can count windows?', []),
 ]
-assert len(CASES) == 190 and len({c[0] for c in CASES}) == 190
+assert len(CASES) == 204 and len({c[0] for c in CASES}) == 204
 
 ALLOWED = {"takeoff": set(), "land": set(), "fly_by": {"x","y","z"},
            "spin_by": {"degrees"}, "delay": {"seconds"}}
@@ -317,4 +334,5 @@ assert len(VERBOSE_CASES) == 54 and len({c[0] for c in VERBOSE_CASES}) == 54
 EMERGENCY_CASES = [
  ("e_stop", "עצור"), ("e_stopstop", "עצור עצור"), ("e_stop_now", "תעצור עכשיו"),
  ("e_emergency", "חירום חירום"), ("e_stop_all", "עצור הכל בבקשה"), ("e_english", "stop stop stop"),
+ ("e_game_stop", "תעצור את המשחק ל-20 שניות"),  # live 2026-09-06: greedy עצור-in-context halt, locked in
 ]

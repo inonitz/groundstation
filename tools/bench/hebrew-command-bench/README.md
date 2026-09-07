@@ -9,7 +9,7 @@ component (`recognizer.py`), its benchmark (`bench.py`), and the measurements th
 | section | what is in it |
 |---|---|
 | [The Recognizer](#the-recognizer-the-component-under-test) | the five-stage diagram and how the component works |
-| [Scorecard](#scorecard--current-complete-recognizer-all-370-sentences-2026-09-02-night) | current results, all 370 sentences |
+| [Scorecard](#scorecard--current-complete-recognizer-all-388-sentences-2026-09-07-after-the-live-run-dataset-additions) | current results, all 388 sentences |
 | [Rulings in force](#rulings-in-force-owner-2026-09-02) | the decisions that define the component |
 | [Files](#files) | what each file is |
 | [Usage](#usage) | how to run and modify |
@@ -66,40 +66,38 @@ BEFORE the Recognizer and never waits on it)
 Status: the component lives in projects/integration_harden/recognizer/ (single home),
 integrated behind the router; this benchmark imports and measures it in place.
 
-## Scorecard — current, complete Recognizer, all 370 sentences (2026-09-03, after the guard-unification pass)
+## Scorecard — current, complete Recognizer, all 388 sentences (2026-09-07, after the live-run dataset additions)
 
-`bench.py`. Raw: results/2026-09-03-recognizer.json (after the guard unification: one Hebrew
-number composer for stage 2 and the guard, and-a-half composition on the English side). The
-routing-kind refactor's byte-identical equivalence run is preserved as
-results/2026-09-03-recognizer-routing-eq.json. Model-dependent sets carry a measured
-±1-2 cross-run noise band: identical final translations flipped english<->reject across dicta
-server restarts (j_pin_halfgate, s_feet_hold). Determinism is proven within one server
-session, not across restarts.
+`bench.py`. Raw: results/2026-09-07-recognizer.json. This run adds 18 cases drawn from the
+2026-09-06 live desk session (raw audio + logs: projects/integration_harden/sessions/
+session-20260906-231140-rog/): 14 commands (l_*), 3 perception (lp_*), 1 emergency
+(e_game_stop). Against the 2026-09-03 run every delta is an added case; all previously scored
+sentences reproduce exactly (temp-0). Model-dependent sets keep the measured ±1-2 cross-run
+noise band across dicta server restarts.
 
 | set | result | note |
 |---|---|---|
-| emergency (stage 0) | 6/6 (100%) | production regex, verbatim |
-| std-190 commands | 186/187 (99%) | guard unification turned 2 false rejects (double-counted מטר אחד, uncombined וחצי) into correct missions; r_mis5 (return-trip sign) remains |
-| verbose-54 commands | 50/53 (94%) | takeoff-chain rule fixed the verbose chain openers; 3 planner fails remain |
-| perception-100 | 57/100 (57%) | DictaLM; TranslateGemma (82/100) deferred to the future E2E ASR system |
-| military-20 | 9/20 (45%) | out of scope; -1 = stay-there-strip removes words the s_jump_point probe requires (mission is behaviorally correct; probe amendment = open owner call), -1 noise |
-| ALL | 308/366 (84%) | rejects follow the ruling: unresolved numbers are read back to the user, not guessed |
+| emergency (stage 0) | 7/7 (100%) | production regex, verbatim; e_game_stop locks in the greedy עצור-in-context halt |
+| std-204 commands | 197/199 (99%) | +14 live cases: 12 scored, 11 pass; NEW measured fail l_land_going — "האם אתה הולך לנחות בקרוב" makes the planner emit a land step (the מתכוון phrasing passes: the trap is phrasing-fragile); r_mis5 (return-trip sign) remains |
+| verbose-54 commands | 50/53 (94%) | unchanged; same 3 planner fails |
+| perception-103 | 60/103 (58%) | +3 live cases, all pass; DictaLM; TranslateGemma (82/100) deferred to the future E2E ASR system |
+| military-20 | 9/20 (45%) | unchanged; out of scope |
+| ALL | 323/382 (85%) | rejects follow the ruling: unresolved numbers are read back to the user, not guessed |
 
 Latency, same run. Spans: "Recognizer + planner" includes the Qwen3-VL planning call — the full
-text-to-mission path; ASR, REST execution and TTS are not measured anywhere yet.
-(Emergency and bypass answers are 0 ms — 79 of the 189 std commands
-were answered by the bypass with no model call; their zeros are included in the end-to-end rows):
+text-to-mission path; ASR, REST execution and TTS are not measured anywhere yet. Emergency and
+bypass answers are 0 ms and their zeros are included in the end-to-end rows:
 
 | set / stage | p25 | p50 | p75 | p95 | p99 | max (ms) |
 |---|---|---|---|---|---|---|
-| std190: Recognizer + planner (text in → mission out) | 0 | 160 | 269 | 580 | 711 | 873 |
-| verbose: Recognizer + planner (text in → mission out) | 575 | 683 | 836 | 955 | 1110 | 1166 |
-| perception: Recognizer only (VLM not simulated) | 81 | 105 | 121 | 165 | 265 | 338 |
-| military: Recognizer only | 63 | 78 | 87 | 124 | 153 | 160 |
+| std204: Recognizer + planner (text in → mission out) | 0 | 185 | 275 | 581 | 738 | 878 |
+| verbose: Recognizer + planner (text in → mission out) | 551 | 678 | 858 | 976 | 1058 | 1113 |
+| perception: Recognizer only (VLM not simulated) | 80 | 105 | 120 | 165 | 277 | 333 |
+| military: Recognizer only | 62 | 77 | 87 | 124 | 150 | 156 |
 
-One stage-0 false positive: "עצור שם לעשר שניות" (a wait command containing the emergency word)
-emergency-stops. Recommendation: keep the filter greedy — it fails in the safe direction.
-Ruling pending.
+One stage-0 false positive, unchanged: "עצור שם לעשר שניות" (a wait command containing the
+emergency word) emergency-stops. Recommendation: keep the filter greedy — it fails in the safe
+direction. Ruling pending.
 
 ## Rulings in force (owner, 2026-09-02)
 

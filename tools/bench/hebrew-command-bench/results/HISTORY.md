@@ -325,3 +325,41 @@ Raw: 2026-09-02-recognizer.json; routing-refactor equivalence twin:
 2026-09-03-recognizer-routing-eq.json (byte-identical). Superseded by the guard-unification
 run: one Hebrew composer + EN and-a-half composition -> 308/366 (two false rejects became
 correct missions). Scorecard in the README.
+
+
+## Superseded 2026-09-07 by the live-run dataset additions (370 -> 388 cases)
+
+## Scorecard — current, complete Recognizer, all 370 sentences (2026-09-03, after the guard-unification pass)
+
+`bench.py`. Raw: results/2026-09-03-recognizer.json (after the guard unification: one Hebrew
+number composer for stage 2 and the guard, and-a-half composition on the English side). The
+routing-kind refactor's byte-identical equivalence run is preserved as
+results/2026-09-03-recognizer-routing-eq.json. Model-dependent sets carry a measured
+±1-2 cross-run noise band: identical final translations flipped english<->reject across dicta
+server restarts (j_pin_halfgate, s_feet_hold). Determinism is proven within one server
+session, not across restarts.
+
+| set | result | note |
+|---|---|---|
+| emergency (stage 0) | 6/6 (100%) | production regex, verbatim |
+| std-190 commands | 186/187 (99%) | guard unification turned 2 false rejects (double-counted מטר אחד, uncombined וחצי) into correct missions; r_mis5 (return-trip sign) remains |
+| verbose-54 commands | 50/53 (94%) | takeoff-chain rule fixed the verbose chain openers; 3 planner fails remain |
+| perception-100 | 57/100 (57%) | DictaLM; TranslateGemma (82/100) deferred to the future E2E ASR system |
+| military-20 | 9/20 (45%) | out of scope; -1 = stay-there-strip removes words the s_jump_point probe requires (mission is behaviorally correct; probe amendment = open owner call), -1 noise |
+| ALL | 308/366 (84%) | rejects follow the ruling: unresolved numbers are read back to the user, not guessed |
+
+Latency, same run. Spans: "Recognizer + planner" includes the Qwen3-VL planning call — the full
+text-to-mission path; ASR, REST execution and TTS are not measured anywhere yet.
+(Emergency and bypass answers are 0 ms — 79 of the 189 std commands
+were answered by the bypass with no model call; their zeros are included in the end-to-end rows):
+
+| set / stage | p25 | p50 | p75 | p95 | p99 | max (ms) |
+|---|---|---|---|---|---|---|
+| std190: Recognizer + planner (text in → mission out) | 0 | 160 | 269 | 580 | 711 | 873 |
+| verbose: Recognizer + planner (text in → mission out) | 575 | 683 | 836 | 955 | 1110 | 1166 |
+| perception: Recognizer only (VLM not simulated) | 81 | 105 | 121 | 165 | 265 | 338 |
+| military: Recognizer only | 63 | 78 | 87 | 124 | 153 | 160 |
+
+One stage-0 false positive: "עצור שם לעשר שניות" (a wait command containing the emergency word)
+emergency-stops. Recommendation: keep the filter greedy — it fails in the safe direction.
+Ruling pending.
