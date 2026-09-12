@@ -16,7 +16,9 @@ import json, os, subprocess, sys, time, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BENCH = os.path.abspath(os.path.join(HERE, "..", "hebrew-command-bench"))
+RECOG = os.path.abspath(os.path.join(HERE, "..", "..", "..", "projects", "integration_harden", "recognizer"))
 sys.path.insert(0, BENCH)
+sys.path.insert(0, RECOG)      # llama.py + prompts.py live with the Recognizer (single home)
 from llama import LlamaServer, chat, port_up, MODELS, QWEN3VL_EXTRA, PORT
 
 # TranslateGemma left the bench when it was deferred; the census still measures it.
@@ -189,11 +191,130 @@ def stack_census():
 
 
 
+def _wait_health(port, proc, secs=180):
+    for _ in range(secs):
+        if port_up(port):
+            return True
+        if proc.poll() is not None:
+            return False
+        time.sleep(1)
+    return False
+
+
+def _proc_vram():
+    """{pid: MiB} per GPU process, from nvidia-smi."""
+    out = subprocess.run(["nvidia-smi", "--query-compute-apps=pid,used_memory",
+                          "--format=csv,noheader,nounits"], capture_output=True, text=True).stdout
+    d = {}
+    for line in out.strip().splitlines():
+        try:
+            pid, mb = line.split(","); d[int(pid)] = int(mb)
+        except ValueError:
+            pass
+    return d
+
+
+def sam3_stack_census():
+    """The ruled 2026-09-07 topology, loaded TOGETHER and measured by nvidia-smi delta (the fit the
+    campaign report section 4 only computed on paper): Qwen3-VL via the production script
+    (run_llama_server.sh) + Hy-MT2-Q4 via recognizer/run_hymt2_server.sh + whisper q5_k via the REAL
+    ASR node + YOLO26n-seg + SAM3-nf4 (perception2.Sam3Backend, one real detect), then one real
+    1280x720 image ask so Qwen's image-encode transient is included. Servers are killed by process
+    group, never by `pkill -f llama-server` (that pattern matches the caller's own shell)."""
+    import numpy as np, cv2, torch, signal
+    HARDEN = os.path.abspath(os.path.join(HERE, "..", "..", "..", "projects", "integration_harden"))
+    BIN = "/root/groundstation/build/release/shared/dji/bin"
+    ASR_MODEL = "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin"
+    sys.path.insert(0, HARDEN)
+    steps, procs = [], []
+    base = prev = vram()
+    print(f"baseline: {base}", flush=True)
+
+    def mark(name, settle=2):
+        nonlocal prev
+        time.sleep(settle); v = vram()
+        steps.append({"step": name, "delta_mb": v["used"] - prev["used"],
+                      "total_used_mb": v["used"] - base["used"], "free_mb": v["free"]})
+        print(f"  {name:44s} +{v['used']-prev['used']:>5d} MiB  total {v['used']-base['used']:>5d}  free {v['free']:>5d}", flush=True)
+        prev = v
+
+    def spawn(cmd, log):
+        # bash, not /bin/sh: the ASR node line needs `source` (dash has none -> the node never ran)
+        p = subprocess.Popen(["bash", "-c", cmd], start_new_session=True,
+                             stdout=open(log, "ab"), stderr=subprocess.STDOUT)
+        procs.append(p); return p
+
+    try:
+        for port, name in ((18090, "Qwen3-VL"), (18091, "Hy-MT2/DictaLM")):
+            assert not port_up(port), f"port {port} ({name}) is busy; stop the desk test first"
+        q = spawn(f"bash {HARDEN}/run_llama_server.sh", "/tmp/census-qwen.log")
+        assert _wait_health(18090, q), "Qwen3-VL server did not come up (see /tmp/census-qwen.log)"
+        # one warm text request, then the image ask later
+        chat(18090, "You are a drone assistant.", "say ok", max_tokens=5)
+        mark("qwen3vl (run_llama_server.sh, prod flags)")
+
+        h = spawn(f"bash {HARDEN}/recognizer/run_hymt2_server.sh", "/tmp/census-hymt2.log")
+        assert _wait_health(18091, h), "Hy-MT2 server did not come up (see /tmp/census-hymt2.log)"
+        chat(18091, TRANSLATE_SYS, "טוס קדימה חמישה מטרים", max_tokens=40, grammar=LINE_GRAMMAR, shots=TRANSLATE_SHOTS)
+        mark("hy-mt2 Q4 (run_hymt2_server.sh, -c 512 -np 1)")
+
+        a = spawn(f"source /opt/ros/jazzy/setup.bash && export LD_LIBRARY_PATH={BIN}:$LD_LIBRARY_PATH "
+                  f"PULSE_SERVER=${{PULSE_SERVER:-unix:/tmp/pulse-socket}} && exec {BIN}/llm_to_action_asr_server "
+                  f"--backend=whisper-whisper --model={ASR_MODEL} --fa --language=he --threads=1 --gid=0",
+                  "/tmp/census-asr.log")
+        for _ in range(60):                         # the node's VRAM appears once whisper is loaded
+            time.sleep(1)
+            if a.pid in _proc_vram() or a.poll() is not None:
+                break
+        asr_ok = a.poll() is None and a.pid in _proc_vram()
+        mark("whisper q5_k via the real ASR node" + ("" if asr_ok else "  [NODE DIED -> 0, use census 829]"), settle=5)
+
+        from ultralytics import YOLO
+        img = np.random.randint(0, 255, (720, 1280, 3), dtype=np.uint8)
+        yolo = YOLO("/root/models/vision/yolo26n-seg.pt")
+        yolo.predict(img, verbose=False, device="0", imgsz=640)
+        mark("yolo26n-seg (ultralytics, 720p predict)")
+
+        from perception2.sam3_backend import Sam3Backend
+        sam3 = Sam3Backend()
+        frame = cv2.imread("/root/groundstation/tools/bench/sam3-mask-bench/candidates/street-scene-1.jpg")
+        dets = sam3.detect(frame, "car", conf=0.12)
+        mark(f"sam3-nf4 (perception2, 1 detect -> {len(dets)} dets)")
+
+        from perception import vlm_client as vlm
+        t0 = time.time()
+        desc, _, _, _ = vlm.ask(frame if frame.shape[1] == 1280 else cv2.resize(frame, (1280, 720)),
+                                "What do you see?", [])
+        mark(f"qwen image ask transient ({(time.time()-t0)*1000:.0f} ms)", settle=1)
+        peak = max(s_["total_used_mb"] for s_ in steps)
+        final = vram()
+        print(f"\nall resident together: used {final['used']} / {final['total']} MiB, free {final['free']} (peak total +{peak})", flush=True)
+        per = _proc_vram()
+        print("per-process:", {pid: mb for pid, mb in per.items()}, flush=True)
+        stamp = datetime.date.today().isoformat()
+        out = os.path.join(HERE, "results", f"{stamp}-sam3-stack-census.json")
+        json.dump({"baseline": base, "steps": steps, "final": final, "per_process": per,
+                   "asr_node_ok": asr_ok}, open(out, "w"), indent=1)
+        print(f"results -> {out}", flush=True)
+    finally:
+        for p in procs:
+            try: os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+            except Exception: pass
+        time.sleep(5)
+        for p in procs:
+            try: os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+            except Exception: pass
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--stack", action="store_true",
                     help="demo-stack co-residency: qwen3vl + omdet + sam2.1 + wav2vec2")
-    if ap.parse_args().stack: stack_census()
+    ap.add_argument("--sam3-stack", action="store_true",
+                    help="ruled 2026-09-07 topology co-resident: qwen3vl + hy-mt2 + whisper node + yolo + sam3-nf4")
+    args = ap.parse_args()
+    if args.stack: stack_census()
+    elif args.sam3_stack: sam3_stack_census()
     else: main()
 

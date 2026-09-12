@@ -130,3 +130,27 @@ Paired comparison (exact McNemar on sentence-exact-match; b = first-only wins, c
   command-corpus KenLM.
 - Open (needs the team recordings): in-domain command WER, military phraseology survival, and wind
   robustness. These decide whether wav2vec2's constrained-grammar path has any real advantage.
+
+
+## Whisper on the CPU (cpu_latency.py, 2026-09-08)
+
+20 real push-to-talk clips (median 2.4 s of audio), large-v3-turbo q5_k, beam 4, the ASR node's build:
+p50 latency 10.2 / 6.9 / 5.5 s at 4 / 6 / 8 threads versus 0.29 s on the GPU (p95 0.51). The cost is
+the fixed 30-second encoder window, so clip length does not matter. Whisper stays on the GPU.
+`python3 cpu_latency.py [clips_dir] --threads 4,6,8 --n 20`.
+
+
+## Gemma 4 E4B as the ASR (2026-09-08, owner note)
+
+`gemma_asr.py` sends every recorded push-to-talk clip of the two live sessions (153) through `llama-mtmd-cli` with the
+Gemma 4 E4B audio conformer (it lives in mmproj-BF16.gguf; llama-server has no audio route yet, llama.cpp issue 21868)
+under a Hebrew-only GBNF grammar (without it the CLI narrates its thinking). Each transcript is scored (CER / WER, after
+normalize_he) against the matched live-test line, next to whisper q5_k's transcript of the same clip. Output:
+`bench_out/gemma-asr-<date>.{md,json}` (gitignored: transcripts). Result (2026-09-08 17:45):
+
+| ASR on the same 107 matched clips (153 total) | CER % | WER % | exact clips | wins head-to-head | p50 ms |
+|---|---|---|---|---|---|
+| whisper q5_k (ASR node, beam 4) | 8.4 | 10.3 | 69 | 96 | ~290 |
+| Gemma 4 E4B audio conformer, CLI, Hebrew-only grammar | 35.8 | 71.8 | 7 | 1 | 3542 (with model load) |
+
+Reading: Gemma 4's audio path is not an ASR replacement for Hebrew commands today; whisper q5_k stays (owner ruling D confirmed by data).

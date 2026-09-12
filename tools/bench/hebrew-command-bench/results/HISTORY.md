@@ -3,6 +3,46 @@
 Superseded results, kept as the record. Raw data for every table is in this directory.
 
 
+## SUPERSEDED 2026-09-07 (late) — scorecard at 388 sentences, DictaLM (2026-09-07 morning run)
+
+`bench.py`. Raw: results/2026-09-07-recognizer.json. This run adds 18 cases drawn from the
+2026-09-06 live desk session (raw audio + logs: projects/integration_harden/sessions/
+session-20260906-231140-rog/): 14 commands (l_*), 3 perception (lp_*), 1 emergency
+(e_game_stop). Against the 2026-09-03 run every delta is an added case; all previously scored
+sentences reproduce exactly (temp-0). Model-dependent sets keep the measured ±1-2 cross-run
+noise band across dicta server restarts.
+
+| set | result | note |
+|---|---|---|
+| emergency (stage 0) | 7/7 (100%) | production regex, verbatim; e_game_stop locks in the greedy עצור-in-context halt |
+| std-204 commands | 197/199 (99%) | +14 live cases: 12 scored, 11 pass; NEW measured fail l_land_going — "האם אתה הולך לנחות בקרוב" makes the planner emit a land step (the מתכוון phrasing passes: the trap is phrasing-fragile); r_mis5 (return-trip sign) remains |
+| verbose-54 commands | 50/53 (94%) | unchanged; same 3 planner fails |
+| perception-103 | 60/103 (58%) | +3 live cases, all pass; DictaLM; TranslateGemma (82/100) deferred to the future E2E ASR system |
+| military-20 | 9/20 (45%) | unchanged; out of scope |
+| ALL | 323/382 (85%) | rejects follow the ruling: unresolved numbers are read back to the user, not guessed |
+
+Latency, same run. Spans: "Recognizer + planner" includes the Qwen3-VL planning call — the full
+text-to-mission path; ASR, REST execution and TTS are not measured anywhere yet. Emergency and
+bypass answers are 0 ms and their zeros are included in the end-to-end rows:
+
+| set / stage | p25 | p50 | p75 | p95 | p99 | max (ms) |
+|---|---|---|---|---|---|---|
+| std204: Recognizer + planner (text in → mission out) | 0 | 185 | 275 | 581 | 738 | 878 |
+| verbose: Recognizer + planner (text in → mission out) | 551 | 678 | 858 | 976 | 1058 | 1113 |
+| perception: Recognizer only (VLM not simulated) | 80 | 105 | 120 | 165 | 277 | 333 |
+| military: Recognizer only | 62 | 77 | 87 | 124 | 150 | 156 |
+
+One stage-0 false positive, unchanged: "עצור שם לעשר שניות" (a wait command containing the
+emergency word) emergency-stops. Recommendation: keep the filter greedy — it fails in the safe
+direction. Ruling pending.
+
+
+
+## SUPERSEDED 2026-09-08 — scorecard of 2026-09-07 (late), 413 sentences, old reject rule
+DictaLM 339/407 (emergency 7/7, std 197/199, verbose 50/53, perception 76/128, military 9/20);
+Hy-MT2-Q4 345/410 (7/7, 195/201, 44/54, 90/128, 9/20). Raw: results/2026-09-07-recognizer-dicta-cw.json,
+results/2026-09-07-recognizer-hymt2-cw2.json. Rejects were dropped from n under that rule.
+
 Everything below is the development history (rounds 1-6, the ablation iterations, the
 intermediate measurements). The numbers are superseded by the scorecard above. Raw data for
 every table is under results/.

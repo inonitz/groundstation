@@ -17,6 +17,8 @@ OmDet+SAM2.1 replacement -- overturning the earlier FP32-ONNX cost verdict.
 | [Method](#method-planned) | how each remaining number will be produced |
 | [Files](#files) | what each file is |
 
+The VLM comparison (Qwen3-VL vs Gemma 4 against SAM3, 2026-09-08) lives in tools/bench/whole-system (vlm_compare.py); it only reads the images here.
+
 ## Objective
 
 Answer, with measured evidence: does SAM 3.x give better masks than SAM 2.1 at equal or lower

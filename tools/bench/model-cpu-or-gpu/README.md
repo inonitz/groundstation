@@ -99,6 +99,25 @@ To seat SAM3-nf4: move tgemma to CPU (frees 2,479, costs p50 1.6 s perception) O
 transiently, so the image path is NOT a residency risk. The earlier ~440 MiB driver carve-out note
 was wrong: at full load used reached 8,058 of 8,151, so ~93 MiB is the true floor.
 
+RULED TOPOLOGY (2026-09-07 late, `census.py --sam3-stack`, everything loaded TOGETHER, real ASR node):
+
+| step | delta MiB | total over baseline | free |
+|---|---|---|---|
+| Qwen3-VL, run_llama_server.sh prod flags | 3,821 | 3,821 | 3,776 |
+| Hy-MT2-Q4, run_hymt2_server.sh (-c 512 -np 1) | 1,187 | 5,008 | 2,590 |
+| whisper q5_k via asr_server node (--fa -l he t1) | 827 | 5,835 | 1,763 |
+| YOLO26n-seg, 720p predict | 282 | 6,117 | 1,481 |
+| SAM3-nf4 in-process (perception2.Sam3Backend, one detect) | 1,074 | 7,191 | 407 |
+| Qwen 1280x720 image ask transient | 94 | 7,285 | 313 |
+| all resident together | | used 7,396 / 8,151 | 313 free |
+
+Whisper on the CPU (2026-09-08, tools/bench/hebrew_asr/cpu_latency.py, 20 real clips, q5_k, beam 4):
+p50 latency 10.2 s / 6.9 s / 5.5 s at 4 / 6 / 8 threads versus 0.29 s on the GPU. Not viable: whisper keeps
+its 827 MiB on the GPU, which closes the "whisper to CPU" route for seating TranslateGemma.
+
+Fits at Q4 only: SAM3-nf4 is 1,074 MiB in-process (bnb + activations; the 886 figure was the isolated
+torch peak), so Hy-MT2-Q6 (+326) would overrun. Raw: results/2026-09-07-sam3-stack-census.json.
+
 Pair loading:
 
 - qwen3vl + dicta: fits. Combined 5,401 MiB, 2,196 MiB free.

@@ -219,3 +219,21 @@ SLANG20 = [
     [["low"],["wadi","valley","ravine","riverbed"],["route","axis","road"],["wait","hold"]], "acronym"),
 ]
 assert len(SLANG20) == 20 and len({c[0] for c in SLANG20}) == 20
+
+
+# ---- live-test-75 v2 (2026-09-08), filed by the `file:` field of each line (owner ruling 2026-09-08 17:15) ----
+PERC100 += [
+ ('p75_open_window_2nd', 'סמן את החלון הפתוח בקומה השנייה', 'Mark the open window on the second floor', [['window'], ['open'], ['second', '2nd']], 2),
+ ('p75_follow_blue_bike', 'עקוב אחרי האופניים הכחולים', 'Follow the blue bicycle', [['bicycle', 'bike'], ['blue'], ['follow', 'track']], 1),
+ ('p75_count_entrance', 'כמה אנשים עומדים ליד הכניסה', 'How many people are standing near the entrance', [['how many', 'count'], ['people', 'person', 'men'], ['entrance', 'door', 'entry']], 2),
+ ('p75_describe_right', 'תאר לי מה יש מימין', 'Describe what is on the right', [['describe', 'tell'], ['right']], 1),
+ ('p75_all_vehicles', 'הדגש את כל הרכבים', 'Highlight all the vehicles', [['vehicle', 'car'], ['all', 'every']], 1),
+ ('p75_purple_bag', 'סמן את האדם עם התיק הסגול', 'Mark the person with the purple bag', [['person', 'man', 'people'], ['bag', 'backpack'], ['purple', 'violet']], 2),
+ ('p75_count_cars_behind_white', 'כמה מכוניות חונות מאחורי הבניין הלבן', 'How many cars are parked behind the white building', [['how many', 'count'], ['car', 'vehicle'], ['behind'], ['white'], ['building']], 3),
+ ('p75_anyone_armed', 'יש כאן מישהו עם נשק?', 'Is there anyone here with a weapon?', [['anyone', 'someone', 'person', 'people'], ['weapon', 'gun', 'rifle']], 1),
+ ('p75_look_right', 'תסתכל ימינה', 'Look to the right', [['look'], ['right']], 1),
+ ('p75_approach_blue_car', 'התקרב לרכב הכחול', 'Get closer to the blue car', [['closer', 'approach', 'toward'], ['car', 'vehicle'], ['blue']], 1),
+]
+SLANG20 += [
+ ('s75_observe_junction', 'תן לי תצפית על הצומת ודווח', 'Give me an observation of the junction and report', [['observ', 'watch', 'view'], ['junction', 'intersection'], ['report']], 'idiom'),
+]
