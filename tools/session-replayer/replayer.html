@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MVD Session Replayer</title>
+<style>
+  :root { --bg:#14171c; --pane:#1c2128; --line:#2b313b; --ink:#e7ebf0; --dim:#9aa4b2;
+          --good:#3cdc64; --near:#f0b429; --bad:#ff5d5d; --accent:#6fb3ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { padding:10px 14px; background:var(--pane); border-bottom:1px solid var(--line); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  .muted { color:var(--dim); }
+  main { display:grid; grid-template-columns:340px 1fr; height:calc(100vh - 52px); }
+  #list { overflow:auto; border-right:1px solid var(--line); }
+  .utt { padding:9px 12px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .utt:hover { background:#20262f; }
+  .utt.sel { background:#263142; }
+  .utt .he { direction:rtl; font-size:15px; }
+  .utt .sub { color:var(--dim); font-size:12px; margin-top:2px; }
+  .badge { display:inline-block; padding:1px 7px; border-radius:10px; font-size:11px; font-weight:600; }
+  .b-highlight{background:#1e3a5f;color:#bcd9ff} .b-count{background:#12402a;color:#9ff0bf}
+  .b-describe{background:#3a2f12;color:#f0d89f} .b-mission{background:#2a2340;color:#d3c2ff}
+  .b-reject{background:#4a1f24;color:#ffbcc2} .b-emergency{background:#5a1414;color:#ffd0d0}
+  #detail { overflow:auto; padding:16px 20px; }
+  .row { display:flex; gap:10px; margin:4px 0; }
+  .row .k { width:120px; color:var(--dim); flex:none; }
+  .row .v { white-space:pre-wrap; }
+  .rtl { direction:rtl; }
+  .passbar { display:flex; gap:10px; align-items:center; margin:12px 0 6px; flex-wrap:wrap; }
+  canvas { width:100%; height:auto; max-width:900px; display:block; background:#000; border:1px solid var(--line); border-radius:4px; }
+  button { background:#2a3240; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:5px 10px; cursor:pointer; }
+  button:hover { background:#333d4e; }
+  .legend span { margin-right:12px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:middle; margin-right:4px; }
+  code { background:#0e1116; padding:1px 5px; border-radius:3px; }
+  #drop { padding:40px; text-align:center; color:var(--dim); }
+</style>
+</head>
+<body>
+<header>
+  <h1>MVD Session Replayer</h1>
+  <label class="muted">Open a session folder:
+    <input type="file" id="pick" webkitdirectory directory multiple>
+  </label>
+  <span id="sessname" class="muted"></span>
+</header>
+<main>
+  <div id="list"><div id="drop">Pick a <code>session-*</code> folder. Nothing is uploaded; it is read in your browser.</div></div>
+  <div id="detail"></div>
+</main>
+<script>
+const files = new Map();          // session-relative path -> File
+let trace = [];
+
+document.getElementById('pick').addEventListener('change', async (e) => {
+  files.clear();
+  let root = "";
+  for (const f of e.target.files) {
+    const parts = f.webkitRelativePath.split('/');
+    if (!root) root = parts[0];
+    files.set(parts.slice(1).join('/'), f);   // strip the picked-folder name -> session-relative
+  }
+  document.getElementById('sessname').textContent = root || "";
+  const tf = files.get('trace.jsonl');
+  if (!tf) { document.getElementById('list').innerHTML = '<div id="drop">No trace.jsonl in that folder.</div>'; return; }
+  const txt = await tf.text();
+  trace = txt.split('\n').filter(l => l.trim()).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  renderList();
+});
+
+function kindBadge(k){ const c={highlight:'b-highlight',count:'b-count',describe:'b-describe',mission:'b-mission',reject:'b-reject',emergency:'b-emergency'}[k]||''; return `<span class="badge ${c}">${k||'?'}</span>`; }
+
+function renderList(){
+  const el = document.getElementById('list'); el.innerHTML = '';
+  trace.forEach((u,i) => {
+    const d = document.createElement('div'); d.className='utt'; d.dataset.i=i;
+    d.innerHTML = `<div class="he">${u.heard_he||''}</div>
+      <div class="sub">#${String(u.seq).padStart(4,'0')} ${kindBadge(u.kind)} ${u.target_en?('· '+u.target_en):''} · ${(u.ts||'').split('T')[1]||''}</div>`;
+    d.onclick = () => { document.querySelectorAll('.utt').forEach(x=>x.classList.remove('sel')); d.classList.add('sel'); renderDetail(i); };
+    el.appendChild(d);
+  });
+  if (trace.length) el.firstChild.click();
+}
+
+function urlFor(path){ const f = files.get(path); return f ? URL.createObjectURL(f) : null; }
+
+async function renderDetail(i){
+  const u = trace[i]; const el = document.getElementById('detail');
+  const rows = [];
+  const R = (k,v,rtl)=> v!=null&&v!==''? `<div class="row"><div class="k">${k}</div><div class="v ${rtl?'rtl':''}">${v}</div></div>`:'';
+  rows.push(R('Heard (he)', u.heard_he, true));
+  rows.push(R('Post-proc (he2)', u.he2, true));
+  rows.push(R('Kind', kindBadge(u.kind)));
+  rows.push(R('Target (en)', u.target_en));
+  rows.push(R('Vision query', u.vision_query));
+  rows.push(R('Mission', u.mission? `<code>${JSON.stringify(u.mission)}</code>`:''));
+  rows.push(R('Spoken', u.spoken, true));
+  rows.push(R('Action', u.action));
+  rows.push(R('Reject reason', u.reject_reason));
+  rows.push(R('Flags', u.flags? JSON.stringify(u.flags):''));
+  rows.push(R('Timings', u.timings? `<code>${JSON.stringify(u.timings)}</code>`:''));
+  let audio = '';
+  if (u.audio_clip){ const a = urlFor(u.audio_clip); if (a) audio = `<div class="row"><div class="k">Audio</div><div class="v"><audio controls src="${a}"></audio></div></div>`; }
+  el.innerHTML = `<h2 style="margin:0 0 8px">#${String(u.seq).padStart(4,'0')} ${kindBadge(u.kind)}</h2>${rows.join('')}${audio}<div id="passes"></div>`;
+  if (u.perception_dir) await renderPasses(u.perception_dir);
+}
+
+async function listPasses(dir){
+  const js = [];
+  for (const [p,f] of files) if (p.startsWith(dir+'/') && p.endsWith('.json') && p.includes('/pass_')) js.push(p);
+  js.sort();
+  return js;
+}
+
+async function renderPasses(dir){
+  const host = document.getElementById('passes');
+  const reqF = files.get(dir+'/request.json');
+  let req = {}; if (reqF) { try { req = JSON.parse(await reqF.text()); } catch {} }
+  const passes = await listPasses(dir);
+  host.innerHTML = `<h3 style="margin:14px 0 2px">Perception · ${dir.split('/').pop()} · ${passes.length} pass(es)</h3>
+    <div class="muted">verdict: <code>${JSON.stringify(req.verdict)}</code></div>
+    <div class="passbar">
+      <button id="prev">◀</button><span id="pnum" class="muted"></span><button id="next">▶</button>
+      <button id="play">▶ play</button>
+      <label class="muted"><input type="checkbox" id="boxes" checked> boxes</label>
+      <button id="export">export annotated</button>
+      <span class="legend muted"><span><i class="dot" style="background:var(--good)"></i>≥0.50</span><span><i class="dot" style="background:var(--near)"></i>&lt;0.50</span></span>
+    </div>
+    <canvas id="cv"></canvas>
+    <div id="pmeta" class="muted" style="margin-top:6px"></div>`;
+  let idx = 0, playing = null;
+  const cv = host.querySelector('#cv'), ctx = cv.getContext('2d');
+  async function draw(){
+    const base = dir+'/pass_'+String(idx).padStart(5,'0');
+    const imgF = files.get(base+'.jpg'); const jsF = files.get(base+'.json');
+    let meta = {}; if (jsF) { try { meta = JSON.parse(await jsF.text()); } catch {} }
+    host.querySelector('#pnum').textContent = `pass ${idx+1}/${passes.length}`;
+    if (!imgF){ ctx.clearRect(0,0,cv.width,cv.height); return; }
+    const img = new Image(); img.src = urlFor(base+'.jpg');
+    await img.decode().catch(()=>{});
+    cv.width = img.naturalWidth||640; cv.height = img.naturalHeight||480;
+    ctx.drawImage(img,0,0);
+    if (host.querySelector('#boxes').checked) for (const d of (meta.raw_dets||[])){
+      const [x1,y1,x2,y2]=d.box; ctx.lineWidth=2; ctx.strokeStyle = (d.conf>=0.5?getComputedStyle(document.body).getPropertyValue('--good'):getComputedStyle(document.body).getPropertyValue('--near')).trim();
+      ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+      const t=`${d.label||''} ${d.conf.toFixed(2)}`; ctx.font='13px system-ui'; const w=ctx.measureText(t).width+8;
+      const ly=(y1-17<0)?y1:y1-17;            // label inside the box when it would clip off the top (no pile-up)
+      ctx.fillStyle='rgba(0,0,0,.72)'; ctx.fillRect(x1,ly,w,17);
+      ctx.fillStyle=ctx.strokeStyle; ctx.fillText(t,x1+4,ly+13);
+    }
+    const extra = meta.answer? `answer: "${meta.answer}"` : `dets: ${(meta.raw_dets||[]).length}`;
+    host.querySelector('#pmeta').textContent = `t=${meta.t} · ${meta.forward_ms!=null?meta.forward_ms+'ms · ':''}${extra}`;
+  }
+  host.querySelector('#prev').onclick=()=>{idx=(idx-1+passes.length)%passes.length;draw();};
+  host.querySelector('#next').onclick=()=>{idx=(idx+1)%passes.length;draw();};
+  host.querySelector('#boxes').onchange=draw;
+  host.querySelector('#play').onclick=(e)=>{ if(playing){clearInterval(playing);playing=null;e.target.textContent='▶ play';}
+    else {e.target.textContent='⏸ stop'; playing=setInterval(()=>{idx=(idx+1)%passes.length;draw();if(idx===0){}},600);} };
+  host.querySelector('#export').onclick=()=>{ cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=dir.split('/').pop()+`_pass${idx}.jpg`;a.click();}); };
+  if (passes.length) draw(); else host.querySelector('#pmeta').textContent='(no passes)';
+}
+</script>
+</body>
+</html>
