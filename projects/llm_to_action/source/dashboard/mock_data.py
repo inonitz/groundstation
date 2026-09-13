@@ -6,8 +6,8 @@ depth) at ~10 Hz, a HUD line at 5 Hz, and a VLM reasoning line every few seconds
 Use it to check the bridge and the browser page end-to-end on a bench before you
 spend SITL or flight time.
 
-Run:  python3 scripts/dashboard/smoke.py      (Ctrl-C to stop)
-Then: python3 scripts/dashboard/serve.py, and open http://localhost:8088
+Run:  python3 mock_data.py      (Ctrl-C to stop)
+Then: python3 serve.py, and open http://localhost:8088
 The image panels animate; the HUD tiles, detection list, and VLM log all update.
 """
 import math

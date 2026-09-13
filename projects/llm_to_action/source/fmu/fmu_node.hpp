@@ -2235,12 +2235,15 @@ private:
         RCLCPP_INFO(this->get_logger(), "[FMU_NODE_DEBUG] task complete status=%s total=%zu",
             status, m_chat.m_completedTasks.size());
 
-        /* Deterministic close-out: the instant an APPROACH finishes, LAND -- do not hand back to a
-           weak planner that may skip the land. Completes "approach the target and land near it"
-           without a second dependence on the 2B. Land completion has id==LAND, so this never loops. */
-        if (m_currTask.m_cmd.id() == CommandID::APPROACH) {
+        /* Deterministic close-out: when an APPROACH finishes AND it was the mission's LAST action
+           (task queue empty), LAND -- do not hand back to a weak planner that may skip the land.
+           Completes a single-step "approach the target and land near it" without a second dependence
+           on the planner. If more actions are queued behind the approach (e.g. move-back -> orbit),
+           skip the auto-land and let them run -- otherwise the LAND halts a multi-step mission at its
+           first approach. Land completion has id==LAND, so this never loops. */
+        if (m_currTask.m_cmd.id() == CommandID::APPROACH && m_taskQueue->size_approx() == 0) {
             RCLCPP_WARN(this->get_logger(),
-                "[FMU_NODE_DEBUG] APPROACH finished (%s) -> auto-land.", status);
+                "[FMU_NODE_DEBUG] APPROACH finished (%s) -> auto-land (queue empty).", status);
             ActiveTask landTask{};
             landTask.m_cmd = GenericCommand(CmdLand{});
             std::snprintf(landTask.m_thought, sizeof(landTask.m_thought), "approached target -> landing");

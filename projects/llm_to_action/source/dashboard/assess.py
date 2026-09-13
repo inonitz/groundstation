@@ -14,7 +14,7 @@ Checks:
   - bridge serves the page, real JPEG frames on both MJPEG streams, and an SSE
     stream carrying the live HUD
 
-Run:  python3 scripts/dashboard/assess.py --port 8088 --out verdict.txt
+Run:  python3 assess.py --port 8088 --out verdict.txt
 Exit code 0 = all PASS, 1 = something FAILED.
 """
 import argparse

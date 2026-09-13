@@ -1,0 +1,306 @@
+[INFO] [1788699105.697568658] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] started (stream 30Hz).
+[INFO] [1788699105.697705032] [high_level_navigation_node]: [FMU_NODE_DEBUG] observability=off.
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-seg-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 2
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-depth-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 1
+[INFO] [1788699105.813586568] [high_level_navigation_node]: [FMU_NODE_DEBUG] Flight Management Unit Active (control 20Hz, backend owns wire).
+[INFO] [1788699105.813653542] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission started (test=9). queued~=3. objective: Canned approach reaches the standoff; a forced impact must interrupt, not approach_ok.
+[INFO] [1788699105.814131972] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788699105.863520815] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=3
+[INFO] [1788699105.863577040] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] takeoff: STANDBY->HANDSHAKING (warmup start=3).
+[INFO] [1788699105.863588491] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.
+[INFO] [1788699106.363535321] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699106.913523927] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699107.042511748] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1
+[INFO] [1788699107.414175947] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699107.638409035] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] FIRST ODOM altENU=-0.03 yaw=-0.10
+[INFO] [1788699107.644818635] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=1 setpoints=57 nav=4 arm=1 altENU=-0.03 velzENU=2.00
+[INFO] [1788699107.842730581] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] OFFBOARD+ARM CONFIRMED at setpoints=63
+[INFO] [1788699107.964016398] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.02,0.06,-0.02) measVelENU=(0.01,0.02,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699108.464031392] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.03,0.06,-0.01) measVelENU=(0.02,0.02,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699108.667749135] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=88 nav=14 arm=2 altENU=-0.01 velzENU=2.00
+[INFO] [1788699109.013524636] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.05,0.05,-0.01) measVelENU=(0.03,0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788699109.513561410] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.05,0.03,-0.00) measVelENU=(0.02,-0.02,0.01) yaw=-0.11 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788699109.690694180] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=119 nav=14 arm=2 altENU=-0.00 velzENU=2.00
+[INFO] [1788699110.063505421] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.05,0.03,0.01) measVelENU=(0.02,-0.02,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699110.369294385] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=62
+[INFO] [1788699110.563508723] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.04,0.03,0.01) measVelENU=(0.01,-0.02,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[     0] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:27   [ADDITIONAL_INFO] create_begin
+[     1] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:61   [ADDITIONAL_INFO] create_end
+[INFO] [1788699110.713653571] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=150 nav=14 arm=2 altENU=0.01 velzENU=2.00
+[INFO] [1788699111.063551918] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.04,0.02,0.03) measVelENU=(0.01,-0.01,0.27) yaw=-0.11 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788699111.613543126] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.06,0.05,0.47) measVelENU=(0.06,0.03,0.99) yaw=-0.11 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788699111.736694151] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=181 nav=14 arm=2 altENU=0.61 velzENU=2.00
+[INFO] [1788699112.113558088] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.08,0.08,1.06) measVelENU=(0.04,0.02,1.23) yaw=-0.11 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788699112.663504431] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.09,0.08,1.79) measVelENU=(0.01,0.00,1.42) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788699112.759696117] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=212 nav=14 arm=2 altENU=1.94 velzENU=2.00
+[INFO] [1788699112.813513697] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=2.01
+[INFO] [1788699112.813546898] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=takeoff_ok total=1
+[INFO] [1788699113.163520625] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.06,2.26) measVelENU=(-0.01,-0.01,-0.00) yaw=-0.10 yawrate=-0.00 active=0 qsize=2
+[INFO] [1788699113.363540880] [high_level_navigation_node]: [FMU_NODE_DEBUG] APPROACH activated target=canned_target track_id=-1.
+[INFO] [1788699113.413530640] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=7.00 medRange=7.00 freeDepth=5.97 budget=0.00 trav=0.00 rem=2.50 fill=0.00 errX=-0.00 errY=-0.01 cmdVelENU=(0.24,-0.02,0.17) yawRate=0.00
+[INFO] [1788699113.613581502] [high_level_navigation_node]: [FMU_NODE_DEBUG] APPROACH range locked R0=7.00 travelBudget=4.50
+[INFO] [1788699113.663520869] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.06,0.06,1.99) measVelENU=(0.01,-0.01,-0.34) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699113.663589456] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=7.01 medRange=7.01 freeDepth=5.97 budget=4.50 trav=0.02 rem=4.48 fill=0.00 errX=-0.00 errY=-0.03 cmdVelENU=(0.25,-0.02,0.16) yawRate=0.00
+[INFO] [1788699113.710128519] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=123
+[INFO] [1788699113.763576931] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.97 free=5.97 trig=0.76 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699113.782835298] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=243 nav=14 arm=2 altENU=1.94 velzENU=0.15
+[INFO] [1788699113.963534349] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.98 medRange=7.00 freeDepth=5.95 budget=4.50 trav=0.13 rem=4.37 fill=0.00 errX=-0.00 errY=-0.05 cmdVelENU=(0.26,-0.03,0.14) yawRate=0.00
+[INFO] [1788699114.213500601] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,0.06,1.82) measVelENU=(0.19,-0.01,-0.22) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699114.213542930] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.94 medRange=6.96 freeDepth=6.20 budget=4.50 trav=0.21 rem=4.30 fill=0.00 errX=-0.00 errY=-0.06 cmdVelENU=(0.27,-0.03,0.13) yawRate=0.00
+[INFO] [1788699114.464052634] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.88 medRange=6.90 freeDepth=4.05 budget=4.50 trav=0.28 rem=4.22 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.27,-0.03,0.12) yawRate=-0.00
+[INFO] [1788699114.713511213] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,0.08,1.73) measVelENU=(0.26,-0.01,-0.16) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699114.713658086] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.50 free=4.50 trig=0.75 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699114.763519578] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.80 medRange=6.83 freeDepth=5.07 budget=4.50 trav=0.36 rem=4.14 fill=0.00 errX=0.01 errY=-0.08 cmdVelENU=(0.28,-0.03,0.11) yawRate=-0.01
+[INFO] [1788699114.806458946] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=274 nav=14 arm=2 altENU=1.72 velzENU=0.11
+[INFO] [1788699115.063519453] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.73 medRange=6.75 freeDepth=5.45 budget=4.50 trav=0.44 rem=4.07 fill=0.00 errX=0.01 errY=-0.08 cmdVelENU=(0.28,-0.03,0.10) yawRate=-0.01
+[INFO] [1788699115.113511387] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.43 free=4.93 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699115.263504352] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.40,0.08,1.67) measVelENU=(0.27,-0.02,-0.11) yaw=-0.09 yawrate=-0.01 active=1 qsize=1
+[INFO] [1788699115.363558751] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.66 medRange=6.68 freeDepth=5.36 budget=4.50 trav=0.51 rem=3.99 fill=0.00 errX=0.01 errY=-0.09 cmdVelENU=(0.28,-0.03,0.09) yawRate=-0.01
+[INFO] [1788699115.513541096] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.61 free=4.61 trig=0.75 loomFill=0.01/0.28 speed=0.29
+[INFO] [1788699115.614038499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.59 medRange=6.62 freeDepth=4.70 budget=4.50 trav=0.57 rem=3.93 fill=0.00 errX=0.01 errY=-0.09 cmdVelENU=(0.29,-0.03,0.08) yawRate=-0.01
+[INFO] [1788699115.763575225] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.54,0.08,1.64) measVelENU=(0.29,-0.02,-0.07) yaw=-0.10 yawrate=-0.02 active=1 qsize=1
+[INFO] [1788699115.828756007] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=305 nav=14 arm=2 altENU=1.64 velzENU=0.08
+[INFO] [1788699115.913511614] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.50 medRange=6.53 freeDepth=3.81 budget=4.50 trav=0.65 rem=3.85 fill=0.00 errX=0.01 errY=-0.09 cmdVelENU=(0.29,-0.03,0.08) yawRate=-0.01
+[INFO] [1788699116.163527610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.43 medRange=6.46 freeDepth=3.81 budget=4.50 trav=0.72 rem=3.78 fill=0.00 errX=0.01 errY=-0.10 cmdVelENU=(0.29,-0.03,0.07) yawRate=-0.01
+[INFO] [1788699116.313592528] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.71,0.06,1.62) measVelENU=(0.30,-0.03,-0.05) yaw=-0.10 yawrate=-0.01 active=1 qsize=1
+[INFO] [1788699116.413573801] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.35 medRange=6.38 freeDepth=3.81 budget=4.50 trav=0.79 rem=3.71 fill=0.00 errX=0.01 errY=-0.10 cmdVelENU=(0.29,-0.03,0.07) yawRate=-0.01
+[INFO] [1788699116.713567514] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.25 medRange=6.28 freeDepth=3.81 budget=4.50 trav=0.88 rem=3.63 fill=0.00 errX=0.00 errY=-0.10 cmdVelENU=(0.29,-0.03,0.06) yawRate=-0.00
+[INFO] [1788699116.851693979] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=336 nav=14 arm=2 altENU=1.61 velzENU=0.06
+[INFO] [1788699116.863512549] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.88,0.02,1.61) measVelENU=(0.30,-0.04,-0.02) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699117.013528346] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.16 medRange=6.19 freeDepth=3.81 budget=4.50 trav=0.96 rem=3.54 fill=0.00 errX=0.00 errY=-0.11 cmdVelENU=(0.29,-0.03,0.06) yawRate=-0.00
+[INFO] [1788699117.030844189] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=184
+[INFO] [1788699117.263615994] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=6.08 medRange=6.11 freeDepth=3.57 budget=4.50 trav=1.03 rem=3.47 fill=0.00 errX=0.00 errY=-0.11 cmdVelENU=(0.29,-0.03,0.06) yawRate=-0.00
+[INFO] [1788699117.363562943] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.04,-0.00,1.60) measVelENU=(0.30,-0.04,-0.01) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699117.513521283] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.46 free=4.46 trig=0.75 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699117.563733036] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.99 medRange=6.02 freeDepth=4.46 budget=4.50 trav=1.12 rem=3.38 fill=0.00 errX=0.00 errY=-0.11 cmdVelENU=(0.29,-0.03,0.06) yawRate=-0.00
+[INFO] [1788699117.864177647] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.19,-0.03,1.60) measVelENU=(0.30,-0.04,0.00) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699117.864307538] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.89 medRange=5.92 freeDepth=4.71 budget=4.50 trav=1.21 rem=3.29 fill=0.00 errX=0.00 errY=-0.11 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699117.874717368] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=367 nav=14 arm=2 altENU=1.60 velzENU=0.05
+[INFO] [1788699118.163656511] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.55 free=4.55 trig=0.75 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699118.163805068] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.79 medRange=5.83 freeDepth=4.55 budget=4.50 trav=1.31 rem=3.20 fill=0.00 errX=0.00 errY=-0.11 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699118.413559526] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.38,-0.04,1.59) measVelENU=(0.31,-0.03,0.01) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699118.463647468] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.96 free=3.96 trig=0.76 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699118.463767732] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.69 medRange=5.73 freeDepth=3.96 budget=4.50 trav=1.41 rem=3.10 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699118.763778235] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.59 medRange=5.62 freeDepth=5.25 budget=4.50 trav=1.51 rem=2.99 fill=0.00 errX=-0.00 errY=-0.12 cmdVelENU=(0.29,-0.04,0.05) yawRate=0.00
+[INFO] [1788699118.897697616] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=398 nav=14 arm=2 altENU=1.59 velzENU=0.05
+[INFO] [1788699118.914013319] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.55,-0.05,1.59) measVelENU=(0.31,-0.03,0.02) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699119.014378887] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.51 medRange=5.54 freeDepth=4.99 budget=4.50 trav=1.59 rem=2.92 fill=0.00 errX=-0.00 errY=-0.12 cmdVelENU=(0.29,-0.04,0.05) yawRate=0.00
+[INFO] [1788699119.313511167] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.42 medRange=5.45 freeDepth=4.53 budget=4.50 trav=1.67 rem=2.83 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699119.463508589] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.71,-0.08,1.59) measVelENU=(0.30,-0.04,0.03) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699119.563545395] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.35 medRange=5.38 freeDepth=4.53 budget=4.50 trav=1.74 rem=2.76 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699119.863502208] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.26 medRange=5.29 freeDepth=4.53 budget=4.50 trav=1.82 rem=2.68 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699119.920641124] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=429 nav=14 arm=2 altENU=1.60 velzENU=0.05
+[INFO] [1788699120.013498107] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.86,-0.10,1.60) measVelENU=(0.29,-0.04,0.03) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699120.113506721] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.19 medRange=5.22 freeDepth=4.53 budget=4.50 trav=1.89 rem=2.61 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699120.363510061] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.12 medRange=5.15 freeDepth=4.53 budget=4.50 trav=1.96 rem=2.54 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699120.369262219] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=245
+[INFO] [1788699120.513586279] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.01,-0.12,1.61) measVelENU=(0.30,-0.03,0.03) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699120.613927331] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=5.05 medRange=5.08 freeDepth=4.53 budget=4.50 trav=2.03 rem=2.48 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699120.913515718] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.96 medRange=4.99 freeDepth=5.52 budget=4.50 trav=2.11 rem=2.39 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699120.943672984] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=460 nav=14 arm=2 altENU=1.61 velzENU=0.05
+[INFO] [1788699121.063751614] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.16,-0.13,1.61) measVelENU=(0.29,-0.03,0.04) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699121.163784131] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.89 medRange=4.92 freeDepth=4.09 budget=4.50 trav=2.18 rem=2.32 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.29,-0.03,0.05) yawRate=-0.00
+[INFO] [1788699121.463544057] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.80 medRange=4.83 freeDepth=4.73 budget=4.50 trav=2.27 rem=2.24 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699121.613544765] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.33,-0.16,1.64) measVelENU=(0.30,-0.04,0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699121.763514765] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.71 medRange=4.74 freeDepth=5.08 budget=4.50 trav=2.36 rem=2.15 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699121.966709622] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=491 nav=14 arm=2 altENU=1.66 velzENU=0.04
+[INFO] [1788699122.014744025] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.63 medRange=4.66 freeDepth=5.63 budget=4.50 trav=2.43 rem=2.08 fill=0.00 errX=0.00 errY=-0.13 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699122.113803153] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.48,-0.18,1.66) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699122.313526303] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.54 medRange=4.57 freeDepth=5.09 budget=4.50 trav=2.52 rem=1.99 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699122.613528619] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.45 medRange=4.48 freeDepth=4.00 budget=4.50 trav=2.60 rem=1.90 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699122.663514552] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.64,-0.20,1.68) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699122.913532058] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.36 medRange=4.39 freeDepth=4.00 budget=4.50 trav=2.69 rem=1.81 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699122.989718768] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=522 nav=14 arm=2 altENU=1.70 velzENU=0.04
+[INFO] [1788699123.163535117] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.79,-0.22,1.70) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699123.163620716] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.28 medRange=4.31 freeDepth=4.00 budget=4.50 trav=2.77 rem=1.74 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699123.463593887] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.19 medRange=4.22 freeDepth=4.00 budget=4.50 trav=2.85 rem=1.65 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699123.699283867] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=306
+[INFO] [1788699123.713540311] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.96,-0.23,1.73) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699123.713638924] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.11 medRange=4.14 freeDepth=4.00 budget=4.50 trav=2.93 rem=1.57 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699123.963762617] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=4.03 medRange=4.07 freeDepth=4.43 budget=4.50 trav=3.00 rem=1.50 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699124.012705280] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=553 nav=14 arm=2 altENU=1.75 velzENU=0.04
+[INFO] [1788699124.263834573] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.13,-0.25,1.76) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699124.263875178] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.42 free=4.42 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699124.263884636] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.94 medRange=3.97 freeDepth=4.42 budget=4.50 trav=3.10 rem=1.41 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699124.563829024] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.57 free=4.57 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699124.563885919] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.85 medRange=3.88 freeDepth=4.57 budget=4.50 trav=3.19 rem=1.32 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699124.813548705] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.29,-0.26,1.77) measVelENU=(0.30,-0.03,0.04) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699124.863515151] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.76 medRange=3.79 freeDepth=5.10 budget=4.50 trav=3.28 rem=1.23 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699124.913580090] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.10 free=5.10 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699125.035719251] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=584 nav=14 arm=2 altENU=1.78 velzENU=0.04
+[INFO] [1788699125.113538737] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.68 medRange=3.71 freeDepth=5.65 budget=4.50 trav=3.35 rem=1.16 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699125.213526732] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.07 free=4.07 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699125.313882711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.44,-0.27,1.79) measVelENU=(0.30,-0.03,0.04) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699125.363540623] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.61 medRange=3.64 freeDepth=5.51 budget=4.50 trav=3.42 rem=1.09 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699125.613548230] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.23 free=5.23 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699125.613614904] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.54 medRange=3.57 freeDepth=5.23 budget=4.50 trav=3.49 rem=1.02 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699125.863511454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.59,-0.29,1.81) measVelENU=(0.30,-0.04,0.04) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699125.913592443] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.45 medRange=3.48 freeDepth=4.01 budget=4.50 trav=3.58 rem=0.93 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699126.058851611] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=615 nav=14 arm=2 altENU=1.82 velzENU=0.04
+[INFO] [1788699126.213605608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.37 medRange=3.39 freeDepth=4.01 budget=4.50 trav=3.66 rem=0.84 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699126.413568202] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.75,-0.31,1.83) measVelENU=(0.29,-0.03,0.04) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699126.513549765] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.29 medRange=3.31 freeDepth=4.01 budget=4.50 trav=3.74 rem=0.76 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699126.763557591] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.22 medRange=3.25 freeDepth=4.01 budget=4.50 trav=3.81 rem=0.70 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699126.963556823] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.90,-0.33,1.84) measVelENU=(0.29,-0.03,0.04) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699127.029473413] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=367
+[INFO] [1788699127.063537735] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.13 medRange=3.16 freeDepth=4.01 budget=4.50 trav=3.89 rem=0.61 fill=0.00 errX=0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=-0.00
+[INFO] [1788699127.081753922] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=646 nav=14 arm=2 altENU=1.85 velzENU=0.04
+[INFO] [1788699127.313504204] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.52 free=4.52 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699127.313576028] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=3.06 medRange=3.09 freeDepth=4.52 budget=4.50 trav=3.96 rem=0.54 fill=0.00 errX=-0.00 errY=-0.12 cmdVelENU=(0.30,-0.03,0.04) yawRate=0.00
+[INFO] [1788699127.463874007] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.03,-0.35,1.87) measVelENU=(0.29,-0.04,0.04) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699127.563874214] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.99 medRange=3.02 freeDepth=5.69 budget=4.50 trav=4.03 rem=0.47 fill=0.00 errX=-0.00 errY=-0.11 cmdVelENU=(0.26,-0.02,0.04) yawRate=0.00
+[INFO] [1788699127.613525313] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.42 free=4.42 trig=0.75 loomFill=0.01/0.28 speed=0.30
+[INFO] [1788699127.863579516] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.90 medRange=2.93 freeDepth=5.08 budget=4.50 trav=4.12 rem=0.39 fill=0.00 errX=-0.00 errY=-0.11 cmdVelENU=(0.21,-0.02,0.04) yawRate=0.00
+[INFO] [1788699127.963572039] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.34 free=4.34 trig=0.74 loomFill=0.01/0.28 speed=0.28
+[INFO] [1788699128.013569312] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.19,-0.38,1.90) measVelENU=(0.27,-0.03,0.04) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699128.105360221] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=677 nav=14 arm=2 altENU=1.91 velzENU=0.03
+[INFO] [1788699128.113598953] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.83 medRange=2.86 freeDepth=5.23 budget=4.50 trav=4.19 rem=0.32 fill=0.00 errX=-0.00 errY=-0.10 cmdVelENU=(0.17,-0.02,0.03) yawRate=0.00
+[INFO] [1788699128.413514225] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.76 medRange=2.78 freeDepth=5.39 budget=4.50 trav=4.26 rem=0.25 fill=0.00 errX=-0.00 errY=-0.10 cmdVelENU=(0.14,-0.01,0.03) yawRate=0.00
+[INFO] [1788699128.563505875] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.32,-0.41,1.94) measVelENU=(0.21,-0.03,0.03) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699128.663518014] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.71 medRange=2.73 freeDepth=5.15 budget=4.50 trav=4.31 rem=0.20 fill=0.00 errX=-0.00 errY=-0.09 cmdVelENU=(0.11,-0.01,0.03) yawRate=0.00
+[INFO] [1788699128.863557621] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.74 free=4.74 trig=0.69 loomFill=0.01/0.28 speed=0.17
+[INFO] [1788699128.913550856] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.66 medRange=2.68 freeDepth=4.74 budget=4.50 trav=4.35 rem=0.15 fill=0.00 errX=-0.01 errY=-0.09 cmdVelENU=(0.08,-0.00,0.03) yawRate=0.01
+[INFO] [1788699129.113513049] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.41,-0.44,1.97) measVelENU=(0.14,-0.02,0.03) yaw=-0.09 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699129.127658476] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=708 nav=14 arm=2 altENU=1.97 velzENU=0.03
+[INFO] [1788699129.163575333] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.62 medRange=2.64 freeDepth=4.30 budget=4.50 trav=4.39 rem=0.12 fill=0.00 errX=-0.01 errY=-0.08 cmdVelENU=(0.06,-0.00,0.03) yawRate=0.01
+[INFO] [1788699129.463522674] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.59 medRange=2.60 freeDepth=4.30 budget=4.50 trav=4.42 rem=0.09 fill=0.00 errX=-0.01 errY=-0.08 cmdVelENU=(0.05,-0.00,0.03) yawRate=0.01
+[INFO] [1788699129.613573884] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.46,-0.45,2.00) measVelENU=(0.08,-0.01,0.02) yaw=-0.09 yawrate=0.01 active=1 qsize=1
+[INFO] [1788699129.713542402] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.58 medRange=2.58 freeDepth=4.30 budget=4.50 trav=4.43 rem=0.07 fill=0.00 errX=-0.00 errY=-0.08 cmdVelENU=(0.04,-0.00,0.03) yawRate=0.00
+[INFO] [1788699130.013512976] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.56 medRange=2.56 freeDepth=4.30 budget=4.50 trav=4.45 rem=0.05 fill=0.00 errX=-0.00 errY=-0.07 cmdVelENU=(0.03,-0.00,0.02) yawRate=0.00
+[INFO] [1788699130.150697968] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=739 nav=14 arm=2 altENU=2.01 velzENU=0.02
+[INFO] [1788699130.163531535] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.48,-0.45,2.01) measVelENU=(0.04,-0.00,0.02) yaw=-0.09 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699130.263525891] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.55 medRange=2.55 freeDepth=4.30 budget=4.50 trav=4.46 rem=0.05 fill=0.00 errX=-0.00 errY=-0.07 cmdVelENU=(0.02,-0.00,0.02) yawRate=0.00
+[INFO] [1788699130.371519123] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=428
+[INFO] [1788699130.514112984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=4.82 budget=4.50 trav=4.47 rem=0.03 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.02,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699130.663946018] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.50,-0.44,2.00) measVelENU=(0.02,0.00,0.02) yaw=-0.09 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699130.663990460] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.45 free=4.45 trig=0.62 loomFill=0.01/0.28 speed=0.03
+[INFO] [1788699130.813513067] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=5.44 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699131.063730051] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=5.39 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699131.173671626] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=770 nav=14 arm=2 altENU=2.01 velzENU=0.02
+[INFO] [1788699131.213532538] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.43,2.01) measVelENU=(0.01,0.00,0.02) yaw=-0.09 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699131.363552499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.07 budget=4.50 trav=4.49 rem=0.02 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699131.663899613] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.67 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.07 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699131.763539489] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.42,2.02) measVelENU=(-0.00,0.00,0.02) yaw=-0.09 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699131.963536035] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.09 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.06 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699132.196756369] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=801 nav=14 arm=2 altENU=2.03 velzENU=0.02
+[INFO] [1788699132.213749071] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.26 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.06 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699132.313671683] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.42,2.04) measVelENU=(-0.00,0.00,0.02) yaw=-0.09 yawrate=-0.01 active=1 qsize=1
+[INFO] [1788699132.513517068] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.52 freeDepth=3.98 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.05 cmdVelENU=(0.01,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699132.763520725] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=3.98 budget=4.50 trav=4.48 rem=0.03 fill=0.00 errX=0.00 errY=-0.05 cmdVelENU=(0.02,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699132.863505773] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.50,-0.42,2.06) measVelENU=(-0.01,0.00,0.02) yaw=-0.09 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699133.013526505] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.53 freeDepth=3.98 budget=4.50 trav=4.47 rem=0.03 fill=0.00 errX=0.00 errY=-0.05 cmdVelENU=(0.02,-0.00,0.02) yawRate=-0.00
+[INFO] [1788699133.219697634] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=832 nav=14 arm=2 altENU=2.06 velzENU=0.02
+[INFO] [1788699133.313539207] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=3.98 budget=4.50 trav=4.47 rem=0.04 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699133.363520760] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.50,-0.41,2.07) measVelENU=(0.00,0.00,0.01) yaw=-0.09 yawrate=-0.01 active=1 qsize=1
+[INFO] [1788699133.613545115] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=3.98 budget=4.50 trav=4.47 rem=0.04 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699133.699581673] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=489
+[INFO] [1788699133.863780763] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.50,-0.41,2.07) measVelENU=(0.01,-0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699133.863867384] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=5.05 budget=4.50 trav=4.47 rem=0.03 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699134.013514101] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.10 free=4.10 trig=0.61 loomFill=0.01/0.28 speed=0.02
+[INFO] [1788699134.163849358] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=5.44 budget=4.50 trav=4.48 rem=0.03 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699134.242713406] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=863 nav=14 arm=2 altENU=2.08 velzENU=0.01
+[INFO] [1788699134.363920312] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.41,2.08) measVelENU=(0.02,-0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699134.463829548] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=4.74 budget=4.50 trav=4.49 rem=0.02 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.01,0.00,0.01) yawRate=-0.00
+[INFO] [1788699134.613547918] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.18 free=4.18 trig=0.61 loomFill=0.01/0.28 speed=0.02
+[INFO] [1788699134.763567618] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=4.80 budget=4.50 trav=4.49 rem=0.01 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.01,0.00,0.01) yawRate=-0.00
+[INFO] [1788699134.913515064] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.52,-0.41,2.08) measVelENU=(0.01,-0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699135.063551626] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=5.31 budget=4.50 trav=4.49 rem=0.01 fill=0.00 errX=-0.00 errY=-0.04 cmdVelENU=(0.01,0.00,0.01) yawRate=0.00
+[INFO] [1788699135.214138220] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.10 free=4.10 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699135.265689303] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=894 nav=14 arm=2 altENU=2.09 velzENU=0.01
+[INFO] [1788699135.313726680] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=4.64 budget=4.50 trav=4.48 rem=0.02 fill=0.00 errX=0.00 errY=-0.04 cmdVelENU=(0.01,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699135.413751101] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.41,2.09) measVelENU=(-0.01,0.00,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699135.513934438] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.83 free=3.83 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699135.613724132] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=4.26 budget=4.50 trav=4.47 rem=0.03 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699135.913516613] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=4.16 budget=4.50 trav=4.47 rem=0.04 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699135.963539694] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.50,-0.41,2.10) measVelENU=(-0.00,0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699136.163525629] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.54 medRange=2.54 freeDepth=4.16 budget=4.50 trav=4.47 rem=0.04 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699136.288713598] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=925 nav=14 arm=2 altENU=2.10 velzENU=0.01
+[INFO] [1788699136.413562967] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.53 medRange=2.53 freeDepth=4.16 budget=4.50 trav=4.48 rem=0.03 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.02,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699136.513549878] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.51,-0.41,2.10) measVelENU=(0.02,-0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699136.713536784] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=4.16 budget=4.50 trav=4.49 rem=0.02 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.01,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699137.013557550] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.53,-0.41,2.11) measVelENU=(0.02,0.00,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699137.013615377] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=4.16 budget=4.50 trav=4.50 rem=0.01 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.00,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699137.029253009] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=550
+[INFO] [1788699137.263695935] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=4.05 budget=4.50 trav=4.50 rem=0.00 fill=0.00 errX=0.00 errY=-0.03 cmdVelENU=(0.00,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699137.311707435] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=956 nav=14 arm=2 altENU=2.11 velzENU=0.01
+[INFO] [1788699137.363786499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=4.58 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699137.563683258] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.53,-0.41,2.11) measVelENU=(0.00,-0.00,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699137.563740314] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=5.29 budget=4.50 trav=4.50 rem=0.01 fill=0.00 errX=-0.00 errY=-0.03 cmdVelENU=(0.00,0.00,0.01) yawRate=0.00
+[INFO] [1788699137.863523466] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=4.75 budget=4.50 trav=4.49 rem=0.01 fill=0.00 errX=-0.00 errY=-0.03 cmdVelENU=(0.01,0.00,0.01) yawRate=0.00
+[INFO] [1788699138.113538603] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.52,-0.43,2.11) measVelENU=(-0.00,-0.01,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699138.113607841] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.27 budget=4.50 trav=4.49 rem=0.02 fill=0.00 errX=-0.00 errY=-0.03 cmdVelENU=(0.01,0.00,0.01) yawRate=0.00
+[INFO] [1788699138.334759198] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=987 nav=14 arm=2 altENU=2.11 velzENU=0.01
+[INFO] [1788699138.413615291] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.46 budget=4.50 trav=4.49 rem=0.02 fill=0.00 errX=-0.01 errY=-0.03 cmdVelENU=(0.01,0.00,0.01) yawRate=0.01
+[INFO] [1788699138.613807980] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.52,-0.44,2.11) measVelENU=(0.00,-0.00,0.01) yaw=-0.10 yawrate=0.01 active=1 qsize=1
+[INFO] [1788699138.613915129] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.80 free=4.80 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699138.713791174] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.52 medRange=2.52 freeDepth=5.76 budget=4.50 trav=4.49 rem=0.01 fill=0.00 errX=-0.00 errY=-0.03 cmdVelENU=(0.01,-0.00,0.01) yawRate=0.00
+[INFO] [1788699139.014004826] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.51 medRange=2.51 freeDepth=6.03 budget=4.50 trav=4.50 rem=0.01 fill=0.00 errX=-0.00 errY=-0.02 cmdVelENU=(0.00,-0.00,0.01) yawRate=0.00
+[INFO] [1788699139.163505160] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.53,-0.43,2.12) measVelENU=(0.01,0.00,0.01) yaw=-0.09 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699139.313516644] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=canned_target rawRange=2.50 medRange=2.50 freeDepth=4.16 budget=4.50 trav=4.50 rem=0.00 fill=0.00 errX=0.00 errY=-0.02 cmdVelENU=(0.00,-0.00,0.01) yawRate=-0.00
+[INFO] [1788699139.357678975] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1018 nav=14 arm=2 altENU=2.12 velzENU=0.01
+[WARN] [1788699139.363522602] [high_level_navigation_node]: [FMU_NODE_DEBUG] APPROACH reached range=2.50 but motion off-nominal (yawrate=0.00 vertVel=0.01) -> impact interrupt.
+[WARN] [1788699139.363581552] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=approach_impact): stashed=approach escalated=0 hover+reassess
+[INFO] [1788699139.413689039] [high_level_navigation_node]: [FMU_NODE_DEBUG] LAND activated; FMU streaming descent.
+[INFO] [1788699139.463517187] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.12 vLand=-0.500
+[INFO] [1788699139.663524611] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.54,-0.41,2.10) measVelENU=(0.01,0.01,-0.29) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699139.763529195] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.06 vLand=-0.500
+[INFO] [1788699140.013637374] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.92 vLand=-0.500
+[INFO] [1788699140.163540366] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.55,-0.40,1.83) measVelENU=(0.00,0.00,-0.52) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699140.313529047] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.75 vLand=-0.500
+[INFO] [1788699140.359171811] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=611
+[INFO] [1788699140.380682315] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1049 nav=14 arm=2 altENU=1.71 velzENU=-0.50
+[INFO] [1788699140.563741740] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.62 vLand=-0.500
+[INFO] [1788699140.663606353] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.56,-0.39,1.57) measVelENU=(0.00,0.00,-0.51) yaw=-0.09 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699140.863825110] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.47 vLand=-0.500
+[INFO] [1788699141.163588494] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.31 vLand=-0.500
+[INFO] [1788699141.213509845] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.55,-0.39,1.29) measVelENU=(-0.00,0.00,-0.52) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699141.403689421] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1080 nav=14 arm=2 altENU=1.19 velzENU=-0.50
+[INFO] [1788699141.463513930] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.17 vLand=-0.500
+[INFO] [1788699141.713510340] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.54,-0.39,1.04) measVelENU=(-0.01,0.00,-0.52) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699141.713561836] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.04 vLand=-0.500
+[INFO] [1788699142.014386103] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.89 vLand=-0.412
+[INFO] [1788699142.213785315] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.53,-0.40,0.80) measVelENU=(-0.01,-0.01,-0.42) yaw=-0.09 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699142.313763870] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.76 vLand=-0.326
+[INFO] [1788699142.426768780] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1111 nav=14 arm=2 altENU=0.73 velzENU=-0.31
+[INFO] [1788699142.613571947] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.67 vLand=-0.272
+[INFO] [1788699142.763504203] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.52,-0.40,0.63) measVelENU=(-0.01,0.00,-0.28) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699142.913514204] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.59 vLand=-0.233
+[INFO] [1788699143.213564401] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.52 vLand=-0.205
+[INFO] [1788699143.263510438] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.52,-0.39,0.51) measVelENU=(0.00,0.01,-0.22) yaw=-0.09 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699143.449715762] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1142 nav=14 arm=2 altENU=0.48 velzENU=-0.19
+[INFO] [1788699143.513541051] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.46 vLand=-0.182
+[INFO] [1788699143.699148053] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=672
+[INFO] [1788699143.763838070] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.53,-0.39,0.42) measVelENU=(0.00,0.00,-0.17) yaw=-0.10 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699143.763881200] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.42 vLand=-0.168
+[INFO] [1788699144.064229020] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.37 vLand=-0.155
+[INFO] [1788699144.313509438] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.53,-0.39,0.33) measVelENU=(-0.00,0.00,-0.15) yaw=-0.10 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699144.363886797] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.33 vLand=-0.144
+[INFO] [1788699144.472703117] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1173 nav=14 arm=2 altENU=0.31 velzENU=-0.14
+[INFO] [1788699144.663531279] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.29 vLand=-0.137
+[INFO] [1788699144.813536610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.54,-0.40,0.27) measVelENU=(0.00,-0.00,-0.13) yaw=-0.10 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699144.963533636] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.25 vLand=-0.131
+[INFO] [1788699145.213964002] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.22 vLand=-0.126
+[INFO] [1788699145.313801855] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.55,-0.41,0.20) measVelENU=(0.00,-0.00,-0.12) yaw=-0.10 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699145.495849276] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1204 nav=14 arm=2 altENU=0.18 velzENU=-0.12
+[INFO] [1788699145.513874669] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.18 vLand=-0.123
+[INFO] [1788699145.813582939] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.15 vLand=-0.121
+[INFO] [1788699145.863505913] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.55,-0.41,0.14) measVelENU=(-0.00,-0.00,-0.12) yaw=-0.10 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699146.113517230] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.11 vLand=-0.120
+[INFO] [1788699146.263533832] [high_level_navigation_node]: [FMU_NODE_DEBUG] LANDING->STANDBY altENU=0.09 (force_disarm)
+[INFO] [1788699146.263563958] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=land_ok total=2
+[INFO] [1788699146.263569979] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.
+[INFO] [1788699146.413507464] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(4.55,-0.42,0.02) measVelENU=(-0.00,-0.01,-1.17) yaw=-0.10 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788699146.518751511] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1235 nav=14 arm=1 altENU=-0.05 velzENU=0.00
+[INFO] [1788699146.963496231] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(4.55,-0.43,-0.02) measVelENU=(0.00,-0.01,0.01) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788699147.029408631] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=733
+[INFO] [1788699147.463801949] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(4.55,-0.44,-0.01) measVelENU=(0.00,-0.01,0.01) yaw=-0.09 yawrate=0.00 active=0 qsize=0
+[INFO] [1788699147.541734464] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1266 nav=14 arm=1 altENU=-0.00 velzENU=0.00
+[INFO] [1788699148.013532866] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(4.55,-0.43,-0.00) measVelENU=(0.00,-0.01,0.01) yaw=-0.09 yawrate=-0.00 active=0 qsize=0

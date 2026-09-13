@@ -1,0 +1,648 @@
+[INFO] [1788787213.952876434] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] started (stream 30Hz).
+[INFO] [1788787213.953518238] [high_level_navigation_node]: [FMU_NODE_DEBUG] observability=ON.
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-seg-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 2
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-depth-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 1
+[INFO] [1788787214.073661976] [high_level_navigation_node]: [FMU_NODE_DEBUG] Flight Management Unit Active (control 20Hz, backend owns wire).
+[INFO] [1788787214.073781889] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission started (test=-1). queued~=0. objective: Take off, find the car, approach it, Move 2 meters back from it, Orbit it for 15 seconds, then land in place.
+[INFO] [1788787214.074119678] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788787214.123610978] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787214.123632528] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=idle DET=- VEL=0.00m/s BATT=-1%
+[INFO] [1788787214.123673485] [high_level_navigation_node]: [FMU_NODE_DEBUG] waiting for first camera frame before planning...
+[INFO] [1788787214.137067602] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1
+[INFO] [1788787214.173648325] [high_level_navigation_node]: [FMU_NODE_DEBUG] VLM wake: requesting plan (vision=1).
+[INFO] [1788787214.207720260] [high_level_navigation_node]: [FMU_NODE_DEBUG] VLM request: image=yes b64Bytes=23624 promptChars=17302
+[INFO] [1788787214.323669055] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787214.523714828] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787214.623630245] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787214.723759410] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787214.973692811] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787215.074993396] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=32 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788787215.173668316] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787215.173764275] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787215.423641385] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@70% VEL=0.00m/s BATT=-1%
+[INFO] [1788787215.623651094] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@67% VEL=0.00m/s BATT=-1%
+[INFO] [1788787215.724141532] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787215.823791426] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.00m/s BATT=-1%
+[INFO] [1788787215.934653348] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] FIRST ODOM altENU=-0.01 yaw=-0.10
+[INFO] [1788787216.073616871] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=busy DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787216.097998299] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=63 nav=4 arm=1 altENU=-0.02 velzENU=0.00
+[INFO] [1788787216.164988385] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=26
+[INFO] [1788787216.273613117] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.03,-0.02,-0.02) measVelENU=(-0.01,-0.01,-0.01) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787216.273813981] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=busy DET=car@69% VEL=0.01m/s BATT=99%
+[INFO] [1788787216.523698187] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=busy DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787216.773615756] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.02,-0.03,-0.01) measVelENU=(0.00,-0.02,-0.00) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787216.773725069] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=busy DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787217.023651985] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=busy DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787217.121228364] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=94 nav=4 arm=1 altENU=-0.01 velzENU=0.00
+[INFO] [1788787217.273660706] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.03,-0.03,-0.00) measVelENU=(-0.00,-0.01,0.00) yaw=-0.10 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787217.273824731] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.00m TASK=idle VLM=busy DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787217.523626688] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=busy DET=car@69% VEL=0.01m/s BATT=99%
+[INFO] [1788787217.773637523] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.01m TASK=idle VLM=busy DET=car@69% VEL=0.01m/s BATT=99%
+[INFO] [1788787217.823629707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.04,-0.04,0.01) measVelENU=(-0.01,-0.00,0.01) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787217.973647157] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.01m TASK=idle VLM=busy DET=car@69% VEL=0.02m/s BATT=99%
+[INFO] [1788787218.144014126] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=125 nav=4 arm=1 altENU=0.02 velzENU=0.00
+[INFO] [1788787218.223619523] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=busy DET=car@69% VEL=0.02m/s BATT=99%
+[INFO] [1788787218.323645390] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.05,-0.04,0.02) measVelENU=(-0.02,-0.01,0.01) yaw=-0.10 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787218.473635551] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.03m TASK=idle VLM=busy DET=car@69% VEL=0.03m/s BATT=99%
+[INFO] [1788787218.694909156] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=63
+[INFO] [1788787218.723629548] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.03m TASK=idle VLM=busy DET=car@69% VEL=0.03m/s BATT=99%
+[INFO] [1788787218.873606804] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.05,-0.04,0.04) measVelENU=(-0.02,-0.01,0.01) yaw=-0.10 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787218.923624507] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.04m TASK=idle VLM=busy DET=car@68% VEL=0.02m/s BATT=99%
+[     0] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:27   [ADDITIONAL_INFO] create_begin
+[     1] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:61   [ADDITIONAL_INFO] create_end
+[INFO] [1788787219.123680461] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.04m TASK=idle VLM=busy DET=car@68% VEL=0.02m/s BATT=99%
+[INFO] [1788787219.167015772] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=156 nav=4 arm=1 altENU=0.04 velzENU=0.00
+[INFO] [1788787219.373615090] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.04,-0.04,0.04) measVelENU=(-0.01,-0.00,0.01) yaw=-0.10 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787219.373657349] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.04m TASK=idle VLM=busy DET=car@68% VEL=0.01m/s BATT=99%
+[INFO] [1788787219.623626813] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.03m TASK=idle VLM=busy DET=car@68% VEL=0.01m/s BATT=99%
+[INFO] [1788787219.873675335] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.03,-0.03,0.03) measVelENU=(0.00,0.00,0.01) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787219.873789938] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.03m TASK=idle VLM=busy DET=car@71% VEL=0.01m/s BATT=99%
+[INFO] [1788787220.123623321] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.03m TASK=idle VLM=busy DET=car@72% VEL=0.01m/s BATT=99%
+[INFO] [1788787220.190249884] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=187 nav=4 arm=1 altENU=0.03 velzENU=0.00
+[INFO] [1788787220.323638883] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.04m TASK=idle VLM=busy DET=car@69% VEL=0.01m/s BATT=99%
+[INFO] [1788787220.423613968] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(-0.03,-0.02,0.04) measVelENU=(0.00,0.00,0.01) yaw=-0.10 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787220.573656540] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.04m TASK=idle VLM=busy DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787220.705218680] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=123
+[INFO] [1788787220.806651979] [high_level_navigation_node]: [FMU_NODE_DEBUG] VLM raw response: [
+    {
+        "thought": "1. Feasibility: The car is visible in the perception data with a bounding box, so it is reachable. 2. Flight strategy: Take off, approach the car, move back 2 meters, orbit it for 15 seconds, then land. 3. Landing clearance: No obstacles detected in the area, so landing is feasible after orbiting. 4" 
+    },
+    {
+        "action": "takeoff"
+    },
+    {
+        "action": "approach",
+        "target_object": "car",
+        "speed": 20
+    },
+    {
+        "action": "go",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "speed": 20
+    },
+    {
+        "action": "orbit",
+        "target_object": "car",
+        "radius_cm": 200,
+        "angle_deg": 360,
+        "direction": "cw",
+        "speed": 30
+    },
+    {
+        "action": "land"
+    }
+]
+[INFO] [1788787220.807600213] [high_level_navigation_node]: [FMU_NODE_DEBUG] VLM plan received (788 chars).
+[INFO] [1788787220.807667157] [high_level_navigation_node]: [FMU_NODE_DEBUG] dropping zero-go no-op (kept plan tail).
+[INFO] [1788787220.823622331] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.05m TASK=idle VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787220.823675029] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] takeoff: STANDBY->HANDSHAKING (warmup start=206).
+[INFO] [1788787220.823700897] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.
+[INFO] [1788787220.923630528] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(-0.03,-0.02,0.05) measVelENU=(-0.00,0.00,0.02) yaw=-0.10 yawrate=-0.00 active=1 qsize=3
+[INFO] [1788787221.023643033] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.05m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787221.273619837] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.05m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787221.473610035] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(-0.05,-0.01,0.05) measVelENU=(-0.01,0.01,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787221.473688561] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.05m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787221.723621754] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.05m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787221.923615107] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787221.973613255] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(-0.04,-0.01,0.04) measVelENU=(-0.01,0.01,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=3
+[INFO] [1788787222.123630774] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@72% VEL=0.02m/s BATT=99%
+[INFO] [1788787222.137212311] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=1 setpoints=246 nav=4 arm=1 altENU=0.04 velzENU=2.00
+[INFO] [1788787222.203131069] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] OFFBOARD+ARM CONFIRMED at setpoints=248
+[INFO] [1788787222.323668512] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@73% VEL=0.02m/s BATT=99%
+[INFO] [1788787222.473669571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.04,-0.00,0.04) measVelENU=(-0.01,0.02,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787222.523667499] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@73% VEL=0.02m/s BATT=99%
+[INFO] [1788787222.718259846] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=145
+[INFO] [1788787222.773726569] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@72% VEL=0.02m/s BATT=99%
+[INFO] [1788787223.023611536] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.04,-0.01,0.04) measVelENU=(-0.01,0.01,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787223.023692116] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@72% VEL=0.02m/s BATT=99%
+[INFO] [1788787223.160626135] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=277 nav=14 arm=2 altENU=0.04 velzENU=2.00
+[INFO] [1788787223.273664859] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.04m TASK=takeoff VLM=idle DET=car@71% VEL=0.02m/s BATT=99%
+[INFO] [1788787223.523614508] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.03,-0.01,0.03) measVelENU=(-0.00,0.01,0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=3
+[INFO] [1788787223.523694718] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.03m TASK=takeoff VLM=idle DET=car@71% VEL=0.01m/s BATT=99%
+[INFO] [1788787223.773680665] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.03m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787224.023633571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.01,0.03) measVelENU=(0.01,0.01,0.00) yaw=-0.10 yawrate=-0.00 active=1 qsize=3
+[INFO] [1788787224.023745840] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.03m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787224.183075117] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=308 nav=14 arm=2 altENU=0.03 velzENU=2.00
+[INFO] [1788787224.273676788] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.03m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787224.523653571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.01,-0.02,0.03) measVelENU=(0.01,0.01,0.00) yaw=-0.10 yawrate=-0.00 active=1 qsize=3
+[INFO] [1788787224.523756052] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.03m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787224.773637658] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.02m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787224.973669771] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.02m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787225.073628542] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.02,0.02) measVelENU=(0.01,0.00,-0.00) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787225.173643718] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.02m TASK=takeoff VLM=idle DET=car@70% VEL=0.01m/s BATT=99%
+[INFO] [1788787225.205996520] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=339 nav=14 arm=2 altENU=0.02 velzENU=2.00
+[INFO] [1788787225.356980903] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=185
+[INFO] [1788787225.373673630] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.02m TASK=takeoff VLM=idle DET=car@70% VEL=0.02m/s BATT=99%
+[INFO] [1788787225.573632058] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.03,0.05) measVelENU=(0.02,-0.00,0.32) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787225.573736513] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.05m TASK=takeoff VLM=idle DET=car@70% VEL=0.33m/s BATT=99%
+[INFO] [1788787225.823619424] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.21m TASK=takeoff VLM=idle DET=car@80% VEL=0.78m/s BATT=99%
+[INFO] [1788787226.073635865] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,-0.04,0.45) measVelENU=(0.06,-0.02,0.99) yaw=-0.11 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787226.073687992] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.45m TASK=takeoff VLM=idle DET=car@82%,kite@29% VEL=0.99m/s BATT=99%
+[INFO] [1788787226.229075680] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=370 nav=14 arm=2 altENU=0.62 velzENU=2.00
+[INFO] [1788787226.323620289] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=0.74m TASK=takeoff VLM=idle DET=car@80% VEL=1.12m/s BATT=99%
+[INFO] [1788787226.573656740] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=1.04m TASK=takeoff VLM=idle DET=car@71% VEL=1.22m/s BATT=99%
+[INFO] [1788787226.623614866] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.04,-0.04,1.11) measVelENU=(0.04,-0.01,1.24) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787226.823641194] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=1.36m TASK=takeoff VLM=idle DET=car@77% VEL=1.32m/s BATT=99%
+[INFO] [1788787227.073675100] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=1.71m TASK=takeoff VLM=idle DET=car@72% VEL=1.41m/s BATT=99%
+[INFO] [1788787227.173622142] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.03,-0.05,1.85) measVelENU=(0.00,-0.01,1.44) yaw=-0.10 yawrate=0.00 active=1 qsize=3
+[INFO] [1788787227.251980097] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=401 nav=14 arm=2 altENU=1.97 velzENU=2.00
+[INFO] [1788787227.323618080] [high_level_navigation_node]: [FMU_HUD] STATE=TAKEOFF ALT=2.08m TASK=takeoff VLM=idle DET=car@70% VEL=1.49m/s BATT=99%
+[INFO] [1788787227.323689313] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=2.08
+[INFO] [1788787227.323715641] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=takeoff_ok total=1
+[INFO] [1788787227.373626381] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.64 free=4.64 trig=1.35 loomFill=0.02/0.28 speed=1.50
+[INFO] [1788787227.375477204] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=243
+[INFO] [1788787227.523619193] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=2.32m TASK=idle VLM=idle DET=car@75% VEL=0.67m/s BATT=99%
+[INFO] [1788787227.673611844] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.63 loomFill=0.02/0.28 speed=0.06
+[INFO] [1788787227.723616548] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-0.05,2.33) measVelENU=(-0.01,-0.00,-0.09) yaw=-0.10 yawrate=-0.00 active=0 qsize=3
+[INFO] [1788787227.723707668] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=2.33m TASK=idle VLM=idle DET=car@75% VEL=0.09m/s BATT=99%
+[INFO] [1788787227.873673219] [high_level_navigation_node]: [FMU_NODE_DEBUG] APPROACH activated target=car track_id=-1.
+[INFO] [1788787227.923614014] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.89 medRange=7.89 freeDepth=4.95 budget=0.00 trav=0.00 rem=2.50 fill=0.02 errX=-0.00 errY=-0.22 cmdVelENU=(0.11,-0.01,0.17) yawRate=0.00
+[INFO] [1788787227.973617246] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=2.21m TASK=approach(car) VLM=idle DET=car@75% VEL=0.42m/s BATT=99%
+[INFO] [1788787227.973743921] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.81 loomFill=0.02/0.28 speed=0.42
+[INFO] [1788787228.123616551] [high_level_navigation_node]: [FMU_NODE_DEBUG] APPROACH range locked R0=7.89 travelBudget=5.39
+[INFO] [1788787228.223618757] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,-0.04,2.09) measVelENU=(0.01,0.01,-0.33) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787228.223719083] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=2.09m TASK=approach(car) VLM=idle DET=car@75% VEL=0.33m/s BATT=99%
+[INFO] [1788787228.223809151] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.76 loomFill=0.02/0.28 speed=0.33
+[INFO] [1788787228.223822476] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.89 medRange=7.89 freeDepth=4.95 budget=5.39 trav=0.04 rem=5.35 fill=0.02 errX=-0.00 errY=-0.22 cmdVelENU=(0.12,-0.01,0.16) yawRate=0.00
+[INFO] [1788787228.275000183] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=432 nav=14 arm=2 altENU=2.07 velzENU=0.16
+[INFO] [1788787228.473616411] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=2.00m TASK=approach(car) VLM=idle DET=car@75% VEL=0.26m/s BATT=99%
+[INFO] [1788787228.523624001] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.72 loomFill=0.02/0.28 speed=0.25
+[INFO] [1788787228.523663264] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.89 medRange=7.89 freeDepth=4.95 budget=5.39 trav=0.14 rem=5.25 fill=0.02 errX=-0.00 errY=-0.22 cmdVelENU=(0.13,-0.02,0.15) yawRate=0.00
+[INFO] [1788787228.673618969] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.95m TASK=approach(car) VLM=idle DET=car@75% VEL=0.23m/s BATT=99%
+[INFO] [1788787228.773619882] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,-0.03,1.93) measVelENU=(0.09,-0.00,-0.19) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787228.773720740] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.71 loomFill=0.02/0.28 speed=0.22
+[INFO] [1788787228.773731700] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.89 medRange=7.89 freeDepth=4.95 budget=5.39 trav=0.20 rem=5.20 fill=0.02 errX=-0.00 errY=-0.23 cmdVelENU=(0.14,-0.02,0.14) yawRate=0.00
+[INFO] [1788787228.873628079] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.92m TASK=approach(car) VLM=idle DET=car@51% VEL=0.21m/s BATT=99%
+[INFO] [1788787229.073614828] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.49 free=3.49 trig=0.69 loomFill=0.02/0.28 speed=0.19
+[INFO] [1788787229.073654111] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.77 medRange=7.09 freeDepth=3.49 budget=5.39 trav=0.25 rem=5.14 fill=0.02 errX=-0.00 errY=-0.22 cmdVelENU=(0.15,-0.02,0.14) yawRate=0.00
+[INFO] [1788787229.123624773] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.88m TASK=approach(car) VLM=idle DET=car@75% VEL=0.19m/s BATT=99%
+[INFO] [1788787229.297991277] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=463 nav=14 arm=2 altENU=1.87 velzENU=0.12
+[INFO] [1788787229.323740785] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.02,1.86) measVelENU=(0.13,-0.01,-0.12) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787229.323800155] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.86m TASK=approach(car) VLM=idle DET=car@42% VEL=0.18m/s BATT=99%
+[INFO] [1788787229.323845760] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.38 free=3.38 trig=0.69 loomFill=0.02/0.28 speed=0.18
+[INFO] [1788787229.323861950] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.14 medRange=6.73 freeDepth=3.38 budget=5.39 trav=0.29 rem=5.11 fill=0.02 errX=-0.01 errY=-0.19 cmdVelENU=(0.16,-0.02,0.12) yawRate=0.01
+[INFO] [1788787229.384972578] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=266
+[INFO] [1788787229.423616486] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787229.573623398] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.84m TASK=approach(car) VLM=idle DET=car@39% VEL=0.20m/s BATT=99%
+[INFO] [1788787229.623610661] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.21 free=4.21 trig=0.70 loomFill=0.02/0.28 speed=0.21
+[INFO] [1788787229.623646768] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.28 medRange=6.24 freeDepth=4.21 budget=5.39 trav=0.33 rem=5.07 fill=0.02 errX=-0.00 errY=-0.10 cmdVelENU=(0.17,-0.02,0.11) yawRate=0.00
+[INFO] [1788787229.773655994] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.82m TASK=approach(car) VLM=idle DET=- VEL=0.20m/s BATT=99%
+[INFO] [1788787229.773899758] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787229.873611685] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.01,1.81) measVelENU=(0.17,-0.01,-0.12) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787229.873662740] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.04 free=5.04 trig=0.70 loomFill=0.02/0.28 speed=0.21
+[INFO] [1788787229.873671055] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.14 medRange=4.28 freeDepth=5.04 budget=5.39 trav=0.37 rem=5.03 fill=0.02 errX=-0.01 errY=-0.03 cmdVelENU=(0.19,-0.02,0.07) yawRate=0.01
+[INFO] [1788787230.023621432] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.80m TASK=approach(car) VLM=idle DET=car@82% VEL=0.22m/s BATT=99%
+[INFO] [1788787230.173648984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.65 free=5.65 trig=0.71 loomFill=0.02/0.28 speed=0.23
+[INFO] [1788787230.173803953] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.70 medRange=4.75 freeDepth=5.65 budget=5.39 trav=0.42 rem=4.97 fill=0.02 errX=-0.01 errY=0.05 cmdVelENU=(0.20,-0.02,0.03) yawRate=0.01
+[INFO] [1788787230.223699375] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.78m TASK=approach(car) VLM=idle DET=car@59% VEL=0.23m/s BATT=99%
+[INFO] [1788787230.321793082] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=494 nav=14 arm=2 altENU=1.77 velzENU=0.02
+[INFO] [1788787230.373633163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.32,-0.03,1.77) measVelENU=(0.20,-0.02,-0.12) yaw=-0.10 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787230.473647113] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.76m TASK=approach(car) VLM=idle DET=car@66% VEL=0.24m/s BATT=99%
+[INFO] [1788787230.473798835] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.15 free=5.62 trig=0.72 loomFill=0.02/0.28 speed=0.24
+[INFO] [1788787230.473819844] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.15 medRange=5.15 freeDepth=5.62 budget=5.39 trav=0.48 rem=4.91 fill=0.02 errX=-0.00 errY=0.13 cmdVelENU=(0.20,-0.02,-0.00) yawRate=0.00
+[INFO] [1788787230.723625909] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.72m TASK=approach(car) VLM=idle DET=car@88%,kite@44%,kite@30% VEL=0.25m/s BATT=99%
+[INFO] [1788787230.773629492] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.24 free=7.25 trig=0.73 loomFill=0.02/0.28 speed=0.25
+[INFO] [1788787230.773745217] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.24 medRange=5.24 freeDepth=7.25 budget=5.39 trav=0.55 rem=4.84 fill=0.02 errX=-0.01 errY=0.23 cmdVelENU=(0.19,-0.02,-0.04) yawRate=0.01
+[INFO] [1788787230.923624594] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.43,-0.05,1.69) measVelENU=(0.20,-0.02,-0.15) yaw=-0.10 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787230.923743305] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.69m TASK=approach(car) VLM=idle DET=car@86% VEL=0.26m/s BATT=99%
+[INFO] [1788787231.073623714] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.94 free=7.46 trig=0.73 loomFill=0.02/0.28 speed=0.25
+[INFO] [1788787231.073687513] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.94 medRange=5.94 freeDepth=7.46 budget=5.39 trav=0.62 rem=4.77 fill=0.02 errX=-0.01 errY=0.25 cmdVelENU=(0.19,-0.02,-0.05) yawRate=0.01
+[INFO] [1788787231.173645540] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.65m TASK=approach(car) VLM=idle DET=car@86% VEL=0.25m/s BATT=99%
+[INFO] [1788787231.344079471] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=525 nav=14 arm=2 altENU=1.63 velzENU=-0.05
+[INFO] [1788787231.373648686] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.63m TASK=approach(car) VLM=idle DET=car@86% VEL=0.24m/s BATT=99%
+[INFO] [1788787231.373770092] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.94 free=7.46 trig=0.72 loomFill=0.02/0.28 speed=0.24
+[INFO] [1788787231.373794918] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.94 medRange=5.94 freeDepth=7.46 budget=5.39 trav=0.69 rem=4.71 fill=0.02 errX=-0.01 errY=0.25 cmdVelENU=(0.19,-0.02,-0.05) yawRate=0.01
+[INFO] [1788787231.473617834] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.52,-0.04,1.61) measVelENU=(0.19,-0.01,-0.14) yaw=-0.09 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787231.623615663] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.60m TASK=approach(car) VLM=idle DET=car@86% VEL=0.24m/s BATT=99%
+[INFO] [1788787231.673624447] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.94 free=7.46 trig=0.72 loomFill=0.02/0.28 speed=0.23
+[INFO] [1788787231.673701750] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.94 medRange=5.94 freeDepth=7.46 budget=5.39 trav=0.75 rem=4.65 fill=0.02 errX=-0.01 errY=0.25 cmdVelENU=(0.19,-0.02,-0.06) yawRate=0.01
+[INFO] [1788787231.823632004] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.58m TASK=approach(car) VLM=idle DET=car@86% VEL=0.23m/s BATT=99%
+[INFO] [1788787231.923625216] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.94 free=7.46 trig=0.71 loomFill=0.02/0.28 speed=0.23
+[INFO] [1788787231.923710695] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.94 medRange=5.94 freeDepth=7.46 budget=5.39 trav=0.79 rem=4.60 fill=0.02 errX=-0.01 errY=0.25 cmdVelENU=(0.19,-0.02,-0.06) yawRate=0.01
+[INFO] [1788787231.973618090] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.60,-0.05,1.56) measVelENU=(0.19,-0.02,-0.13) yaw=-0.09 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787232.023638526] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.56m TASK=approach(car) VLM=idle DET=car@86% VEL=0.23m/s BATT=99%
+[INFO] [1788787232.059619792] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=307
+[INFO] [1788787232.223758753] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.53m TASK=approach(car) VLM=idle DET=car@79% VEL=0.22m/s BATT=99%
+[INFO] [1788787232.223973633] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.35 free=7.40 trig=0.71 loomFill=0.02/0.28 speed=0.22
+[INFO] [1788787232.224000583] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.35 medRange=6.01 freeDepth=7.40 budget=5.39 trav=0.85 rem=4.54 fill=0.02 errX=-0.00 errY=0.21 cmdVelENU=(0.19,-0.02,-0.04) yawRate=0.00
+[INFO] [1788787232.367003869] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=556 nav=14 arm=2 altENU=1.52 velzENU=-0.05
+[INFO] [1788787232.473626227] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.51m TASK=approach(car) VLM=idle DET=car@71%,car@38% VEL=0.22m/s BATT=99%
+[INFO] [1788787232.523620244] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.69,-0.07,1.50) measVelENU=(0.19,-0.02,-0.10) yaw=-0.09 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787232.523678573] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.00 free=7.84 trig=0.71 loomFill=0.02/0.28 speed=0.22
+[INFO] [1788787232.523719890] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.00 medRange=6.45 freeDepth=7.84 budget=5.39 trav=0.91 rem=4.49 fill=0.02 errX=0.00 errY=0.20 cmdVelENU=(0.19,-0.01,-0.05) yawRate=-0.00
+[INFO] [1788787232.673656586] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.49m TASK=approach(car) VLM=idle DET=car@82% VEL=0.22m/s BATT=99%
+[INFO] [1788787232.823619442] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.67 free=8.73 trig=0.71 loomFill=0.02/0.28 speed=0.22
+[INFO] [1788787232.823678011] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.67 medRange=5.54 freeDepth=8.73 budget=5.39 trav=0.97 rem=4.43 fill=0.02 errX=0.00 errY=0.20 cmdVelENU=(0.19,-0.01,-0.05) yawRate=-0.00
+[INFO] [1788787232.923619749] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.46m TASK=approach(car) VLM=idle DET=car@82% VEL=0.21m/s BATT=99%
+[INFO] [1788787233.073624333] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.79,-0.08,1.45) measVelENU=(0.19,-0.01,-0.09) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787233.073847368] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.08 free=7.85 trig=0.71 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787233.073883625] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.08 medRange=6.33 freeDepth=7.85 budget=5.39 trav=1.02 rem=4.38 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787233.123655630] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.44m TASK=approach(car) VLM=idle DET=car@79% VEL=0.21m/s BATT=99%
+[INFO] [1788787233.373651857] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.42m TASK=approach(car) VLM=idle DET=car@78% VEL=0.21m/s BATT=99%
+[INFO] [1788787233.373863641] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.74 free=8.26 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787233.373891393] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.74 medRange=6.25 freeDepth=8.26 budget=5.39 trav=1.07 rem=4.32 fill=0.03 errX=0.00 errY=0.19 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787233.390007398] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=587 nav=14 arm=2 altENU=1.42 velzENU=-0.05
+[INFO] [1788787233.573629571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.87,-0.07,1.40) measVelENU=(0.19,-0.01,-0.08) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787233.573794037] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.40m TASK=approach(car) VLM=idle DET=car@82% VEL=0.21m/s BATT=99%
+[INFO] [1788787233.673628877] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.61 free=8.37 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787233.673730466] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=7.61 medRange=7.48 freeDepth=8.37 budget=5.39 trav=1.13 rem=4.27 fill=0.03 errX=0.00 errY=0.19 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787233.823752143] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.38m TASK=approach(car) VLM=idle DET=car@84%,kite@33% VEL=0.21m/s BATT=99%
+[INFO] [1788787233.973623330] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.20 free=7.78 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787233.973689553] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.20 medRange=6.51 freeDepth=7.78 budget=5.39 trav=1.18 rem=4.21 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787234.073641272] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.37m TASK=approach(car) VLM=idle DET=car@62% VEL=0.21m/s BATT=99%
+[INFO] [1788787234.086209836] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=366
+[INFO] [1788787234.123618939] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.97,-0.08,1.36) measVelENU=(0.19,-0.02,-0.07) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787234.273613928] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=7.46 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787234.273675533] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.03 medRange=5.98 freeDepth=7.46 budget=5.39 trav=1.23 rem=4.16 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787234.323634175] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.35m TASK=approach(car) VLM=idle DET=car@80%,kite@61%,kite@28% VEL=0.21m/s BATT=99%
+[INFO] [1788787234.412977446] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=618 nav=14 arm=2 altENU=1.34 velzENU=-0.05
+[INFO] [1788787234.523673847] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.34m TASK=approach(car) VLM=idle DET=car@80%,kite@61%,kite@28% VEL=0.20m/s BATT=99%
+[INFO] [1788787234.523838383] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=7.46 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787234.523865884] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.03 medRange=5.03 freeDepth=7.46 budget=5.39 trav=1.28 rem=4.11 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787234.673615356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.06,-0.08,1.33) measVelENU=(0.19,-0.01,-0.07) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787234.773627037] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.32m TASK=approach(car) VLM=idle DET=car@80%,kite@61%,kite@28% VEL=0.20m/s BATT=99%
+[INFO] [1788787234.823615565] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=7.46 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787234.823657172] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.03 medRange=5.03 freeDepth=7.46 budget=5.39 trav=1.33 rem=4.06 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787235.023627765] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.30m TASK=approach(car) VLM=idle DET=car@80%,kite@61%,kite@28% VEL=0.20m/s BATT=99%
+[INFO] [1788787235.123619951] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=7.46 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787235.123665997] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.03 medRange=5.03 freeDepth=7.46 budget=5.39 trav=1.38 rem=4.01 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.05) yawRate=-0.00
+[INFO] [1788787235.223617096] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.16,-0.10,1.29) measVelENU=(0.19,-0.02,-0.07) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787235.223693578] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.29m TASK=approach(car) VLM=idle DET=car@80%,kite@61%,kite@28% VEL=0.20m/s BATT=99%
+[INFO] [1788787235.373622085] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=7.46 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787235.373718003] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.03 medRange=5.03 freeDepth=7.46 budget=5.39 trav=1.43 rem=3.96 fill=0.03 errX=0.00 errY=0.18 cmdVelENU=(0.19,-0.02,-0.06) yawRate=-0.00
+[INFO] [1788787235.436288492] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=649 nav=14 arm=2 altENU=1.28 velzENU=-0.06
+[INFO] [1788787235.473752748] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.27m TASK=approach(car) VLM=idle DET=car@67%,kite@48% VEL=0.20m/s BATT=99%
+[INFO] [1788787235.623636772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.93 free=5.01 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787235.623746977] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.93 medRange=5.08 freeDepth=5.01 budget=5.39 trav=1.48 rem=3.92 fill=0.03 errX=0.01 errY=0.15 cmdVelENU=(0.19,-0.02,-0.04) yawRate=-0.01
+[INFO] [1788787235.723634969] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.25,-0.10,1.26) measVelENU=(0.19,-0.02,-0.05) yaw=-0.09 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787235.723761865] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.26m TASK=approach(car) VLM=idle DET=car@79%,kite@44% VEL=0.20m/s BATT=99%
+[INFO] [1788787235.923632775] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.23 free=5.25 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787235.923676316] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.23 medRange=5.34 freeDepth=5.25 budget=5.39 trav=1.53 rem=3.86 fill=0.03 errX=0.01 errY=0.14 cmdVelENU=(0.19,-0.02,-0.04) yawRate=-0.01
+[INFO] [1788787235.973662080] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.24m TASK=approach(car) VLM=idle DET=car@80% VEL=0.20m/s BATT=99%
+[INFO] [1788787236.095933078] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=388
+[INFO] [1788787236.223647886] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.23m TASK=approach(car) VLM=idle DET=car@56% VEL=0.20m/s BATT=99%
+[INFO] [1788787236.223784670] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.11 free=6.12 trig=0.70 loomFill=0.03/0.28 speed=0.20
+[INFO] [1788787236.223808234] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.11 medRange=5.72 freeDepth=6.12 budget=5.39 trav=1.59 rem=3.81 fill=0.03 errX=0.00 errY=0.13 cmdVelENU=(0.19,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787236.273612370] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.35,-0.11,1.23) measVelENU=(0.20,-0.02,-0.05) yaw=-0.09 yawrate=-0.01 active=1 qsize=2
+[INFO] [1788787236.459373390] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=680 nav=14 arm=2 altENU=1.22 velzENU=-0.04
+[INFO] [1788787236.473649001] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.22m TASK=approach(car) VLM=idle DET=car@28% VEL=0.21m/s BATT=99%
+[INFO] [1788787236.523626600] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.41 free=5.43 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787236.523678927] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.41 medRange=5.41 freeDepth=5.43 budget=5.39 trav=1.65 rem=3.74 fill=0.03 errX=0.00 errY=0.12 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787236.723671696] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.21m TASK=approach(car) VLM=idle DET=car@74%,kite@49% VEL=0.21m/s BATT=99%
+[INFO] [1788787236.823620382] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.47,-0.11,1.21) measVelENU=(0.20,-0.02,-0.04) yaw=-0.10 yawrate=-0.01 active=1 qsize=2
+[INFO] [1788787236.823736137] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.02 free=5.02 trig=0.70 loomFill=0.03/0.28 speed=0.21
+[INFO] [1788787236.823753430] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.05 medRange=4.31 freeDepth=5.02 budget=5.39 trav=1.71 rem=3.69 fill=0.03 errX=0.00 errY=0.12 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787236.973645320] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.20m TASK=approach(car) VLM=idle DET=car@58%,kite@54%,kite@40% VEL=0.20m/s BATT=99%
+[INFO] [1788787237.123624174] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.39 free=4.39 trig=0.70 loomFill=0.04/0.28 speed=0.21
+[INFO] [1788787237.123677463] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.19 medRange=4.77 freeDepth=4.39 budget=5.39 trav=1.77 rem=3.63 fill=0.04 errX=0.00 errY=0.12 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787237.223629336] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.20m TASK=approach(car) VLM=idle DET=car@71%,kite@28% VEL=0.21m/s BATT=99%
+[INFO] [1788787237.373628568] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.59,-0.12,1.19) measVelENU=(0.20,-0.02,-0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787237.373743763] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.78 free=4.79 trig=0.70 loomFill=0.04/0.28 speed=0.21
+[INFO] [1788787237.373765273] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.78 medRange=4.37 freeDepth=4.79 budget=5.39 trav=1.82 rem=3.58 fill=0.04 errX=0.00 errY=0.11 cmdVelENU=(0.20,-0.02,-0.03) yawRate=-0.00
+[INFO] [1788787237.423676248] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.19m TASK=approach(car) VLM=idle DET=car@49% VEL=0.21m/s BATT=99%
+[INFO] [1788787237.482086849] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=711 nav=14 arm=2 altENU=1.19 velzENU=-0.04
+[INFO] [1788787237.623707281] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.18m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.21m/s BATT=99%
+[INFO] [1788787237.623937790] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.22 free=4.22 trig=0.70 loomFill=0.04/0.28 speed=0.21
+[INFO] [1788787237.623971493] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.24 medRange=4.53 freeDepth=4.22 budget=5.39 trav=1.87 rem=3.53 fill=0.04 errX=0.00 errY=0.11 cmdVelENU=(0.20,-0.02,-0.03) yawRate=-0.00
+[INFO] [1788787237.873626337] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.17m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.20m/s BATT=99%
+[INFO] [1788787237.923609747] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.70,-0.14,1.16) measVelENU=(0.20,-0.02,-0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787237.923660291] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.22 free=4.22 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787237.923669658] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.24 medRange=4.24 freeDepth=4.22 budget=5.39 trav=1.93 rem=3.46 fill=0.04 errX=0.00 errY=0.11 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787238.073928775] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.16m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.20m/s BATT=99%
+[INFO] [1788787238.223609657] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.22 free=4.22 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787238.223696659] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.24 medRange=4.24 freeDepth=4.22 budget=5.39 trav=1.99 rem=3.40 fill=0.04 errX=0.00 errY=0.11 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787238.323619779] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.14m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.20m/s BATT=99%
+[INFO] [1788787238.473613663] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.82,-0.15,1.14) measVelENU=(0.20,-0.02,-0.04) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788787238.473669126] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.22 free=4.22 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787238.505007806] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=742 nav=14 arm=2 altENU=1.14 velzENU=-0.04
+[INFO] [1788787238.523632270] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.13m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.20m/s BATT=99%
+[INFO] [1788787238.523710686] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.24 medRange=4.24 freeDepth=4.22 budget=5.39 trav=2.05 rem=3.34 fill=0.04 errX=0.00 errY=0.11 cmdVelENU=(0.20,-0.02,-0.04) yawRate=-0.00
+[INFO] [1788787238.723693892] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.13m TASK=approach(car) VLM=idle DET=car@68%,kite@25% VEL=0.20m/s BATT=99%
+[INFO] [1788787238.723825066] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.22 free=4.22 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787238.736039252] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=429
+[INFO] [1788787238.823644754] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.26 medRange=4.24 freeDepth=4.22 budget=5.39 trav=2.11 rem=3.29 fill=0.04 errX=-0.00 errY=0.09 cmdVelENU=(0.20,-0.02,-0.03) yawRate=0.00
+[INFO] [1788787238.973652163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.91,-0.17,1.12) measVelENU=(0.19,-0.02,-0.03) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787238.973733124] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.12m TASK=approach(car) VLM=idle DET=car@49%,truck@26% VEL=0.20m/s BATT=99%
+[INFO] [1788787239.023625976] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.41 free=5.41 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787239.073646797] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.30 medRange=5.30 freeDepth=5.26 budget=5.39 trav=2.15 rem=3.24 fill=0.04 errX=-0.01 errY=0.09 cmdVelENU=(0.20,-0.02,-0.03) yawRate=0.01
+[INFO] [1788787239.223623221] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=car@61% VEL=0.20m/s BATT=99%
+[INFO] [1788787239.323615111] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.89 free=4.89 trig=0.70 loomFill=0.04/0.28 speed=0.20
+[INFO] [1788787239.323663941] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.93 medRange=5.41 freeDepth=4.89 budget=5.39 trav=2.20 rem=3.19 fill=0.04 errX=-0.01 errY=0.09 cmdVelENU=(0.20,-0.02,-0.03) yawRate=0.01
+[INFO] [1788787239.423626466] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=car@74% VEL=0.21m/s BATT=99%
+[INFO] [1788787239.473716386] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.02,-0.19,1.11) measVelENU=(0.20,-0.03,-0.03) yaw=-0.10 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787239.528093473] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=773 nav=14 arm=2 altENU=1.11 velzENU=-0.03
+[INFO] [1788787239.573709438] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.40 free=5.40 trig=0.70 loomFill=0.04/0.28 speed=0.21
+[INFO] [1788787239.573766544] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=5.42 medRange=4.83 freeDepth=5.40 budget=5.39 trav=2.25 rem=3.14 fill=0.04 errX=-0.01 errY=0.08 cmdVelENU=(0.20,-0.01,-0.03) yawRate=0.01
+[INFO] [1788787239.673668246] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=car@79%,kite@60%,kite@40% VEL=0.21m/s BATT=99%
+[INFO] [1788787239.873617141] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.41 free=4.41 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787239.873677984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.45 medRange=4.45 freeDepth=4.41 budget=5.39 trav=2.31 rem=3.08 fill=0.05 errX=-0.01 errY=0.08 cmdVelENU=(0.20,-0.01,-0.03) yawRate=0.01
+[INFO] [1788787239.923622674] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=car@62% VEL=0.21m/s BATT=99%
+[INFO] [1788787240.023621557] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.14,-0.23,1.11) measVelENU=(0.20,-0.03,-0.03) yaw=-0.09 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787240.123663330] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=car@27% VEL=0.21m/s BATT=99%
+[INFO] [1788787240.123767053] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.35 free=4.35 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787240.123781149] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.42 medRange=4.41 freeDepth=4.35 budget=5.39 trav=2.36 rem=3.03 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.01,-0.03) yawRate=0.02
+[INFO] [1788787240.373634812] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.10m TASK=approach(car) VLM=idle DET=car@61% VEL=0.20m/s BATT=99%
+[INFO] [1788787240.423626610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787240.523612380] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.19 free=4.19 trig=0.70 loomFill=0.05/0.28 speed=0.20
+[INFO] [1788787240.523677851] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.25 medRange=3.95 freeDepth=4.19 budget=5.39 trav=2.44 rem=2.96 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.02,-0.03) yawRate=0.02
+[INFO] [1788787240.551167961] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=804 nav=14 arm=2 altENU=1.10 velzENU=-0.03
+[INFO] [1788787240.573623744] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.24,-0.24,1.10) measVelENU=(0.20,-0.02,-0.02) yaw=-0.08 yawrate=0.01 active=1 qsize=2
+[INFO] [1788787240.573699394] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.10m TASK=approach(car) VLM=idle DET=car@53% VEL=0.20m/s BATT=99%
+[INFO] [1788787240.773619438] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.74 free=3.74 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787240.773713944] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.79 medRange=3.82 freeDepth=3.74 budget=5.39 trav=2.48 rem=2.91 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.02,-0.03) yawRate=0.02
+[INFO] [1788787240.774838336] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=489
+[INFO] [1788787240.823644117] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.10m TASK=approach(car) VLM=idle DET=car@44% VEL=0.21m/s BATT=99%
+[INFO] [1788787241.023625524] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.32 free=3.32 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787241.023777397] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.36 medRange=3.36 freeDepth=3.32 budget=5.39 trav=2.53 rem=2.86 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.02,-0.02) yawRate=0.02
+[INFO] [1788787241.073622072] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=car@44% VEL=0.21m/s BATT=99%
+[INFO] [1788787241.123614401] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.36,-0.25,1.09) measVelENU=(0.21,-0.01,-0.03) yaw=-0.07 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787241.273659746] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=car@44% VEL=0.21m/s BATT=99%
+[INFO] [1788787241.273785771] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.32 free=3.32 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787241.273802923] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.36 medRange=3.36 freeDepth=3.32 budget=5.39 trav=2.58 rem=2.82 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.02,-0.02) yawRate=0.02
+[INFO] [1788787241.523695831] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=car@44% VEL=0.21m/s BATT=99%
+[INFO] [1788787241.523841352] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.32 free=3.32 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787241.523857041] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.36 medRange=3.36 freeDepth=3.32 budget=5.39 trav=2.63 rem=2.76 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.01,-0.02) yawRate=0.02
+[INFO] [1788787241.574010310] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=835 nav=14 arm=2 altENU=1.09 velzENU=-0.02
+[INFO] [1788787241.623627031] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.46,-0.26,1.09) measVelENU=(0.21,-0.01,-0.03) yaw=-0.06 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787241.773625719] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=car@44% VEL=0.21m/s BATT=99%
+[INFO] [1788787241.823614241] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.32 free=3.32 trig=0.70 loomFill=0.05/0.28 speed=0.21
+[INFO] [1788787241.823679002] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.36 medRange=3.36 freeDepth=3.32 budget=5.39 trav=2.69 rem=2.70 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.01,-0.02) yawRate=0.02
+[INFO] [1788787241.973625703] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=car@44% VEL=0.20m/s BATT=99%
+[INFO] [1788787242.073623277] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.32 free=3.32 trig=0.70 loomFill=0.05/0.28 speed=0.20
+[INFO] [1788787242.073697796] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.36 medRange=3.36 freeDepth=3.32 budget=5.39 trav=2.74 rem=2.65 fill=0.05 errX=-0.02 errY=0.08 cmdVelENU=(0.20,-0.01,-0.02) yawRate=0.02
+[INFO] [1788787242.123625475] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.57,-0.27,1.08) measVelENU=(0.20,-0.02,-0.02) yaw=-0.05 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787242.173629727] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=kite@27% VEL=0.20m/s BATT=99%
+[INFO] [1788787242.273626810] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787242.373635815] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=- VEL=0.23m/s BATT=99%
+[INFO] [1788787242.423694990] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.46 free=3.46 trig=0.72 loomFill=0.07/0.28 speed=0.24
+[INFO] [1788787242.423782332] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.59 medRange=3.59 freeDepth=3.46 budget=5.39 trav=2.79 rem=2.60 fill=0.07 errX=-0.04 errY=0.06 cmdVelENU=(0.18,-0.00,-0.09) yawRate=0.04
+[INFO] [1788787242.597595774] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=866 nav=14 arm=2 altENU=1.11 velzENU=-0.04
+[INFO] [1788787242.623627080] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=- VEL=0.18m/s BATT=99%
+[INFO] [1788787242.623700136] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787242.673724546] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.66,-0.28,1.11) measVelENU=(0.18,0.02,-0.01) yaw=0.02 yawrate=0.11 active=1 qsize=2
+[INFO] [1788787242.723621619] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.11 free=3.11 trig=0.69 loomFill=0.07/0.28 speed=0.18
+[INFO] [1788787242.723680057] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.79 medRange=3.69 freeDepth=3.11 budget=5.39 trav=2.84 rem=2.56 fill=0.07 errX=-0.04 errY=0.06 cmdVelENU=(0.20,-0.00,-0.02) yawRate=0.04
+[INFO] [1788787242.795472921] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=511
+[INFO] [1788787242.823644259] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.11m TASK=approach(car) VLM=idle DET=kite@37%,car@30% VEL=0.18m/s BATT=99%
+[INFO] [1788787242.923717634] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787243.023621784] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.24 free=3.24 trig=0.70 loomFill=0.07/0.28 speed=0.20
+[INFO] [1788787243.023703496] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.31 medRange=3.37 freeDepth=3.24 budget=5.39 trav=2.89 rem=2.50 fill=0.07 errX=-0.05 errY=0.06 cmdVelENU=(0.20,-0.00,-0.02) yawRate=0.05
+[INFO] [1788787243.073630074] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.10m TASK=approach(car) VLM=idle DET=car@46%,kite@29% VEL=0.20m/s BATT=99%
+[INFO] [1788787243.223615321] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.77,-0.27,1.10) measVelENU=(0.21,0.02,-0.02) yaw=0.05 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787243.273645292] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=car@29% VEL=0.22m/s BATT=99%
+[INFO] [1788787243.273862276] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.35 free=3.35 trig=0.71 loomFill=0.07/0.28 speed=0.22
+[INFO] [1788787243.273950450] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.44 medRange=3.41 freeDepth=3.35 budget=5.39 trav=2.94 rem=2.45 fill=0.07 errX=-0.04 errY=0.06 cmdVelENU=(0.20,0.00,-0.02) yawRate=0.04
+[INFO] [1788787243.523637962] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.09m TASK=approach(car) VLM=idle DET=car@27% VEL=0.22m/s BATT=99%
+[INFO] [1788787243.573619913] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.57 free=3.57 trig=0.71 loomFill=0.08/0.28 speed=0.22
+[INFO] [1788787243.573698049] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.68 medRange=3.68 freeDepth=3.57 budget=5.39 trav=3.02 rem=2.38 fill=0.08 errX=-0.05 errY=0.06 cmdVelENU=(0.20,0.01,-0.02) yawRate=0.05
+[INFO] [1788787243.620407491] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=897 nav=14 arm=2 altENU=1.09 velzENU=-0.02
+[INFO] [1788787243.723642410] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.89,-0.25,1.08) measVelENU=(0.22,0.01,-0.02) yaw=0.07 yawrate=0.04 active=1 qsize=2
+[INFO] [1788787243.723728009] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=car@46%,kite@27% VEL=0.22m/s BATT=99%
+[INFO] [1788787243.823642860] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787243.873730618] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.94 free=3.94 trig=0.71 loomFill=0.08/0.28 speed=0.22
+[INFO] [1788787243.873861161] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.08 medRange=4.08 freeDepth=3.94 budget=5.39 trav=3.09 rem=2.31 fill=0.08 errX=-0.04 errY=0.06 cmdVelENU=(0.20,0.02,-0.02) yawRate=0.04
+[INFO] [1788787243.973626935] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=kite@53%,car@35% VEL=0.22m/s BATT=99%
+[INFO] [1788787244.123615099] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787244.173647655] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.07m TASK=approach(car) VLM=idle DET=- VEL=0.22m/s BATT=99%
+[INFO] [1788787244.223618235] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.49 free=3.49 trig=0.71 loomFill=0.01/0.28 speed=0.22
+[INFO] [1788787244.223666786] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=6.73 medRange=4.08 freeDepth=3.49 budget=5.39 trav=3.17 rem=2.22 fill=0.01 errX=0.33 errY=-0.91 cmdVelENU=(0.08,0.01,0.18) yawRate=-0.33
+[INFO] [1788787244.273631175] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.03,-0.24,1.07) measVelENU=(0.22,0.02,-0.02) yaw=0.08 yawrate=0.03 active=1 qsize=2
+[INFO] [1788787244.423626482] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.08m TASK=approach(car) VLM=idle DET=kite@28% VEL=0.26m/s BATT=99%
+[INFO] [1788787244.473635154] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.63 free=3.63 trig=0.74 loomFill=0.01/0.28 speed=0.28
+[INFO] [1788787244.473764404] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.73 medRange=4.73 freeDepth=3.63 budget=5.39 trav=3.22 rem=2.17 fill=0.01 errX=0.33 errY=-0.91 cmdVelENU=(0.09,0.00,0.18) yawRate=-0.33
+[INFO] [1788787244.623627175] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.12m TASK=approach(car) VLM=idle DET=kite@28% VEL=0.28m/s BATT=99%
+[INFO] [1788787244.643050927] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=928 nav=14 arm=2 altENU=1.12 velzENU=0.18
+[INFO] [1788787244.773628434] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.63 free=3.63 trig=0.73 loomFill=0.01/0.28 speed=0.26
+[INFO] [1788787244.773738408] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.73 medRange=4.73 freeDepth=3.63 budget=5.39 trav=3.26 rem=2.13 fill=0.01 errX=0.33 errY=-0.91 cmdVelENU=(0.10,-0.01,0.18) yawRate=-0.33
+[INFO] [1788787244.823622007] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.15,-0.21,1.16) measVelENU=(0.17,0.03,0.19) yaw=-0.02 yawrate=-0.35 active=1 qsize=2
+[INFO] [1788787244.823714599] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.16m TASK=approach(car) VLM=idle DET=kite@28% VEL=0.26m/s BATT=99%
+[INFO] [1788787245.023693862] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.63 free=3.63 trig=0.72 loomFill=0.01/0.28 speed=0.23
+[INFO] [1788787245.023806722] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.73 medRange=4.73 freeDepth=3.63 budget=5.39 trav=3.29 rem=2.10 fill=0.01 errX=0.33 errY=-0.91 cmdVelENU=(0.09,-0.02,0.18) yawRate=-0.33
+[INFO] [1788787245.073643655] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.20m TASK=approach(car) VLM=idle DET=kite@28% VEL=0.23m/s BATT=99%
+[INFO] [1788787245.273734859] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.24m TASK=approach(car) VLM=idle DET=kite@28% VEL=0.21m/s BATT=99%
+[INFO] [1788787245.273865301] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.63 free=3.63 trig=0.71 loomFill=0.01/0.28 speed=0.21
+[INFO] [1788787245.273879508] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=4.73 medRange=4.73 freeDepth=3.63 budget=5.39 trav=3.30 rem=2.09 fill=0.01 errX=0.33 errY=-0.91 cmdVelENU=(0.09,-0.02,0.18) yawRate=-0.33
+[INFO] [1788787245.373617011] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.22,-0.20,1.26) measVelENU=(0.11,0.00,0.18) yaw=-0.22 yawrate=-0.34 active=1 qsize=2
+[INFO] [1788787245.397316790] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=551
+[INFO] [1788787245.523629001] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.29m TASK=approach(car) VLM=idle DET=kite@31% VEL=0.20m/s BATT=99%
+[INFO] [1788787245.573630631] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787245.666390290] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=959 nav=14 arm=2 altENU=1.31 velzENU=0.16
+[INFO] [1788787245.773625705] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.34m TASK=approach(car) VLM=idle DET=- VEL=0.21m/s BATT=99%
+[INFO] [1788787245.873618564] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787245.923621305] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.27,-0.20,1.37) measVelENU=(0.11,-0.01,0.17) yaw=-0.31 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787245.973656136] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.37m TASK=approach(car) VLM=idle DET=- VEL=0.21m/s BATT=99%
+[INFO] [1788787246.023611639] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.62 free=3.62 trig=0.70 loomFill=0.12/0.28 speed=0.21
+[INFO] [1788787246.023654870] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.77 medRange=4.73 freeDepth=3.62 budget=5.39 trav=3.33 rem=2.06 fill=0.12 errX=0.00 errY=0.07 cmdVelENU=(0.16,-0.07,-0.10) yawRate=-0.00
+[INFO] [1788787246.173646704] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.40m TASK=approach(car) VLM=idle DET=kite@30% VEL=0.16m/s BATT=99%
+[INFO] [1788787246.273623965] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.42 free=3.42 trig=0.70 loomFill=0.13/0.28 speed=0.20
+[INFO] [1788787246.273721126] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=3.68 medRange=3.77 freeDepth=3.42 budget=5.39 trav=3.37 rem=2.02 fill=0.13 errX=0.02 errY=0.05 cmdVelENU=(0.17,-0.08,-0.07) yawRate=-0.02
+[INFO] [1788787246.323628129] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787246.423622502] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.41m TASK=approach(car) VLM=idle DET=kite@67% VEL=0.17m/s BATT=99%
+[INFO] [1788787246.473618371] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.35,-0.21,1.41) measVelENU=(0.17,0.00,0.01) yaw=-0.28 yawrate=0.09 active=1 qsize=2
+[INFO] [1788787246.523630310] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.00 free=4.00 trig=0.69 loomFill=0.13/0.28 speed=0.19
+[INFO] [1788787246.573666894] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787246.623627137] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.42m TASK=approach(car) VLM=idle DET=- VEL=0.22m/s BATT=99%
+[INFO] [1788787246.689534563] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=990 nav=14 arm=2 altENU=1.43 velzENU=0.17
+[INFO] [1788787246.723646686] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=10.10 medRange=8.99 freeDepth=3.41 budget=5.39 trav=3.44 rem=1.95 fill=0.01 errX=-0.36 errY=-0.91 cmdVelENU=(0.09,-0.03,0.18) yawRate=0.36
+[INFO] [1788787246.773648186] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.41 free=3.41 trig=0.72 loomFill=0.01/0.28 speed=0.24
+[INFO] [1788787246.823674982] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.45m TASK=approach(car) VLM=idle DET=- VEL=0.25m/s BATT=99%
+[INFO] [1788787246.823807829] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787246.973635518] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.44,-0.22,1.48) measVelENU=(0.19,-0.01,0.17) yaw=-0.23 yawrate=0.15 active=1 qsize=2
+[INFO] [1788787247.023617061] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=11.08 medRange=10.10 freeDepth=2.93 budget=5.39 trav=3.48 rem=1.91 fill=0.01 errX=-0.34 errY=-0.92 cmdVelENU=(0.09,-0.03,0.18) yawRate=0.34
+[INFO] [1788787247.073626556] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.50m TASK=approach(car) VLM=idle DET=- VEL=0.25m/s BATT=99%
+[INFO] [1788787247.123696984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787247.273636443] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.53m TASK=approach(car) VLM=idle DET=- VEL=0.26m/s BATT=99%
+[INFO] [1788787247.406036906] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=609
+[INFO] [1788787247.423634631] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787247.473639196] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.57m TASK=approach(car) VLM=idle DET=- VEL=0.27m/s BATT=99%
+[INFO] [1788787247.523613847] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.55,-0.20,1.58) measVelENU=(0.21,0.05,0.17) yaw=-0.19 yawrate=0.02 active=1 qsize=2
+[INFO] [1788787247.711971522] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1021 nav=14 arm=2 altENU=1.61 velzENU=0.17
+[INFO] [1788787247.723625246] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.61m TASK=approach(car) VLM=idle DET=- VEL=0.28m/s BATT=99%
+[INFO] [1788787247.723704353] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787247.973620864] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.65m TASK=approach(car) VLM=idle DET=- VEL=0.29m/s BATT=99%
+[INFO] [1788787248.023610793] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787248.073614167] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.67,-0.15,1.66) measVelENU=(0.23,0.08,0.17) yaw=-0.19 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787248.173687188] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.68m TASK=approach(car) VLM=idle DET=- VEL=0.30m/s BATT=99%
+[INFO] [1788787248.273644664] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787248.423629940] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.72m TASK=approach(car) VLM=idle DET=- VEL=0.30m/s BATT=99%
+[INFO] [1788787248.523726515] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787248.573615967] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.79,-0.10,1.75) measVelENU=(0.24,0.08,0.17) yaw=-0.19 yawrate=0.00 active=1 qsize=2
+[INFO] [1788787248.673617115] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.77m TASK=approach(car) VLM=idle DET=- VEL=0.30m/s BATT=99%
+[INFO] [1788787248.735003280] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1052 nav=14 arm=2 altENU=1.78 velzENU=0.17
+[INFO] [1788787248.823614163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH coasting target=car (lost).
+[INFO] [1788787248.873710901] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.81m TASK=approach(car) VLM=idle DET=car@51% VEL=0.30m/s BATT=99%
+[INFO] [1788787248.873832467] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.97 free=3.04 trig=0.75 loomFill=0.28/0.28 speed=0.30
+[INFO] [1788787248.873858565] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] APPROACH target=car rawRange=2.97 medRange=10.10 freeDepth=3.04 budget=5.39 trav=3.84 rem=1.55 fill=0.28 errX=-0.25 errY=0.23 cmdVelENU=(0.07,-0.07,-0.18) yawRate=0.25
+[WARN] [1788787248.923635859] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.28 > 0.28 (depth unreliable close up, speed=0.30) -> interrupt.
+[WARN] [1788787248.923728511] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=0 hover+reassess
+[WARN] [1788787248.973633031] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.29 > 0.28 (depth unreliable close up, speed=0.27) -> interrupt.
+[WARN] [1788787248.973727116] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=0 hover+reassess
+[WARN] [1788787249.023628340] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.30 > 0.28 (depth unreliable close up, speed=0.26) -> interrupt.
+[WARN] [1788787249.023720221] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=0 hover+reassess
+[INFO] [1788787249.073673493] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.91,-0.06,1.83) measVelENU=(0.23,0.08,0.05) yaw=-0.19 yawrate=0.02 active=0 qsize=2
+[INFO] [1788787249.073842217] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.83m TASK=idle VLM=idle DET=car@69%,kite@52% VEL=0.25m/s BATT=99%
+[WARN] [1788787249.073938165] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.31 > 0.28 (depth unreliable close up, speed=0.25) -> interrupt.
+[WARN] [1788787249.073953023] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.123630281] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.32 > 0.28 (depth unreliable close up, speed=0.23) -> interrupt.
+[WARN] [1788787249.123746878] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.173662289] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.76 free=2.81 trig=0.71 loomFill=0.32/0.28 speed=0.22
+[WARN] [1788787249.173769238] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.32 > 0.28 (depth unreliable close up, speed=0.22) -> interrupt.
+[WARN] [1788787249.173778365] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.223622894] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.32 > 0.28 (depth unreliable close up, speed=0.21) -> interrupt.
+[WARN] [1788787249.223702181] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.273620317] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.33 > 0.28 (depth unreliable close up, speed=0.19) -> interrupt.
+[WARN] [1788787249.273689306] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.323643178] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.83m TASK=idle VLM=idle DET=boat@68% VEL=0.18m/s BATT=99%
+[WARN] [1788787249.323740259] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.33 > 0.28 (depth unreliable close up, speed=0.18) -> interrupt.
+[WARN] [1788787249.323752301] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.373891078] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.33 > 0.28 (depth unreliable close up, speed=0.16) -> interrupt.
+[WARN] [1788787249.373927856] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.423620713] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.33 > 0.28 (depth unreliable close up, speed=0.14) -> interrupt.
+[WARN] [1788787249.423692386] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.425455748] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=632
+[INFO] [1788787249.473621703] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.52 free=2.59 trig=0.66 loomFill=0.33/0.28 speed=0.13
+[WARN] [1788787249.473697685] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.33 > 0.28 (depth unreliable close up, speed=0.13) -> interrupt.
+[WARN] [1788787249.473748249] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.523653140] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.82m TASK=idle VLM=idle DET=boat@62%,kite@36% VEL=0.11m/s BATT=99%
+[WARN] [1788787249.523796316] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.34 > 0.28 (depth unreliable close up, speed=0.11) -> interrupt.
+[WARN] [1788787249.523805383] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.573627631] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.34 > 0.28 (depth unreliable close up, speed=0.10) -> interrupt.
+[WARN] [1788787249.573718159] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.623619163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.98,-0.04,1.82) measVelENU=(0.08,0.03,-0.01) yaw=-0.18 yawrate=0.00 active=0 qsize=2
+[WARN] [1788787249.623698271] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.34 > 0.28 (depth unreliable close up, speed=0.09) -> interrupt.
+[WARN] [1788787249.623707979] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.673702737] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.07) -> interrupt.
+[WARN] [1788787249.673790921] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.723623759] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.15 free=3.24 trig=0.63 loomFill=0.35/0.28 speed=0.06
+[WARN] [1788787249.723677509] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.06) -> interrupt.
+[WARN] [1788787249.723689250] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.758728030] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1083 nav=14 arm=2 altENU=1.81 velzENU=0.00
+[INFO] [1788787249.773629908] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.81m TASK=idle VLM=idle DET=kite@45%,boat@26% VEL=0.05m/s BATT=99%
+[WARN] [1788787249.773721679] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.05) -> interrupt.
+[WARN] [1788787249.773736697] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.823710577] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.04) -> interrupt.
+[WARN] [1788787249.823774075] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.873674378] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.04) -> interrupt.
+[WARN] [1788787249.873807345] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787249.923656342] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.03) -> interrupt.
+[WARN] [1788787249.923718678] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787249.973650600] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.81m TASK=idle VLM=idle DET=boat@33% VEL=0.02m/s BATT=99%
+[INFO] [1788787249.973862454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.86 free=3.02 trig=0.61 loomFill=0.35/0.28 speed=0.02
+[WARN] [1788787249.973876410] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.02) -> interrupt.
+[WARN] [1788787249.973884656] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787250.023630892] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.02) -> interrupt.
+[WARN] [1788787250.023672500] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787250.073664624] [high_level_navigation_node]: [FMU_NODE_DEBUG] ORBIT activated target=car speed=0.30 angle=6.28 dir=cw (odometry circle, camera on target)
+[INFO] [1788787250.123634226] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.99,-0.04,1.80) measVelENU=(0.01,-0.00,-0.01) yaw=-0.17 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788787250.123754590] [high_level_navigation_node]: [FMU_NODE_DEBUG] ORBIT (hardcoded) target=car centerENU=(6.95,-0.54) R=3.00 alt=4.00 dir=cw
+[INFO] [1788787250.173758236] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.80m TASK=orbit(car) VLM=idle DET=kite@26% VEL=0.01m/s BATT=99%
+[INFO] [1788787250.173905590] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=3.00/3.00 alt=1.80/4.00 swept=0.00/6.28
+[INFO] [1788787250.323611249] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.40 free=2.40 trig=0.76 loomFill=0.35/0.28 speed=0.32
+[WARN] [1788787250.323691278] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.32) -> interrupt.
+[WARN] [1788787250.323727125] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[WARN] [1788787250.373719469] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.47) -> interrupt.
+[WARN] [1788787250.373807974] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787250.423671870] [high_level_navigation_node]: [FMU_HUD] STATE=FLIGHT ALT=1.87m TASK=idle VLM=idle DET=car@32% VEL=0.45m/s BATT=99%
+[WARN] [1788787250.423803535] [high_level_navigation_node]: [FMU_NODE_DEBUG] BOUNDARY looming fill=0.35 > 0.28 (depth unreliable close up, speed=0.45) -> interrupt.
+[WARN] [1788787250.423816759] [high_level_navigation_node]: [FMU_NODE_DEBUG] INTERRUPT (reason=emergency_boundary): stashed= escalated=1 hover+reassess
+[INFO] [1788787250.473629640] [high_level_navigation_node]: [FMU_NODE_DEBUG] LAND activated; FMU streaming descent.
+[INFO] [1788787250.523618949] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.91 vLand=-0.500
+[INFO] [1788787250.673620940] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.00,-0.02,1.91) measVelENU=(0.02,0.12,-0.17) yaw=-0.20 yawrate=-0.07 active=1 qsize=0
+[INFO] [1788787250.673708382] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.91m TASK=land VLM=idle DET=kite@74% VEL=0.21m/s BATT=99%
+[INFO] [1788787250.773635955] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.88 vLand=-0.500
+[INFO] [1788787250.781036306] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1114 nav=14 arm=2 altENU=1.88 velzENU=-0.50
+[INFO] [1788787250.923625693] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.80m TASK=land VLM=idle DET=- VEL=0.54m/s BATT=99%
+[INFO] [1788787251.073622414] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.71 vLand=-0.500
+[INFO] [1788787251.173622904] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.64m TASK=land VLM=idle DET=- VEL=0.57m/s BATT=99%
+[INFO] [1788787251.223612484] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.01,0.05,1.61) measVelENU=(-0.00,0.07,-0.56) yaw=-0.21 yawrate=0.00 active=1 qsize=0
+[INFO] [1788787251.373622241] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.52m TASK=land VLM=idle DET=- VEL=0.56m/s BATT=99%
+[INFO] [1788787251.373667575] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.52 vLand=-0.500
+[INFO] [1788787251.623623401] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.38m TASK=land VLM=idle DET=- VEL=0.55m/s BATT=99%
+[INFO] [1788787251.623743474] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.38 vLand=-0.500
+[INFO] [1788787251.723655149] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.02,0.04,1.33) measVelENU=(0.00,0.00,-0.55) yaw=-0.20 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788787251.804016865] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1145 nav=14 arm=2 altENU=1.28 velzENU=-0.50
+[INFO] [1788787251.823626284] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.27m TASK=land VLM=idle DET=- VEL=0.54m/s BATT=99%
+[INFO] [1788787251.923619711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.22 vLand=-0.500
+[INFO] [1788787252.056716106] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=673
+[INFO] [1788787252.073632955] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.14m TASK=land VLM=idle DET=- VEL=0.54m/s BATT=99%
+[INFO] [1788787252.173702605] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.08 vLand=-0.500
+[INFO] [1788787252.273617997] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.03,0.02,1.03) measVelENU=(0.00,-0.01,-0.54) yaw=-0.20 yawrate=0.00 active=1 qsize=0
+[INFO] [1788787252.273722652] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=1.03m TASK=land VLM=idle DET=car@78%,bird@46% VEL=0.54m/s BATT=99%
+[INFO] [1788787252.473631393] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.91 vLand=-0.431
+[INFO] [1788787252.523643585] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.88m TASK=land VLM=idle DET=- VEL=0.51m/s BATT=99%
+[INFO] [1788787252.773617988] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.03,0.02,0.76) measVelENU=(-0.01,-0.01,-0.41) yaw=-0.20 yawrate=0.00 active=1 qsize=0
+[INFO] [1788787252.773666258] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.76m TASK=land VLM=idle DET=- VEL=0.41m/s BATT=99%
+[INFO] [1788787252.773699009] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.76 vLand=-0.327
+[INFO] [1788787252.827052199] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1176 nav=14 arm=2 altENU=0.74 velzENU=-0.31
+[INFO] [1788787253.023630602] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.67m TASK=land VLM=idle DET=- VEL=0.33m/s BATT=99%
+[INFO] [1788787253.023737321] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.67 vLand=-0.273
+[INFO] [1788787253.273625987] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.60m TASK=land VLM=idle DET=- VEL=0.27m/s BATT=99%
+[INFO] [1788787253.323622100] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(4.03,0.01,0.59) measVelENU=(-0.01,-0.00,-0.27) yaw=-0.19 yawrate=0.00 active=1 qsize=0
+[INFO] [1788787253.323713050] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.59 vLand=-0.231
+[INFO] [1788787253.473648622] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.55m TASK=land VLM=idle DET=- VEL=0.25m/s BATT=99%
+[INFO] [1788787253.623615031] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.51 vLand=-0.197
+[INFO] [1788787253.673726750] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.48m TASK=land VLM=idle DET=- VEL=0.86m/s BATT=99%
+[INFO] [1788787253.823690514] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(3.86,0.18,0.39) measVelENU=(-0.51,0.63,-0.58) yaw=2.61 yawrate=8.43 active=1 qsize=0
+[INFO] [1788787253.850109194] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1207 nav=14 arm=2 altENU=0.38 velzENU=-0.16
+[INFO] [1788787253.873627608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.36 vLand=-0.152
+[INFO] [1788787253.923629983] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.33m TASK=land VLM=idle DET=kite@31% VEL=1.00m/s BATT=99%
+[INFO] [1788787254.065973378] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=731
+[INFO] [1788787254.173626512] [high_level_navigation_node]: [FMU_HUD] STATE=LANDING ALT=0.18m TASK=land VLM=idle DET=- VEL=0.81m/s BATT=99%
+[INFO] [1788787254.173701221] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.18 vLand=-0.123
+[INFO] [1788787254.323731411] [high_level_navigation_node]: [FMU_NODE_DEBUG] LANDING->STANDBY altENU=0.09 (force_disarm)
+[INFO] [1788787254.323907078] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=land_ok total=2
+[INFO] [1788787254.323919331] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.
+[INFO] [1788787254.373617230] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.73,0.49,0.06) measVelENU=(0.09,0.28,-0.73) yaw=0.13 yawrate=5.72 active=0 qsize=0
+[INFO] [1788787254.373671431] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.06m TASK=idle VLM=idle DET=- VEL=0.79m/s BATT=99%
+[INFO] [1788787254.623637854] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.06m TASK=idle VLM=idle DET=- VEL=0.11m/s BATT=99%
+[INFO] [1788787254.872984385] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1238 nav=14 arm=1 altENU=-0.06 velzENU=0.00
+[INFO] [1788787254.873616731] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.06m TASK=idle VLM=idle DET=- VEL=0.07m/s BATT=99%
+[INFO] [1788787254.923645756] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.77,0.54,-0.06) measVelENU=(-0.01,-0.07,0.01) yaw=1.33 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787255.073641203] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.05m TASK=idle VLM=idle DET=- VEL=0.09m/s BATT=99%
+[INFO] [1788787255.323635291] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.04m TASK=idle VLM=idle DET=- VEL=0.09m/s BATT=99%
+[INFO] [1788787255.473619306] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.77,0.49,-0.04) measVelENU=(-0.00,-0.09,0.00) yaw=1.34 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787255.573680905] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.03m TASK=idle VLM=idle DET=boat@72% VEL=0.08m/s BATT=99%
+[INFO] [1788787255.823637623] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=idle DET=boat@55%,car@31% VEL=0.06m/s BATT=99%
+[INFO] [1788787255.896041435] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1269 nav=14 arm=1 altENU=-0.02 velzENU=0.00
+[INFO] [1788787255.973625777] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.77,0.50,-0.02) measVelENU=(0.00,-0.05,0.01) yaw=1.34 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787256.023636759] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=idle DET=- VEL=0.05m/s BATT=99%
+[INFO] [1788787256.095751684] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=754
+[INFO] [1788787256.223655764] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.02m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787256.423675601] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=car@43% VEL=0.03m/s BATT=99%
+[INFO] [1788787256.473760962] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.75,0.52,-0.01) measVelENU=(-0.01,-0.02,0.01) yaw=1.35 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787256.673654734] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=car@84% VEL=0.02m/s BATT=99%
+[INFO] [1788787256.919708994] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1300 nav=14 arm=1 altENU=-0.01 velzENU=0.00
+[INFO] [1788787256.923629800] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=car@72% VEL=0.01m/s BATT=99%
+[INFO] [1788787257.023613184] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.75,0.54,-0.01) measVelENU=(-0.01,0.00,0.01) yaw=1.35 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787257.123640270] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=kite@34%,traffic light@33% VEL=0.01m/s BATT=99%
+[INFO] [1788787257.323672271] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=- VEL=0.01m/s BATT=99%
+[INFO] [1788787257.523633952] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.74,0.54,-0.01) measVelENU=(-0.01,0.01,0.01) yaw=1.35 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787257.523746361] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.01m TASK=idle VLM=idle DET=- VEL=0.01m/s BATT=99%
+[INFO] [1788787257.773623327] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.00m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%
+[INFO] [1788787257.941990946] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1331 nav=14 arm=1 altENU=-0.00 velzENU=0.00
+[INFO] [1788787257.973624612] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=-0.00m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%
+[INFO] [1788787258.073615511] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.73,0.54,-0.00) measVelENU=(-0.02,0.00,0.01) yaw=1.35 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787258.223624439] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.00m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%
+[INFO] [1788787258.423633069] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.01m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%
+[INFO] [1788787258.573615246] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.72,0.56,0.01) measVelENU=(-0.02,0.02,0.01) yaw=1.35 yawrate=0.00 active=0 qsize=0
+[INFO] [1788787258.673615885] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.01m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787258.727353734] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=795
+[INFO] [1788787258.873630346] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787258.964986779] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1362 nav=14 arm=1 altENU=0.02 velzENU=0.00
+[INFO] [1788787259.123615908] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.73,0.57,0.02) measVelENU=(-0.01,0.02,0.01) yaw=1.35 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787259.123832481] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787259.373632309] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787259.573625153] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.03m/s BATT=99%
+[INFO] [1788787259.623623915] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(3.73,0.57,0.02) measVelENU=(-0.01,0.02,0.01) yaw=1.35 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788787259.773640638] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%
+[INFO] [1788787259.973652988] [high_level_navigation_node]: [FMU_HUD] STATE=STANDBY ALT=0.02m TASK=idle VLM=idle DET=- VEL=0.02m/s BATT=99%

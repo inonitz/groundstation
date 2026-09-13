@@ -36,15 +36,15 @@ publishes nothing and this dashboard sees no data.
 
 ## Run
 
-Source the workspace, start a SITL run with observability on, then start the bridge:
+Source the workspace, start a SITL run with observability on, then start the bridge. Run these commands from this directory (`source/dashboard/`):
 
 ```bash
 FMU_OBSERVABILITY=1   # set for the SITL/FMU run
-python3 scripts/dashboard/serve.py                      # default port 8088
-python3 scripts/dashboard/serve.py 9000                 # or pick a port
-python3 scripts/dashboard/serve.py 8088 --log dash.log  # also write a log file
-python3 scripts/dashboard/serve.py 8088 --log dash.log --verbose   # + per-request DEBUG
-python3 scripts/dashboard/serve.py 8088 --workers 6                # HTTP worker-pool size
+python3 serve.py                      # default port 8088
+python3 serve.py 9000                 # or pick a port
+python3 serve.py 8088 --log dash.log  # also write a log file
+python3 serve.py 8088 --log dash.log --verbose   # + per-request DEBUG
+python3 serve.py 8088 --workers 6                # HTTP worker-pool size
 ```
 
 Open `http://localhost:8088`. The camera and depth panels stream over MJPEG. The HUD and VLM log update
@@ -71,7 +71,7 @@ the FMU does the image work only while a browser is actually subscribed (no view
 
 ```bash
 # FMU side (e.g. before the SITL run):   FMU_A2_IMG_W=960 FMU_A2_IMG_H=540 ...
-python3 scripts/dashboard/serve.py 8088 --quality 92
+python3 serve.py 8088 --quality 92
 ```
 
 Because the FMU skips the resize/encode when nothing is subscribed, a big debug resolution costs

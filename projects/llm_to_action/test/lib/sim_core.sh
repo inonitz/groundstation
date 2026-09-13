@@ -115,16 +115,17 @@ done
 
 # --- command definitions ---
 CMD_AGENT="MicroXRCEAgent udp4 -p 8888"
+# HEADLESS export (below): PX4's px4-rc.gzsim starts the gz GUI only when HEADLESS is EMPTY
+# ([ -z "$HEADLESS" ]). A literal "0" is non-empty, so HEADLESS=0 would silently suppress the GUI
+# on every run (regression from commit 54b8a6a). Export "1" only for a real headless run; else
+# export empty so the GUI launches. The ${HEADLESS:-0} checks below treat unset/empty as attended.
+# NOTE: keep this comment OUT of the CMD_PX4 string -- backticks inside "..." run as commands.
 CMD_PX4="\
     export PX4_GZ_MODEL_POSE=$SPAWN_POSE && \
     export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH && \
     export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH && \
     export PX4_GZ_WORLD=$WORLD_NAME && \
     export PX4_NET_INTERFACE=eth0 && \
-    # PX4's px4-rc.gzsim starts the gz GUI only when HEADLESS is EMPTY (`[ -z "$HEADLESS" ]`).
-    # A literal "0" is non-empty, so exporting HEADLESS=0 silently suppresses the GUI on every run
-    # (regression from commit 54b8a6a). Export "1" only for a real headless run; otherwise export
-    # empty so the GUI launches. Internal `${HEADLESS:-0}` checks below still treat unset/empty as attended.
     export HEADLESS="$([ "${HEADLESS:-0}" = "1" ] && echo 1)" && \
     cd $PX4_DIRECTORY && \
     make px4_sitl gz_x500_gimbal; \
@@ -166,8 +167,8 @@ CMD_BAG_HEADLESS="ros2 bag record -o \"$BAG_DIR\" \
     /fmu/out/battery_status_v1"
 CMD_VLM="export LD_LIBRARY_PATH=$BUILD_BINARY_DIR:\$LD_LIBRARY_PATH && \
     $BUILD_BINARY_DIR/llama-server \
-    -m ${VLM_MODEL:-/root/models/vlm/Qwen3-VL-2B-Instruct/Qwen3-VL-2B-Instruct-Q4_K_M.gguf} \
-    --mmproj ${VLM_MMPROJ:-/root/models/vlm/Qwen3-VL-2B-Instruct/mmproj-BF16.gguf} \
+    -m ${VLM_MODEL:-/root/models/vlm/Qwen3-VL-4B-Instruct/Qwen3-VL-4B-Instruct-Q4_K_M.gguf} \
+    --mmproj ${VLM_MMPROJ:-/root/models/vlm/Qwen3-VL-4B-Instruct/mmproj-BF16.gguf} \
     -dev Vulkan0 ${VLM_NGL_ARG- -ngl 99} -c ${VLM_CTX_SIZE:-8192} --flash-attn on ${VLM_KV_ARG- --cache-type-k q4_0 --cache-type-v q4_0} --temp 0.3 \
     --host 0.0.0.0 --port 8080 --threads ${VLM_THREADS:-1}; echo 'llama-server stopped'; read"
 

@@ -17,7 +17,7 @@ per-request DEBUG detail. The log records subscription rates, every HTTP
 request, each stream's open/close with frames sent, and any encode error --
 enough to diagnose "the page is blank" without guessing which layer failed.
 
-Run:  python3 scripts/dashboard/serve.py [port] [--log FILE] [--verbose]
+Run:  python3 serve.py [port] [--log FILE] [--verbose]
       (default port 8088)
 """
 
@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import queue
+import signal
 import sys
 import threading
 import time
@@ -401,7 +402,8 @@ def main():
         except ExternalShutdownException:
             pass  # normal on Ctrl-C: main() called rclpy.shutdown() under us.
 
-    threading.Thread(target=spin, daemon=True).start()
+    spin_thread = threading.Thread(target=spin, daemon=True)
+    spin_thread.start()
 
     def rater():
         prev = {"annotated": 0, "depth": 0, "hud": 0}
@@ -417,6 +419,16 @@ def main():
             prev = cur
     threading.Thread(target=rater, daemon=True).start()
     server = PooledHTTPServer(("0.0.0.0", args.port), Handler, args.workers)
+    # rclpy.init() installs signal handlers that stop the ROS executor but never interrupt
+    # this thread's serve_forever(), so the bridge would ignore SIGINT/SIGTERM and keep the
+    # port bound (a second demo run then cannot bind it). Install our own AFTER rclpy.init()
+    # so they win; stop the server from a helper thread, since serve_forever() cannot be
+    # stopped from the thread it runs on.
+    def _on_signal(signum, _frame):
+        LOG.info("signal %d -- shutting down", signum)
+        threading.Thread(target=server.shutdown, daemon=True).start()
+    signal.signal(signal.SIGINT, _on_signal)
+    signal.signal(signal.SIGTERM, _on_signal)
     LOG.info("dashboard ready: http://localhost:%d (http worker pool=%d, ros executor=single-threaded)",
              args.port, args.workers)
     try:
@@ -425,8 +437,9 @@ def main():
         LOG.info("SIGINT -- shutting down")
     finally:
         server.shutdown()
+        rclpy.shutdown()             # unblocks rclpy.spin() -> ExternalShutdownException in the spin thread
+        spin_thread.join(timeout=2)  # let the spin thread unwind before node teardown, or exit aborts in C++
         node.destroy_node()
-        rclpy.shutdown()
         LOG.info("stopped")
 
 

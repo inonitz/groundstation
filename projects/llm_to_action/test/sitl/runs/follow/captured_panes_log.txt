@@ -1,0 +1,1180 @@
+[INFO] [1788699269.418108732] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] started (stream 30Hz).
+[INFO] [1788699269.418200132] [high_level_navigation_node]: [FMU_NODE_DEBUG] observability=off.
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-seg-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 2
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-depth-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 1
+[INFO] [1788699269.531642849] [high_level_navigation_node]: [FMU_NODE_DEBUG] Flight Management Unit Active (control 20Hz, backend owns wire).
+[INFO] [1788699269.531714793] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission started (test=13). queued~=2. objective: Follow the person and hold.
+[INFO] [1788699269.532417179] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788699269.581585102] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=2
+[INFO] [1788699269.581627140] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] takeoff: STANDBY->HANDSHAKING (warmup start=2).
+[INFO] [1788699269.581633021] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.
+[INFO] [1788699269.873610832] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1
+[INFO] [1788699270.131606811] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699270.681553690] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699271.181654245] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699271.697886017] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] FIRST ODOM altENU=-0.00 yaw=-0.10
+[INFO] [1788699271.728321565] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=1 setpoints=68 nav=4 arm=1 altENU=-0.01 velzENU=2.00
+[INFO] [1788699271.731561309] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(-0.03,0.03,-0.01) measVelENU=(-0.02,0.01,-0.02) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699271.892192258] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=35
+[INFO] [1788699271.926539239] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] OFFBOARD+ARM CONFIRMED at setpoints=74
+[INFO] [1788699272.231565034] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,0.03,-0.01) measVelENU=(-0.00,0.01,-0.02) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699272.751247562] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=99 nav=14 arm=2 altENU=-0.02 velzENU=2.00
+[INFO] [1788699272.781735037] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.01,0.02,-0.02) measVelENU=(0.00,-0.01,-0.02) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699273.331557433] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.00,0.02,-0.03) measVelENU=(0.02,-0.01,-0.02) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699273.774281019] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=130 nav=14 arm=2 altENU=-0.02 velzENU=2.00
+[INFO] [1788699273.831558231] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.02,-0.02) measVelENU=(0.01,-0.01,-0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699274.331559911] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.03,-0.01) measVelENU=(0.02,0.00,0.00) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[     0] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:27   [ADDITIONAL_INFO] create_begin
+[     1] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:61   [ADDITIONAL_INFO] create_end
+[INFO] [1788699274.393354083] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=70
+[INFO] [1788699274.797217634] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=161 nav=14 arm=2 altENU=0.00 velzENU=2.00
+[INFO] [1788699274.881580335] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.03,0.00) measVelENU=(0.02,0.01,0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699275.431580981] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.03,0.21) measVelENU=(0.04,-0.01,0.77) yaw=-0.10 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699275.820250277] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=192 nav=14 arm=2 altENU=0.60 velzENU=2.00
+[INFO] [1788699275.981607326] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.02,0.78) measVelENU=(0.03,-0.01,1.13) yaw=-0.11 yawrate=-0.00 active=1 qsize=1
+[INFO] [1788699276.531560533] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,0.00,1.48) measVelENU=(0.01,-0.01,1.36) yaw=-0.11 yawrate=0.00 active=1 qsize=1
+[INFO] [1788699276.843237815] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=223 nav=14 arm=2 altENU=1.90 velzENU=2.00
+[INFO] [1788699276.931570368] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=2.04
+[INFO] [1788699276.931624709] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=takeoff_ok total=1
+[INFO] [1788699276.981567432] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.05 free=6.05 trig=1.34 loomFill=0.01/0.28 speed=1.47
+[INFO] [1788699277.081557512] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,-0.01,2.23) measVelENU=(0.00,-0.01,0.89) yaw=-0.11 yawrate=-0.00 active=0 qsize=1
+[INFO] [1788699277.231608365] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.05 free=6.05 trig=0.68 loomFill=0.01/0.28 speed=0.16
+[INFO] [1788699277.481573127] [high_level_navigation_node]: [FMU_NODE_DEBUG] FOLLOW activated track_id=10 target_index=0 label=person centerPx=(798,264) standoff_cm=200.
+[INFO] [1788699277.531606909] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.05 free=6.05 trig=0.81 loomFill=0.01/0.28 speed=0.42
+[INFO] [1788699277.531643327] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=10.07 minSafe=2.00 errX=0.25 errY=-0.27 backoff=0.00 yawRate=-0.86 vUp=0.13
+[INFO] [1788699277.581568998] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,-0.01,2.11) measVelENU=(-0.00,-0.00,-0.43) yaw=-0.11 yawrate=-0.01 active=1 qsize=0
+[INFO] [1788699277.762234802] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=131
+[INFO] [1788699277.831573554] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.34 free=4.34 trig=0.76 loomFill=0.01/0.28 speed=0.31
+[INFO] [1788699277.831632533] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=20.01 minSafe=2.00 errX=0.39 errY=-0.27 backoff=0.00 yawRate=-0.90 vUp=0.14
+[INFO] [1788699277.866317674] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=254 nav=14 arm=2 altENU=1.97 velzENU=0.14
+[INFO] [1788699278.131558012] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-0.01,1.89) measVelENU=(-0.00,0.01,-0.24) yaw=-0.41 yawrate=-0.96 active=1 qsize=0
+[INFO] [1788699278.131600821] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.00 free=5.00 trig=0.72 loomFill=0.01/0.28 speed=0.24
+[INFO] [1788699278.131607754] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=10.74 minSafe=2.00 errX=0.39 errY=-0.27 backoff=0.00 yawRate=-0.90 vUp=0.14
+[INFO] [1788699278.431577635] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.56 free=5.56 trig=0.70 loomFill=0.02/0.28 speed=0.20
+[INFO] [1788699278.431642375] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=12.28 minSafe=2.00 errX=0.33 errY=-0.27 backoff=0.00 yawRate=-0.90 vUp=0.14
+[INFO] [1788699278.631626483] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-0.00,1.79) measVelENU=(-0.01,0.00,-0.17) yaw=-0.89 yawrate=-0.95 active=1 qsize=0
+[INFO] [1788699278.731570989] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.94 free=3.94 trig=0.68 loomFill=0.02/0.28 speed=0.16
+[INFO] [1788699278.731653742] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=10.99 minSafe=2.00 errX=0.31 errY=-0.26 backoff=0.00 yawRate=-0.90 vUp=0.13
+[INFO] [1788699278.889258342] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=285 nav=14 arm=2 altENU=1.76 velzENU=0.10
+[INFO] [1788699279.031587786] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.42 free=8.62 trig=0.67 loomFill=0.02/0.28 speed=0.13
+[INFO] [1788699279.031654150] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.42 minSafe=2.00 errX=0.29 errY=-0.15 backoff=0.00 yawRate=-0.90 vUp=0.08
+[INFO] [1788699279.181566765] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.00,1.73) measVelENU=(-0.01,0.00,-0.14) yaw=-1.41 yawrate=-0.93 active=1 qsize=0
+[INFO] [1788699279.331565631] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.11 free=8.11 trig=0.67 loomFill=0.02/0.28 speed=0.15
+[INFO] [1788699279.331658634] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.43 minSafe=2.00 errX=0.26 errY=-0.08 backoff=0.00 yawRate=-0.90 vUp=0.04
+[INFO] [1788699279.631580776] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=9.75 free=11.85 trig=0.69 loomFill=0.02/0.28 speed=0.17
+[INFO] [1788699279.631633664] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=9.75 minSafe=2.00 errX=0.23 errY=0.03 backoff=0.00 yawRate=-0.80 vUp=0.00
+[INFO] [1788699279.731551700] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,-0.01,1.66) measVelENU=(-0.01,-0.01,-0.17) yaw=-1.92 yawrate=-0.90 active=1 qsize=0
+[INFO] [1788699279.912280521] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=316 nav=14 arm=2 altENU=1.63 velzENU=-0.05
+[INFO] [1788699279.931574430] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.63 free=12.25 trig=0.69 loomFill=0.02/0.28 speed=0.19
+[INFO] [1788699279.931641905] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.63 minSafe=2.00 errX=0.21 errY=0.09 backoff=0.00 yawRate=-0.75 vUp=-0.05
+[INFO] [1788699280.181581840] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.63 free=12.25 trig=0.69 loomFill=0.02/0.28 speed=0.19
+[INFO] [1788699280.181674803] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.63 minSafe=2.00 errX=0.21 errY=0.09 backoff=0.00 yawRate=-0.75 vUp=-0.05
+[INFO] [1788699280.231638595] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.01,-0.01,1.58) measVelENU=(-0.02,0.00,-0.18) yaw=-2.32 yawrate=-0.76 active=1 qsize=0
+[INFO] [1788699280.431586365] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.63 free=12.25 trig=0.69 loomFill=0.02/0.28 speed=0.17
+[INFO] [1788699280.481650654] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.63 minSafe=2.00 errX=0.21 errY=0.09 backoff=0.00 yawRate=-0.75 vUp=-0.05
+[INFO] [1788699280.731567796] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.63 free=12.25 trig=0.68 loomFill=0.02/0.28 speed=0.15
+[INFO] [1788699280.781576782] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(-0.00,-0.01,1.50) measVelENU=(-0.02,-0.00,-0.15) yaw=-2.74 yawrate=-0.76 active=1 qsize=0
+[INFO] [1788699280.781631755] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.63 minSafe=2.00 errX=0.21 errY=0.09 backoff=0.00 yawRate=-0.75 vUp=-0.05
+[INFO] [1788699280.935258797] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=347 nav=14 arm=2 altENU=1.49 velzENU=-0.05
+[INFO] [1788699281.031576789] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.63 free=12.25 trig=0.67 loomFill=0.02/0.28 speed=0.14
+[INFO] [1788699281.031674290] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.63 minSafe=2.00 errX=0.21 errY=0.09 backoff=0.00 yawRate=-0.75 vUp=-0.05
+[INFO] [1788699281.132080905] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=192
+[INFO] [1788699281.281587124] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.01,-0.02,1.44) measVelENU=(0.00,-0.01,-0.15) yaw=-3.12 yawrate=-0.73 active=1 qsize=0
+[INFO] [1788699281.281646435] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.83 free=9.10 trig=0.68 loomFill=0.01/0.28 speed=0.15
+[INFO] [1788699281.331562698] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.37 minSafe=2.00 errX=-0.06 errY=0.32 backoff=0.00 yawRate=0.22 vUp=-0.16
+[INFO] [1788699281.581567524] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=11.57 free=11.57 trig=0.70 loomFill=0.02/0.28 speed=0.19
+[INFO] [1788699281.581682618] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=11.64 minSafe=2.00 errX=-0.27 errY=0.34 backoff=0.00 yawRate=0.90 vUp=-0.17
+[INFO] [1788699281.831561298] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-0.01,1.34) measVelENU=(0.01,0.01,-0.19) yaw=3.12 yawrate=0.67 active=1 qsize=0
+[INFO] [1788699281.831689947] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=10.41 free=10.41 trig=0.70 loomFill=0.03/0.28 speed=0.19
+[INFO] [1788699281.831752754] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=11.01 minSafe=2.00 errX=-0.56 errY=0.39 backoff=0.00 yawRate=0.90 vUp=-0.19
+[INFO] [1788699281.958249977] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=378 nav=14 arm=2 altENU=1.32 velzENU=-0.21
+[INFO] [1788699282.081883854] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.70 free=4.70 trig=0.72 loomFill=0.04/0.28 speed=0.25
+[INFO] [1788699282.081960767] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person trackId=10 range=8.32 minSafe=2.00 errX=-0.92 errY=0.50 backoff=0.00 yawRate=0.90 vUp=-0.25
+[INFO] [1788699282.131559711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699282.381592247] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,-0.01,1.22) measVelENU=(-0.01,-0.00,-0.08) yaw=-2.67 yawrate=0.64 active=1 qsize=0
+[INFO] [1788699282.482179838] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.52 free=3.52 trig=0.62 loomFill=0.01/0.28 speed=0.05
+[INFO] [1788699282.931555711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.00,-0.02,1.21) measVelENU=(-0.01,-0.01,-0.04) yaw=-2.55 yawrate=0.02 active=1 qsize=0
+[INFO] [1788699282.981250222] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=409 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699283.131583629] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699283.431570890] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(-0.01,-0.01,1.20) measVelENU=(-0.01,-0.00,-0.03) yaw=-2.55 yawrate=0.01 active=1 qsize=0
+[INFO] [1788699283.981556755] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(-0.01,0.01,1.18) measVelENU=(-0.00,0.01,-0.02) yaw=-2.55 yawrate=0.01 active=1 qsize=0
+[INFO] [1788699284.004237091] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=440 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699284.181553676] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699284.481573547] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(-0.01,0.03,1.17) measVelENU=(-0.00,0.01,-0.02) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699284.502227274] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=253
+[INFO] [1788699284.681581007] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.98 free=2.98 trig=0.61 loomFill=0.01/0.28 speed=0.02
+[INFO] [1788699284.981576263] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.00,0.04,1.17) measVelENU=(0.00,0.01,-0.02) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699285.027560895] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=471 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699285.031563449] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.32 free=6.32 trig=0.61 loomFill=0.01/0.28 speed=0.02
+[INFO] [1788699285.181773476] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699285.481716194] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.01,0.04,1.16) measVelENU=(0.00,0.00,-0.01) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699285.481866293] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.29 free=4.29 trig=0.61 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699285.881597285] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.44 free=4.44 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699286.031680978] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.04,1.16) measVelENU=(0.00,0.00,-0.01) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699286.050205576] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=502 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699286.231603831] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699286.581552418] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.05,1.16) measVelENU=(-0.01,0.01,-0.01) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699287.073222067] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=533 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699287.081581863] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.05,1.15) measVelENU=(0.00,0.00,-0.01) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699287.281579284] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699287.631567785] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.05,1.14) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699287.862026732] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=314
+[INFO] [1788699288.096207980] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=564 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699288.181590956] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.04,1.13) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699288.281706499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699288.631569777] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699288.681609781] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.03,1.12) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699289.119229438] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=595 nav=14 arm=2 altENU=1.12 velzENU=0.00
+[INFO] [1788699289.181628985] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.04,1.12) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699289.331568179] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699289.381559291] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.19 free=5.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699289.681551560] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.92 free=4.92 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699289.731561377] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.01,0.04,1.11) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699290.142224857] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=626 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699290.281557707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.04,1.09) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699290.381555210] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699290.781581179] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.05,1.08) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699291.165269286] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=657 nav=14 arm=2 altENU=1.07 velzENU=0.00
+[INFO] [1788699291.222885437] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=375
+[INFO] [1788699291.281582810] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.06,1.07) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699291.381631327] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699291.531561454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.50 free=5.50 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699291.831558421] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.05,1.07) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699291.831608564] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.84 free=4.84 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699292.181585011] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.62 free=5.62 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699292.188234035] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=688 nav=14 arm=2 altENU=1.08 velzENU=0.00
+[INFO] [1788699292.381627896] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.04,1.08) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699292.381715308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699292.481590664] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.65 free=4.65 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699292.931559364] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.06,0.04,1.09) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699293.211243828] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=719 nav=14 arm=2 altENU=1.10 velzENU=0.00
+[INFO] [1788699293.431568337] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.04,1.11) measVelENU=(0.01,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699293.431619342] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699293.981561049] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.04,1.12) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699294.234225998] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=750 nav=14 arm=2 altENU=1.12 velzENU=0.00
+[INFO] [1788699294.481578648] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.06,0.04,1.12) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699294.481644089] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699294.592014822] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=436
+[INFO] [1788699294.931586350] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.11 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699295.031559617] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.05,0.03,1.11) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699295.257239655] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=781 nav=14 arm=2 altENU=1.11 velzENU=0.00
+[INFO] [1788699295.481883426] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699295.531582535] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.02,1.11) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699295.531671310] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.91 free=4.91 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699295.831558782] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.45 free=5.45 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699296.081598419] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.03,1.11) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699296.280257209] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=812 nav=14 arm=2 altENU=1.11 velzENU=0.00
+[INFO] [1788699296.431554757] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.58 free=5.58 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699296.531649420] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699296.631570270] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.03,1.11) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699297.131580364] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.02,1.10) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699297.303259794] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=843 nav=14 arm=2 altENU=1.10 velzENU=0.00
+[INFO] [1788699297.581562397] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699297.681576379] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,0.02,1.09) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699297.962285077] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=497
+[INFO] [1788699298.231564270] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.01,1.09) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699298.326504728] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=874 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699298.581828961] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699298.731588078] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,0.01,1.10) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699299.181585759] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.11 free=5.11 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699299.281555931] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.01,1.10) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699299.349251756] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=905 nav=14 arm=2 altENU=1.10 velzENU=0.00
+[INFO] [1788699299.481582193] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.22 free=5.22 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699299.631564114] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699299.781552608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=5.25 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699299.831553408] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,0.01,1.10) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699300.331575903] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.06,0.01,1.09) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699300.372248036] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=936 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699300.681560984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699300.881551820] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,0.02,1.09) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699301.322313495] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=558
+[INFO] [1788699301.381557543] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,0.03,1.09) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699301.395445739] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=967 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699301.731551069] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699301.931568294] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,0.05,1.09) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699302.418207942] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=998 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699302.481546584] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,0.06,1.09) measVelENU=(-0.01,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699302.731556524] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699302.981553379] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.05,1.09) measVelENU=(-0.01,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699303.441236930] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1029 nav=14 arm=2 altENU=1.10 velzENU=0.00
+[INFO] [1788699303.481558009] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.03,1.10) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699303.731574951] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699303.981580613] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,0.02,1.10) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699304.464284852] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1060 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699304.531548022] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,0.01,1.09) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699304.692095129] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=619
+[INFO] [1788699304.781597384] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699304.931580537] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.06 free=5.06 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699305.031571026] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.09,0.02,1.09) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699305.487649011] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1091 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699305.531572649] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,0.02,1.09) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699305.781631920] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699306.081551208] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,0.02,1.09) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699306.481561441] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.87 free=4.87 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699306.510232497] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1122 nav=14 arm=2 altENU=1.09 velzENU=0.00
+[INFO] [1788699306.581560355] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,0.02,1.09) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699306.831666573] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699307.131558069] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,0.01,1.10) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699307.533234631] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1153 nav=14 arm=2 altENU=1.11 velzENU=0.00
+[INFO] [1788699307.681576371] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,0.00,1.11) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699307.881559582] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699308.062666150] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=680
+[INFO] [1788699308.181632224] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.00,1.12) measVelENU=(0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699308.556239448] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1184 nav=14 arm=2 altENU=1.12 velzENU=0.00
+[INFO] [1788699308.681745675] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.01,1.12) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699308.881729707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699309.231554256] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.12) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699309.579265114] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1215 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699309.731601903] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.13) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699309.931813568] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699310.281564340] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.02,1.13) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699310.602249021] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1246 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699310.781566412] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.14) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699310.981581772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699311.281608057] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.03,1.14) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699311.422367607] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=741
+[INFO] [1788699311.625320830] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1277 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699311.681595426] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.80 free=4.80 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699311.781620097] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.03,1.14) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699311.981629496] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.39 free=5.39 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699311.981722990] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699312.281784952] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.03,1.15) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699312.281833442] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.37 free=5.37 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699312.581636432] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=5.03 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699312.648237360] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1308 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699312.831548216] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.16) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699312.881551610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.99 free=4.99 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699313.031766333] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699313.331711647] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.02,1.16) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699313.671276406] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1339 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699313.881555251] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.03,1.15) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699314.081566372] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699314.381563663] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.04,1.14) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699314.694231065] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1370 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699314.792488289] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=802
+[INFO] [1788699314.883451580] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.09,-0.04,1.14) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699315.081579059] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699315.431556450] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.08,-0.04,1.14) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699315.631562451] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.67 free=5.81 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699315.717220808] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1401 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699315.931573307] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.09,-0.04,1.15) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699315.931629371] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.77 free=4.77 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699316.131574129] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699316.231593540] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.81 free=4.81 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699316.481606732] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,-0.06,1.15) measVelENU=(0.01,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699316.531544063] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.20 free=5.20 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699316.740206512] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1432 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699316.831638575] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.11 free=5.31 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699316.981969833] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.06,1.15) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699317.131562608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.45 free=5.85 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699317.131615587] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699317.381587071] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.45 free=5.85 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699317.531557930] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.06,1.15) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699317.681571407] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.45 free=5.85 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699317.763263969] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1463 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699317.981573015] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.45 free=5.85 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699318.081560577] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.05,1.15) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699318.152770525] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=863
+[INFO] [1788699318.181569609] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699318.381573666] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.85 free=4.85 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699318.581575229] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.06,1.15) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699318.731558330] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=5.25 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699318.786489727] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1494 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699318.981562635] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.26 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699319.131559201] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.06,1.16) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699319.181588302] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699319.281572367] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.99 free=4.99 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699319.681567978] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.06,1.16) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699319.809223670] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1525 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699320.181587519] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.07,1.16) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699320.181648282] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=4.98 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699320.181658170] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699320.481564771] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.09 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699320.731550982] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.06,1.16) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699320.731594563] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.09 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699320.832245428] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1556 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699321.031551857] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.09 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699321.231572615] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.05,1.17) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699321.231664356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699321.281559989] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.09 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699321.521881949] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=924
+[INFO] [1788699321.781568759] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.05,1.17) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699321.855478507] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1587 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699322.281556138] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699322.331562707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.05,1.16) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699322.331605517] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=4.98 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699322.878235049] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1618 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699322.881561054] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.05,1.17) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699323.281570309] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699323.381615838] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.04,1.16) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699323.901221538] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1649 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699323.931566857] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.04,1.16) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699324.281579380] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699324.481572757] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.04,1.16) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699324.882903849] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=985
+[INFO] [1788699324.924291291] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1680 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699324.981610068] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.04,1.15) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699325.081687616] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.62 free=5.62 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699325.281600833] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699325.381603863] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.99 free=4.99 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699325.481667997] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.05,1.16) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699325.681561768] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.29 free=5.29 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699325.947274572] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1711 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699326.031585131] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.07,1.15) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699326.331561490] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.65 free=5.65 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699326.331656677] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699326.581559341] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.09,1.15) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699326.931564791] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.54 free=5.54 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699326.970224149] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1742 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699327.131557335] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.09,1.15) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699327.181570136] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.02 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699327.331849797] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699327.481558406] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.02 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699327.631644828] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.08,1.15) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699327.781623399] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.02 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699327.993277478] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1773 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699328.081584118] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.02 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699328.181564846] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.08,1.15) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699328.252132510] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1046
+[INFO] [1788699328.381751772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699328.431564140] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.19 free=5.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699328.681613527] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.14) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699328.731573179] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.03 free=5.03 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699329.016224740] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1804 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699329.031564154] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.20 free=5.20 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699329.231560124] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.13) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699329.331557463] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.78 free=4.78 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699329.431565442] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699329.731580521] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.08,1.13) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699330.039224076] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1835 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699330.281551984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.06,1.14) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699330.281596788] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.31 free=5.31 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699330.481575425] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699330.581584406] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.73 free=5.35 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699330.781582901] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.05,1.15) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699330.881578035] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.73 free=5.35 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699331.062236797] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1866 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699331.181546468] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.73 free=5.35 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699331.331562118] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.05,1.16) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699331.431563143] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.73 free=5.35 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699331.481583999] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699331.622572111] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1107
+[INFO] [1788699331.831562447] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,-0.06,1.17) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699332.085297106] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1897 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699332.381648912] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,-0.06,1.17) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699332.531564256] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699332.931558970] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,-0.05,1.17) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699333.108218845] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1928 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699333.331598127] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.74 free=5.74 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699333.431763658] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.11,-0.04,1.17) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699333.531710072] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699333.631558744] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.07 free=5.07 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699333.981548052] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.04,1.17) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699334.131207949] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1959 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699334.481555713] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.04,1.16) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699334.581573409] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699334.981624578] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.03,1.16) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699334.992062017] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1168
+[INFO] [1788699335.154373931] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1990 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699335.181575954] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.55 free=5.09 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699335.481558302] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.46 free=4.46 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699335.531546396] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.15) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699335.581588541] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699335.781581505] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.21 free=4.21 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699336.031581668] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.02,1.15) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699336.081553332] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.38 free=5.38 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699336.177221440] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2021 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699336.581567856] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.03,1.16) measVelENU=(-0.01,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699336.581617197] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699337.131555475] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.04,1.16) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699337.200275763] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2052 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699337.631560881] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.04,1.16) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699337.631605624] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699338.131565766] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.03,1.16) measVelENU=(0.01,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699338.223219719] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2083 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699338.352007784] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1229
+[INFO] [1788699338.681586596] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.03,1.17) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699338.681692904] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699338.831553925] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.59 free=5.59 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699339.131630176] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.58 free=5.58 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699339.231571680] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.04,1.19) measVelENU=(0.01,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699339.246324283] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2114 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699339.431643610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.32 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699339.731593455] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.06,1.19) measVelENU=(0.01,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699339.731659679] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699340.031767027] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.05 free=4.05 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699340.269216872] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2145 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699340.281565945] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.06,1.19) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699340.331576972] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.67 free=4.67 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699340.781624619] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.07,1.19) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699340.781733231] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699341.292227449] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2176 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699341.331562133] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.06,1.19) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699341.733461316] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1290
+[INFO] [1788699341.831571705] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.06,1.18) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699341.831656292] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699342.315453597] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2207 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699342.381547730] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.19) measVelENU=(-0.02,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699342.881529761] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699342.931622169] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.09,1.19) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699343.081563649] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.29 free=5.29 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699343.331590490] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=5.61 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699343.338259822] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2238 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699343.481549273] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.09,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699343.681600834] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.61 free=5.61 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699343.881588927] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699343.981592586] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.19) measVelENU=(0.01,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699344.361223600] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2269 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699344.531552571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.08,1.20) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699344.931556468] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699345.031553084] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699345.092439313] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1351
+[INFO] [1788699345.384424918] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2300 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699345.531580908] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.06,1.19) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699345.781551454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.76 free=4.76 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699345.931594753] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699346.031599264] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.06,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699346.081568964] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.52 free=4.52 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699346.407525398] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2331 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699346.431606577] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.18 free=4.18 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699346.531629101] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.07,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699346.731608257] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.21 free=4.21 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699346.931952262] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699347.031562599] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.80 free=6.08 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699347.081555052] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.08,1.17) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699347.430226734] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2362 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699347.581562186] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.09,1.17) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699347.981560502] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699348.131570689] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.10,1.17) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699348.452966321] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1412
+[INFO] [1788699348.454467863] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2393 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699348.681631199] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.10,1.17) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699348.981573618] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699349.231567938] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.10,1.18) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699349.476233568] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2424 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699349.731596211] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.09,1.18) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699350.031605414] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699350.081562841] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.22 free=5.42 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699350.281621333] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.09,1.18) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699350.381556285] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.06 free=5.06 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699350.499230813] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2455 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699350.831553533] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.09,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699351.081580002] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699351.331557070] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.11,1.18) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699351.522214931] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2486 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699351.812358198] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1473
+[INFO] [1788699351.831568170] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.11,1.18) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699351.881610615] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.74 free=4.87 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699352.131573124] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699352.181571417] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.76 free=5.11 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699352.381557826] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.10,1.17) measVelENU=(-0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699352.531560659] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.05 free=5.05 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699352.545216322] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2517 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699352.831596240] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.09 free=5.09 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699352.931806062] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.09,1.17) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699353.131580867] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699353.481560650] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.08,1.17) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699353.568272252] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2548 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699353.981566129] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.08,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699354.181563137] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699354.531551616] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.08,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699354.591237924] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2579 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699355.031559168] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.07,1.17) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699355.181583630] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699355.192699160] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1534
+[INFO] [1788699355.581554833] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.07,1.17) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699355.614459049] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2610 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699355.831594466] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.43 free=5.43 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699356.081573445] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.06,1.17) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699356.181567225] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.13 free=5.13 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699356.181621857] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699356.481555949] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.00 free=5.00 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699356.581604881] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.05,1.17) measVelENU=(-0.01,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699356.637206784] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2641 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699357.131563056] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.17) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699357.231560202] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699357.631567772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.17) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699357.660242142] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2672 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699358.181562514] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.03,1.17) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699358.231570996] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699358.542023236] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1595
+[INFO] [1788699358.681605541] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.04,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699358.683448718] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2703 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699358.931556869] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.88 free=4.88 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699359.231613217] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.05,1.18) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699359.231708154] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=4.96 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699359.231790687] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699359.531898170] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.54 free=5.54 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699359.706442688] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2734 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699359.731654480] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.07,1.18) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699359.831588398] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.76 free=6.12 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699360.131570969] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=4.98 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699360.231876378] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.07,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699360.231976685] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699360.431563589] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.13 free=5.13 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699360.729220635] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2765 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699360.781559901] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.19) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699361.281560117] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699361.331562847] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.09,1.18) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699361.752251442] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2796 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699361.831565207] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.10,1.18) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699361.922834022] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1656
+[INFO] [1788699362.281590092] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699362.331576292] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.09,1.19) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699362.775429491] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2827 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699362.831595843] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.08,1.19) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699363.181560526] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.38 free=5.38 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699363.331611356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.07,1.19) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699363.331699691] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699363.481573673] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.99 free=4.99 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699363.781573064] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.02 free=5.02 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699363.798216242] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2858 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699363.881559470] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.07,1.20) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699364.381553512] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699364.431594885] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.07,1.21) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699364.821273054] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2889 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699364.981563976] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.07,1.21) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699365.274079792] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1717
+[INFO] [1788699365.331557792] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.40 free=4.40 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699365.381582614] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699365.531570067] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.07,1.20) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699365.631561491] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.83 free=3.83 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699365.844205865] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2920 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699366.081614919] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.19) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699366.431714671] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699366.631555577] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.09,1.18) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699366.867245804] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2951 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699367.131565919] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.10,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699367.481554194] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699367.681599509] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.09,1.19) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699367.890205984] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=2982 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699368.231576233] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.07,1.18) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699368.481587530] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699368.652158798] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1778
+[INFO] [1788699368.781560020] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699368.913637870] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3013 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699369.331737257] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.17) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699369.531570668] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699369.631643854] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.69 free=6.25 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699369.881613844] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.17) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699369.931583683] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=5.25 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699369.936229532] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3044 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699370.431557376] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.17) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699370.531561424] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.67 free=5.67 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699370.531599394] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699370.959195470] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3075 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699370.981590133] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.08,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699371.531551818] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.09,1.19) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699371.531604536] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699371.982227811] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3106 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699372.012408552] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1839
+[INFO] [1788699372.031558140] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.09,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699372.331569151] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=5.47 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699372.531627299] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.18) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699372.531772229] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699372.631703952] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.00 free=5.00 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699373.005375004] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3137 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699373.031832872] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.07,1.17) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699373.231557300] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.50 free=5.11 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699373.581574407] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.07,1.17) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699373.581619040] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699373.881562575] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.52 free=5.52 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699374.028231786] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3168 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699374.131569833] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.07,1.16) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699374.631554133] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699374.681557685] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.15) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699375.051204493] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3199 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699375.231543753] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.08,1.16) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699375.372661491] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1900
+[INFO] [1788699375.631615556] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699375.731559432] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.16) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699375.981557132] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.14 free=5.14 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699376.074459864] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3230 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699376.231597972] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.17) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699376.281586085] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.23 free=5.23 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699376.581567029] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.94 free=4.94 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699376.681573851] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699376.781568741] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.09,1.17) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699377.097256392] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3261 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699377.331553366] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.09,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699377.731558735] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699377.831563533] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.19) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699378.120238614] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3292 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699378.381562294] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.07,1.19) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699378.731581573] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699378.741837524] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1961
+[INFO] [1788699378.931550875] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.07,1.18) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699379.143209363] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3323 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699379.231563177] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.67 free=4.67 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699379.431570530] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.07,1.18) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699379.731665485] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699379.931650025] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.18) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699380.166281821] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3354 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699380.481605023] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.08,1.17) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699380.581574856] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.84 free=4.84 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699380.781572230] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699381.031552547] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.07,1.15) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699381.189222373] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3385 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699381.531555770] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.06,1.14) measVelENU=(-0.01,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699381.781584436] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699382.031590331] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.07,1.14) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699382.112527362] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2022
+[INFO] [1788699382.212269282] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3416 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699382.431693690] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.83 free=6.29 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699382.531592371] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.08,1.14) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699382.731690822] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.04 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699382.781726092] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699383.031832193] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.12,-0.08,1.14) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699383.031922902] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.04 free=5.04 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699383.235457472] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3447 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699383.331602022] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.24 free=5.24 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699383.581556761] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.07,1.14) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699383.831566712] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699384.081588295] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.13,-0.06,1.15) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699384.258254825] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3478 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699384.631558961] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.06,1.16) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699384.881577247] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699385.131561361] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.06,1.16) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699385.281275953] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3509 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699385.472543544] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2083
+[INFO] [1788699385.631595850] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.15) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699385.781552232] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699385.931806108] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699386.081564011] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.68 free=4.68 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699386.131627704] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.09,1.15) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699386.304803102] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3540 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699386.381559610] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=4.58 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699386.681555318] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.09,1.13) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699386.681610110] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.12 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699386.981587936] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.19 free=5.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699386.981641125] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699387.181573036] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.14) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699387.281577332] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.15 free=5.15 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699387.327266581] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3571 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699387.731569227] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.07,1.13) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699388.031553935] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699388.281572862] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.06,1.13) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699388.350248063] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3602 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699388.831561499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.06,1.14) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699388.842239465] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2144
+[INFO] [1788699389.031563931] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699389.331607729] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.06,1.14) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699389.373860748] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3633 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699389.431577050] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.76 free=3.76 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699389.881555579] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.08,1.15) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699390.031589576] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.77 free=5.77 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699390.031660498] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699390.331556380] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.02 free=5.02 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699390.381556124] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.08,1.14) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699390.396280463] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3664 nav=14 arm=2 altENU=1.14 velzENU=0.00
+[INFO] [1788699390.681587688] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.91 free=5.91 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699390.881565223] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.07,1.13) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699391.081553679] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699391.381567721] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.06,1.13) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699391.419241404] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3695 nav=14 arm=2 altENU=1.13 velzENU=0.00
+[INFO] [1788699391.931585350] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.05,1.13) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699392.131553308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699392.212416221] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2205
+[INFO] [1788699392.431631258] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.06,1.15) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699392.442222843] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3726 nav=14 arm=2 altENU=1.15 velzENU=0.00
+[INFO] [1788699392.981567736] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.07,1.16) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699393.131557389] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699393.465375579] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3757 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699393.531581147] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.09,1.17) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699393.681568155] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.46 free=4.46 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699394.081565453] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.10,1.17) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699394.131561410] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699394.488202799] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3788 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699394.631553787] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.11,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699395.131581620] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.09,1.18) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699395.131651180] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699395.511266237] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3819 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699395.572209450] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2266
+[INFO] [1788699395.631855530] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.09,1.18) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699395.781709802] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699396.131601559] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.23 free=5.23 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699396.131662663] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699396.181581195] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.08,1.17) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699396.431557121] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.46 free=5.46 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699396.534383925] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3850 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699396.731563988] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.06,1.17) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699396.731607318] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699397.181548535] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699397.281553272] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.05,1.17) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699397.557214479] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3881 nav=14 arm=2 altENU=1.17 velzENU=0.00
+[INFO] [1788699397.831565038] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.06,1.17) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699398.231547948] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699398.381613903] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.07,1.18) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699398.580198697] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3912 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699398.931615980] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.08,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699398.942294126] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2327
+[INFO] [1788699399.231830543] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699399.431748125] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.09,1.18) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699399.481554279] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.26 free=5.26 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699399.603455792] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3943 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699399.781588917] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.37 free=5.37 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699399.981579295] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.08,1.19) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699400.281607430] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699400.481635458] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.06,1.19) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699400.626562376] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=3974 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699401.031556043] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.03,1.19) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699401.331572266] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699401.531575047] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.04,1.19) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699401.649254680] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4005 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699402.031596445] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.05,1.19) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699402.313589535] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2388
+[INFO] [1788699402.331601327] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699402.531591454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.34 free=5.34 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699402.581570559] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.05,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699402.672242872] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4036 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699402.831631942] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.43 free=5.43 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699403.131577554] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.05,1.19) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699403.131641603] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.19 free=5.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699403.381600926] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699403.431564883] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.29 free=5.13 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699403.681587844] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.05,1.20) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699403.695529649] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4067 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699403.731566669] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=5.03 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699404.031578423] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.17 free=5.17 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699404.181714888] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.07,1.21) measVelENU=(0.01,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699404.431558576] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699404.718248078] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4098 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699404.731556845] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.09,1.20) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699405.231559567] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.10,1.20) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699405.431565153] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699405.673411119] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2449
+[INFO] [1788699405.741242830] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4129 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699405.781555931] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.11,1.20) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699406.281556489] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.11,1.22) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699406.431887345] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699406.681569362] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.39 free=5.39 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699406.764239144] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4160 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699406.781577435] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.12,1.23) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699407.081577767] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.09 free=5.09 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699407.281912895] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.13,1.23) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699407.431597609] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.27 free=5.27 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699407.481967581] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699407.731563848] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.98 free=5.98 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699407.787251858] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4191 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699407.831569886] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.13,1.23) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699407.981567112] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.98 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699408.231582088] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.98 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699408.331569742] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.12,1.23) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699408.531558746] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.98 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699408.531631722] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699408.781560898] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.98 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699408.810248141] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4222 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699408.881616478] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.12,1.22) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699409.031659038] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.12 free=5.98 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699409.033006444] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2510
+[INFO] [1788699409.431998638] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.12,1.21) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699409.581658556] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.34 free=5.34 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699409.581720782] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699409.833349207] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4253 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699409.981580219] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.11,1.22) measVelENU=(-0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699410.481560156] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.65 free=4.65 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699410.531561693] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.09,1.22) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699410.631569434] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699410.731608073] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.57 free=4.57 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699410.856294453] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4284 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699411.081568664] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.29,-0.09,1.21) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699411.081623516] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.97 free=5.97 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699411.381580186] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.97 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699411.631573822] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.09,1.21) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699411.631652007] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.97 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699411.631659841] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699411.879269785] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4315 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699411.931560047] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.97 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699412.181551207] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.09,1.21) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699412.181588877] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.97 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699412.412061293] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2571
+[INFO] [1788699412.431603772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.32 free=5.97 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699412.681558585] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.09,1.21) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699412.681604350] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699412.902250966] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4346 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699413.131564787] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.38 free=4.38 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699413.181587864] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.08,1.20) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699413.731579145] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.07,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699413.731624499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699413.925519370] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4377 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699414.231596911] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.06,1.18) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699414.781552595] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.06,1.18) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699414.781597890] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699414.948254031] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4408 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699415.281558920] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.05,1.19) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699415.772660657] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2632
+[INFO] [1788699415.831632002] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.04,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699415.831722090] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699415.931705646] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.93 free=3.93 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699415.971254636] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4439 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699416.231934932] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.68 free=4.07 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699416.331760184] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.03,1.19) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699416.531583077] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.74 free=3.74 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699416.831556728] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.56 free=4.72 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699416.881601384] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.04,1.20) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699416.881849666] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699416.994470370] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4470 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699417.431556807] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.04,1.21) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699417.431677140] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.29 free=5.29 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699417.831559197] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.70 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699417.931576235] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.04,1.22) measVelENU=(0.01,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699417.931703572] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699418.017214296] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4501 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699418.081566877] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.85 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699418.381555906] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.85 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699418.481557916] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.29,-0.03,1.23) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699418.631557425] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.85 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699418.881591394] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.85 free=6.19 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699418.981566844] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.29,-0.02,1.23) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699418.981612449] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699419.040326145] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4532 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699419.132638477] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2693
+[INFO] [1788699419.531579603] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.30,-0.03,1.22) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699419.531675641] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.04 free=5.29 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699419.831562480] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.38 free=5.38 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699420.031553546] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699420.063416834] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4563 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699420.081569779] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.30,-0.05,1.21) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699420.231556373] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.43 free=4.43 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699420.531549579] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.68 free=5.68 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699420.581604565] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.29,-0.07,1.21) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699421.031629840] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699421.081685667] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.06,1.22) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699421.086338108] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4594 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699421.131557451] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.34 free=5.34 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699421.631554506] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.07,1.22) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699422.081547731] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699422.109234303] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4625 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699422.131562732] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.06,1.21) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699422.502473446] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2754
+[INFO] [1788699422.631618687] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,-0.05,1.21) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699422.681589806] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.17 free=5.17 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699423.081554033] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699423.132187394] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4656 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699423.181550633] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.04,1.21) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699423.681708927] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.04,1.20) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699423.881953424] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.32 free=4.32 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699424.081562599] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699424.155218539] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4687 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699424.181820084] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.04,1.20) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699424.181849338] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.44 free=4.44 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699424.481607186] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=4.58 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699424.731552589] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.27,-0.03,1.20) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699425.081569250] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699425.178255905] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4718 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699425.231564070] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.03,1.20) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699425.781553752] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.04,1.19) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699425.872767641] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2815
+[INFO] [1788699425.981553994] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.18 free=5.08 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699426.081597521] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699426.201212771] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4749 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699426.281556036] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.05,1.19) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699426.331567239] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.09 free=5.09 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699426.631554713] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.91 free=4.91 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699426.781646823] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.05,1.19) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699427.131564921] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699427.224520538] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4780 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699427.231562582] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.52 free=4.52 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699427.281708216] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.04,1.20) measVelENU=(-0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699427.831561614] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.03,1.21) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699428.131582029] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699428.247303699] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4811 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699428.331574887] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.02,1.22) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699428.831580586] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.02,1.21) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699429.181549487] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699429.241910436] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2876
+[INFO] [1788699429.270193076] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4842 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699429.331787969] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.02,1.21) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699429.881558603] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.02,1.22) measVelENU=(0.01,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699429.931564627] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.71 free=4.71 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699430.181604505] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699430.231575153] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.65 free=4.65 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699430.293457220] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4873 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699430.381836076] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.00,1.22) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699430.581684535] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.76 free=4.76 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699430.881602359] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=4.98 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699430.931610186] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,0.00,1.22) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699431.181612584] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699431.231605544] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.53 free=5.53 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699431.316226793] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4904 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699431.481550805] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,0.01,1.22) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699431.981575127] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,0.00,1.22) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699432.231571163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699432.339249496] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4935 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699432.531573834] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,0.00,1.22) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699432.602173932] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2937
+[INFO] [1788699432.731597909] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.23 free=4.23 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699433.031580082] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,0.00,1.22) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699433.031641256] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.53 free=4.53 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699433.281608448] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699433.362243876] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4966 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699433.581631977] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,0.01,1.21) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699433.631567410] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.94 free=4.94 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699433.931570151] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=4.96 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699434.131572115] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.01,1.20) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699434.231557353] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.11 free=5.11 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699434.331560724] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699434.385433277] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=4997 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699434.581579502] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.08 free=5.96 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699434.681573926] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.03,1.21) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699435.231575608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.05,1.21) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699435.331571756] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699435.408224648] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5028 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699435.781563964] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.04,1.21) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699435.962420217] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=2998
+[INFO] [1788699436.281564270] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.03,1.22) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699436.381570897] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699436.431283265] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5059 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699436.681576592] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.18 free=5.18 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699436.781616301] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.03,1.22) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699436.981574584] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=5.25 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699437.281862444] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.03,1.22) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699437.281904051] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.16 free=5.16 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699437.381581907] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699437.454731555] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5090 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699437.581652147] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.63 free=5.63 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699437.831555971] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.22) measVelENU=(-0.01,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699438.381568751] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.04,1.21) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699438.381625357] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699438.477206996] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5121 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699438.931561084] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.03,1.20) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699439.342308006] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3059
+[INFO] [1788699439.381557378] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.23 free=5.23 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699439.431573330] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.03,1.20) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699439.431656936] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699439.500212812] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5152 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699439.981563729] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.04,1.20) measVelENU=(-0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699440.481563702] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699440.523247000] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5183 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699440.531554658] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.14,-0.04,1.21) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699441.031581361] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.04,1.21) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699441.181591537] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.52 free=4.52 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699441.531553222] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699441.546317455] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5214 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699441.581553635] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.04,1.21) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699442.081584245] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.03,1.20) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699442.569262837] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5245 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699442.581552499] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699442.631576405] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.03,1.18) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699442.692349730] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3120
+[INFO] [1788699442.731573905] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=4.97 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699443.081645705] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.82 free=4.82 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699443.181600235] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.03,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699443.381646870] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.71 free=4.71 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699443.581760130] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699443.592222744] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5276 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699443.681576463] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.68 free=4.68 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699443.731564362] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.05,1.18) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699444.281633746] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.05,1.18) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699444.281743921] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.80 free=4.80 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699444.615233686] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5307 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699444.631564943] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699444.831565102] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.15,-0.04,1.18) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699445.381559867] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.05,1.18) measVelENU=(0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699445.638242133] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5338 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699445.681553097] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699445.881564367] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.05,1.19) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699446.063170443] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3181
+[INFO] [1788699446.131567163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.73 free=5.73 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699446.381573184] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.04,1.20) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699446.431581722] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.92 free=4.92 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699446.661242834] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5369 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699446.681669596] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699446.731545949] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.76 free=4.76 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699446.881589546] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.03,1.20) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699447.031571359] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.59 free=4.59 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699447.331554951] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.59 free=4.59 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699447.381606328] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.03,1.20) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699447.631589698] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.48 free=4.48 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699447.684456160] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5400 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699447.731566990] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699447.881789279] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.03,1.21) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699447.931557741] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.52 free=4.52 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699448.431585553] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.03,1.21) measVelENU=(0.01,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699448.707333871] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5431 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699448.781559048] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699448.981571039] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.02,1.21) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699449.432111392] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3242
+[INFO] [1788699449.481726979] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.02,1.21) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699449.481914377] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.21 free=4.21 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699449.730209167] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5462 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699449.781561523] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.15 free=5.15 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699449.781648816] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699450.031579327] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.03,1.20) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699450.381630826] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.01 free=5.01 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699450.581833070] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.04,1.19) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699450.753266711] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5493 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699450.831556967] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699450.981559177] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.50 free=4.50 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699451.131569442] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.04,1.20) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699451.281587161] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.72 free=4.72 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699451.681552421] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.02,1.20) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699451.776192058] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5524 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699451.831566243] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699452.231594521] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.01,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699452.781555700] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.02,1.18) measVelENU=(0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699452.792924860] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3303
+[INFO] [1788699452.799201351] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5555 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699452.831649546] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699453.281599711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.03,1.19) measVelENU=(0.01,-0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699453.822547830] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5586 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699453.831565788] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.04,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699453.881612878] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699454.381562352] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.05,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699454.381607015] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.22 free=5.22 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699454.681553757] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.44 free=5.44 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699454.845254749] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5617 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699454.931572882] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.05,1.18) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699454.931634356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699455.431574823] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.05,1.18) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699455.868319162] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5648 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699455.981554405] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.05,1.18) measVelENU=(-0.01,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699455.981605911] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699456.162119745] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3364
+[INFO] [1788699456.231578489] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.89 free=4.89 trig=0.61 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699456.481590921] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.04,1.18) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699456.481654469] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.10 free=5.10 trig=0.61 loomFill=0.00/0.28 speed=0.02
+[INFO] [1788699456.891229638] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5679 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699456.981614172] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.04,1.19) measVelENU=(-0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699456.981715170] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699457.131555398] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.78 free=5.85 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699457.431577509] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.34 free=5.34 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699457.481617014] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.03,1.19) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699457.914466730] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5710 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699458.031559607] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.02,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699458.031621552] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699458.531562559] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.02,1.19) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699458.937231954] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5741 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699459.031567455] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.02,1.20) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699459.031626174] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699459.522190406] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3425
+[INFO] [1788699459.581558477] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.02,1.22) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699459.960236423] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5772 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699460.081588188] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.03,1.23) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699460.081653720] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699460.181589304] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=4.96 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699460.581657453] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.03,1.24) measVelENU=(0.00,-0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699460.983479073] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5803 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699461.131608430] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.23) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699461.131714547] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699461.331561790] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=4.98 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699461.681555249] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.21) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699462.006246991] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5834 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699462.181554373] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699462.231560806] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.04,1.21) measVelENU=(0.01,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699462.781593554] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.23,-0.03,1.21) measVelENU=(0.01,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699462.891882899] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3486
+[INFO] [1788699463.029258410] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5865 nav=14 arm=2 altENU=1.21 velzENU=0.00
+[INFO] [1788699463.181578528] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699463.231574172] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.19 free=5.66 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699463.331566851] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.01,1.20) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699463.881588979] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.00,1.20) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699464.052200860] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5896 nav=14 arm=2 altENU=1.20 velzENU=0.00
+[INFO] [1788699464.231565446] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699464.381558637] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.85 free=5.85 trig=0.60 loomFill=0.00/0.28 speed=0.01
+[INFO] [1788699464.431556355] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.02,1.20) measVelENU=(-0.00,-0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699464.931576637] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.04,1.20) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699465.075247433] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5927 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699465.281553344] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699465.481558840] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.05,1.19) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699465.981599871] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.06,1.19) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699466.098226149] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5958 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699466.252125574] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3547
+[INFO] [1788699466.281585142] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699466.531592372] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.06,1.18) measVelENU=(-0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699467.081533238] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.05,1.18) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699467.121263954] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=5989 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699467.281784471] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699467.581555313] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.04,1.18) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699468.081555907] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.03,1.19) measVelENU=(0.00,0.01,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699468.081614967] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.61 free=4.61 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699468.144779036] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6020 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699468.331564560] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699468.581600955] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.04,1.19) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699469.081633368] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.04,1.19) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699469.167203419] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6051 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699469.381611616] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699469.631557261] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.05,1.19) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699469.632180851] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3608
+[INFO] [1788699470.131564067] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.05,1.19) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699470.181605816] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.87 free=4.92 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699470.190234530] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6082 nav=14 arm=2 altENU=1.19 velzENU=0.00
+[INFO] [1788699470.381666954] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699470.681607181] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.06,1.18) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699471.213681593] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6113 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699471.231659111] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.06,1.16) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699471.431594386] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699471.781563487] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.16) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699472.236232429] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6144 nav=14 arm=2 altENU=1.16 velzENU=0.00
+[INFO] [1788699472.331560996] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.16) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699472.481567191] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699472.881559556] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.09,1.18) measVelENU=(-0.00,-0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699472.992173294] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3669
+[INFO] [1788699473.259239273] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6175 nav=14 arm=2 altENU=1.18 velzENU=0.00
+[INFO] [1788699473.381663110] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.09,1.19) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699473.481617668] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699473.931548680] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.21) measVelENU=(-0.00,0.01,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699474.181558625] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699474.282208776] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6206 nav=14 arm=2 altENU=1.22 velzENU=0.00
+[INFO] [1788699474.431554362] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,-0.08,1.22) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699474.531555356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699474.781567344] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.95 free=4.95 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699474.931574802] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.09,1.23) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699475.305273575] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6237 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699475.481557041] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.09,1.23) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699475.531659362] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699475.981563173] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.10,1.23) measVelENU=(0.00,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699476.328239210] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6268 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699476.361989857] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3730
+[INFO] [1788699476.481577029] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.11,1.23) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699476.581694871] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699476.631568707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.08 free=5.08 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699476.981585576] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.13,1.23) measVelENU=(-0.00,-0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699477.231555806] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.94 free=4.94 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699477.351221705] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6299 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699477.481594182] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.13,1.23) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699477.481662349] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.78 free=4.84 trig=0.60 loomFill=0.00/0.28 speed=0.00
+[INFO] [1788699477.631566834] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699477.831574583] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.21 free=5.21 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699478.031549731] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.17,-0.11,1.23) measVelENU=(-0.00,0.01,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699478.131566765] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.00 free=5.00 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699478.374380958] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6330 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699478.531555231] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.09,1.22) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699478.631570682] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699479.031570800] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.08,1.23) measVelENU=(0.00,0.01,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699479.397190961] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6361 nav=14 arm=2 altENU=1.23 velzENU=0.00
+[INFO] [1788699479.581555823] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.18,-0.07,1.23) measVelENU=(-0.00,0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699479.681552057] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699479.721932071] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3791
+[INFO] [1788699480.131552647] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.19,-0.07,1.24) measVelENU=(0.00,0.00,0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699480.281663055] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.87 free=4.87 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699480.420256048] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6392 nav=14 arm=2 altENU=1.24 velzENU=0.00
+[INFO] [1788699480.631570760] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.08,1.25) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699480.681567525] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699480.881558692] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.39 free=4.39 trig=0.60 loomFill=0.01/0.28 speed=0.00
+[INFO] [1788699481.131629358] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.20,-0.08,1.24) measVelENU=(-0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699481.181559920] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=5.25 trig=0.60 loomFill=0.01/0.28 speed=0.01
+[INFO] [1788699481.443428383] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6423 nav=14 arm=2 altENU=1.24 velzENU=0.00
+[INFO] [1788699481.681561341] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.21,-0.07,1.24) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699481.681618137] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699482.181589623] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.06,1.24) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699482.466242110] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6454 nav=14 arm=2 altENU=1.24 velzENU=0.00
+[INFO] [1788699482.731567421] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-0.07,1.24) measVelENU=(0.00,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699482.731622553] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699483.092315602] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=3852
+[INFO] [1788699483.281601043] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.24,-0.07,1.24) measVelENU=(0.01,-0.00,-0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699483.489207369] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6485 nav=14 arm=2 altENU=1.24 velzENU=0.00
+[INFO] [1788699483.781608475] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.08,1.24) measVelENU=(0.01,-0.00,0.00) yaw=-2.54 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788699483.781672454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.
+[INFO] [1788699484.331572727] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.26,-0.08,1.24) measVelENU=(0.00,0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699484.512229373] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=6516 nav=14 arm=2 altENU=1.24 velzENU=0.00
+[INFO] [1788699484.831591550] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.25,-0.08,1.24) measVelENU=(-0.01,-0.00,-0.00) yaw=-2.54 yawrate=0.00 active=1 qsize=0
+[INFO] [1788699484.831676187] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] FOLLOW(yaw-only) target=person gap -> holding, re-acquiring.

@@ -1,0 +1,542 @@
+[INFO] [1788700001.428684511] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] started (stream 30Hz).
+[INFO] [1788700001.428760392] [high_level_navigation_node]: [FMU_NODE_DEBUG] observability=off.
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-seg-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 2
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-depth-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 1
+[INFO] [1788700001.538016721] [high_level_navigation_node]: [FMU_NODE_DEBUG] Flight Management Unit Active (control 20Hz, backend owns wire).
+[INFO] [1788700001.538082433] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission started (test=12). queued~=3. objective: Orbit the car one full turn, then land.
+[INFO] [1788700001.538470785] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700001.587962550] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=3
+[INFO] [1788700001.588006883] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] takeoff: STANDBY->HANDSHAKING (warmup start=2).
+[INFO] [1788700001.588026339] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF activated; backend handshaking, FMU streaming climb.
+[INFO] [1788700002.087973989] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700002.556746999] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1
+[INFO] [1788700002.639417980] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700003.088349261] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] FIRST ODOM altENU=0.02 yaw=-0.10
+[INFO] [1788700003.111838532] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=1 setpoints=49 nav=4 arm=1 altENU=0.02 velzENU=2.00
+[INFO] [1788700003.187944748] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=1 posENU=(0.02,-0.01,0.02) measVelENU=(0.01,0.01,-0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700003.309791936] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] OFFBOARD+ARM CONFIRMED at setpoints=55
+[INFO] [1788700003.687972907] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,-0.02,0.02) measVelENU=(-0.01,0.00,-0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700004.134824601] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=80 nav=14 arm=2 altENU=0.02 velzENU=2.00
+[INFO] [1788700004.238098808] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.01,-0.03,0.02) measVelENU=(-0.01,-0.00,-0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788700004.787953905] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.01,-0.04,0.02) measVelENU=(-0.01,-0.01,-0.00) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700005.157996376] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=111 nav=14 arm=2 altENU=0.02 velzENU=2.00
+[INFO] [1788700005.287966726] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.05,0.02) measVelENU=(-0.01,-0.01,-0.01) yaw=-0.10 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700005.837962775] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.05,0.02) measVelENU=(-0.01,-0.00,-0.01) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[INFO] [1788700005.915729038] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=62
+[INFO] [1788700006.180825864] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=142 nav=14 arm=2 altENU=0.03 velzENU=2.00
+[INFO] [1788700006.337967551] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(-0.02,-0.05,0.03) measVelENU=(-0.00,-0.00,0.00) yaw=-0.10 yawrate=-0.00 active=1 qsize=2
+[     0] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:27   [ADDITIONAL_INFO] create_begin
+[     1] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:61   [ADDITIONAL_INFO] create_end
+[INFO] [1788700006.887961376] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.01,-0.04,0.30) measVelENU=(0.09,0.00,0.84) yaw=-0.11 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700007.203831950] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=173 nav=14 arm=2 altENU=0.63 velzENU=2.00
+[INFO] [1788700007.438349734] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.08,-0.03,0.90) measVelENU=(0.08,0.00,1.15) yaw=-0.11 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700007.987944817] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=1 io=2 posENU=(0.09,-0.03,1.62) measVelENU=(0.02,-0.01,1.37) yaw=-0.11 yawrate=0.00 active=1 qsize=2
+[INFO] [1788700008.226819822] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=204 nav=14 arm=2 altENU=1.95 velzENU=2.00
+[INFO] [1788700008.287942651] [high_level_navigation_node]: [FMU_NODE_DEBUG] TAKEOFF->FLIGHT altENU=2.04
+[INFO] [1788700008.287966095] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=takeoff_ok total=1
+[INFO] [1788700008.537967997] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.07,-0.06,2.26) measVelENU=(-0.01,-0.02,0.33) yaw=-0.10 yawrate=-0.00 active=0 qsize=2
+[INFO] [1788700008.837951894] [high_level_navigation_node]: [FMU_NODE_DEBUG] ORBIT activated target=car speed=0.30 angle=6.28 dir=ccw (odometry circle, camera on target)
+[INFO] [1788700008.887943679] [high_level_navigation_node]: [FMU_NODE_DEBUG] ORBIT (hardcoded) target=car centerENU=(4.04,-0.48) R=4.00 alt=4.00 dir=ccw
+[INFO] [1788700008.937943338] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.00/4.00 alt=2.09/4.00 swept=0.00/6.28
+[INFO] [1788700009.087947955] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.05,-0.08,2.00) measVelENU=(-0.02,-0.02,-0.16) yaw=-0.10 yawrate=0.02 active=1 qsize=1
+[INFO] [1788700009.187944618] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=1.99/4.00 swept=0.00/6.28
+[INFO] [1788700009.249810279] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=235 nav=14 arm=2 altENU=2.01 velzENU=1.00
+[INFO] [1788700009.284979184] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=123
+[INFO] [1788700009.437960857] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=2.11/4.00 swept=0.01/6.28
+[INFO] [1788700009.537947010] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.62 free=3.62 trig=0.95 loomFill=0.01/0.28 speed=0.69
+[INFO] [1788700009.637953421] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.04,-0.19,2.25) measVelENU=(-0.02,-0.39,0.62) yaw=-0.03 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700009.737960073] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=2.31/4.00 swept=0.04/6.28
+[INFO] [1788700009.787965483] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.57 free=3.57 trig=0.98 loomFill=0.01/0.28 speed=0.76
+[INFO] [1788700010.037976852] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=3.99/4.00 alt=2.49/4.00 swept=0.08/6.28
+[INFO] [1788700010.137976150] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.05,-0.45,2.55) measVelENU=(-0.02,-0.57,0.52) yaw=0.04 yawrate=0.07 active=1 qsize=1
+[INFO] [1788700010.138040029] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.75 free=3.75 trig=0.99 loomFill=0.00/0.28 speed=0.77
+[INFO] [1788700010.272829508] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=266 nav=14 arm=2 altENU=2.62 velzENU=0.70
+[INFO] [1788700010.338183263] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=3.99/4.00 alt=2.65/4.00 swept=0.12/6.28
+[INFO] [1788700010.438068559] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.54 free=4.54 trig=0.98 loomFill=0.01/0.28 speed=0.77
+[INFO] [1788700010.637947052] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=2.79/4.00 swept=0.17/6.28
+[INFO] [1788700010.687951029] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-0.79,2.82) measVelENU=(-0.03,-0.62,0.43) yaw=0.08 yawrate=0.11 active=1 qsize=1
+[INFO] [1788700010.838591569] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.98 free=2.98 trig=0.97 loomFill=0.01/0.28 speed=0.74
+[INFO] [1788700010.887953442] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=2.90/4.00 swept=0.21/6.28
+[INFO] [1788700011.137967667] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.00/4.00 swept=0.24/6.28
+[INFO] [1788700011.187949532] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=2.94 free=2.94 trig=0.96 loomFill=0.07/0.28 speed=0.72
+[INFO] [1788700011.238019652] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.03,-1.12,3.04) measVelENU=(0.04,-0.62,0.35) yaw=0.16 yawrate=0.17 active=1 qsize=1
+[INFO] [1788700011.295778066] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=297 nav=14 arm=2 altENU=3.06 velzENU=0.47
+[INFO] [1788700011.437943720] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.10/4.00 swept=0.29/6.28
+[INFO] [1788700011.487943609] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.33 trig=0.95 loomFill=0.07/0.28 speed=0.69
+[INFO] [1788700011.687950200] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.18/4.00 swept=0.33/6.28
+[INFO] [1788700011.737972371] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.33 trig=0.94 loomFill=0.07/0.28 speed=0.68
+[INFO] [1788700011.787947103] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,-1.44,3.22) measVelENU=(0.15,-0.60,0.29) yaw=0.26 yawrate=0.13 active=1 qsize=1
+[INFO] [1788700011.937969944] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.26/4.00 swept=0.36/6.28
+[INFO] [1788700012.037992115] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.33 trig=0.94 loomFill=0.07/0.28 speed=0.68
+[INFO] [1788700012.237976504] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.33/4.00 swept=0.41/6.28
+[INFO] [1788700012.318856606] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=328 nav=14 arm=2 altENU=3.35 velzENU=0.33
+[INFO] [1788700012.337964361] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.22,-1.75,3.35) measVelENU=(0.22,-0.59,0.24) yaw=0.33 yawrate=0.13 active=1 qsize=1
+[INFO] [1788700012.338030374] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.33 trig=0.94 loomFill=0.07/0.28 speed=0.67
+[INFO] [1788700012.537984747] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.40/4.00 swept=0.45/6.28
+[INFO] [1788700012.638013299] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.26 free=4.33 trig=0.93 loomFill=0.07/0.28 speed=0.66
+[INFO] [1788700012.645110555] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=184
+[INFO] [1788700012.837978042] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.34,-2.02,3.46) measVelENU=(0.23,-0.57,0.21) yaw=0.40 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700012.838048914] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.46/4.00 swept=0.50/6.28
+[INFO] [1788700012.937976308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.84 free=4.92 trig=0.92 loomFill=0.08/0.28 speed=0.65
+[INFO] [1788700013.137976617] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.51/4.00 swept=0.54/6.28
+[INFO] [1788700013.237998527] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.28 free=4.33 trig=0.92 loomFill=0.08/0.28 speed=0.64
+[INFO] [1788700013.337980192] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.44,-2.28,3.55) measVelENU=(0.24,-0.56,0.18) yaw=0.47 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700013.341820412] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=359 nav=14 arm=2 altENU=3.55 velzENU=0.22
+[INFO] [1788700013.437985281] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.57/4.00 swept=0.58/6.28
+[INFO] [1788700013.737985308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.62/4.00 swept=0.63/6.28
+[INFO] [1788700013.787958478] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.21 free=5.24 trig=0.92 loomFill=0.09/0.28 speed=0.63
+[INFO] [1788700013.887953408] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.58,-2.60,3.64) measVelENU=(0.29,-0.55,0.14) yaw=0.55 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700014.038257101] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.66 free=5.49 trig=0.92 loomFill=0.08/0.28 speed=0.63
+[INFO] [1788700014.038300602] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.66/4.00 swept=0.67/6.28
+[INFO] [1788700014.338174976] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.38 free=5.16 trig=0.91 loomFill=0.08/0.28 speed=0.63
+[INFO] [1788700014.338219609] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.70/4.00 swept=0.72/6.28
+[INFO] [1788700014.364820054] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=390 nav=14 arm=2 altENU=3.70 velzENU=0.15
+[INFO] [1788700014.387959555] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.74,-2.86,3.71) measVelENU=(0.36,-0.50,0.12) yaw=0.63 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700014.638236728] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.73 free=8.60 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700014.638295137] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.07/4.00 alt=3.73/4.00 swept=0.76/6.28
+[INFO] [1788700014.937963698] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.93,-3.11,3.77) measVelENU=(0.41,-0.45,0.09) yaw=0.71 yawrate=0.13 active=1 qsize=1
+[INFO] [1788700014.938017388] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.07/4.00 alt=3.77/4.00 swept=0.80/6.28
+[INFO] [1788700015.237986207] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.07/4.00 alt=3.80/4.00 swept=0.85/6.28
+[INFO] [1788700015.387801462] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=421 nav=14 arm=2 altENU=3.81 velzENU=0.10
+[INFO] [1788700015.437965096] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.14,-3.33,3.81) measVelENU=(0.46,-0.41,0.07) yaw=0.78 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700015.537951530] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.82/4.00 swept=0.89/6.28
+[INFO] [1788700015.838078353] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.84/4.00 swept=0.93/6.28
+[INFO] [1788700015.937967256] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.36,-3.51,3.85) measVelENU=(0.49,-0.36,0.06) yaw=0.86 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700016.015345286] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=245
+[INFO] [1788700016.087945915] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.27 free=8.74 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700016.137980729] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.87/4.00 swept=0.98/6.28
+[INFO] [1788700016.337997638] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.37 free=9.03 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700016.410811093] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=452 nav=14 arm=2 altENU=3.88 velzENU=0.06
+[INFO] [1788700016.438007025] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.60,-3.68,3.89) measVelENU=(0.50,-0.35,0.04) yaw=0.92 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700016.438089869] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.89/4.00 swept=1.02/6.28
+[INFO] [1788700016.638004208] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.13 free=9.08 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700016.737982246] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.90/4.00 swept=1.07/6.28
+[INFO] [1788700016.938321565] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.85,-3.85,3.91) measVelENU=(0.51,-0.33,0.03) yaw=0.99 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700016.938382689] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.28 free=8.80 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700017.037960142] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.92/4.00 swept=1.11/6.28
+[INFO] [1788700017.237948709] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.75 free=7.22 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700017.338246171] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.93/4.00 swept=1.16/6.28
+[INFO] [1788700017.433838325] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=483 nav=14 arm=2 altENU=3.93 velzENU=0.03
+[INFO] [1788700017.487952784] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.14,-4.03,3.93) measVelENU=(0.53,-0.30,0.02) yaw=1.08 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700017.488006003] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.98 free=8.59 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700017.637953274] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.93/4.00 swept=1.20/6.28
+[INFO] [1788700017.738201264] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.89 free=8.45 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700017.887970384] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.94/4.00 swept=1.24/6.28
+[INFO] [1788700017.987955605] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.41,-4.17,3.94) measVelENU=(0.55,-0.25,0.02) yaw=1.16 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700018.037951717] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.10 free=7.77 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700018.187956795] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.94/4.00 swept=1.29/6.28
+[INFO] [1788700018.337962454] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.17 free=6.69 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700018.437976960] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.95/4.00 swept=1.32/6.28
+[INFO] [1788700018.456888070] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=514 nav=14 arm=2 altENU=3.95 velzENU=0.03
+[INFO] [1788700018.537965709] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.72,-4.30,3.95) measVelENU=(0.58,-0.20,0.02) yaw=1.24 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700018.638053020] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.17 free=6.69 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700018.737967079] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.95/4.00 swept=1.37/6.28
+[INFO] [1788700018.937990591] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.17 free=6.69 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700019.037999046] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.01,-4.40,3.95) measVelENU=(0.60,-0.15,0.02) yaw=1.31 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700019.038105514] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.95/4.00 swept=1.41/6.28
+[INFO] [1788700019.237972304] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.17 free=6.69 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700019.337998943] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.95/4.00 swept=1.46/6.28
+[INFO] [1788700019.385085375] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=306
+[INFO] [1788700019.479803504] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=545 nav=14 arm=2 altENU=3.95 velzENU=0.02
+[INFO] [1788700019.487980868] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.09 free=7.18 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700019.587973824] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.36,-4.47,3.95) measVelENU=(0.62,-0.08,0.02) yaw=1.40 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700019.588016122] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.95/4.00 swept=1.50/6.28
+[INFO] [1788700019.737989601] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.67 free=8.22 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700019.887952922] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.95/4.00 swept=1.55/6.28
+[INFO] [1788700020.037997162] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.01 free=9.28 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700020.138262545] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.69,-4.49,3.96) measVelENU=(0.62,-0.03,0.02) yaw=1.48 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700020.138319581] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.96/4.00 swept=1.59/6.28
+[INFO] [1788700020.337965571] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.13 free=9.67 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700020.437947867] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.97/4.00 swept=1.63/6.28
+[INFO] [1788700020.502827581] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=576 nav=14 arm=2 altENU=3.97 velzENU=0.01
+[INFO] [1788700020.587983982] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.54 free=7.65 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700020.638504730] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.00,-4.50,3.98) measVelENU=(0.61,0.00,0.01) yaw=1.56 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700020.687976748] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.98/4.00 swept=1.67/6.28
+[INFO] [1788700020.838261065] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.70 free=8.16 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700020.938262507] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.98/4.00 swept=1.71/6.28
+[INFO] [1788700021.137961896] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.05 free=9.85 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700021.187933352] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.34,-4.49,3.99) measVelENU=(0.61,0.04,0.01) yaw=1.65 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700021.237952087] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=1.75/6.28
+[INFO] [1788700021.437960891] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.89 free=6.09 trig=0.91 loomFill=0.00/0.28 speed=0.61
+[INFO] [1788700021.487964758] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=1.79/6.28
+[INFO] [1788700021.525843000] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=607 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700021.687948696] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.65,-4.47,4.00) measVelENU=(0.61,0.09,0.00) yaw=1.72 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700021.687996164] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.51 free=6.45 trig=0.91 loomFill=0.00/0.28 speed=0.61
+[INFO] [1788700021.737966689] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=1.83/6.28
+[INFO] [1788700021.987947941] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.51 free=6.45 trig=0.91 loomFill=0.00/0.28 speed=0.61
+[INFO] [1788700021.987990160] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=4.00/4.00 swept=1.87/6.28
+[INFO] [1788700022.237959220] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.97,-4.42,4.00) measVelENU=(0.59,0.15,-0.00) yaw=1.81 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700022.238016165] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.51 free=6.45 trig=0.90 loomFill=0.00/0.28 speed=0.61
+[INFO] [1788700022.238023980] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=4.00/4.00 swept=1.90/6.28
+[INFO] [1788700022.538066877] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.51 free=6.45 trig=0.90 loomFill=0.00/0.28 speed=0.61
+[INFO] [1788700022.538174136] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=1.95/6.28
+[INFO] [1788700022.548818396] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=638 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700022.737984070] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.25,-4.32,4.00) measVelENU=(0.57,0.21,-0.00) yaw=1.88 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700022.745306264] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=367
+[INFO] [1788700022.838027931] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=1.99/6.28
+[INFO] [1788700023.038208695] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.27 free=6.94 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700023.088065067] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.00/4.00 swept=2.03/6.28
+[INFO] [1788700023.287964909] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.57,-4.18,4.00) measVelENU=(0.56,0.25,-0.00) yaw=1.96 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700023.338013278] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.80 free=7.30 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700023.338086935] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.00/4.00 alt=4.00/4.00 swept=2.07/6.28
+[INFO] [1788700023.571803879] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=669 nav=14 arm=2 altENU=4.00 velzENU=-0.00
+[INFO] [1788700023.638013536] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=3.99/4.00 alt=4.00/4.00 swept=2.12/6.28
+[INFO] [1788700023.787969141] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.85,-4.04,4.00) measVelENU=(0.55,0.26,-0.00) yaw=2.04 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700023.788036667] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.39 free=8.15 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700023.938339368] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=3.99/4.00 alt=4.00/4.00 swept=2.16/6.28
+[INFO] [1788700024.038338075] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.46 free=7.76 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700024.237950452] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.00/4.00 swept=2.21/6.28
+[INFO] [1788700024.338212959] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.16,-3.89,4.00) measVelENU=(0.55,0.28,0.00) yaw=2.12 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700024.338264976] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.10 free=6.86 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700024.487979623] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=2.25/6.28
+[INFO] [1788700024.594979877] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=700 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700024.637948814] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.89 free=6.17 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700024.787953271] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=4.00/4.00 swept=2.30/6.28
+[INFO] [1788700024.887946107] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.47,-3.73,3.99) measVelENU=(0.51,0.34,0.00) yaw=2.21 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700024.887981813] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.57 free=8.84 trig=0.90 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700025.087957746] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.99/4.00 swept=2.34/6.28
+[INFO] [1788700025.187946133] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.57 free=8.84 trig=0.90 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700025.337988981] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.07/4.00 alt=3.99/4.00 swept=2.38/6.28
+[INFO] [1788700025.387953725] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.71,-3.54,3.99) measVelENU=(0.45,0.41,0.00) yaw=2.29 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700025.437965106] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.57 free=8.84 trig=0.90 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700025.617830089] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=731 nav=14 arm=2 altENU=3.99 velzENU=0.01
+[INFO] [1788700025.637966807] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.99/4.00 swept=2.43/6.28
+[INFO] [1788700025.737978237] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.57 free=8.84 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700025.887960372] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.92,-3.32,3.99) measVelENU=(0.40,0.47,0.01) yaw=2.37 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700025.888023199] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.99/4.00 swept=2.47/6.28
+[INFO] [1788700026.037957705] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.57 free=8.84 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700026.115663004] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=428
+[INFO] [1788700026.187958064] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=2.51/6.28
+[INFO] [1788700026.437974161] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.13,-3.05,4.00) measVelENU=(0.37,0.50,0.00) yaw=2.45 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700026.438044392] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.81 free=7.23 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700026.438054681] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=2.55/6.28
+[INFO] [1788700026.640836731] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=762 nav=14 arm=2 altENU=4.01 velzENU=-0.00
+[INFO] [1788700026.738925747] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.68 free=8.48 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700026.738985949] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=2.60/6.28
+[INFO] [1788700026.987953176] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.34,-2.77,4.01) measVelENU=(0.35,0.51,-0.00) yaw=2.53 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700027.037977711] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.66 free=7.66 trig=0.91 loomFill=0.01/0.28 speed=0.62
+[INFO] [1788700027.038026672] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=2.64/6.28
+[INFO] [1788700027.338193819] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=2.69/6.28
+[INFO] [1788700027.387946389] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=8.56 free=8.56 trig=0.90 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700027.537977144] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.53,-2.51,4.00) measVelENU=(0.31,0.52,-0.00) yaw=2.62 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700027.637971382] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.88 free=7.51 trig=0.90 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700027.638013200] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=2.73/6.28
+[INFO] [1788700027.663823777] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=793 nav=14 arm=2 altENU=4.00 velzENU=-0.00
+[INFO] [1788700027.937951051] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.25 free=7.28 trig=0.90 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700027.937998539] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=2.77/6.28
+[INFO] [1788700028.087990793] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.68,-2.21,3.99) measVelENU=(0.25,0.56,0.00) yaw=2.70 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700028.237973279] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=7.48 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700028.238019014] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=2.82/6.28
+[INFO] [1788700028.538012528] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=7.48 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700028.538089722] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=2.87/6.28
+[INFO] [1788700028.637971320] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.81,-1.89,3.99) measVelENU=(0.21,0.59,0.01) yaw=2.78 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700028.686853311] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=824 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700028.837986887] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=7.48 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700028.838054733] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=2.92/6.28
+[INFO] [1788700029.137968940] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=7.48 trig=0.91 loomFill=0.09/0.28 speed=0.62
+[INFO] [1788700029.138039832] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=2.96/6.28
+[INFO] [1788700029.187947930] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.92,-1.55,4.00) measVelENU=(0.16,0.60,0.00) yaw=2.87 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700029.437949139] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.96 free=7.48 trig=0.91 loomFill=0.09/0.28 speed=0.61
+[INFO] [1788700029.437988903] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=3.01/6.28
+[INFO] [1788700029.475067880] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=489
+[INFO] [1788700029.687959035] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(8.00,-1.26,3.99) measVelENU=(0.11,0.60,0.00) yaw=2.95 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700029.688016482] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.16 free=8.30 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700029.688026310] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=3.05/6.28
+[INFO] [1788700029.709815851] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=855 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700029.987959382] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.41 free=8.90 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700029.988028651] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=3.09/6.28
+[INFO] [1788700030.187966943] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(8.04,-0.95,3.99) measVelENU=(0.06,0.61,0.01) yaw=3.02 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700030.287955451] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.34 free=9.65 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700030.288013919] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=3.14/6.28
+[INFO] [1788700030.538208408] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.75 free=11.03 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700030.538287435] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=3.18/6.28
+[INFO] [1788700030.732842219] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=886 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700030.738412876] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(8.07,-0.62,3.99) measVelENU=(0.02,0.62,0.01) yaw=3.11 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700030.837946708] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.91 free=9.67 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700030.837982274] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=3.22/6.28
+[INFO] [1788700031.087963095] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.33 free=9.56 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700031.088098367] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=3.26/6.28
+[INFO] [1788700031.287963413] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(8.07,-0.27,3.99) measVelENU=(-0.04,0.61,0.00) yaw=-3.09 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700031.337985784] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.55 free=9.02 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700031.387957411] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=3.31/6.28
+[INFO] [1788700031.637960323] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.05 free=10.12 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700031.638007601] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=3.35/6.28
+[INFO] [1788700031.755828302] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=917 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700031.837969267] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(8.04,0.07,3.99) measVelENU=(-0.09,0.60,0.00) yaw=-3.01 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700031.938032353] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.05 free=10.12 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700031.938102433] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=3.39/6.28
+[INFO] [1788700032.238015308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.05 free=10.12 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700032.238097330] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=3.44/6.28
+[INFO] [1788700032.337975342] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.98,0.36,4.00) measVelENU=(-0.14,0.59,0.00) yaw=-2.93 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700032.538043887] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.05 free=10.12 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700032.538142039] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=3.48/6.28
+[INFO] [1788700032.778859458] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=948 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700032.837997046] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.90,0.65,4.00) measVelENU=(-0.19,0.58,0.00) yaw=-2.86 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700032.838079299] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.05 free=10.12 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700032.838091291] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=3.53/6.28
+[INFO] [1788700032.845288502] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=550
+[INFO] [1788700033.137997984] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.82 free=11.98 trig=0.91 loomFill=0.05/0.28 speed=0.61
+[INFO] [1788700033.138066191] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=3.57/6.28
+[INFO] [1788700033.338151577] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.79,0.95,4.00) measVelENU=(-0.22,0.57,0.00) yaw=-2.78 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700033.438388145] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.52 free=11.43 trig=0.91 loomFill=0.05/0.28 speed=0.61
+[INFO] [1788700033.438447365] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.00/4.00 swept=3.62/6.28
+[INFO] [1788700033.737984651] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.86 free=11.18 trig=0.91 loomFill=0.06/0.28 speed=0.62
+[INFO] [1788700033.738034033] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.01/4.00 swept=3.67/6.28
+[INFO] [1788700033.801794005] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=979 nav=14 arm=2 altENU=4.01 velzENU=-0.01
+[INFO] [1788700033.838356982] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.66,1.24,4.02) measVelENU=(-0.25,0.57,-0.00) yaw=-2.70 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700034.038220816] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.67 free=10.37 trig=0.91 loomFill=0.06/0.28 speed=0.62
+[INFO] [1788700034.038264948] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.02/4.00 swept=3.72/6.28
+[INFO] [1788700034.338279301] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.66 free=10.54 trig=0.91 loomFill=0.06/0.28 speed=0.62
+[INFO] [1788700034.338340274] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.03/4.00 swept=3.76/6.28
+[INFO] [1788700034.387951531] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.51,1.56,4.03) measVelENU=(-0.30,0.54,-0.01) yaw=-2.61 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700034.637948181] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.03/4.00 swept=3.81/6.28
+[INFO] [1788700034.687948902] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.88 free=10.35 trig=0.91 loomFill=0.00/0.28 speed=0.62
+[INFO] [1788700034.825011146] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1010 nav=14 arm=2 altENU=4.02 velzENU=-0.01
+[INFO] [1788700034.887956453] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.34,1.83,4.02) measVelENU=(-0.35,0.51,-0.01) yaw=-2.54 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700034.887998081] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.02/4.00 swept=3.85/6.28
+[INFO] [1788700035.187951921] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.02/4.00 swept=3.90/6.28
+[INFO] [1788700035.437978106] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(7.14,2.09,4.02) measVelENU=(-0.39,0.47,-0.01) yaw=-2.45 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700035.438040933] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.02/4.00 swept=3.93/6.28
+[INFO] [1788700035.738079942] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=3.98/6.28
+[INFO] [1788700035.847803428] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1041 nav=14 arm=2 altENU=4.01 velzENU=-0.00
+[INFO] [1788700035.937979492] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.94,2.31,4.01) measVelENU=(-0.43,0.44,-0.01) yaw=-2.37 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700036.037970183] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=4.02/6.28
+[INFO] [1788700036.205097895] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=611
+[INFO] [1788700036.287948480] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.20 free=9.09 trig=0.91 loomFill=0.05/0.28 speed=0.61
+[INFO] [1788700036.287990468] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=4.06/6.28
+[INFO] [1788700036.437987831] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.72,2.52,4.01) measVelENU=(-0.45,0.40,-0.00) yaw=-2.30 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700036.538054433] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.48 free=8.45 trig=0.90 loomFill=0.05/0.28 speed=0.61
+[INFO] [1788700036.538163586] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=4.10/6.28
+[INFO] [1788700036.838075288] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.18 free=8.88 trig=0.90 loomFill=0.05/0.28 speed=0.60
+[INFO] [1788700036.838125281] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=4.14/6.28
+[INFO] [1788700036.870832359] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1072 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700036.987951055] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.47,2.72,4.00) measVelENU=(-0.48,0.36,0.00) yaw=-2.22 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700037.138360374] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=4.18/6.28
+[INFO] [1788700037.238264334] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.24 free=8.81 trig=0.90 loomFill=0.05/0.28 speed=0.61
+[INFO] [1788700037.437964203] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.99/4.00 swept=4.23/6.28
+[INFO] [1788700037.487960595] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(6.22,2.89,3.99) measVelENU=(-0.51,0.33,0.00) yaw=-2.14 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700037.538600935] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.28 free=8.45 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700037.687972124] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.99/4.00 swept=4.27/6.28
+[INFO] [1788700037.837955701] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.24 free=8.81 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700037.893833128] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1103 nav=14 arm=2 altENU=3.99 velzENU=0.01
+[INFO] [1788700037.987968784] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.96,3.05,3.99) measVelENU=(-0.53,0.31,0.01) yaw=-2.07 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700037.988028144] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.99/4.00 swept=4.32/6.28
+[INFO] [1788700038.137966307] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.93 free=7.85 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700038.287950485] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.99/4.00 swept=4.36/6.28
+[INFO] [1788700038.437953409] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=7.84 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700038.537996157] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.66,3.21,4.00) measVelENU=(-0.56,0.26,0.00) yaw=-1.99 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700038.538093598] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=4.40/6.28
+[INFO] [1788700038.737966078] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=7.84 trig=0.91 loomFill=0.06/0.28 speed=0.62
+[INFO] [1788700038.837967209] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=4.45/6.28
+[INFO] [1788700038.916873951] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1134 nav=14 arm=2 altENU=4.00 velzENU=-0.00
+[INFO] [1788700039.037971744] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=7.84 trig=0.91 loomFill=0.06/0.28 speed=0.62
+[INFO] [1788700039.087957868] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.34,3.34,4.00) measVelENU=(-0.58,0.20,-0.00) yaw=-1.90 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700039.088031625] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=4.48/6.28
+[INFO] [1788700039.338014169] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=7.84 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700039.338082075] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=4.52/6.28
+[INFO] [1788700039.575577333] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=672
+[INFO] [1788700039.637967808] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(5.03,3.44,4.00) measVelENU=(-0.59,0.15,-0.00) yaw=-1.82 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700039.638031707] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.46 free=7.84 trig=0.90 loomFill=0.08/0.28 speed=0.60
+[INFO] [1788700039.638041595] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=4.56/6.28
+[INFO] [1788700039.938230502] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.97 free=7.26 trig=0.90 loomFill=0.08/0.28 speed=0.60
+[INFO] [1788700039.938289402] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=4.61/6.28
+[INFO] [1788700039.939810800] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1165 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700040.138225981] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.76,3.50,3.99) measVelENU=(-0.59,0.09,0.00) yaw=-1.74 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700040.237955487] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.54 free=7.26 trig=0.90 loomFill=0.08/0.28 speed=0.60
+[INFO] [1788700040.237997054] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=4.65/6.28
+[INFO] [1788700040.538238889] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.77 free=7.06 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700040.538287780] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=4.69/6.28
+[INFO] [1788700040.638410116] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.45,3.54,3.99) measVelENU=(-0.61,0.04,0.00) yaw=-1.67 yawrate=0.14 active=1 qsize=1
+[INFO] [1788700040.837964114] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.24 free=7.48 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700040.838006723] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=4.74/6.28
+[INFO] [1788700040.962863425] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1196 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700041.138254690] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.64 free=7.69 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700041.138324289] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=4.79/6.28
+[INFO] [1788700041.187969479] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(4.11,3.55,3.99) measVelENU=(-0.62,-0.00,0.01) yaw=-1.59 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700041.437972961] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.47 free=7.69 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700041.438028444] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.99/4.00 swept=4.83/6.28
+[INFO] [1788700041.737974009] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.78,3.53,3.99) measVelENU=(-0.61,-0.04,0.00) yaw=-1.51 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700041.738026336] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=7.99 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700041.738033289] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.99/4.00 swept=4.88/6.28
+[INFO] [1788700041.985834517] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1227 nav=14 arm=2 altENU=3.99 velzENU=0.00
+[INFO] [1788700042.037961090] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=7.99 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700042.038018978] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=3.99/4.00 swept=4.92/6.28
+[INFO] [1788700042.287951248] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.44,3.49,3.98) measVelENU=(-0.61,-0.09,0.00) yaw=-1.42 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700042.287997825] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=7.99 trig=0.91 loomFill=0.08/0.28 speed=0.62
+[INFO] [1788700042.338004356] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.98/4.00 swept=4.97/6.28
+[INFO] [1788700042.587960260] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=7.99 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700042.588014471] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.98/4.00 swept=5.01/6.28
+[INFO] [1788700042.787957121] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(3.14,3.43,3.98) measVelENU=(-0.60,-0.12,0.01) yaw=-1.34 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700042.837968221] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.58 free=7.99 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700042.838026840] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=3.98/4.00 swept=5.05/6.28
+[INFO] [1788700042.945709412] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=733
+[INFO] [1788700043.008812783] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1258 nav=14 arm=2 altENU=3.99 velzENU=0.01
+[INFO] [1788700043.137982173] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.78 free=7.87 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700043.138048666] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=5.09/6.28
+[INFO] [1788700043.287961322] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.84,3.38,3.98) measVelENU=(-0.59,-0.16,0.01) yaw=-1.27 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700043.438263181] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.77 free=7.38 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700043.438312642] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.98/4.00 swept=5.13/6.28
+[INFO] [1788700043.738002381] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.50 free=6.81 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700043.738054558] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.98/4.00 swept=5.18/6.28
+[INFO] [1788700043.787969349] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.55,3.30,3.98) measVelENU=(-0.57,-0.22,0.01) yaw=-1.19 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700044.031838056] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1289 nav=14 arm=2 altENU=3.98 velzENU=0.01
+[INFO] [1788700044.037953305] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.01 free=8.15 trig=0.90 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700044.037982139] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.06/4.00 alt=3.98/4.00 swept=5.22/6.28
+[INFO] [1788700044.287969181] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.33 free=7.34 trig=0.91 loomFill=0.08/0.28 speed=0.61
+[INFO] [1788700044.288038069] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.05/4.00 alt=3.98/4.00 swept=5.26/6.28
+[INFO] [1788700044.337962558] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.26,3.16,3.98) measVelENU=(-0.54,-0.29,0.01) yaw=-1.12 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700044.537991318] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.01 free=7.60 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700044.538048835] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=3.99/4.00 swept=5.30/6.28
+[INFO] [1788700044.838329743] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(2.01,3.01,3.99) measVelENU=(-0.51,-0.34,0.01) yaw=-1.04 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700044.838383432] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.73 free=7.24 trig=0.90 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700044.838391257] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=3.99/4.00 swept=5.34/6.28
+[INFO] [1788700045.054850915] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1320 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700045.137988123] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=8.47 trig=0.90 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700045.138055608] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=5.38/6.28
+[INFO] [1788700045.387944087] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.74,2.81,4.01) measVelENU=(-0.49,-0.36,0.00) yaw=-0.96 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700045.438356813] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=8.47 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700045.438459234] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=5.43/6.28
+[INFO] [1788700045.737983715] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=8.47 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700045.738058704] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.01/4.00 swept=5.48/6.28
+[INFO] [1788700045.937985084] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.47,2.61,4.01) measVelENU=(-0.48,-0.39,-0.01) yaw=-0.88 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700046.037968011] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=8.47 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700046.038025308] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.01/4.00 alt=4.01/4.00 swept=5.52/6.28
+[INFO] [1788700046.077859787] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1351 nav=14 arm=2 altENU=4.01 velzENU=-0.01
+[INFO] [1788700046.305488922] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=794
+[INFO] [1788700046.338001238] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.47 free=8.47 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700046.338059667] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=5.57/6.28
+[INFO] [1788700046.487949529] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(1.20,2.37,4.01) measVelENU=(-0.45,-0.42,-0.01) yaw=-0.79 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700046.638182169] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.09 free=6.49 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700046.638231792] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=5.62/6.28
+[INFO] [1788700046.937957006] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=6.84 free=6.94 trig=0.91 loomFill=0.00/0.28 speed=0.62
+[INFO] [1788700046.938035712] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=5.67/6.28
+[INFO] [1788700046.987966633] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.98,2.14,4.00) measVelENU=(-0.42,-0.45,-0.00) yaw=-0.71 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700047.100812665] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1382 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700047.187976568] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.77 free=7.77 trig=0.91 loomFill=0.01/0.28 speed=0.62
+[INFO] [1788700047.188071645] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=5.71/6.28
+[INFO] [1788700047.437992754] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=5.08 free=6.56 trig=0.91 loomFill=0.07/0.28 speed=0.62
+[INFO] [1788700047.487951817] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=5.76/6.28
+[INFO] [1788700047.537987663] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.76,1.86,4.00) measVelENU=(-0.37,-0.50,0.00) yaw=-0.63 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700047.737972732] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=5.80/6.28
+[INFO] [1788700047.787963635] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.77 free=4.59 trig=0.91 loomFill=0.01/0.28 speed=0.62
+[INFO] [1788700048.037971415] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=5.84/6.28
+[INFO] [1788700048.087948772] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.57,1.57,4.01) measVelENU=(-0.31,-0.53,-0.00) yaw=-0.54 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700048.123799255] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1413 nav=14 arm=2 altENU=4.01 velzENU=-0.00
+[INFO] [1788700048.337962423] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=5.89/6.28
+[INFO] [1788700048.587955015] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.42,1.29,4.01) measVelENU=(-0.27,-0.55,-0.00) yaw=-0.46 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700048.588015338] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=5.93/6.28
+[INFO] [1788700048.838049156] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.01/4.00 swept=5.97/6.28
+[INFO] [1788700049.137990622] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.28,0.98,4.01) measVelENU=(-0.23,-0.57,-0.00) yaw=-0.37 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700049.138056705] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.01/4.00 swept=6.01/6.28
+[INFO] [1788700049.146844934] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1444 nav=14 arm=2 altENU=4.01 velzENU=-0.00
+[INFO] [1788700049.437981631] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=6.06/6.28
+[INFO] [1788700049.675203670] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=855
+[INFO] [1788700049.687948134] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.16,0.65,4.00) measVelENU=(-0.17,-0.59,-0.00) yaw=-0.28 yawrate=0.16 active=1 qsize=1
+[INFO] [1788700049.688019447] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=6.10/6.28
+[INFO] [1788700049.737951800] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=3.90 free=4.61 trig=0.91 loomFill=0.07/0.28 speed=0.61
+[INFO] [1788700049.938190040] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.04/4.00 alt=4.00/4.00 swept=6.14/6.28
+[INFO] [1788700050.037980609] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=7.55 free=8.83 trig=0.91 loomFill=0.01/0.28 speed=0.61
+[INFO] [1788700050.169829470] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1475 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700050.187956862] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.10,0.35,4.00) measVelENU=(-0.11,-0.60,0.00) yaw=-0.21 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700050.237946272] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.03/4.00 alt=4.00/4.00 swept=6.18/6.28
+[INFO] [1788700050.338170066] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.73 free=7.51 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700050.487957398] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=6.22/6.28
+[INFO] [1788700050.637959600] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.20 free=6.78 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700050.737959738] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.05,0.03,4.00) measVelENU=(-0.07,-0.61,0.00) yaw=-0.13 yawrate=0.15 active=1 qsize=1
+[INFO] [1788700050.738006214] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] ORBIT target=car dist=4.02/4.00 alt=4.00/4.00 swept=6.26/6.28
+[INFO] [1788700050.938223665] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.68 free=7.77 trig=0.91 loomFill=0.06/0.28 speed=0.61
+[INFO] [1788700050.938263369] [high_level_navigation_node]: [FMU_NODE_DEBUG] ORBIT complete target=car swept=6.29/6.28 rad
+[INFO] [1788700050.938268589] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=orbit_ok total=2
+[INFO] [1788700051.192833081] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1506 nav=14 arm=2 altENU=4.00 velzENU=0.00
+[INFO] [1788700051.237987321] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=2 io=2 posENU=(0.02,-0.28,4.00) measVelENU=(-0.03,-0.55,0.01) yaw=-0.06 yawrate=0.07 active=0 qsize=1
+[INFO] [1788700051.238061789] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] BOUNDARY nearest=4.72 free=8.97 trig=0.88 loomFill=0.06/0.28 speed=0.55
+[INFO] [1788700051.487964424] [high_level_navigation_node]: [FMU_NODE_DEBUG] LAND activated; FMU streaming descent.
+[INFO] [1788700051.538189381] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=4.00 vLand=-0.500
+[INFO] [1788700051.787971001] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.01,-0.45,3.95) measVelENU=(0.00,-0.18,-0.40) yaw=-0.04 yawrate=-0.01 active=1 qsize=0
+[INFO] [1788700051.837974116] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.94 vLand=-0.500
+[INFO] [1788700052.137973319] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.77 vLand=-0.500
+[INFO] [1788700052.215818808] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1537 nav=14 arm=2 altENU=3.73 velzENU=-0.50
+[INFO] [1788700052.337998162] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.02,-0.48,3.66) measVelENU=(-0.00,-0.02,-0.53) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700052.437982311] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.60 vLand=-0.500
+[INFO] [1788700052.737968089] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.45 vLand=-0.500
+[INFO] [1788700052.887946857] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.04,-0.48,3.37) measVelENU=(0.00,0.02,-0.52) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700053.037979144] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.29 vLand=-0.500
+[INFO] [1788700053.045449533] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=916
+[INFO] [1788700053.238833048] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1568 nav=14 arm=2 altENU=3.19 velzENU=-0.50
+[INFO] [1788700053.338108179] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=3.14 vLand=-0.500
+[INFO] [1788700053.387991441] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.04,-0.48,3.11) measVelENU=(0.01,0.02,-0.52) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700053.638249817] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.99 vLand=-0.500
+[INFO] [1788700053.937951337] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.04,-0.47,2.84) measVelENU=(0.01,0.02,-0.51) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700053.937997413] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.84 vLand=-0.500
+[INFO] [1788700054.238311982] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.69 vLand=-0.500
+[INFO] [1788700054.261819988] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1599 nav=14 arm=2 altENU=2.67 velzENU=-0.50
+[INFO] [1788700054.438233873] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.04,-0.46,2.58) measVelENU=(0.01,0.03,-0.51) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700054.538258517] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.53 vLand=-0.500
+[INFO] [1788700054.837983170] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.38 vLand=-0.500
+[INFO] [1788700054.987943724] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.02,-0.43,2.29) measVelENU=(0.02,0.03,-0.51) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700055.137949742] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.23 vLand=-0.500
+[INFO] [1788700055.284838205] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1630 nav=14 arm=2 altENU=2.15 velzENU=-0.50
+[INFO] [1788700055.387985214] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=2.09 vLand=-0.500
+[INFO] [1788700055.487944306] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(-0.00,-0.41,2.04) measVelENU=(0.02,0.03,-0.51) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700055.687941968] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.94 vLand=-0.500
+[INFO] [1788700055.937949177] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.82 vLand=-0.500
+[INFO] [1788700055.987948174] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.00,-0.38,1.78) measVelENU=(0.01,0.03,-0.50) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700056.187955464] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.68 vLand=-0.500
+[INFO] [1788700056.307822218] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1661 nav=14 arm=2 altENU=1.62 velzENU=-0.50
+[INFO] [1788700056.415206916] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=977
+[INFO] [1788700056.438327822] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.56 vLand=-0.500
+[INFO] [1788700056.538177551] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.02,-0.36,1.52) measVelENU=(0.02,0.02,-0.50) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700056.737964200] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.42 vLand=-0.500
+[INFO] [1788700057.038452222] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.04,-0.35,1.27) measVelENU=(0.01,0.02,-0.50) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700057.038501183] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.27 vLand=-0.500
+[INFO] [1788700057.330836267] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1692 nav=14 arm=2 altENU=1.12 velzENU=-0.50
+[INFO] [1788700057.338211729] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=1.12 vLand=-0.500
+[INFO] [1788700057.587961469] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.04,-0.35,0.99) measVelENU=(0.01,0.01,-0.51) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700057.637970455] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.97 vLand=-0.476
+[INFO] [1788700057.937995236] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.84 vLand=-0.374
+[INFO] [1788700058.137993448] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.05,-0.34,0.76) measVelENU=(0.01,0.02,-0.38) yaw=-0.03 yawrate=0.00 active=1 qsize=0
+[INFO] [1788700058.237954785] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.72 vLand=-0.303
+[INFO] [1788700058.353879490] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1723 nav=14 arm=2 altENU=0.69 velzENU=-0.29
+[INFO] [1788700058.537964087] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.64 vLand=-0.257
+[INFO] [1788700058.687951301] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.06,-0.34,0.60) measVelENU=(0.01,0.01,-0.26) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700058.837978989] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.57 vLand=-0.222
+[INFO] [1788700059.137975447] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.50 vLand=-0.196
+[INFO] [1788700059.187955880] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.07,-0.34,0.49) measVelENU=(0.00,0.01,-0.20) yaw=-0.03 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700059.376816065] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1754 nav=14 arm=2 altENU=0.45 velzENU=-0.18
+[INFO] [1788700059.437959672] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.44 vLand=-0.174
+[INFO] [1788700059.737946822] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.06,-0.32,0.39) measVelENU=(0.00,0.01,-0.16) yaw=-0.03 yawrate=0.00 active=1 qsize=0
+[INFO] [1788700059.737991475] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.39 vLand=-0.158
+[INFO] [1788700059.785198472] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1038
+[INFO] [1788700060.037957978] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.34 vLand=-0.147
+[INFO] [1788700060.237986276] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.06,-0.30,0.31) measVelENU=(-0.00,0.01,-0.14) yaw=-0.02 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700060.338363746] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.30 vLand=-0.138
+[INFO] [1788700060.399818041] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1785 nav=14 arm=2 altENU=0.29 velzENU=-0.14
+[INFO] [1788700060.637988473] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.26 vLand=-0.131
+[INFO] [1788700060.738323233] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.05,-0.28,0.24) measVelENU=(-0.00,0.02,-0.12) yaw=-0.02 yawrate=0.00 active=1 qsize=0
+[INFO] [1788700060.937958672] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.22 vLand=-0.127
+[INFO] [1788700061.237977671] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.19 vLand=-0.124
+[INFO] [1788700061.287947654] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.04,-0.25,0.18) measVelENU=(-0.00,0.01,-0.12) yaw=-0.02 yawrate=-0.00 active=1 qsize=0
+[INFO] [1788700061.422822050] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=2 setpoints=1816 nav=14 arm=2 altENU=0.17 velzENU=-0.12
+[INFO] [1788700061.537978046] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.16 vLand=-0.121
+[INFO] [1788700061.837994721] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=3 io=2 posENU=(0.04,-0.24,0.12) measVelENU=(-0.00,0.01,-0.11) yaw=-0.02 yawrate=0.00 active=1 qsize=0
+[INFO] [1788700061.838061625] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] LAND altENU=0.12 vLand=-0.120
+[INFO] [1788700062.087987212] [high_level_navigation_node]: [FMU_NODE_DEBUG] LANDING->STANDBY altENU=0.10 (force_disarm)
+[INFO] [1788700062.088022287] [high_level_navigation_node]: [FMU_NODE_DEBUG] task complete status=land_ok total=3
+[INFO] [1788700062.088028239] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission complete after LAND; VLM planning halted.
+[INFO] [1788700062.387951290] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.04,-0.22,0.03) measVelENU=(-0.02,0.01,0.00) yaw=-0.02 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700062.445817042] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1847 nav=14 arm=1 altENU=0.03 velzENU=0.00
+[INFO] [1788700062.887962400] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.05,-0.21,0.04) measVelENU=(-0.01,0.01,0.01) yaw=-0.02 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700063.145345392] [high_level_navigation_node]: [FMU_NODE_DEBUG] camera frame rx: 1280x720 encoding=bgr8 count=1099
+[INFO] [1788700063.437955306] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.05,-0.22,0.05) measVelENU=(-0.01,0.00,0.01) yaw=-0.02 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700063.468812085] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1878 nav=14 arm=1 altENU=0.05 velzENU=0.00
+[INFO] [1788700063.937956589] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.05,-0.22,0.06) measVelENU=(-0.01,-0.00,0.01) yaw=-0.02 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788700064.437968120] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.05,-0.22,0.07) measVelENU=(-0.00,-0.00,0.01) yaw=-0.03 yawrate=-0.00 active=0 qsize=0
+[INFO] [1788700064.491811905] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1909 nav=14 arm=1 altENU=0.07 velzENU=0.00

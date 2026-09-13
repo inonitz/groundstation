@@ -11,9 +11,11 @@
 #   ./run.sh                                # demo: up ~30 min, assesses once
 #   HEADLESS_TIMEOUT_SECONDS=150 ./run.sh   # short self-test / CI
 #
-# Logs (fmu.log, dashboard.log, assess.log, verdict.txt, sim.log) land in
-# ./logs_<timestamp>/. The stack (PX4, gz, FMU, VLM) is a child process with its
-# own cleanup trap; this wrapper only owns the dashboard bridge + assessor.
+# Logs (dashboard.log, dashboard.stderr, assess.log, verdict.txt, sim.log) land in
+# ./logs_<timestamp>/. The FMU's own pane log lands in
+# ../../test/sitl/runs/follow/captured_panes_log.txt -- the SITL harness sets its own
+# LOG_FILE, so logs_<timestamp>/fmu.log is not written. The stack (PX4, gz, FMU, VLM) is a
+# child process with its own cleanup trap; this wrapper only owns the dashboard bridge + assessor.
 #
 # Needs: PX4 built, gz, the ONNX vision + Qwen VLM models, MicroXRCEAgent.
 set -u

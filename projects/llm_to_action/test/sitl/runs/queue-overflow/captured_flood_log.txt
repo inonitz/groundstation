@@ -1,0 +1,62 @@
+[INFO] [1788700079.890045399] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] started (stream 30Hz).
+[INFO] [1788700079.890129745] [high_level_navigation_node]: [FMU_NODE_DEBUG] observability=off.
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-seg-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 2
+[INFO] Inference device: CPU
+[INFO] Model loaded: /root/models/vision/yolo26n-depth-384.onnx
+[INFO] Input shape: 384x384
+[INFO] Batch size: 1
+[INFO] Inputs: 1, Outputs: 1
+[INFO] [1788700079.999722608] [high_level_navigation_node]: [FMU_NODE_DEBUG] Flight Management Unit Active (control 20Hz, backend owns wire).
+[WARN] [1788700079.999760508] [high_level_navigation_node]: [FMU_NODE_DEBUG] QUEUE-OVERFLOW test: 100 actions vs queue cap 60.
+[WARN] [1788700079.999872667] [high_level_navigation_node]: [FMU_NODE_DEBUG] VLM plan has 100 actions (cap=60); overflow dropped by backpressure.
+[WARN] [1788700079.999879790] [high_level_navigation_node]: [FMU_NODE_DEBUG] plan rejected: not airborne and first action is 'stop', not takeoff -- discarding whole plan, re-asking VLM.
+[INFO] [1788700079.999893726] [high_level_navigation_node]: [FMU_NODE_DEBUG] Mission started (test=3). queued~=0. objective: Backpressure flood test: 100 actions vs the queue cap.
+[INFO] [1788700080.000271228] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=1 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700080.049998139] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700080.599707886] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700081.012214248] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=32 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700081.099774628] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700081.649682654] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700082.035147200] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=63 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700082.150007145] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700082.699665096] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700083.058163298] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=94 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700083.199666066] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700083.699715967] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700084.081188101] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=125 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700084.249751640] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700084.799726019] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[     0] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:27   [ADDITIONAL_INFO] create_begin
+[     1] /root/groundstation/projects/llm_to_action/source/fmu/threadpool.hpp:61   [ADDITIONAL_INFO] create_end
+[INFO] [1788700085.104568055] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=156 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700085.299763748] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700085.849710987] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700086.127195418] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=187 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700086.399657243] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700086.899694701] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700087.150166723] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=218 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700087.449659893] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700087.949719422] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700088.173199971] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=249 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700088.449727323] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700088.999673269] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700089.196202130] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=280 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700089.549716465] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700090.099703587] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700090.219595597] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=311 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700090.649686862] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700091.149759364] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700091.242527937] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=342 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700091.699709316] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700092.249714502] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700092.265156371] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=373 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700092.799673662] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700093.288210887] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=404 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700093.299747415] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700093.799753414] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
+[INFO] [1788700094.311238704] [high_level_navigation_node]: [PX4_BACKEND_DEBUG] io=0 setpoints=435 nav=0 arm=0 altENU=0.00 velzENU=0.00
+[INFO] [1788700094.349685163] [high_level_navigation_node]: [FMU_NODE_DIAGNOSTICS] fs=0 io=0 posENU=(0.00,0.00,0.00) measVelENU=(0.00,0.00,0.00) yaw=0.00 yawrate=0.00 active=0 qsize=0
