@@ -1,0 +1,16 @@
+depth-anything-base-q4_k CPU-2t    bench: out=504x504 threads=2 load=80.7ms infer=2758.5ms/iter (median over 15, min=2745.7 max=3226.8 p90=2770.6)
+depth-anything-base-q4_k CPU-8t    bench: out=504x504 threads=8 load=38.1ms infer=806.4ms/iter (median over 15, min=799.8 max=1112.1 p90=816.9)
+depth-anything-base-q4_k CPU-16t   bench: out=504x504 threads=16 load=38.2ms infer=584.2ms/iter (median over 15, min=574.7 max=921.8 p90=594.6)
+depth-anything-base-q4_k GPU-vulkan 
+depth-anything-base-q8_0 CPU-2t    bench: out=504x504 threads=2 load=58.3ms infer=2248.6ms/iter (median over 15, min=2238.2 max=2552.6 p90=2254.2)
+depth-anything-base-q8_0 CPU-8t    bench: out=504x504 threads=8 load=55.5ms infer=671.3ms/iter (median over 15, min=662.9 max=993.9 p90=686.4)
+depth-anything-base-q8_0 CPU-16t   bench: out=504x504 threads=16 load=57.0ms infer=481.0ms/iter (median over 15, min=470.8 max=827.7 p90=497.0)
+depth-anything-base-q8_0 GPU-vulkan 
+depth-anything-base-f16 CPU-2t     bench: out=504x504 threads=2 load=120.7ms infer=2356.6ms/iter (median over 15, min=2343.4 max=2655.1 p90=2363.6)
+depth-anything-base-f16 CPU-8t     bench: out=504x504 threads=8 load=83.5ms infer=693.2ms/iter (median over 15, min=688.5 max=1000.5 p90=714.2)
+depth-anything-base-f16 CPU-16t    bench: out=504x504 threads=16 load=85.1ms infer=486.7ms/iter (median over 15, min=477.7 max=827.2 p90=503.4)
+depth-anything-base-f16 GPU-vulkan 
+depth-anything-metric-large-f32 CPU-2t bench: out=504x504 threads=2 load=510.4ms infer=8172.2ms/iter (median over 15, min=8135.8 max=8448.5 p90=8190.2)
+depth-anything-metric-large-f32 CPU-8t bench: out=504x504 threads=8 load=444.3ms infer=2347.1ms/iter (median over 15, min=2324.5 max=2579.9 p90=2369.6)
+depth-anything-metric-large-f32 CPU-16t bench: out=504x504 threads=16 load=448.0ms infer=1488.1ms/iter (median over 15, min=1477.1 max=1706.2 p90=1554.3)
+depth-anything-metric-large-f32 GPU-vulkan bench: out=504x504 threads=1 load=722.5ms infer=168.1ms/iter (median over 15, min=162.8 max=1795.6 p90=191.2)

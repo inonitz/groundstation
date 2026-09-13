@@ -4,6 +4,10 @@ Selects the ASR for the Hebrew voice loop. Two models compete: whisper-large-v3-
 fine-tune) and wav2vec2-xls-r-300m-lm-hebrew. Whisper is measured across two engines (whisper.cpp,
 faster-whisper/CT2), four precisions, and CPU vs GPU. All numbers are on the FLEURS he_il test set.
 
+Archival note (2026-09-13): this round is complete and retired. This document is the standalone
+record. The private clip transcripts (`bench_out/`) were archived and are purged at freeze; the
+WER, latency, and McNemar tables here are the retained record.
+
 ## Reproduce
 
 Prerequisites on this host:

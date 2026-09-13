@@ -3,6 +3,25 @@ Owner: groundstation-13 [8501ec] (llm_to_action presentation agent). See docs/ac
 Machine: RTX 5070 Laptop (Vulkan; no CUDA toolkit) + 16-core CPU. Latency = per-forward, p50 = median.
 CPU mem = process RSS; GPU mem = peak VRAM. Quality column is knowledge-based, UNVERIFIED here.
 
+## Objective
+
+Choose the depth model and runtime for the perception stack. Depth = monocular depth from one
+RGB frame. Compare the production yolo26n-depth against Depth Anything (DA2 and DA3) across
+engines, precisions, sizes, and CPU vs GPU. Primary metric: per-forward latency (p50). Secondary:
+memory, and whether the model runs at all on each backend.
+
+## Setup
+
+- Engines: ONNX Runtime (yolo26n-depth), ggml via depth-anything.cpp (DA2/DA3), PyTorch (SOTA reference).
+- Backends: CPU (2/8/16 threads) and GPU. ggml uses Vulkan (no CUDA toolkit on this host); PyTorch uses CUDA.
+- Runs: 15 timed forwards per configuration. The tables report the median (p50); min, max, and p90
+  are in the raw txt files.
+- Hardware: RTX 5070 Laptop GPU, 16-core CPU.
+- Raw data: `results_da3_full.txt` and `results_da3cpp.txt` (ggml per-config medians),
+  `results_sota.jsonl` (PyTorch SOTA), `sota_errors.log` (failures). The depth-anything.cpp build
+  and the gguf weights are archived at freeze; the numbers below stand alone.
+
+
 ## 1. yolo26n-depth — ONNX runtime (CPU, 2 threads) — CURRENT production depth
 | Variant | Prec | Res | p50 ms | Hz | RSS MB | Note |
 |---|---|---|---|---|---|---|
@@ -66,3 +85,12 @@ only changes load time + memory. On CPU, q8_0 is the sweet spot.
 - Path B (Python perception service publishing to the ROS topic): opens Depth Pro / Metric3D as options,
   but adds a process + boundary. Only worth it if a PyTorch-only model wins on quality (unmeasured here).
 - Not decided. Quality needs a ground-truth test (Gazebo can give GT depth).
+
+## Status (archival, 2026-09-13)
+
+- The benchmark is complete and retired. This document is its standalone record.
+- Direction on the fork: the C++/ggml path (depth-anything.cpp) was identified as the intended
+  embedded depth path for llm_to_action (see the 2026-09-06 depth handoff). Final integration is
+  the llm_to_action owner's call. The PyTorch-service path (Depth Pro, Metric3D) was not adopted.
+- Open, deferred: a ground-truth quality test (for example Gazebo GT depth) to rank accuracy, not
+  only latency. The quality columns here are knowledge-based, not measured.

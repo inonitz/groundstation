@@ -1,0 +1,6 @@
+{"model": "depthpro", "device": "cuda", "error": "OSError('apple/DepthPro does not appear to have a file named pytorch_model.bin or model.safetensors.')"}
+{"model": "depthpro", "device": "cpu", "error": "OSError('apple/DepthPro does not appear to have a file named pytorch_model.bin or model.safetensors.')"}
+{"model": "metric3d-small", "device": "cuda", "load_ms": 2426, "res": "616x1064", "p50": 182.2, "p95": 237.1, "hz": 5.5, "iters": 20, "mem_mb": 744}
+{"model": "metric3d-small", "device": "cpu", "load_ms": 1462, "res": "616x1064", "error": "RuntimeError('Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!')"}
+{"model": "metric3d-large", "device": "cuda", "load_ms": 4877, "res": "616x1064", "p50": 1206.5, "p95": 1209.0, "hz": 0.8, "iters": 20, "mem_mb": 3205}
+{"model": "metric3d-large", "device": "cpu", "load_ms": 4098, "res": "616x1064", "error": "RuntimeError('Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!')"}

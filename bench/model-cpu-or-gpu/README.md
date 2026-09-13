@@ -6,6 +6,9 @@ how fast a model runs on the CPU instead (offload latency). Composed of one scri
 (`census.py`, rerunnable on any machine) and its results. The planned ASR engine comparison
 will live here too — DEFERRED until the Recognizer reaches an alpha (owner ruling 2026-09-02).
 
+Archival note (2026-09-13): this bench is retired. `census.py` and `results/` are kept; the
+numbers below are the standalone record. The ASR round it planned is now complete (see below).
+
 ## Sections
 
 | section | what is in it |
@@ -159,7 +162,13 @@ CPU offload, llama.cpp with -ngl 0, 16 threads, 20 command translations:
 - Not yet measured: whisper serving stacks (ASR round), production hardware. Both census
   scripts rerun unchanged on any host.
 
-## ASR round — planned lanes
+## ASR round — COMPLETED (see ../hebrew_asr)
+
+STATUS: this round is done. Full results are in `../hebrew_asr/README.md`. Outcome:
+whisper-large-v3-turbo (ivrit-ai) via whisper.cpp q5_1 was selected; wav2vec2-xls-r was
+rejected on general Hebrew (WER 64 vs 19). The plan below is kept for context.
+
+### Planned lanes (historical)
 
 1. ivrit-ai whisper-large-v3-turbo via faster-whisper/CT2 with VAD, GPU and CPU int8.
 2. The same model in whisper.cpp via the project's asr_server. Quantized 2026-09-02:

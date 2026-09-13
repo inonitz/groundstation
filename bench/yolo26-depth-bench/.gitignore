@@ -1,6 +1,0 @@
-libs/
-models/
-*.pt
-*.onnx
-__pycache__/
-results.jsonl

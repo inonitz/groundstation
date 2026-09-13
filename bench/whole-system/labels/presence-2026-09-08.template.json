@@ -1,0 +1,162 @@
+{
+ "labeled_by": "FILL IN: who looked at the images, and when",
+ "labels": {
+  "candidate_contact_sheet_v2.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img0.png": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img1.png": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img10_highlight_windows_from_event_perform_ocr.jpeg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img2.png": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img3.png": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img4.png": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img5.jpeg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img6.jpeg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "img7.jpeg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "market-0.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "market-1.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "market-2.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "street-crowd-0.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "street-crowd-1.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "street-scene-0.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "street-scene-1.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "street-scene-2.jpg": {
+   "person": null,
+   "car": null,
+   "window": null,
+   "boiler": null
+  },
+  "desk_0000.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0015.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0030.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0045.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0060.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0075.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0090.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  },
+  "desk_0105.jpg": {
+   "person": null,
+   "chair": null,
+   "monitor": null,
+   "boiler": null
+  }
+ },
+ "how": "true = at least one such object clearly visible; false = not; then: python3 sam3_alone.py --score --labels <this file renamed presence-<date>.json>"
+}

@@ -1,0 +1,238 @@
+{
+ "labeled_by": "CONSENSUS of the qwen3vl and gemma4 gates from vlm-compare.json (NOT human truth; disputed asks omitted)",
+ "labels": {
+  "candidate_contact_sheet_v2.jpg": {
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "img0.png": {
+   "person": false,
+   "car": false,
+   "window": true,
+   "boiler": false
+  },
+  "img1.png": {
+   "person": false,
+   "car": false,
+   "boiler": false
+  },
+  "img10_highlight_windows_from_event_perform_ocr.jpeg": {
+   "person": true,
+   "window": true,
+   "boiler": false
+  },
+  "img2.png": {
+   "person": true,
+   "car": false,
+   "boiler": false
+  },
+  "img3.png": {
+   "person": true,
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "img4.png": {
+   "person": true,
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "img5.jpeg": {
+   "person": true,
+   "boiler": false
+  },
+  "img6.jpeg": {
+   "person": true,
+   "car": true,
+   "window": false,
+   "boiler": false
+  },
+  "img7.jpeg": {
+   "person": true,
+   "car": false,
+   "boiler": false
+  },
+  "market-0.jpg": {
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "market-1.jpg": {
+   "person": true,
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "market-2.jpg": {
+   "person": true,
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "street-crowd-0.jpg": {
+   "person": true,
+   "car": false,
+   "boiler": false
+  },
+  "street-crowd-1.jpg": {
+   "person": true,
+   "car": false,
+   "window": false,
+   "boiler": false
+  },
+  "street-scene-0.jpg": {
+   "person": true,
+   "car": true,
+   "window": false,
+   "boiler": false
+  },
+  "street-scene-1.jpg": {
+   "person": true,
+   "car": true,
+   "boiler": false
+  },
+  "street-scene-2.jpg": {
+   "car": true,
+   "window": true,
+   "boiler": false
+  },
+  "desk_0000.jpg": {
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0015.jpg": {
+   "person": false,
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0030.jpg": {
+   "person": false,
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0045.jpg": {
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0060.jpg": {
+   "person": false,
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0075.jpg": {
+   "person": false,
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0090.jpg": {
+   "chair": true,
+   "monitor": false,
+   "boiler": false
+  },
+  "desk_0105.jpg": {
+   "person": false,
+   "chair": true,
+   "boiler": false
+  }
+ },
+ "disputed": [
+  {
+   "image": "candidate_contact_sheet_v2.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "img1.png",
+   "phrase": "window",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "img10_highlight_windows_from_event_perform_ocr.jpeg",
+   "phrase": "car",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "img2.png",
+   "phrase": "window",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "img5.jpeg",
+   "phrase": "car",
+   "qwen3vl": true,
+   "gemma4": false
+  },
+  {
+   "image": "img5.jpeg",
+   "phrase": "window",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "img7.jpeg",
+   "phrase": "window",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "market-0.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "street-crowd-0.jpg",
+   "phrase": "window",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "street-scene-1.jpg",
+   "phrase": "window",
+   "qwen3vl": true,
+   "gemma4": false
+  },
+  {
+   "image": "street-scene-2.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "desk_0000.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "desk_0045.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "desk_0090.jpg",
+   "phrase": "person",
+   "qwen3vl": false,
+   "gemma4": true
+  },
+  {
+   "image": "desk_0105.jpg",
+   "phrase": "monitor",
+   "qwen3vl": false,
+   "gemma4": true
+  }
+ ]
+}
