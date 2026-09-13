@@ -207,3 +207,25 @@ These invariants hold for every experiment below unless a section states otherwi
   a sentence deterministically without any model call; on no match the sentence passes through
   unmodified.
 
+
+## Recognizer facts that keep biting
+
+(folded from the retired recognizer-bench skill; general procedure is in ../README.md)
+
+- Component lives ONLY in `projects/integration_harden2/recognizer/` (recognizer.py = stages incl.
+  recognize_direct, pipeline.py = glue incl. _plan2, prompts.py, llama.py). This bench imports it in place.
+- harden2 reads Hebrew DIRECTLY: one Gemma-4-E4B call does routing + planning under UNIFIED_PROMPT/
+  UNIFIED_GRAMMAR. There is NO translator.
+- Hebrew clitic prefixes (ו/ב/ל/ה) break naive \b boundaries; number-words compose (עשרים וחמישה=25)
+  and the number can FOLLOW the unit (מטר אחד=1). שנייה and מעלה are homographs -- never bare units.
+- Keyword scoring cannot detect relation inversion; review the dump for that class.
+- Emergency regex source of truth is stage 0 (EMERGENCY_RE in recognizer/recognizer.py);
+  control/commands.py imports it. Greedy by ruling.
+- Negation guard (negation_only, SUBTRACT rule) removes the verb a negation trigger governs; a
+  surviving imperative is a real order and passes. Defense-in-depth, 0-false-fire gated.
+
+### Commands
+- `python3 bench/hebrew-command-bench/unified_bench.py`  -- CURRENT harness (recognize_direct + _plan2), ~2 min, GPU
+- `python3 projects/integration_harden2/recognizer/recognizer.py`  -- component self-test, no GPU
+- `python3 -m pytest projects/integration_harden2/test/ -q`  -- 66 wiring tests, models faked
+- `bench.py` is the retired translated-path harness + shared infra; use unified_bench.py.

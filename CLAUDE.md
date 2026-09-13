@@ -35,7 +35,7 @@ motors spun and the human was injured stopping it by hand. Never again.
 - **Real tests over canned mocks.** A predefined-output mock proves nothing; claims of "working" require the real path exercised, and unmeasured numbers are labeled unverified.
 - **Background agents report to files, not chat.** Relaying bulk agent output into the conversation destroys the owner's scrollback; keep chat replies to short summaries.
 - **Script every install.** The dev container wipes ad-hoc installs on rebuild (it has eaten working tools before).
-- **`projects/integration/` is FROZEN** - the proven demo fallback. Changes land in forks, never there.
+- **`projects/integration_tts/` is FROZEN** - the proven demo fallback (the old `integration/` was retired in the 2026-09-13 restructure). Changes land in forks, never there.
 
 # Tool Execution Rules
 
@@ -271,19 +271,13 @@ Then:
 - If we have spent several turns on one sub-problem without progress, STOP and re-evaluate against the objective instead of trying fix #4.
 - Brevity is signal. No ego-massaging, no re-confirming what the user already said.
 
-# Components & measurement (added 2026-09-02, owner-ruled; project-agnostic)
+# Components (one home, modular plug & play)
 
 - A component has exactly ONE home in the repo. Benchmarks and consumers import it in place;
   never keep a second copy anywhere.
 - No integration of a component into a larger system until the owner declares it closed and
-  merge-ready.
-- Measurement invariants: deterministic sampling (temperature 0; prove determinism once, then
-  one pass per case), proper intervals (Wilson 95%) and paired tests (exact McNemar), latency
-  percentiles as table columns, one model resident on the GPU at a time, a duration estimate
-  stated BEFORE every benchmark run, and full result tables in chat — never abbreviated.
-- Deterministic guard/rewrite rules ship only with measured evidence, positive cases, and
-  adversarial negative cases; zero false fires is the gate.
-- After any refactor of measured code, re-run the full measurement and compare counts before
-  claiming equivalence. A summary claim without a re-run is an unverified claim.
-- Before working on a benchmarked component, check for and invoke its project skill
-  (see `.claude/skills/`).
+  merge-ready. Develop a feature, test it, then integrate it self-contained -- build modules for
+  plug & play, not a monolith.
+- Before benchmarking a component, read its `bench/<name>/README.md` (why it exists, how to run
+  start-to-finish, results over runs). If a benchmark has NO README, flag that before benching.
+  The general measurement procedure lives in `bench/README.md`.
