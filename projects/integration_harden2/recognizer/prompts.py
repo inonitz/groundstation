@@ -108,112 +108,10 @@ PLANNER_SHOTS_D = [
   '[{"type":"takeoff"},{"type":"fly_by","dz":4},{"type":"spin_by","degrees":90},{"type":"fly_by","dx":6},{"type":"land"}]'),
 ]
 
-WIRE_GRAMMAR = r'''
-root ::= "[" ws (action (ws "," ws action)*)? ws "]"
-action ::= takeoff | land | flyby | spinby | delay
-takeoff ::= "{" ws "\"type\"" ws ":" ws "\"takeoff\"" ws "}"
-land ::= "{" ws "\"type\"" ws ":" ws "\"land\"" ws "}"
-flyby ::= "{" ws "\"type\"" ws ":" ws "\"fly_by\"" (ws "," ws axis)+ ws "}"
-axis ::= ("\"dx\"" | "\"dy\"" | "\"dz\"" | "\"velocity\"") ws ":" ws num
-spinby ::= "{" ws "\"type\"" ws ":" ws "\"spin_by\"" ws "," ws "\"degrees\"" ws ":" ws num ws "}"
-delay ::= "{" ws "\"type\"" ws ":" ws "\"delay\"" ws "," ws "\"seconds\"" ws ":" ws num ws "}"
-num ::= "-"? [0-9]+ ("." [0-9]+)?
-ws ::= [ \t\n]*
-'''
-
-TRANSLATE_SYS = ("You are a translation engine. Translate the user's Hebrew drone command to "
-                 "English. Output ONLY the English translation, nothing else.")
-TRANSLATE_SHOTS = [("טוס שמאלה שישה מטרים", "Fly left six meters"),
-                   ("עצור במקום", "Stop in place")]
-LINE_GRAMMAR = r'root ::= [^\n\r]+'
-
-# V2 translator prompt (2026-09-08): six rules tied to Hy-MT2's measured failures (statement register,
-# intent questions, numbers, rotation idioms, sideways = move, fillers) and two NEW few-shots (count
-# kept at two, the campaign's measured optimum). Selected with bench.py --prompt v2 /
-# run_list.py --prompt v2 / MVD_TRANSLATE_PROMPT=v2 in the live pipeline. V1 stays the default
-# until the gate says otherwise. Design note: docs/active/2026-09-07-session-handoff.md section 11.4f.
-TRANSLATE_SYS_V2 = (
- "You translate spoken Hebrew addressed to a camera drone into English for a flight planner. "
- "Output ONLY the English sentence.\n"
- "1. An instruction or a request becomes an English IMPERATIVE: \"take off\", \"climb 5 meters\". "
- "Never past tense, never \"it rose\", never \"it is possible to\". "
- "\"אפשר ל...\", \"תוכל ל...\", \"אתה יכול ל...\", \"בוא נ...\" are requests: translate them as imperatives.\n"
- "2. A question about the drone's intent or state stays a question and is never answered: "
- "\"האם אתה מתכוון/הולך/מתכנן ל...\", \"מה אתה רואה\", \"כמה ...\".\n"
- "3. Keep every number, unit and direction exactly. Write numbers as digits.\n"
- "4. Rotation words: \"עם כיוון השעון\" = clockwise, \"נגד כיוון השעון\" = counterclockwise, "
- "\"חצי סיבוב\" = a half turn, \"סיבוב שלם\" = a full turn, \"סיבוב וחצי\" = one and a half turns.\n"
- "5. Sideways motion is \"move right/left N meters\", never \"turn\". \"פנה\"/\"הסתובב\" are \"turn\".\n"
- "6. Fillers are not actions: \"רגע\", \"שנייה\", \"תקשיב\", \"יאללה\", \"בסדר\", \"יופי\" are dropped or "
- "become \"then\". Keep the order and the number of actions, one clause per action.")
-TRANSLATE_SHOTS_V2 = [
- ("אפשר להמריא ואז לעלות חמישה מטרים?", "Take off, then climb 5 meters."),
- ("תקשיב, קודם טוס אחורה ארבעה מטרים, שנייה אחרי זה זוז שמאלה שלושה מטרים ובסוף הסתובב תשעים מעלות עם כיוון השעון",
-  "First fly backward 4 meters, then move left 3 meters, and finally turn 90 degrees clockwise."),
-]
-TRANSLATE_PROMPTS = {"v1": (TRANSLATE_SYS, TRANSLATE_SHOTS), "v2": (TRANSLATE_SYS_V2, TRANSLATE_SHOTS_V2)}
-
-# Purpose-objective translate prompt (owner idea 2026-09-02): tell the translator WHAT THE
-# TRANSLATION IS FOR instead of asking for faithful translation. Measured against TRANSLATE_SYS
-# by bench.py --pipeline.
-TRANSLATE_SYS_PURPOSE = (
- "You are the language front-end of a voice-controlled camera drone. The user speaks Hebrew. "
- "Rewrite the utterance as clear imperative English drone commands for the flight planner. "
- "Rules: one short imperative clause per action, keep the user's order and the exact count of "
- "actions; preserve every number, unit and direction exactly; verbs: take off, land, climb, "
- "descend, fly, move, turn, rotate, wait. "
- "Do not narrate, no introductions, do not add or drop actions; questions and negated requests "
- "stay questions/negations. Output ONLY the English rewrite.")
-PURPOSE_SHOTS = [
- ("טוס שמאלה שישה מטרים", "Move left six meters"),
- ("תמריא, חכה שלוש שניות ואז תנחת", "Take off, wait three seconds, then land"),
- ("תעלה שני מטרים ואז פנה ימינה תשעים מעלות ותנחת",
-  "Climb two meters, then turn right ninety degrees, then land"),
- ("אל תסתובב בבקשה", "Please do not rotate"),
-]
-
-# Hebrew sign addendum: appended to REVISED_PROMPT ONLY in the direct-Hebrew lane (the main
-# English arms stay untouched). Round-2026-09-02 finding: without it DictaLM maps the Hebrew
-# clockwise idiom to NEGATIVE degrees.
-HE_SIGN_ADDENDUM = """
-
-# Hebrew signs
-- "עם כיוון השעון" = clockwise = POSITIVE degrees. "נגד כיוון השעון" = counterclockwise = NEGATIVE degrees.
-- "ימינה" = right = dy positive (or positive degrees for turns). "שמאלה" = left = dy negative (or negative degrees)."""
-
-# Hebrew twins of PLANNER_SHOTS_D, for direct-Hebrew planning (no translation stage).
-PLANNER_SHOTS_D_HE = [
- ("טוס שמאלה שנים עשר מטרים", '[{"type":"fly_by","dy":-12}]'),
- ("רד שני מטרים ואז טוס קדימה שישה מטרים", '[{"type":"fly_by","dz":-2},{"type":"fly_by","dx":6}]'),
- ("אל תטוס למעלה", "[]"),
- ("מה הגובה שלך", "[]"),
- ("פנה ימינה עשרים מעלות", '[{"type":"spin_by","degrees":20}]'),
- ("הסתובב שישים מעלות עם כיוון השעון", '[{"type":"spin_by","degrees":60}]'),
- ("המראה, עלה ארבעה מטרים, הסתובב תשעים מעלות עם כיוון השעון, טוס קדימה שישה מטרים ונחת",
-  '[{"type":"takeoff"},{"type":"fly_by","dz":4},{"type":"spin_by","degrees":90},{"type":"fly_by","dx":6},{"type":"land"}]'),
-]
-
-TGEMMA_PROMPT = ("<start_of_turn>user\n"
- "You are a professional Hebrew (he) to English (en) translator. Your goal is to accurately convey "
- "the meaning and nuances of the original Hebrew text while adhering to English grammar, "
- "vocabulary, and cultural sensitivities.\n"
- "Produce only the English translation, without any additional explanations or commentary. "
- "Please translate the following Hebrew text into English:\n\n\n"
- "{he}<end_of_turn>\n<start_of_turn>model\n")
-
-TGEMMA_REFINE = ("<start_of_turn>user\n"
- "You are a professional Hebrew (he) to English (en) translator.\n"
- "The Hebrew text below is the ground truth. The draft English translation below it was produced "
- "by another system and may contain errors or omissions. Correct and finalize the translation "
- "against the Hebrew ground truth. Produce only the final English translation, without any "
- "additional explanations or commentary.\n\n"
- "Hebrew ground truth:\n{he}\n\n"
- "Draft translation:\n{draft}<end_of_turn>\n<start_of_turn>model\n")
 
 def write_prompts_md(path="PROMPTS.md"):
     shots = "\n".join(f"- user: `{u}`\n  assistant: `{a}`" for u, a in PLANNER_SHOTS_D)
-    tshots = "\n".join(f"- user: `{u}`\n  assistant: `{a}`" for u, a in TRANSLATE_SHOTS)
-    open(path, "w").write(f"""# The exact prompts the bench uses
+    open(path, "w").write(f"""# The exact prompts the recognizer uses
 
 Generated by `python3 prompts.py` from the constants in prompts.py -- edit there, not here.
 
@@ -226,9 +124,9 @@ Schema block in the app's short-JSON rendering, limited to the 5 whitelisted act
 {APP_PROMPT}
 ```
 
-## 2. Revised prompt (the candidate replacement)
+## 2. Revised prompt (the planning scaffold)
 
-Same scaffold plus: a Signs & Directions section, a Refusals section, and 6 few-shot pairs sent
+Same scaffold plus a Signs & Directions section, a Refusals section, and 6 few-shot pairs sent
 as user/assistant chat turns (not part of the system prompt text).
 
 ```
@@ -238,29 +136,6 @@ as user/assistant chat turns (not part of the system prompt text).
 The 6 example pairs:
 
 {shots}
-
-## 3. Translate-stage prompts
-
-Chat translators (DictaLM; Qwen3-VL in its translator arm) get this system prompt, 2 example
-pairs, and a one-line GBNF grammar:
-
-```
-{TRANSLATE_SYS}
-```
-
-{tshots}
-
-TranslateGemma runs its native template on the raw completion endpoint:
-
-```
-{TGEMMA_PROMPT.format(he="<the Hebrew sentence>")}
-```
-
-The refine experiment (round 6, measured worse than TranslateGemma alone -- kept for the record):
-
-```
-{TGEMMA_REFINE.format(he="<the Hebrew sentence>", draft="<DictaLM draft>")}
-```
 """)
 
 if __name__ == "__main__":
@@ -268,10 +143,6 @@ if __name__ == "__main__":
     print("PROMPTS.md regenerated")
 
 
-# TranslateGemma's own instruction as a chat system prompt, ZERO-shot, for the "after" arm of the Gemma 4 translator
-# measurement (owner ask 2026-09-08). Same words as TGEMMA_PROMPT; the server applies the model's chat template.
-TGEMMA_SYS = re.split(r"\n+\{he\}", TGEMMA_PROMPT.split("<start_of_turn>user\n", 1)[1], 1)[0].strip()
-TRANSLATE_PROMPTS["tgemma"] = (TGEMMA_SYS, ())
 
 
 # ============ harden2 (2026-09-08): ONE Gemma call routes, plans and names the object for SAM3 ============

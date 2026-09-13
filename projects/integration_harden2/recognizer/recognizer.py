@@ -1,7 +1,7 @@
 """The Recognizer: Hebrew utterance in -> {emergency | mission | routed English | rejection}.
 
 This file is the component. It is pure text processing: it owns no model and starts no server.
-The translator (stage 3) is injected into recognize() as a callable, so the file moves into
+The live entry is recognize_direct() (direct Hebrew, no translator); stages 0-2 + guards run before the Gemma call.
 integration unchanged. bench.py owns the models and the measurements.
 
 File layout follows execution order:
@@ -12,7 +12,7 @@ File layout follows execution order:
     stage 4  output guards        verify the translation against the source
     stage 5  English rewrites     fix known translation defects
     stage 6  routing              command path or perception path
-    recognize()                   runs all of it
+    recognize_direct()            runs the live direct-Hebrew chain
     selftest() + main             `python3 recognizer.py` must print CLEAN before any change ships
 
 Every rewrite rule carries positives (must fire) and negatives (must not fire). The selftest
@@ -569,48 +569,6 @@ def route(he):
 
 # ================================ the entry point ================================
 
-def recognize(he, translate):
-    """Run the full Recognizer on one Hebrew utterance.
-
-    translate(text, required_numbers=None, strict=False) -> English string; one model call,
-    injected by the caller. On the number-guard retry the required numbers are passed in, so the
-    caller can name them to the model; on the answer-mode retry strict=True asks for a translation
-    only.
-
-    Returns (kind, payload, flags):
-        ("emergency", None,  [])      stage 0 fired; act immediately
-        ("mission",   steps, [])      bypass answered; no model ran
-        ("command",   text,  flags)   translated English, planner-bound
-        ("perception", text,  flags)   translated English, VLM-bound
-        ("reject",    text,  flags)   numbers unrecoverable; read the text back to the user
-    """
-    if emergency(he):
-        return ("emergency", None, [])
-
-    mission = bypass(he)
-    if mission is not None:
-        return ("mission", mission, [])
-
-    he2, flags = apply_he(he)
-    dest = route(he)                     # first-class routing decision, returned as the kind
-
-    text = translate(he2, required_numbers=None)
-    if answer_mode(text):                            # stage 4b: a reply is not a translation
-        flags.append("answer-flag")
-        retry = translate(he2, required_numbers=None, strict=True)
-        if retry and retry.strip() and not answer_mode(retry):
-            text = retry.strip()
-        else:
-            return ("reject", text, flags + ["REJECT-answer"])
-    text, flags, rejected = _resolve_numbers(he2, text, translate, flags)
-    if rejected:
-        return ("reject", text, flags)
-
-    text, en_fired = apply_en(text)
-    return (dest, text.strip(), flags + en_fired)
-
-
-# ==================================== selftest ====================================
 
 def selftest():
     """Every rule against its own evidence, plus the helpers. Returns a list of problems."""
