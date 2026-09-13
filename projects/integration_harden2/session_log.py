@@ -46,7 +46,7 @@ class SessionLog:
         host = socket.gethostname()
         stamp = time.strftime("%Y%m%d-%H%M%S")
         exact = os.environ.get("MVD_SESSION_DIR")
-        self.dir = exact or os.path.join(root or os.path.join(os.path.dirname(__file__), "sessions"),
+        self.dir = exact or os.path.join(root or os.path.join(os.path.dirname(__file__), "..", "..", "logs", "sessions"),
                                          f"session-{stamp}-{host}")
         os.makedirs(self.dir, exist_ok=True)
         self.clips_dir = os.path.join(self.dir, "asr_clips"); os.makedirs(self.clips_dir, exist_ok=True)

@@ -8,7 +8,7 @@ ACKs missions WITHOUT integrating motion, so position is not asserted here -- ta
 telemetry, dispatch results, and mode gating are. (If the mock ever integrates fly_by
 missions into position3D, add position asserts back.)
 
-Run: python3 projects/integration_harden/test/live_mock_smoke.py
+Run: python3 projects/integration_harden2/test/live_mock_smoke.py
 """
 import json
 import os
@@ -19,10 +19,10 @@ import urllib.request
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "projects"))
-sys.path.insert(0, os.path.join(ROOT, "projects", "integration_harden"))  # house rule: the
-# integration_harden root is on sys.path for every consumer (commands.py imports recognizer.*)
-from integration_harden.control.dji_wire import DjiWire      # noqa: E402
-from integration_harden.control.router import Router          # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "projects", "integration_harden2"))  # house rule: the
+# integration_harden2 root is on sys.path for every consumer (commands.py imports recognizer.*)
+from control.dji_wire import DjiWire      # noqa: E402
+from control.router import Router          # noqa: E402
 
 MOCK = os.path.join(ROOT, "tools", "dji_mock", "mock_apiserver.py")
 

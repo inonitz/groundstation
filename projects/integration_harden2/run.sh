@@ -20,7 +20,7 @@ ROS_SETUP=/opt/ros/jazzy/setup.bash
 SESSION=mvd
 VLM_PORT=18090
 OUR_PORTS=(18090 8079 8080 5600)                               # Gemma, mock, phone, gstreamer_rx
-RUN_ROOT="${DESK_TEST_LOGDIR:-${TMPDIR:-/tmp}/mvd-runs}"
+RUN_ROOT="${DESK_TEST_LOGDIR:-$(cd "$HERE/../.." && pwd)/logs/runs}"
 SEG=sam3
 ASR_MODEL="${ASR_MODEL_PATH:-/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin}"
 ASR_BACKEND="${ASR_BACKEND:-whisper-whisper}"
@@ -192,7 +192,7 @@ BANNER
     fi
 
     # --- session dir (recording lands here) ---
-    local session_dir="${MVD_SESSIONS_ROOT:-$HERE/sessions}/session-$(date +%Y%m%d-%H%M%S)-$(hostname)"
+    local session_dir="${MVD_SESSIONS_ROOT:-$(cd "$HERE/../.." && pwd)/logs/sessions}/session-$(date +%Y%m%d-%H%M%S)-$(hostname)"
     mkdir -p "$session_dir/asr_clips"
     log "session -> $session_dir"
 

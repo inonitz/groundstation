@@ -2,9 +2,9 @@
 Pins the ambiguous phrases that bit us: 'back up' != go_up, 'go down' != land,
 long questions containing 'land' != land, and mode-gating under override."""
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from integration_harden.control.commands import classify, Tier
-from integration_harden.control.router import Router
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from control.commands import classify, Tier
+from control.router import Router
 
 def _c(t): return classify(t)
 
