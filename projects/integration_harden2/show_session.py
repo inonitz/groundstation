@@ -1,9 +1,17 @@
+def _u(root):  # the per-utterance log: trace.jsonl (2026-09-12), then legacy utterances.jsonl layouts
+    import os as _o
+    for c in ("trace.jsonl", "asr/utterances.jsonl", "utterances.jsonl"):
+        p = _o.path.join(root, *c.split("/"))
+        if _o.path.exists(p):
+            return p
+    return _o.path.join(root, "trace.jsonl")
+
 #!/usr/bin/env python3
 """Pretty-print a desk-test session's recorded utterances: heard Hebrew, English, wire mission.
 Usage:  python3 show_session.py [session_dir | latest]   (default: latest)"""
 import json, os, sys, glob
 root = os.environ.get("MVD_SESSION_DIR") or \
-    os.path.join(os.path.dirname(__file__), "..", "..", "projects", "integration_harden", "sessions")
+    os.path.join(os.path.dirname(__file__), "..", "..", "logs", "sessions")
 arg = sys.argv[1] if len(sys.argv) > 1 else "latest"
 if arg == "latest":
     dirs = sorted(glob.glob(os.path.join(root, "session-*")))
@@ -12,7 +20,7 @@ if arg == "latest":
     sdir = dirs[-1]
 else:
     sdir = arg
-jl = os.path.join(sdir, "utterances.jsonl")
+jl = _u(sdir)
 print("session:", sdir)
 if not os.path.exists(jl):
     print("no utterances.jsonl yet"); sys.exit(0)

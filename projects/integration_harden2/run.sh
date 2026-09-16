@@ -7,6 +7,8 @@
 #   bash run.sh down                                  # kill the stack + free ports
 #   bash run.sh status [run_dir]                      # ports, panes, last transcripts + commands
 #   bash run.sh preflight [webcam|dji]                # checks only, starts nothing
+#   bash run.sh score [list.md] [session]             # score a recorded session vs an e2e list -> REPORT.md
+#   bash run.sh show  [session]                       # pretty-print a session's utterances
 #
 # SAFETY (CLAUDE.md): 'real' control is HUMAN-ONLY and prompts to confirm. The assistant runs only 'mock'.
 set -euo pipefail
@@ -278,7 +280,20 @@ cmd_status(){
     [ -f "$run_dir/asr.log" ] && grep -aiE "text|transcri|heard|>" "$run_dir/asr.log" 2>/dev/null | tail -5 | sed 's/^/    /' || echo "    <none>"
     echo "-- last mock REST commands --"
     [ -f "$run_dir/mock_commands.log" ] && tail -8 "$run_dir/mock_commands.log" | sed 's/^/    /' || echo "    <none>"
+    # ported from the retired tools/desk-test/status.sh
+    _sig(){ local f="$run_dir/$1"; shift; local lbl="$1"; shift; if [ -f "$f" ]; then echo "  $lbl: $(grep -aE "$*" "$f" 2>/dev/null | tail -1 || echo "<none>")"; else echo "  $lbl: <no $1>"; fi; }
+    echo "-- app wiring --";  _sig app.log router "drone router \(ON\|DISABLED\)"; _sig app.log PhoneEars "PhoneEars|ASR"
+    echo "-- video --";       _sig gst.log gst "frame|fps|EOS|error|connect"; _sig dog.log dog "stall|reconnect|ok|frames"
+    echo "-- phone gate --";  local ip; ip="$(phone_ip)"; if [ -n "$ip" ]; then echo "  $ip:8080/status/ -> $(curl -s -m 3 -o /dev/null -w "%{http_code}" "http://$ip:8080/status/" 2>/dev/null || echo 000)"; else echo "  (no phone IP)"; fi
+    echo "-- cameras (WEBCAM_DEV=<n>; the running app holds its own) --"; make_camera_nodes; python3 "$HERE/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
 }
+
+# ------------------------------------------------------------------ score / show (diagnose a recorded session)
+cmd_score(){  # run.sh score [list.md] [session];  SAFETY: read-only, writes REPORT.md into the session
+    local list="${1:-$(cd "$HERE/../.." && pwd)/datasets/e2e/live-test-e2e-50.md}"
+    python3 "$HERE/score_session.py" "$list" "${2:-}"
+}
+cmd_show(){ python3 "$HERE/show_session.py" "${1:-latest}"; }  # read-only pretty-print
 
 # ------------------------------------------------------------------ dispatch
 cmd="${1:-up}"; shift || true
@@ -287,5 +302,7 @@ case "$cmd" in
     down)      cmd_down ;;
     status)    cmd_status "$@" ;;
     preflight) cmd_preflight "$@" ;;
-    *) die "usage: run.sh up|down|status|preflight" ;;
+    score)     cmd_score "$@" ;;
+    show)      cmd_show "$@" ;;
+    *) die "usage: run.sh up|down|status|preflight|score|show" ;;
 esac
