@@ -1,0 +1,10 @@
+{
+  "session": "sample-session",
+  "host": "rog",
+  "started": "2026-09-12T14:18:32",
+  "asr_backend": "",
+  "asr_language": "",
+  "asr_model": "",
+  "segmenter": "sam3",
+  "planner": "gemma4"
+}

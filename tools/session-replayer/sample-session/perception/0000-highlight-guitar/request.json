@@ -1,0 +1,13 @@
+{
+ "seq": 0,
+ "kind": "highlight",
+ "target_en": "guitar",
+ "he2": "סמן את הגיטרה",
+ "query": "highlight guitar",
+ "started": "2026-09-12T14:18:32",
+ "verdict": {
+  "present": true,
+  "note": "held for 3 passes"
+ },
+ "passes": 3
+}

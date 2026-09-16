@@ -1,0 +1,12 @@
+{
+ "seq": 1,
+ "kind": "count",
+ "target_en": "chairs",
+ "he2": null,
+ "query": "count chairs",
+ "started": "2026-09-12T14:18:32",
+ "verdict": {
+  "n": 2
+ },
+ "passes": 1
+}

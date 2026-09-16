@@ -1,0 +1,12 @@
+{
+ "seq": 2,
+ "kind": "describe",
+ "target_en": "what do you see",
+ "he2": null,
+ "query": "what do you see",
+ "started": "2026-09-12T14:18:32",
+ "verdict": {
+  "answer": "a room with guitars and chairs"
+ },
+ "passes": 1
+}

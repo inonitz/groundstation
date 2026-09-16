@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MVD live-pane mockup</title>
+<style>
+  :root{--vid:#0b0d10;--pane:#16191f;--line:#2b313b;--ink:#e7ebf0;--dim:#8b95a3;
+        --you:#ffd278;--model:#a0ebb0;--spoken:#ffd24a;--meta:#8b95a3;--hud:#00ffff;
+        --good:#3cdc64;--near:#f0b429;--bad:#ff6b6b;--mask:#dc5adc;}
+  body{margin:0;background:#05070a;color:var(--ink);font:14px system-ui,Segoe UI,Roboto,sans-serif;padding:18px;}
+  h1{font-size:15px;font-weight:600;margin:0 0 4px} .note{color:var(--dim);font-size:12px;margin:0 0 14px}
+  /* the opencv window: video + a fixed 460px chat pane, like config.CHAT_W */
+  .win{display:flex;width:1180px;max-width:100%;height:620px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .video{flex:1;background:
+     repeating-linear-gradient(45deg,#0b0d10,#0b0d10 18px,#0c0f13 18px,#0c0f13 36px);position:relative}
+  .bbox{position:absolute;left:38%;top:34%;width:26%;height:38%;border:2px solid var(--good);border-radius:2px}
+  .bbox .lbl{position:absolute;left:0;top:-20px;background:rgba(0,0,0,.7);color:var(--good);font-size:12px;padding:1px 6px}
+  .mask{position:absolute;left:40%;top:37%;width:22%;height:32%;background:var(--mask);opacity:.22;border-radius:6px}
+  .hud{position:absolute;left:10px;top:8px;color:var(--hud);font:12px ui-monospace,monospace}
+  .ptt{position:absolute;left:10px;bottom:8px;color:var(--dim);font:12px ui-monospace,monospace}
+  /* chat pane */
+  .chat{width:460px;flex:none;background:var(--pane);border-left:1px solid var(--line);padding:10px 12px;overflow:auto}
+  .turn{border-bottom:1px solid var(--line);padding:8px 0}
+  .line{display:flex;gap:8px;margin:2px 0;align-items:flex-start}
+  .tag{flex:none;width:62px;color:var(--meta);font:12px ui-monospace,monospace;text-align:right}
+  .txt{flex:1;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}  /* wraps INSIDE the pane */
+  .he{direction:rtl;text-align:right}
+  .you .txt{color:var(--you)} .model .txt{color:var(--model)} .spoken .txt{color:var(--spoken)}
+  .why .txt{color:var(--near)} .bad .txt{color:var(--bad)} .sam .txt{color:var(--good)}
+  .k{color:var(--dim)}
+</style></head>
+<body>
+<h1>MVD live-pane — proposed redesign (mockup)</h1>
+<p class="note">This is how the opencv window's chat pane should look: fixed 460px, Hebrew right-to-left and
+WRAPPED inside the pane (no overflow), one block per turn, with the new reject-reason and SAM3-score lines.
+Approve/adjust and I replicate it in scene_omdet's render_chat. The video side is illustrative.</p>
+
+<div class="win">
+  <div class="video">
+    <div class="hud">fps 28 · SAM3 · mock 127.0.0.1:8079</div>
+    <div class="mask"></div>
+    <div class="bbox"><span class="lbl">red car 0.88</span></div>
+    <div class="ptt">F5 to talk (F5, speak, F5)</div>
+  </div>
+  <div class="chat">
+
+    <div class="turn you"><div class="line you"><div class="tag">You</div>
+      <div class="txt he">סמן את המכונית האדומה שחונה ליד הבניין הלבן מצד שמאל</div></div>
+      <div class="line"><div class="tag k">Kind</div><div class="txt">highlight</div></div>
+      <div class="line sam"><div class="tag k">SAM3</div><div class="txt">red car · best 0.88 ✓</div></div>
+      <div class="line model"><div class="tag k">Action</div><div class="txt">Highlighting: red car</div></div>
+    </div>
+
+    <div class="turn"><div class="line you"><div class="tag">You</div>
+      <div class="txt he">סמן את כל הגיטרות</div></div>
+      <div class="line bad"><div class="tag k">Kind</div><div class="txt">highlight</div></div>
+      <div class="line why"><div class="tag k">miss</div><div class="txt he">לא רואה "guitars" — SAM3 best 0.42 &lt; 0.50</div></div>
+    </div>
+
+    <div class="turn"><div class="line you"><div class="tag">You</div>
+      <div class="txt he">אל תזוז</div></div>
+      <div class="line bad"><div class="tag k">reject</div><div class="txt">negation with no action</div></div>
+    </div>
+
+    <div class="turn"><div class="line you"><div class="tag">You</div>
+      <div class="txt he">כמה כיסאות יש בחדר</div></div>
+      <div class="line"><div class="tag k">Kind</div><div class="txt">count</div></div>
+      <div class="line model"><div class="tag k">Answer</div><div class="txt he">ספרתי 2</div></div>
+    </div>
+
+    <div class="turn"><div class="line you"><div class="tag">You</div>
+      <div class="txt he">מה אתה רואה</div></div>
+      <div class="line"><div class="tag k">Kind</div><div class="txt">describe</div></div>
+      <div class="line spoken"><div class="tag k">Spoken</div><div class="txt he">חדר עם גיטרות וכיסאות</div></div>
+    </div>
+
+  </div>
+</div>
+</body></html>
