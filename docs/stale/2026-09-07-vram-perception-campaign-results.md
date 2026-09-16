@@ -73,17 +73,18 @@ Model footprints (resident MiB):
 | SAM3-nf4 | 886 |
 
 Measured co-resident (Qwen + Hy-MT2-Q6 + whisper-q5_k + YOLO) = 6,553 MiB used, 1,156 free. Ceiling ~7,708.
-<!-- FORMATTING TODO: reformat this perception-engine fit table into clearer columns (total MiB + verdict split; the '8,144 — OVER 436' cells are cramped). -->
-| perception engine | + Hy-MT2-Q6 | + Hy-MT2-Q4 |
-|---|---|---|
-| current: OmDet + SAM2.1 (both) | 8,144 — OVER 436 | 7,818 — OVER 110 |
-| SAM3 (unifies both) | 7,439 — FITS 269 free | 7,113 — FITS 595 free |
+| perception engine | translator | total (MiB, paper) | verdict (paper) | measured together |
+|---|---|---|---|---|
+| OmDet + SAM2.1 (current) | Hy-MT2-Q6 | 8,144 | OVER by 436 | — |
+| OmDet + SAM2.1 (current) | Hy-MT2-Q4 | 7,818 | OVER by 110 | — |
+| SAM3 (unifies both) | Hy-MT2-Q6 | 7,439 | fits, 269 free | would OVERRUN (SAM3 is 1,074 in-process, see below) |
+| SAM3 (unifies both) | Hy-MT2-Q4 | 7,113 | fits, 595 free | **7,396 used, 313 free** (2026-09-07 late) |
 
 **Conclusion**
 
 - Current OmDet + SAM2.1: no room for a GPU translator — even Q4 is 110 MiB over.
 - SAM3 (unifies both, saves ~705 MiB) is the prerequisite. With SAM3, prefer Q4 (595 MiB free); Q6's 269 MiB free is eaten by Qwen's +89 MiB image-encode spikes.
-- Caveat: the perception footprints (OmDet / SAM2.1 / SAM3) are census numbers measured in isolation, not loaded in this co-resident run — so the fit is four-measured-together plus SAM3 added on paper. A live all-five load is the final confirmation (not yet run).
+- CONFIRMED 2026-09-07 late, all five loaded together (`census.py --sam3-stack`, real ASR node): Qwen 3,821 + Hy-MT2-Q4 1,187 + whisper q5_k 827 + YOLO 282 + SAM3-nf4 1,074 + image transient 94 = used 7,396 / 8,151, **313 MiB free**. Fits at Q4 only; SAM3-nf4 is 1,074 in-process (not the 886 isolated peak), so Q6 (+326) would overrun. Raw: tools/bench/model-cpu-or-gpu/results/2026-09-07-sam3-stack-census.json.
 
 ## 5. VRAM overhead decomposition (Step 4)
 | model | file | resident | overhead source |
@@ -115,10 +116,14 @@ Measured contribution (sieve ablation, verbose + std-190 sets):
 tencent 1.25-bit (PR #22836 ARM NEON) and 2-bit (PR #19357 ARM SME2): unmerged + ARM-only -> unrunnable
 on x86. Self-quant standard Q2_K: runs but incoherent (1.8B collapses at 2-bit). Floor = Q4_K_M.
 
-<!-- FORMATTING TODO: tidy this section's layout (owner flagged it reads poorly). -->
-## 8. Remaining work (all decisions made — this is engineering + one optional benchmark)
+## 8. Remaining work — status 2026-09-07 (late)
 
-1. **Integrate SAM3** into integration_harden — HARD PREREQUISITE (§4): without it, no GPU translator fits.
-2. **Wire in Hy-MT2** as the single-model translator; drop the DictaLM split option.
-3. **Confirm the fit** with one live all-five co-resident load (Qwen + SAM3 + YOLO + whisper + Hy-MT2) once SAM3 is in.
-4. **(Optional, low value) Step 5 — whisper k-quant WER/CER.** jiwer removed and a local scorer patched into asr_bench; remaining blocker is a stale FLEURS manifest (points at a dead scratchpad). Fix: `cd tools/bench/hebrew_asr && rm manifests/*.json && bash run.sh --step prep && bash run.sh --lanes q4_k,q5_k,q6_k`. Classic quants already scored: fp16 18.72 / q8_0 18.73 / q5_1 18.79 / q4_0 19.59 WER — k-quants expected similar.
+| item | state | where |
+|---|---|---|
+| 1. Integrate SAM3 into integration_harden | DONE, opt-in: `SCENE_SEG=sam3` (default stays `omdet` until the live test passes) | projects/integration_harden/scene_omdet.py `build_highlight()`; perception2/README.md |
+| 2. Wire in single-model Hy-MT2 | DONE, opt-in: `MVD_TRANSLATOR=hymt2` (default stays `dicta`) | recognizer/run_hymt2_server.sh; run_mvd.sh; bench `--translator hymt2` reproduces this table: 342/410 |
+| 3. Confirm the fit (all five co-resident) | DONE: used 7,396 / 8,151, 313 MiB free (§4) | tools/bench/model-cpu-or-gpu/census.py `--sam3-stack`, results/2026-09-07-sam3-stack-census.json |
+| 4. Step 5 whisper k-quant WER/CER (optional) | OWNER to run: the agent's `rm manifests/*.json` + `run.sh --step prep` were blocked by the permission classifier | `cd /root/groundstation/tools/bench/hebrew_asr && rm manifests/*.json && bash run.sh --step prep && bash run.sh --step bench --lanes q4_k,q5_k,q6_k && bash run.sh --step stats` (GPU, ~15 min) |
+| 5. Step 6 smart number guard | DONE, bench-gated: 413 cases, 0 output diffs vs baseline, self-test + pipeline test carry the positives | recognizer.py HE_HALF_TURN_RE / EN_HALF_TURN_RE; test_recognizer.py |
+
+Classic quant WERs for reference: fp16 18.72 / q8_0 18.73 / q5_1 18.79 / q4_0 19.59.

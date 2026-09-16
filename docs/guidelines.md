@@ -1,4 +1,7 @@
-# Code Guidelines
+# Guidelines (code + prose)
+
+Merged 2026-09-14 from code-guidelines.md + writing-style.md, plus the working
+rules below. One guidelines file for the repo: code style first, then prose and reporting.
 
 Derived from sampling the user's own code: `speech_to_action` (feature-showcase-v2
 branch), `sttserv`, `util2`, `inonitz/tree` (github repo), CPU thread/core manager gist
@@ -231,3 +234,34 @@ paragraphs. Do not drown it in jargon.
 
 If a file doesn't clearly match one of these patterns, don't force it — ask, or match
 the nearest existing sibling file instead of inventing a new convention.
+
+---
+
+## Writing style (prose)
+
+Write prose the reader can follow on the first pass. They should never have to untangle a sentence before they understand it.
+
+Keep sentences short. Put one idea in each sentence. Make each sentence lead into the next, so the reasoning flows instead of branching. Cut parentheticals and mid-sentence asides; give that content its own sentence, or drop it. Do not reach for bullet points to avoid writing clear sentences — fix the sentence itself.
+
+This is about prose: explanations, reports, and messages. Code style is separate and lives in [code-guidelines.md](code-guidelines.md).
+
+## Result documents (added 2026-09-02, owner-ruled)
+
+Benchmark and test reports use the register of a senior robotics/software engineer:
+Objective, Setup, Results (neutral tables, every column), Analysis (numbered, factual),
+Conclusions or open decisions at the end. No metaphors, no narrative, no session references —
+the document must stand alone. Define a project term once, then use only that term.
+
+READMEs are the current state of a thing, never an archive: a 3-line introduction, a section
+table, then only current content. Superseded results move next to their raw data (for example
+results/HISTORY.md), marked superseded. New results update the scorecard in place; they never
+stack a new dated section.
+
+
+## Reporting rules (from experience)
+
+- Answer first. Lead with the result, then a single table if it helps, then detail.
+- Put detail in files, not the chat. Long write-ups pasted into chat get rejected.
+- Address every point of a multi-point message, by number, none skipped.
+- Name things plainly. No task-ID jargon; use an ID only as a parenthetical reference.
+- A recommendation is not a decision. Anything the owner has not ruled stays open.

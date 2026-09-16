@@ -81,6 +81,10 @@ CURRENT tree so the owner knows what they are rewriting, not fixes for the agent
 - `[ ]` **[PAIR] B1 — eval harness: time-cost decision pending.** Estimate for the owner: agent builds
   the replay harness in roughly half a day; owner hand-marks 50-100 captured frames (~1-2 h, once);
   each subsequent model/config run is minutes, unattended. Decide go/no-go on that budget.
+  - 2026-09-11: CAPTURE HALF DONE (harden2). Each perception query (count/highlight/ask) now saves its
+    frame + raw/kept SAM3 detections + the result to <session>/perception/ (scene_omdet SessionLog
+    .capture_perception; test_perception_capture.py, 3 tests). This makes an outdoor miss debuggable and
+    is the replay harness's input. STILL PENDING: the replay+score harness and the owner hand-marking.
 - `[ ]` **[AGENT] B2 — 4B-at-Q4 box-accuracy experiment** — first harness run if B1 goes.
 - `[ ]` **[OWNER+AGENT] B3 — NE-approach root cause** (`bboxToEnuAnchor` back-projection) — agent maps
   the math, owner fixes in the rewrite.

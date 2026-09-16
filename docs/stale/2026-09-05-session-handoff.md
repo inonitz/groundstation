@@ -340,3 +340,74 @@ appending these roles to S.chat in scene_omdet (bypass -> show the mission as th
   missing. Git is fully UNCOMMITTED — the owner runs ALL git; the changed-file list is in §16 "FIXED".
 - **Resource note:** GPU freed (down.sh). Owner is benchmarking SOTA monocular depth estimators —
   the agent must NOT run heavy GPU/CPU work until the owner says so.
+
+## 18. FINAL STATE v2 — post day-2 live test (2026-09-06). READ WITH §16-17.
+**Doc owner: groundstation-05 (ref 55e80f) — the live-test agent** (integration_harden desk test / judges demo). Manager = groundstation-3c. NEW commit attribution from here on: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
+
+### Since §17
+- Owner COMMITTED all §1-17 work (the 4 commit blocks). Judge reviews architecture today; I wrote the
+  manager's diagram-task prompt (sync-first reading list, federate low-level to lane agents, system
+  inventory) — owner was reviewing it; send-status UNKNOWN. My offer to draw my lane's low-level
+  diagram: OPEN, never green-lit.
+- **up.sh silent death FIXED:** phone_ip_wifi() returned non-zero when no wireless default route ->
+  `set -e` killed up.sh at the PHONE_IP assignment with no output. Both up.sh + preflight.sh now
+  `return 0` on the empty case (empty IP -> preflight fails LOUDLY instead).
+- **24-case live subset** saved to tools/desk-test/live-test-subset.md (was chat-only). Owner ran
+  roughly half informally on day-2; a formally SCORED pass is still OPEN.
+
+### Day-2 live findings (session-2026-09-06 ~18:xx + pane-capture-180640/, both under sessions/)
+1. **Hebrew reversed = DOUBLE-bidi. FIXED.** App PIL has Raqm (native bidi in ImageDraw.text); our
+   get_display() pre-reversal double-reversed. scene_omdet now detects `_RAQM` and passes the raw
+   logical string when Raqm is present (get_display only as no-Raqm fallback).
+2. **Overlay block re-formatted. FIXED.** Aligned label column `En|Kind|Cmds|Action` with indexed cmd
+   lines; overlay font default -> DejaVuSansMono (Hebrew glyphs verified) so columns truly align.
+3. **"complex->perception" was a recorder artifact. FIXED.** Router labels every COMPLEX res.action
+   with that constant; recorder now wraps pipe.handle to record the pipeline's REAL action string
+   (router label = fallback only). The phone "narration" on some commands = the REJECT path speaking
+   "לא הבנתי, שמעתי:..." (by design); root causes of those rejects: DictaLM answering instead of
+   translating (incl. the owner's prompt-injection tests, answered in Hebrew) + ASR-garbled numbers.
+4. **EMERGENCY_RE gap. OPEN, bench-gated:** תפסיק הכל / תפסיק שליטה not matched -> no halt. Adding
+   תפסיק requires the recognizer-bench skill + measured zero-false-fire pass.
+5. **Phone TTS 503 = the app's connection gate. OPEN, owner to rule:** ALL routes incl /tts gated on
+   RC/aircraft/product connection; drone eco -> 503 -> silence (early posts 200, later all 503).
+   Options: (a) exempt /tts app-side (Kotlin dev) or (b) tts_io local espeak/piper fallback on 5xx
+   (beware old "both = double-speak" trap; espeak may not be installed).
+6. Positives: land-trap question did NOT land (guard held); ASR-typo הסתורב still planned 90 correctly;
+   backward WORKED inside chains post-language-fix (single-backward confirm still pending).
+
+### UNCOMMITTED since the owner's commits (new commit block)
+Files: projects/integration_harden/scene_omdet.py (raqm fix, aligned block, real-action recorder),
+projects/integration_harden/config.py (mono font default), tools/desk-test/up.sh + preflight.sh
+(set-e fix), tools/desk-test/live-test-subset.md (new), docs/NOTES.md, docs/active/2026-09-05-session-handoff.md.
+```
+cd /root/groundstation
+git add projects/integration_harden/scene_omdet.py projects/integration_harden/config.py \
+        tools/desk-test/ docs/NOTES.md docs/active/2026-09-05-session-handoff.md
+git commit -m "fix(desk-test): Raqm double-bidi, aligned overlay block, real action in recorder, up.sh set-e death
+
+PIL+Raqm applies bidi natively -> skip get_display when raqm present (Hebrew was double-reversed) | overlay -> aligned En|Kind|Cmds|Action column, font -> DejaVuSansMono | SessionLog records pipe.handle's real action (router's constant complex->perception label demoted to fallback) | phone_ip_wifi return 0 on no-wireless (set -e killed up.sh silently) | live-test-subset.md (24 bench-drawn cases) | NOTES: double-bidi, TTS-503 gate, recorder artifact, EMERGENCY_RE gap
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+```
+
+### Skimmed / unresolved talking points (so nothing is lost)
+- ggml language-pointer curiosity: found issue #2998 (danbev, strdup workaround, no documented
+  rationale for keeping the pointer); deeper dig offered, not pursued.
+- ASR pane noise (gate print_timings, asr_node.cpp:288) — optional C++ polish, open.
+- My lane's architecture diagram for the judge — offered, not green-lit.
+- Formal scored run of the 24-case subset — open.
+- SOTA monocular depth benches (tools/bench/depth-sota-bench, yolo26-depth-bench) = OWNER's lane,
+  untracked, not mine; share the GPU politely.
+
+### NEXT BOOT CHECKLIST (all Python fixes -> restart only, no rebuild)
+1. up.sh (on the phone hotspot). 2. Verify: Hebrew direction CORRECT (raqm fix), aligned block, real
+Action values. 3. Run tools/desk-test/live-test-subset.md and score via show_session.py. 4. Owner
+rulings pending: TTS-503 remedy (a/b), EMERGENCY_RE תפסיק addition (bench-gated).
+
+### Standing owner rules for this agent (triple-check addition — do not violate post-compaction)
+- MINIMIZE SendMessage to the manager (groundstation-3c): the owner relays between agents himself;
+  message the manager ONLY when the owner explicitly directs it.
+- The owner runs ALL git writes and every boot/mock/control script; the agent diagnoses from logs and
+  runs down.sh only when the owner says so. Owner writes C++; agent writes MVD Python.
+- Owner is human at the desk: put review files in the workspace with a clickable path, no SendUserFile.
+- GPU/CPU: do not run heavy work while the owner benchmarks (depth lane) unless told.

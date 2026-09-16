@@ -1,6 +1,11 @@
 # Groundstation — FMU Architecture Specification
 
-> **Status:** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
+> **Status: PARKED — the C++ destination engine, behind harden2.** This is the `llm_to_action` FMU
+> spec. It is NOT the live system. The LIVE voice-drone stack is `integration_harden2` — see
+> `spec-harden2-architecture.md`. This engine is where harden2's voice+guard+SAM3 layer folds on
+> eventually (ROADMAP phase 7); until then it is deferred, SITL-verified, not flying end to end.
+>
+> **(historical status below):** IMPLEMENTED / LIVING SPEC. The committed FMU now implements this architecture
 > (20 Hz control loop, odometry, event-driven VLM, ENU convention, GenericBackend interface, canned test
 > rigs). `NOTES.md` is the running change log. Sections below are annotated where reality has
 > moved past the original plan; the remaining gap is Tello hardware bring-up and SLAM-based position (§15). Reactive safety
@@ -61,7 +66,7 @@
 ## 2. Thread Architecture
 
 `MultiThreadedExecutor` + callback groups. Threads: **YOLO-Seg (Model-S, ~30 Hz, meets
-target)**, **Depth (Model-D, ~13 Hz measured -- the slow one, not a real 40Hz refresh)**,
+target)**, **Depth (Model-D -- today yolo26n-depth-384 ONNX CPU-2t, 44 ms p50 = 22.5 Hz, measured 2026-09-06; replacement fork open, see §15 Reconciliation)**,
 **VLM (async, event-driven)**, **Control (20 Hz)**, and the **Offboard publisher (30 Hz PX4 /
 20 Hz Tello)** streaming setpoints via the backend (§7). Shared state is `std::atomic`:
 `m_flightState`, `m_missionActive`, `m_planning`, `m_frameCount`, `m_currImg`, latest pose,
@@ -377,6 +382,30 @@ the battery/failsafe supervisor + reversible manual override (§11), bounded SPS
 the ROTATE accumulated-angle law and the LAND flare (§4) — all covered by the 15-test
 `projects/llm_to_action/test/sitl/` suite (ROADMAP §SITL test matrix).
 
+### Reconciliation (2026-09-06) — real-flight hacks, depth, and the VLM swap
+
+Source: docs/active/2026-09-05-fmu-control-loop-smell-catalog.md and the 2026-09-06 lane handoffs.
+- APPROACH as flown on real hardware differs from the §4 row: the real-flight path anchors the VLM
+  bbox to a world ENU point at setup and flies it by odometry, injecting a synthetic detection
+  (`fmu_node.hpp` ~2052-2067, 913-950). The per-tick live-YOLO law is the SITL/canned path.
+- ORBIT as flown is a fixed circle: center `kOrbitFixedRadiusM` AHEAD of the drone, altitude floored
+  at `kOrbitFixedAltM`=4 m — not centered on the target. A depth-seeded center "flung the drone into
+  terrain" (code comment).
+- Auto-land after APPROACH auto-enqueued LAND and ended every multi-step mission at the first
+  approach (measured 2026-09-06, `vlm` scenario: approach->move->orbit collapsed to approach->land).
+  Guard applied: auto-land fires only when the task queue is empty (`fmu_node.hpp:2244`). Compiles;
+  full SITL verification pending (owner runs `rubicon_orbit`).
+- Root cause of all three hacks: unreliable metric depth. The replacement study is COMPLETE
+  (bench/depth-sota-bench/DEPTH-BENCHMARKS.md). OPEN owner decision, post-meeting: Path A =
+  depth-anything.cpp ggml in-process (DA3 metric-large q8_0: 176 ms Vulkan) vs Path B = a Python
+  torch perception service (DA3-small GPU: 38.5 ms). Known: DA3 *relative* models segfault on
+  Vulkan; metric models and DA2 run fine.
+- VLM default is now **Qwen3-VL-4B Q4_K_M** (`sim_core.sh`, env-overridable back to 2B). 4B verified
+  standalone: 4097/8151 MiB VRAM, text 0.078 s, vision 1.06 s per 320x240 frame.
+- New since the last reconciliation: a top-level `projects/llm_to_action/README.md`; the A2 dashboard
+  verified end-to-end (9/9 assessor checks, 3 runs) with its bridge port-leak fixed. Owner ruling
+  2026-09-05: `fmu_node.hpp` is intentionally throwaway code; its cleanliness is a non-goal.
+
 ---
 
 ## 16. Open Items
@@ -507,10 +536,22 @@ the live wiring of the frozen-proven pattern; production app boot is the live-te
 
 - `projects/integration_harden/recognizer/` — Hebrew utterance in; mission JSON, planner-bound
   English, VLM-bound English, or a spoken rejection out. Six deterministic stages around one
-  injected translator call. Details + diagram: its README and tools/bench/hebrew-command-bench/README.md.
+  injected translator call. Details + diagram: its README and bench/hebrew-command-bench/README.md.
 - `projects/integration_harden/perception/` — detection/masking/VLM-gating logic with injected
   models. Details: its README.
 - Remaining top-level integration_harden files are three not-yet-clustered components plus glue:
   drone control (router.py, commands.py, dji_wire.py), audio I/O (ears.py, phone_ears.py,
   voice.py), video plumbing (camera_stream.py, video_doctor.py, video_watchdog.py), and the app
   glue (scene_omdet.py, config.py, run scripts). Clustering them is roadmapped, not urgent.
+
+**Status update (2026-09-06, desk-verified).** The full Hebrew chain ran live at the desk on
+2026-09-05: laptop mic (F5 push-to-talk) -> `asr_node` whisper.cpp (ivrit whisper-large-v3-turbo
+q5_k, language forced `he`) -> Recognizer -> missions as HTTP 200 on the mock wire (bare `/c/fly`
+arrays), with real phone video. New since the last entry: the mock mirrors the current
+`ApiServer.kt` endpoint-for-endpoint and logs every received command; all four `dji_wire` clients
+send the bare `/c/fly` array (frozen `integration/` included, owner-authorized freeze exception);
+`tools/desk-test/` boots and tears down the whole desk test detached and records a per-session
+dataset (`utterances.jsonl` + WAV clips, gitignored); `scene_omdet` renders a Hebrew-RTL + English
+overlay with the full per-utterance chain (implemented; needs one app restart to be seen live).
+ASR latency: ~300 ms warm, ~3.9 s cold (Vulkan shader compile). Open: COMPLEX runs synchronously on
+the ASR callback thread; the C++ DjiBackend `/status` parse resync stays deferred to integration time.

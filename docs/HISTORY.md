@@ -2557,7 +2557,7 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   user, per ruling) -> English rewrites -> route() (deterministic; movement verb beats perception
   clause; 100/100 + 240/243 offline).
 - Measured, complete pipeline, 370 sentences: emergency 6/6, std 98% (planner ceiling), verbose
-  85% (ceiling), perception 58% (DictaLM), military 55%; ALL 301/364. Bench: tools/bench/hebrew-command-bench.
+  85% (ceiling), perception 58% (DictaLM), military 55%; ALL 301/364. Bench: bench/hebrew-command-bench.
 - **Perception engine** extracted to `projects/integration_harden/perception/`: engine.py = pure
   logic w/ injected models (relative-confidence gate, mask hygiene, VLM-box fallback, VLM presence
   gate); detectors.py = OmDet + Eyes moved verbatim; vlm_client.py = vlm.py + testable parse_reply.
@@ -2647,7 +2647,7 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   images); masks on par (IoU 0.862); on-demand p50 366 ms. SAM3 is a CONCEPT segmenter (bare nouns,
   not instructions; no car->van generalization -> synonym fan-out). SAM3.1 video tracking SHELVED
   (activation-bound peak, infeasible on the 8 GiB RTX 5070). Follow-on: integrate nf4 + build the
-  VLM->concept front-end. Evidence + load recipe: tools/bench/sam3-mask-bench/INTEGRATION-HANDOFF.md.
+  VLM->concept front-end. Evidence + load recipe: bench/sam3-mask-bench/INTEGRATION-HANDOFF.md.
 - **Go-live fragilities flagged at close (2026-09-04, d4, read-verified not measured):** COMPLEX
   now runs SYNCHRONOUSLY on the ASR callback thread (translate + Qwen plan + fly_mission block it);
   the real-model command chain (DictaLM->Qwen->mission) has ZERO automated coverage (fakes only) --
@@ -2666,7 +2666,7 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   fix is true int4/fp8 COMPUTE (gemlite/marlin, blocked by the repo's mixed-precision forward + a
   direct .weight transpose) OR the AOTInductor route (compile off-box, specialize the spatial_shapes
   grid symint), OR a Hopper-class GPU. A custom llama.cpp fork can also run BASE SAM3 (one of several
-  alt methods), but SAM3.1 is preferred. Detail: tools/bench/sam3-mask-bench/results/sam3-quantization.md
+  alt methods), but SAM3.1 is preferred. Detail: bench/sam3-mask-bench/results/sam3-quantization.md
   and INTEGRATION-HANDOFF.md; memory sam3-quantization-insights.
 - **Desk test defined and staged (2026-09-04, owner-ruled):** the live desk test bootstraps
   integration_harden into a real runnable system. Step 1 = the owner's desk: his microphone ->
@@ -2776,7 +2776,7 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   only when the task queue is empty. Compiles; NOT yet SITL-verified end-to-end — the owner runs
   rubicon_orbit to confirm. Log: projects/llm_to_action/test/sitl/runs/vlm/captured_panes_log.txt.
 - **Depth-model study COMPLETE; the perception fork is OPEN (2026-09-06, post-meeting decision):**
-  master table tools/bench/depth-sota-bench/DEPTH-BENCHMARKS.md. Path A = depth-anything.cpp ggml
+  master table bench/depth-sota-bench/DEPTH-BENCHMARKS.md. Path A = depth-anything.cpp ggml
   in-process (same stack family as llama.cpp/whisper.cpp; DA3 metric-large q8_0 176 ms Vulkan,
   bit-exact vs PyTorch) vs Path B = Python torch service (DA3-small GPU 38.5 ms). Root-caused: DA3
   RELATIVE models segfault on Vulkan (metric + DA2 fine). Current prod yolo26n-depth-384 ONNX
@@ -2874,12 +2874,12 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   DEFAULTS; at -c 512 / 1 slot it is 2,552 MiB (q8 KV: 2,521), identical output, 50-token worst-case
   prompt. Lean config fits the SAM3-nf4 end stack with ~370 MiB spare (mmproj/YOLO/fragmentation
   unmeasured); Q3_K_M requant = the comfort lever, quality gate pending. Table in
-  tools/bench/model-cpu-or-gpu/README.md addendum.
+  bench/model-cpu-or-gpu/README.md addendum.
 - Full VRAM census (2026-09-07, measured, supersedes yesterday's arithmetic AND the ~550 whisper
   estimate): whisper q4_k 743 / q5_k 838 / fp16 1841; dicta lean 1187; tgemma lean 2552; qwen prod
   3821 (lean 3738); yolo 286. Real free ceiling 7598 (440 driver carve-out). All-on-GPU at Q4 does
   NOT fit (over by ~600); fits = tgemma-Q3+whisper-CPU (+638) or tgemma-CPU (+1850). Full scenario
-  table: tools/bench/model-cpu-or-gpu/README.md addendum. OPEN owner ruling: which component leaves
+  table: bench/model-cpu-or-gpu/README.md addendum. OPEN owner ruling: which component leaves
   the GPU (tgemma vs whisper) or tgemma Q3 requant (quality gate needed).
 - REAL co-resident VRAM (2026-09-07 night): full owner stack loaded together = 7,505 MiB, 93 free of
   8,151. SAM3-nf4 (886) does NOT fit -> over by ~793. ASR measured via the real asr_server node
@@ -2888,3 +2888,574 @@ Measured this session; corrections + new facts for the record. Demo is **Thu 202
   worst perception input 115 tok -> -c 256 is plenty. tgemma CPU p50 1,599 ms (was quoted 624 for
   short commands; perception is 2.6x longer). DictaLM on CPU confirmed fine. Table: census README.
   OWNER RULING NEEDED: which model leaves the GPU so SAM3 fits (tgemma frees 2,479 / whisper 829).
+- SAM3 + Hy-MT2 wired behind FLAGS, defaults unchanged (2026-09-07 late, agent call -- OWNER to rule):
+  `SCENE_SEG=omdet|sam3` picks the highlight backend (scene_omdet `build_highlight()`; sam3 = one
+  perception2.Sam3Backend, OmDet+SAM2.1 never load) and `MVD_TRANSLATOR=dicta|hymt2` picks the
+  stage-3 server on :18091 (recognizer/run_hymt2_server.sh, -c 512 -np 1, Vulkan). Defaults stay
+  on the proven demo path (omdet + dicta) until the live test passes; the next stack boots with
+  `SCENE_SEG=sam3 MVD_TRANSLATOR=hymt2 bash tools/desk-test/up.sh`. preflight checks the pairing
+  (hymt2 on the GPU requires sam3) and the SAM3 deps. tmux window `dicta` is now `xlate`
+  (log mvd_xlate.log). Deps scripted: bitsandbytes 0.50.2 + accelerate 1.14.0 in
+  install-runtime-deps.sh + Dockerfile (they were wiped by a rebuild; SAM3-nf4 needs both).
+- SAM3 live-path concepts KEEP attributes (agent call, OPEN): `perception2.phrase_concepts` strips
+  only the article and fans out bare categories; the VLM concept front-end (drops colours by its
+  prompt) is off the live path -- "the white car" must not highlight every vehicle. Evidence that
+  SAM3 discriminates attributes: sam3-mask-bench RESULTS.md Web candidates finding 2. SAM3 forwards
+  are rate-limited to one per SCENE_SAM3_PERIOD (1.0 s) per phrase because the highlight worker runs
+  every frame and a ~0.45 s forward would hog the GPU shared with Qwen and whisper.
+- Step 6 number guard fixed the SMART way (2026-09-07, gated): `חצי סיבוב`/`חצי הקפה` compose to
+  180 on the Hebrew side and "half a turn|rotation|revolution|circle|spin" to 180 on the English
+  side, so a correct "180 degrees" AND a correct "half a turn" pass unpatched; `חצי מטר` stays 0.5.
+  patch_number now matches decimal tokens (0.5) bounded so it never edits inside 10.5. Full 413-case
+  re-run vs the same-day baseline: 339/407 -> 339/407, ZERO Recognizer output diffs (the bench's
+  DictaLM never emits the 180 phrasing; the positives live in the self-test + test_recognizer.py
+  `test_half_turn_keeps_a_correct_180`). compare_runs.py = the per-case diff tool.
+- bench.py grew `--translator dicta|hymt2` and `--tag` (raw JSON name suffix). Hy-MT2-Q4 through
+  the FULL Recognizer + planner: 342/410 (std 193/201, verbose 43/54, perception 90/128, military
+  9/20) -- reproduces the campaign's lost-harness row (345/410) within the noise band. The +3 net
+  hides a swap: +14 perception, -4 std, -7 verbose. Hy-MT2 failure classes (OPEN, bench-gated):
+  (a) "עם כיוון השעון" rendered COUNTER-clockwise = sign flip (combo3, combo5, v_finish3_g3) ->
+  fixed by the clockwise-inline / counterclockwise-inline HE rules (Latin token pass-through,
+  re-measured below); (b) literal register: "Wait, make sure you are ready" makes the planner add
+  a wait step, "שנייה אחרי זה" becomes "a second after that" -> delay 1 (v_first3_g0/g2,
+  v_ready3_g0/g3); (c) possibility/past phrasing the planner refuses: "It is possible to take off",
+  "Let's fly", "Climbed to a height of 10 meters" -> [] (r_takeoff2/3, r_land4, r_alt10). Candidate
+  lever for (b)+(c): few-shot CONTENT (imperative register exemplars), count stays 2 -- owner call.
+- census.py `--sam3-stack` measures the ruled topology co-resident (Qwen prod script + Hy-MT2
+  server + REAL asr node + YOLO + SAM3-nf4 + one image ask). Its import path was stale (llama.py
+  moved to recognizer/) -- fixed. Servers are killed by process group, never `pkill -f llama-server`.
+- Step 5 (whisper k-quants) is the OWNER's to run: the agent's `rm manifests/*.json` and
+  `run.sh --step prep` were blocked by the permission classifier. Command in the campaign doc §8.
+- RULED TOPOLOGY FITS, at Q4 only (2026-09-07 late, measured together, `census.py --sam3-stack`):
+  Qwen 3,821 + Hy-MT2-Q4 1,187 + whisper q5_k node 827 + YOLO 282 + SAM3-nf4 1,074 + image transient
+  94 -> used 7,396 / 8,151, 313 MiB free. SAM3-nf4 costs 1,074 in-process, NOT the 886 isolated peak
+  the campaign budgeted, so the paper margin (~600) is really ~313 and Hy-MT2-Q6 (+326) is out.
+- Clockwise/counterclockwise inline rules SHIPPED with the flip disclosed (2026-09-07 late): Hy-MT2
+  verdict gate vs an in-memory rules-off control = 5 flips: combo3, combo5, v_finish3_g3 (rotation
+  SIGN fixed), v_ready3_g0 fixed; v_note3_g3 pass->fail (Hy-MT2 splits the sentence at "Note:" and
+  the planner drops the last step; the English is correct). Zero false fires. DictaLM: counts
+  identical. bench.py now persists per-case planner verdicts ("verdicts") so compare_runs.py can
+  list flips; runs before this session lack them. Owner may veto the rules (handoff §11.5 item 3).
+- down.sh could not free :18091 (2026-09-08 00:3x, owner-reported): the listener belonged to uid 1000
+  and was INVISIBLE in this container (host networking shares the port space; the process lived on
+  the host or in another container). It accepted TCP but never answered HTTP (a wedged or half-dead
+  server), with ~50 live + ~1,400 TIME_WAIT root-owned client connections churning at it from
+  outside too. Nothing inside the container can kill such a process. Fixes: (1) preflight.sh and
+  down.sh now say "held by a process OUTSIDE this container (uid N)" and print the host command
+  (`sudo ss -tlnp | grep :PORT`); (2) the translator port is overridable end to end with
+  `MVD_XLATE_PORT=18092 bash up.sh` (run_mvd -> server script -> pipeline.py). The foreign
+  listener was VS CODE PORT FORWARDING (owner, 2026-09-08): VS Code had forwarded :18091 and its
+  forwarder holds the port from the host side. Stop the forward in the VS Code Ports panel before
+  booting, or boot with MVD_XLATE_PORT=18092.
+- LIVE Step 1 (2026-09-08 00:37, DictaLM stack, live-test-50): 38/50. Causes: ASR 6 (אחורה->סחור,
+  זוז->זו, עשרים->עשרה, הדגש את->הדגשת x2, ארובה->ערובה), DictaLM answer-mode 3, router see-question
+  gap 2 (יש מישהו, מה הצבע), תפסיק emergency gap 1. SAFETY: the land-trap question (#28) made
+  DictaLM reply "To land, please say Land" and the planner SENT LAND (it did not on 2026-09-06 --
+  DictaLM is unstable run to run); ad-hoc "תחזור הביתה" -> "Return home" -> planner sent LAND;
+  ASR garble flew wrong spins (#5, #8) that the number guard cannot see. Report:
+  sessions/session-20260908-003702-rog/REPORT.md.
+- NO answer-mode guard exists in the Recognizer (only the few-shot copy guard and the number guard);
+  the interrogative guard was withdrawn 2026-09-07 and the remedy chosen was Hy-MT2 (answer-mode 0
+  on the bench). Proposed stage-4 guard (OPEN, owner deferred to after Step 3): reject an English
+  line that reads as a reply ("No,", "Yes,", "I am", "I see", "I can", "please say ..."): strict
+  retry first, then REJECT + read back. Evidence: 4 live utterances 2026-09-08. Gate: full 413 run,
+  both translators, zero flips on correct cases.
+- LIVE Step 3 (2026-09-08 01:02, Hy-MT2 + SAM3 stack, live-test-75): 41/69 scored. Report:
+  sessions/session-20260908-010129-rog/REPORT.md. Causes: Hy-MT2 register 6 (past tense /
+  possibility -> planner refuses), Hy-MT2 wording 3, Hy-MT2 numbers 3 (bare מטר -> "six meters" x2,
+  caught; סיבוב וחצי -> 180 flew for 540), MY guard bugs 3 (punctuation glued to tokens, ש clitic on
+  שחצי -> false rejects), ASR 6, planner 3, router 2, emergency 2. Land trap HELD on Hy-MT2.
+- HIGHLIGHT PATH NEVER REACHED for "Follow" / "Focus on" / "Emphasize" (2026-09-08): engine FIND_RE
+  knows highlight/locate/track/mark/find/show me/point at/where is only; both translators use the
+  other three for עקוב/התמקד/הדגש -> every such request became a VLM question in BOTH live runs.
+  Fix = extend FIND_RE + LEAD_VERB_RE (perception/engine.py). check_colors() is dead code (never
+  called in recognize()) and COLORS lacks סגול.
+- PLANNER FEW-SHOT ECHO (safety, 2026-09-08 u74): "Do it!" made Qwen emit its own example mission
+  (takeoff, dz+4, spin 90, dx+6, land). The copy guard covers translator shots only. Candidate
+  guard: refuse a mission identical to a PLANNER_SHOTS_D mission.
+- Post-Step-3 fixes (2026-09-08 ~02:00, owner approved items 1, 2, 3, 6; items 4 and 5 held):
+  (1) perception/engine.py FIND_RE + LEAD_VERB_RE now accept follow / focus on / emphasize (+ "stop
+  following" clears) -- the highlight path is reachable for עקוב/התמקד/הדגש at last; (2) number guard
+  tokenizer strips ASR-glued punctuation ("חמישה...", "מטר.") and reads a clitic on חצי (שחצי);
+  (3) סיבוב וחצי = 540 on both sides (HE_TURN_HALF_RE / EN_TURN_HALF_RE) so "a half turn" for a turn
+  and a half is caught; (6) stage-4b answer-mode guard: a first-person reply ("I am", "I see",
+  "please say", "my primary function") is retried with strict=True ("Translate ONLY ... Do not answer
+  it"), then REJECTED + read back. translate() contract grew `strict` (pipeline, bench, app wrapper,
+  test fakes). Self-test positives/negatives for every rule; 38 tests green. Bench gate: see the
+  next entry.
+- First gate of the answer-mode guard (2026-09-08 ~02:30, DictaLM, items 1+2+3+6): the wide pattern
+  caught every trap but also rejected three CORRECT translations -- "I can fly up five meters"
+  (r_pol_up5, polite request the planner flies), "I will fly up 20 meters and describe..." (v_mix1),
+  "I have visual contact with the command post" (s_cp_visual, a correct report). Narrowed to the
+  measured shapes: "I am / I'm / I see / I cannot / I can't" (sentence-initial, optional No,/Yes,),
+  "please say", "my (primary) function", "as a drone/AI". Hy-MT2 on the same gate: 2 outputs
+  changed, 0 flips (j_pin_halfgate now passes; s_cp_visual was the false fire, fixed by narrowing).
+- Bench scoring of REJECTS changed (2026-09-08): a reject on a must-not-fly case (expected []) is
+  CORRECT-reject (nothing flew, the user heard the read-back); a reject on a real command is REJECT
+  and counts as a fail. Before, both were "routed" and dropped from n, which hid rejected commands.
+  Baselines re-scored offline under the new rule: DictaLM std 201/203, verbose 50/54; Hy-MT2 std
+  197/203, verbose 44/54.
+- Items 4 and 5 applied (owner: "apply those fixes too", 2026-09-08 ~02:20): (4) stage-2
+  `explicit_one_meter`: a bare מטר with no number on either side -> מטר אחד (15 מטר, מטר וחצי, מטר
+  אחד, מטרים untouched); (5) pipeline `is_shot_echo`: a planned mission identical to one of the
+  planner's six few-shot missions, from English carrying none of that example's numbers, is
+  refused and read back (action "reject-planner-echo"). recognizer/__init__ now exports _nums_en.
+  bench/whole-system/run_list.py = text-mode run of a live-test list through the
+  real translator + planner (no mic), judged against the list's expected notation.
+- Gate of all six 2026-09-08 fixes (both translators, 413, per-case flips): DictaLM 339 -> 346 (5 flips,
+  all safe: four traps now CORRECT-reject, l_land_going planner-LANDED -> reject); Hy-MT2 345 -> 348, 0
+  flips against. Text-mode 75 list: DictaLM 45/7/23, Hy-MT2 36/16/23 -- Hy-MT2's past-tense/possibility
+  register costs it 8 lines (planner refuses statements). DANGER (DictaLM): "יאללה נחת" -> "Take off".
+  Tables: sessions/text-runs/2026-09-08-live-test-75-{hymt2,dicta}.md.
+- RULING (owner, 2026-09-08): retests, including the retest of any new translator prompt, run on the
+  WEBCAM (`VIDEO=webcam SCENE_TTS=off bash /root/groundstation/tools/desk-test/up.sh`), never on the drone + phone. Webcam mode mocks the
+  whole system with nothing connected; the phone/drone are for final demo footage only. The mode has
+  existed in run_mvd.sh/up.sh (VIDEO=webcam) throughout -- the runbook wrongly steered to the hotspot,
+  which cost the owner ~12 hours over two days. Phone TTS is absent in webcam mode: SCENE_TTS=off.
+- DAY-2 RERUN (2026-09-08 morning): all suites green (39 tests, 3 self-tests, bench audit); bench 413
+  reproduced last night EXACTLY on both translators (0 of 413 outputs changed, 0 flips): DictaLM
+  346/412, Hy-MT2 348/412. Raw: results/2026-09-08-recognizer-{dicta,hymt2}-day2.json.
+- live-test-75 REBUILT as v2, ALL 75 NEW (owner: unique sentences only; v1's Set 1 had been drawn
+  from the dataset by my misreading). Set 1 = dataset-style fresh sentences. Text-mode results:
+  Hy-MT2 42 pass / 10 fail / 23 review; DictaLM 44 / 8 / 23. Set 1 alone: Hy-MT2 23/25, DictaLM
+  21/25. Tables: sessions/text-runs/2026-09-08-live-test-75v2-{hymt2,dicta}.md. Filing after the
+  owner rules: commands std 50, perception 10, verbose 9, emergency 5, military 1.
+- New guard findings from v2 (candidates, not applied): (a) "סיבוב שלם" -> DictaLM "one full
+  revolution" -> the number guard reads "one" as 1 vs nothing in Hebrew -> FALSE reject (1 measured;
+  the symmetric fix is סיבוב שלם = 360 on both sides, like the 180/540 idioms); (b) DictaLM
+  answer shapes the answer-mode guard does not know: "There are five people standing near the
+  entrance." (caught by the number guard, safe) and "To the right, there's a large tree..." (NOT
+  caught, sent to the VLM as the question); (c) "תן לי תצפית על הצומת ודווח" routes to the planner
+  (PERCEPTION_RE lacks תצפית/דווח) -> EMPTY on both.
+- PERFECT-ENGLISH CONTROL rerun on the current dataset (2026-09-08, `bench.py --perfect-en`, the
+  hand-written reference English straight to Qwen3-VL): std 201/204, verbose 45/54 = 246/258. The
+  PLANNER alone loses 12: r_mis5 (return-leg sign), l_postpone + l_pause_idiom (a "hold off two
+  minutes" becomes a delay), and NINE verbose chains where the literal reference ("a second after
+  that", "Wait, make sure you are ready", "and also") makes the planner add a delay/wait step or merge
+  axes. Hy-MT2 (197 + 44) translates faithfully and inherits those planner faults; DictaLM (202 + 50)
+  paraphrases them away and beats the "perfect" reference on verbose. Consequence: the "שנייה" and
+  preamble losses are PLANNER issues (prompt or a Hebrew rewrite before translation), and Hy-MT2's
+  own gap is the statement register only (4 std + 1 verbose). Raw: results/2026-09-08-perfect-en.json.
+- V2 translator prompt SIZE (2026-09-08, measured on the live Hy-MT2 server's /tokenize): system + 2
+  shots + a long input = ~516 tokens (V1: ~107). The live server ran -c 512 -> raised to -c 1024 in
+  run_hymt2_server.sh (KV cost is a few MiB; the co-resident margin was 313). The bench serves -c 4096.
+- Self-kill gotcha, second form: `pgrep -f '<model name>' | xargs kill` inside a long bash -c chain
+  matches the CHAIN'S OWN command line (the pattern is in it) and kills the chain. Never match process
+  names from inside a script whose text contains them; kill by saved PID only.
+- V2 TRANSLATOR PROMPT MEASURED AND REJECTED (2026-09-08, Hy-MT2, 413 cases, `--prompt v2`):
+  341/412 vs 348 with V1. It fixed the register class (verbose 44 -> 51: every planner-inherited
+  filler/statement loss; std: r_takeoff2/3, r_land4, r_alt10, combo4 now CORRECT) but broke ten std
+  cases, three of them in the UNSAFE direction: r_pol_spin (90 -> -90), r_low (dz +2 -> -2), r_neg4
+  (a negation now FLIES 4 steps); five became number-guard rejects (r_bit_left/up, r_quart_r,
+  r_wait1, r_ord4); perception dropped 91 -> 83; 273 of 413 outputs changed. On the 75 list the total
+  stayed 42/10/23 but line 6 flipped sign (+20 -> -20) and line 11 lost its land. A 1.8B translator
+  does not absorb a six-rule prompt; it trades one error class for sign errors. V1 stays the default
+  (MVD_TRANSLATE_PROMPT=v1). Untested option: V3 = V1 prompt + rule 1 (register) + the two new shots
+  only, one gate. Raw: results/2026-09-08-recognizer-hymt2-v2.json, sessions/text-runs/…-hymt2-p2.md.
+- WHISPER ON THE CPU MEASURED (2026-09-08, `bench/hebrew_asr/cpu_latency.py`, 20 real push-to-talk
+  clips from the 2026-09-08 session, p50 2.4 s of audio, large-v3-turbo q5_k, beam 4, same build as the
+  node): latency p50 = 10.2 s at 4 threads, 6.9 s at 6, 5.5 s at 8 (RTF 2.5-4.6; the cost is the fixed
+  30-second encoder window, so short clips do not help). GPU Vulkan = 0.29 s p50 (0.51 p95). Verdict:
+  whisper stays on the GPU; the "whisper to CPU frees 827 MiB for TranslateGemma" option is DEAD on this
+  laptop. Remaining ways to seat TranslateGemma (needs ~750 MiB): drop the YOLO background (282) +
+  tgemma Q3_K_M requant (~500, quality gate unrun) = borderline; tgemma on the CPU (measured p50 1.6 s
+  perception / 0.6 s commands); or the 16 GB desktop.
+- GEMMA 4 E4B PROBED (2026-09-08, llama-server Vulkan, gemma-4-E4B-it-qat-UD-Q4_K_XL + mmproj-BF16):
+  resident 3,950 MiB WITH its 1 GB vision projector (Qwen3-VL-4B: 3,821) -> replacing Qwen AND the
+  translator (1,188) would free ~1,060 MiB. DIRECT-HEBREW PLANNING (no translator; the bench's revised
+  prompt + Hebrew sign addendum + Hebrew shots + JSON grammar): 8/10 on a probe -- the 3-step chain,
+  "שנייה אחרי זה" with NO delay, יאללה נחת -> land, negation, אל תנחת+תעלה, חצי סיבוב שמאלה, the
+  land-trap question -> [] (safe); misses: אפשר להמריא -> [] and סיבוב וחצי -> 180. p50 351 ms.
+  VISION: understands the image and Hebrew questions natively (people, parked sedan, distant white
+  car, motorcycles, shop fronts), 5.5 s per 1280x720 ask vs Qwen ~3 s, but it NARRATES a "thinking
+  process" as plain content even with --reasoning-budget 0 / enable_thinking=false, so free-text
+  answers exhaust max_tokens before the LONG/SHORT lines -> vlm_client parse fails. Fix path: a GBNF
+  grammar for the LONG/SHORT/HIGHLIGHT format (as the planner does). Server gotchas: --image-min-tokens
+  1024 breaks its CLIP load (image_max_pixels < image_min_pixels); KV q4_0 + flash-attn gave empty
+  output; `setsid llama-server` forks, so the saved PID is the parent -- stop it via
+  `ss -tlnpH 'sport = :18090'`. Gemma-4-12B (7.1 GB Q4) cannot fit next to anything on 8 GB.
+  Web (2026-09): Gemma 4 12B MMMU-Pro 69.1; Qwen3-VL-4B DocVQA 95.3 vs Gemma 4 26B 94.9 -> Qwen3-VL
+  stays at least as strong per parameter on vision benchmarks; no E4B vision numbers or vision
+  fine-tunes found; Gemma 4 = 140+ languages incl. Hebrew, audio input on E2B/E4B/12B.
+  OPEN owner idea: Gemma 4 E4B as ONE model for Hebrew planning + VLM (drop the translator), with
+  whisper + SAM3. Untested at scale: the 413-case direct-Hebrew run and a grammar-forced VLM format.
+- VISION COMPARISON Qwen3-VL-4B vs Gemma 4 E4B (2026-09-08, whole-system/vlm_compare.py, SAM3 as the
+  reference, 26 images): gate agreement 88/104 vs 91/104; "boiler" false-present 0/26 both; box IoU
+  median 0.47 vs 0.02 (Gemma cannot localize); people count exact 11/26 vs 2/26; format 104/104 both
+  with the grammar (Gemma needs it); latency p50 2.2 s vs 1.6 s. Verdict: Gemma gates as well and
+  faster, boxes useless (we use SAM3's anyway), counting much worse. No labels exist: agreement, not truth.
+- GEMMA 4 E4B AS PLANNER (2026-09-08): perfect-English ceiling std 195/204, verbose 51/54 (Qwen: 201/204,
+  45/54). DIRECT HEBREW, no translator (bench --planner gemma4 --direct-he): std 195/203, verbose 52/54 =
+  247/257 -- at Qwen's perfect-English ceiling (246/258) and above the current Hy-MT2 pipeline (241) with
+  NO translation stage; fails: אפשר להמריא/לנחות -> [], r_higher, r_mis5, r_mis8, r_wait1, l_postpone,
+  l_pause_idiom, v_start4_g3, v_mix1. Qwen direct Hebrew (reference): 187/203, 35/54. The lanes crashed on
+  a scorecard division by zero (perception skipped) before writing JSON -> fixed, rerun for the raw files.
+- WHOLE-SYSTEM OFFLINE TEST (2026-09-08, owner: "make it self-contained inside bench"):
+  bench/whole-system/{run_all.sh, README.md, results/<date>/}. Lanes: 1 audio replay (session
+  clips -> whisper-cli -> Recognizer -> planner, `run_list.py --from-clips`, clips matched to list lines
+  by token overlap), 2 bench 413 (+ --direct-he, --planner gemma4), planner ceiling (--perfect-en),
+  3 vision (whole-system/vlm_compare.py), 4 live mic on the webcam. Decision rule: a candidate stack
+  must match or beat the current one on lanes 1-3 with zero unsafe flips before lane 4. Lane tools
+  stay in their own homes; the runner only sequences them.
+- AUDIO REPLAY LANE first run (2026-09-08, after the six fixes, the live sessions' own clips ->
+  whisper-cli q5_k beam 4 -> Recognizer -> planner): Step-1 session vs live-test-50: Hy-MT2 35 pass /
+  2 fail / 20 review, DictaLM 34/3/20 (57 clips matched by overlap, 8 ad-hoc/repeats unmatched); Step-3
+  session vs the v2 list: Hy-MT2 18/14/21, DictaLM 23/9/21 (35 unmatched = v1's Set 1). The live runs
+  on the same audio before the fixes scored 38/50 and 41/69. Reports: bench/whole-system/results/2026-09-08/.
+- HIGHLIGHT CHAIN + PLANNING PER CASE (2026-09-08, whole-system/results/2026-09-08/vision-sam3-chain.md,
+  planning-per-case.md): with the object present (42), Qwen says present 28 and SAM3 hits from its phrase
+  22; Gemma says present 35, SAM3 hits 28 -> Gemma delivers MORE correct highlights; its VLM-box
+  fallback is unusable (3/35 vs Qwen 13/28). Planning: Gemma direct 247/258, Hy-MT2 241, DictaLM 252;
+  Gemma's misses carry no wrong direction/sign (two EMPTY idioms flown as delays, אפשר ל -> []).
+- RELOCATION (owner: "keep the features self contained", 2026-09-08): everything whole-system-specific
+  now lives in bench/whole-system: run_list.py (text + audio replay), vlm_compare.py (VLM vs SAM3),
+  vision_chain.py (SAM3 from each VLM's phrase), planning_table.py (per-case planning table), run_all.sh,
+  results/<date>/. sam3-mask-bench keeps only the images; hebrew-command-bench keeps bench.py and its raw
+  JSON. Earlier paths in NOTES/handoffs were rewritten to the new home.
+- OVERLAYS (2026-09-08, owner: "I want to see what Qwen3-VL and Gemma 4 highlighted with their boxes and how
+  they work with SAM3 against the ground truth"): whole-system/overlays.py draws, per image and phrase, a
+  three-panel jpg (VLM box yellow, SAM3-from-VLM-phrase green, SAM3-on-concept magenta = reference) ->
+  results/<date>/overlays/index.md. vlm_compare.py now keeps the FULL reply and the parsed box per row
+  (the first run truncated replies at 300 chars and lost some VLM_BOX lines). There is no human ground
+  truth for these images; the reference is SAM3 on the asked concept.
+- Vision rerun with full replies (2026-09-08 late): identical numbers; 104 overlays drawn -> bench/whole-system/results/2026-09-08/overlays/index.md.
+- OWNER IDEA (2026-09-08, open): SAM3 as a standalone tool the LLM calls, dropping the Qwen3-VL presence
+  gate for highlight requests (saves one ~2-3 s VLM call). Measured today from vlm-compare.json: SAM3 alone
+  at score >= 0.5 said "present" for the absent phrase "boiler" on 0/26 images (the VLM gate: 0/26).
+  The VLM stays needed for questions, descriptions and counts. Missing number: SAM3's false-present rate
+  against real labels (the 20 desk frames) and the score threshold that zeroes it.
+- 2026-09-08 (owner instruction, scheduled AFTER the judge meetings): consolidate the repo documentation.
+  Owner + agent go through every document one by one, build a map (what connects to what, stale vs current),
+  then write 2-3 cohesive documents that describe everything in the repo. NOTES.md is exempt (dumping ground).
+  The documents aggregate performance metrics over history, what was measured, why, the design consideration
+  behind it, and the other technical decisions. Full note: docs/active/2026-09-08-session-handoff.md §16.
+- 2026-09-08 15:10 MEASURED (lane 3c, bench/whole-system/sam3_alone.py -> results/2026-09-08/sam3-alone.md):
+  SAM3 alone as the presence gate, scored against the CONSENSUS of the Qwen3-VL and Gemma 4 gates (not human
+  truth; 89/104 asks, 15 disputed omitted): max score >= 0.5 -> 82/89 (6 false presents / 61 absent, 1 miss / 28
+  present, desk frames 28/28); >= 0.7 -> 83/89; >= 0.8 starts missing (6/28). "boiler" (absent by construction)
+  got zero detections on all 26 images even at a 0.05 floor. SAM3 detect p50 451 ms vs Qwen gate 2150 ms.
+  Of the 7 disagreements at 0.5, at least 4 look like VLM-consensus errors (windows/cars in street scenes; a truck
+  called a car). Nobody in this session can view images (no Read tool) -> the owner settles 22 asks by eye in
+  side-by-side.md or fills labels/presence-2026-09-08.template.json and reruns --score. Ruling still OPEN.
+- 2026-09-08 15:40 OWNER PROPOSAL (open): replace the whole stack with whisper q5_k + Gemma 4 E4B Q4 + SAM3 (+ YOLO).
+  Evidence per claim with verdicts, numbers copied from the raw files: bench/whole-system/results/2026-09-08/
+  stack-swap-evidence.md. Supported: Hebrew planning 247/258 with no translator (no wrong direction/sign in the 11
+  misses), highlight chain 28/42 vs Qwen 22/42, vision asks 1520 vs 2150 ms, Q4 file. Not supported: counts 2/26,
+  own boxes IoU 0.02, no Hebrew router/number guard/live grammar, no audio replay or live run. VRAM: the saving is
+  the translator (~1,100), Gemma itself is +90 vs Qwen in the same harness; new stack ~6,300 derived, unmeasured.
+- 2026-09-08 15:55 OWNER RULINGS: (a) the v2 75-list will not be spoken live; (b) TranslateGemma will NOT be used
+  (open decision 1 closed); (c) the remaining §12 not-done items are low priority; (d) measure Gemma 4 E4B as the
+  TRANSLATOR on the 413 bench, before (v1 prompt, 2 shots) and after (TranslateGemma's instruction, zero-shot):
+  bench.py --translator gemma4 [--prompt tgemma]; (e) the 75 v2 sentences must be filed into the dataset by their
+  `file:` set (agent deferred it by mistake). OPEN QUESTION: freeze integration_harden for real-drone testing and
+  fork integration_harden2 on the new stack. Agent view: the SAM3 + Hy-MT2 switches already prove the runtime-switch
+  route (one home, zero duplication); a copy doubles every fix and breaks the bench import path (it imports
+  projects/integration_harden/recognizer). Frozen fallback precedent: projects/integration/.
+- 2026-09-08 16:10 RULINGS: FORK DECIDED -> projects/integration_harden2 (copy) hosts the Gemma 4 stack; harden stays
+  clean for tomorrow; copy after the harden go-live commit. Emergency words הפסק/תפסיק/די ADDED + gated (0 new
+  fires on 413; +תפסיק/+הפסק הכל on the live lists, intended; 42 tests). Keyboard KILL SWITCH built: SPACE = /c/stop
+  (stop + RC control) + latch refusing every motion verb, R = re-arm (control/kill.py, fake-wire tested, not yet
+  pressed live). TTS/eco: tools/dji_mock/watch_503.sh (SAFE) finds the eco timeout; keep-alive effect unverified.
+- 2026-09-08 16:15 MEASURED: Gemma 4 E4B as the TRANSLATOR (v1 prompt, 2 shots) -> Qwen planner = 359/412
+  (+11 vs Hy-MT2: perception 116/128 (+25), verbose 26/54 (-18), std 198/203, military 12/20). 57/413 outputs
+  NARRATE ("The user wants to translate...") -> 23 answer-mode rejects; ONE UNSAFE flip (r_neg4 negation flown).
+  WON back the four Hy-MT2 register cases (r_takeoff2/3, r_land4, r_alt10). TranslateGemma's zero-shot
+  instruction on Gemma 4 = 171/412 (narrates everywhere) -> few-shots are mandatory for Gemma 4 too. Next lever
+  (not ruled): a grammar that forbids the narration opening, or the strict retry. Raw:
+  bench/hebrew-command-bench/results/2026-09-08-recognizer-gemma4-xlate-{v1,tgemma}.json.
+- 2026-09-08 16:30 RULINGS APPLIED: (1) the 503 watcher is built into the desk-test: `status.sh` prints the phone gate
+  code each run and `status.sh --watch` streams changes; preflight prints the watcher command. (2) Manual override =
+  the M key toggle (kill / re-arm), replacing SPACE/R. (3) LIVE DEFAULTS FLIPPED: Hy-MT2 + SAM3 + Qwen3-VL
+  (run_mvd.sh, scene_omdet.py, preflight.sh, up.sh); omdet/dicta remain switches. (4) integration_harden2 is to be
+  built NOW after a short planning round with the owner (Gemma 4 stack). (5) Gemma 4 grammar restriction: research
+  existing solutions on the web first (owner ask).
+- 2026-09-08 16:35 GEMMA 4 NARRATION FIXED: the cause is the thinking channel; `--reasoning-budget 0` is ignored by
+  Gemma 4 (same finding as llama.cpp discussion #21338). `--jinja --chat-template-kwargs '{"enable_thinking":false}'`
+  (or `--reasoning off` on build b8738+) stops it: our 12 narrating translator cases -> 0/12, 120-700 ms. Flag is now
+  in GEMMA4_EXTRA (recognizer/llama.py) for every Gemma server the bench starts; the harden2 VLM/planner server must
+  carry it too. Sources: github.com/ggml-org/llama.cpp/discussions/21338, unsloth.ai/docs/models/gemma-4.
+- 2026-09-08 16:40 MEASURED: Gemma 4 E4B translator with enable_thinking=false -> Qwen planner = 389/412 (std 202/203, verbose 51/54, perception 117/128, military 12/20); narrations 0/413 (was 57); vs Hy-MT2 348: lost 1 ['v_ready3_g2'], won 13; unsafe 0 []. Raw: bench/hebrew-command-bench/results/2026-09-08-recognizer-gemma4-xlate-v1-nothink.json.
+- 2026-09-08 17:20 OWNER RULINGS + ACTIONS: harden2 created (projects/integration_harden2, copy of the working tree
+  minus sessions/). Design rulings: Gemma routes via grammar; translator switch kept; YOLO off by default, switchable;
+  whisper stays (TODO: measure Gemma 4 as ASR on the ~125 recorded clips); Hebrew answers straight to the phone TTS
+  (SCENE_TTS_LANG=he, no VRAM). The 75 v2 sentences FILED into the bench (488 cases: cmd 254, verbose 63, emergency
+  12, perception 138, slang 21; audit CLEAN). Register phrasings HARDWIRED (stage-2 register_imperative: אפשר ל-/
+  יש אפשרות ל- + infinitive -> imperative, בוא נ- -> ת-, עלה לגובה N -> עלה N; questions untouched). די/מספיק
+  emergency fix. Running: Hy-MT2 488 gate, then Gemma 4 ALONE direct-Hebrew with thinking off and on.
+- 2026-09-08 17:30 MEASURED (488-case dataset): Hy-MT2 488 gate 420/487, register rewrites LOST 0 / WON 4 on the
+  413 common cases. GEMMA 4 ALONE (direct Hebrew, one model, no translator): thinking OFF 318/328 commands (std
+  245/253, verbose 61/63) vs the deployed Hy-MT2->Qwen 310/328 on the same cases; thinking ON 314/328 (loses 4,
+  wins 0) -> thinking OFF. Perception for Gemma alone: n/a until the target_en scoring lands.
+- 2026-09-08 17:30 HARDEN2 BUILT (projects/integration_harden2): one Gemma server (planner + VLM + Hebrew answers,
+  thinking off), direct-Hebrew pipeline with a unified grammar {kind, target_en, mission}, number guard on the
+  mission, YOLO off by default, Hebrew TTS, home switch MVD_HOME for desk-test/bench/tests. Live smoke: 10/10.
+  Boot (owner): MVD_HOME=integration_harden2 VIDEO=webcam SCENE_TTS=off bash tools/desk-test/up.sh
+- 2026-09-08 17:30 GEMMA 4 AS ASR (owner note D): our /root/models/vlm/Gemma-4-E4B/mmproj-BF16.gguf CARRIES the audio
+  encoder (has_audio_encoder=true in the GGUF). llama.cpp has the Gemma 4 audio conformer in mtmd (PR #21421) and it
+  works through llama-mtmd-cli, but the HTTP server has no input_audio route yet (issue #21868) and the encoder needs
+  BF16 (quantised mmproj drifts past its clamps). So the measurement runs clip-by-clip through the CLI, not the server.
+- 2026-09-08 17:33 GEMMA-AS-ASR RUN started (background, ~9 min): bench/hebrew_asr/gemma_asr.py, 153 clips of
+  the two live sessions through llama-mtmd-cli with the audio mmproj, Hebrew-only GBNF grammar (the CLI has no
+  thinking switch; without the grammar it narrates "**Analyze the Request**"). Scored CER/WER vs the matched
+  live-test line next to whisper q5_k on the same clip. Result table: bench_out/gemma-asr-2026-09-08.md (gitignored)
+  + the summary goes into bench/hebrew_asr/README.md when done.
+- 2026-09-08 GOTCHA (again): `pkill -f`/`pgrep -f <pattern>` from a Bash call whose own text contains the pattern kills
+  the call (exit 144). Use `ps -eo pid,args | awk '/pattern/ && !/awk/ {print $1}'`.
+- 2026-09-08 17:45 MEASURED Gemma 4 E4B as ASR on the 107 matched live clips: CER 35.8 % / WER 71.8 % vs whisper q5_k CER 8.4 % / WER 10.3 %; exact clips 7 vs 69; head-to-head Gemma better on 1, whisper on 96; p50 3542 ms per clip (CLI, model reload each). WHISPER STAYS. Table: bench/hebrew_asr/README.md; per-clip: bench_out/gemma-asr-2026-09-08.md (gitignored).
+- 2026-09-08 18:05 MEASURED harden2 END TO END on the 488 bench (unified_bench.py): Gemma 4 alone = 415/487 (perception 108/138, commands 295/316) vs harden Hy-MT2->Qwen 420/487 (perception 100/138, commands 298/316); military not comparable (translation-only set). p50 475 ms per utterance. Parity on the bench, one model, no translator. Raw: bench/hebrew-command-bench/results/2026-09-08-unified-gemma4.json.
+- 2026-09-08 19:20 .gitignore: projects/integration_harden2/sessions/ added (the fork records clips + transcripts the same way; private).
+- 2026-09-08 19:40 WEBCAM GOTCHA: `VIDEO=webcam` opens index 0 = the laptop's built-in ASUS lid camera, which is
+  black with the lid shut. The desk camera is a Logitech C920 = host /dev/video2+3; the dev container only carries
+  the /dev/video nodes that existed at container start, so a camera plugged later has NO node inside (mknod
+  /dev/video2 c 81 2 + video3 minor 3 fixes it until the container restarts). New switch: WEBCAM_DEV=2 (run_mvd.sh
+  webcam mode in both trees; up.sh passes it). C920 measured from the container: 1280x720, 30/30 frames.
+- 2026-09-08 19:43 up.sh now creates any missing /dev/videoN node from /sys/class/video4linux at boot (privileged container), so a camera plugged after container start works without a restart.
+- 2026-09-08 19:50 tools/desk-test/list_cams.py lists every host camera with index, name, whether the container can open it, frame size/fps and brightness (BLACK flag); preflight (VIDEO=webcam) and status.sh print it; the lid camera is tagged.
+- 2026-09-08 20:30 LIVE END-TO-END, harden2 on the C920 + mock (session-20260908-170015-rog, REPORT.md there): 62
+  utterances vs the 50-line uniform sample -> PASS 42, FAIL 17, REVIEW 1, unmatched 2. The 17: 8 ASR/speaker (7 of them
+  safely rejected by the number guard or fixed on the owner's retry), 4 by ruling/known (greedy עצור halt on r_wait4;
+  the 3 military idioms -> reject), 4 planner (extra 0-degree spin on "סיבוב קטן"; a DOUBLE NEGATION flew two spins
+  once and was empty on the retry -> UNSAFE, shot added; dz vs dy axis on one chain; return-trip sign dx=-10), 1
+  routing ("יש אפשרות לנחות עכשיו?" with an ASR question mark -> reject). Perception: all 14 lines routed right; gate
+  absent on 12 desk-less scenes, present on the owner (line 21) and ONE FALSE PRESENT with a zero box (line 34).
+  Peak VRAM ~6.5 GiB (owner-observed). SAM3 jitter explained: one SAM3 forward per second (SCENE_SAM3_PERIOD=1.0);
+  the compound phrase scored 0.21-0.49 around the 0.30 floor -> mask on/off each second; below the floor the VLM box
+  (IoU 0.02) was drawn as the fallback = the "chest rectangle". FIXED in harden2: Gemma boxes never used as a
+  fallback, a degenerate gate box = absent, SAM3 gets the head object with its own attributes only
+  (phrase_concepts drops relational clauses), a highlight nobody finds for SCENE_HL_GIVEUP=8 s is dropped with a
+  Hebrew "לא מצאתי". Tests 49 green. Not fixed: SAM3 counting; the double-negation guard is a shot, not a rule.
+- 2026-09-08 21:10 GITIGNORE (owner: "make gitignores", diff was 326 files -> 217): *.done markers, the whole-system
+  overlay jpgs (regenerated by overlays.py), whole-system run logs and replay .jsonl rows (clip transcripts = private),
+  bench/hebrew_asr/bench_out/ (transcripts), projects/integration_harden2/sessions/. Kept on purpose: the
+  bench raw .json results and the .md reports (the READMEs cite them as evidence). A gitignore pattern must not
+  carry a trailing "# comment" on the same line -- it becomes part of the pattern.
+- 2026-09-08 21:10 harden2 architecture diagram (mermaid + measured numbers per box + switches):
+  docs/active/2026-09-08-harden2-architecture.md. To be aligned with the owner's demo-day diagram.
+- 2026-09-08 22:40 docs/active/2026-09-06-architecture-diagrams.md refreshed by the live-test lane at the manager's request: §3 (defaults, kill switch, line cites), NEW §3b harden2 (links the 09-08 doc), §5 (stage 0/2/4 changes, 488-case table), §6 (SAM3 backend, rate limit, live flicker finding), §7 (WIRED, the six open items resolved/updated). Every mermaid block re-rendered via mermaid.ink.
+- **Defaults flipped to SAM3 + Hy-MT2 (owner ruling 2026-09-08; recorded here by the manager
+  2026-09-08 late, since the 2026-09-07 entry above still says "defaults unchanged, OWNER to rule"):**
+  `SCENE_SEG=sam3` and `MVD_TRANSLATOR=hymt2` are the run_mvd.sh defaults (run_mvd.sh:36-40,
+  tools/desk-test/preflight.sh:56); `omdet` + `dicta` remain the switches for the old pair. The
+  translator pane is now named `xlate` (log mvd_xlate.log), port MVD_XLATE_PORT default 18091.
+  Measured fit of the deployed five-model stack (census.py --sam3-stack, 2026-09-07): Qwen 3,821 +
+  Hy-MT2-Q4 1,187 + whisper q5_k 827 + YOLO 282 + SAM3-nf4 1,074 + transient 94 = 7,396 / 8,151 MiB,
+  313 free. whisper q5_k MEASURED at 827 MiB supersedes the file-size estimate (~550).
+- **Judge diagrams doc consistency pass after the lane refresh (manager, 2026-09-08 late):** §1
+  high-level view now shows the three Python forks (frozen, harden, harden2), the GPU model servers
+  per fork and SAM3 as the default highlighter; §9 renamed dicta->xlate and the new preflight model
+  checks; §12 marks the SAM3 lane WIRED and adds the harden2 flight gate; §13 replaces the 09-02
+  census table with the measured 09-07 five-model stack. The lane's edits (§3, §3b, §5, §6, §7)
+  were verified against run_mvd.sh, preflight.sh, the bench README and the tree before acceptance.
+  Its report of 404/503 on the FMU-lane blocks was mermaid.ink rate limiting: all render 200 with backoff.
+- 2026-09-09 00:45 OWNER RULING applied: COUNTING IS SAM3's JOB in harden2 (Gemma 2/26 on the bench). kind=count ->
+  "count the <target>" -> TextHandler._handle_count -> SAM3 alone at score 0.5 on phrase_concepts(target) (no VLM
+  gate), the counted objects stay highlighted, chat "ספרתי N: <target>", TTS "יש N" / "לא מצאתי". parse_count in
+  perception/engine.py; tests 51 green. Not yet exercised live.
+- 2026-09-09 00:45 OWNER RULING: a root `runs/`-style folder for every log / trace / session / overlay / replay row,
+  gitignored as one line, scripts write there; committed evidence (.md reports + cited raw .json) stays next to each
+  bench. Scheduled for the day after the judges ("we'll do the data folder tomorrow"); ~8 scripts touch their paths.
+- 2026-09-09 01:30 harden2 slide diagrams redone as graphviz DOT (docs/active/assets/harden2-*.dot -> .png/.svg, dpi 192) per the llm_to_action lane's recipe; mermaid.ink dropped for slides (Hebrew/'&'/'direction' parse failures; banner aspect ratios).
+- 2026-09-09 02:15 DJI API server diagrams + route doc written by a headless Opus job (docs/active/assets/dji-apiserver-{simplified,detailed}.{dot,png,svg}, docs/active/2026-09-09-dji-apiserver-architecture.md). It corrected four ground-station-side assumptions: /input is the PHONE posting to the ground station; the H.264 video is TCP :5600 with the phone as the server; the recognizer is Google SpeechRecognizer (Vosk is dead code); /c/ws/sticks has no keepalive. harden2 diagram labels fixed accordingly.
+- 2026-09-09 02:20 DIAGRAM SVG BUG FIXED: graphviz's default SVG keeps text as <text> with fontname Helvetica; slide tools without that font substitute a wider one and labels overflow. All diagram SVGs (harden2-*, dji-apiserver-*) are now rendered with `dot -Tsvg:cairo`, which outlines every glyph into paths (0 <text> elements, verified). Labels narrowed (line breaks instead of dot separators). draw.io files regenerated from the DOT layouts.
+- 2026-09-09 02:30 tools/diagrams/dot2drawio.py: graphviz DOT -> native editable draw.io (keeps the dot layout). Slide recipe: dot -Tpng, dot -Tsvg:cairo (outlined glyphs), dot2drawio for hand edits.
+- 2026-09-09 05:40 CONTEXT SWEEP before compaction: handoff §17 (the night's work) + §18 (where to look next); the judge/team objective brief is docs/private/2026-09-09-team-summary-objective.md (gitignored). Next agent: read §18 first.
+- 2026-09-09 05:45 tools/desk-test/score_session.py: the live-session scorer (overlap alignment + expected-notation judge) saved as a script; it reproduces the 42/17/1/2 review of session-20260908-170015-rog.
+- 2026-09-09 06:05 block A (webcam + mock, harden2) result: 7/7 sentences routed right; 2 missions flew on the mock with the exact steps; highlight chair stable (SAM3 0.93-0.95); describe answered in Hebrew; both rejects clean; M killed (POST /c/stop 200) and refused the next 3 missions until re-armed; "עצור ל-10 שניות" halts by design. ONE bug: "ספור את הכיסאות" 4 times -> 2, 5, 4, 6 (one frame, no dedup; SAM3 returns part-inside-whole instances). Fix: perception2/counting.py (conf >= 0.5, drop boxes 70 % contained in a stronger box) + median over 3 frames 0.3 s apart (SCENE_COUNT_FRAMES/SCENE_COUNT_GAP); test/test_count.py. Live stability of the fix is UNVERIFIED until block B.
+- 2026-09-09 06:05 evidence gaps closed: _say now always prints to app.log (the KILL / refused lines were chat-only, so the session log could not show the kill); pipeline names a 409 refusal "REFUSED-kill-latch mission(...)" instead of "mission(..., planned)".
+- 2026-09-09 06:00 team summary document produced by a headless agent into docs/private/ (gitignored): team-summary-2026-09-09.{md,pdf} (7 pages), competitors-validation.md (12 blocks, 2 sources each), render_team_summary.py, team-summary-STATUS.md. Findings the owner must read before the meeting: ThirdEye had a MAFAT Hebrew voice interface (20 commands) in 2022; XTEND markets XOS as hardware-agnostic; "Kronos Group" was not found (likely Kratos); LINE5 product claims unverifiable; every "they lack X" claim is unverified by construction.
+- 2026-09-09 06:40 block B (phone video + mock + Hebrew TTS, harden2) worked: mark chair + count chairs (5,5,5 after the median fix) from the phone, the phone spoke. Vision misses, root causes from /tmp/desk-test/20260909-031808/app.log + traces: (1) Gemma's target_en mistranslated furniture nouns: מגירות -> "cabin", שידות -> "desks" -> SAM3 counted 0 (Gemma is not the vision here, its English WORD was wrong); (2) SAM3 scores "screens" 0.25 and "window panes" 0.26 while "monitor"/"window" score ~0.9; (3) "top left window": SAM3 cannot use positional words -> NOTHING; (4) the Gemma presence gate said absent once for "all screens" (then present on retry); Gemma describe answers were pedantic ("no traditional kitchen cabinets... there is a wooden hutch"). Windows highlight actually worked (2 windows at 0.88-0.91).
+- 2026-09-09 06:40 fixes: perception2/lexicon.py HE->EN noun table (about 120 nouns) applied under Gemma for highlight/count only when Gemma's target has none of the noun's aliases (flag "lexicon:'cabin'->'drawer'" in the trace); SAM3 synonyms screen->monitor/television/screen, cabinet->cabinet/cupboard/wardrobe, drawer->drawer/dresser, "window pane"->window; positional words (top/left/upper/... , "on the left") stripped from the SAM3 concept; SCENE_GATE=vlm|either|sam3 switch in scene_omdet (default vlm = unchanged; "either" = Gemma no + SAM3 hit >= 0.5 counts as present). 60 tests pass. OPEN ruling: the SCENE_GATE default for the demo (agent recommends "either").
+- 2026-09-09 06:46 RULING (owner): block C and the demo run with SCENE_GATE=either (Gemma "absent" is overruled by a SAM3 hit >= 0.5). The code default stays vlm until C confirms it; if C is clean, flip the default in scene_omdet.py so the demo cannot forget the env.
+- 2026-09-09 07:19 laptop restart wiped bitsandbytes + accelerate from the container (SAM3 nf4 would not load). Restored with tools/devenv/install-runtime-deps.sh (exit 0). Rule for the morning: after ANY restart run that script, then preflight. The C920 was not on USB and the laptop was on a non-hotspot network (gw 10.160.188.132) at the time.
+- 2026-09-09 07:28 real-run blocker: run_mvd.sh line 173 exported a bare $MVD_SESSION_DIR under set -u; only up.sh set it, so `run_mvd.sh dji real` aborted "unbound variable" (blocks A/B went through up.sh and never hit it). Fix: run_mvd.sh now defaults MVD_SESSION_DIR to sessions/session-<stamp>-<host> and records clips (ASR_RECORD=1) so a direct real run leaves the same evidence as up.sh.
+- 2026-09-09 07:28 real-run blocker 2: the phone's hotspot IP CHANGED (10.222.215.92 -> 10.160.188.132). The run was launched with the old IP: gstreamer video flowed (derived gateway) but the app's router said "-> 10.222.215.92 (real)" and every POST /c/fly timed out UNREACHABLE while the aircraft was airborne on the RC. Rule: never hardcode PHONE_IP; use $(ip route | awk '/^default/{print $3}') and confirm GET http://<gw>:8080/status = 200 before boot. Run sheet + run_mvd.sh header fixed; memory updated.
+- 2026-09-09 07:35 RULING (owner): "Gemma 4 is the planner, SAM3 is the eyes." SCENE_GATE default flipped vlm -> sam3 in harden2 scene_omdet.py: a highlight no longer asks Gemma whether the object is visible; SAM3 at score >= 0.5 (deduplicated) decides. Count was already SAM3-only. Describe questions still go to Gemma because SAM3 cannot describe a scene (the only VLM on the box). SCENE_GATE=vlm|either remain as switches.
+- 2026-09-09 07:45 FIRST REAL harden2 FLIGHT (Gemma 4 planner, SAM3 eyes) — session projects/integration_harden2/sessions/session-20260909-042949-rog, log /tmp/mvd_app.log: 6 missions reached the aircraft with HTTP 200 (dz 2; spin -90 + dx 1; spin 180 + dx 5; three "square" requests). Planner finding: "square" is phrasing-dependent at temp 0 — "תבצע תנועה של ריבוע בגודל של מטר אחד" -> the correct 4 legs; "תטוס בריבוע של מטר" -> ONE diagonal leg (dx 1, dy 1); "תעלה עוד שני מטרים ... ריבוע בגודל שני מטרים" -> dz 2 then a diagonal first leg. Not a vision issue; a UNIFIED_SHOTS square example is the fix but needs the 488 bench rerun -> after the judges. Do NOT say "ריבוע" in the demo. Vision finding: "סמן את כל הכיסאות" in an open field -> Gemma gate present=True AND SAM3 "chairs" 0.60-0.86 on boxes under 0.5 % of the frame = speck false positives. Fix: SCENE_MIN_BOX_FRAC=0.001 (about 30x30 px at 720p) applied to the gate, the count and the drawn highlight; test added; 61 tests pass. ASR note: "תספורת מיכלי הגז" (haircut) for "תספור את" still routed to count by Gemma.
+- 2026-09-09 08:05 "can't see" diagnosis (session-20260909-044803-rog, /tmp/mvd_app.log; SCENE_GATE=sam3 default confirmed via /proc environ, process started 04:48 > code mtime 04:42 so the new code IS live). Pattern, by noun: cars/vehicles/person -> SAM3 0.86-0.97 on real boxes (3-17% of frame), highlighted fine. windows 17x "found NOTHING", blinds 4-5x NOTHING, and several drops-after-8s. Root cause: SAM3-nf4 is UNSTABLE on glass/architecture (windows, blinds) and tiny boxes -- it returns a box on the gate snapshot (present=True) then loses it on the next frames, so after SCENE_HL_GIVEUP (8s) the chat says "לא מצאתי" = the "can't see" the owner heard. NOT a Gemma fault (gate is SAM3 now) and NOT the speck floor (no person/car/chair was dropped by it). Demo rule: highlight/count PEOPLE, CARS, CHAIRS -- never windows, blinds, glass, screens-at-distance. Post-judges fix: seed the worker with the gate's own SAM3 box so an unstable object is not lost (gate and worker both run SAM3 now but independently), and/or raise SCENE_HL_GIVEUP.
+- 2026-09-09 08:20 "only 3 of 12 cars highlighted" root cause + fix (live block C). The offline sam3-mask-bench fed images straight to the backend; the LIVE highlighter wraps SAM3 in PerceptionEngine with three limits the bench never had: (a) mask_k=3 -> at most 3 detections drawn per frame [THE cap: the log showed 8/8 cars passed the gate, only 3 drawn]; (b) SAM3 detect topk=8 -> cars 9-12 never entered; (c) relative gate rel=0.65 -> anything below 0.65*best dropped. So live recall = SAM3 raw minus three gates, on a moving drone -- not a SAM3 regression. Fix (scene_omdet.py, 61 tests pass): SCENE_HL_TOPK default 8->24 (detect + count), SCENE_HL_MAX default 3->15 (engine mask_k, passed at construction; constructor default stays 3 so the engine selftest is unchanged). SAM3 masks are cached from detect so drawing 15 costs almost nothing. Simulation (12 real car boxes conf 0.97..0.55): before=3 drawn; after rel=0.65=9 drawn; rel=0.45=12 drawn. Remaining lever for crowded scenes: SCENE_HL_REL=0.45 (default 0.65 kept -- it protects single-object highlights, e.g. the engine selftest's 0.48 window dying next to a 0.90). Windows/blinds are still the SAM3-can't-segment-glass problem (separate, 08:05).
+- 2026-09-09 08:25 WHY the highlight cap existed (for the record, owner asked). The PerceptionEngine (mask_k=3, rel=0.65, presence gate) was written for the OmDet-Turbo + SAM2.1 pipeline: each kept box needed a SEPARATE, expensive SAM2.1 mask forward, so mask_k=3 capped cost for the live loop, and the relative/presence gates existed because OmDet returns a confident box on absent objects. SAM3 returns boxes AND masks in ONE cached forward, so the per-box mask cost that justified mask_k=3 is gone -- but the cap was inherited at the SAM3 swap and never lifted (integration oversight). That is the entire bench-vs-live gap: sam3-mask-bench (2026-09-03) called the backend DIRECTLY (run_suite/run_indepth) and saw 26-47 windows, 30 people, 8 cars; the live app ran the SAME SAM3 through the OmDet-era throttle -> 3 draws max. Fixed 08:20 (HL_MAX 15, HL_TOPK 24). Note the split: cars = the cap (fixed); windows live = SAM3 returned ZERO at floor 0.12 from the moving drone (the bench stills gave 47) = scene/motion, NOT the cap. compare_engines.py is the one bench path that DID drive the full PerceptionEngine, so the gating was visible there, just not in the headline raw-detect numbers.
+- 2026-09-09 08:55 team doc section ד rewritten from verdict-log bullets (אמיתי/סותר/אין ראיה) to Gemini-style prose, one paragraph per company, in order 1-12, no internal jargon; dropped the "Gemini logic vs findings / don't tell the judge" meta-subsection; kept the three differentiation blocks + the numbers/form table. The firm per-claim verdicts + 16-39 sources each stay in competitors-validation.md (evidence file for owner only). PDF re-rendered: 6 pages. Backup at team-summary-2026-09-09.md.bak.
+- 2026-09-09 18:45 judge meeting CANCELLED (the business meeting was enough for them). Reorienting to the challenge form only. Full high+low state written to docs/active/2026-09-09-project-state-and-reorientation.md: scorecard (done/WIP/not-met/not-measured) with WHY each was worked, all measured numbers, today's work, and the ranked backlog led by 3.1 vision-conditioned action.
+- 2026-09-09 19:20 SAM3 caps were arbitrary and wrong (owner called it). The 3-draw / 8-detect caps were inherited from the OmDet+SAM2.1 era where each box cost a separate SAM2.1 mask forward; SAM3 returns boxes+masks in one cached pass so there is NO per-box cost to cap. My 15/24 "fix" this morning was still an arbitrary number and it silently clipped COUNT at 24 (a real bug: >24 objects would undercount). Corrected: HL_TOPK and HL_MAX default 128, above SAM3's own object-query budget (bench saw 47 windows, 51 in market-2; exact budget UNMEASURED = a research point). They are now a latency safety-valve, not a product limit; count is effectively uncapped. Open: measure SAM3's true per-pass instance ceiling.
+- 2026-09-09 19:50 challenge form saved canonical: docs/active/challenge-form.md (from Build Challenge Doc.pdf, Ground Forces Innovation Lab). All status docs map to its section numbers.
+- 2026-09-09 19:50 ASR noise numbers FOUND (owner pointed to the noise filter; they live in the ASR side, not the vision repo): docs/research/asr-noise-robustness.md + the sttserv harness (BUILD_noisefilter/snr_mix_core.h, sttserv/test/asr_test.cpp, dependencies/noise_beds/battle_{0..3}.wav). Result, Parakeet-TDT-0.6B q4, ENGLISH, raw audio, real gunfire/explosion beds mixed at controlled SNR: 92% intent at 0 dB (38/38 pass), ~87%+ from +20 to 0 dB, ~80% at -4 dB, collapse by -10 dB. Denoisers ALL net-negative end to end: raw 37/44 vs classical DSP 33, SpeexDSP 30, GTCRN neural 27 -> decision "ship raw, no front-end filter" (the ASR is trained on noisy speech). Confidence gating dead (failing transcripts averaged higher confidence than passing). GAP vs the challenge: this is Parakeet/English; the challenge is whisper/Hebrew. Remaining work = replicate the SNR sweep with whisper on Hebrew clips + the same beds (infra reusable), and build the LOW-LIGHT image equivalent for SAM3. Do NOT re-research denoisers; that question is answered.
+- 2026-09-09 21:00 negation demo (offline, deterministic): ALL negation sentences pass through recognize_direct as "direct" -> reach Gemma. Safety on negations currently rests on Gemma classifying them as reject; it worked for "אל תנחת" (block A) but FAILED live for r_neg4 "בלי להסתובב בבקשה" (flew two spins). Demonstrates the need for a deterministic action-negation guard BEFORE the model. Demo script in scratchpad.
+- 2026-09-09 21:00 SAM3 cap state: code corrected (HL_TOPK/HL_MAX=128, count uncapped, comment cleaned), compiles, 61 tests pass, but UNTRACKED in git and NOT verified live. Not shipped.
+- 2026-09-09 21:00 repo cleanup DRAFT written: docs/active/2026-09-09-repo-cleanup-draft.md. Key risk flagged: integration_harden2 is entirely UNTRACKED; a git mishap would delete the fork. Commit it first.
+- 2026-09-09 21:30 owner replan approvals: (B) negation guard+test APPROVED; (C) operator-mission context = its own project (the drone's context != the operator's field context; model mission/phase so the system assumes correctly instead of guessing); (D) tracker back ON, NOT Plane (owner dislikes their pricing) — agent recommends OpenProject (GPL, free, hierarchy + wiki, ~4GB, Docker) hosted on the workstation not the 8GB laptop, Huly as the modern-feel alternative (8-16GB); noise = a real whisper-Hebrew e2e benchmark, no denoiser research (answered). New ordered plan in docs/active/2026-09-09-project-state-and-reorientation.md §7 (two tracks: organization + technical).
+- 2026-09-10 owner: each track gets its own subagent. Track 2 (the system) = owner + this session. Track 1 (self-hosted tracker) = a separate subagent, seeded by docs/active/2026-09-10-track1-tracker-handoff.md (written in the house handoff style; cross-checked against the 09-05/-07/-08 handoffs + the 08-26 manager brief). Tracker recommendation OpenProject (Huly alt), host on the workstation not the 8GB demo laptop, NOT Plane.
+- 2026-09-10 "routing verification" pinned = harden2's single Gemma call choosing action+plan, checked by bench/hebrew-command-bench/unified_bench.py over 488 cases (last 415/466) + a live pass; it is Track 2 (owner's point 2). Today's changes were vision-only, so routing should be unchanged. Track 2 execution draft written: docs/active/2026-09-10-track2-execution-draft.md (steps 1-5 with definition-of-done + who-runs-what).
+- 2026-09-10 Track2 draft rev2 (owner corrections): (1) the negation guard is a harden2 FEATURE and must land BEFORE the commit/freeze, not after — folded into step 2 (2b) and made part of routing verification (a negation that flies is a routing failure); clarified we FREEZE harden (old fallback), NOT harden2 (active). (2) noise+low-light benchmarks DEFERRED to after the repo cleanup, which is now step 3. New order: 1 webcam verify, 2 harden2 save+guard+verify+commit(+freeze harden), 3 cleanup, 4 benchmarks, 5 big builds.
+- 2026-09-10 Track2 draft rev3 (owner): harden is ABANDONED as the dev target but KEPT as fallback; FREEZE it only AFTER harden2 proves it works well OUTSIDE (real outdoor drone session) — freeze moved to step 5, gated on outdoor validation, not on the bench+webcam. Added the abandonment-reasons list (4->1 models, lossy translation hop dropped, VRAM, 415 vs 410, less to tune, Hebrew answers free, iteration speed). Added step 7: eventually FUSE the C++ llm_to_action engine with integration_harden2 (the destination product). New order: 1 webcam verify, 2 harden2 save+guard+verify+commit, 3 cleanup, 4 benchmarks, 5 outside-validation->freeze harden, 6 features, 7 llm_to_action fusion.
+- 2026-09-10 CORRECTION (owner was right): integration_harden is NOT the fallback and is half-baked. Evidence: CLAUDE.md names projects/integration/ (English, frozen) as THE proven fallback; integration_harden is 100% uncommitted (22 modified + 3 untracked), and lacks every 2026-09-09 harden2 fix (no perception2/counting.py, no lexicon.py, no HL_TOPK/HL_MAX cap fix, no SCENE_GATE) so it still has the count jitter + 3-draw cap + "cabin" mistranslation. Its 44 tests pass (code coherent) but it is stale/buggy as a system. Ruling: drop "freeze harden" from the plan entirely; harden is a dead intermediate; owner later discards its uncommitted diff or leaves it as history; harden2 is the Hebrew system; the only real fallback is projects/integration/ (English). No second Hebrew tree maintained. Track2 draft -> rev4.
+- 2026-09-10 Track2 rev5 (owner): the outdoor test validates the FINAL system (harden2 + today's perception fixes + the negation guard), so it comes BEFORE the cleanup, not after; passing it freezes THAT exact commit as the validated baseline (tag). Cleanup must be behaviour-preserving for harden2 (moves/commits/docs OK); any change to harden2's runtime behaviour invalidates the frozen validation -> RETEST outdoors and re-freeze. New order: 1 webcam verify, 2 harden2 save+guard+verify+commit, 3 outdoor validation -> freeze baseline, 4 cleanup (behaviour-preserving), 5 benchmarks, 6 features off the baseline, 7 llm_to_action fusion.
+- 2026-09-10 clarified (owner asked "why hymt2 as translator?"): harden2 does NOT run a translator. run_mvd.sh defaults MVD_TRANSLATOR=none (Gemma reads Hebrew directly); no xlate tmux window starts (block A/B had windows vlm/keys/asr/gst/dog/app, no xlate). The "hymt2" the owner saw was a COSMETIC LIE in up.sh's status echo and preflight.sh's default (hardcoded :-hymt2 from harden's era). Fixed both to be MVD_HOME-aware: default none for integration_harden2, hymt2 otherwise. Display/preflight-only change; no runtime behaviour change to harden2.
+- 2026-09-10 GOTCHA found while listing run args: SCENE_TTS is NOT read anywhere; "SCENE_TTS=off" (used in earlier retest commands + up.sh comment) is a NO-OP. The real TTS switch is MVD_TTS=0. On webcam-only boots TTS was off because the phone voice backend fails to attach, not because of the flag. Full arg reference: docs/active/2026-09-10-harden2-run-arguments.md.
+- 2026-09-10 owner rulings on harden2 args + a 2-file config draft. DELETE: MVD_HOME, MVD_TRANSLATOR, MVD_XLATE_PORT, GEMMA4_THINK, MVD_TRANSLATE_PROMPT, MVD_PLANNER(qwen3vl path), SCENE_SEG(omdet path)+SCENE_SAM2, SCENE_TTS(no-op). BAKE constants: gemma4+thinking-off, ports, SEG=sam3, BG off, HL_TOPK/HL_MAX/HL_CONF/DETECT_FLOOR/MIN_BOX_FRAC/COUNT_FRAMES/COUNT_GAP/HL_GIVEUP/SAM3_PERIOD, TTS_LANG=he, PHONE_ASR on, PHONE_ASR_PORT, offline flags, TMUX_SESSION, DISPLAY, PULSE_SERVER, DRONE_ROUTER on. KEEP as overridable-with-default: VIDEO(webcam|dji), CONTROL(mock|real), WEBCAM_DEV, PHONE_IP(ALWAYS derived from default route, override to force), SCENE_HL_REL, SCENE_GATE(kept "at bay", default sam3), MVD_TTS, all ASR_* escape hatches, RECORD(default on, drives clips), SESSIONS_ROOT/SESSION_DIR(one root; CLIPS_DIR+LOG_DIR derived). Draft files: projects/integration_harden2/config_constants.py + config_defaults.py (NOT yet wired; behaviour-preserving until the cleanup wires them and deletes the dead code paths + moves config out of the scripts). run_mvd stays only as a thin process launcher (llama-server, whisper ASR node, keyboard hook, gstreamer node, app, tmux); config leaves it.
+- 2026-09-10 config draft rev2 (owner): MVD_DRONE removed ENTIRELY (not even baked) — routing is unconditional, CONTROL alone decides the wire target; no "enable router" flag. Perception constants renamed to intent-describing names (SAM3_MAX_BOXES_PER_QUERY, MAX_HIGHLIGHTS_DRAWN_PER_FRAME, MIN_DRAW_CONFIDENCE, DETECTOR_QUERY_THRESHOLD, MIN_BOX_FRACTION_OF_FRAME, COUNT_MEDIAN_FRAMES, COUNT_FRAME_GAP_SECONDS, HIGHLIGHT_GIVEUP_SECONDS, SAM3_MIN_SECONDS_BETWEEN_FORWARDS). SCENE_GATE stays in config_defaults.py as HIGHLIGHT_PRESENCE_GATE (default sam3, env-overridable). Confirmed: Gemma has ONE runtime prompt (UNIFIED_PROMPT = REVISED_PROMPT + routing, with UNIFIED_GRAMMAR + UNIFIED_SHOTS); the other prompt strings are the dead translator. run_mvd stays only as the process launcher post-cleanup.
+- 2026-09-10 22:47 negation-guard BASELINE finding: at temp 0 the 488-case bench shows Gemma ALREADY rejects EVERY negation correctly (r_neg1-5, neg_trap, l_dbl_neg, l75_neg_emphatic all CORRECT-reject; the negation+order cases CORRECT). Zero measured failures. The UNIFIED_SHOTS negation reject examples already handle it. So the deterministic guard is DEFENSE-IN-DEPTH vs the LIVE non-determinism (r_neg4 flew two spins once), NOT a bench fix; it does not meet the skill's >=2-failures bar, and its only real risk is regressing a currently-correct case. PAUSED for owner go/no-go. Current bench total = 410/487 (the older "415/466" is stale).
+- 2026-09-11 (morning) persisted the assurance math (binomial/Clopper-Pearson/Wilson/rule-of-three + implications) to the guard workplan appendix; added a consolidated session index + resume pointer to the reorientation doc section 8. Everything non-private is in purpose-specific files, not chat. Resume = workplan "STATUS at stop" -> A5.
+
+- 2026-09-11 negation guard HARDENED + config merge DESIGNED (harden2). (1) recognizer.negation_only
+  rewritten from a positional heuristic ("positive before negation") to a SUBTRACT rule: split the
+  utterance on , . ; ואז אבל ורק אולם, then per clause remove the verb the negation trigger governs
+  (אל ת.../בלי ל.../לא ל...); an imperative that SURVIVES the removal is a separate real order, so the
+  clause passes. A bare number+unit is an order only when the clause has no negation. This fixed a real
+  false fire — a leading manner-negation before an order ("בלי לעצור תמשיך ישר", continue straight
+  without stopping) — that the positional rule wrongly refused. Added continue/slow/speed verbs
+  (תמשיך/המשך, תאט/האט, תאיץ/האץ) to the positive-imperative list. Dataset grown to 24 must-refuse +
+  25 must-pass (test_negation_guard.py). Full bench re-run (tag negation-guard-a7): 410/487, 0 changed
+  cases vs baseline, 0 false fires. Guard is defense-in-depth (Gemma already rejects these at temp 0);
+  the win is determinism for the safety-critical negation class. UNCOMMITTED (human owns git).
+- 2026-09-11 config merge (harden2) design + golden-master, behaviour-preserving. Captured the current
+  config surface (~47 keys across config.py + scattered getenv in scene_omdet.py/pipeline.py/watchdog)
+  per launch scenario -> test/golden_config.json (capture_golden_config.py). Completed config_constants.py
+  (baked) + config_defaults.py (overridable + video_input()/wire_target() derivers) as a full superset of
+  the ACTIVE keys; test_config_golden.py proves they reproduce the golden for webcam_mock/dji_mock/dji_real
+  (2 tests green, 66 total offline). The merge DROPS the omdet/sam2/yolo + translator keys with their dead
+  code. It bakes the launcher's active values (TTS he, background off, router unconditional) as constants,
+  dropping config.py's stale yolo/English naked defaults (the bench does not read them -> no behaviour
+  change). B2 (rewire app imports + delete dead code + strip run_mvd.sh exports) is STAGED, gated on an
+  owner live webcam run because the bench exercises only the recognizer, not perception/camera/TTS.
+
+- 2026-09-11 perception capture ADDED (harden2, cleanup-audit B1 half 1). scene_omdet SessionLog gains
+  capture_perception(); the count/highlight/ask threads each call it after detection. Per query it saves
+  the frame (<session>/perception/NNNN-<kind>.jpg) + raw and kept SAM3 detections (conf+box) + the result
+  + the params (gate/seg/thr/min_box_frac/topk) as one JSONL line in <session>/perception/perception.jsonl.
+  Self-contained in the session dir, SEPARATE from the ASR clips/ and utterances.jsonl (owner requirement,
+  "dont mix the data"). Behaviour-preserving (additive I/O on the existing background threads). This closes
+  the gap that made the indoor "12 cars, 3 highlighted" miss un-debuggable, and feeds the B1 replay harness.
+  test_perception_capture.py 3/3; full harden2 suite green. UNCOMMITTED (human owns git).
+
+- 2026-09-11 config merge WIRED (harden2) + session-folder symmetry + a static-analysis pass on all
+  session features. (a) config.py is now a thin ADAPTER: every value is sourced from config_constants.py
+  (baked) + config_defaults.py (overridable + the host resolvers resolve_device/torch/default_gateway/
+  resolve_he_font + overlay colours), with each env override preserved. scene_omdet's scattered perception
+  knobs (SEG/GATE/HL_TOPK/HL_MAX/COUNT_*/MIN_BOX_FRAC/HL_GIVEUP/SAM3_PERIOD/DETECT_FLOOR/HL_CONF/HL_REL) now
+  take their DEFAULTS from the two files. Behaviour-preserving: golden-master 2/2, scene_omdet imports with
+  every knob value identical, 70 offline tests green, the guard bench unaffected (410/487). (b) session
+  folder is now symmetric: asr/ (utterances.jsonl + .log + clips/*.wav) and perception/ (frames + jsonl),
+  meta.json at the root; SessionLog + run_mvd.sh write there, and the 5 reader tools (show_session, score_*,
+  gemma_asr, run_list) fall back to the legacy top-level so old sessions still read. (c) static analysis /
+  dry run of every feature: recognize_direct crashed on a None transcript (pre-existing stage-0 regex;
+  unreachable live because the text handler does (text or "").strip()) -> hardened with `he = he or ""`;
+  the negation guard is fail-safe (reject only, never motion) and survives empty/emoji/5000-char/null-byte
+  input; the perception threads were driven synchronously with fakes and do not crash (None frame -> image
+  null); perception2/detectors.Eyes does an UNGUARDED YOLO(config.BG_SEG_MODEL) that would raise on BG=off,
+  but it is DEAD (scene_omdet uses the guarded perception/detectors.Eyes) -> delete it in the B2 dead-code
+  pass, no live risk. REMAINING (B2 cleanup, not blocking): delete the omdet/translator dead code and strip
+  the now-redundant config exports from run_mvd.sh. All UNCOMMITTED (human owns git).
+
+- 2026-09-11 harden2 dead-code PURGE (owner ruling: keep YOLO26 background, delete the rest of the old
+  4-model stack; harden2 only). Removed OmDet, SAM2.1, the DictaLM/Hy-MT2 translators, and the Qwen3-VL
+  planner from pipeline.py (-> direct path only), llama.MODELS, perception/detectors.py (Eyes=YOLO only),
+  scene_omdet (import + build_highlight omdet branch + _translate wrap), config.SAM2_WEIGHTS, perception2/
+  __init__, run_mvd.sh (translator/xlate/qwen/omdet). Behaviour-preserving: bench 410/487 with 0 changed
+  cases; 60 offline tests; golden-master 2/2; all modules import. Owner to git rm 6 orphaned files
+  (2 translator servers + perception2/{detectors,engine,vlm_client,chain_demo}.py). Deferred to the nuclear
+  review: prompts.py dead strings + recognizer.recognize(). Plan: docs/active/2026-09-11-harden2-deadcode-purge.md.
+
+- 2026-09-12 up.sh completeness fix for the asr/ folder change. The session-folder move to asr/ had only
+  touched run_mvd.sh; but tools/desk-test/up.sh (the launcher the owner drives) OVERRIDES ASR_RECORD_DIR,
+  so clips would have landed in flat clips/ while utterances went to asr/ -- a split. Fixed: up.sh now sets
+  CLIPS_SUB=asr/clips for MVD_HOME=integration_harden2, flat clips/ otherwise. run_mvd.sh push-to-talk
+  banner corrected H->F5 (the keyboard hook binds F5; run_mvd echoed a stale H). Desk-test launch method of
+  record = the 4 scripts (up/preflight/status/down), NOT raw run_mvd.sh.
+
+- 2026-09-12 MVD_HOME DELETED (honoring the 2026-09-10 ruling I had missed). It was the up.sh/preflight
+  fork-selector and, worse, defaulted to the DEAD integration_harden. harden2 is the only system, so the
+  desk-test launchers now hardcode projects/integration_harden2: up.sh RUNMVD + SESSIONS_ROOT + CLIPS_SUB
+  (=asr/clips), preflight TRANSLATOR=none. No MVD_HOME anywhere in tools/desk-test/*.sh. Desk-test launch
+  is now just: VIDEO=webcam MVD_TTS=0 bash tools/desk-test/up.sh. config_constants docstring updated to list
+  MVD_HOME among the deleted knobs.
+
+- 2026-09-12 webcam-test fixes (owner complaints 1/3/4). (1) Rejections now show WHY in the overlay:
+  _reject_why() maps the action to a plain reason (neg-guard / number-mismatch / planner-echo / model
+  could-not-route). (3) The highlight-absent message was ungrammatical ("a all guitars") AND opaque: it
+  used the raw target and gave no reason. Now it uses the stripped concept and reports SAM3's best score
+  -- "I don't see \"guitars\" in view (SAM3 best 0.42 < 0.50 gate)" vs "(SAM3 found nothing)". The gate now
+  detects at a 0.1 floor so near-misses are visible (still gates at 0.50). (4) Container is UTC (TZ unset,
+  /etc/localtime->Etc/UTC); session dirs + asr clip names (localtime_r) were stamped UTC. up.sh now exports
+  TZ=${TZ:-Asia/Jerusalem} so both stamp local time. PENDING (big): (5) full start-to-finish per-utterance
+  trace with before/after frames; (2) UI redo for Hebrew overflow (HTML draft -> opencv).
+
+- 2026-09-12 full start-to-finish trace + session replayer built (owner point 5 + 2b). trace.jsonl is now
+  THE per-utterance log (retires utterances.jsonl): transcript, he2, flags, kind, target, vision_query,
+  mission, verdict, spoken, action+reject_reason, timings, and audio_clip. Audio linked causally (no C++
+  change, no timestamp math): on transcript arrival Python claims the newest unclaimed asr_clips/*.wav and
+  renames it utt_<seq>.wav. Vision captured per REQUEST under perception/<seq>-<kind>-<target>/ with one RAW
+  frame + json per SAM3 forward / Gemma VLM call (model-agnostic, no burned boxes). he2/kind/target flow via
+  a new optional Pipeline.observe() callback (off the bench path). Replayer: tools/session-replayer/replayer.html
+  (local directory picker, draws boxes from JSON, audio, per-pass scrub, annotated export). 62 offline tests;
+  bench unaffected. PENDING: opencv pane redesign (2a); browser + webcam smoke of the replayer/capture.
+
+- 2026-09-12 live opencv pane reproduced from the approved mockup (tools/ui-mockups/live-pane.html).
+  render_chat: width-aware wrapping via _wrap_px (measures _HE_FONT.getlength; the old fixed char-count
+  overflowed — long Hebrew now wraps inside CHAT_W, verified 388<426px), RTL right-align for Hebrew in
+  _draw_conv, and the session DUMP PATH shown in the header ("dump: sessions/session-..."). reject-reason +
+  SAM3 best-score lines already land from the earlier fixes. Not yet reproduced: the mockup's left tag-column
+  (kept the inline You:/Scene:/Kind labels) -- iterate after a live look. Can't render the window headless;
+  verified wrap logic + compile + 62 tests. Replayer nits fixed same day: canvas full-width, utterance
+  timings populated (recognizer/plan/e2e ms), box-label top-clamp pile-up fixed.
+
+## scene_omdet split + recording crash-safety (2026-09-12)
+- scene_omdet.py did four jobs in 899 lines. Split into three files, no behaviour change (66 tests pass):
+  - overlay.py (213) -- pure chat-pane renderer. render_chat(height, chat, thinking, killed, session_dir, om_name) takes a SNAPSHOT; the caller holds S.lock. No shared state, no threads. Owns the 3-font stack + draw_box + FONT.
+  - session_log.py (178) -- SessionLog + reject_why. The telemetry/capture layer.
+  - scene_omdet.py (548) -- engine wiring + command dispatch + main loop (its real job).
+- Recording crash-safety: a hard interrupt outdoors (Ctrl-C / power loss / force-quit) must never corrupt the recording.
+  - trace.jsonl: one complete JSON line per utterance, append + flush + os.fsync on commit -> every committed utterance is durable.
+  - meta.json / request.json / pass_*.json / pass_*.jpg: written atomically (temp file + fsync + os.replace) -> never a truncated mix.
+  - Contract: at worst the in-flight utterance is lost; everything committed survives. Proven by test/test_crash_safety.py (incl. a real SIGKILL mid-session).
+
+## Field power/energy is a first-class constraint (owner, 2026-09-12)
+- The deployment target is a backpack box, not a 5070-Mobile laptop. Power draw, heat, and battery life gate it.
+- Derived from the owner's data: <3x 20-min flights on the pack => >~90 W average SYSTEM draw. Laptop-class.
+- We have measured SAM3 VRAM/latency/accuracy but NEVER watts. That is the gap. SAM3 1008->672 ~halves a
+  forward's GPU energy, but SAM3 is on-demand (per highlight, ~0.4 s, 1/s cap) so its share of the sustained
+  draw is small. The continuous baseline (GPU holding Gemma, video) + the platform choice dominate.
+- SAM3 input is a fixed 1008x1008x3 square (patch 14 x window 24 = 336; 1008 = 3x336). Valid clean sizes are
+  multiples of 336 (672, 1008, 1344); 960 is NOT valid. Lowering it is an accuracy risk (small/distant objects)
+  -> benchmark, do not assume.
+- Tool: tools/desk-test/power_profile.py -- detects the GPU (nvidia-smi/rocm-smi) and the battery from /sys
+  (nothing hardcoded), samples live power, integrates to Wh, and estimates flights/charge from the DETECTED pack.
+  Run it UNPLUGGED (battery discharging) for the true total-system number; on AC it measures only the GPU.
+
+## HUD model line + power profiler, properly (owner push 2026-09-12)
+- HUD header: the single appended "planner · SAM3 · whisper-ivrit" line is split into one line per subsystem,
+  each READ from env/config (overlay._model_lines): brain=MVD_PLANNER, eyes=SCENE_SEG+SCENE_SAM3_PRECISION,
+  ears=ASR_MODEL_PATH. It follows the env, so it never lies. NOTE: harden2 is single-stack -- qwen3vl was purged
+  from llama.MODELS, so MVD_PLANNER=qwen3vl would change the LABEL but NOT load Qwen3-VL; the backend must exist.
+- power_profile.py now works plugged-in: adds CPU package power via RAPL (/sys/class/powercap/intel-rapl:*,
+  package domains, wrap-handled). Reports CPU(RAPL) + GPU(smi) = "compute draw" (a LOWER bound, excludes
+  RAM/board/PSU) when no battery discharges; prefers the full-system battery number when it does. Fixed a first-
+  sample div-by-tiny-dt that showed 30 kW; dt is now stamped at the RAPL read. Idle on this rig: CPU ~55 W,
+  GPU ~22 W, compute ~77 W -> ~3.5 flights/90 Wh at idle (drops under load).
+- Wh = watts x hours (energy). watts = Wh / hours. 90 Wh pack = 90 W for 1 h, or 30 W for 3 h.
+
+- 2026-09-13 repo restructure: `bench/` is now top-level (was `tools/bench`); dead forks (integration, integration_harden, integration_notify) + slam moved to `archive/` (purged at freeze); harden2 runtime output consolidated under `logs/{sessions,traces,runs}`; `integration_tts` is the frozen demo fallback (was `integration/`); `.gitignore` slimmed. Recognizer bench unchanged at 410/487 (verified 2026-09-13, wall 237s).
+
+
+## Extracted rulings preserved during the 2026-09-15 doc flatten
+
+These were pulled from docs now retired to stale, so the binding content survives the flatten.
+
+### Objective + proven/not-proven (from the 2026-08-27 "compass")
+- Objective: a drone commanded by voice that understands the scene and acts. Human-in-the-loop, safety-gated.
+  Camera drone, no weaponization/targeting/payload. "Kill switch" = flight-safety motor cut.
+- Hardware bet: DJI Mini 4 Pro flown from a phone (ExoSkeletons MSDK app); the Linux laptop is the brain over
+  WiFi -- control/telemetry on 8080, raw H.264 video on 5600. Tello/SITL era retired (recoverable from git).
+- PROVEN (2026-08-25/26): MVD end-to-end voice->verb->drone + smart-CV answers, field-tested >3 h incl. a
+  classroom flight; app builds/installs; discrete verbs round-trip on the real link; transport latency
+  WS p95 24 ms / telemetry p95 47 ms, zero loss; REST mission actions drive the aircraft.
+- NOT PROVEN (do not claim): end-to-end command->action latency < 1 s on the real link; video glass->Linux
+  latency number; gimbal control (broken backend-side); the C++ llm_to_action engine flying end-to-end.
+- Operational facts: phone IP = the WiFi hotspot gateway (changes per phone; derive from the default route);
+  indoors the drone refuses horizontal/vertical sticks unless VPS locks (yaw + slow vertical otherwise);
+  /status/ exposes no altitude, position3D null indoors; ONNX seg/depth on CPU keeps the 8 GB GPU free for the VLM.
+
+### VRAM + perception campaign rulings (2026-09-07)
+- tgemma + few-shots is the most accurate (90%) but VRAM-blocked (~2,478 MiB) -- not deployable on the 8 GB host.
+- DictaLM stays the command path on CPU (99% commands) if a split is chosen; weak perception, CPU latency tail.
+- Direction: everything-on-GPU at Q4 does not fit; one of tgemma/whisper moves to CPU, or tgemma drops to Q3.
+  (Superseded later by the harden2 single-Gemma-direct-Hebrew planner; kept here as the measured record.)
