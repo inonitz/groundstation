@@ -14,7 +14,7 @@ VLM_TIMEOUT = 30                      # a warm 4B describe call is ~1-3 s
 #     promptable = on-demand highlight of a phrase. Swap to YOLOE-26 weights when local. ---
 # Background (always-on, subtle): fast closed-set YOLO26 segmentation. You already have this
 # locally; referenced by name it auto-downloads anywhere (point SCENE_BG at the local path to skip).
-BG_SEG_MODEL    = os.environ.get("SCENE_BG",        "yolo26n-seg.pt")
+BG_SEG_MODEL    = os.environ.get("SCENE_BG",        "/root/models/vision/yolo26n-seg.pt")
 # Highlight (on-demand, open-vocab): YOLOE-26 -- the 2026 model (arXiv 2602.00168), NOT the 2025
 # yoloe-11. "l" scale; drop to yoloe-26s/m-seg.pt for less compute.
 OPENVOCAB_MODEL = os.environ.get("SCENE_OPENVOCAB", "yoloe-26l-seg.pt")
