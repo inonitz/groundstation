@@ -1,0 +1,14 @@
+[recognize] 2026-08-19 22:33:07
+[recognize] argv    : recognize.py ../../test_img2.png Highlight the Leftmost window on the top-floor of the building in the scene --mask -o ../../test_img2_result.jpg
+[recognize] image   : ../../test_img2.png  (1000x563)
+[recognize] prompt  : Highlight the Leftmost window on the top-floor of the building in the scene
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:8080   mask=True
+[recognize] querying VLM...
+
+=== VLM ANSWER  (1.4s) ===
+The leftmost window on the top floor is located on the far left side of the upper level, positioned above the ground-floor window and to the left of the central staircase. It is part of a row of three identical windows with dark frames.
+
+=== OBJECTS (1) ===
+  Leftmost window on the top floor (108, 181, 246, 239)
+
+[recognize] saved image -> ../../test_img2_result.jpg

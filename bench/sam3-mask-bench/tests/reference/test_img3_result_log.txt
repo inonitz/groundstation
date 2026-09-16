@@ -1,0 +1,14 @@
+[recognize] 2026-08-19 22:34:10
+[recognize] argv    : recognize.py ../../test_img3.png Highlight the top-most & left-most tower windows inside the scene --mask -o ../../test_img3_result.jpg
+[recognize] image   : ../../test_img3.png  (1110x1480)
+[recognize] prompt  : Highlight the top-most & left-most tower windows inside the scene
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:8080   mask=True
+[recognize] querying VLM...
+
+=== VLM ANSWER  (1.5s) ===
+The top-most and left-most tower window is located at the uppermost level of the leftmost tower, which is a small, dark rectangular opening in the damaged facade.
+
+=== OBJECTS (1) ===
+  top-most & left-most tower window (11, 74, 111, 148)
+
+[recognize] saved image -> ../../test_img3_result.jpg

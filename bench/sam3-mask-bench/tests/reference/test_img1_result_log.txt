@@ -1,0 +1,14 @@
+[recognize] 2026-08-19 22:32:30
+[recognize] argv    : recognize.py ../../test_img1.png What is the precise amount of people present in the image? --mask -o ../../test_img1_result.jpg
+[recognize] image   : ../../test_img1.png  (612x408)
+[recognize] prompt  : What is the precise amount of people present in the image?
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:8080   mask=True
+[recognize] querying VLM...
+
+=== VLM ANSWER  (0.8s) ===
+There are at least 15 people visible in the image, seated in rows of red theater chairs and clapping.
+
+=== OBJECTS (1) ===
+  person                   (0, 0, 612, 408)
+
+[recognize] saved image -> ../../test_img1_result.jpg

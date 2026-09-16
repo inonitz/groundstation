@@ -1,0 +1,4131 @@
+{
+ "translator": "gemma4",
+ "prompt": "tgemma",
+ "planner": "qwen3vl",
+ "direct_he": false,
+ "results": {
+  "emergency": {
+   "ok": 7,
+   "n": 7
+  },
+  "perception": {
+   "ok": 6,
+   "n": 128
+  },
+  "military": {
+   "ok": 1,
+   "n": 20
+  },
+  "std190": {
+   "ok": 151,
+   "n": 203
+  },
+  "verbose": {
+   "ok": 6,
+   "n": 54
+  }
+ },
+ "verdicts": {
+  "std190": {
+   "up10": "CORRECT",
+   "fwd5": "CORRECT",
+   "spin90cw": "CORRECT",
+   "takeoff": "CORRECT",
+   "land": "CORRECT",
+   "combo3": "REJECT",
+   "combo_tl": "REJECT",
+   "back2left3": "wrong-y(3vs-3)",
+   "ccw45": "CORRECT",
+   "down3": "CORRECT",
+   "question": "CORRECT",
+   "square": "valid(open)",
+   "up2": "CORRECT",
+   "right4": "CORRECT",
+   "left7": "CORRECT",
+   "back10": "CORRECT",
+   "fwd15": "CORRECT",
+   "spin180cw": "CORRECT",
+   "spin360": "CORRECT",
+   "wait5": "CORRECT",
+   "up_half": "REJECT",
+   "combo2b": "CORRECT",
+   "combo4": "CORRECT",
+   "combo5": "wrong-degrees(3vs90)",
+   "digit12": "CORRECT",
+   "digit45deg": "CORRECT",
+   "question2": "CORRECT",
+   "q_land_trap": "CORRECT",
+   "neg_trap": "CORRECT",
+   "colloq_up": "CORRECT",
+   "land_now": "CORRECT",
+   "takeoff_ctx": "CORRECT",
+   "g_up1": "CORRECT",
+   "g_up2": "CORRECT",
+   "g_up3": "CORRECT",
+   "g_up4": "CORRECT",
+   "g_up6": "CORRECT",
+   "g_up8": "CORRECT",
+   "g_up9": "CORRECT",
+   "g_up20": "CORRECT",
+   "g_up25": "CORRECT",
+   "g_down1": "CORRECT",
+   "g_down2": "CORRECT",
+   "g_down3": "CORRECT",
+   "g_down4": "CORRECT",
+   "g_down6": "CORRECT",
+   "g_down8": "CORRECT",
+   "g_down9": "CORRECT",
+   "g_down20": "CORRECT",
+   "g_down25": "CORRECT",
+   "g_fwd1": "wrong-len(0vs1)",
+   "g_fwd2": "CORRECT",
+   "g_fwd3": "CORRECT",
+   "g_fwd4": "CORRECT",
+   "g_fwd6": "CORRECT",
+   "g_fwd8": "CORRECT",
+   "g_fwd9": "CORRECT",
+   "g_fwd20": "CORRECT",
+   "g_fwd25": "CORRECT",
+   "g_back1": "REJECT",
+   "g_back2": "CORRECT",
+   "g_back3": "CORRECT",
+   "g_back4": "CORRECT",
+   "g_back6": "CORRECT",
+   "g_back8": "CORRECT",
+   "g_back9": "CORRECT",
+   "g_back20": "CORRECT",
+   "g_back25": "CORRECT",
+   "g_right1": "CORRECT",
+   "g_right2": "CORRECT",
+   "g_right3": "CORRECT",
+   "g_right4": "CORRECT",
+   "g_right6": "CORRECT",
+   "g_right8": "CORRECT",
+   "g_right9": "CORRECT",
+   "g_right20": "CORRECT",
+   "g_right25": "CORRECT",
+   "g_left1": "REJECT",
+   "g_left2": "CORRECT",
+   "g_left3": "CORRECT",
+   "g_left4": "CORRECT",
+   "g_left6": "CORRECT",
+   "g_left8": "CORRECT",
+   "g_left9": "CORRECT",
+   "g_left20": "CORRECT",
+   "g_left25": "CORRECT",
+   "g_cw30": "CORRECT",
+   "g_ccw30": "CORRECT",
+   "g_cw60": "CORRECT",
+   "g_ccw60": "CORRECT",
+   "g_cw120": "CORRECT",
+   "g_ccw120": "CORRECT",
+   "g_cw270": "CORRECT",
+   "g_ccw270": "CORRECT",
+   "g_wait2": "CORRECT",
+   "g_wait10": "CORRECT",
+   "g_combo2_0": "CORRECT",
+   "g_combo2_1": "missing-z",
+   "g_combo2_2": "CORRECT",
+   "g_combo2_3": "CORRECT",
+   "g_combo2_4": "REJECT",
+   "g_combo2_5": "CORRECT",
+   "g_combo2_6": "CORRECT",
+   "g_combo2_7": "REJECT",
+   "g_combo3_0": "REJECT",
+   "g_combo3_1": "missing-z",
+   "g_combo3_2": "REJECT",
+   "g_combo3_3": "CORRECT",
+   "r_takeoff1": "CORRECT",
+   "r_takeoff2": "wrong-len(0vs1)",
+   "r_takeoff3": "wrong-len(0vs1)",
+   "r_takeoff4": "CORRECT",
+   "r_takeoff5": "CORRECT",
+   "r_land1": "CORRECT",
+   "r_land2": "wrong-len(0vs1)",
+   "r_land3": "wrong-len(0vs1)",
+   "r_land4": "wrong-len(0vs1)",
+   "r_land5": "wrong-len(0vs1)",
+   "r_pol_up5": "CORRECT",
+   "r_pol_fwd3": "CORRECT",
+   "r_pol_left2": "CORRECT",
+   "r_pol_down1": "CORRECT",
+   "r_pol_spin": "CORRECT",
+   "r_fill1": "REJECT",
+   "r_fill2": "REJECT",
+   "r_fill3": "REJECT",
+   "r_fill4": "REJECT",
+   "r_fill5": "CORRECT",
+   "r_alt10": "CORRECT",
+   "r_alt20": "CORRECT",
+   "r_low": "wrong-z(2vs-2)",
+   "r_rise3": "CORRECT",
+   "r_updown": "CORRECT",
+   "r_bit_left": "wrong-sign-y(1)",
+   "r_bit_up": "wrong-len(0vs1)",
+   "r_bit_back": "missing-x",
+   "r_higher": "wrong-len(0vs1)",
+   "r_bit_fwd": "wrong-len(0vs1)",
+   "r_turn_r90": "CORRECT",
+   "r_turn_l45": "REJECT",
+   "r_half_turn": "REJECT",
+   "r_quart_r": "CORRECT",
+   "r_full": "CORRECT",
+   "r_around": "valid(open)",
+   "r_num_first": "CORRECT",
+   "r_m_half": "REJECT",
+   "r_2_half": "CORRECT",
+   "r_digit50": "CORRECT",
+   "r_digit7": "CORRECT",
+   "r_meter1": "REJECT",
+   "r_mis1": "CORRECT",
+   "r_mis2": "CORRECT",
+   "r_mis3": "REJECT",
+   "r_mis4": "REJECT",
+   "r_mis5": "REJECT",
+   "r_mis6": "wrong-x(2vs-2)",
+   "r_mis7": "REJECT",
+   "r_mis8": "wrong-len(1vs2)",
+   "r_mis9": "CORRECT",
+   "r_mis10": "REJECT",
+   "r_dis1": "valid(open)",
+   "r_dis2": "REJECT",
+   "r_dis3": "valid(open)",
+   "r_dis4": "REJECT",
+   "r_q1": "CORRECT",
+   "r_q2": "CORRECT",
+   "r_q3": "CORRECT",
+   "r_q4": "CORRECT",
+   "r_q5": "CORRECT",
+   "r_q6": "CORRECT",
+   "r_q7": "CORRECT",
+   "r_q8": "CORRECT",
+   "r_neg1": "CORRECT",
+   "r_neg2": "CORRECT",
+   "r_neg3": "CORRECT",
+   "r_neg4": "CORRECT",
+   "r_neg5": "CORRECT",
+   "r_wait1": "wrong-len(0vs1)",
+   "r_wait2": "wrong-len(0vs1)",
+   "r_wait3": "REJECT",
+   "r_wait4": "routed:emergency",
+   "r_big100": "CORRECT",
+   "r_deg10": "REJECT",
+   "r_deg135": "REJECT",
+   "r_z_03": "CORRECT",
+   "r_back15": "CORRECT",
+   "r_ord1": "CORRECT",
+   "r_ord2": "CORRECT",
+   "r_ord3": "CORRECT",
+   "r_ord4": "wrong-len(0vs1)",
+   "l_deg_frac": "REJECT",
+   "l_deg_precise": "CORRECT",
+   "l_half_cw": "REJECT",
+   "l_dbl_neg": "CORRECT-reject",
+   "l_postpone": "CORRECT",
+   "l_pause_idiom": "CORRECT",
+   "l_combo_tamtin": "REJECT",
+   "l_fwd_future": "CORRECT",
+   "l_land_going": "CORRECT",
+   "l_pres_pic": "CORRECT",
+   "l_pres_you": "CORRECT",
+   "l_color_near": "CORRECT",
+   "l_tower_count": "CORRECT",
+   "l_lighthouse_count": "CORRECT"
+  },
+  "verbose": {
+   "v_listen3_g0": "REJECT",
+   "v_listen3_g1": "missing-z",
+   "v_listen3_g2": "REJECT",
+   "v_listen3_g3": "REJECT",
+   "v_finish3_g0": "REJECT",
+   "v_finish3_g1": "REJECT",
+   "v_finish3_g2": "REJECT",
+   "v_finish3_g3": "REJECT",
+   "v_start4_g0": "REJECT",
+   "v_start4_g1": "REJECT",
+   "v_start4_g2": "REJECT",
+   "v_start4_g3": "REJECT",
+   "v_okso4_g0": "REJECT",
+   "v_okso4_g1": "REJECT",
+   "v_okso4_g2": "wrong-len(0vs4)",
+   "v_okso4_g3": "wrong-x(6vs25)",
+   "v_first3_g0": "REJECT",
+   "v_first3_g1": "REJECT",
+   "v_first3_g2": "REJECT",
+   "v_first3_g3": "REJECT",
+   "v_favor4_g0": "wrong-len(0vs4)",
+   "v_favor4_g1": "REJECT",
+   "v_favor4_g2": "REJECT",
+   "v_favor4_g3": "REJECT",
+   "v_mission3_g0": "REJECT",
+   "v_mission3_g1": "REJECT",
+   "v_mission3_g2": "REJECT",
+   "v_mission3_g3": "REJECT",
+   "v_yalla2_g0": "CORRECT",
+   "v_yalla2_g1": "REJECT",
+   "v_yalla2_g2": "CORRECT",
+   "v_yalla2_g3": "CORRECT",
+   "v_ready3_g0": "wrong-len(2vs3)",
+   "v_ready3_g1": "REJECT",
+   "v_ready3_g2": "REJECT",
+   "v_ready3_g3": "REJECT",
+   "v_seq5_g0": "CORRECT",
+   "v_seq5_g1": "wrong-verb(takeoffvsfly_by)",
+   "v_seq5_g2": "wrong-x(2vs-4)",
+   "v_seq5_g3": "wrong-x(6vs25)",
+   "v_note3_g0": "REJECT",
+   "v_note3_g1": "REJECT",
+   "v_note3_g2": "REJECT",
+   "v_note3_g3": "REJECT",
+   "v_round3_g0": "REJECT",
+   "v_round3_g1": "REJECT",
+   "v_round3_g2": "REJECT",
+   "v_round3_g3": "REJECT",
+   "v_neg1": "REJECT",
+   "v_neg2": "REJECT",
+   "v_q1": "CORRECT",
+   "v_q2": "CORRECT",
+   "v_mix1": "REJECT",
+   "v_mix2": "REJECT"
+  }
+ },
+ "stage0_false_positives": [
+  [
+   "std190",
+   "r_wait4",
+   "עצור שם לעשר שניות"
+  ]
+ ],
+ "recognized": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stopstop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_now",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_emergency",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_all",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_english",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_game_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin90cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 90.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "combo3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is accurate, professional, and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3585
+   },
+   {
+    "case": "combo_tl",
+    "kind": "reject",
+    "payload": "The user wants me to translate a short, technical instruction from Hebrew to English. The context seems to be related to flight, robotics, or a similar controlled movement. I need to ensure the translation is natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4331
+   },
+   {
+    "case": "back2left3",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"טוס אחורה 2 מטרים ואז זוז שמאלה 3 מטרים\". This is a set of movement commands. I need to translate it accurately while maintaining the imperative tone.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 1284
+   },
+   {
+    "case": "ccw45",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה אתה רואה עכשיו?\" into English. This is a common, informal question. I need to provide a natural and accurate translation.",
+    "flags": [],
+    "t_ms": 892
+   },
+   {
+    "case": "square",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"טוס בריבוע של 2 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1048
+   },
+   {
+    "case": "up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "left7",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -7.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "back10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd15",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"התקדם 15 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 681
+   },
+   {
+    "case": "spin180cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 180.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin360",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 360.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "wait5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "up_half",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"עלה חצי מטר\" into English.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2707
+   },
+   {
+    "case": "combo2b",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off ואז עלה 3 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 706
+   },
+   {
+    "case": "combo4",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the directions. 4 meters forward, 2 meters right, 4 meters backward, and then 2 meters left.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 1250
+   },
+   {
+    "case": "combo5",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of instructions from Hebrew to English. The instructions describe a sequence of movements (take off, move up, turn, move forward, land). I must ensure the English translation includes the exact numbers: 2, 3, and 90. I must only provide the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "clockwise-inline",
+     "takeoff-noun-inline",
+     "number-flag"
+    ],
+    "t_ms": 2918
+   },
+   {
+    "case": "digit12",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 12.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "digit45deg",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question2",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"כמה אנשים אתה רואה\" into English.",
+    "flags": [],
+    "t_ms": 633
+   },
+   {
+    "case": "q_land_trap",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם אתה מתכוון לנחות בקרוב\" into English.",
+    "flags": [],
+    "t_ms": 690
+   },
+   {
+    "case": "neg_trap",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אל תטוס קדימה\" into English.",
+    "flags": [],
+    "t_ms": 624
+   },
+   {
+    "case": "colloq_up",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land_now",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff_ctx",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"עלה מטר 1\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 724
+   },
+   {
+    "case": "g_up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תרד מטר 1\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1046
+   },
+   {
+    "case": "g_down2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"טוס קדימה מטר 1\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1256
+   },
+   {
+    "case": "g_fwd2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"התקדם 2 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 689
+   },
+   {
+    "case": "g_fwd3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"התקדם 4 מטרים\" into English.",
+    "flags": [],
+    "t_ms": 674
+   },
+   {
+    "case": "g_fwd6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd8",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"התקדם 8 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 667
+   },
+   {
+    "case": "g_fwd9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd20",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"התקדם 20 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 707
+   },
+   {
+    "case": "g_fwd25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back1",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"זוז אחורה מטר 1\" into English. This is a direct command. \"זוז\" (Zoz) means \"move\" or \"go.\" \"אחורה\" (Achora) means \"backward.\" \"מטר 1\" (Meter 1) means \"one meter.\" The tone is imperative and direct.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3022
+   },
+   {
+    "case": "g_back2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right1",
+    "kind": "command",
+    "payload": "The user wants me to translate a short Hebrew phrase into English. The phrase is \"טוס ימינה מטר 1\". This looks like a directional instruction, likely from a map, a game, or a set of directions. I need to translate it accurately while maintaining the context of a directional instruction.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1231
+   },
+   {
+    "case": "g_right2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a short Hebrew phrase into English. The phrase is \"זוז שמאלה מטר 1\". This is a common instruction, likely in a driving or navigation context. \"זוז\" (Zoz) means \"move\" or \"shift.\" \"שמאלה\" (Smala) means \"left.\" \"מטר 1\" (Meter 1) means \"1 meter.\" The instruction is telling someone to move left by 1 meter.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4260
+   },
+   {
+    "case": "g_left2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_0",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is: \"עלה מטר 1 ואז תעלה 20 מטרים\". This sounds like instructions or a description of movement (like climbing or moving up). I need to ensure the translation is natural and accurate in English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1455
+   },
+   {
+    "case": "g_combo2_1",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is \"תעלה 4 מטרים ואז רד 4 מטרים\". This is a simple instruction or description of movement. I need to translate it accurately while maintaining a natural English flow.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1273
+   },
+   {
+    "case": "g_combo2_2",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"עלה 9 מטרים ואז תרד 25 מטרים\". This is a simple instruction or description of movement (climbing and descending). I need to ensure the translation is natural and accurate.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1332
+   },
+   {
+    "case": "g_combo2_3",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"תרד מטר 1 ואז טוס קדימה 6 מטרים\". This is a set of directions, likely for a game or exercise. I need to translate it accurately while maintaining the imperative tone.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1350
+   },
+   {
+    "case": "g_combo2_4",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"רד 4 מטרים ואז זוז אחורה מטר 1\" (Red 4 metarim ve'az tuz achora metar 1). This is likely a set of directions for a physical activity, like a game or a drill. I need to translate it accurately while maintaining the instructional tone.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3615
+   },
+   {
+    "case": "g_combo2_5",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"תרד 9 מטרים ואז טוס אחורה 8 מטרים\". This is a set of instructions or a description of movement. I need to translate it accurately while maintaining a natural English flow. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1479
+   },
+   {
+    "case": "g_combo2_6",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"טוס קדימה מטר 1 ואז זוז ימינה 2 מטרים\". This is a set of directions. I need to translate it accurately while maintaining the instructional tone.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1256
+   },
+   {
+    "case": "g_combo2_7",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 6869
+   },
+   {
+    "case": "g_combo3_0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"עלה מטר אחד, תעלה 4 מטרים ואז תעלה 8 מטרים\" (Ala metr echad, ta'ale 4 metarim ve'az ta'ale 8 metarim). This sounds like instructions or a description of a sequence of movements (like climbing or jumping). I need to ensure the tone is natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4854
+   },
+   {
+    "case": "g_combo3_1",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. 1, 8, and 20 must be included in the English translation. The translation should be professional and accurate. No extra commentary.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 4366
+   },
+   {
+    "case": "g_combo3_2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence describes a sequence of movements. I need to ensure the translation is natural and accurately reflects the actions.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3590
+   },
+   {
+    "case": "g_combo3_3",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is clear and accurately reflects the directions. 4 meters forward, then 1 meter right, then 25 meters right.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1335
+   },
+   {
+    "case": "r_takeoff1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"בוא נמריא\" into English.",
+    "flags": [],
+    "t_ms": 656
+   },
+   {
+    "case": "r_takeoff3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אפשר להמריא\" into English.",
+    "flags": [],
+    "t_ms": 607
+   },
+   {
+    "case": "r_takeoff4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"יאללה take off\" into English.",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 749
+   },
+   {
+    "case": "r_takeoff5",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off בבקשה\" into English.",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 552
+   },
+   {
+    "case": "r_land1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"בוא ננחת\" into English.",
+    "flags": [],
+    "t_ms": 571
+   },
+   {
+    "case": "r_land3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תנחת בבקשה\" into English.",
+    "flags": [],
+    "t_ms": 552
+   },
+   {
+    "case": "r_land4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אפשר לנחות\" into English.",
+    "flags": [],
+    "t_ms": 536
+   },
+   {
+    "case": "r_land5",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"סיימנו, תנחת\" into English.",
+    "flags": [],
+    "t_ms": 649
+   },
+   {
+    "case": "r_pol_up5",
+    "kind": "command",
+    "payload": "You can climb 5 meters, please.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 1853
+   },
+   {
+    "case": "r_pol_fwd3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תוכל לטוס קדימה 3 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 741
+   },
+   {
+    "case": "r_pol_left2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אם אפשר, 2 מטרים שמאלה\" into English. This is a common directional instruction. I need to ensure the translation is natural and professional.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1037
+   },
+   {
+    "case": "r_pol_down1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"רד בבקשה מטר 1\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 641
+   },
+   {
+    "case": "r_pol_spin",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תסתובב בבקשה 90 מעלות ימינה\" into English. This is a common instruction, likely in a navigation or directional context. I need to ensure the tone is polite and the meaning is precise.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1211
+   },
+   {
+    "case": "r_fill1",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"אה טוס קדימה 3 מטרים בבקשה\" into English. This phrase sounds like a command or a request, likely in a context involving movement (like a game, a physical activity, or perhaps a drone/robot). \"אה\" is an interjection, \"טוס\" is a verb (fly/go), \"קדימה\" means forward, \"3 מטרים\" is 3 meters, and \"בבקשה\" means please.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3646
+   },
+   {
+    "case": "r_fill2",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"אוקיי עכשיו תעלה 4 מטרים\" into English. This is a direct instruction. \"אוקיי\" means \"Okay\" or \"Alright.\" \"עכשיו\" means \"now.\" \"תעלה\" is the imperative form of \"to go up\" or \"to climb,\" meaning \"go up\" or \"climb.\" \"4 מטרים\" means \"4 meters.\" The context suggests a command or instruction to move upwards by a specific distance.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3104
+   },
+   {
+    "case": "r_fill3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is: \"טוב אז בוא נטוס אחורה 2 מטרים\" (Tov az bo ne'tous achora 2 metarim).",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4037
+   },
+   {
+    "case": "r_fill4",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"רגע רגע קודם תעלה 2 מטרים\" into English. This phrase is informal and sounds like a command or instruction, likely in a physical context (like climbing, moving an object, or perhaps even in a game). The tone is urgent or directive. \"רגע רגע\" means \"Wait, wait\" or \"Hold on, hold on.\" \"קודם\" means \"first.\" \"תעלה\" is the imperative form of \"to go up\" or \"to climb.\" \"2 מטרים\" means \"2 meters.\"",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3303
+   },
+   {
+    "case": "r_fill5",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"כן תמשיך ימינה עוד 3 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2107
+   },
+   {
+    "case": "r_alt10",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"עלה לגובה 10 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 783
+   },
+   {
+    "case": "r_alt20",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעלה לגובה 20 מטר\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 697
+   },
+   {
+    "case": "r_low",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תנמיך 2 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 618
+   },
+   {
+    "case": "r_rise3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תתרומם 3 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1077
+   },
+   {
+    "case": "r_updown",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_left",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"טוס טיפה שמאלה\" into English.",
+    "flags": [],
+    "t_ms": 679
+   },
+   {
+    "case": "r_bit_up",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעלה קצת\" into English. This phrase is highly contextual and can have several meanings depending on the situation. I need to provide the most common and natural translations.",
+    "flags": [],
+    "t_ms": 1203
+   },
+   {
+    "case": "r_bit_back",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"זוז קצת אחורה\" into English.",
+    "flags": [],
+    "t_ms": 619
+   },
+   {
+    "case": "r_higher",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעוף קצת יותר גבוה\" into English.",
+    "flags": [],
+    "t_ms": 579
+   },
+   {
+    "case": "r_bit_fwd",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תתקדם עוד קצת\" into English.",
+    "flags": [],
+    "t_ms": 606
+   },
+   {
+    "case": "r_turn_r90",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"סובב את הרחפן 90 מעלות ימינה\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 824
+   },
+   {
+    "case": "r_turn_l45",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"תפנה 45 מעלות שמאלה\" into English. This is a directional instruction. \"תפנה\" means \"turn,\" \"45 מעלות\" means \"45 degrees,\" and \"שמאלה\" means \"left.\" The tone is imperative/instructional.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2344
+   },
+   {
+    "case": "r_half_turn",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעשה חצי סיבוב\" into English.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2132
+   },
+   {
+    "case": "r_quart_r",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"רבע סיבוב ימינה\" into English.",
+    "flags": [],
+    "t_ms": 586
+   },
+   {
+    "case": "r_full",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעשה סיבוב שלם\" into English.",
+    "flags": [],
+    "t_ms": 634
+   },
+   {
+    "case": "r_around",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תסתובב אליי\" into English.",
+    "flags": [],
+    "t_ms": 594
+   },
+   {
+    "case": "r_num_first",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"30 מטר קדימה\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 572
+   },
+   {
+    "case": "r_m_half",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"מטר וחצי למעלה\" into English.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1818
+   },
+   {
+    "case": "r_2_half",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"2.5 וחצי מטרים ימינה\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "number-patched"
+    ],
+    "t_ms": 1742
+   },
+   {
+    "case": "r_digit50",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 50.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_digit7",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"7 מטרים למעלה\" into English.",
+    "flags": [],
+    "t_ms": 570
+   },
+   {
+    "case": "r_meter1",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"זוז מטר אחד ימינה\" into English.",
+    "flags": [
+     "one-meter",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2686
+   },
+   {
+    "case": "r_mis1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off ותעלה לגובה 5 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 735
+   },
+   {
+    "case": "r_mis2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off, עלה 3 מטרים ותישאר שם\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 783
+   },
+   {
+    "case": "r_mis3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"טוס ימינה 3 מטרים ואחרי זה זוז שמאלה 3 מטרים בחזרה\" (Tose yamina 3 metrim ve'acharei zeh zoze shimala 3 metrim be'chazara). This is a set of movement instructions. I need to ensure the translation is natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3907
+   },
+   {
+    "case": "r_mis4",
+    "kind": "reject",
+    "payload": "The user wants me to translate a short Hebrew phrase into English. The phrase is: \"עלה 5 מטרים, חכה 2 שניות ורד בחזרה\" (Alah 5 metarim, chake 2 shaniyot ve-rad ba-chazara). This sounds like an instruction or a step in a process (like a physical exercise or a technical procedure). I need to translate it accurately while maintaining the instructional tone.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4036
+   },
+   {
+    "case": "r_mis5",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"take off, טוס קדימה 10 מטרים, תסתובב חצי סיבוב וחזור\". This sounds like a set of instructions for a drone or a robot. I need to translate each part accurately while maintaining the instructional tone. \"Take off\" is already in English, so I will keep it. \"טוס קדימה 10 מטרים\" means \"fly forward 10 meters\". \"תסתובב חצי סיבוב\" means \"turn half a turn\" or \"make a half turn\". \"וחזור\" means \"and return\" or \"and come back\". I will combine these into a natural English instruction.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 5063
+   },
+   {
+    "case": "r_mis6",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the movements. 2 meters is the key unit. \"קדימה\" means forward, \"זוז למעלה\" means move up, and \"זוז אחורה\" means move back/backward. \"ואז\" means and then. \"2 מטרים\" means 2 meters.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 1992
+   },
+   {
+    "case": "r_mis7",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"תעלה 10 מטרים ואז תסתובב לאט סיבוב שלם\" (Ta'ale 10 metarim ve'az tistovév le'at sivuv shalem). This is a set of directions. I need to ensure the tone is appropriate for instructions.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3421
+   },
+   {
+    "case": "r_mis8",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is \"אחורה 5 מטרים ולמטה 2 מטרים\". This is a set of directional instructions. I need to translate it accurately while maintaining a natural English flow.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1140
+   },
+   {
+    "case": "r_mis9",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off ואז תנחת\" into English.",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 624
+   },
+   {
+    "case": "r_mis10",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is accurate and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3925
+   },
+   {
+    "case": "r_dis1",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is: \"טוס קדימה 5 מטרים ותצלם את הבית\". I need to provide a professional, accurate translation.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1005
+   },
+   {
+    "case": "r_dis2",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעלה 3 מטרים ותסתכל מסביב\" into English. This is a directive or instruction. I need to capture the meaning accurately and naturally in English. \"תעלה\" (Ta'ale) means \"climb/go up.\" \"3 מטרים\" (Shalosh metarim) means \"3 meters.\" \"ותסתכל\" (Ve'tistakel) means \"and look.\" \"מסביב\" (Misbayav) means \"around.\" The tone is informal/imperative.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3197
+   },
+   {
+    "case": "r_dis3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"take off ותחפש את המכונית\" into English.",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 695
+   },
+   {
+    "case": "r_dis4",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"טוס ימינה 2 מטרים ותגיד לי מה אתה רואה\" (Tose yamina 2 metarim ve'tagid li ma ata ro'eh). This is a command/instruction. I need to translate it accurately while maintaining the tone.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3274
+   },
+   {
+    "case": "r_q1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה מצב הסוללה\" into English. This is a common question asked when checking the status of a battery (e.g., on a phone, laptop, or device).",
+    "flags": [],
+    "t_ms": 931
+   },
+   {
+    "case": "r_q2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"איפה אתה עכשיו\" into English. This is a common, informal question. I need to provide a natural and accurate translation.",
+    "flags": [],
+    "t_ms": 864
+   },
+   {
+    "case": "r_q3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"כמה גבוה אתה\" into English. This phrase is a direct question asking about someone's height.",
+    "flags": [],
+    "t_ms": 738
+   },
+   {
+    "case": "r_q4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אתה מצלם\" into English.",
+    "flags": [],
+    "t_ms": 562
+   },
+   {
+    "case": "r_q5",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"ספר לי מה אתה רואה\" into English.",
+    "flags": [],
+    "t_ms": 617
+   },
+   {
+    "case": "r_q6",
+    "kind": "command",
+    "payload": "Is there someone there?",
+    "flags": [],
+    "t_ms": 144
+   },
+   {
+    "case": "r_q7",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"כמה זמן נשאר לך באוויר\" into English.",
+    "flags": [],
+    "t_ms": 745
+   },
+   {
+    "case": "r_q8",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אתה שומע אותי\" into English.",
+    "flags": [],
+    "t_ms": 637
+   },
+   {
+    "case": "r_neg1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אל תעלה יותר\" into English.",
+    "flags": [],
+    "t_ms": 618
+   },
+   {
+    "case": "r_neg2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אל תזוז\" into English.",
+    "flags": [],
+    "t_ms": 530
+   },
+   {
+    "case": "r_neg3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"לא לטוס קדימה\" into English.",
+    "flags": [],
+    "t_ms": 595
+   },
+   {
+    "case": "r_neg4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"בלי להסתובב בבקשה\" into English.",
+    "flags": [],
+    "t_ms": 681
+   },
+   {
+    "case": "r_neg5",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אל תנחת עדיין\" into English.",
+    "flags": [],
+    "t_ms": 575
+   },
+   {
+    "case": "r_wait1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"חכה רגע\" into English. This is a common, informal phrase. \"חכה\" (Hakecha) is the imperative form of \"to wait,\" and \"רגע\" (rega) means \"a moment\" or \"a second.\" The tone is casual and direct.",
+    "flags": [],
+    "t_ms": 1333
+   },
+   {
+    "case": "r_wait2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew text \"שנייה 1\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 575
+   },
+   {
+    "case": "r_wait3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is: \"תמתין 5 שניות ואז רד מטר אחד\".",
+    "flags": [
+     "hebnum-digits",
+     "one-meter",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3188
+   },
+   {
+    "case": "r_wait4",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_big100",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 100.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_deg10",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"תסתובב 10 מעלות ימינה\" into English. This is a directional instruction. \"תסתובב\" means \"turn\" or \"rotate.\" \"10 מעלות\" means \"10 degrees.\" \"ימינה\" means \"right.\" The context suggests a command or instruction.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2488
+   },
+   {
+    "case": "r_deg135",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"פנה 135 מעלות שמאלה\" into English. This is a directional instruction. \"פנה\" means \"turn,\" \"135\" is the number, \"מעלות\" means \"degrees,\" and \"שמאלה\" means \"left.\" The context is likely navigation or a map.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2499
+   },
+   {
+    "case": "r_z_03",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעלה 30 סנטימטר\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1148
+   },
+   {
+    "case": "r_back15",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -15.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord1",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"5 מטרים קדימה טוס\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 700
+   },
+   {
+    "case": "r_ord2",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"ימינה 2 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 623
+   },
+   {
+    "case": "r_ord3",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"למעלה, 3 מטרים\" into English.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 657
+   },
+   {
+    "case": "r_ord4",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אחורה קצת\" into English.",
+    "flags": [],
+    "t_ms": 565
+   },
+   {
+    "case": "l_deg_frac",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is \"פני שמאלה 74.5 מעלות\". This is a technical or directional measurement. \"פני שמאלה\" means \"left side\" or \"to the left.\" \"74.5 מעלות\" means \"74.5 degrees.\" In the context of direction or orientation, this is likely referring to a bearing or angle.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3474
+   },
+   {
+    "case": "l_deg_precise",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"תעשה סיבוב של 174.235 מעלות counterclockwise\".",
+    "flags": [
+     "counterclockwise-inline"
+    ],
+    "t_ms": 991
+   },
+   {
+    "case": "l_half_cw",
+    "kind": "reject",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעשה חצי סיבוב clockwise\" into English.",
+    "flags": [
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2188
+   },
+   {
+    "case": "l_dbl_neg",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"אל תפנה 90 מעלות שמאלה כנגד כיוון השעון ואז אל תפנה ימינה\" (Al tifneh 90 ma'alot smala kenegad kiyvan ha'sha'on ve'az al tifneh yamina).",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3681
+   },
+   {
+    "case": "l_postpone",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תדחה את מה שאתה עושה לשתי דקות הקרובות\" into English.",
+    "flags": [],
+    "t_ms": 857
+   },
+   {
+    "case": "l_pause_idiom",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"פוס משחק לארבע שניות\" into English.",
+    "flags": [],
+    "t_ms": 692
+   },
+   {
+    "case": "l_combo_tamtin",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"בצע take off, עלה 5 מטרים, תמתין 3 שניות ותנחת\" (Betza take off, alah 5 metarim, temtayn 3 shaniyot ve-tinaḥat). This sounds like a set of instructions for a drone or a similar automated system. I need to translate it accurately while maintaining the technical tone.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2479
+   },
+   {
+    "case": "l_fwd_future",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תתקדם 15 מטרים\" into English.",
+    "flags": [],
+    "t_ms": 646
+   },
+   {
+    "case": "l_land_going",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם אתה הולך לנחות בקרוב\" into English.",
+    "flags": [],
+    "t_ms": 689
+   },
+   {
+    "case": "l_pres_pic",
+    "kind": "command",
+    "payload": "Is there anyone in the picture?",
+    "flags": [],
+    "t_ms": 162
+   },
+   {
+    "case": "l_pres_you",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew sentence \"האם אתה רואה מישהו בתמונה?\" into English. I need to ensure the translation is natural and accurate.",
+    "flags": [],
+    "t_ms": 776
+   },
+   {
+    "case": "l_color_near",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew sentence \"מה הצבע של המכונית הקרובה ביותר?\" into English. This is a straightforward question asking for the color of the nearest car.",
+    "flags": [],
+    "t_ms": 893
+   },
+   {
+    "case": "l_tower_count",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"האם אתה רואה מגדל בסצנה שאתה יכול לספור בו חלונות?\" (Ha'im ata ro'eh migdal ba'sitzana she'ata yachol lespor bo halonot?)",
+    "flags": [],
+    "t_ms": 1420
+   },
+   {
+    "case": "l_lighthouse_count",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"האם אתה רואה מגדלור בסצנה שאתה יכול לספור בו חלונות?\" (Ha'im ata ro'eh migdalur ba'satsana she'ata yachol lespor bo halonot?)",
+    "flags": [],
+    "t_ms": 1452
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is a set of instructions, likely related to navigation or movement. It contains a mix of Hebrew and English (\"take off\"). I need to translate the Hebrew parts while maintaining the technical/instructional tone. \"Take off\" is already English, so I will keep it. \"תקשיב\" means \"Listen.\" \"אני רוצה שקודם כל\" means \"I want first.\" \"אחרי זה\" means \"after that.\" \"עלה 5 מטרים\" means \"went up 5 meters.\" \"ואז הסתובב 90 מעלות clockwise\" means \"and then turned 90 degrees clockwise.\" I will structure the English translation to sound natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 5057
+   },
+   {
+    "case": "v_listen3_g1",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. 12, 20, and 45 must be included in the English translation. The tone is informal/direct (\"Listen,\" \"I want\"). I need to maintain the meaning of the directional instructions.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2655
+   },
+   {
+    "case": "v_listen3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the tone is natural and the directions are clear. \"תקשיב\" (Listen) sets a conversational tone. \"טוס אחורה\" (Fly/Go back) is likely a typo for \"לך אחורה\" (Go back), but I should translate the intended meaning of movement. \"זוז שמאלה\" (Move left) and \"רד\" (Go down) are clear. I will translate it as a set of commands.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3766
+   },
+   {
+    "case": "v_listen3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the technical terms (like \"clockwise\") and the sequence of actions are accurately conveyed. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2093
+   },
+   {
+    "case": "v_finish3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The text is: \"take off, כשתסיים עלה 5 מטרים, ובסוף הסתובב 90 מעלות clockwise בבקשה\" (take off, when you finish climb 5 meters, and at the end turn 90 degrees clockwise please). This sounds like a set of instructions for a drone or a robot. I need to make the English sound natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3979
+   },
+   {
+    "case": "v_finish3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directions from Hebrew to English. I need to ensure the translation is natural, accurate, and professional.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4268
+   },
+   {
+    "case": "v_finish3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the commands.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1769
+   },
+   {
+    "case": "v_finish3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is clear, professional, and accurately reflects the spatial directions.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4329
+   },
+   {
+    "case": "v_start4_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions/commands from Hebrew to English. The context seems to be related to a simulation, game, or physical movement (like a drone or robot). I need to maintain the instructional tone and accurately translate the technical terms.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4682
+   },
+   {
+    "case": "v_start4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the tone is clear and professional, as if giving directions. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4464
+   },
+   {
+    "case": "v_start4_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is accurate, professional, and natural in English. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3533
+   },
+   {
+    "case": "v_start4_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the technical terms (like \"clockwise,\" \"meters,\" \"degrees\") are accurate and the tone is maintained. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3919
+   },
+   {
+    "case": "v_okso4_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions/actions from Hebrew to English. The text is informal and uses some English loanwords (\"take off\"). I need to maintain the instructional tone and accurately translate the movements.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3473
+   },
+   {
+    "case": "v_okso4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the sequence of actions.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3993
+   },
+   {
+    "case": "v_okso4_g2",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I must ensure the English translation contains the exact numbers: 2, 3, 4, and 30. I must only provide the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2652
+   },
+   {
+    "case": "v_okso4_g3",
+    "kind": "command",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I must ensure the English translation is accurate and contains the exact numbers: 6, 15, 25, and 180. I must provide only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag"
+    ],
+    "t_ms": 3126
+   },
+   {
+    "case": "v_first3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of actions from Hebrew to English. The text describes a series of movements (take off, ascent, rotation). I need to ensure the translation is natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1860
+   },
+   {
+    "case": "v_first3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew text describing a sequence of movements into English. I need to ensure the translation is accurate, professional, and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4403
+   },
+   {
+    "case": "v_first3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the actions (move backward, move left, move down). I will use professional, clear English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2053
+   },
+   {
+    "case": "v_first3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is accurate, professional, and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3386
+   },
+   {
+    "case": "v_favor4_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is a sequence of movements. I must ensure the English translation includes the exact numbers: 5, 10, and 90. I must only provide the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag"
+    ],
+    "t_ms": 3142
+   },
+   {
+    "case": "v_favor4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions from Hebrew to English. I need to ensure the tone is maintained (casual/request-based) while providing clear, accurate directions. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4656
+   },
+   {
+    "case": "v_favor4_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions from Hebrew to English. The tone is informal and polite (\"תעשה לי טובה\" - do me a favor). I need to ensure the translation is accurate, natural, and maintains the instructional nature of the text. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2584
+   },
+   {
+    "case": "v_favor4_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions from Hebrew to English. I need to ensure the tone is maintained (polite request) and the technical instructions (movement) are accurate.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2442
+   },
+   {
+    "case": "v_mission3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of instructions from Hebrew to English. The instructions describe a sequence of movements. I need to ensure the translation is natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1878
+   },
+   {
+    "case": "v_mission3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is accurate, professional, and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1971
+   },
+   {
+    "case": "v_mission3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is accurate and natural in English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1836
+   },
+   {
+    "case": "v_mission3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the technical terms (like \"clockwise\") and the sequence of actions are accurately conveyed.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1969
+   },
+   {
+    "case": "v_yalla2_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a short, informal Hebrew phrase into English. The phrase is: \"יאללה take off ואז עלה 5 מטרים\".",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 968
+   },
+   {
+    "case": "v_yalla2_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The text is: \"יאללה עלה 20 מטרים ואז פנה ימינה 45 מעלות\" (Yalla alah 20 mitrim ve'az pneh yamina 45 ma'alot). This sounds like a navigation or hiking instruction. I need to translate it accurately while maintaining the tone (which is informal/direct).",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4271
+   },
+   {
+    "case": "v_yalla2_g2",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"יאללה טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים\". This is a set of directions, likely for a game or physical activity. I need to translate it accurately while maintaining the informal tone.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1492
+   },
+   {
+    "case": "v_yalla2_g3",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instruction is: \"יאללה טוס קדימה 25 מטרים ואז הסתובב 180 מעלות clockwise\". This is a set of directions, likely for a drone or a robot. I need to ensure the tone is appropriate (casual/encouraging, as indicated by \"יאללה\") while maintaining technical accuracy.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 1844
+   },
+   {
+    "case": "v_ready3_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The translation must be professional, accurate, and must contain the exact numbers 5 and 90. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag"
+    ],
+    "t_ms": 3010
+   },
+   {
+    "case": "v_ready3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of navigational instructions from Hebrew to English. I need to ensure the tone is professional and the instructions are clear. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3523
+   },
+   {
+    "case": "v_ready3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the tone is professional and the instructions are clear. No extra commentary should be included.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4338
+   },
+   {
+    "case": "v_ready3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is accurate, natural, and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2177
+   },
+   {
+    "case": "v_seq5_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of instructions from Hebrew to English. The instructions are: \"take off, עלה 5 מטרים, הסתובב 90 מעלות clockwise, טוס קדימה 10 מטרים, תנחת\". This is a set of flight or movement commands. I need to ensure the English translation is natural and professional.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 1844
+   },
+   {
+    "case": "v_seq5_g1",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of instructions from Hebrew to English. I must ensure the English translation is accurate and contains the exact numbers: 3, 12, 20, and 45. I must provide only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2777
+   },
+   {
+    "case": "v_seq5_g2",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of movement instructions from Hebrew to English. I must ensure the English translation is accurate and contains the exact numbers: 2, 3, 4, 5, 30. I must provide only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 3148
+   },
+   {
+    "case": "v_seq5_g3",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of movement instructions from Hebrew to English. I must ensure the English translation is accurate and contains the exact numbers: 6, 8, 15, 25, 180. I must provide only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag"
+    ],
+    "t_ms": 3230
+   },
+   {
+    "case": "v_note3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The text is: \"take off ואז עלה 5 מטרים, ושים לב, הסתובב 90 מעלות clockwise לאט ובזהירות\" (take off and then went up 5 meters, and pay attention, turn 90 degrees clockwise slowly and carefully). Note that the first part is already in English (\"take off\"). I need to translate the rest while maintaining the instructional tone.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2824
+   },
+   {
+    "case": "v_note3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the tone is professional and the instructions are clear.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4313
+   },
+   {
+    "case": "v_note3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The instructions are: \"טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים, ושים לב, רד 2 מטרים לאט ובזהירות\" (Tose achora 4 metarim ve'az zoze shimala 3 metarim, ve'sim lamav, rad 2 metarim le'at u've'zehiut). This sounds like a set of physical or movement instructions. I need to ensure the tone is professional and the instructions are clear in English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3165
+   },
+   {
+    "case": "v_note3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the translation is accurate, professional, and captures the nuances of the commands.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4386
+   },
+   {
+    "case": "v_round3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is a set of instructions. It contains a mix of Hebrew and English (\"take off\"). I need to translate the Hebrew parts while maintaining the instructional tone and incorporating the English phrase naturally.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3936
+   },
+   {
+    "case": "v_round3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of directional instructions from Hebrew to English. I need to ensure the translation is natural and accurately reflects the movement described.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4608
+   },
+   {
+    "case": "v_round3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the tone is natural and the directions are clear.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2029
+   },
+   {
+    "case": "v_round3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a set of movement instructions from Hebrew to English. I need to ensure the instructions are clear and follow standard English phrasing for directions.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2186
+   },
+   {
+    "case": "v_neg1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3901
+   },
+   {
+    "case": "v_neg2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew phrase into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3311
+   },
+   {
+    "case": "v_q1",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2468
+   },
+   {
+    "case": "v_q2",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2947
+   },
+   {
+    "case": "v_mix1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"עלה 20 מטרים ותגיד לי מה אתה רואה משם\" (Aleh 20 metarim ve'tagid li ma ata ro'eh mi-sham). I need to provide a natural, professional English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3108
+   },
+   {
+    "case": "v_mix2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew instruction into English. The tone is informal and directive, like giving directions or instructions in a game. I need to ensure the translation is natural and accurate.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 1775
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1748
+   },
+   {
+    "case": "i_third_door",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1554
+   },
+   {
+    "case": "i_rear_wheel",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1381
+   },
+   {
+    "case": "i_top_windows",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1541
+   },
+   {
+    "case": "i_roof_corner",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3209
+   },
+   {
+    "case": "i_chimney",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2504
+   },
+   {
+    "case": "i_back_entrance",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1363
+   },
+   {
+    "case": "i_ladder_pickup",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"סמן את הסולם שעל הגג של הטנדר הלבן\" (Siman et hasulam she'al hagig shel hatandar halvan). I need to provide a professional, accurate translation.",
+    "flags": [],
+    "t_ms": 1368
+   },
+   {
+    "case": "i_car_by_red",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"הדגש את המכונית שצמודה לאדם עם הלבוש האדום\" (Hadges et ha-mekhonit she-tzamuda la-adam im ha-livush ha-adom).",
+    "flags": [],
+    "t_ms": 1378
+   },
+   {
+    "case": "i_orange_cap",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"עקוב אחרי האדם עם הכובע ה-orange\" into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 690
+   },
+   {
+    "case": "i_door_by_coat",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"סמן את הדלת שליד האיש עם המעיל השחור\" (Siman et ha-delet she-yade ha-ish im ha-me'il ha-shachor). I need to provide a professional and accurate English translation.",
+    "flags": [],
+    "t_ms": 1430
+   },
+   {
+    "case": "i_bike_fence",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1141
+   },
+   {
+    "case": "i_dog_by_dress",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1395
+   },
+   {
+    "case": "i_kid_bag",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"הדגש את התיק שמחזיק הילד עם החולצה הירוקה\" (Hadges et ha-tik she-machzik ha-yeled im ha-chultza ha-yarakah).",
+    "flags": [],
+    "t_ms": 1389
+   },
+   {
+    "case": "i_tree_truck",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"סמן את העץ שמאחורי המשאית הצהובה\" (Siman et ha'etz she'me'achori ha'mesayit ha'tzahova).",
+    "flags": [],
+    "t_ms": 1173
+   },
+   {
+    "case": "i_win_over_door",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1560
+   },
+   {
+    "case": "i_cars_by_flag",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"ספור את המכוניות שחונות מול הבניין עם הדגל\". I need to provide only the English translation.",
+    "flags": [],
+    "t_ms": 1108
+   },
+   {
+    "case": "i_bench_trees",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2927
+   },
+   {
+    "case": "i_behind_moto",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1195
+   },
+   {
+    "case": "i_man_on_roof",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1261
+   },
+   {
+    "case": "i_box_by_man",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן\" (Hadges et ha-tivah she-yadd ha-ish she-o-med al ha-gag shel ha-binyan ha-lavan).",
+    "flags": [],
+    "t_ms": 1687
+   },
+   {
+    "case": "i_girl_balloon",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1545
+   },
+   {
+    "case": "i_car_between",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1484
+   },
+   {
+    "case": "i_door_by_tree",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1239
+   },
+   {
+    "case": "i_sign_awning",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1182
+   },
+   {
+    "case": "i_front_tire",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1456
+   },
+   {
+    "case": "i_bench_fountain",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1425
+   },
+   {
+    "case": "i_exit_gray",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1702
+   },
+   {
+    "case": "i_second_car",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1458
+   },
+   {
+    "case": "i_dark_stain",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1460
+   },
+   {
+    "case": "i_glasses_talk",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is a command or instruction, likely for an image description or a task involving an image. The instruction is to \"highlight the man with glasses who is talking to the woman in the yellow shirt.\" I need to ensure the English translation is natural and professional.",
+    "flags": [],
+    "t_ms": 1395
+   },
+   {
+    "case": "i_truck_boat",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1203
+   },
+   {
+    "case": "i_empty_chair",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2028
+   },
+   {
+    "case": "i_bird_cable",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3171
+   },
+   {
+    "case": "i_fence_gap",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 2091
+   },
+   {
+    "case": "i_main_steps",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1620
+   },
+   {
+    "case": "i_helmet_mid",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1237
+   },
+   {
+    "case": "i_cat_climb",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1681
+   },
+   {
+    "case": "i_lean_silver",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1543
+   },
+   {
+    "case": "i_flag_low",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1385
+   },
+   {
+    "case": "i_broken_window",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2866
+   },
+   {
+    "case": "i_last_convoy",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"עקוב אחרי המכונית האחרונה בשיירה\" into English.",
+    "flags": [],
+    "t_ms": 786
+   },
+   {
+    "case": "i_big_tent",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1889
+   },
+   {
+    "case": "i_crane_arm",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1357
+   },
+   {
+    "case": "i_boats_pier",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"ספור את הסירות הקשורות למזח הצפוני\" into English.",
+    "flags": [],
+    "t_ms": 784
+   },
+   {
+    "case": "j_bag_chain",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1410
+   },
+   {
+    "case": "j_bird_branch",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1542
+   },
+   {
+    "case": "j_kid_ball",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1636
+   },
+   {
+    "case": "j_win_gas",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1589
+   },
+   {
+    "case": "j_hat_bench",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1498
+   },
+   {
+    "case": "j_flag_mast",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3207
+   },
+   {
+    "case": "j_sticker",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1233
+   },
+   {
+    "case": "j_dog_steps",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1655
+   },
+   {
+    "case": "j_lock_gate",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1204
+   },
+   {
+    "case": "j_helmet_seat",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1436
+   },
+   {
+    "case": "j_sign_between",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1289
+   },
+   {
+    "case": "j_drainpipe",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1369
+   },
+   {
+    "case": "j_umbrella_x",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1486
+   },
+   {
+    "case": "j_hole_wall",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1507
+   },
+   {
+    "case": "j_tilt_sign",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1681
+   },
+   {
+    "case": "j_crate_trunk",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1700
+   },
+   {
+    "case": "j_mural",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1254
+   },
+   {
+    "case": "j_cat_jump",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1534
+   },
+   {
+    "case": "j_faucet",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1647
+   },
+   {
+    "case": "j_truck_text",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. I need to ensure the translation is natural and accurately conveys the meaning.",
+    "flags": [],
+    "t_ms": 873
+   },
+   {
+    "case": "j_pin_busstop",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is a set of instructions for locating a person in an image or video. I need to ensure the translation is natural and accurately conveys the spatial relationships described.",
+    "flags": [],
+    "t_ms": 1337
+   },
+   {
+    "case": "j_pin_notmoving",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1936
+   },
+   {
+    "case": "j_pin_antennas",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is a descriptive instruction, likely for locating a specific building. I need to ensure the translation is natural, accurate, and maintains the descriptive tone.",
+    "flags": [],
+    "t_ms": 1374
+   },
+   {
+    "case": "j_pin_drone2",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1799
+   },
+   {
+    "case": "j_pin_leash",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3522
+   },
+   {
+    "case": "j_pin_window3",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1629
+   },
+   {
+    "case": "j_pin_notphone",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1692
+   },
+   {
+    "case": "j_pin_2riders",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2826
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1387
+   },
+   {
+    "case": "j_pin_smallbike",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2035
+   },
+   {
+    "case": "j_pin_roofnear",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. I need to ensure the translation is natural, accurate, and captures the intended meaning. The context seems to be giving directions or identifying a specific house.",
+    "flags": [],
+    "t_ms": 1196
+   },
+   {
+    "case": "j_pin_leaving",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. I need to ensure the translation is natural, accurate, and professional. The sentence is: \"עקוב אחרי המשאית ה-orange שיוצאת עכשיו מהאתר, זו עם הארגז הפתוח\" (Akubov acharei ha-mashayit ha-orange she-yotzet achshav me-ha-eter, zo im ha-argaz ha-pituach).",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 2018
+   },
+   {
+    "case": "j_pin_flagman",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1539
+   },
+   {
+    "case": "j_pin_notsail",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1842
+   },
+   {
+    "case": "j_pin_bushes",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1378
+   },
+   {
+    "case": "j_pin_campole",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1671
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1902
+   },
+   {
+    "case": "j_pin_planks",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 2979
+   },
+   {
+    "case": "j_pin_halfgate",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 5094
+   },
+   {
+    "case": "j_pin_spare",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1397
+   },
+   {
+    "case": "j_pin_stage3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4437
+   },
+   {
+    "case": "j_pin_hay",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1740
+   },
+   {
+    "case": "j_pin_fullbin",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1379
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1533
+   },
+   {
+    "case": "j_pin_extstairs",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1694
+   },
+   {
+    "case": "j_pin_wrongway",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1705
+   },
+   {
+    "case": "j_pin_firstrun",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 1779
+   },
+   {
+    "case": "j_pin_barrel",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1766
+   },
+   {
+    "case": "j_pin_puddle",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1652
+   },
+   {
+    "case": "j_pin_scaffold",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3361
+   },
+   {
+    "case": "j_pin_idledozer",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1669
+   },
+   {
+    "case": "j_pin_cart",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1621
+   },
+   {
+    "case": "j_pin_graffiti",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"הדגש את הכתובת שרשומה על הקיר, מתחת לחלון השני משמאל\" (Hadges et ha-ktovet she-reshuma al ha-kir, mitachat la-chalon ha-sheni mi-shemal).",
+    "flags": [],
+    "t_ms": 1596
+   },
+   {
+    "case": "j_pin_ferris",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1298
+   },
+   {
+    "case": "j_pin_planters",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4818
+   },
+   {
+    "case": "lp_white_car",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעקוב אחרי המכונית הלבנה\" into English.",
+    "flags": [],
+    "t_ms": 723
+   },
+   {
+    "case": "lp_nearest_person",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"תדגיש את האדם שהכי קרוב אליך\" into English.",
+    "flags": [],
+    "t_ms": 749
+   },
+   {
+    "case": "lp_look_down",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"תסתכל למטה בבקשה\" into English. This is a polite request to look down.",
+    "flags": [],
+    "t_ms": 744
+   },
+   {
+    "case": "pq_see_now",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה אתה רואה עכשיו\" into English. This is a common, informal question. I need to provide a natural and accurate translation.",
+    "flags": [],
+    "t_ms": 936
+   },
+   {
+    "case": "pq_see_frame",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה אתה רואה בפריים\" into English.",
+    "flags": [],
+    "t_ms": 695
+   },
+   {
+    "case": "pq_count_people_see",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"כמה אנשים אתה רואה\" into English.",
+    "flags": [],
+    "t_ms": 655
+   },
+   {
+    "case": "pq_count_cars_see",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew sentence \"כמה מכוניות אתה רואה בזירה\" into English. I need to ensure the translation is natural and accurate. \"בזירה\" (bazira) can mean \"in the arena,\" \"on the field,\" or \"in the scene/setting.\" Given the context of \"cars,\" it likely refers to a specific location or scene. \"כמה מכוניות אתה רואה\" means \"how many cars do you see.\" \"בזירה\" adds a specific location context. A common translation for \"בזירה\" in this context is \"in the scene\" or \"in the area.\" However, if it's a literal translation of a specific setting, \"in the arena\" might be used, but that's less likely for cars. I will opt for a natural English phrasing.",
+    "flags": [],
+    "t_ms": 3140
+   },
+   {
+    "case": "pq_see_suspicious",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה אתה רואה חשוד בזירה\" into English.",
+    "flags": [],
+    "t_ms": 699
+   },
+   {
+    "case": "pq_count_vehicles_road",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew sentence \"כמה רכבים אתה רואה על הכביש\" into English. I need to provide a professional, accurate translation.",
+    "flags": [],
+    "t_ms": 878
+   },
+   {
+    "case": "pq_see_ahead",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה אתה רואה לפניך\" into English.",
+    "flags": [],
+    "t_ms": 614
+   },
+   {
+    "case": "pq_count_windows_see",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew sentence \"כמה חלונות אתה רואה בבניין\" into English. I need to ensure the translation is natural and accurate.",
+    "flags": [],
+    "t_ms": 826
+   },
+   {
+    "case": "pq_any_person",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם יש אדם בתמונה\" into English. This is a simple question asking if there is a person in a picture.",
+    "flags": [],
+    "t_ms": 827
+   },
+   {
+    "case": "pq_any_vehicle",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם יש רכב בזירה\" into English.",
+    "flags": [],
+    "t_ms": 625
+   },
+   {
+    "case": "pq_any_red_car",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"האם יש מכונית אדומה בפריים\" (Ha'im yesh mechonit adoma be'Fram). I need to provide only the English translation.",
+    "flags": [],
+    "t_ms": 1117
+   },
+   {
+    "case": "pq_any_roof_person",
+    "kind": "perception",
+    "payload": "Is there anyone on the roof?",
+    "flags": [],
+    "t_ms": 170
+   },
+   {
+    "case": "pq_any_weapon",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם יש מישהו חמוש בזירה\" into English.",
+    "flags": [],
+    "t_ms": 676
+   },
+   {
+    "case": "pq_any_backpack_left",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם יש תיק גב בצד שמאל\" into English.",
+    "flags": [],
+    "t_ms": 747
+   },
+   {
+    "case": "pq_any_movement",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"האם יש תנועה בזירה\" into English.",
+    "flags": [],
+    "t_ms": 628
+   },
+   {
+    "case": "pq_whats_in_frame",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה נמצא בפריים\" into English.",
+    "flags": [],
+    "t_ms": 579
+   },
+   {
+    "case": "pq_whats_ahead",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מה נמצא לפניך\" into English.",
+    "flags": [],
+    "t_ms": 592
+   },
+   {
+    "case": "pq_describe_scene",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"תאר את מה שאתה רואה בזירה\" into English.",
+    "flags": [],
+    "t_ms": 731
+   },
+   {
+    "case": "pq_identify_threats",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"זהה איומים אפשריים בזירה\" into English.",
+    "flags": [],
+    "t_ms": 723
+   },
+   {
+    "case": "pq_find_people",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"מצא את כל האנשים בפריים\" into English.",
+    "flags": [],
+    "t_ms": 691
+   },
+   {
+    "case": "pq_count_buildings",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"ספור את הבניינים בזירה\" into English.",
+    "flags": [],
+    "t_ms": 694
+   },
+   {
+    "case": "pq_search_vehicle",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"חפש רכב חשוד באזור\" into English.",
+    "flags": [],
+    "t_ms": 718
+   },
+   {
+    "case": "pq_look_ground",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1296
+   },
+   {
+    "case": "pq_identify_color",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"זהה את הצבע של הרכב הקרוב ביותר\". This is a command or instruction. I need to identify the color of the closest vehicle.",
+    "flags": [],
+    "t_ms": 1069
+   },
+   {
+    "case": "pq_focus_describe",
+    "kind": "perception",
+    "payload": "The user wants me to translate the Hebrew phrase \"התמקד באדם הקרוב ותאר אותו\" into English.",
+    "flags": [],
+    "t_ms": 735
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English. The sentence is: \"תבצע מעגל אינדיאני על המטרה מולך\" (Tivtza ma'agal indiani al ha'matara mulcha). I need to provide a professional translation that captures the meaning and nuance. No extra commentary should be included.",
+    "flags": [],
+    "t_ms": 1614
+   },
+   {
+    "case": "s_sitrep",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"טפס לגובה ותן לי תמונת מצב\" into English.",
+    "flags": [],
+    "t_ms": 741
+   },
+   {
+    "case": "s_jump_point",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"קפוץ לנקודה ותשאר עליה\" into English.",
+    "flags": [],
+    "t_ms": 698
+   },
+   {
+    "case": "s_gentle_scan",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תעשה לי סריקה עדינה על האזור\" into English. This phrase is likely used in a medical or technical context, requesting a gentle scan of a specific area. I need to provide a natural and professional English translation.",
+    "flags": [
+     "slang-sector"
+    ],
+    "t_ms": 1303
+   },
+   {
+    "case": "s_eye_junction",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English.",
+    "flags": [],
+    "t_ms": 3295
+   },
+   {
+    "case": "s_zoom_suspect",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 1172
+   },
+   {
+    "case": "s_route_escort",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3011
+   },
+   {
+    "case": "s_dead_ground",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English. The phrase is: \"תפוס גובה, יש לך שטח מת מאחורי הגבעה\".",
+    "flags": [],
+    "t_ms": 953
+   },
+   {
+    "case": "s_give_distance",
+    "kind": "reject",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "hebnum-digits",
+     "slang-sector",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4843
+   },
+   {
+    "case": "s_one_more_pass",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3235
+   },
+   {
+    "case": "s_grid_out",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"עבור לנקודת הציון שנתתי לך\" into English.",
+    "flags": [
+     "acronym-grid",
+     "proc-out-final"
+    ],
+    "t_ms": 772
+   },
+   {
+    "case": "s_roger_over",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"קיבלתי, ממשיך בסריקה\" into English.",
+    "flags": [
+     "proc-roger",
+     "proc-over-final"
+    ],
+    "t_ms": 722
+   },
+   {
+    "case": "s_cp_visual",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "acronym-cp"
+    ],
+    "t_ms": 1358
+   },
+   {
+    "case": "s_eyes_on",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"תדווח כשיש לך עיניים על המטרה\" into English.",
+    "flags": [],
+    "t_ms": 806
+   },
+   {
+    "case": "s_rally_point",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"קיבלתי, חוזר לנקודת האיסוף\" into English.",
+    "flags": [
+     "abbrev-point"
+    ],
+    "t_ms": 795
+   },
+   {
+    "case": "s_feet_hold",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "feet-unit"
+    ],
+    "t_ms": 1269
+   },
+   {
+    "case": "s_lost_uav",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "t_ms": 1438
+   },
+   {
+    "case": "s_scramble",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew phrase into English.",
+    "flags": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ],
+    "t_ms": 1503
+   },
+   {
+    "case": "s_obs_report",
+    "kind": "command",
+    "payload": "Maintain surveillance on the White House; report every movement.",
+    "flags": [
+     "proc-over-final"
+    ],
+    "t_ms": 230
+   },
+   {
+    "case": "s_wadi_route",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew sentence into English.",
+    "flags": [],
+    "t_ms": 3450
+   }
+  ]
+ },
+ "wall_s": 621
+}

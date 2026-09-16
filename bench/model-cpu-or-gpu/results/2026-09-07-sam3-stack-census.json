@@ -1,0 +1,57 @@
+{
+ "baseline": {
+  "total": 8151,
+  "used": 111,
+  "free": 7597
+ },
+ "steps": [
+  {
+   "step": "qwen3vl (run_llama_server.sh, prod flags)",
+   "delta_mb": 3821,
+   "total_used_mb": 3821,
+   "free_mb": 3776
+  },
+  {
+   "step": "hy-mt2 Q4 (run_hymt2_server.sh, -c 512 -np 1)",
+   "delta_mb": 1187,
+   "total_used_mb": 5008,
+   "free_mb": 2590
+  },
+  {
+   "step": "whisper q5_k via the real ASR node",
+   "delta_mb": 827,
+   "total_used_mb": 5835,
+   "free_mb": 1763
+  },
+  {
+   "step": "yolo26n-seg (ultralytics, 720p predict)",
+   "delta_mb": 282,
+   "total_used_mb": 6117,
+   "free_mb": 1481
+  },
+  {
+   "step": "sam3-nf4 (perception2, 1 detect -> 8 dets)",
+   "delta_mb": 1074,
+   "total_used_mb": 7191,
+   "free_mb": 407
+  },
+  {
+   "step": "qwen image ask transient (3644 ms)",
+   "delta_mb": 94,
+   "total_used_mb": 7285,
+   "free_mb": 313
+  }
+ ],
+ "final": {
+  "total": 8151,
+  "used": 7396,
+  "free": 313
+ },
+ "per_process": {
+  "1243461": 3899,
+  "1243549": 1173,
+  "1243630": 812,
+  "1243442": 1352
+ },
+ "asr_node_ok": true
+}

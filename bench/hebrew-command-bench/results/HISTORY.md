@@ -403,3 +403,5 @@ were answered by the bypass with no model call; their zeros are included in the 
 One stage-0 false positive: "עצור שם לעשר שניות" (a wait command containing the emergency word)
 emergency-stops. Recommendation: keep the filter greedy — it fails in the safe direction.
 Ruling pending.
+| 2026-09-12 | Legacy translated path retired: bench.py + recognize() + TRANSLATE_/TGEMMA_/WIRE_GRAMMAR/LINE_GRAMMAR removed | 410/487, live direct path (recognize_direct + _plan2 + UNIFIED_*) byte-unchanged, 66 tests green |
+| 2026-09-12 | apply_he (stage 2) ablation: raw Hebrew to Gemma vs rewritten | 410/487 -> 404/487 (-6): std190 236->228 (-8), perception 103->105 (+2), others flat. apply_he is load-bearing for commands; KEPT. Per-rule ablation deferred. |

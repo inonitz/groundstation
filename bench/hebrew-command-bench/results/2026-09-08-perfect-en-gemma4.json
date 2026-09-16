@@ -1,0 +1,3827 @@
+{
+ "results": {
+  "std190": {
+   "ok": 195,
+   "n": 204
+  },
+  "verbose": {
+   "ok": 51,
+   "n": 54
+  }
+ },
+ "verdicts": {
+  "std190": {
+   "up10": "CORRECT",
+   "fwd5": "CORRECT",
+   "spin90cw": "CORRECT",
+   "takeoff": "CORRECT",
+   "land": "CORRECT",
+   "combo3": "CORRECT",
+   "combo_tl": "CORRECT",
+   "back2left3": "CORRECT",
+   "ccw45": "CORRECT",
+   "down3": "CORRECT",
+   "question": "CORRECT",
+   "square": "valid(open)",
+   "up2": "CORRECT",
+   "right4": "CORRECT",
+   "left7": "CORRECT",
+   "back10": "CORRECT",
+   "fwd15": "CORRECT",
+   "spin180cw": "CORRECT",
+   "spin360": "CORRECT",
+   "wait5": "CORRECT",
+   "up_half": "CORRECT",
+   "combo2b": "CORRECT",
+   "combo4": "CORRECT",
+   "combo5": "CORRECT",
+   "digit12": "CORRECT",
+   "digit45deg": "CORRECT",
+   "question2": "CORRECT",
+   "q_land_trap": "CORRECT",
+   "neg_trap": "CORRECT",
+   "colloq_up": "CORRECT",
+   "land_now": "CORRECT",
+   "takeoff_ctx": "CORRECT",
+   "g_up1": "CORRECT",
+   "g_up2": "CORRECT",
+   "g_up3": "CORRECT",
+   "g_up4": "CORRECT",
+   "g_up6": "CORRECT",
+   "g_up8": "CORRECT",
+   "g_up9": "CORRECT",
+   "g_up20": "CORRECT",
+   "g_up25": "CORRECT",
+   "g_down1": "CORRECT",
+   "g_down2": "CORRECT",
+   "g_down3": "CORRECT",
+   "g_down4": "CORRECT",
+   "g_down6": "CORRECT",
+   "g_down8": "CORRECT",
+   "g_down9": "CORRECT",
+   "g_down20": "CORRECT",
+   "g_down25": "CORRECT",
+   "g_fwd1": "CORRECT",
+   "g_fwd2": "CORRECT",
+   "g_fwd3": "CORRECT",
+   "g_fwd4": "CORRECT",
+   "g_fwd6": "CORRECT",
+   "g_fwd8": "CORRECT",
+   "g_fwd9": "CORRECT",
+   "g_fwd20": "CORRECT",
+   "g_fwd25": "CORRECT",
+   "g_back1": "CORRECT",
+   "g_back2": "CORRECT",
+   "g_back3": "CORRECT",
+   "g_back4": "CORRECT",
+   "g_back6": "CORRECT",
+   "g_back8": "CORRECT",
+   "g_back9": "CORRECT",
+   "g_back20": "CORRECT",
+   "g_back25": "CORRECT",
+   "g_right1": "CORRECT",
+   "g_right2": "CORRECT",
+   "g_right3": "CORRECT",
+   "g_right4": "CORRECT",
+   "g_right6": "CORRECT",
+   "g_right8": "CORRECT",
+   "g_right9": "CORRECT",
+   "g_right20": "CORRECT",
+   "g_right25": "CORRECT",
+   "g_left1": "CORRECT",
+   "g_left2": "CORRECT",
+   "g_left3": "CORRECT",
+   "g_left4": "CORRECT",
+   "g_left6": "CORRECT",
+   "g_left8": "CORRECT",
+   "g_left9": "CORRECT",
+   "g_left20": "CORRECT",
+   "g_left25": "CORRECT",
+   "g_cw30": "CORRECT",
+   "g_ccw30": "CORRECT",
+   "g_cw60": "CORRECT",
+   "g_ccw60": "CORRECT",
+   "g_cw120": "CORRECT",
+   "g_ccw120": "CORRECT",
+   "g_cw270": "CORRECT",
+   "g_ccw270": "CORRECT",
+   "g_wait2": "CORRECT",
+   "g_wait10": "CORRECT",
+   "g_combo2_0": "CORRECT",
+   "g_combo2_1": "CORRECT",
+   "g_combo2_2": "CORRECT",
+   "g_combo2_3": "CORRECT",
+   "g_combo2_4": "CORRECT",
+   "g_combo2_5": "CORRECT",
+   "g_combo2_6": "CORRECT",
+   "g_combo2_7": "CORRECT",
+   "g_combo3_0": "CORRECT",
+   "g_combo3_1": "CORRECT",
+   "g_combo3_2": "CORRECT",
+   "g_combo3_3": "CORRECT",
+   "r_takeoff1": "CORRECT",
+   "r_takeoff2": "CORRECT",
+   "r_takeoff3": "wrong-len(0vs1)",
+   "r_takeoff4": "CORRECT",
+   "r_takeoff5": "CORRECT",
+   "r_land1": "CORRECT",
+   "r_land2": "CORRECT",
+   "r_land3": "CORRECT",
+   "r_land4": "wrong-len(0vs1)",
+   "r_land5": "CORRECT",
+   "r_pol_up5": "wrong-len(0vs1)",
+   "r_pol_fwd3": "CORRECT",
+   "r_pol_left2": "CORRECT",
+   "r_pol_down1": "CORRECT",
+   "r_pol_spin": "CORRECT",
+   "r_fill1": "CORRECT",
+   "r_fill2": "CORRECT",
+   "r_fill3": "CORRECT",
+   "r_fill4": "wrong-len(2vs1)",
+   "r_fill5": "CORRECT",
+   "r_alt10": "CORRECT",
+   "r_alt20": "wrong-len(0vs1)",
+   "r_low": "CORRECT",
+   "r_rise3": "CORRECT",
+   "r_updown": "CORRECT",
+   "r_bit_left": "CORRECT",
+   "r_bit_up": "CORRECT",
+   "r_bit_back": "CORRECT",
+   "r_higher": "wrong-len(0vs1)",
+   "r_bit_fwd": "CORRECT",
+   "r_turn_r90": "CORRECT",
+   "r_turn_l45": "CORRECT",
+   "r_half_turn": "CORRECT",
+   "r_quart_r": "CORRECT",
+   "r_full": "CORRECT",
+   "r_around": "valid(open)",
+   "r_num_first": "CORRECT",
+   "r_m_half": "CORRECT",
+   "r_2_half": "CORRECT",
+   "r_digit50": "CORRECT",
+   "r_digit7": "CORRECT",
+   "r_meter1": "CORRECT",
+   "r_mis1": "CORRECT",
+   "r_mis2": "CORRECT",
+   "r_mis3": "CORRECT",
+   "r_mis4": "CORRECT",
+   "r_mis5": "CORRECT",
+   "r_mis6": "CORRECT",
+   "r_mis7": "CORRECT",
+   "r_mis8": "wrong-len(1vs2)",
+   "r_mis9": "CORRECT",
+   "r_mis10": "CORRECT",
+   "r_dis1": "valid(open)",
+   "r_dis2": "valid(open)",
+   "r_dis3": "valid(open)",
+   "r_dis4": "valid(open)",
+   "r_q1": "CORRECT",
+   "r_q2": "CORRECT",
+   "r_q3": "CORRECT",
+   "r_q4": "CORRECT",
+   "r_q5": "CORRECT",
+   "r_q6": "CORRECT",
+   "r_q7": "CORRECT",
+   "r_q8": "CORRECT",
+   "r_neg1": "CORRECT",
+   "r_neg2": "CORRECT",
+   "r_neg3": "CORRECT",
+   "r_neg4": "CORRECT",
+   "r_neg5": "CORRECT",
+   "r_wait1": "CORRECT",
+   "r_wait2": "CORRECT",
+   "r_wait3": "CORRECT",
+   "r_wait4": "CORRECT",
+   "r_big100": "CORRECT",
+   "r_deg10": "CORRECT",
+   "r_deg135": "CORRECT",
+   "r_z_03": "CORRECT",
+   "r_back15": "CORRECT",
+   "r_ord1": "CORRECT",
+   "r_ord2": "CORRECT",
+   "r_ord3": "CORRECT",
+   "r_ord4": "CORRECT",
+   "l_deg_frac": "CORRECT",
+   "l_deg_precise": "CORRECT",
+   "l_half_cw": "CORRECT",
+   "l_dbl_neg": "CORRECT",
+   "l_postpone": "wrong-len(1vs0)",
+   "l_pause_idiom": "wrong-len(1vs0)",
+   "l_combo_tamtin": "CORRECT",
+   "l_fwd_future": "CORRECT",
+   "l_land_going": "CORRECT",
+   "l_pres_pic": "CORRECT",
+   "l_pres_you": "CORRECT",
+   "l_color_near": "CORRECT",
+   "l_tower_count": "CORRECT",
+   "l_lighthouse_count": "CORRECT"
+  },
+  "verbose": {
+   "v_listen3_g0": "CORRECT",
+   "v_listen3_g1": "CORRECT",
+   "v_listen3_g2": "CORRECT",
+   "v_listen3_g3": "CORRECT",
+   "v_finish3_g0": "CORRECT",
+   "v_finish3_g1": "CORRECT",
+   "v_finish3_g2": "CORRECT",
+   "v_finish3_g3": "CORRECT",
+   "v_start4_g0": "CORRECT",
+   "v_start4_g1": "CORRECT",
+   "v_start4_g2": "CORRECT",
+   "v_start4_g3": "wrong-len(3vs4)",
+   "v_okso4_g0": "CORRECT",
+   "v_okso4_g1": "CORRECT",
+   "v_okso4_g2": "CORRECT",
+   "v_okso4_g3": "CORRECT",
+   "v_first3_g0": "CORRECT",
+   "v_first3_g1": "CORRECT",
+   "v_first3_g2": "CORRECT",
+   "v_first3_g3": "CORRECT",
+   "v_favor4_g0": "CORRECT",
+   "v_favor4_g1": "CORRECT",
+   "v_favor4_g2": "CORRECT",
+   "v_favor4_g3": "CORRECT",
+   "v_mission3_g0": "CORRECT",
+   "v_mission3_g1": "CORRECT",
+   "v_mission3_g2": "CORRECT",
+   "v_mission3_g3": "CORRECT",
+   "v_yalla2_g0": "CORRECT",
+   "v_yalla2_g1": "CORRECT",
+   "v_yalla2_g2": "CORRECT",
+   "v_yalla2_g3": "CORRECT",
+   "v_ready3_g0": "CORRECT",
+   "v_ready3_g1": "wrong-len(4vs3)",
+   "v_ready3_g2": "CORRECT",
+   "v_ready3_g3": "CORRECT",
+   "v_seq5_g0": "CORRECT",
+   "v_seq5_g1": "CORRECT",
+   "v_seq5_g2": "CORRECT",
+   "v_seq5_g3": "CORRECT",
+   "v_note3_g0": "CORRECT",
+   "v_note3_g1": "CORRECT",
+   "v_note3_g2": "CORRECT",
+   "v_note3_g3": "CORRECT",
+   "v_round3_g0": "CORRECT",
+   "v_round3_g1": "CORRECT",
+   "v_round3_g2": "CORRECT",
+   "v_round3_g3": "CORRECT",
+   "v_neg1": "CORRECT",
+   "v_neg2": "CORRECT",
+   "v_q1": "CORRECT",
+   "v_q2": "CORRECT",
+   "v_mix1": "wrong-len(0vs1)",
+   "v_mix2": "CORRECT"
+  }
+ },
+ "rows": {
+  "std190": [
+   {
+    "case": "up10",
+    "english": "go up 10 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     }
+    ],
+    "t_ms": 1570
+   },
+   {
+    "case": "fwd5",
+    "english": "fly forward 5 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 5
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "spin90cw",
+    "english": "rotate 90 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 316
+   },
+   {
+    "case": "takeoff",
+    "english": "take off",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 618
+   },
+   {
+    "case": "land",
+    "english": "land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 182
+   },
+   {
+    "case": "combo3",
+    "english": "go up 10 meters, rotate 90 degrees clockwise, then fly forward 5 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 5
+     }
+    ],
+    "t_ms": 665
+   },
+   {
+    "case": "combo_tl",
+    "english": "take off, go up 5 meters, wait 3 seconds, and land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 596
+   },
+   {
+    "case": "back2left3",
+    "english": "fly backward 2 meters then left 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -2
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     }
+    ],
+    "t_ms": 493
+   },
+   {
+    "case": "ccw45",
+    "english": "rotate 45 degrees counterclockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -45
+     }
+    ],
+    "t_ms": 327
+   },
+   {
+    "case": "down3",
+    "english": "go down 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -3
+     }
+    ],
+    "t_ms": 297
+   },
+   {
+    "case": "question",
+    "english": "what do you see right now?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 111
+   },
+   {
+    "case": "square",
+    "english": "fly in a square of 2 meters",
+    "score": "valid(open)",
+    "mission": [],
+    "t_ms": 143
+   },
+   {
+    "case": "up2",
+    "english": "go up 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 2
+     }
+    ],
+    "t_ms": 282
+   },
+   {
+    "case": "right4",
+    "english": "fly right 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 4
+     }
+    ],
+    "t_ms": 280
+   },
+   {
+    "case": "left7",
+    "english": "move left 7 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -7
+     }
+    ],
+    "t_ms": 298
+   },
+   {
+    "case": "back10",
+    "english": "fly backward 10 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -10
+     }
+    ],
+    "t_ms": 324
+   },
+   {
+    "case": "fwd15",
+    "english": "advance 15 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 15
+     }
+    ],
+    "t_ms": 297
+   },
+   {
+    "case": "spin180cw",
+    "english": "rotate 180 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "t_ms": 326
+   },
+   {
+    "case": "spin360",
+    "english": "do a full turn clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 360
+     }
+    ],
+    "t_ms": 315
+   },
+   {
+    "case": "wait5",
+    "english": "wait 5 seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 5
+     }
+    ],
+    "t_ms": 923
+   },
+   {
+    "case": "up_half",
+    "english": "go up half a meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 0.5
+     }
+    ],
+    "t_ms": 316
+   },
+   {
+    "case": "combo2b",
+    "english": "take off then go up 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 383
+   },
+   {
+    "case": "combo4",
+    "english": "fly forward 4 meters, right 2 meters, backward 4 meters, then left 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 4
+     },
+     {
+      "type": "fly_by",
+      "dy": 2
+     },
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -2
+     }
+    ],
+    "t_ms": 832
+   },
+   {
+    "case": "combo5",
+    "english": "take off, go up 2 meters, rotate 90 degrees clockwise, fly forward 3 meters, and land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 2
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 3
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 818
+   },
+   {
+    "case": "digit12",
+    "english": "go up 12 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 12
+     }
+    ],
+    "t_ms": 305
+   },
+   {
+    "case": "digit45deg",
+    "english": "turn right 45 degrees",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 45
+     }
+    ],
+    "t_ms": 303
+   },
+   {
+    "case": "question2",
+    "english": "how many people do you see",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 104
+   },
+   {
+    "case": "q_land_trap",
+    "english": "are you going to land soon",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 104
+   },
+   {
+    "case": "neg_trap",
+    "english": "don't fly forward",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 99
+   },
+   {
+    "case": "colloq_up",
+    "english": "climb 10 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     }
+    ],
+    "t_ms": 302
+   },
+   {
+    "case": "land_now",
+    "english": "land now",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 191
+   },
+   {
+    "case": "takeoff_ctx",
+    "english": "perform takeoff",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 206
+   },
+   {
+    "case": "g_up1",
+    "english": "go up 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     }
+    ],
+    "t_ms": 282
+   },
+   {
+    "case": "g_up2",
+    "english": "go up 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 2
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "g_up3",
+    "english": "go up 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 268
+   },
+   {
+    "case": "g_up4",
+    "english": "go up 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 4
+     }
+    ],
+    "t_ms": 268
+   },
+   {
+    "case": "g_up6",
+    "english": "go up 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 6
+     }
+    ],
+    "t_ms": 269
+   },
+   {
+    "case": "g_up8",
+    "english": "go up 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 8
+     }
+    ],
+    "t_ms": 271
+   },
+   {
+    "case": "g_up9",
+    "english": "go up 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 9
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "g_up20",
+    "english": "go up 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     }
+    ],
+    "t_ms": 290
+   },
+   {
+    "case": "g_up25",
+    "english": "go up 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 25
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "g_down1",
+    "english": "go down 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -1
+     }
+    ],
+    "t_ms": 291
+   },
+   {
+    "case": "g_down2",
+    "english": "go down 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "g_down3",
+    "english": "go down 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -3
+     }
+    ],
+    "t_ms": 285
+   },
+   {
+    "case": "g_down4",
+    "english": "go down 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -4
+     }
+    ],
+    "t_ms": 287
+   },
+   {
+    "case": "g_down6",
+    "english": "go down 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -6
+     }
+    ],
+    "t_ms": 284
+   },
+   {
+    "case": "g_down8",
+    "english": "go down 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -8
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "g_down9",
+    "english": "go down 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -9
+     }
+    ],
+    "t_ms": 285
+   },
+   {
+    "case": "g_down20",
+    "english": "go down 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -20
+     }
+    ],
+    "t_ms": 307
+   },
+   {
+    "case": "g_down25",
+    "english": "go down 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -25
+     }
+    ],
+    "t_ms": 301
+   },
+   {
+    "case": "g_fwd1",
+    "english": "fly forward 1 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "t_ms": 282
+   },
+   {
+    "case": "g_fwd2",
+    "english": "fly forward 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 2
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "g_fwd3",
+    "english": "fly forward 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     }
+    ],
+    "t_ms": 268
+   },
+   {
+    "case": "g_fwd4",
+    "english": "fly forward 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 4
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "g_fwd6",
+    "english": "fly forward 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 6
+     }
+    ],
+    "t_ms": 269
+   },
+   {
+    "case": "g_fwd8",
+    "english": "fly forward 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 8
+     }
+    ],
+    "t_ms": 269
+   },
+   {
+    "case": "g_fwd9",
+    "english": "fly forward 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 9
+     }
+    ],
+    "t_ms": 272
+   },
+   {
+    "case": "g_fwd20",
+    "english": "fly forward 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 20
+     }
+    ],
+    "t_ms": 290
+   },
+   {
+    "case": "g_fwd25",
+    "english": "fly forward 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "g_back1",
+    "english": "fly backward 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -1
+     }
+    ],
+    "t_ms": 293
+   },
+   {
+    "case": "g_back2",
+    "english": "fly backward 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -2
+     }
+    ],
+    "t_ms": 286
+   },
+   {
+    "case": "g_back3",
+    "english": "fly backward 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -3
+     }
+    ],
+    "t_ms": 284
+   },
+   {
+    "case": "g_back4",
+    "english": "fly backward 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     }
+    ],
+    "t_ms": 287
+   },
+   {
+    "case": "g_back6",
+    "english": "fly backward 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -6
+     }
+    ],
+    "t_ms": 277
+   },
+   {
+    "case": "g_back8",
+    "english": "fly backward 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -8
+     }
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "g_back9",
+    "english": "fly backward 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -9
+     }
+    ],
+    "t_ms": 238
+   },
+   {
+    "case": "g_back20",
+    "english": "fly backward 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -20
+     }
+    ],
+    "t_ms": 257
+   },
+   {
+    "case": "g_back25",
+    "english": "fly backward 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -25
+     }
+    ],
+    "t_ms": 260
+   },
+   {
+    "case": "g_right1",
+    "english": "fly right 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 1
+     }
+    ],
+    "t_ms": 219
+   },
+   {
+    "case": "g_right2",
+    "english": "fly right 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 2
+     }
+    ],
+    "t_ms": 209
+   },
+   {
+    "case": "g_right3",
+    "english": "fly right 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 3
+     }
+    ],
+    "t_ms": 209
+   },
+   {
+    "case": "g_right4",
+    "english": "fly right 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 4
+     }
+    ],
+    "t_ms": 224
+   },
+   {
+    "case": "g_right6",
+    "english": "fly right 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 230
+   },
+   {
+    "case": "g_right8",
+    "english": "fly right 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 8
+     }
+    ],
+    "t_ms": 228
+   },
+   {
+    "case": "g_right9",
+    "english": "fly right 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 9
+     }
+    ],
+    "t_ms": 225
+   },
+   {
+    "case": "g_right20",
+    "english": "fly right 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 20
+     }
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "g_right25",
+    "english": "fly right 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 25
+     }
+    ],
+    "t_ms": 243
+   },
+   {
+    "case": "g_left1",
+    "english": "fly left 1 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -1
+     }
+    ],
+    "t_ms": 247
+   },
+   {
+    "case": "g_left2",
+    "english": "fly left 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -2
+     }
+    ],
+    "t_ms": 240
+   },
+   {
+    "case": "g_left3",
+    "english": "fly left 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -3
+     }
+    ],
+    "t_ms": 242
+   },
+   {
+    "case": "g_left4",
+    "english": "fly left 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -4
+     }
+    ],
+    "t_ms": 242
+   },
+   {
+    "case": "g_left6",
+    "english": "fly left 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -6
+     }
+    ],
+    "t_ms": 242
+   },
+   {
+    "case": "g_left8",
+    "english": "fly left 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -8
+     }
+    ],
+    "t_ms": 242
+   },
+   {
+    "case": "g_left9",
+    "english": "fly left 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -9
+     }
+    ],
+    "t_ms": 241
+   },
+   {
+    "case": "g_left20",
+    "english": "fly left 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -20
+     }
+    ],
+    "t_ms": 260
+   },
+   {
+    "case": "g_left25",
+    "english": "fly left 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -25
+     }
+    ],
+    "t_ms": 257
+   },
+   {
+    "case": "g_cw30",
+    "english": "rotate 30 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 30
+     }
+    ],
+    "t_ms": 255
+   },
+   {
+    "case": "g_ccw30",
+    "english": "rotate 30 degrees counterclockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -30
+     }
+    ],
+    "t_ms": 258
+   },
+   {
+    "case": "g_cw60",
+    "english": "rotate 60 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 60
+     }
+    ],
+    "t_ms": 250
+   },
+   {
+    "case": "g_ccw60",
+    "english": "rotate 60 degrees counterclockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -60
+     }
+    ],
+    "t_ms": 255
+   },
+   {
+    "case": "g_cw120",
+    "english": "rotate 120 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 120
+     }
+    ],
+    "t_ms": 265
+   },
+   {
+    "case": "g_ccw120",
+    "english": "rotate 120 degrees counterclockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -120
+     }
+    ],
+    "t_ms": 271
+   },
+   {
+    "case": "g_cw270",
+    "english": "rotate 270 degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 270
+     }
+    ],
+    "t_ms": 266
+   },
+   {
+    "case": "g_ccw270",
+    "english": "rotate 270 degrees counterclockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -270
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "g_wait2",
+    "english": "wait 2 seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 2
+     }
+    ],
+    "t_ms": 204
+   },
+   {
+    "case": "g_wait10",
+    "english": "wait 10 seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 10
+     }
+    ],
+    "t_ms": 216
+   },
+   {
+    "case": "g_combo2_0",
+    "english": "go up 1 meter, then go up 20 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     },
+     {
+      "type": "fly_by",
+      "dz": 20
+     }
+    ],
+    "t_ms": 406
+   },
+   {
+    "case": "g_combo2_1",
+    "english": "go up 4 meters, then go down 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 4
+     },
+     {
+      "type": "fly_by",
+      "dz": -4
+     }
+    ],
+    "t_ms": 404
+   },
+   {
+    "case": "g_combo2_2",
+    "english": "go up 9 meters, then go down 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 9
+     },
+     {
+      "type": "fly_by",
+      "dz": -25
+     }
+    ],
+    "t_ms": 419
+   },
+   {
+    "case": "g_combo2_3",
+    "english": "go down 1 meter, then fly forward 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -1
+     },
+     {
+      "type": "fly_by",
+      "dx": 6
+     }
+    ],
+    "t_ms": 404
+   },
+   {
+    "case": "g_combo2_4",
+    "english": "go down 4 meters, then fly backward 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -4
+     },
+     {
+      "type": "fly_by",
+      "dx": -1
+     }
+    ],
+    "t_ms": 423
+   },
+   {
+    "case": "g_combo2_5",
+    "english": "go down 9 meters, then fly backward 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -9
+     },
+     {
+      "type": "fly_by",
+      "dx": -8
+     }
+    ],
+    "t_ms": 419
+   },
+   {
+    "case": "g_combo2_6",
+    "english": "fly forward 1 meters, then fly right 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 1
+     },
+     {
+      "type": "fly_by",
+      "dy": 2
+     }
+    ],
+    "t_ms": 393
+   },
+   {
+    "case": "g_combo2_7",
+    "english": "fly forward 4 meters, then fly right 9 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 4
+     },
+     {
+      "type": "fly_by",
+      "dy": 9
+     }
+    ],
+    "t_ms": 390
+   },
+   {
+    "case": "g_combo3_0",
+    "english": "go up 1 meter, go up 4 meters, then go up 8 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     },
+     {
+      "type": "fly_by",
+      "dz": 4
+     },
+     {
+      "type": "fly_by",
+      "dz": 8
+     }
+    ],
+    "t_ms": 539
+   },
+   {
+    "case": "g_combo3_1",
+    "english": "go up 20 meters, go down 8 meters, then fly forward 1 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "fly_by",
+      "dz": -8
+     },
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "t_ms": 568
+   },
+   {
+    "case": "g_combo3_2",
+    "english": "go down 8 meters, fly forward 20 meters, then fly backward 6 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -8
+     },
+     {
+      "type": "fly_by",
+      "dx": 20
+     },
+     {
+      "type": "fly_by",
+      "dx": -6
+     }
+    ],
+    "t_ms": 543
+   },
+   {
+    "case": "g_combo3_3",
+    "english": "fly forward 4 meters, fly right 1 meter, then fly right 25 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 4
+     },
+     {
+      "type": "fly_by",
+      "dy": 1
+     },
+     {
+      "type": "fly_by",
+      "dy": 25
+     }
+    ],
+    "t_ms": 534
+   },
+   {
+    "case": "r_takeoff1",
+    "english": "take off",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 170
+   },
+   {
+    "case": "r_takeoff2",
+    "english": "let's take off",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "r_takeoff3",
+    "english": "you can take off",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 77
+   },
+   {
+    "case": "r_takeoff4",
+    "english": "come on, take off",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 177
+   },
+   {
+    "case": "r_takeoff5",
+    "english": "take off please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "t_ms": 171
+   },
+   {
+    "case": "r_land1",
+    "english": "land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 154
+   },
+   {
+    "case": "r_land2",
+    "english": "let's land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 161
+   },
+   {
+    "case": "r_land3",
+    "english": "please land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 154
+   },
+   {
+    "case": "r_land4",
+    "english": "you can land",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 73
+   },
+   {
+    "case": "r_land5",
+    "english": "we're done, land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 174
+   },
+   {
+    "case": "r_pol_up5",
+    "english": "can you go up 5 meters please",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 86
+   },
+   {
+    "case": "r_pol_fwd3",
+    "english": "could you fly forward 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     }
+    ],
+    "t_ms": 244
+   },
+   {
+    "case": "r_pol_left2",
+    "english": "if possible, 2 meters to the left",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -2
+     }
+    ],
+    "t_ms": 261
+   },
+   {
+    "case": "r_pol_down1",
+    "english": "please descend 1 meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -1
+     }
+    ],
+    "t_ms": 251
+   },
+   {
+    "case": "r_pol_spin",
+    "english": "please turn 90 degrees right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 260
+   },
+   {
+    "case": "r_fill1",
+    "english": "uh fly forward 3 meters please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     }
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "r_fill2",
+    "english": "okay now climb 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 4
+     }
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "r_fill3",
+    "english": "alright so let's fly back 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -2
+     }
+    ],
+    "t_ms": 261
+   },
+   {
+    "case": "r_fill4",
+    "english": "wait wait first go up 2 meters",
+    "score": "wrong-len(2vs1)",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 1
+     },
+     {
+      "type": "fly_by",
+      "dz": 2
+     }
+    ],
+    "t_ms": 362
+   },
+   {
+    "case": "r_fill5",
+    "english": "yes continue right another 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 3
+     }
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "r_alt10",
+    "english": "climb to a height of 10 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     }
+    ],
+    "t_ms": 260
+   },
+   {
+    "case": "r_alt20",
+    "english": "go up to 20 meters altitude",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 105
+   },
+   {
+    "case": "r_low",
+    "english": "descend 2 meters lower",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 253
+   },
+   {
+    "case": "r_rise3",
+    "english": "rise 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 231
+   },
+   {
+    "case": "r_updown",
+    "english": "go down 4 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -4
+     }
+    ],
+    "t_ms": 252
+   },
+   {
+    "case": "r_bit_left",
+    "english": "fly a bit to the left",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": -1
+     }
+    ],
+    "t_ms": 258
+   },
+   {
+    "case": "r_bit_up",
+    "english": "go up a little",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     }
+    ],
+    "t_ms": 218
+   },
+   {
+    "case": "r_bit_back",
+    "english": "move back a little",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -1
+     }
+    ],
+    "t_ms": 232
+   },
+   {
+    "case": "r_higher",
+    "english": "fly a bit higher",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 77
+   },
+   {
+    "case": "r_bit_fwd",
+    "english": "move forward a bit more",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "t_ms": 221
+   },
+   {
+    "case": "r_turn_r90",
+    "english": "turn the drone 90 degrees right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 261
+   },
+   {
+    "case": "r_turn_l45",
+    "english": "turn 45 degrees left",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -45
+     }
+    ],
+    "t_ms": 267
+   },
+   {
+    "case": "r_half_turn",
+    "english": "do a half turn",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "t_ms": 262
+   },
+   {
+    "case": "r_quart_r",
+    "english": "quarter turn to the right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 251
+   },
+   {
+    "case": "r_full",
+    "english": "do a full turn",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 360
+     }
+    ],
+    "t_ms": 262
+   },
+   {
+    "case": "r_around",
+    "english": "turn around toward me",
+    "score": "valid(open)",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "t_ms": 275
+   },
+   {
+    "case": "r_num_first",
+    "english": "30 meters forward",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 30
+     }
+    ],
+    "t_ms": 247
+   },
+   {
+    "case": "r_m_half",
+    "english": "a meter and a half up",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1.5
+     }
+    ],
+    "t_ms": 269
+   },
+   {
+    "case": "r_2_half",
+    "english": "two and a half meters right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 2.5
+     }
+    ],
+    "t_ms": 270
+   },
+   {
+    "case": "r_digit50",
+    "english": "fly forward 50 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 50
+     }
+    ],
+    "t_ms": 254
+   },
+   {
+    "case": "r_digit7",
+    "english": "7 meters up",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 7
+     }
+    ],
+    "t_ms": 232
+   },
+   {
+    "case": "r_meter1",
+    "english": "move a meter to the right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 1
+     }
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "r_mis1",
+    "english": "take off and climb to 5 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     }
+    ],
+    "t_ms": 318
+   },
+   {
+    "case": "r_mis2",
+    "english": "take off, go up 3 meters and stay there",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 319
+   },
+   {
+    "case": "r_mis3",
+    "english": "fly right 3 meters and then 3 meters left back",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 3
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     }
+    ],
+    "t_ms": 407
+   },
+   {
+    "case": "r_mis4",
+    "english": "go up 5 meters, wait 2 seconds and come back down",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "delay",
+      "seconds": 2
+     },
+     {
+      "type": "fly_by",
+      "dz": -5
+     }
+    ],
+    "t_ms": 521
+   },
+   {
+    "case": "r_mis5",
+    "english": "take off, fly forward 10 meters, do a half turn and come back",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "t_ms": 678
+   },
+   {
+    "case": "r_mis6",
+    "english": "forward 2 meters then up 2 meters then back 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 2
+     },
+     {
+      "type": "fly_by",
+      "dz": 2
+     },
+     {
+      "type": "fly_by",
+      "dx": -2
+     }
+    ],
+    "t_ms": 517
+   },
+   {
+    "case": "r_mis7",
+    "english": "climb 10 meters then slowly do a full turn",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 360
+     }
+    ],
+    "t_ms": 417
+   },
+   {
+    "case": "r_mis8",
+    "english": "back 5 meters and down 2 meters",
+    "score": "wrong-len(1vs2)",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -5,
+      "dz": -2
+     }
+    ],
+    "t_ms": 332
+   },
+   {
+    "case": "r_mis9",
+    "english": "take off and then land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "r_mis10",
+    "english": "up 2 meters, right 4 meters, left 4 meters and down 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 2
+     },
+     {
+      "type": "fly_by",
+      "dy": 4
+     },
+     {
+      "type": "fly_by",
+      "dy": -4
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 709
+   },
+   {
+    "case": "r_dis1",
+    "english": "fly forward 5 meters and photograph the house",
+    "score": "valid(open)",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 5
+     }
+    ],
+    "t_ms": 249
+   },
+   {
+    "case": "r_dis2",
+    "english": "go up 3 meters and look around",
+    "score": "valid(open)",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 245
+   },
+   {
+    "case": "r_dis3",
+    "english": "take off and search for the car",
+    "score": "valid(open)",
+    "mission": [],
+    "t_ms": 86
+   },
+   {
+    "case": "r_dis4",
+    "english": "fly right 2 meters and tell me what you see",
+    "score": "valid(open)",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 2
+     }
+    ],
+    "t_ms": 227
+   },
+   {
+    "case": "r_q1",
+    "english": "what's the battery status",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 82
+   },
+   {
+    "case": "r_q2",
+    "english": "where are you now",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 79
+   },
+   {
+    "case": "r_q3",
+    "english": "how high are you",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 75
+   },
+   {
+    "case": "r_q4",
+    "english": "are you recording",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 71
+   },
+   {
+    "case": "r_q5",
+    "english": "tell me what you see",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 78
+   },
+   {
+    "case": "r_q6",
+    "english": "is anyone there",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 74
+   },
+   {
+    "case": "r_q7",
+    "english": "how much flight time do you have left",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 90
+   },
+   {
+    "case": "r_q8",
+    "english": "can you hear me",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 75
+   },
+   {
+    "case": "r_neg1",
+    "english": "don't go up any more",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 88
+   },
+   {
+    "case": "r_neg2",
+    "english": "don't move",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 67
+   },
+   {
+    "case": "r_neg3",
+    "english": "do not fly forward",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 76
+   },
+   {
+    "case": "r_neg4",
+    "english": "without turning please",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 91
+   },
+   {
+    "case": "r_neg5",
+    "english": "don't land yet",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 78
+   },
+   {
+    "case": "r_wait1",
+    "english": "wait a moment",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 1
+     }
+    ],
+    "t_ms": 200
+   },
+   {
+    "case": "r_wait2",
+    "english": "one second",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 1
+     }
+    ],
+    "t_ms": 198
+   },
+   {
+    "case": "r_wait3",
+    "english": "wait 5 seconds and then descend a meter",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 5
+     },
+     {
+      "type": "fly_by",
+      "dz": -1
+     }
+    ],
+    "t_ms": 373
+   },
+   {
+    "case": "r_wait4",
+    "english": "hold there for ten seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 10
+     }
+    ],
+    "t_ms": 229
+   },
+   {
+    "case": "r_big100",
+    "english": "fly forward 100 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 100
+     }
+    ],
+    "t_ms": 273
+   },
+   {
+    "case": "r_deg10",
+    "english": "turn 10 degrees right",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 10
+     }
+    ],
+    "t_ms": 253
+   },
+   {
+    "case": "r_deg135",
+    "english": "turn 135 degrees left",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -135
+     }
+    ],
+    "t_ms": 276
+   },
+   {
+    "case": "r_z_03",
+    "english": "go up 30 centimeters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 0.3
+     }
+    ],
+    "t_ms": 273
+   },
+   {
+    "case": "r_back15",
+    "english": "go back 15 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -15
+     }
+    ],
+    "t_ms": 267
+   },
+   {
+    "case": "r_ord1",
+    "english": "five meters forward, fly",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 5
+     }
+    ],
+    "t_ms": 238
+   },
+   {
+    "case": "r_ord2",
+    "english": "right 2 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 2
+     }
+    ],
+    "t_ms": 232
+   },
+   {
+    "case": "r_ord3",
+    "english": "upward, 3 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 3
+     }
+    ],
+    "t_ms": 243
+   },
+   {
+    "case": "r_ord4",
+    "english": "backward a little",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -1
+     }
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "l_deg_frac",
+    "english": "turn left 74.5 degrees",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -74.5
+     }
+    ],
+    "t_ms": 303
+   },
+   {
+    "case": "l_deg_precise",
+    "english": "make a 174.235 degree counter-clockwise turn",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -174.235
+     }
+    ],
+    "t_ms": 350
+   },
+   {
+    "case": "l_half_cw",
+    "english": "make a half turn clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "t_ms": 262
+   },
+   {
+    "case": "l_dbl_neg",
+    "english": "don't turn left 90 degrees counter-clockwise, then don't turn right",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 95
+   },
+   {
+    "case": "l_postpone",
+    "english": "hold off on what you're doing for the next two minutes",
+    "score": "wrong-len(1vs0)",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 120
+     }
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "l_pause_idiom",
+    "english": "whoa, timeout for four seconds",
+    "score": "wrong-len(1vs0)",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 4
+     }
+    ],
+    "t_ms": 215
+   },
+   {
+    "case": "l_combo_tamtin",
+    "english": "take off, climb five meters, wait three seconds and land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 509
+   },
+   {
+    "case": "l_fwd_future",
+    "english": "advance 15 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 15
+     }
+    ],
+    "t_ms": 251
+   },
+   {
+    "case": "l_land_going",
+    "english": "are you going to land soon",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 83
+   },
+   {
+    "case": "l_pres_pic",
+    "english": "is there anyone in the picture?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 87
+   },
+   {
+    "case": "l_pres_you",
+    "english": "do you see anyone in the picture?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 89
+   },
+   {
+    "case": "l_color_near",
+    "english": "what is the color of the nearest car?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 88
+   },
+   {
+    "case": "l_tower_count",
+    "english": "do you see a tower in the scene where you can count windows?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 90
+   },
+   {
+    "case": "l_lighthouse_count",
+    "english": "do you see a lighthouse in the scene where you can count windows?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 89
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "english": "Listen, I want you to first take off, after that climb five meters and then rotate ninety degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 481
+   },
+   {
+    "case": "v_listen3_g1",
+    "english": "Listen, I want you to first climb twenty meters, after that turn right 45 degrees and then fly forward 12 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 566
+   },
+   {
+    "case": "v_listen3_g2",
+    "english": "Listen, I want you to first fly backward four meters, after that move left three meters and then descend two meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 544
+   },
+   {
+    "case": "v_listen3_g3",
+    "english": "Listen, I want you to first fly forward twenty five meters, after that rotate one hundred eighty degrees clockwise and then move right six meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 585
+   },
+   {
+    "case": "v_finish3_g0",
+    "english": "take off, when you finish climb five meters, and at the end rotate ninety degrees clockwise please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 490
+   },
+   {
+    "case": "v_finish3_g1",
+    "english": "climb twenty meters, when you finish turn right 45 degrees, and at the end fly forward 12 meters please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 599
+   },
+   {
+    "case": "v_finish3_g2",
+    "english": "fly backward four meters, when you finish move left three meters, and at the end descend two meters please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 539
+   },
+   {
+    "case": "v_finish3_g3",
+    "english": "fly forward twenty five meters, when you finish rotate one hundred eighty degrees clockwise, and at the end move right six meters please",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 556
+   },
+   {
+    "case": "v_start4_g0",
+    "english": "Let's start: take off. Now climb five meters. Good, now rotate ninety degrees clockwise and also fly forward ten meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "t_ms": 641
+   },
+   {
+    "case": "v_start4_g1",
+    "english": "Let's start: climb twenty meters. Now turn right 45 degrees. Good, now fly forward 12 meters and also wait three seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     }
+    ],
+    "t_ms": 695
+   },
+   {
+    "case": "v_start4_g2",
+    "english": "Let's start: fly backward four meters. Now move left three meters. Good, now descend two meters and also turn left thirty degrees",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     },
+     {
+      "type": "spin_by",
+      "degrees": -30
+     }
+    ],
+    "t_ms": 705
+   },
+   {
+    "case": "v_start4_g3",
+    "english": "Let's start: fly forward twenty five meters. Now rotate one hundred eighty degrees clockwise. Good, now move right six meters and also climb fifteen meters",
+    "score": "wrong-len(3vs4)",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6,
+      "dz": 15
+     }
+    ],
+    "t_ms": 646
+   },
+   {
+    "case": "v_okso4_g0",
+    "english": "Okay so, take off and then climb five meters and then rotate ninety degrees clockwise and then fly forward ten meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "t_ms": 595
+   },
+   {
+    "case": "v_okso4_g1",
+    "english": "Okay so, climb twenty meters and then turn right 45 degrees and then fly forward 12 meters and then wait three seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     }
+    ],
+    "t_ms": 701
+   },
+   {
+    "case": "v_okso4_g2",
+    "english": "Okay so, fly backward four meters and then move left three meters and then descend two meters and then turn left thirty degrees",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     },
+     {
+      "type": "spin_by",
+      "degrees": -30
+     }
+    ],
+    "t_ms": 737
+   },
+   {
+    "case": "v_okso4_g3",
+    "english": "Okay so, fly forward twenty five meters and then rotate one hundred eighty degrees clockwise and then move right six meters and then climb fifteen meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     },
+     {
+      "type": "fly_by",
+      "dz": 15
+     }
+    ],
+    "t_ms": 686
+   },
+   {
+    "case": "v_first3_g0",
+    "english": "First take off, a second after that climb five meters, and to finish rotate ninety degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 485
+   },
+   {
+    "case": "v_first3_g1",
+    "english": "First climb twenty meters, a second after that turn right 45 degrees, and to finish fly forward 12 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 541
+   },
+   {
+    "case": "v_first3_g2",
+    "english": "First fly backward four meters, a second after that move left three meters, and to finish descend two meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 564
+   },
+   {
+    "case": "v_first3_g3",
+    "english": "First fly forward twenty five meters, a second after that rotate one hundred eighty degrees clockwise, and to finish move right six meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 585
+   },
+   {
+    "case": "v_favor4_g0",
+    "english": "Do me a favor, take off, afterwards climb five meters, afterwards rotate ninety degrees clockwise, and finally fly forward ten meters, thanks",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "t_ms": 641
+   },
+   {
+    "case": "v_favor4_g1",
+    "english": "Do me a favor, climb twenty meters, afterwards turn right 45 degrees, afterwards fly forward 12 meters, and finally wait three seconds, thanks",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     }
+    ],
+    "t_ms": 699
+   },
+   {
+    "case": "v_favor4_g2",
+    "english": "Do me a favor, fly backward four meters, afterwards move left three meters, afterwards descend two meters, and finally turn left thirty degrees, thanks",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     },
+     {
+      "type": "spin_by",
+      "degrees": -30
+     }
+    ],
+    "t_ms": 741
+   },
+   {
+    "case": "v_favor4_g3",
+    "english": "Do me a favor, fly forward twenty five meters, afterwards rotate one hundred eighty degrees clockwise, afterwards move right six meters, and finally climb fifteen meters, thanks",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     },
+     {
+      "type": "fly_by",
+      "dz": 15
+     }
+    ],
+    "t_ms": 697
+   },
+   {
+    "case": "v_mission3_g0",
+    "english": "The mission is this: take off, then climb five meters, and then rotate ninety degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 470
+   },
+   {
+    "case": "v_mission3_g1",
+    "english": "The mission is this: climb twenty meters, then turn right 45 degrees, and then fly forward 12 meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 546
+   },
+   {
+    "case": "v_mission3_g2",
+    "english": "The mission is this: fly backward four meters, then move left three meters, and then descend two meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 543
+   },
+   {
+    "case": "v_mission3_g3",
+    "english": "The mission is this: fly forward twenty five meters, then rotate one hundred eighty degrees clockwise, and then move right six meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 570
+   },
+   {
+    "case": "v_yalla2_g0",
+    "english": "Come on, take off and then climb five meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     }
+    ],
+    "t_ms": 296
+   },
+   {
+    "case": "v_yalla2_g1",
+    "english": "Come on, climb twenty meters and then turn right 45 degrees",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     }
+    ],
+    "t_ms": 403
+   },
+   {
+    "case": "v_yalla2_g2",
+    "english": "Come on, fly backward four meters and then move left three meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     }
+    ],
+    "t_ms": 408
+   },
+   {
+    "case": "v_yalla2_g3",
+    "english": "Come on, fly forward twenty five meters and then rotate one hundred eighty degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "t_ms": 408
+   },
+   {
+    "case": "v_ready3_g0",
+    "english": "Wait, make sure you are ready. Now take off, after that climb five meters and then rotate ninety degrees clockwise",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 462
+   },
+   {
+    "case": "v_ready3_g1",
+    "english": "Wait, make sure you are ready. Now climb twenty meters, after that turn right 45 degrees and then fly forward 12 meters",
+    "score": "wrong-len(4vs3)",
+    "mission": [
+     {
+      "type": "delay",
+      "seconds": 1
+     },
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 700
+   },
+   {
+    "case": "v_ready3_g2",
+    "english": "Wait, make sure you are ready. Now fly backward four meters, after that move left three meters and then descend two meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 574
+   },
+   {
+    "case": "v_ready3_g3",
+    "english": "Wait, make sure you are ready. Now fly forward twenty five meters, after that rotate one hundred eighty degrees clockwise and then move right six meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 546
+   },
+   {
+    "case": "v_seq5_g0",
+    "english": "I need you to perform the following sequence: take off, climb five meters, rotate ninety degrees clockwise, fly forward ten meters, land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 662
+   },
+   {
+    "case": "v_seq5_g1",
+    "english": "I need you to perform the following sequence: climb twenty meters, turn right 45 degrees, fly forward 12 meters, wait three seconds, land",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     },
+     {
+      "type": "delay",
+      "seconds": 3
+     },
+     {
+      "type": "land"
+     }
+    ],
+    "t_ms": 749
+   },
+   {
+    "case": "v_seq5_g2",
+    "english": "I need you to perform the following sequence: fly backward four meters, move left three meters, descend two meters, turn left thirty degrees, wait five seconds",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     },
+     {
+      "type": "spin_by",
+      "degrees": -30
+     },
+     {
+      "type": "delay",
+      "seconds": 5
+     }
+    ],
+    "t_ms": 885
+   },
+   {
+    "case": "v_seq5_g3",
+    "english": "I need you to perform the following sequence: fly forward twenty five meters, rotate one hundred eighty degrees clockwise, move right six meters, climb fifteen meters, descend eight meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     },
+     {
+      "type": "fly_by",
+      "dz": 15
+     },
+     {
+      "type": "fly_by",
+      "dz": -8
+     }
+    ],
+    "t_ms": 914
+   },
+   {
+    "case": "v_note3_g0",
+    "english": "take off and then climb five meters, and pay attention, rotate ninety degrees clockwise slowly and carefully",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 466
+   },
+   {
+    "case": "v_note3_g1",
+    "english": "climb twenty meters and then turn right 45 degrees, and pay attention, fly forward 12 meters slowly and carefully",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12,
+      "velocity": 0.5
+     }
+    ],
+    "t_ms": 647
+   },
+   {
+    "case": "v_note3_g2",
+    "english": "fly backward four meters and then move left three meters, and pay attention, descend two meters slowly and carefully",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 541
+   },
+   {
+    "case": "v_note3_g3",
+    "english": "fly forward twenty five meters and then rotate one hundred eighty degrees clockwise, and pay attention, move right six meters slowly and carefully",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6,
+      "velocity": 0
+     }
+    ],
+    "t_ms": 634
+   },
+   {
+    "case": "v_round3_g0",
+    "english": "Alright, let's do a small round: take off, climb five meters and then rotate ninety degrees clockwise and that's it",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "t_ms": 485
+   },
+   {
+    "case": "v_round3_g1",
+    "english": "Alright, let's do a small round: climb twenty meters, turn right 45 degrees and then fly forward 12 meters and that's it",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "t_ms": 580
+   },
+   {
+    "case": "v_round3_g2",
+    "english": "Alright, let's do a small round: fly backward four meters, move left three meters and then descend two meters and that's it",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "t_ms": 583
+   },
+   {
+    "case": "v_round3_g3",
+    "english": "Alright, let's do a small round: fly forward twenty five meters, rotate one hundred eighty degrees clockwise and then move right six meters and that's it",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 25
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "fly_by",
+      "dy": 6
+     }
+    ],
+    "t_ms": 585
+   },
+   {
+    "case": "v_neg1",
+    "english": "Listen, climb five meters but do not rotate in the meantime",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 5
+     }
+    ],
+    "t_ms": 247
+   },
+   {
+    "case": "v_neg2",
+    "english": "Okay fly forward ten meters, and please do not land yet",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "t_ms": 247
+   },
+   {
+    "case": "v_q1",
+    "english": "Before we continue, how much battery do you have left?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 95
+   },
+   {
+    "case": "v_q2",
+    "english": "Wait wait, can you even see me from here?",
+    "score": "CORRECT",
+    "mission": [],
+    "t_ms": 86
+   },
+   {
+    "case": "v_mix1",
+    "english": "Climb twenty meters and tell me what you see from there",
+    "score": "wrong-len(0vs1)",
+    "mission": [],
+    "t_ms": 87
+   },
+   {
+    "case": "v_mix2",
+    "english": "Turn right ninety degrees, and if you hear me well then also fly forward five meters",
+    "score": "CORRECT",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 90
+     },
+     {
+      "type": "fly_by",
+      "dx": 5
+     }
+    ],
+    "t_ms": 383
+   }
+  ]
+ },
+ "wall_s": 89
+}

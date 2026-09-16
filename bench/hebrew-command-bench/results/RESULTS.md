@@ -3,7 +3,7 @@
 The Recognizer turns a Hebrew utterance into a mission, a planner-ready English command, a
 perception query, or a rejection. This document is the authoritative result record for its
 benchmark. The component lives in `projects/integration_harden2/recognizer/`. The benchmark
-lives in `tools/bench/hebrew-command-bench/` (`bench.py`, `unified_bench.py`,
+lives in `tools/bench/hebrew-command-bench/` (`unified_bench.py` is the current harness;
 `cases_commands.py`, `cases_perception.py`).
 
 ## 1. Objective

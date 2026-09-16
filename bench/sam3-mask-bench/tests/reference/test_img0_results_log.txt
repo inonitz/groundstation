@@ -1,0 +1,14 @@
+[recognize] 2026-08-19 22:31:33
+[recognize] argv    : recognize.py ../../test_img0.png Create a bounding box around the person --mask -o ../../test_img0_results.jpg
+[recognize] image   : ../../test_img0.png  (459x612)
+[recognize] prompt  : Create a bounding box around the person
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:8080   mask=True
+[recognize] querying VLM...
+
+=== VLM ANSWER  (1.1s) ===
+There is a person in the image, standing against a large tree trunk. The person is wearing a suit that appears to be made of wood or bark-like material, and they are positioned centrally in the frame.
+
+=== OBJECTS (1) ===
+  person                   (151, 212, 315, 610)
+
+[recognize] saved image -> ../../test_img0_results.jpg

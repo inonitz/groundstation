@@ -1,0 +1,4022 @@
+{
+ "translator": "gemma4",
+ "prompt": "v1",
+ "planner": "qwen3vl",
+ "direct_he": false,
+ "results": {
+  "emergency": {
+   "ok": 7,
+   "n": 7
+  },
+  "perception": {
+   "ok": 116,
+   "n": 128
+  },
+  "military": {
+   "ok": 12,
+   "n": 20
+  },
+  "std190": {
+   "ok": 198,
+   "n": 203
+  },
+  "verbose": {
+   "ok": 26,
+   "n": 54
+  }
+ },
+ "verdicts": {
+  "std190": {
+   "up10": "CORRECT",
+   "fwd5": "CORRECT",
+   "spin90cw": "CORRECT",
+   "takeoff": "CORRECT",
+   "land": "CORRECT",
+   "combo3": "CORRECT",
+   "combo_tl": "CORRECT",
+   "back2left3": "CORRECT",
+   "ccw45": "CORRECT",
+   "down3": "CORRECT",
+   "question": "CORRECT",
+   "square": "valid(open)",
+   "up2": "CORRECT",
+   "right4": "CORRECT",
+   "left7": "CORRECT",
+   "back10": "CORRECT",
+   "fwd15": "CORRECT",
+   "spin180cw": "CORRECT",
+   "spin360": "CORRECT",
+   "wait5": "CORRECT",
+   "up_half": "CORRECT",
+   "combo2b": "CORRECT",
+   "combo4": "CORRECT",
+   "combo5": "CORRECT",
+   "digit12": "CORRECT",
+   "digit45deg": "CORRECT",
+   "question2": "CORRECT",
+   "q_land_trap": "CORRECT",
+   "neg_trap": "CORRECT",
+   "colloq_up": "CORRECT",
+   "land_now": "CORRECT",
+   "takeoff_ctx": "CORRECT",
+   "g_up1": "CORRECT",
+   "g_up2": "CORRECT",
+   "g_up3": "CORRECT",
+   "g_up4": "CORRECT",
+   "g_up6": "CORRECT",
+   "g_up8": "CORRECT",
+   "g_up9": "CORRECT",
+   "g_up20": "CORRECT",
+   "g_up25": "CORRECT",
+   "g_down1": "CORRECT",
+   "g_down2": "CORRECT",
+   "g_down3": "CORRECT",
+   "g_down4": "CORRECT",
+   "g_down6": "CORRECT",
+   "g_down8": "CORRECT",
+   "g_down9": "CORRECT",
+   "g_down20": "CORRECT",
+   "g_down25": "CORRECT",
+   "g_fwd1": "CORRECT",
+   "g_fwd2": "CORRECT",
+   "g_fwd3": "CORRECT",
+   "g_fwd4": "CORRECT",
+   "g_fwd6": "CORRECT",
+   "g_fwd8": "CORRECT",
+   "g_fwd9": "CORRECT",
+   "g_fwd20": "CORRECT",
+   "g_fwd25": "CORRECT",
+   "g_back1": "CORRECT",
+   "g_back2": "CORRECT",
+   "g_back3": "CORRECT",
+   "g_back4": "CORRECT",
+   "g_back6": "CORRECT",
+   "g_back8": "CORRECT",
+   "g_back9": "CORRECT",
+   "g_back20": "CORRECT",
+   "g_back25": "CORRECT",
+   "g_right1": "CORRECT",
+   "g_right2": "CORRECT",
+   "g_right3": "CORRECT",
+   "g_right4": "CORRECT",
+   "g_right6": "CORRECT",
+   "g_right8": "CORRECT",
+   "g_right9": "CORRECT",
+   "g_right20": "CORRECT",
+   "g_right25": "CORRECT",
+   "g_left1": "CORRECT",
+   "g_left2": "CORRECT",
+   "g_left3": "CORRECT",
+   "g_left4": "CORRECT",
+   "g_left6": "CORRECT",
+   "g_left8": "CORRECT",
+   "g_left9": "CORRECT",
+   "g_left20": "CORRECT",
+   "g_left25": "CORRECT",
+   "g_cw30": "CORRECT",
+   "g_ccw30": "CORRECT",
+   "g_cw60": "CORRECT",
+   "g_ccw60": "CORRECT",
+   "g_cw120": "CORRECT",
+   "g_ccw120": "CORRECT",
+   "g_cw270": "CORRECT",
+   "g_ccw270": "CORRECT",
+   "g_wait2": "CORRECT",
+   "g_wait10": "CORRECT",
+   "g_combo2_0": "CORRECT",
+   "g_combo2_1": "CORRECT",
+   "g_combo2_2": "CORRECT",
+   "g_combo2_3": "CORRECT",
+   "g_combo2_4": "CORRECT",
+   "g_combo2_5": "CORRECT",
+   "g_combo2_6": "CORRECT",
+   "g_combo2_7": "CORRECT",
+   "g_combo3_0": "CORRECT",
+   "g_combo3_1": "CORRECT",
+   "g_combo3_2": "CORRECT",
+   "g_combo3_3": "CORRECT",
+   "r_takeoff1": "CORRECT",
+   "r_takeoff2": "CORRECT",
+   "r_takeoff3": "CORRECT",
+   "r_takeoff4": "CORRECT",
+   "r_takeoff5": "CORRECT",
+   "r_land1": "CORRECT",
+   "r_land2": "CORRECT",
+   "r_land3": "CORRECT",
+   "r_land4": "CORRECT",
+   "r_land5": "CORRECT",
+   "r_pol_up5": "CORRECT",
+   "r_pol_fwd3": "REJECT",
+   "r_pol_left2": "CORRECT",
+   "r_pol_down1": "CORRECT",
+   "r_pol_spin": "CORRECT",
+   "r_fill1": "REJECT",
+   "r_fill2": "CORRECT",
+   "r_fill3": "CORRECT",
+   "r_fill4": "CORRECT",
+   "r_fill5": "CORRECT",
+   "r_alt10": "CORRECT",
+   "r_alt20": "CORRECT",
+   "r_low": "CORRECT",
+   "r_rise3": "CORRECT",
+   "r_updown": "CORRECT",
+   "r_bit_left": "CORRECT",
+   "r_bit_up": "CORRECT",
+   "r_bit_back": "CORRECT",
+   "r_higher": "CORRECT",
+   "r_bit_fwd": "CORRECT",
+   "r_turn_r90": "CORRECT",
+   "r_turn_l45": "CORRECT",
+   "r_half_turn": "CORRECT",
+   "r_quart_r": "CORRECT",
+   "r_full": "CORRECT",
+   "r_around": "valid(open)",
+   "r_num_first": "CORRECT",
+   "r_m_half": "CORRECT",
+   "r_2_half": "CORRECT",
+   "r_digit50": "CORRECT",
+   "r_digit7": "CORRECT",
+   "r_meter1": "CORRECT",
+   "r_mis1": "CORRECT",
+   "r_mis2": "CORRECT",
+   "r_mis3": "CORRECT",
+   "r_mis4": "CORRECT",
+   "r_mis5": "wrong-x(-10vs10)",
+   "r_mis6": "REJECT",
+   "r_mis7": "CORRECT",
+   "r_mis8": "CORRECT",
+   "r_mis9": "CORRECT",
+   "r_mis10": "CORRECT",
+   "r_dis1": "valid(open)",
+   "r_dis2": "valid(open)",
+   "r_dis3": "valid(open)",
+   "r_dis4": "valid(open)",
+   "r_q1": "CORRECT",
+   "r_q2": "CORRECT",
+   "r_q3": "CORRECT",
+   "r_q4": "CORRECT",
+   "r_q5": "CORRECT",
+   "r_q6": "CORRECT",
+   "r_q7": "CORRECT",
+   "r_q8": "CORRECT",
+   "r_neg1": "CORRECT",
+   "r_neg2": "CORRECT",
+   "r_neg3": "CORRECT",
+   "r_neg4": "wrong-len(1vs0)",
+   "r_neg5": "CORRECT",
+   "r_wait1": "CORRECT",
+   "r_wait2": "CORRECT",
+   "r_wait3": "CORRECT",
+   "r_wait4": "routed:emergency",
+   "r_big100": "CORRECT",
+   "r_deg10": "CORRECT",
+   "r_deg135": "CORRECT",
+   "r_z_03": "CORRECT",
+   "r_back15": "CORRECT",
+   "r_ord1": "CORRECT",
+   "r_ord2": "CORRECT",
+   "r_ord3": "CORRECT",
+   "r_ord4": "CORRECT",
+   "l_deg_frac": "CORRECT",
+   "l_deg_precise": "CORRECT",
+   "l_half_cw": "CORRECT",
+   "l_dbl_neg": "CORRECT",
+   "l_postpone": "CORRECT-reject",
+   "l_pause_idiom": "CORRECT-reject",
+   "l_combo_tamtin": "CORRECT",
+   "l_fwd_future": "CORRECT",
+   "l_land_going": "CORRECT",
+   "l_pres_pic": "CORRECT",
+   "l_pres_you": "CORRECT",
+   "l_color_near": "CORRECT",
+   "l_tower_count": "CORRECT",
+   "l_lighthouse_count": "CORRECT"
+  },
+  "verbose": {
+   "v_listen3_g0": "CORRECT",
+   "v_listen3_g1": "REJECT",
+   "v_listen3_g2": "REJECT",
+   "v_listen3_g3": "CORRECT",
+   "v_finish3_g0": "CORRECT",
+   "v_finish3_g1": "CORRECT",
+   "v_finish3_g2": "wrong-len(4vs3)",
+   "v_finish3_g3": "CORRECT",
+   "v_start4_g0": "CORRECT",
+   "v_start4_g1": "REJECT",
+   "v_start4_g2": "REJECT",
+   "v_start4_g3": "REJECT",
+   "v_okso4_g0": "REJECT",
+   "v_okso4_g1": "REJECT",
+   "v_okso4_g2": "REJECT",
+   "v_okso4_g3": "REJECT",
+   "v_first3_g0": "REJECT",
+   "v_first3_g1": "CORRECT",
+   "v_first3_g2": "REJECT",
+   "v_first3_g3": "CORRECT",
+   "v_favor4_g0": "REJECT",
+   "v_favor4_g1": "REJECT",
+   "v_favor4_g2": "REJECT",
+   "v_favor4_g3": "REJECT",
+   "v_mission3_g0": "CORRECT",
+   "v_mission3_g1": "CORRECT",
+   "v_mission3_g2": "CORRECT",
+   "v_mission3_g3": "REJECT",
+   "v_yalla2_g0": "REJECT",
+   "v_yalla2_g1": "CORRECT",
+   "v_yalla2_g2": "CORRECT",
+   "v_yalla2_g3": "CORRECT",
+   "v_ready3_g0": "REJECT",
+   "v_ready3_g1": "REJECT",
+   "v_ready3_g2": "wrong-len(4vs3)",
+   "v_ready3_g3": "wrong-len(4vs3)",
+   "v_seq5_g0": "CORRECT",
+   "v_seq5_g1": "CORRECT",
+   "v_seq5_g2": "CORRECT",
+   "v_seq5_g3": "CORRECT",
+   "v_note3_g0": "CORRECT",
+   "v_note3_g1": "CORRECT",
+   "v_note3_g2": "CORRECT",
+   "v_note3_g3": "CORRECT",
+   "v_round3_g0": "wrong-len(0vs3)",
+   "v_round3_g1": "REJECT",
+   "v_round3_g2": "REJECT",
+   "v_round3_g3": "REJECT",
+   "v_neg1": "CORRECT",
+   "v_neg2": "REJECT",
+   "v_q1": "wrong-len(1vs0)",
+   "v_q2": "CORRECT",
+   "v_mix1": "CORRECT",
+   "v_mix2": "CORRECT"
+  }
+ },
+ "stage0_false_positives": [
+  [
+   "std190",
+   "r_wait4",
+   "עצור שם לעשר שניות"
+  ]
+ ],
+ "recognized": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stopstop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_now",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_emergency",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_all",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_english",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_game_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin90cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 90.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "combo3",
+    "kind": "command",
+    "payload": "Ascend 10 meters, rotate 90 degrees clockwise, then fly forward 5 meters",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 461
+   },
+   {
+    "case": "combo_tl",
+    "kind": "command",
+    "payload": "Execute take off, ascend 5 meters, wait 3 seconds and land",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 269
+   },
+   {
+    "case": "back2left3",
+    "kind": "command",
+    "payload": "Fly backward two meters and then move left three meters",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 246
+   },
+   {
+    "case": "ccw45",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question",
+    "kind": "perception",
+    "payload": "What do you see now?",
+    "flags": [],
+    "t_ms": 180
+   },
+   {
+    "case": "square",
+    "kind": "command",
+    "payload": "Fly in a 2-meter square",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 240
+   },
+   {
+    "case": "up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "left7",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -7.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "back10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd15",
+    "kind": "command",
+    "payload": "Advance 15 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 196
+   },
+   {
+    "case": "spin180cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 180.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin360",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 360.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "wait5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "up_half",
+    "kind": "command",
+    "payload": "Ascend half a meter",
+    "flags": [],
+    "t_ms": 193
+   },
+   {
+    "case": "combo2b",
+    "kind": "command",
+    "payload": "Take off and then rise three meters",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 229
+   },
+   {
+    "case": "combo4",
+    "kind": "command",
+    "payload": "Fly forward 4 meters, move right 2 meters, move backward 4 meters, and then move left 2 meters",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 544
+   },
+   {
+    "case": "combo5",
+    "kind": "command",
+    "payload": "Execute take off, ascend 2 meters, rotate 90 degrees clockwise, fly forward 3 meters and land",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "clockwise-inline",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 507
+   },
+   {
+    "case": "digit12",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 12.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "digit45deg",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question2",
+    "kind": "perception",
+    "payload": "How many people do you see",
+    "flags": [],
+    "t_ms": 211
+   },
+   {
+    "case": "q_land_trap",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"האם אתה מתכוון לנחות בקרוב\" (Ha'im ata mitkaven lenachot bekarov). This translates to \"Do you mean to land soon?\" or \"Are you planning to land soon?\" Since the user is interacting with a translation engine, I must translate this command/question into English.",
+    "flags": [],
+    "t_ms": 1699
+   },
+   {
+    "case": "neg_trap",
+    "kind": "command",
+    "payload": "Do not fly forward",
+    "flags": [],
+    "t_ms": 184
+   },
+   {
+    "case": "colloq_up",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land_now",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff_ctx",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up1",
+    "kind": "command",
+    "payload": "Ascend one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 177
+   },
+   {
+    "case": "g_up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down1",
+    "kind": "command",
+    "payload": "Descend one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 177
+   },
+   {
+    "case": "g_down2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd1",
+    "kind": "command",
+    "payload": "Fly forward one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 176
+   },
+   {
+    "case": "g_fwd2",
+    "kind": "command",
+    "payload": "Advance two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 164
+   },
+   {
+    "case": "g_fwd3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd4",
+    "kind": "command",
+    "payload": "Advance four meters",
+    "flags": [],
+    "t_ms": 160
+   },
+   {
+    "case": "g_fwd6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd8",
+    "kind": "command",
+    "payload": "Advance eight meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 159
+   },
+   {
+    "case": "g_fwd9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd20",
+    "kind": "command",
+    "payload": "Advance 20 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 195
+   },
+   {
+    "case": "g_fwd25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back1",
+    "kind": "command",
+    "payload": "Move back one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 185
+   },
+   {
+    "case": "g_back2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right1",
+    "kind": "command",
+    "payload": "Fly right one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "g_right2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left1",
+    "kind": "command",
+    "payload": "Move left one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 178
+   },
+   {
+    "case": "g_left2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_0",
+    "kind": "command",
+    "payload": "Ascend one meter and then ascend twenty meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 268
+   },
+   {
+    "case": "g_combo2_1",
+    "kind": "command",
+    "payload": "Ascend four meters and then descend four meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 266
+   },
+   {
+    "case": "g_combo2_2",
+    "kind": "command",
+    "payload": "Ascend 9 meters then descend 25 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 294
+   },
+   {
+    "case": "g_combo2_3",
+    "kind": "command",
+    "payload": "Descend one meter and then fly forward six meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 281
+   },
+   {
+    "case": "g_combo2_4",
+    "kind": "command",
+    "payload": "Descend 4 meters and then move back 1 meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 315
+   },
+   {
+    "case": "g_combo2_5",
+    "kind": "command",
+    "payload": "Descend nine meters and then fly backward eight meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 281
+   },
+   {
+    "case": "g_combo2_6",
+    "kind": "command",
+    "payload": "Fly forward one meter and then move right two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 272
+   },
+   {
+    "case": "g_combo2_7",
+    "kind": "command",
+    "payload": "Move forward four meters and then fly right nine meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 272
+   },
+   {
+    "case": "g_combo3_0",
+    "kind": "command",
+    "payload": "Ascend one meter, ascend four meters, and then ascend eight meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 337
+   },
+   {
+    "case": "g_combo3_1",
+    "kind": "command",
+    "payload": "Ascend 20 meters, descend 8 meters, then fly forward 1 meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 438
+   },
+   {
+    "case": "g_combo3_2",
+    "kind": "command",
+    "payload": "Descend 8 meters, advance 20 meters, then move back 6 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 402
+   },
+   {
+    "case": "g_combo3_3",
+    "kind": "command",
+    "payload": "Move forward 4 meters, fly right 1 meter and then fly right 25 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 420
+   },
+   {
+    "case": "r_takeoff1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff2",
+    "kind": "command",
+    "payload": "Let's take off",
+    "flags": [],
+    "t_ms": 184
+   },
+   {
+    "case": "r_takeoff3",
+    "kind": "command",
+    "payload": "Can take off",
+    "flags": [],
+    "t_ms": 152
+   },
+   {
+    "case": "r_takeoff4",
+    "kind": "command",
+    "payload": "The user provided a mixed Hebrew/English command: \"יאללה take off\". The Hebrew part \"יאללה\" (Yalla) is an interjection meaning \"come on\" or \"let's go.\" The English part \"take off\" is a standard drone command. Since the user is asking for a translation of a drone command, and the intent is clearly to initiate flight, the most accurate and functional translation for the command is \"Take off.\" I will output only the English translation.",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 1962
+   },
+   {
+    "case": "r_takeoff5",
+    "kind": "command",
+    "payload": "Take off please",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 155
+   },
+   {
+    "case": "r_land1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land2",
+    "kind": "command",
+    "payload": "Let's land",
+    "flags": [],
+    "t_ms": 167
+   },
+   {
+    "case": "r_land3",
+    "kind": "command",
+    "payload": "Please land",
+    "flags": [],
+    "t_ms": 136
+   },
+   {
+    "case": "r_land4",
+    "kind": "command",
+    "payload": "Can land",
+    "flags": [],
+    "t_ms": 137
+   },
+   {
+    "case": "r_land5",
+    "kind": "command",
+    "payload": "We are done, land",
+    "flags": [],
+    "t_ms": 184
+   },
+   {
+    "case": "r_pol_up5",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"אתה יכול לעלות 5 מטרים בבקשה\" into English.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2098
+   },
+   {
+    "case": "r_pol_fwd3",
+    "kind": "reject",
+    "payload": "The user wants to translate the Hebrew drone command \"תוכל לטוס קדימה 3 מטרים\" into English. The translation should be a direct command or request for the drone to move forward 3 meters.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3906
+   },
+   {
+    "case": "r_pol_left2",
+    "kind": "command",
+    "payload": "If possible, two meters left",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 208
+   },
+   {
+    "case": "r_pol_down1",
+    "kind": "command",
+    "payload": "Descend one meter",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 168
+   },
+   {
+    "case": "r_pol_spin",
+    "kind": "command",
+    "payload": "Turn 90 degrees right",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 201
+   },
+   {
+    "case": "r_fill1",
+    "kind": "reject",
+    "payload": "The user wants to translate the Hebrew drone command \"אה טוס קדימה 3 מטרים בבקשה\" into English. The tone is polite (\"בבקשה\"). The core command is \"Fly forward 3 meters.\"",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3135
+   },
+   {
+    "case": "r_fill2",
+    "kind": "command",
+    "payload": "The user wants to translate the Hebrew drone command \"אוקיי עכשיו תעלה 4 מטרים\" into English. The translation should be the English command only.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 804
+   },
+   {
+    "case": "r_fill3",
+    "kind": "command",
+    "payload": "The user wants to translate the Hebrew drone command \"טוב אז בוא נטוס אחורה 2 מטרים\" into English. The context is a drone command. The translation should be direct and functional.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 942
+   },
+   {
+    "case": "r_fill4",
+    "kind": "command",
+    "payload": "Wait, wait, first go up two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 205
+   },
+   {
+    "case": "r_fill5",
+    "kind": "command",
+    "payload": "Yes, continue right another three meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "r_alt10",
+    "kind": "command",
+    "payload": "Ascend to 10 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 177
+   },
+   {
+    "case": "r_alt20",
+    "kind": "command",
+    "payload": "Ascend to 20 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 183
+   },
+   {
+    "case": "r_low",
+    "kind": "command",
+    "payload": "Descend two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 140
+   },
+   {
+    "case": "r_rise3",
+    "kind": "command",
+    "payload": "Ascend three meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 136
+   },
+   {
+    "case": "r_updown",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_left",
+    "kind": "command",
+    "payload": "Fly a little left",
+    "flags": [],
+    "t_ms": 133
+   },
+   {
+    "case": "r_bit_up",
+    "kind": "command",
+    "payload": "Ascend a little",
+    "flags": [],
+    "t_ms": 134
+   },
+   {
+    "case": "r_bit_back",
+    "kind": "command",
+    "payload": "Move back a little",
+    "flags": [],
+    "t_ms": 132
+   },
+   {
+    "case": "r_higher",
+    "kind": "command",
+    "payload": "Fly a little higher",
+    "flags": [],
+    "t_ms": 135
+   },
+   {
+    "case": "r_bit_fwd",
+    "kind": "command",
+    "payload": "Move forward a little more",
+    "flags": [],
+    "t_ms": 151
+   },
+   {
+    "case": "r_turn_r90",
+    "kind": "command",
+    "payload": "Rotate the drone 90 degrees right",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 195
+   },
+   {
+    "case": "r_turn_l45",
+    "kind": "command",
+    "payload": "Turn 45 degrees left",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 164
+   },
+   {
+    "case": "r_half_turn",
+    "kind": "command",
+    "payload": "Make a half turn",
+    "flags": [],
+    "t_ms": 134
+   },
+   {
+    "case": "r_quart_r",
+    "kind": "command",
+    "payload": "Quarter turn right",
+    "flags": [],
+    "t_ms": 120
+   },
+   {
+    "case": "r_full",
+    "kind": "command",
+    "payload": "Make a full circle",
+    "flags": [],
+    "t_ms": 134
+   },
+   {
+    "case": "r_around",
+    "kind": "command",
+    "payload": "Turn towards me",
+    "flags": [],
+    "t_ms": 121
+   },
+   {
+    "case": "r_num_first",
+    "kind": "command",
+    "payload": "30 meters forward",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 135
+   },
+   {
+    "case": "r_m_half",
+    "kind": "command",
+    "payload": "One and a half meters up",
+    "flags": [],
+    "t_ms": 164
+   },
+   {
+    "case": "r_2_half",
+    "kind": "command",
+    "payload": "Two and a half meters right",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 163
+   },
+   {
+    "case": "r_digit50",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 50.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_digit7",
+    "kind": "command",
+    "payload": "7 meters up",
+    "flags": [],
+    "t_ms": 120
+   },
+   {
+    "case": "r_meter1",
+    "kind": "command",
+    "payload": "Move one meter right",
+    "flags": [
+     "one-meter"
+    ],
+    "t_ms": 134
+   },
+   {
+    "case": "r_mis1",
+    "kind": "command",
+    "payload": "Take off and ascend to a height of 5 meters",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 233
+   },
+   {
+    "case": "r_mis2",
+    "kind": "command",
+    "payload": "Take off, ascend 3 meters",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline",
+     "stay-there-strip"
+    ],
+    "t_ms": 222
+   },
+   {
+    "case": "r_mis3",
+    "kind": "command",
+    "payload": "Fly right three meters and then move left three meters back",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "r_mis4",
+    "kind": "command",
+    "payload": "Ascend 5 meters, wait 2 seconds, and descend back",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 280
+   },
+   {
+    "case": "r_mis5",
+    "kind": "command",
+    "payload": "Take off, fly forward 10 meters, turn half a circle and return",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 309
+   },
+   {
+    "case": "r_mis6",
+    "kind": "reject",
+    "payload": "The user wants to translate a sequence of drone commands from Hebrew to English. I need to break down the Hebrew sentence and translate each part accurately. The output must be *only* the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2761
+   },
+   {
+    "case": "r_mis7",
+    "kind": "command",
+    "payload": "Ascend 10 meters and then slowly rotate a full circle",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 251
+   },
+   {
+    "case": "r_mis8",
+    "kind": "command",
+    "payload": "Back five meters and down two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "r_mis9",
+    "kind": "command",
+    "payload": "Take off and then land",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 150
+   },
+   {
+    "case": "r_mis10",
+    "kind": "command",
+    "payload": "Ascend 2 meters, move right 4 meters, move left 4 meters, descend 2 meters",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 401
+   },
+   {
+    "case": "r_dis1",
+    "kind": "command",
+    "payload": "Fly forward 5 meters and take a picture of the house",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 249
+   },
+   {
+    "case": "r_dis2",
+    "kind": "command",
+    "payload": "Ascend three meters and look around",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 181
+   },
+   {
+    "case": "r_dis3",
+    "kind": "command",
+    "payload": "Take off and search for the car",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "r_dis4",
+    "kind": "command",
+    "payload": "Fly right two meters and tell me what you see",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 224
+   },
+   {
+    "case": "r_q1",
+    "kind": "command",
+    "payload": "What is the battery status",
+    "flags": [],
+    "t_ms": 150
+   },
+   {
+    "case": "r_q2",
+    "kind": "command",
+    "payload": "Where are you now",
+    "flags": [],
+    "t_ms": 133
+   },
+   {
+    "case": "r_q3",
+    "kind": "command",
+    "payload": "The user is asking \"How tall are you?\" in Hebrew. Since I am an AI, I do not have a physical height. I must translate the command/question into English.",
+    "flags": [],
+    "t_ms": 751
+   },
+   {
+    "case": "r_q4",
+    "kind": "command",
+    "payload": "You are filming",
+    "flags": [],
+    "t_ms": 120
+   },
+   {
+    "case": "r_q5",
+    "kind": "perception",
+    "payload": "Tell me what you see",
+    "flags": [],
+    "t_ms": 144
+   },
+   {
+    "case": "r_q6",
+    "kind": "command",
+    "payload": "Is there someone there",
+    "flags": [],
+    "t_ms": 128
+   },
+   {
+    "case": "r_q7",
+    "kind": "command",
+    "payload": "The user wants me to translate the Hebrew phrase \"כמה זמן נשאר לך באוויר\" into English. This is a question asking about the remaining flight time.",
+    "flags": [],
+    "t_ms": 810
+   },
+   {
+    "case": "r_q8",
+    "kind": "command",
+    "payload": "Can you hear me",
+    "flags": [],
+    "t_ms": 133
+   },
+   {
+    "case": "r_neg1",
+    "kind": "command",
+    "payload": "Do not ascend further",
+    "flags": [],
+    "t_ms": 134
+   },
+   {
+    "case": "r_neg2",
+    "kind": "command",
+    "payload": "Do not move",
+    "flags": [],
+    "t_ms": 117
+   },
+   {
+    "case": "r_neg3",
+    "kind": "command",
+    "payload": "Do not fly forward",
+    "flags": [],
+    "t_ms": 135
+   },
+   {
+    "case": "r_neg4",
+    "kind": "command",
+    "payload": "The user wants to translate the Hebrew phrase \"בלי להסתובב בבקשה\" into English. This phrase is a drone command, meaning it's a directive to the drone. \"בלי להסתובב\" means \"without turning\" or \"do not turn.\" \"בבקשה\" means \"please.\" The most natural and direct translation for a drone command is \"Do not turn, please\" or simply \"Do not turn.\" I will provide the most direct and functional translation.",
+    "flags": [],
+    "t_ms": 1731
+   },
+   {
+    "case": "r_neg5",
+    "kind": "command",
+    "payload": "Do not land yet",
+    "flags": [],
+    "t_ms": 133
+   },
+   {
+    "case": "r_wait1",
+    "kind": "command",
+    "payload": "Wait a moment",
+    "flags": [],
+    "t_ms": 113
+   },
+   {
+    "case": "r_wait2",
+    "kind": "command",
+    "payload": "Wait one second",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 118
+   },
+   {
+    "case": "r_wait3",
+    "kind": "command",
+    "payload": "Wait 5 seconds and then descend one meter",
+    "flags": [
+     "hebnum-digits",
+     "one-meter"
+    ],
+    "t_ms": 194
+   },
+   {
+    "case": "r_wait4",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_big100",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 100.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_deg10",
+    "kind": "command",
+    "payload": "Turn 10 degrees right",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 167
+   },
+   {
+    "case": "r_deg135",
+    "kind": "command",
+    "payload": "Turn 135 degrees left",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 180
+   },
+   {
+    "case": "r_z_03",
+    "kind": "command",
+    "payload": "Ascend 30 centimeters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 165
+   },
+   {
+    "case": "r_back15",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -15.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord1",
+    "kind": "command",
+    "payload": "Fly five meters forward",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 134
+   },
+   {
+    "case": "r_ord2",
+    "kind": "command",
+    "payload": "Right two meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 122
+   },
+   {
+    "case": "r_ord3",
+    "kind": "command",
+    "payload": "Up, 3 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 148
+   },
+   {
+    "case": "r_ord4",
+    "kind": "command",
+    "payload": "Back a little",
+    "flags": [],
+    "t_ms": 121
+   },
+   {
+    "case": "l_deg_frac",
+    "kind": "command",
+    "payload": "Turn left 74.5 degrees",
+    "flags": [],
+    "t_ms": 192
+   },
+   {
+    "case": "l_deg_precise",
+    "kind": "command",
+    "payload": "Turn 174.235 degrees counterclockwise",
+    "flags": [
+     "counterclockwise-inline"
+    ],
+    "t_ms": 252
+   },
+   {
+    "case": "l_half_cw",
+    "kind": "command",
+    "payload": "Make a half turn clockwise",
+    "flags": [
+     "clockwise-inline"
+    ],
+    "t_ms": 151
+   },
+   {
+    "case": "l_dbl_neg",
+    "kind": "command",
+    "payload": "Do not turn 90 degrees left counter-clockwise and then do not turn right",
+    "flags": [],
+    "t_ms": 327
+   },
+   {
+    "case": "l_postpone",
+    "kind": "reject",
+    "payload": "The user wants to translate the Hebrew phrase \"תדחה את מה שאתה עושה לשתי דקות הקרובות\" into English. This is a drone command. The phrase means \"Delay what you are doing for the next two minutes.\"",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2037
+   },
+   {
+    "case": "l_pause_idiom",
+    "kind": "reject",
+    "payload": "Pause game for four seconds",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 292
+   },
+   {
+    "case": "l_combo_tamtin",
+    "kind": "command",
+    "payload": "Perform take off, rise 5 meters, wait 3 seconds and land",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 327
+   },
+   {
+    "case": "l_fwd_future",
+    "kind": "command",
+    "payload": "Advance 15 meters",
+    "flags": [],
+    "t_ms": 152
+   },
+   {
+    "case": "l_land_going",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"האם אתה הולך לנחות בקרוב\" (Ha'im ata holekh lenachot bekarov). This translates to \"Are you going to land soon?\" or \"Are you going to land shortly?\" Since the context is a drone command translation, I must translate the user's input into English.",
+    "flags": [],
+    "t_ms": 1353
+   },
+   {
+    "case": "l_pres_pic",
+    "kind": "command",
+    "payload": "Is there anyone in the picture?",
+    "flags": [],
+    "t_ms": 168
+   },
+   {
+    "case": "l_pres_you",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"האם אתה רואה מישהו בתמונה?\" (Do you see anyone in the picture?). This is a question about image content. Since I am a text-based model and no image was provided, I cannot answer this question. However, the instructions state I am a translation engine and must translate the user's Hebrew drone command to English. This input is not a drone command. I must translate it.",
+    "flags": [],
+    "t_ms": 1629
+   },
+   {
+    "case": "l_color_near",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"What is the color of the closest car?\" (מה הצבע של המכונית הקרובה ביותר?). However, the context is a \"translation engine\" for \"Hebrew drone commands.\" This is a general question, not a command. I must translate it into English.",
+    "flags": [],
+    "t_ms": 1256
+   },
+   {
+    "case": "l_tower_count",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"Do you see a tower in the scene that you can count windows in?\" This is a question about visual perception and object recognition. Since I am a text-based AI and do not have a \"scene\" or visual input unless provided, I must translate the question accurately.",
+    "flags": [],
+    "t_ms": 1245
+   },
+   {
+    "case": "l_lighthouse_count",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"Do you see a lighthouse in the scene that you can count windows in?\" This is a complex question that implies the user is interacting with a visual scene or image, which I, as a text-based AI, cannot see. However, the prompt specifies that I am a \"translation engine\" and my task is to translate the user's Hebrew drone command to English. Since this is a question and not a command, I should translate it accurately.",
+    "flags": [],
+    "t_ms": 1776
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew drone command into English. The command is: \"תקשיב, אני רוצה שקודם כל take off, אחרי זה עלה 5 מטרים ואז הסתובב 90 מעלות clockwise\".",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag"
+    ],
+    "t_ms": 6088
+   },
+   {
+    "case": "v_listen3_g1",
+    "kind": "reject",
+    "payload": "The user wants to translate a complex drone command from Hebrew to English. The command is: \"תקשיב, אני רוצה שקודם כל עלה 20 מטרים, אחרי זה פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים\" (Listen, I want first to rise 20 meters, after that turn right 45 degrees and then fly forward 12 meters). I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4691
+   },
+   {
+    "case": "v_listen3_g2",
+    "kind": "reject",
+    "payload": "The user wants to translate a sequence of drone commands from Hebrew to English. The commands are: \"טוס אחורה 4 מטרים\" (Fly backward 4 meters), \"אחרי זה זוז שמאלה 3 מטרים\" (then move left 3 meters), and \"ואז רד 2 מטרים\" (and then descend 2 meters). I must output only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4395
+   },
+   {
+    "case": "v_listen3_g3",
+    "kind": "command",
+    "payload": "The user wants to translate a complex drone command from Hebrew to English. The command is: \"Listen, I want you to first fly forward 25 meters, then turn 180 degrees clockwise, and then move right 6 meters.\" I need to provide a clear, direct English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 1471
+   },
+   {
+    "case": "v_finish3_g0",
+    "kind": "command",
+    "payload": "Take off, when you finish, ascend 5 meters, and finally, turn 90 degrees clockwise please",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 395
+   },
+   {
+    "case": "v_finish3_g1",
+    "kind": "command",
+    "payload": "Ascend 20 meters, when finished turn right 45 degrees, and finally fly forward 12 meters please",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 445
+   },
+   {
+    "case": "v_finish3_g2",
+    "kind": "command",
+    "payload": "Fly back four meters, when you finish move left three meters, and finally descend two meters please",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 357
+   },
+   {
+    "case": "v_finish3_g3",
+    "kind": "command",
+    "payload": "Fly forward 25 meters, when you finish turn 180 degrees clockwise, and finally move right 6 meters please",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 460
+   },
+   {
+    "case": "v_start4_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew/English mix into English. I need to translate the Hebrew parts and maintain the English parts. The user provided a mix of English and Hebrew, but the core task is to translate the Hebrew commands into English. However, the user provided a full sequence of commands, some of which are already in English. I should translate the Hebrew parts and present the full command sequence in English. Wait, the prompt says \"Translate the user's Hebrew drone command to English. Output ONLY the English translation, nothing else.\" The user's input is a complex instruction, not a single command. I should translate the entire instruction into a coherent English command sequence. The user's input is: \"בוא נתחיל: take off. עכשיו עלה 5 מטרים. יופי, עכשיו הסתובב 90 מעלות clockwise וגם טוס קדימה 10",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 3093
+   },
+   {
+    "case": "v_start4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2689
+   },
+   {
+    "case": "v_start4_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3079
+   },
+   {
+    "case": "v_start4_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4447
+   },
+   {
+    "case": "v_okso4_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from a mix of Hebrew and English into English. I need to ensure the translation is accurate and follows the instruction to output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3231
+   },
+   {
+    "case": "v_okso4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2614
+   },
+   {
+    "case": "v_okso4_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4121
+   },
+   {
+    "case": "v_okso4_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4257
+   },
+   {
+    "case": "v_first3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. The commands are: \"קודם take off\" (First take off), \"שנייה אחרי זה עלה 5 מטרים\" (Then rise 5 meters), and \"ולסיום הסתובב 90 מעלות clockwise\" (And finally turn 90 degrees clockwise). I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4707
+   },
+   {
+    "case": "v_first3_g1",
+    "kind": "command",
+    "payload": "First ascend 20 meters, then turn right 45 degrees, and finally fly forward 12 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 424
+   },
+   {
+    "case": "v_first3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3166
+   },
+   {
+    "case": "v_first3_g3",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew drone command into English. The command is: \"קודם טוס קדימה 25 מטרים, שנייה אחרי זה הסתובב 180 מעלות clockwise, ולסיום זוז ימינה 6 מטרים\". I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 1586
+   },
+   {
+    "case": "v_favor4_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex drone command from Hebrew/English mix into English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4087
+   },
+   {
+    "case": "v_favor4_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex Hebrew drone command into English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4118
+   },
+   {
+    "case": "v_favor4_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex Hebrew drone command into English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3765
+   },
+   {
+    "case": "v_favor4_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex Hebrew drone command into English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4126
+   },
+   {
+    "case": "v_mission3_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. The input is: \"המשימה היא כזאת: take off, לאחר מכן עלה 5 מטרים, ואז הסתובב 90 מעלות clockwise\". I need to translate the Hebrew parts while keeping the English parts as they are, and output only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 1678
+   },
+   {
+    "case": "v_mission3_g1",
+    "kind": "command",
+    "payload": "The mission is as follows: ascend 20 meters, then turn right 45 degrees, and then fly forward 12 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 490
+   },
+   {
+    "case": "v_mission3_g2",
+    "kind": "command",
+    "payload": "The mission is as follows: fly back 4 meters, then move left 3 meters, and then descend 2 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 450
+   },
+   {
+    "case": "v_mission3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3817
+   },
+   {
+    "case": "v_yalla2_g0",
+    "kind": "reject",
+    "payload": "The user wants to translate a Hebrew drone command into English. The command is \"יאללה take off ואז עלה 5 מטרים\". This is a mix of Hebrew and English. \"יאללה\" is an interjection (like \"Go\" or \"Let's go\"). \"take off\" is English. \"ואז\" means \"and then\". \"עלה 5 מטרים\" means \"rise 5 meters\" or \"ascend 5 meters\". The user wants the translation of the entire command.",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4197
+   },
+   {
+    "case": "v_yalla2_g1",
+    "kind": "command",
+    "payload": "Ascend 20 meters then turn right 45 degrees",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 2866
+   },
+   {
+    "case": "v_yalla2_g2",
+    "kind": "command",
+    "payload": "The user wants to translate a Hebrew drone command into English. The command is: \"יאללה טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים\". I need to translate this into a clear, concise English drone command.",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 1229
+   },
+   {
+    "case": "v_yalla2_g3",
+    "kind": "command",
+    "payload": "The user wants to translate a Hebrew drone command into English. The command is: \"יאללה טוס קדימה 25 מטרים ואז הסתובב 180 מעלות clockwise\". I need to translate this accurately and output only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 1289
+   },
+   {
+    "case": "v_ready3_g0",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex Hebrew drone command into English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2857
+   },
+   {
+    "case": "v_ready3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex drone command from Hebrew to English. I must output *only* the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3772
+   },
+   {
+    "case": "v_ready3_g2",
+    "kind": "command",
+    "payload": "Wait, make sure you are ready. Now fly back 4 meters, then move left 3 meters and then descend 2 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 450
+   },
+   {
+    "case": "v_ready3_g3",
+    "kind": "command",
+    "payload": "Wait, make sure you are ready. Now fly forward 25 meters, then turn 180 degrees clockwise, and then move right 6 meters",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 554
+   },
+   {
+    "case": "v_seq5_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. The sequence is: \"take off, עלה 5 מטרים, הסתובב 90 מעלות clockwise, טוס קדימה 10 מטרים, תנחת\". I need to translate each part and output only the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 1679
+   },
+   {
+    "case": "v_seq5_g1",
+    "kind": "command",
+    "payload": "Ascend 20 meters, turn right 45 degrees, fly forward 12 meters, wait 3 seconds, land",
+    "flags": [
+     "hebnum-digits",
+     "number-flag"
+    ],
+    "t_ms": 1502
+   },
+   {
+    "case": "v_seq5_g2",
+    "kind": "command",
+    "payload": "Execute the following sequence: fly back 4 meters, move left 3 meters, descend 2 meters, turn left 30 degrees, wait 5 seconds",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 567
+   },
+   {
+    "case": "v_seq5_g3",
+    "kind": "command",
+    "payload": "Execute the following sequence: fly forward 25 meters, turn 180 degrees clockwise, move right 6 meters, ascend 15 meters, descend 8 meters",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 624
+   },
+   {
+    "case": "v_note3_g0",
+    "kind": "command",
+    "payload": "Take off, then ascend 5 meters, and note, rotate 90 degrees clockwise slowly and carefully",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 358
+   },
+   {
+    "case": "v_note3_g1",
+    "kind": "command",
+    "payload": "Ascend 20 meters, then turn right 45 degrees, and note, fly forward 12 meters slowly and carefully",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 451
+   },
+   {
+    "case": "v_note3_g2",
+    "kind": "command",
+    "payload": "Fly back four meters and then move left three meters, and pay attention, descend two meters slowly and carefully",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 358
+   },
+   {
+    "case": "v_note3_g3",
+    "kind": "command",
+    "payload": "Fly forward 25 meters, then rotate 180 degrees clockwise, and note, move right 6 meters slowly and carefully",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 460
+   },
+   {
+    "case": "v_round3_g0",
+    "kind": "command",
+    "payload": "The user wants me to translate a complex drone command into English. The command is: \"טוב, בוא נעשה סיבוב קטן: take off, עלה 5 מטרים ואז הסתובב 90 מעלות clockwise וזהו\". I need to translate the Hebrew parts and integrate them with the English parts provided. The output must be ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 1869
+   },
+   {
+    "case": "v_round3_g1",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex drone command from Hebrew to English. I must output *only* the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 4064
+   },
+   {
+    "case": "v_round3_g2",
+    "kind": "reject",
+    "payload": "The user wants me to translate a sequence of drone commands from Hebrew to English. I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3970
+   },
+   {
+    "case": "v_round3_g3",
+    "kind": "reject",
+    "payload": "The user wants me to translate a complex drone command from Hebrew to English. I must output *only* the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 2641
+   },
+   {
+    "case": "v_neg1",
+    "kind": "command",
+    "payload": "Listen, ascend 5 meters but do not rotate for now",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 238
+   },
+   {
+    "case": "v_neg2",
+    "kind": "reject",
+    "payload": "The user wants to translate a Hebrew drone command into English. The command is \"אוקיי טוס קדימה 10 מטרים, ובבקשה אל תנחת עדיין\". This translates to \"Okay, fly forward 10 meters, and please don't land yet.\" I must output ONLY the English translation.",
+    "flags": [
+     "hebnum-digits",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 3041
+   },
+   {
+    "case": "v_q1",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"לפני שנמשיך, כמה סוללה נשארה לך?\" (Before we continue, how much battery do you have left?). However, the prompt specifies that I am a translation engine translating a \"Hebrew drone command\" to English, and the output should be *only* the English translation. While this is a question and not a command, I must translate it according to the persona.",
+    "flags": [],
+    "t_ms": 1680
+   },
+   {
+    "case": "v_q2",
+    "kind": "command",
+    "payload": "The user is asking a question in Hebrew: \"Wait, wait, can you even see me from here?\" This is a conversational question, not a direct drone command. However, the instruction is to translate the user's Hebrew drone command to English. Since this is a conversational query, I must translate it accurately while adhering to the \"translation engine\" persona.",
+    "flags": [],
+    "t_ms": 1414
+   },
+   {
+    "case": "v_mix1",
+    "kind": "command",
+    "payload": "Ascend 20 meters and tell me what you see from there",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 284
+   },
+   {
+    "case": "v_mix2",
+    "kind": "command",
+    "payload": "Turn right 90 degrees, and if you hear me well, also fly forward 5 meters",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 367
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "kind": "perception",
+    "payload": "Highlight the middle windows of the rightmost building",
+    "flags": [],
+    "t_ms": 216
+   },
+   {
+    "case": "i_third_door",
+    "kind": "perception",
+    "payload": "Mark the front door of the third house on the left",
+    "flags": [],
+    "t_ms": 239
+   },
+   {
+    "case": "i_rear_wheel",
+    "kind": "perception",
+    "payload": "Focus on the rear wheel of the parked motorcycle",
+    "flags": [],
+    "t_ms": 208
+   },
+   {
+    "case": "i_top_windows",
+    "kind": "perception",
+    "payload": "Count the windows on the top floor of the building",
+    "flags": [],
+    "t_ms": 221
+   },
+   {
+    "case": "i_roof_corner",
+    "kind": "perception",
+    "payload": "Mark the upper left corner of the red roof",
+    "flags": [],
+    "t_ms": 212
+   },
+   {
+    "case": "i_chimney",
+    "kind": "perception",
+    "payload": "Highlight the lowest house in the street",
+    "flags": [],
+    "t_ms": 182
+   },
+   {
+    "case": "i_back_entrance",
+    "kind": "perception",
+    "payload": "Find the rear entrance of the large warehouse",
+    "flags": [],
+    "t_ms": 195
+   },
+   {
+    "case": "i_ladder_pickup",
+    "kind": "perception",
+    "payload": "Mark the ladder on the roof of the white pickup",
+    "flags": [],
+    "t_ms": 222
+   },
+   {
+    "case": "i_car_by_red",
+    "kind": "perception",
+    "payload": "Highlight the car next to the person in red clothing",
+    "flags": [],
+    "t_ms": 223
+   },
+   {
+    "case": "i_orange_cap",
+    "kind": "perception",
+    "payload": "Follow the person with the orange hat",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 182
+   },
+   {
+    "case": "i_door_by_coat",
+    "kind": "perception",
+    "payload": "Mark my door next to the man in the black coat",
+    "flags": [],
+    "t_ms": 237
+   },
+   {
+    "case": "i_bike_fence",
+    "kind": "perception",
+    "payload": "Focus on the bicycle leaning on the fence of the yellow house",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 253
+   },
+   {
+    "case": "i_dog_by_dress",
+    "kind": "perception",
+    "payload": "Follow the dog walking next to the woman in the white dress",
+    "flags": [],
+    "t_ms": 252
+   },
+   {
+    "case": "i_kid_bag",
+    "kind": "perception",
+    "payload": "Highlight the backpack carried by the child with the green shirt",
+    "flags": [],
+    "t_ms": 241
+   },
+   {
+    "case": "i_tree_truck",
+    "kind": "perception",
+    "payload": "Mark the tree behind the yellow truck",
+    "flags": [],
+    "t_ms": 182
+   },
+   {
+    "case": "i_win_over_door",
+    "kind": "perception",
+    "payload": "Find the window above the blue door",
+    "flags": [],
+    "t_ms": 181
+   },
+   {
+    "case": "i_cars_by_flag",
+    "kind": "perception",
+    "payload": "Count the cars parked in front of the building with the flag",
+    "flags": [],
+    "t_ms": 250
+   },
+   {
+    "case": "i_bench_trees",
+    "kind": "perception",
+    "payload": "Highlight the bench between the two tall trees",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 197
+   },
+   {
+    "case": "i_behind_moto",
+    "kind": "perception",
+    "payload": "Follow the vehicle driving behind the red motorcycle",
+    "flags": [],
+    "t_ms": 197
+   },
+   {
+    "case": "i_man_on_roof",
+    "kind": "perception",
+    "payload": "Mark the person standing on the roof of the white building",
+    "flags": [],
+    "t_ms": 238
+   },
+   {
+    "case": "i_box_by_man",
+    "kind": "perception",
+    "payload": "Highlight my box next to the person standing on the roof of the white building",
+    "flags": [],
+    "t_ms": 298
+   },
+   {
+    "case": "i_girl_balloon",
+    "kind": "perception",
+    "payload": "Follow the girl with the balloon walking near the woman with the stroller",
+    "flags": [],
+    "t_ms": 267
+   },
+   {
+    "case": "i_car_between",
+    "kind": "perception",
+    "payload": "Mark the car parked between the white pickup and the red truck",
+    "flags": [],
+    "t_ms": 253
+   },
+   {
+    "case": "i_door_by_tree",
+    "kind": "perception",
+    "payload": "Find the door of the house in front of the tallest tree",
+    "flags": [],
+    "t_ms": 253
+   },
+   {
+    "case": "i_sign_awning",
+    "kind": "perception",
+    "payload": "Focus on the sign above the store entrance with the green awning",
+    "flags": [],
+    "t_ms": 255
+   },
+   {
+    "case": "i_front_tire",
+    "kind": "perception",
+    "payload": "Highlight the front tire of the car parked closest to the gate",
+    "flags": [],
+    "t_ms": 253
+   },
+   {
+    "case": "i_bench_fountain",
+    "kind": "perception",
+    "payload": "Count the people sitting on the benches to the left of the fountain",
+    "flags": [],
+    "t_ms": 268
+   },
+   {
+    "case": "i_exit_gray",
+    "kind": "perception",
+    "payload": "Follow the person who exited the door of the gray building",
+    "flags": [],
+    "t_ms": 239
+   },
+   {
+    "case": "i_second_car",
+    "kind": "perception",
+    "payload": "Mark the second vehicle on the left in the front row of the parking lot",
+    "flags": [],
+    "t_ms": 293
+   },
+   {
+    "case": "i_dark_stain",
+    "kind": "perception",
+    "payload": "Find the dark spot on the wall to the right of the large window",
+    "flags": [],
+    "t_ms": 281
+   },
+   {
+    "case": "i_glasses_talk",
+    "kind": "perception",
+    "payload": "Highlight the man with glasses talking to the woman in the yellow shirt",
+    "flags": [],
+    "t_ms": 269
+   },
+   {
+    "case": "i_truck_boat",
+    "kind": "perception",
+    "payload": "Follow the truck towing the white boat",
+    "flags": [],
+    "t_ms": 181
+   },
+   {
+    "case": "i_empty_chair",
+    "kind": "perception",
+    "payload": "Mark the empty chair next to the round table",
+    "flags": [],
+    "t_ms": 208
+   },
+   {
+    "case": "i_bird_cable",
+    "kind": "perception",
+    "payload": "Focus on the bird sitting on the cable between the two poles",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 254
+   },
+   {
+    "case": "i_fence_gap",
+    "kind": "perception",
+    "payload": "Find the opening in the fence behind the blue container",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 225
+   },
+   {
+    "case": "i_main_steps",
+    "kind": "perception",
+    "payload": "Count the stairs at the main entrance of the tall building",
+    "flags": [],
+    "t_ms": 239
+   },
+   {
+    "case": "i_helmet_mid",
+    "kind": "perception",
+    "payload": "Highlight the rider with the yellow helmet in the center of the group",
+    "flags": [],
+    "t_ms": 269
+   },
+   {
+    "case": "i_cat_climb",
+    "kind": "perception",
+    "payload": "Follow the cat climbing the tree near the wall",
+    "flags": [],
+    "t_ms": 209
+   },
+   {
+    "case": "i_lean_silver",
+    "kind": "perception",
+    "payload": "Mark the guy leaning on the silver car",
+    "flags": [],
+    "t_ms": 195
+   },
+   {
+    "case": "i_flag_low",
+    "kind": "perception",
+    "payload": "Find the flag waving above the roof of the low building",
+    "flags": [],
+    "t_ms": 240
+   },
+   {
+    "case": "i_broken_window",
+    "kind": "perception",
+    "payload": "Highlight the broken window on the ground floor of the abandoned building",
+    "flags": [],
+    "t_ms": 255
+   },
+   {
+    "case": "i_last_convoy",
+    "kind": "perception",
+    "payload": "Follow the last car in the convoy",
+    "flags": [],
+    "t_ms": 185
+   },
+   {
+    "case": "i_big_tent",
+    "kind": "perception",
+    "payload": "Mark the largest tent at the edge of the field",
+    "flags": [],
+    "t_ms": 225
+   },
+   {
+    "case": "i_crane_arm",
+    "kind": "perception",
+    "payload": "Focus on the arm of the crane above the construction site",
+    "flags": [],
+    "t_ms": 246
+   },
+   {
+    "case": "i_boats_pier",
+    "kind": "perception",
+    "payload": "Count the boats tied to the north pier",
+    "flags": [],
+    "t_ms": 195
+   },
+   {
+    "case": "j_bag_chain",
+    "kind": "perception",
+    "payload": "Highlight the bag placed next to the chair behind the counter of the store with the blue awning",
+    "flags": [],
+    "t_ms": 342
+   },
+   {
+    "case": "j_bird_branch",
+    "kind": "perception",
+    "payload": "Mark the bird on the branch of the tree near the entrance to the gray building",
+    "flags": [],
+    "t_ms": 310
+   },
+   {
+    "case": "j_kid_ball",
+    "kind": "perception",
+    "payload": "Follow the child with the ball running near the field fence behind the school",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 282
+   },
+   {
+    "case": "j_win_gas",
+    "kind": "perception",
+    "payload": "Focus on the broken window on the second floor of the house across from the gas station",
+    "flags": [],
+    "t_ms": 325
+   },
+   {
+    "case": "j_hat_bench",
+    "kind": "perception",
+    "payload": "Find the hat that fell near the bench under the big tree in the park corner",
+    "flags": [],
+    "t_ms": 313
+   },
+   {
+    "case": "j_flag_mast",
+    "kind": "perception",
+    "payload": "Mark the small flag on the ship's mast connected to the southern buoy",
+    "flags": [],
+    "t_ms": 297
+   },
+   {
+    "case": "j_sticker",
+    "kind": "perception",
+    "payload": "The user wants me to translate a Hebrew drone command into English. The command is: \"הדגש את המדבקה שעל הפגוש של המכונית שחונה מאחורי המשאית הירוקה\" (Highlight the sticker on the bumper of the car parked behind the green truck). I must output ONLY the English translation.",
+    "flags": [],
+    "t_ms": 1419
+   },
+   {
+    "case": "j_dog_steps",
+    "kind": "perception",
+    "payload": "Follow the small dog playing near the girl sitting on the steps of the White House",
+    "flags": [],
+    "t_ms": 309
+   },
+   {
+    "case": "j_lock_gate",
+    "kind": "perception",
+    "payload": "Focus on the lock on the gate of the fence surrounding the empty field",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 284
+   },
+   {
+    "case": "j_helmet_seat",
+    "kind": "perception",
+    "payload": "Find the helmet placed on the motorcycle seat parked near the entrance to the parking lot",
+    "flags": [],
+    "t_ms": 317
+   },
+   {
+    "case": "j_sign_between",
+    "kind": "perception",
+    "payload": "Mark the small sign above the store door between the restaurant and the bank",
+    "flags": [],
+    "t_ms": 279
+   },
+   {
+    "case": "j_drainpipe",
+    "kind": "perception",
+    "payload": "Highlight the pipe coming down from the roof of the house next to the high electricity pole",
+    "flags": [],
+    "t_ms": 328
+   },
+   {
+    "case": "j_umbrella_x",
+    "kind": "perception",
+    "payload": "Follow the woman with the red umbrella crossing the street near the traffic light",
+    "flags": [],
+    "t_ms": 288
+   },
+   {
+    "case": "j_hole_wall",
+    "kind": "perception",
+    "payload": "Focus on the boy in the wall of the old building behind the parking lot",
+    "flags": [],
+    "t_ms": 296
+   },
+   {
+    "case": "j_tilt_sign",
+    "kind": "perception",
+    "payload": "Find the sign leaning to the side near the turn to the street with the trees",
+    "flags": [],
+    "t_ms": 312
+   },
+   {
+    "case": "j_crate_trunk",
+    "kind": "perception",
+    "payload": "Mark the box sticking out of the vehicle's trunk parked in front of the yellow gate",
+    "flags": [],
+    "t_ms": 347
+   },
+   {
+    "case": "j_mural",
+    "kind": "perception",
+    "payload": "Highlight the painting on the building wall to the right of the pedestrian bridge",
+    "flags": [],
+    "t_ms": 284
+   },
+   {
+    "case": "j_cat_jump",
+    "kind": "perception",
+    "payload": "Follow the cat jumping from the fence to the roof of the shed in the backyard",
+    "flags": [],
+    "t_ms": 312
+   },
+   {
+    "case": "j_faucet",
+    "kind": "perception",
+    "payload": "Focus on the faucet next to my house near the flower bed with the red flowers",
+    "flags": [],
+    "t_ms": 314
+   },
+   {
+    "case": "j_truck_text",
+    "kind": "perception",
+    "payload": "Find the writing on the side of the truck stopping near the covered bus station",
+    "flags": [],
+    "t_ms": 300
+   },
+   {
+    "case": "j_pin_busstop",
+    "kind": "perception",
+    "payload": "Follow the man in the blue shirt, the one standing by the bus stop, on the left side of the screen, near the bench",
+    "flags": [],
+    "t_ms": 475
+   },
+   {
+    "case": "j_pin_notmoving",
+    "kind": "perception",
+    "payload": "Mark the white car, not the one driving, the one parked by the curb, with the door open",
+    "flags": [],
+    "t_ms": 385
+   },
+   {
+    "case": "j_pin_antennas",
+    "kind": "perception",
+    "payload": "Highlight the tall building, the one with the antennas on the roof, located behind the playground, slightly to the right of the center",
+    "flags": [],
+    "t_ms": 456
+   },
+   {
+    "case": "j_pin_drone2",
+    "kind": "reject",
+    "payload": "Follow the second drone, the smaller one, flying low over the field, near the tree line",
+    "flags": [
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 669
+   },
+   {
+    "case": "j_pin_leash",
+    "kind": "perception",
+    "payload": "Find the brown dog, with the red leash, playing on the grass, between the two benches, near the path",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 418
+   },
+   {
+    "case": "j_pin_window3",
+    "kind": "perception",
+    "payload": "Focus on the third window from the right, on the second floor, of the yellow-walled building, it's next to the cafe",
+    "flags": [],
+    "t_ms": 453
+   },
+   {
+    "case": "j_pin_notphone",
+    "kind": "perception",
+    "payload": "Mark the person standing closest to the entrance, with the large backpack, not the one with the phone",
+    "flags": [],
+    "t_ms": 344
+   },
+   {
+    "case": "j_pin_2riders",
+    "kind": "perception",
+    "payload": "Follow the black motorcycle, the one with 2 riders, traveling in the right lane, towards the intersection",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 363
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "kind": "perception",
+    "payload": "Highlight the blue door, the third from the left, in the row of shops, next to the fruit stand",
+    "flags": [],
+    "t_ms": 376
+   },
+   {
+    "case": "j_pin_smallbike",
+    "kind": "perception",
+    "payload": "Find the child with the red hat, the one riding a small bicycle, on the path, near the awning",
+    "flags": [],
+    "t_ms": 398
+   },
+   {
+    "case": "j_pin_roofnear",
+    "kind": "perception",
+    "payload": "Mark the roof of the nearest house to you, the one with the ladder leaning against it",
+    "flags": [],
+    "t_ms": 323
+   },
+   {
+    "case": "j_pin_leaving",
+    "kind": "perception",
+    "payload": "Follow the orange truck that is now leaving the site, the one with the open crate",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 310
+   },
+   {
+    "case": "j_pin_flagman",
+    "kind": "perception",
+    "payload": "Highlight the man on the right edge of the group, the one with the hat holding the flag",
+    "flags": [],
+    "t_ms": 345
+   },
+   {
+    "case": "j_pin_notsail",
+    "kind": "perception",
+    "payload": "Focus on the small motorboat, not the sailboat, the one closer to the shore",
+    "flags": [],
+    "t_ms": 328
+   },
+   {
+    "case": "j_pin_bushes",
+    "kind": "perception",
+    "payload": "Find the opening in the fence, roughly in the middle, where the bushes are low",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 326
+   },
+   {
+    "case": "j_pin_campole",
+    "kind": "perception",
+    "payload": "Mark the pole with the camera, the one in the corner of the parking lot, near the exit",
+    "flags": [],
+    "t_ms": 367
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "kind": "perception",
+    "payload": "Follow the woman in the long coat, the one walking fast, on the far side of the square",
+    "flags": [],
+    "t_ms": 371
+   },
+   {
+    "case": "j_pin_planks",
+    "kind": "perception",
+    "payload": "Highlight the stack of boards, near the back wall, under the window",
+    "flags": [],
+    "t_ms": 284
+   },
+   {
+    "case": "j_pin_halfgate",
+    "kind": "perception",
+    "payload": "Focus on the blue gate at the end of the path, the one that is half open",
+    "flags": [],
+    "t_ms": 337
+   },
+   {
+    "case": "j_pin_spare",
+    "kind": "perception",
+    "payload": "Find the spare tire connected to the back of the gray jeep",
+    "flags": [],
+    "t_ms": 256
+   },
+   {
+    "case": "j_pin_stage3",
+    "kind": "perception",
+    "payload": "Mark the group of three people standing closest to the stage, to the left of the large speaker",
+    "flags": [],
+    "t_ms": 355
+   },
+   {
+    "case": "j_pin_hay",
+    "kind": "perception",
+    "payload": "Follow the green tractor working in the field, the one pulling the wagon with hay",
+    "flags": [],
+    "t_ms": 311
+   },
+   {
+    "case": "j_pin_fullbin",
+    "kind": "perception",
+    "payload": "Highlight the orange bin near the rear entrance, the one that is full to the top",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 326
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "kind": "perception",
+    "payload": "Focus on the birds sitting on the wires, only those above the road, not those above the sidewalk",
+    "flags": [],
+    "t_ms": 373
+   },
+   {
+    "case": "j_pin_extstairs",
+    "kind": "perception",
+    "payload": "Find the external stairs on the side of the building, the ones that lead to the roof",
+    "flags": [],
+    "t_ms": 340
+   },
+   {
+    "case": "j_pin_wrongway",
+    "kind": "perception",
+    "payload": "Mark the only vehicle in the parking lot that is parked backward, facing the exit",
+    "flags": [],
+    "t_ms": 312
+   },
+   {
+    "case": "j_pin_firstrun",
+    "kind": "perception",
+    "payload": "Follow the group of runners, specifically the one with the yellow vest who is running first",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 326
+   },
+   {
+    "case": "j_pin_barrel",
+    "kind": "perception",
+    "payload": "Highlight the overturned bucket next to the sand pile, behind the concrete blocks",
+    "flags": [],
+    "t_ms": 283
+   },
+   {
+    "case": "j_pin_puddle",
+    "kind": "perception",
+    "payload": "Focus on the large puddle in the middle of the road, the one reflecting the building",
+    "flags": [],
+    "t_ms": 327
+   },
+   {
+    "case": "j_pin_scaffold",
+    "kind": "perception",
+    "payload": "Find the tallest ladder among those leaning on the fence, on the western side",
+    "flags": [],
+    "t_ms": 298
+   },
+   {
+    "case": "j_pin_idledozer",
+    "kind": "perception",
+    "payload": "Mark the yellow excavator that is standing still near the large hole, not the one that is working",
+    "flags": [],
+    "t_ms": 358
+   },
+   {
+    "case": "j_pin_cart",
+    "kind": "perception",
+    "payload": "Follow the shopping cart someone is pushing up the street, near the parked cars",
+    "flags": [],
+    "t_ms": 299
+   },
+   {
+    "case": "j_pin_graffiti",
+    "kind": "perception",
+    "payload": "Highlight the address written on the wall, under the second window from the left",
+    "flags": [],
+    "t_ms": 298
+   },
+   {
+    "case": "j_pin_ferris",
+    "kind": "perception",
+    "payload": "Focus on the giant wheel at the end of the park, specifically its lower cabin",
+    "flags": [],
+    "t_ms": 312
+   },
+   {
+    "case": "j_pin_planters",
+    "kind": "perception",
+    "payload": "Find the two large pots on either side of the hotel's main door",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 297
+   },
+   {
+    "case": "lp_white_car",
+    "kind": "perception",
+    "payload": "Follow the white car",
+    "flags": [],
+    "t_ms": 138
+   },
+   {
+    "case": "lp_nearest_person",
+    "kind": "perception",
+    "payload": "Highlight the person closest to you",
+    "flags": [],
+    "t_ms": 166
+   },
+   {
+    "case": "lp_look_down",
+    "kind": "perception",
+    "payload": "Look down please",
+    "flags": [],
+    "t_ms": 121
+   },
+   {
+    "case": "pq_see_now",
+    "kind": "perception",
+    "payload": "What do you see now",
+    "flags": [],
+    "t_ms": 147
+   },
+   {
+    "case": "pq_see_frame",
+    "kind": "perception",
+    "payload": "What do you see in the frame",
+    "flags": [],
+    "t_ms": 177
+   },
+   {
+    "case": "pq_count_people_see",
+    "kind": "perception",
+    "payload": "How many people do you see",
+    "flags": [],
+    "t_ms": 163
+   },
+   {
+    "case": "pq_count_cars_see",
+    "kind": "perception",
+    "payload": "The user is asking a question in Hebrew: \"כמה מכוניות אתה רואה בזירה\" (How many cars do you see in the scene/area?). This is a request for object detection/counting. Since I am a translation engine, I must translate this command/question into English.",
+    "flags": [],
+    "t_ms": 1295
+   },
+   {
+    "case": "pq_see_suspicious",
+    "kind": "perception",
+    "payload": "The user is asking a question in Hebrew: \"What do you see suspicious in the scene?\" (מה אתה רואה חשוד בזירה). This is a command/query directed at a drone/AI, asking for an analysis of the environment. I need to translate this into English.",
+    "flags": [],
+    "t_ms": 1228
+   },
+   {
+    "case": "pq_count_vehicles_road",
+    "kind": "perception",
+    "payload": "The user is asking a question in Hebrew: \"כמה רכבים אתה רואה על הכביש\" (How many cars do you see on the road). This is a request for information or perception. Since I am a translation engine, I must translate this command/question into English.",
+    "flags": [],
+    "t_ms": 1267
+   },
+   {
+    "case": "pq_see_ahead",
+    "kind": "perception",
+    "payload": "What do you see in front of you",
+    "flags": [],
+    "t_ms": 185
+   },
+   {
+    "case": "pq_count_windows_see",
+    "kind": "perception",
+    "payload": "The user is asking a question in Hebrew: \"כמה חלונות אתה רואה בבניין\" (How many windows do you see in the building). However, the instructions state that I am a translation engine and must translate the user's Hebrew drone command to English. The previous examples were drone commands. This input is a general question, not a drone command. Given the strict instruction to translate the user's input, I will translate the sentence.",
+    "flags": [
+     "answer-flag"
+    ],
+    "t_ms": 3869
+   },
+   {
+    "case": "pq_any_person",
+    "kind": "perception",
+    "payload": "Is there a person in the picture",
+    "flags": [],
+    "t_ms": 179
+   },
+   {
+    "case": "pq_any_vehicle",
+    "kind": "perception",
+    "payload": "Is there a vehicle in the area",
+    "flags": [],
+    "t_ms": 166
+   },
+   {
+    "case": "pq_any_red_car",
+    "kind": "perception",
+    "payload": "Is there a red car in the frame",
+    "flags": [],
+    "t_ms": 194
+   },
+   {
+    "case": "pq_any_roof_person",
+    "kind": "perception",
+    "payload": "Is there anyone on the roof",
+    "flags": [],
+    "t_ms": 161
+   },
+   {
+    "case": "pq_any_weapon",
+    "kind": "perception",
+    "payload": "Is there anyone armed on the scene",
+    "flags": [],
+    "t_ms": 184
+   },
+   {
+    "case": "pq_any_backpack_left",
+    "kind": "perception",
+    "payload": "Is there a backpack on the left side",
+    "flags": [],
+    "t_ms": 194
+   },
+   {
+    "case": "pq_any_movement",
+    "kind": "perception",
+    "payload": "Is there movement on the ground",
+    "flags": [],
+    "t_ms": 164
+   },
+   {
+    "case": "pq_whats_in_frame",
+    "kind": "perception",
+    "payload": "What is in the frame",
+    "flags": [],
+    "t_ms": 148
+   },
+   {
+    "case": "pq_whats_ahead",
+    "kind": "perception",
+    "payload": "What is in front of you",
+    "flags": [],
+    "t_ms": 162
+   },
+   {
+    "case": "pq_describe_scene",
+    "kind": "perception",
+    "payload": "Describe what you see in the field",
+    "flags": [],
+    "t_ms": 179
+   },
+   {
+    "case": "pq_identify_threats",
+    "kind": "perception",
+    "payload": "Identify possible threats in the area",
+    "flags": [],
+    "t_ms": 166
+   },
+   {
+    "case": "pq_find_people",
+    "kind": "perception",
+    "payload": "Find all people in the frame",
+    "flags": [],
+    "t_ms": 165
+   },
+   {
+    "case": "pq_count_buildings",
+    "kind": "perception",
+    "payload": "Count the buildings in the area",
+    "flags": [],
+    "t_ms": 163
+   },
+   {
+    "case": "pq_search_vehicle",
+    "kind": "perception",
+    "payload": "Search for a suspicious vehicle in the area",
+    "flags": [],
+    "t_ms": 193
+   },
+   {
+    "case": "pq_look_ground",
+    "kind": "perception",
+    "payload": "Look at the ground and describe what is there",
+    "flags": [],
+    "t_ms": 208
+   },
+   {
+    "case": "pq_identify_color",
+    "kind": "perception",
+    "payload": "Identify the color of the nearest vehicle",
+    "flags": [],
+    "t_ms": 183
+   },
+   {
+    "case": "pq_focus_describe",
+    "kind": "perception",
+    "payload": "Focus on the nearest person and describe them",
+    "flags": [],
+    "t_ms": 194
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "kind": "command",
+    "payload": "Perform an Indian circle on the target in front of you",
+    "flags": [],
+    "t_ms": 238
+   },
+   {
+    "case": "s_sitrep",
+    "kind": "command",
+    "payload": "Ascend to altitude and give me a status image",
+    "flags": [],
+    "t_ms": 220
+   },
+   {
+    "case": "s_jump_point",
+    "kind": "command",
+    "payload": "Jump to the point and stay on it",
+    "flags": [],
+    "t_ms": 193
+   },
+   {
+    "case": "s_gentle_scan",
+    "kind": "command",
+    "payload": "Perform a gentle scan of the area",
+    "flags": [
+     "slang-sector"
+    ],
+    "t_ms": 180
+   },
+   {
+    "case": "s_eye_junction",
+    "kind": "command",
+    "payload": "Keep an eye on the intersection and don't leave it",
+    "flags": [],
+    "t_ms": 253
+   },
+   {
+    "case": "s_zoom_suspect",
+    "kind": "perception",
+    "payload": "Zoom on the suspicious vehicle and keep it centered",
+    "flags": [],
+    "t_ms": 208
+   },
+   {
+    "case": "s_route_escort",
+    "kind": "command",
+    "payload": "Climb onto the flight path and follow it until the turn",
+    "flags": [],
+    "t_ms": 251
+   },
+   {
+    "case": "s_dead_ground",
+    "kind": "command",
+    "payload": "Gain altitude, you have a dead space behind the hill",
+    "flags": [],
+    "t_ms": 240
+   },
+   {
+    "case": "s_give_distance",
+    "kind": "command",
+    "payload": "Drone 2 is entering your area, give it space",
+    "flags": [
+     "hebnum-digits",
+     "slang-sector"
+    ],
+    "t_ms": 239
+   },
+   {
+    "case": "s_one_more_pass",
+    "kind": "command",
+    "payload": "Make another lap over the neighborhood and then return home",
+    "flags": [],
+    "t_ms": 227
+   },
+   {
+    "case": "s_grid_out",
+    "kind": "command",
+    "payload": "Go to the waypoint I gave you",
+    "flags": [
+     "acronym-grid",
+     "proc-out-final"
+    ],
+    "t_ms": 178
+   },
+   {
+    "case": "s_roger_over",
+    "kind": "command",
+    "payload": "Received, continuing scan",
+    "flags": [
+     "proc-roger",
+     "proc-over-final"
+    ],
+    "t_ms": 137
+   },
+   {
+    "case": "s_cp_visual",
+    "kind": "command",
+    "payload": "I have line of sight with the command post near the building",
+    "flags": [
+     "acronym-cp"
+    ],
+    "t_ms": 254
+   },
+   {
+    "case": "s_eyes_on",
+    "kind": "command",
+    "payload": "Report when you have eyes on the target",
+    "flags": [],
+    "t_ms": 195
+   },
+   {
+    "case": "s_rally_point",
+    "kind": "command",
+    "payload": "Acknowledged, returning to pickup point",
+    "flags": [
+     "abbrev-point"
+    ],
+    "t_ms": 179
+   },
+   {
+    "case": "s_feet_hold",
+    "kind": "reject",
+    "payload": "Ascend to eight hundred feet and wait in holding over the area",
+    "flags": [
+     "feet-unit",
+     "number-flag",
+     "REJECT-number"
+    ],
+    "t_ms": 490
+   },
+   {
+    "case": "s_lost_uav",
+    "kind": "command",
+    "payload": "The user wants me to translate a Hebrew drone command into English. The command is: \"אבד קשר עם כלי הטיס הבלתי מאויש, תתחיל סריקה באזור הצפונית\" (Abad kesher im keli ha-tis ha-biltí me'uyash, tit'chíl sarika ba-ezor ha-tzofoní). This translates to: \"Lost contact with the unmanned aerial vehicle, start scanning in the northern area.\"",
+    "flags": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "t_ms": 1967
+   },
+   {
+    "case": "s_scramble",
+    "kind": "command",
+    "payload": "Execute takeoff immediately, there is an emergency mission",
+    "flags": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ],
+    "t_ms": 201
+   },
+   {
+    "case": "s_obs_report",
+    "kind": "command",
+    "payload": "Maintain surveillance on the White House, report every movement",
+    "flags": [
+     "proc-over-final"
+    ],
+    "t_ms": 224
+   },
+   {
+    "case": "s_wadi_route",
+    "kind": "command",
+    "payload": "Fly low over the wadi until the intersection with the axis, then wait there",
+    "flags": [],
+    "t_ms": 313
+   }
+  ]
+ },
+ "wall_s": 275
+}

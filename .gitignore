@@ -1,7 +1,8 @@
 build/
 __pycache__/
 .pytest_cache/
-logs/
-datasets/
-archive/
+logs
+datasets
+archive
 docs/private
+*.log

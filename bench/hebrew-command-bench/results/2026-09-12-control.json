@@ -1,0 +1,6633 @@
+{
+ "home": "integration_harden2",
+ "planner": "gemma4",
+ "results": {
+  "emergency": {
+   "ok": 12,
+   "n": 12
+  },
+  "std190": {
+   "ok": 236,
+   "n": 253
+  },
+  "verbose": {
+   "ok": 59,
+   "n": 63
+  },
+  "perception": {
+   "ok": 103,
+   "n": 138
+  },
+  "military": {
+   "ok": 0,
+   "n": 21
+  }
+ },
+ "verdicts": {
+  "emergency": {
+   "e_stop": "CORRECT",
+   "e_stopstop": "CORRECT",
+   "e_stop_now": "CORRECT",
+   "e_emergency": "CORRECT",
+   "e_stop_all": "CORRECT",
+   "e_english": "CORRECT",
+   "e_game_stop": "CORRECT",
+   "e75_two_words": "CORRECT",
+   "e75_dai_maspik": "CORRECT",
+   "e75_hafsek_hakol": "CORRECT",
+   "e75_retracted_stop": "CORRECT",
+   "e75_conditional_stop": "CORRECT"
+  },
+  "std190": {
+   "up10": "CORRECT",
+   "fwd5": "CORRECT",
+   "spin90cw": "CORRECT",
+   "takeoff": "CORRECT",
+   "land": "CORRECT",
+   "combo3": "CORRECT",
+   "combo_tl": "CORRECT",
+   "back2left3": "CORRECT",
+   "ccw45": "CORRECT",
+   "down3": "CORRECT",
+   "question": "CORRECT-perception",
+   "square": "valid(open)",
+   "up2": "CORRECT",
+   "right4": "CORRECT",
+   "left7": "CORRECT",
+   "back10": "CORRECT",
+   "fwd15": "CORRECT",
+   "spin180cw": "CORRECT",
+   "spin360": "CORRECT",
+   "wait5": "CORRECT",
+   "up_half": "CORRECT",
+   "combo2b": "CORRECT",
+   "combo4": "CORRECT",
+   "combo5": "CORRECT",
+   "digit12": "CORRECT",
+   "digit45deg": "CORRECT",
+   "question2": "CORRECT-perception",
+   "q_land_trap": "CORRECT-reject",
+   "neg_trap": "CORRECT-reject",
+   "colloq_up": "CORRECT",
+   "land_now": "CORRECT",
+   "takeoff_ctx": "CORRECT",
+   "g_up1": "CORRECT",
+   "g_up2": "CORRECT",
+   "g_up3": "CORRECT",
+   "g_up4": "CORRECT",
+   "g_up6": "CORRECT",
+   "g_up8": "CORRECT",
+   "g_up9": "CORRECT",
+   "g_up20": "CORRECT",
+   "g_up25": "CORRECT",
+   "g_down1": "CORRECT",
+   "g_down2": "CORRECT",
+   "g_down3": "CORRECT",
+   "g_down4": "CORRECT",
+   "g_down6": "CORRECT",
+   "g_down8": "CORRECT",
+   "g_down9": "CORRECT",
+   "g_down20": "CORRECT",
+   "g_down25": "CORRECT",
+   "g_fwd1": "CORRECT",
+   "g_fwd2": "CORRECT",
+   "g_fwd3": "CORRECT",
+   "g_fwd4": "CORRECT",
+   "g_fwd6": "CORRECT",
+   "g_fwd8": "CORRECT",
+   "g_fwd9": "CORRECT",
+   "g_fwd20": "CORRECT",
+   "g_fwd25": "CORRECT",
+   "g_back1": "CORRECT",
+   "g_back2": "CORRECT",
+   "g_back3": "CORRECT",
+   "g_back4": "CORRECT",
+   "g_back6": "CORRECT",
+   "g_back8": "CORRECT",
+   "g_back9": "CORRECT",
+   "g_back20": "CORRECT",
+   "g_back25": "CORRECT",
+   "g_right1": "CORRECT",
+   "g_right2": "CORRECT",
+   "g_right3": "CORRECT",
+   "g_right4": "CORRECT",
+   "g_right6": "CORRECT",
+   "g_right8": "CORRECT",
+   "g_right9": "CORRECT",
+   "g_right20": "CORRECT",
+   "g_right25": "CORRECT",
+   "g_left1": "CORRECT",
+   "g_left2": "CORRECT",
+   "g_left3": "CORRECT",
+   "g_left4": "CORRECT",
+   "g_left6": "CORRECT",
+   "g_left8": "CORRECT",
+   "g_left9": "CORRECT",
+   "g_left20": "CORRECT",
+   "g_left25": "CORRECT",
+   "g_cw30": "CORRECT",
+   "g_ccw30": "CORRECT",
+   "g_cw60": "CORRECT",
+   "g_ccw60": "CORRECT",
+   "g_cw120": "CORRECT",
+   "g_ccw120": "CORRECT",
+   "g_cw270": "CORRECT",
+   "g_ccw270": "CORRECT",
+   "g_wait2": "CORRECT",
+   "g_wait10": "CORRECT",
+   "g_combo2_0": "CORRECT",
+   "g_combo2_1": "CORRECT",
+   "g_combo2_2": "CORRECT",
+   "g_combo2_3": "CORRECT",
+   "g_combo2_4": "CORRECT",
+   "g_combo2_5": "CORRECT",
+   "g_combo2_6": "CORRECT",
+   "g_combo2_7": "CORRECT",
+   "g_combo3_0": "CORRECT",
+   "g_combo3_1": "CORRECT",
+   "g_combo3_2": "CORRECT",
+   "g_combo3_3": "CORRECT",
+   "r_takeoff1": "CORRECT",
+   "r_takeoff2": "CORRECT",
+   "r_takeoff3": "CORRECT",
+   "r_takeoff4": "CORRECT",
+   "r_takeoff5": "CORRECT",
+   "r_land1": "CORRECT",
+   "r_land2": "CORRECT",
+   "r_land3": "CORRECT",
+   "r_land4": "CORRECT",
+   "r_land5": "CORRECT",
+   "r_pol_up5": "CORRECT",
+   "r_pol_fwd3": "CORRECT",
+   "r_pol_left2": "CORRECT",
+   "r_pol_down1": "CORRECT",
+   "r_pol_spin": "CORRECT",
+   "r_fill1": "CORRECT",
+   "r_fill2": "CORRECT",
+   "r_fill3": "CORRECT",
+   "r_fill4": "CORRECT",
+   "r_fill5": "CORRECT",
+   "r_alt10": "CORRECT",
+   "r_alt20": "CORRECT",
+   "r_low": "CORRECT",
+   "r_rise3": "CORRECT",
+   "r_updown": "CORRECT",
+   "r_bit_left": "CORRECT",
+   "r_bit_up": "CORRECT",
+   "r_bit_back": "CORRECT",
+   "r_higher": "REJECT",
+   "r_bit_fwd": "CORRECT",
+   "r_turn_r90": "CORRECT",
+   "r_turn_l45": "CORRECT",
+   "r_half_turn": "CORRECT",
+   "r_quart_r": "CORRECT",
+   "r_full": "CORRECT",
+   "r_around": "REJECT",
+   "r_num_first": "CORRECT",
+   "r_m_half": "CORRECT",
+   "r_2_half": "CORRECT",
+   "r_digit50": "CORRECT",
+   "r_digit7": "CORRECT",
+   "r_meter1": "CORRECT",
+   "r_mis1": "CORRECT",
+   "r_mis2": "CORRECT",
+   "r_mis3": "CORRECT",
+   "r_mis4": "CORRECT",
+   "r_mis5": "wrong-x(-10vs10)",
+   "r_mis6": "CORRECT",
+   "r_mis7": "CORRECT",
+   "r_mis8": "wrong-len(1vs2)",
+   "r_mis9": "CORRECT",
+   "r_mis10": "CORRECT",
+   "r_dis1": "valid(open)",
+   "r_dis2": "valid(open)",
+   "r_dis3": "valid(open)",
+   "r_dis4": "valid(open)",
+   "r_q1": "CORRECT-reject",
+   "r_q2": "CORRECT-reject",
+   "r_q3": "CORRECT-reject",
+   "r_q4": "CORRECT-reject",
+   "r_q5": "CORRECT-perception",
+   "r_q6": "CORRECT-perception",
+   "r_q7": "CORRECT-reject",
+   "r_q8": "CORRECT-reject",
+   "r_neg1": "CORRECT-reject",
+   "r_neg2": "CORRECT-reject",
+   "r_neg3": "CORRECT-reject",
+   "r_neg4": "CORRECT-reject",
+   "r_neg5": "CORRECT-reject",
+   "r_wait1": "REJECT",
+   "r_wait2": "CORRECT",
+   "r_wait3": "CORRECT",
+   "r_wait4": "routed:emergency",
+   "r_big100": "CORRECT",
+   "r_deg10": "CORRECT",
+   "r_deg135": "CORRECT",
+   "r_z_03": "REJECT-numbers[30.0]",
+   "r_back15": "CORRECT",
+   "r_ord1": "CORRECT",
+   "r_ord2": "CORRECT",
+   "r_ord3": "CORRECT",
+   "r_ord4": "CORRECT",
+   "l_deg_frac": "CORRECT",
+   "l_deg_precise": "CORRECT",
+   "l_half_cw": "CORRECT",
+   "l_dbl_neg": "CORRECT-reject",
+   "l_postpone": "CORRECT-reject",
+   "l_pause_idiom": "CORRECT-reject",
+   "l_combo_tamtin": "CORRECT",
+   "l_fwd_future": "CORRECT",
+   "l_land_going": "CORRECT-reject",
+   "l_pres_pic": "CORRECT-perception",
+   "l_pres_you": "CORRECT-perception",
+   "l_color_near": "CORRECT-perception",
+   "l_tower_count": "CORRECT-perception",
+   "l_lighthouse_count": "CORRECT-perception",
+   "l75_climb8": "CORRECT",
+   "l75_down4_pls": "CORRECT",
+   "l75_left3_back3": "CORRECT",
+   "l75_drive_fwd8": "CORRECT",
+   "l75_move_back9": "CORRECT",
+   "l75_turn20_right": "CORRECT",
+   "l75_turn_left120": "CORRECT",
+   "l75_full_ccw": "CORRECT",
+   "l75_wait8": "CORRECT",
+   "l75_takeoff_up2": "CORRECT",
+   "l75_land_gate": "CORRECT",
+   "l75_rise3_up": "CORRECT",
+   "l75_neg_emphatic": "CORRECT-reject",
+   "l75_q_ability_back": "CORRECT-reject",
+   "l75_q_altitude": "CORRECT-reject",
+   "l75_possible_up5": "CORRECT",
+   "l75_could_right2": "CORRECT",
+   "l75_lets_down2": "CORRECT",
+   "l75_possible_land": "CORRECT",
+   "l75_rise_to6": "CORRECT",
+   "l75_climb_to20": "CORRECT",
+   "l75_turn540": "REJECT-numbers[540.0]",
+   "l75_turn270": "REJECT-numbers[3.0]",
+   "l75_half_left": "CORRECT",
+   "l75_turn_back": "REJECT",
+   "l75_up2_ccw120": "CORRECT",
+   "l75_neg_land_up4": "CORRECT",
+   "l75_neg_fwd_back3": "CORRECT",
+   "l75_q_can_land": "CORRECT-reject",
+   "l75_q_why_not_up": "CORRECT-reject",
+   "l75_hover_stand": "REJECT",
+   "l75_photo_then_back2": "wrong-route(highlight)",
+   "l75_hesitate_up7": "CORRECT",
+   "l75_name_fwd2": "CORRECT",
+   "l75_yalla_land": "CORRECT",
+   "l75_thanks_land": "CORRECT",
+   "l75_return_home": "REJECT",
+   "l75_stay_put": "REJECT",
+   "l75_bit_forward": "valid(open)",
+   "l75_higher": "REJECT",
+   "l75_fast_fwd7": "CORRECT",
+   "l75_slowly_down1": "CORRECT",
+   "l75_do_hover": "REJECT",
+   "l75_forward_latin": "CORRECT",
+   "l75_ten_feet": "valid(open)",
+   "l75_approx_up4": "CORRECT",
+   "l75_gimbal_down": "REJECT",
+   "l75_toward_white_bldg": "wrong-route(describe)",
+   "l75_q_flight_time": "CORRECT-reject",
+   "l75_up4_photo": "CORRECT"
+  },
+  "verbose": {
+   "v_listen3_g0": "CORRECT",
+   "v_listen3_g1": "CORRECT",
+   "v_listen3_g2": "CORRECT",
+   "v_listen3_g3": "CORRECT",
+   "v_finish3_g0": "CORRECT",
+   "v_finish3_g1": "CORRECT",
+   "v_finish3_g2": "CORRECT",
+   "v_finish3_g3": "CORRECT",
+   "v_start4_g0": "CORRECT",
+   "v_start4_g1": "CORRECT",
+   "v_start4_g2": "CORRECT",
+   "v_start4_g3": "wrong-len(3vs4)",
+   "v_okso4_g0": "CORRECT",
+   "v_okso4_g1": "CORRECT",
+   "v_okso4_g2": "CORRECT",
+   "v_okso4_g3": "CORRECT",
+   "v_first3_g0": "CORRECT",
+   "v_first3_g1": "CORRECT",
+   "v_first3_g2": "CORRECT",
+   "v_first3_g3": "CORRECT",
+   "v_favor4_g0": "CORRECT",
+   "v_favor4_g1": "CORRECT",
+   "v_favor4_g2": "CORRECT",
+   "v_favor4_g3": "CORRECT",
+   "v_mission3_g0": "CORRECT",
+   "v_mission3_g1": "CORRECT",
+   "v_mission3_g2": "CORRECT",
+   "v_mission3_g3": "CORRECT",
+   "v_yalla2_g0": "CORRECT",
+   "v_yalla2_g1": "CORRECT",
+   "v_yalla2_g2": "CORRECT",
+   "v_yalla2_g3": "CORRECT",
+   "v_ready3_g0": "CORRECT",
+   "v_ready3_g1": "CORRECT",
+   "v_ready3_g2": "CORRECT",
+   "v_ready3_g3": "CORRECT",
+   "v_seq5_g0": "CORRECT",
+   "v_seq5_g1": "CORRECT",
+   "v_seq5_g2": "CORRECT",
+   "v_seq5_g3": "CORRECT",
+   "v_note3_g0": "CORRECT",
+   "v_note3_g1": "CORRECT",
+   "v_note3_g2": "CORRECT",
+   "v_note3_g3": "CORRECT",
+   "v_round3_g0": "CORRECT",
+   "v_round3_g1": "CORRECT",
+   "v_round3_g2": "CORRECT",
+   "v_round3_g3": "CORRECT",
+   "v_neg1": "CORRECT",
+   "v_neg2": "CORRECT",
+   "v_q1": "CORRECT-reject",
+   "v_q2": "CORRECT-reject",
+   "v_mix1": "CORRECT",
+   "v_mix2": "CORRECT",
+   "l75_v_listen_chain": "CORRECT",
+   "l75_v_yalla_sortie": "CORRECT",
+   "l75_v_if_possible": "CORRECT",
+   "l75_v_slow_chain": "CORRECT",
+   "l75_v_rega_no_wait": "CORRECT",
+   "l75_v_shniya_twice": "wrong-len(4vs2)",
+   "l75_v_self_correct": "REJECT-numbers[5.0]",
+   "l75_v_climb_then_count": "wrong-len(2vs1)",
+   "l75_v_okso_full_turn": "CORRECT"
+  },
+  "perception": {
+   "i_mid_windows": "CORRECT",
+   "i_third_door": "CORRECT",
+   "i_rear_wheel": "CORRECT",
+   "i_top_windows": "CORRECT",
+   "i_roof_corner": "CORRECT",
+   "i_chimney": "CORRECT",
+   "i_back_entrance": "CORRECT",
+   "i_ladder_pickup": "CORRECT",
+   "i_car_by_red": "CORRECT",
+   "i_orange_cap": "CORRECT",
+   "i_door_by_coat": "CORRECT",
+   "i_bike_fence": "CORRECT",
+   "i_dog_by_dress": "CORRECT",
+   "i_kid_bag": "keywords-missed(backpack held by child with gr)",
+   "i_tree_truck": "CORRECT",
+   "i_win_over_door": "CORRECT",
+   "i_cars_by_flag": "CORRECT",
+   "i_bench_trees": "CORRECT",
+   "i_behind_moto": "keywords-missed(vehicle behind the red motorcy)",
+   "i_man_on_roof": "CORRECT",
+   "i_box_by_man": "CORRECT",
+   "i_girl_balloon": "CORRECT",
+   "i_car_between": "keywords-missed(car parked between white truck)",
+   "i_door_by_tree": "CORRECT",
+   "i_sign_awning": "CORRECT",
+   "i_front_tire": "keywords-missed(front tire of the car closest )",
+   "i_bench_fountain": "CORRECT",
+   "i_exit_gray": "CORRECT",
+   "i_second_car": "CORRECT",
+   "i_dark_stain": "CORRECT",
+   "i_glasses_talk": "CORRECT",
+   "i_truck_boat": "CORRECT",
+   "i_empty_chair": "CORRECT",
+   "i_bird_cable": "CORRECT",
+   "i_fence_gap": "CORRECT",
+   "i_main_steps": "CORRECT",
+   "i_helmet_mid": "CORRECT",
+   "i_cat_climb": "CORRECT",
+   "i_lean_silver": "CORRECT",
+   "i_flag_low": "CORRECT",
+   "i_broken_window": "CORRECT",
+   "i_last_convoy": "CORRECT",
+   "i_big_tent": "CORRECT",
+   "i_crane_arm": "CORRECT",
+   "i_boats_pier": "CORRECT",
+   "j_bag_chain": "CORRECT",
+   "j_bird_branch": "CORRECT",
+   "j_kid_ball": "CORRECT",
+   "j_win_gas": "CORRECT",
+   "j_hat_bench": "CORRECT",
+   "j_flag_mast": "keywords-missed(small flag on the railing of t)",
+   "j_sticker": "keywords-missed(sticker on the bumper of the c)",
+   "j_dog_steps": "CORRECT",
+   "j_lock_gate": "CORRECT",
+   "j_helmet_seat": "CORRECT",
+   "j_sign_between": "CORRECT",
+   "j_drainpipe": "CORRECT",
+   "j_umbrella_x": "CORRECT",
+   "j_hole_wall": "keywords-missed(boy on the wall of the old bui)",
+   "j_tilt_sign": "CORRECT",
+   "j_crate_trunk": "CORRECT",
+   "j_mural": "CORRECT",
+   "j_cat_jump": "CORRECT",
+   "j_faucet": "keywords-missed(faucet next to the flower bed )",
+   "j_truck_text": "CORRECT",
+   "j_pin_busstop": "CORRECT",
+   "j_pin_notmoving": "CORRECT",
+   "j_pin_antennas": "CORRECT",
+   "j_pin_drone2": "keywords-missed(smaller drone flying low over )",
+   "j_pin_leash": "CORRECT",
+   "j_pin_window3": "keywords-missed(third window on the second flo)",
+   "j_pin_notphone": "keywords-missed(person closest to the entrance)",
+   "j_pin_2riders": "keywords-missed(black motorcycle with 2 riders)",
+   "j_pin_bluedoor": "CORRECT",
+   "j_pin_smallbike": "keywords-missed(child with red hat riding smal)",
+   "j_pin_roofnear": "CORRECT",
+   "j_pin_leaving": "CORRECT",
+   "j_pin_flagman": "CORRECT",
+   "j_pin_notsail": "keywords-missed(small boat with engine closer )",
+   "j_pin_bushes": "CORRECT",
+   "j_pin_campole": "CORRECT",
+   "j_pin_fastwalk": "CORRECT",
+   "j_pin_planks": "CORRECT",
+   "j_pin_halfgate": "CORRECT",
+   "j_pin_spare": "CORRECT",
+   "j_pin_stage3": "keywords-missed(group of three people closest )",
+   "j_pin_hay": "CORRECT",
+   "j_pin_fullbin": "CORRECT",
+   "j_pin_wirebirds": "keywords-missed(birds sitting on wires above t)",
+   "j_pin_extstairs": "keywords-missed(external stairs leading to the)",
+   "j_pin_wrongway": "CORRECT",
+   "j_pin_firstrun": "keywords-missed(runner with yellow vest)",
+   "j_pin_barrel": "keywords-missed(pot lying on its side, near th)",
+   "j_pin_puddle": "CORRECT",
+   "j_pin_scaffold": "keywords-missed(tallest ladder leaning on the )",
+   "j_pin_idledozer": "CORRECT",
+   "j_pin_cart": "CORRECT",
+   "j_pin_graffiti": "CORRECT",
+   "j_pin_ferris": "keywords-missed(bottom part of the giant wheel)",
+   "j_pin_planters": "keywords-missed(large planters on both sides o)",
+   "lp_white_car": "CORRECT",
+   "lp_nearest_person": "CORRECT",
+   "lp_look_down": "CORRECT",
+   "pq_see_now": "keywords-missed()",
+   "pq_see_frame": "CORRECT",
+   "pq_count_people_see": "CORRECT",
+   "pq_count_cars_see": "keywords-missed(cars)",
+   "pq_see_suspicious": "CORRECT",
+   "pq_count_vehicles_road": "CORRECT",
+   "pq_see_ahead": "keywords-missed()",
+   "pq_count_windows_see": "CORRECT",
+   "pq_any_person": "keywords-missed()",
+   "pq_any_vehicle": "CORRECT",
+   "pq_any_red_car": "CORRECT",
+   "pq_any_roof_person": "keywords-missed(roof)",
+   "pq_any_weapon": "CORRECT",
+   "pq_any_backpack_left": "CORRECT",
+   "pq_any_movement": "keywords-missed(the arena)",
+   "pq_whats_in_frame": "CORRECT",
+   "pq_whats_ahead": "CORRECT",
+   "pq_describe_scene": "CORRECT",
+   "pq_identify_threats": "keywords-missed(potential threats in the area)",
+   "pq_find_people": "keywords-missed(people)",
+   "pq_count_buildings": "keywords-missed(buildings in the arena)",
+   "pq_search_vehicle": "keywords-missed(suspicious vehicle)",
+   "pq_look_ground": "CORRECT",
+   "pq_identify_color": "keywords-missed(closest vehicle color)",
+   "pq_focus_describe": "keywords-missed(closest person)",
+   "p75_open_window_2nd": "CORRECT",
+   "p75_follow_blue_bike": "CORRECT",
+   "p75_count_entrance": "CORRECT",
+   "p75_describe_right": "CORRECT",
+   "p75_all_vehicles": "CORRECT",
+   "p75_purple_bag": "CORRECT",
+   "p75_count_cars_behind_white": "CORRECT",
+   "p75_anyone_armed": "CORRECT",
+   "p75_look_right": "CORRECT",
+   "p75_approach_blue_car": "keywords-missed(blue car)"
+  },
+  "military": {
+   "s_indian_circle": "wrong-route(reject)",
+   "s_sitrep": "wrong-route(reject)",
+   "s_jump_point": "wrong-route(reject)",
+   "s_gentle_scan": "keywords-missed(area)",
+   "s_eye_junction": "keywords-missed(intersection)",
+   "s_zoom_suspect": "keywords-missed(suspicious vehicle)",
+   "s_route_escort": "wrong-route(reject)",
+   "s_dead_ground": "keywords-missed(area behind the hill)",
+   "s_give_distance": "wrong-route(reject)",
+   "s_one_more_pass": "wrong-route(reject)",
+   "s_grid_out": "wrong-route(reject)",
+   "s_roger_over": "wrong-route(reject)",
+   "s_cp_visual": "keywords-missed(command post near the building)",
+   "s_eyes_on": "wrong-route(reject)",
+   "s_rally_point": "wrong-route(reject)",
+   "s_feet_hold": "wrong-route(reject)",
+   "s_lost_uav": "wrong-route(reject)",
+   "s_scramble": "wrong-route(mission)",
+   "s_obs_report": "keywords-missed(white house)",
+   "s_wadi_route": "wrong-route(mission)",
+   "s75_observe_junction": "keywords-missed(intersection)"
+  }
+ },
+ "rows": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_stopstop",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_now",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_emergency",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_all",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_english",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e_game_stop",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e75_two_words",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e75_dai_maspik",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e75_hafsek_hakol",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e75_retracted_stop",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "e75_conditional_stop",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "fwd5",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "spin90cw",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "land",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "combo3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 10
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 5
+      }
+     ]
+    },
+    "t_ms": 1905
+   },
+   {
+    "case": "combo_tl",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 901
+   },
+   {
+    "case": "back2left3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -2
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      }
+     ]
+    },
+    "t_ms": 729
+   },
+   {
+    "case": "ccw45",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "down3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "question",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 380
+   },
+   {
+    "case": "square",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 2,
+       "dy": 2
+      }
+     ]
+    },
+    "t_ms": 620
+   },
+   {
+    "case": "up2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "right4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "left7",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "back10",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "fwd15",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 15
+      }
+     ]
+    },
+    "t_ms": 554
+   },
+   {
+    "case": "spin180cw",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "spin360",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "wait5",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "up_half",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 0.5
+      }
+     ]
+    },
+    "t_ms": 580
+   },
+   {
+    "case": "combo2b",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 633
+   },
+   {
+    "case": "combo4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 4
+      },
+      {
+       "type": "fly_by",
+       "dy": 2
+      },
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -2
+      }
+     ]
+    },
+    "t_ms": 1190
+   },
+   {
+    "case": "combo5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 2
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 3
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 1194
+   },
+   {
+    "case": "digit12",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "digit45deg",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "question2",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "count",
+     "target_en": "people",
+     "mission": []
+    },
+    "t_ms": 390
+   },
+   {
+    "case": "q_land_trap",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 350
+   },
+   {
+    "case": "neg_trap",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "colloq_up",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "land_now",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff_ctx",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 1
+      }
+     ]
+    },
+    "t_ms": 538
+   },
+   {
+    "case": "g_up2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up20",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_up25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -1
+      }
+     ]
+    },
+    "t_ms": 563
+   },
+   {
+    "case": "g_down2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down20",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_down25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 1
+      }
+     ]
+    },
+    "t_ms": 573
+   },
+   {
+    "case": "g_fwd2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 2
+      }
+     ]
+    },
+    "t_ms": 529
+   },
+   {
+    "case": "g_fwd3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 4
+      }
+     ]
+    },
+    "t_ms": 516
+   },
+   {
+    "case": "g_fwd6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd8",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 8
+      }
+     ]
+    },
+    "t_ms": 515
+   },
+   {
+    "case": "g_fwd9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd20",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 20
+      }
+     ]
+    },
+    "t_ms": 537
+   },
+   {
+    "case": "g_fwd25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -1
+      }
+     ]
+    },
+    "t_ms": 528
+   },
+   {
+    "case": "g_back2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back20",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_back25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 1
+      }
+     ]
+    },
+    "t_ms": 525
+   },
+   {
+    "case": "g_right2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right20",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_right25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": -1,
+       "velocity": 1
+      }
+     ]
+    },
+    "t_ms": 628
+   },
+   {
+    "case": "g_left2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left3",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left4",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left6",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left20",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_left25",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw30",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw30",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw60",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw60",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw120",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw120",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw270",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw270",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait2",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait10",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 1
+      },
+      {
+       "type": "fly_by",
+       "dz": 20
+      }
+     ]
+    },
+    "t_ms": 797
+   },
+   {
+    "case": "g_combo2_1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      },
+      {
+       "type": "fly_by",
+       "dz": -4
+      }
+     ]
+    },
+    "t_ms": 785
+   },
+   {
+    "case": "g_combo2_2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 9
+      },
+      {
+       "type": "fly_by",
+       "dz": -25
+      }
+     ]
+    },
+    "t_ms": 813
+   },
+   {
+    "case": "g_combo2_3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -1
+      },
+      {
+       "type": "fly_by",
+       "dx": 6
+      }
+     ]
+    },
+    "t_ms": 764
+   },
+   {
+    "case": "g_combo2_4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -4
+      },
+      {
+       "type": "fly_by",
+       "dx": -1
+      }
+     ]
+    },
+    "t_ms": 739
+   },
+   {
+    "case": "g_combo2_5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -9
+      },
+      {
+       "type": "fly_by",
+       "dx": -8
+      }
+     ]
+    },
+    "t_ms": 727
+   },
+   {
+    "case": "g_combo2_6",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 1
+      },
+      {
+       "type": "fly_by",
+       "dy": 2
+      }
+     ]
+    },
+    "t_ms": 737
+   },
+   {
+    "case": "g_combo2_7",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 4
+      },
+      {
+       "type": "fly_by",
+       "dy": 9
+      }
+     ]
+    },
+    "t_ms": 787
+   },
+   {
+    "case": "g_combo3_0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 1
+      },
+      {
+       "type": "fly_by",
+       "dz": 4
+      },
+      {
+       "type": "fly_by",
+       "dz": 8
+      }
+     ]
+    },
+    "t_ms": 939
+   },
+   {
+    "case": "g_combo3_1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "fly_by",
+       "dz": -8
+      },
+      {
+       "type": "fly_by",
+       "dx": 1
+      }
+     ]
+    },
+    "t_ms": 956
+   },
+   {
+    "case": "g_combo3_2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -8
+      },
+      {
+       "type": "fly_by",
+       "dx": 20
+      },
+      {
+       "type": "fly_by",
+       "dx": -6
+      }
+     ]
+    },
+    "t_ms": 977
+   },
+   {
+    "case": "g_combo3_3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 4
+      },
+      {
+       "type": "fly_by",
+       "dy": 1
+      },
+      {
+       "type": "fly_by",
+       "dy": 25
+      }
+     ]
+    },
+    "t_ms": 952
+   },
+   {
+    "case": "r_takeoff1",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 412
+   },
+   {
+    "case": "r_takeoff3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 379
+   },
+   {
+    "case": "r_takeoff4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 428
+   },
+   {
+    "case": "r_takeoff5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 423
+   },
+   {
+    "case": "r_land1",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_land2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 406
+   },
+   {
+    "case": "r_land3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 402
+   },
+   {
+    "case": "r_land4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 407
+   },
+   {
+    "case": "r_land5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 457
+   },
+   {
+    "case": "r_pol_up5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 5
+      }
+     ]
+    },
+    "t_ms": 569
+   },
+   {
+    "case": "r_pol_fwd3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 3
+      }
+     ]
+    },
+    "t_ms": 524
+   },
+   {
+    "case": "r_pol_left2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": -2
+      }
+     ]
+    },
+    "t_ms": 529
+   },
+   {
+    "case": "r_pol_down1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -1
+      }
+     ]
+    },
+    "t_ms": 521
+   },
+   {
+    "case": "r_pol_spin",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 542
+   },
+   {
+    "case": "r_fill1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 3
+      }
+     ]
+    },
+    "t_ms": 522
+   },
+   {
+    "case": "r_fill2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      }
+     ]
+    },
+    "t_ms": 525
+   },
+   {
+    "case": "r_fill3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -2
+      }
+     ]
+    },
+    "t_ms": 524
+   },
+   {
+    "case": "r_fill4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 2
+      }
+     ]
+    },
+    "t_ms": 560
+   },
+   {
+    "case": "r_fill5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 3
+      }
+     ]
+    },
+    "t_ms": 525
+   },
+   {
+    "case": "r_alt10",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 10
+      }
+     ]
+    },
+    "t_ms": 535
+   },
+   {
+    "case": "r_alt20",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      }
+     ]
+    },
+    "t_ms": 540
+   },
+   {
+    "case": "r_low",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 525
+   },
+   {
+    "case": "r_rise3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 529
+   },
+   {
+    "case": "r_updown",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_left",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": -1
+      }
+     ]
+    },
+    "t_ms": 555
+   },
+   {
+    "case": "r_bit_up",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 1
+      }
+     ]
+    },
+    "t_ms": 517
+   },
+   {
+    "case": "r_bit_back",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -1
+      }
+     ]
+    },
+    "t_ms": 520
+   },
+   {
+    "case": "r_higher",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 363
+   },
+   {
+    "case": "r_bit_fwd",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 1
+      }
+     ]
+    },
+    "t_ms": 564
+   },
+   {
+    "case": "r_turn_r90",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 588
+   },
+   {
+    "case": "r_turn_l45",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -45
+      }
+     ]
+    },
+    "t_ms": 540
+   },
+   {
+    "case": "r_half_turn",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 180
+      }
+     ]
+    },
+    "t_ms": 559
+   },
+   {
+    "case": "r_quart_r",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 540
+   },
+   {
+    "case": "r_full",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 360
+      }
+     ]
+    },
+    "t_ms": 553
+   },
+   {
+    "case": "r_around",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 344
+   },
+   {
+    "case": "r_num_first",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 30
+      }
+     ]
+    },
+    "t_ms": 560
+   },
+   {
+    "case": "r_m_half",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 1.5
+      }
+     ]
+    },
+    "t_ms": 596
+   },
+   {
+    "case": "r_2_half",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 2.5
+      }
+     ]
+    },
+    "t_ms": 588
+   },
+   {
+    "case": "r_digit50",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_digit7",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 7
+      }
+     ]
+    },
+    "t_ms": 524
+   },
+   {
+    "case": "r_meter1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 1
+      }
+     ]
+    },
+    "t_ms": 521
+   },
+   {
+    "case": "r_mis1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      }
+     ]
+    },
+    "t_ms": 623
+   },
+   {
+    "case": "r_mis2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 631
+   },
+   {
+    "case": "r_mis3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 3
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      }
+     ]
+    },
+    "t_ms": 740
+   },
+   {
+    "case": "r_mis4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "delay",
+       "seconds": 2
+      },
+      {
+       "type": "fly_by",
+       "dz": -5
+      }
+     ]
+    },
+    "t_ms": 973
+   },
+   {
+    "case": "r_mis5",
+    "score": "wrong-x(-10vs10)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dx": 10
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dx": -10
+      }
+     ]
+    },
+    "t_ms": 1147
+   },
+   {
+    "case": "r_mis6",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 2
+      },
+      {
+       "type": "fly_by",
+       "dz": 2
+      },
+      {
+       "type": "fly_by",
+       "dx": -2
+      }
+     ]
+    },
+    "t_ms": 992
+   },
+   {
+    "case": "r_mis7",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 10
+      },
+      {
+       "type": "spin_by",
+       "degrees": 360
+      }
+     ]
+    },
+    "t_ms": 794
+   },
+   {
+    "case": "r_mis8",
+    "score": "wrong-len(1vs2)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -5,
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 671
+   },
+   {
+    "case": "r_mis9",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 563
+   },
+   {
+    "case": "r_mis10",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 2
+      },
+      {
+       "type": "fly_by",
+       "dy": 4
+      },
+      {
+       "type": "fly_by",
+       "dy": -4
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 1151
+   },
+   {
+    "case": "r_dis1",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "house",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 5
+      }
+     ]
+    },
+    "t_ms": 558
+   },
+   {
+    "case": "r_dis2",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      },
+      {
+       "type": "fly_by",
+       "dx": 0,
+       "dy": 0,
+       "dz": 0
+      }
+     ]
+    },
+    "t_ms": 1003
+   },
+   {
+    "case": "r_dis3",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 463
+   },
+   {
+    "case": "r_dis4",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 2
+      }
+     ]
+    },
+    "t_ms": 567
+   },
+   {
+    "case": "r_q1",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 363
+   },
+   {
+    "case": "r_q2",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 363
+   },
+   {
+    "case": "r_q3",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 358
+   },
+   {
+    "case": "r_q4",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 344
+   },
+   {
+    "case": "r_q5",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 339
+   },
+   {
+    "case": "r_q6",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 332
+   },
+   {
+    "case": "r_q7",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 348
+   },
+   {
+    "case": "r_q8",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 347
+   },
+   {
+    "case": "r_neg1",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg2",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg3",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg4",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg5",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_wait1",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 339
+   },
+   {
+    "case": "r_wait2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "delay",
+       "seconds": 1
+      }
+     ]
+    },
+    "t_ms": 474
+   },
+   {
+    "case": "r_wait3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "delay",
+       "seconds": 5
+      },
+      {
+       "type": "fly_by",
+       "dz": -1
+      }
+     ]
+    },
+    "t_ms": 692
+   },
+   {
+    "case": "r_wait4",
+    "score": "routed:emergency",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_big100",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_deg10",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 10
+      }
+     ]
+    },
+    "t_ms": 533
+   },
+   {
+    "case": "r_deg135",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -135
+      }
+     ]
+    },
+    "t_ms": 552
+   },
+   {
+    "case": "r_z_03",
+    "score": "REJECT-numbers[30.0]",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 0.3
+      }
+     ]
+    },
+    "t_ms": 558
+   },
+   {
+    "case": "r_back15",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 5
+      }
+     ]
+    },
+    "t_ms": 529
+   },
+   {
+    "case": "r_ord2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 2
+      }
+     ]
+    },
+    "t_ms": 570
+   },
+   {
+    "case": "r_ord3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 562
+   },
+   {
+    "case": "r_ord4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -1
+      }
+     ]
+    },
+    "t_ms": 508
+   },
+   {
+    "case": "l_deg_frac",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -74.5
+      }
+     ]
+    },
+    "t_ms": 566
+   },
+   {
+    "case": "l_deg_precise",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -174.235
+      }
+     ]
+    },
+    "t_ms": 604
+   },
+   {
+    "case": "l_half_cw",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 180
+      }
+     ]
+    },
+    "t_ms": 542
+   },
+   {
+    "case": "l_dbl_neg",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l_postpone",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 347
+   },
+   {
+    "case": "l_pause_idiom",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 436
+   },
+   {
+    "case": "l_combo_tamtin",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 1023
+   },
+   {
+    "case": "l_fwd_future",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 15
+      }
+     ]
+    },
+    "t_ms": 552
+   },
+   {
+    "case": "l_land_going",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 368
+   },
+   {
+    "case": "l_pres_pic",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 353
+   },
+   {
+    "case": "l_pres_you",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 362
+   },
+   {
+    "case": "l_color_near",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "closest car",
+     "mission": []
+    },
+    "t_ms": 429
+   },
+   {
+    "case": "l_tower_count",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "tower",
+     "mission": []
+    },
+    "t_ms": 398
+   },
+   {
+    "case": "l_lighthouse_count",
+    "score": "CORRECT-perception",
+    "obj": {
+     "kind": "describe",
+     "target_en": "lighthouse",
+     "mission": []
+    },
+    "t_ms": 405
+   },
+   {
+    "case": "l75_climb8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l75_down4_pls",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -4
+      }
+     ]
+    },
+    "t_ms": 582
+   },
+   {
+    "case": "l75_left3_back3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dy": 3
+      }
+     ]
+    },
+    "t_ms": 806
+   },
+   {
+    "case": "l75_drive_fwd8",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 8
+      }
+     ]
+    },
+    "t_ms": 583
+   },
+   {
+    "case": "l75_move_back9",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn20_right",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 20
+      }
+     ]
+    },
+    "t_ms": 600
+   },
+   {
+    "case": "l75_turn_left120",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l75_full_ccw",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -360
+      }
+     ]
+    },
+    "t_ms": 601
+   },
+   {
+    "case": "l75_wait8",
+    "score": "CORRECT",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l75_takeoff_up2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 2
+      }
+     ]
+    },
+    "t_ms": 639
+   },
+   {
+    "case": "l75_land_gate",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "near the gate",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 484
+   },
+   {
+    "case": "l75_rise3_up",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 537
+   },
+   {
+    "case": "l75_neg_emphatic",
+    "score": "CORRECT-reject",
+    "obj": null,
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_ability_back",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 350
+   },
+   {
+    "case": "l75_q_altitude",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 352
+   },
+   {
+    "case": "l75_possible_up5",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 5
+      }
+     ]
+    },
+    "t_ms": 564
+   },
+   {
+    "case": "l75_could_right2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dy": 2
+      }
+     ]
+    },
+    "t_ms": 531
+   },
+   {
+    "case": "l75_lets_down2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 521
+   },
+   {
+    "case": "l75_possible_land",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 419
+   },
+   {
+    "case": "l75_rise_to6",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 6
+      }
+     ]
+    },
+    "t_ms": 557
+   },
+   {
+    "case": "l75_climb_to20",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      }
+     ]
+    },
+    "t_ms": 546
+   },
+   {
+    "case": "l75_turn540",
+    "score": "REJECT-numbers[540.0]",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 180
+      }
+     ]
+    },
+    "t_ms": 550
+   },
+   {
+    "case": "l75_turn270",
+    "score": "REJECT-numbers[3.0]",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 270
+      }
+     ]
+    },
+    "t_ms": 592
+   },
+   {
+    "case": "l75_half_left",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": -180
+      }
+     ]
+    },
+    "t_ms": 587
+   },
+   {
+    "case": "l75_turn_back",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 342
+   },
+   {
+    "case": "l75_up2_ccw120",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 2
+      },
+      {
+       "type": "spin_by",
+       "degrees": -120
+      }
+     ]
+    },
+    "t_ms": 772
+   },
+   {
+    "case": "l75_neg_land_up4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      }
+     ]
+    },
+    "t_ms": 530
+   },
+   {
+    "case": "l75_neg_fwd_back3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -3
+      }
+     ]
+    },
+    "t_ms": 566
+   },
+   {
+    "case": "l75_q_can_land",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 389
+   },
+   {
+    "case": "l75_q_why_not_up",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 361
+   },
+   {
+    "case": "l75_hover_stand",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 369
+   },
+   {
+    "case": "l75_photo_then_back2",
+    "score": "wrong-route(highlight)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "red car",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -2
+      }
+     ]
+    },
+    "t_ms": 567
+   },
+   {
+    "case": "l75_hesitate_up7",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 7
+      }
+     ]
+    },
+    "t_ms": 516
+   },
+   {
+    "case": "l75_name_fwd2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 2
+      }
+     ]
+    },
+    "t_ms": 510
+   },
+   {
+    "case": "l75_yalla_land",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 405
+   },
+   {
+    "case": "l75_thanks_land",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 416
+   },
+   {
+    "case": "l75_return_home",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 343
+   },
+   {
+    "case": "l75_stay_put",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 360
+   },
+   {
+    "case": "l75_bit_forward",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 1
+      }
+     ]
+    },
+    "t_ms": 562
+   },
+   {
+    "case": "l75_higher",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 348
+   },
+   {
+    "case": "l75_fast_fwd7",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 7,
+       "velocity": 6
+      }
+     ]
+    },
+    "t_ms": 660
+   },
+   {
+    "case": "l75_slowly_down1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -1
+      }
+     ]
+    },
+    "t_ms": 561
+   },
+   {
+    "case": "l75_do_hover",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 333
+   },
+   {
+    "case": "l75_forward_latin",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 2
+      }
+     ]
+    },
+    "t_ms": 528
+   },
+   {
+    "case": "l75_ten_feet",
+    "score": "valid(open)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 10
+      }
+     ]
+    },
+    "t_ms": 534
+   },
+   {
+    "case": "l75_approx_up4",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      }
+     ]
+    },
+    "t_ms": 520
+   },
+   {
+    "case": "l75_gimbal_down",
+    "score": "REJECT",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 347
+   },
+   {
+    "case": "l75_toward_white_bldg",
+    "score": "wrong-route(describe)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "white building",
+     "mission": []
+    },
+    "t_ms": 400
+   },
+   {
+    "case": "l75_q_flight_time",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 374
+   },
+   {
+    "case": "l75_up4_photo",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      }
+     ]
+    },
+    "t_ms": 566
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 931
+   },
+   {
+    "case": "v_listen3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 1044
+   },
+   {
+    "case": "v_listen3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 930
+   },
+   {
+    "case": "v_listen3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 989
+   },
+   {
+    "case": "v_finish3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 896
+   },
+   {
+    "case": "v_finish3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 1080
+   },
+   {
+    "case": "v_finish3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 999
+   },
+   {
+    "case": "v_finish3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 986
+   },
+   {
+    "case": "v_start4_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 10
+      }
+     ]
+    },
+    "t_ms": 1120
+   },
+   {
+    "case": "v_start4_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      }
+     ]
+    },
+    "t_ms": 1194
+   },
+   {
+    "case": "v_start4_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      },
+      {
+       "type": "spin_by",
+       "degrees": -30
+      }
+     ]
+    },
+    "t_ms": 1168
+   },
+   {
+    "case": "v_start4_g3",
+    "score": "wrong-len(3vs4)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6,
+       "dz": 15
+      }
+     ]
+    },
+    "t_ms": 1098
+   },
+   {
+    "case": "v_okso4_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 10
+      }
+     ]
+    },
+    "t_ms": 1076
+   },
+   {
+    "case": "v_okso4_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      }
+     ]
+    },
+    "t_ms": 1193
+   },
+   {
+    "case": "v_okso4_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      },
+      {
+       "type": "spin_by",
+       "degrees": -30
+      }
+     ]
+    },
+    "t_ms": 1156
+   },
+   {
+    "case": "v_okso4_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      },
+      {
+       "type": "fly_by",
+       "dz": 15
+      }
+     ]
+    },
+    "t_ms": 1199
+   },
+   {
+    "case": "v_first3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 878
+   },
+   {
+    "case": "v_first3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 985
+   },
+   {
+    "case": "v_first3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 952
+   },
+   {
+    "case": "v_first3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 968
+   },
+   {
+    "case": "v_favor4_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 10
+      }
+     ]
+    },
+    "t_ms": 1098
+   },
+   {
+    "case": "v_favor4_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      }
+     ]
+    },
+    "t_ms": 1197
+   },
+   {
+    "case": "v_favor4_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      },
+      {
+       "type": "spin_by",
+       "degrees": -30
+      }
+     ]
+    },
+    "t_ms": 1224
+   },
+   {
+    "case": "v_favor4_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      },
+      {
+       "type": "fly_by",
+       "dz": 15
+      }
+     ]
+    },
+    "t_ms": 1190
+   },
+   {
+    "case": "v_mission3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 889
+   },
+   {
+    "case": "v_mission3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 1032
+   },
+   {
+    "case": "v_mission3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 962
+   },
+   {
+    "case": "v_mission3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 990
+   },
+   {
+    "case": "v_yalla2_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      }
+     ]
+    },
+    "t_ms": 629
+   },
+   {
+    "case": "v_yalla2_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      }
+     ]
+    },
+    "t_ms": 779
+   },
+   {
+    "case": "v_yalla2_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      }
+     ]
+    },
+    "t_ms": 775
+   },
+   {
+    "case": "v_yalla2_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      }
+     ]
+    },
+    "t_ms": 844
+   },
+   {
+    "case": "v_ready3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 904
+   },
+   {
+    "case": "v_ready3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 993
+   },
+   {
+    "case": "v_ready3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 1006
+   },
+   {
+    "case": "v_ready3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 1014
+   },
+   {
+    "case": "v_seq5_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 10
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 1253
+   },
+   {
+    "case": "v_seq5_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      },
+      {
+       "type": "delay",
+       "seconds": 3
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 1264
+   },
+   {
+    "case": "v_seq5_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      },
+      {
+       "type": "spin_by",
+       "degrees": -30
+      },
+      {
+       "type": "delay",
+       "seconds": 5
+      }
+     ]
+    },
+    "t_ms": 1381
+   },
+   {
+    "case": "v_seq5_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      },
+      {
+       "type": "fly_by",
+       "dz": 15
+      },
+      {
+       "type": "fly_by",
+       "dz": -8
+      }
+     ]
+    },
+    "t_ms": 1431
+   },
+   {
+    "case": "v_note3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 920
+   },
+   {
+    "case": "v_note3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12,
+       "velocity": 1
+      }
+     ]
+    },
+    "t_ms": 1100
+   },
+   {
+    "case": "v_note3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 944
+   },
+   {
+    "case": "v_note3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6,
+       "velocity": 0.5
+      }
+     ]
+    },
+    "t_ms": 1106
+   },
+   {
+    "case": "v_round3_g0",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 5
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 880
+   },
+   {
+    "case": "v_round3_g1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      },
+      {
+       "type": "spin_by",
+       "degrees": 45
+      },
+      {
+       "type": "fly_by",
+       "dx": 12
+      }
+     ]
+    },
+    "t_ms": 978
+   },
+   {
+    "case": "v_round3_g2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": -4
+      },
+      {
+       "type": "fly_by",
+       "dy": -3
+      },
+      {
+       "type": "fly_by",
+       "dz": -2
+      }
+     ]
+    },
+    "t_ms": 976
+   },
+   {
+    "case": "v_round3_g3",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 25
+      },
+      {
+       "type": "spin_by",
+       "degrees": 180
+      },
+      {
+       "type": "fly_by",
+       "dy": 6
+      }
+     ]
+    },
+    "t_ms": 979
+   },
+   {
+    "case": "v_neg1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 5
+      }
+     ]
+    },
+    "t_ms": 518
+   },
+   {
+    "case": "v_neg2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dx": 10
+      }
+     ]
+    },
+    "t_ms": 550
+   },
+   {
+    "case": "v_q1",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 350
+   },
+   {
+    "case": "v_q2",
+    "score": "CORRECT-reject",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 365
+   },
+   {
+    "case": "v_mix1",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 20
+      }
+     ]
+    },
+    "t_ms": 582
+   },
+   {
+    "case": "v_mix2",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "spin_by",
+       "degrees": 90
+      },
+      {
+       "type": "fly_by",
+       "dx": 5
+      }
+     ]
+    },
+    "t_ms": 748
+   },
+   {
+    "case": "l75_v_listen_chain",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -2
+      },
+      {
+       "type": "fly_by",
+       "dy": 5
+      },
+      {
+       "type": "delay",
+       "seconds": 4
+      }
+     ]
+    },
+    "t_ms": 907
+   },
+   {
+    "case": "l75_v_yalla_sortie",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dx": 8
+      },
+      {
+       "type": "land"
+      }
+     ]
+    },
+    "t_ms": 738
+   },
+   {
+    "case": "l75_v_if_possible",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 6
+      },
+      {
+       "type": "spin_by",
+       "degrees": 90
+      }
+     ]
+    },
+    "t_ms": 790
+   },
+   {
+    "case": "l75_v_slow_chain",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -3
+      },
+      {
+       "type": "fly_by",
+       "dx": -2
+      }
+     ]
+    },
+    "t_ms": 728
+   },
+   {
+    "case": "l75_v_rega_no_wait",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 4
+      },
+      {
+       "type": "spin_by",
+       "degrees": -90
+      }
+     ]
+    },
+    "t_ms": 745
+   },
+   {
+    "case": "l75_v_shniya_twice",
+    "score": "wrong-len(4vs2)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "delay",
+       "seconds": 1
+      },
+      {
+       "type": "fly_by",
+       "dz": 3
+      },
+      {
+       "type": "delay",
+       "seconds": 1
+      },
+      {
+       "type": "fly_by",
+       "dz": -1
+      }
+     ]
+    },
+    "t_ms": 1072
+   },
+   {
+    "case": "l75_v_self_correct",
+    "score": "REJECT-numbers[5.0]",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      }
+     ]
+    },
+    "t_ms": 506
+   },
+   {
+    "case": "l75_v_climb_then_count",
+    "score": "wrong-len(2vs1)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": 3
+      },
+      {
+       "type": "delay",
+       "seconds": 0
+      }
+     ]
+    },
+    "t_ms": 770
+   },
+   {
+    "case": "l75_v_okso_full_turn",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      },
+      {
+       "type": "fly_by",
+       "dz": 2
+      },
+      {
+       "type": "spin_by",
+       "degrees": 360
+      }
+     ]
+    },
+    "t_ms": 843
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "middle windows of the rightmost building",
+     "mission": []
+    },
+    "t_ms": 482
+   },
+   {
+    "case": "i_third_door",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "front door of the third house on the left",
+     "mission": []
+    },
+    "t_ms": 507
+   },
+   {
+    "case": "i_rear_wheel",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "rear wheel of the parked motorcycle",
+     "mission": []
+    },
+    "t_ms": 453
+   },
+   {
+    "case": "i_top_windows",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "windows on the top floor of the building",
+     "mission": []
+    },
+    "t_ms": 488
+   },
+   {
+    "case": "i_roof_corner",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "upper left corner of the red roof",
+     "mission": []
+    },
+    "t_ms": 475
+   },
+   {
+    "case": "i_chimney",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "chimney of the lowest house on the street",
+     "mission": []
+    },
+    "t_ms": 496
+   },
+   {
+    "case": "i_back_entrance",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "back entrance of the large warehouse",
+     "mission": []
+    },
+    "t_ms": 485
+   },
+   {
+    "case": "i_ladder_pickup",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "ladder on the roof of the white pickup truck",
+     "mission": []
+    },
+    "t_ms": 504
+   },
+   {
+    "case": "i_car_by_red",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "car next to person in red outfit",
+     "mission": []
+    },
+    "t_ms": 493
+   },
+   {
+    "case": "i_orange_cap",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "person with the orange hat",
+     "mission": []
+    },
+    "t_ms": 461
+   },
+   {
+    "case": "i_door_by_coat",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "door next to the man with the black coat",
+     "mission": []
+    },
+    "t_ms": 527
+   },
+   {
+    "case": "i_bike_fence",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bicycles leaning on the fence of the yellow house",
+     "mission": []
+    },
+    "t_ms": 548
+   },
+   {
+    "case": "i_dog_by_dress",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "dog walking next to the woman with the white dress",
+     "mission": []
+    },
+    "t_ms": 553
+   },
+   {
+    "case": "i_kid_bag",
+    "score": "keywords-missed(backpack held by child with gr)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "backpack held by child with green shirt",
+     "mission": []
+    },
+    "t_ms": 506
+   },
+   {
+    "case": "i_tree_truck",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "tree behind the yellow truck",
+     "mission": []
+    },
+    "t_ms": 466
+   },
+   {
+    "case": "i_win_over_door",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "window above the blue door",
+     "mission": []
+    },
+    "t_ms": 466
+   },
+   {
+    "case": "i_cars_by_flag",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "cars parked in front of the building with the flag",
+     "mission": []
+    },
+    "t_ms": 559
+   },
+   {
+    "case": "i_bench_trees",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bench between two tall trees",
+     "mission": []
+    },
+    "t_ms": 481
+   },
+   {
+    "case": "i_behind_moto",
+    "score": "keywords-missed(vehicle behind the red motorcy)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "vehicle behind the red motorcycle",
+     "mission": []
+    },
+    "t_ms": 475
+   },
+   {
+    "case": "i_man_on_roof",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "person standing on the roof of the white building",
+     "mission": []
+    },
+    "t_ms": 547
+   },
+   {
+    "case": "i_box_by_man",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "box next to the person standing on the roof of the white building",
+     "mission": []
+    },
+    "t_ms": 609
+   },
+   {
+    "case": "i_girl_balloon",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "girl with balloon walking near woman with stroller",
+     "mission": []
+    },
+    "t_ms": 486
+   },
+   {
+    "case": "i_car_between",
+    "score": "keywords-missed(car parked between white truck)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "car parked between white truck and red truck",
+     "mission": []
+    },
+    "t_ms": 493
+   },
+   {
+    "case": "i_door_by_tree",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "door of the house in front of the tallest tree",
+     "mission": []
+    },
+    "t_ms": 515
+   },
+   {
+    "case": "i_sign_awning",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "sign above the store entrance with the green awning",
+     "mission": []
+    },
+    "t_ms": 509
+   },
+   {
+    "case": "i_front_tire",
+    "score": "keywords-missed(front tire of the car closest )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "front tire of the car closest to the gate",
+     "mission": []
+    },
+    "t_ms": 533
+   },
+   {
+    "case": "i_bench_fountain",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "people sitting on benches to the left of the fountain",
+     "mission": []
+    },
+    "t_ms": 557
+   },
+   {
+    "case": "i_exit_gray",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "person who exited the door of the gray building",
+     "mission": []
+    },
+    "t_ms": 537
+   },
+   {
+    "case": "i_second_car",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "second vehicle on the left in the front row of the parking lot",
+     "mission": []
+    },
+    "t_ms": 599
+   },
+   {
+    "case": "i_dark_stain",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "dark spot on the wall to the right of the large window",
+     "mission": []
+    },
+    "t_ms": 591
+   },
+   {
+    "case": "i_glasses_talk",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "man with glasses talking to woman in yellow shirt",
+     "mission": []
+    },
+    "t_ms": 538
+   },
+   {
+    "case": "i_truck_boat",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "truck towing white boat",
+     "mission": []
+    },
+    "t_ms": 423
+   },
+   {
+    "case": "i_empty_chair",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "empty chair near the round table",
+     "mission": []
+    },
+    "t_ms": 449
+   },
+   {
+    "case": "i_bird_cable",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bird sitting on the cable between the two poles",
+     "mission": []
+    },
+    "t_ms": 492
+   },
+   {
+    "case": "i_fence_gap",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "opening in the fence behind the blue container",
+     "mission": []
+    },
+    "t_ms": 480
+   },
+   {
+    "case": "i_main_steps",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "stairs at the main entrance of the tall building",
+     "mission": []
+    },
+    "t_ms": 500
+   },
+   {
+    "case": "i_helmet_mid",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "rider with yellow helmet in the center of the group",
+     "mission": []
+    },
+    "t_ms": 545
+   },
+   {
+    "case": "i_cat_climb",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "cat climbing the tree near the wall",
+     "mission": []
+    },
+    "t_ms": 475
+   },
+   {
+    "case": "i_lean_silver",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "guy leaning on the silver car",
+     "mission": []
+    },
+    "t_ms": 457
+   },
+   {
+    "case": "i_flag_low",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "flag waving above the roof of the low building",
+     "mission": []
+    },
+    "t_ms": 508
+   },
+   {
+    "case": "i_broken_window",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "broken window on the ground floor of the abandoned building",
+     "mission": []
+    },
+    "t_ms": 517
+   },
+   {
+    "case": "i_last_convoy",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "last car in the convoy",
+     "mission": []
+    },
+    "t_ms": 468
+   },
+   {
+    "case": "i_big_tent",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "largest tent at the edge of the field",
+     "mission": []
+    },
+    "t_ms": 511
+   },
+   {
+    "case": "i_crane_arm",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "arm of the crane above the construction site",
+     "mission": []
+    },
+    "t_ms": 530
+   },
+   {
+    "case": "i_boats_pier",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "boats tied to the north pier",
+     "mission": []
+    },
+    "t_ms": 483
+   },
+   {
+    "case": "j_bag_chain",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bag placed next to the chair behind the shop counter with the blue awning",
+     "mission": []
+    },
+    "t_ms": 617
+   },
+   {
+    "case": "j_bird_branch",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bird on the branch of the tree near the entrance to the gray building",
+     "mission": []
+    },
+    "t_ms": 586
+   },
+   {
+    "case": "j_kid_ball",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "child with ball running near the field fence behind the school",
+     "mission": []
+    },
+    "t_ms": 527
+   },
+   {
+    "case": "j_win_gas",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "broken window on the second floor of the house across from the gas station",
+     "mission": []
+    },
+    "t_ms": 567
+   },
+   {
+    "case": "j_hat_bench",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "hat fallen near the bench under the big tree in the park corner",
+     "mission": []
+    },
+    "t_ms": 564
+   },
+   {
+    "case": "j_flag_mast",
+    "score": "keywords-missed(small flag on the railing of t)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "small flag on the railing of the ship connected to the southern dock",
+     "mission": []
+    },
+    "t_ms": 585
+   },
+   {
+    "case": "j_sticker",
+    "score": "keywords-missed(sticker on the bumper of the c)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "sticker on the bumper of the car behind the green truck",
+     "mission": []
+    },
+    "t_ms": 560
+   },
+   {
+    "case": "j_dog_steps",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "small dog playing near the girl sitting on the steps of the white house",
+     "mission": []
+    },
+    "t_ms": 573
+   },
+   {
+    "case": "j_lock_gate",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "lock on the gate of the fence surrounding the empty field",
+     "mission": []
+    },
+    "t_ms": 526
+   },
+   {
+    "case": "j_helmet_seat",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "helmet on the motorcycle seat near the parking entrance",
+     "mission": []
+    },
+    "t_ms": 499
+   },
+   {
+    "case": "j_sign_between",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "small sign above the shop door between the restaurant and the bank",
+     "mission": []
+    },
+    "t_ms": 585
+   },
+   {
+    "case": "j_drainpipe",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "pipe coming down from the roof of the house near the tall utility pole",
+     "mission": []
+    },
+    "t_ms": 621
+   },
+   {
+    "case": "j_umbrella_x",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "woman with red umbrella crossing the street near the traffic light",
+     "mission": []
+    },
+    "t_ms": 536
+   },
+   {
+    "case": "j_hole_wall",
+    "score": "keywords-missed(boy on the wall of the old bui)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "boy on the wall of the old building behind the parking lot",
+     "mission": []
+    },
+    "t_ms": 548
+   },
+   {
+    "case": "j_tilt_sign",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "sign leaning to the side near the turn to the street with trees",
+     "mission": []
+    },
+    "t_ms": 564
+   },
+   {
+    "case": "j_crate_trunk",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "box sticking out of the trunk of the car parked in front of the yellow gate",
+     "mission": []
+    },
+    "t_ms": 639
+   },
+   {
+    "case": "j_mural",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "painting on the building wall to the right of the pedestrian bridge",
+     "mission": []
+    },
+    "t_ms": 578
+   },
+   {
+    "case": "j_cat_jump",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "cat jumping from the fence to the roof of the shed in the backyard",
+     "mission": []
+    },
+    "t_ms": 568
+   },
+   {
+    "case": "j_faucet",
+    "score": "keywords-missed(faucet next to the flower bed )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "faucet next to the flower bed with red flowers",
+     "mission": []
+    },
+    "t_ms": 550
+   },
+   {
+    "case": "j_truck_text",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "writing on the side of the truck stopping near the covered bus stop",
+     "mission": []
+    },
+    "t_ms": 562
+   },
+   {
+    "case": "j_pin_busstop",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "man in blue shirt standing near the bus stop on the left side of the screen near the bench",
+     "mission": []
+    },
+    "t_ms": 639
+   },
+   {
+    "case": "j_pin_notmoving",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "white car parked by the curb with open door",
+     "mission": []
+    },
+    "t_ms": 497
+   },
+   {
+    "case": "j_pin_antennas",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "tall building with antennas on the roof behind the playground, slightly to the right of the center",
+     "mission": []
+    },
+    "t_ms": 648
+   },
+   {
+    "case": "j_pin_drone2",
+    "score": "keywords-missed(smaller drone flying low over )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "smaller drone flying low over the field near the tree line",
+     "mission": []
+    },
+    "t_ms": 562
+   },
+   {
+    "case": "j_pin_leash",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "brown dog with red leash playing on the grass between the two benches near the path",
+     "mission": []
+    },
+    "t_ms": 643
+   },
+   {
+    "case": "j_pin_window3",
+    "score": "keywords-missed(third window on the second flo)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "third window on the second floor of the yellow building near the cafe",
+     "mission": []
+    },
+    "t_ms": 588
+   },
+   {
+    "case": "j_pin_notphone",
+    "score": "keywords-missed(person closest to the entrance)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "person closest to the entrance with the large bag",
+     "mission": []
+    },
+    "t_ms": 535
+   },
+   {
+    "case": "j_pin_2riders",
+    "score": "keywords-missed(black motorcycle with 2 riders)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "black motorcycle with 2 riders on the right lane towards the intersection",
+     "mission": []
+    },
+    "t_ms": 599
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "blue door, third from left, in the row of shops, next to the fruit stand",
+     "mission": []
+    },
+    "t_ms": 665
+   },
+   {
+    "case": "j_pin_smallbike",
+    "score": "keywords-missed(child with red hat riding smal)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "child with red hat riding small bike on the path near the awning",
+     "mission": []
+    },
+    "t_ms": 557
+   },
+   {
+    "case": "j_pin_roofnear",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "roof of the closest house with a ladder leaning on it",
+     "mission": []
+    },
+    "t_ms": 538
+   },
+   {
+    "case": "j_pin_leaving",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "orange truck leaving the site with open crate",
+     "mission": []
+    },
+    "t_ms": 522
+   },
+   {
+    "case": "j_pin_flagman",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "man with hat holding flag at the right end of the group",
+     "mission": []
+    },
+    "t_ms": 543
+   },
+   {
+    "case": "j_pin_notsail",
+    "score": "keywords-missed(small boat with engine closer )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "small boat with engine closer to the shore",
+     "mission": []
+    },
+    "t_ms": 485
+   },
+   {
+    "case": "j_pin_bushes",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "opening in the fence, roughly in the middle, where the bushes are low",
+     "mission": []
+    },
+    "t_ms": 627
+   },
+   {
+    "case": "j_pin_campole",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "pole with camera in the parking lot corner near the exit",
+     "mission": []
+    },
+    "t_ms": 563
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "woman with long coat walking fast in the far side of the square",
+     "mission": []
+    },
+    "t_ms": 592
+   },
+   {
+    "case": "j_pin_planks",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "pile of boards near the back wall under the window",
+     "mission": []
+    },
+    "t_ms": 510
+   },
+   {
+    "case": "j_pin_halfgate",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "half-open blue gate at the end of the path",
+     "mission": []
+    },
+    "t_ms": 519
+   },
+   {
+    "case": "j_pin_spare",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "spare tire attached to the back of the gray jeep",
+     "mission": []
+    },
+    "t_ms": 514
+   },
+   {
+    "case": "j_pin_stage3",
+    "score": "keywords-missed(group of three people closest )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "group of three people closest to the stage, to the left of the large speaker",
+     "mission": []
+    },
+    "t_ms": 605
+   },
+   {
+    "case": "j_pin_hay",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "green tractor working in the field pulling the hay wagon",
+     "mission": []
+    },
+    "t_ms": 524
+   },
+   {
+    "case": "j_pin_fullbin",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "full orange bin near the back entrance",
+     "mission": []
+    },
+    "t_ms": 467
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "score": "keywords-missed(birds sitting on wires above t)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "birds sitting on wires above the road",
+     "mission": []
+    },
+    "t_ms": 478
+   },
+   {
+    "case": "j_pin_extstairs",
+    "score": "keywords-missed(external stairs leading to the)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "external stairs leading to the roof",
+     "mission": []
+    },
+    "t_ms": 449
+   },
+   {
+    "case": "j_pin_wrongway",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "single car parked facing exit",
+     "mission": []
+    },
+    "t_ms": 440
+   },
+   {
+    "case": "j_pin_firstrun",
+    "score": "keywords-missed(runner with yellow vest)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "runner with yellow vest",
+     "mission": []
+    },
+    "t_ms": 458
+   },
+   {
+    "case": "j_pin_barrel",
+    "score": "keywords-missed(pot lying on its side, near th)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "pot lying on its side, near the sand pile, behind the concrete blocks",
+     "mission": []
+    },
+    "t_ms": 593
+   },
+   {
+    "case": "j_pin_puddle",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "large puddle in the middle of the road reflecting the building",
+     "mission": []
+    },
+    "t_ms": 532
+   },
+   {
+    "case": "j_pin_scaffold",
+    "score": "keywords-missed(tallest ladder leaning on the )",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "tallest ladder leaning on the pole on the west side",
+     "mission": []
+    },
+    "t_ms": 568
+   },
+   {
+    "case": "j_pin_idledozer",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "yellow bulldozer standing still near the large hole",
+     "mission": []
+    },
+    "t_ms": 501
+   },
+   {
+    "case": "j_pin_cart",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "shopping cart being pushed up the street near parked cars",
+     "mission": []
+    },
+    "t_ms": 518
+   },
+   {
+    "case": "j_pin_graffiti",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "writing on the wall under the second window from the left",
+     "mission": []
+    },
+    "t_ms": 536
+   },
+   {
+    "case": "j_pin_ferris",
+    "score": "keywords-missed(bottom part of the giant wheel)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "bottom part of the giant wheel at the end of the park",
+     "mission": []
+    },
+    "t_ms": 553
+   },
+   {
+    "case": "j_pin_planters",
+    "score": "keywords-missed(large planters on both sides o)",
+    "obj": {
+     "kind": "count",
+     "target_en": "large planters on both sides of the hotel main door",
+     "mission": []
+    },
+    "t_ms": 516
+   },
+   {
+    "case": "lp_white_car",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "white car",
+     "mission": []
+    },
+    "t_ms": 391
+   },
+   {
+    "case": "lp_nearest_person",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "closest person",
+     "mission": []
+    },
+    "t_ms": 394
+   },
+   {
+    "case": "lp_look_down",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "down",
+     "mission": []
+    },
+    "t_ms": 403
+   },
+   {
+    "case": "pq_see_now",
+    "score": "keywords-missed()",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 371
+   },
+   {
+    "case": "pq_see_frame",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 357
+   },
+   {
+    "case": "pq_count_people_see",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "people",
+     "mission": []
+    },
+    "t_ms": 407
+   },
+   {
+    "case": "pq_count_cars_see",
+    "score": "keywords-missed(cars)",
+    "obj": {
+     "kind": "count",
+     "target_en": "cars",
+     "mission": []
+    },
+    "t_ms": 400
+   },
+   {
+    "case": "pq_see_suspicious",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "suspicious object",
+     "mission": []
+    },
+    "t_ms": 434
+   },
+   {
+    "case": "pq_count_vehicles_road",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "vehicles on the road",
+     "mission": []
+    },
+    "t_ms": 457
+   },
+   {
+    "case": "pq_see_ahead",
+    "score": "keywords-missed()",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 362
+   },
+   {
+    "case": "pq_count_windows_see",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "windows on the building",
+     "mission": []
+    },
+    "t_ms": 445
+   },
+   {
+    "case": "pq_any_person",
+    "score": "keywords-missed()",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 350
+   },
+   {
+    "case": "pq_any_vehicle",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "vehicle on the ground",
+     "mission": []
+    },
+    "t_ms": 404
+   },
+   {
+    "case": "pq_any_red_car",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "red car",
+     "mission": []
+    },
+    "t_ms": 387
+   },
+   {
+    "case": "pq_any_roof_person",
+    "score": "keywords-missed(roof)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "roof",
+     "mission": []
+    },
+    "t_ms": 364
+   },
+   {
+    "case": "pq_any_weapon",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "armed person",
+     "mission": []
+    },
+    "t_ms": 375
+   },
+   {
+    "case": "pq_any_backpack_left",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "backpack on the left side",
+     "mission": []
+    },
+    "t_ms": 432
+   },
+   {
+    "case": "pq_any_movement",
+    "score": "keywords-missed(the arena)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "the arena",
+     "mission": []
+    },
+    "t_ms": 401
+   },
+   {
+    "case": "pq_whats_in_frame",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 358
+   },
+   {
+    "case": "pq_whats_ahead",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "front",
+     "mission": []
+    },
+    "t_ms": 391
+   },
+   {
+    "case": "pq_describe_scene",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 377
+   },
+   {
+    "case": "pq_identify_threats",
+    "score": "keywords-missed(potential threats in the area)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "potential threats in the area",
+     "mission": []
+    },
+    "t_ms": 467
+   },
+   {
+    "case": "pq_find_people",
+    "score": "keywords-missed(people)",
+    "obj": {
+     "kind": "count",
+     "target_en": "people",
+     "mission": []
+    },
+    "t_ms": 403
+   },
+   {
+    "case": "pq_count_buildings",
+    "score": "keywords-missed(buildings in the arena)",
+    "obj": {
+     "kind": "count",
+     "target_en": "buildings in the arena",
+     "mission": []
+    },
+    "t_ms": 450
+   },
+   {
+    "case": "pq_search_vehicle",
+    "score": "keywords-missed(suspicious vehicle)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "suspicious vehicle",
+     "mission": []
+    },
+    "t_ms": 411
+   },
+   {
+    "case": "pq_look_ground",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "ground",
+     "mission": []
+    },
+    "t_ms": 378
+   },
+   {
+    "case": "pq_identify_color",
+    "score": "keywords-missed(closest vehicle color)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "closest vehicle color",
+     "mission": []
+    },
+    "t_ms": 402
+   },
+   {
+    "case": "pq_focus_describe",
+    "score": "keywords-missed(closest person)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "closest person",
+     "mission": []
+    },
+    "t_ms": 394
+   },
+   {
+    "case": "p75_open_window_2nd",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "open window on the second floor",
+     "mission": []
+    },
+    "t_ms": 453
+   },
+   {
+    "case": "p75_follow_blue_bike",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "blue bicycle",
+     "mission": []
+    },
+    "t_ms": 409
+   },
+   {
+    "case": "p75_count_entrance",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "people near the entrance",
+     "mission": []
+    },
+    "t_ms": 416
+   },
+   {
+    "case": "p75_describe_right",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "right side",
+     "mission": []
+    },
+    "t_ms": 389
+   },
+   {
+    "case": "p75_all_vehicles",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "all vehicles",
+     "mission": []
+    },
+    "t_ms": 399
+   },
+   {
+    "case": "p75_purple_bag",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "person with the purple bag",
+     "mission": []
+    },
+    "t_ms": 461
+   },
+   {
+    "case": "p75_count_cars_behind_white",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "cars parked behind the white building",
+     "mission": []
+    },
+    "t_ms": 485
+   },
+   {
+    "case": "p75_anyone_armed",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "count",
+     "target_en": "person with a weapon",
+     "mission": []
+    },
+    "t_ms": 444
+   },
+   {
+    "case": "p75_look_right",
+    "score": "CORRECT",
+    "obj": {
+     "kind": "describe",
+     "target_en": "right side",
+     "mission": []
+    },
+    "t_ms": 412
+   },
+   {
+    "case": "p75_approach_blue_car",
+    "score": "keywords-missed(blue car)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "blue car",
+     "mission": []
+    },
+    "t_ms": 410
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 375
+   },
+   {
+    "case": "s_sitrep",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 368
+   },
+   {
+    "case": "s_jump_point",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 390
+   },
+   {
+    "case": "s_gentle_scan",
+    "score": "keywords-missed(area)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "area",
+     "mission": []
+    },
+    "t_ms": 384
+   },
+   {
+    "case": "s_eye_junction",
+    "score": "keywords-missed(intersection)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "intersection",
+     "mission": []
+    },
+    "t_ms": 378
+   },
+   {
+    "case": "s_zoom_suspect",
+    "score": "keywords-missed(suspicious vehicle)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "suspicious vehicle",
+     "mission": []
+    },
+    "t_ms": 409
+   },
+   {
+    "case": "s_route_escort",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 350
+   },
+   {
+    "case": "s_dead_ground",
+    "score": "keywords-missed(area behind the hill)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "area behind the hill",
+     "mission": []
+    },
+    "t_ms": 426
+   },
+   {
+    "case": "s_give_distance",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 363
+   },
+   {
+    "case": "s_one_more_pass",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 381
+   },
+   {
+    "case": "s_grid_out",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 386
+   },
+   {
+    "case": "s_roger_over",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 367
+   },
+   {
+    "case": "s_cp_visual",
+    "score": "keywords-missed(command post near the building)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "command post near the building",
+     "mission": []
+    },
+    "t_ms": 463
+   },
+   {
+    "case": "s_eyes_on",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 378
+   },
+   {
+    "case": "s_rally_point",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 377
+   },
+   {
+    "case": "s_feet_hold",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 377
+   },
+   {
+    "case": "s_lost_uav",
+    "score": "wrong-route(reject)",
+    "obj": {
+     "kind": "reject",
+     "target_en": "",
+     "mission": []
+    },
+    "t_ms": 388
+   },
+   {
+    "case": "s_scramble",
+    "score": "wrong-route(mission)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "",
+     "mission": [
+      {
+       "type": "takeoff"
+      }
+     ]
+    },
+    "t_ms": 460
+   },
+   {
+    "case": "s_obs_report",
+    "score": "keywords-missed(white house)",
+    "obj": {
+     "kind": "highlight",
+     "target_en": "white house",
+     "mission": []
+    },
+    "t_ms": 430
+   },
+   {
+    "case": "s_wadi_route",
+    "score": "wrong-route(mission)",
+    "obj": {
+     "kind": "mission",
+     "target_en": "wadi until intersection with axis",
+     "mission": [
+      {
+       "type": "fly_by",
+       "dz": -1
+      },
+      {
+       "type": "delay",
+       "seconds": 0
+      }
+     ]
+    },
+    "t_ms": 837
+   },
+   {
+    "case": "s75_observe_junction",
+    "score": "keywords-missed(intersection)",
+    "obj": {
+     "kind": "describe",
+     "target_en": "intersection",
+     "mission": []
+    },
+    "t_ms": 376
+   }
+  ]
+ }
+}

@@ -1,0 +1,4656 @@
+{
+ "translator": "dicta",
+ "prompt": "v1",
+ "planner": "gemma4",
+ "direct_he": true,
+ "results": {
+  "emergency": {
+   "ok": 12,
+   "n": 12
+  },
+  "perception": {
+   "ok": 0,
+   "n": 0
+  },
+  "military": {
+   "ok": 0,
+   "n": 0
+  },
+  "std190": {
+   "ok": 245,
+   "n": 253
+  },
+  "verbose": {
+   "ok": 61,
+   "n": 63
+  }
+ },
+ "verdicts": {
+  "std190": {
+   "up10": "CORRECT",
+   "fwd5": "CORRECT",
+   "spin90cw": "CORRECT",
+   "takeoff": "CORRECT",
+   "land": "CORRECT",
+   "combo3": "CORRECT",
+   "combo_tl": "CORRECT",
+   "back2left3": "CORRECT",
+   "ccw45": "CORRECT",
+   "down3": "CORRECT",
+   "question": "CORRECT",
+   "square": "valid(open)",
+   "up2": "CORRECT",
+   "right4": "CORRECT",
+   "left7": "CORRECT",
+   "back10": "CORRECT",
+   "fwd15": "CORRECT",
+   "spin180cw": "CORRECT",
+   "spin360": "CORRECT",
+   "wait5": "CORRECT",
+   "up_half": "CORRECT",
+   "combo2b": "CORRECT",
+   "combo4": "CORRECT",
+   "combo5": "CORRECT",
+   "digit12": "CORRECT",
+   "digit45deg": "CORRECT",
+   "question2": "CORRECT",
+   "q_land_trap": "CORRECT",
+   "neg_trap": "CORRECT",
+   "colloq_up": "CORRECT",
+   "land_now": "CORRECT",
+   "takeoff_ctx": "CORRECT",
+   "g_up1": "CORRECT",
+   "g_up2": "CORRECT",
+   "g_up3": "CORRECT",
+   "g_up4": "CORRECT",
+   "g_up6": "CORRECT",
+   "g_up8": "CORRECT",
+   "g_up9": "CORRECT",
+   "g_up20": "CORRECT",
+   "g_up25": "CORRECT",
+   "g_down1": "CORRECT",
+   "g_down2": "CORRECT",
+   "g_down3": "CORRECT",
+   "g_down4": "CORRECT",
+   "g_down6": "CORRECT",
+   "g_down8": "CORRECT",
+   "g_down9": "CORRECT",
+   "g_down20": "CORRECT",
+   "g_down25": "CORRECT",
+   "g_fwd1": "CORRECT",
+   "g_fwd2": "CORRECT",
+   "g_fwd3": "CORRECT",
+   "g_fwd4": "CORRECT",
+   "g_fwd6": "CORRECT",
+   "g_fwd8": "CORRECT",
+   "g_fwd9": "CORRECT",
+   "g_fwd20": "CORRECT",
+   "g_fwd25": "CORRECT",
+   "g_back1": "CORRECT",
+   "g_back2": "CORRECT",
+   "g_back3": "CORRECT",
+   "g_back4": "CORRECT",
+   "g_back6": "CORRECT",
+   "g_back8": "CORRECT",
+   "g_back9": "CORRECT",
+   "g_back20": "CORRECT",
+   "g_back25": "CORRECT",
+   "g_right1": "CORRECT",
+   "g_right2": "CORRECT",
+   "g_right3": "CORRECT",
+   "g_right4": "CORRECT",
+   "g_right6": "CORRECT",
+   "g_right8": "CORRECT",
+   "g_right9": "CORRECT",
+   "g_right20": "CORRECT",
+   "g_right25": "CORRECT",
+   "g_left1": "CORRECT",
+   "g_left2": "CORRECT",
+   "g_left3": "CORRECT",
+   "g_left4": "CORRECT",
+   "g_left6": "CORRECT",
+   "g_left8": "CORRECT",
+   "g_left9": "CORRECT",
+   "g_left20": "CORRECT",
+   "g_left25": "CORRECT",
+   "g_cw30": "CORRECT",
+   "g_ccw30": "CORRECT",
+   "g_cw60": "CORRECT",
+   "g_ccw60": "CORRECT",
+   "g_cw120": "CORRECT",
+   "g_ccw120": "CORRECT",
+   "g_cw270": "CORRECT",
+   "g_ccw270": "CORRECT",
+   "g_wait2": "CORRECT",
+   "g_wait10": "CORRECT",
+   "g_combo2_0": "CORRECT",
+   "g_combo2_1": "CORRECT",
+   "g_combo2_2": "CORRECT",
+   "g_combo2_3": "CORRECT",
+   "g_combo2_4": "CORRECT",
+   "g_combo2_5": "CORRECT",
+   "g_combo2_6": "CORRECT",
+   "g_combo2_7": "CORRECT",
+   "g_combo3_0": "CORRECT",
+   "g_combo3_1": "CORRECT",
+   "g_combo3_2": "CORRECT",
+   "g_combo3_3": "CORRECT",
+   "r_takeoff1": "CORRECT",
+   "r_takeoff2": "CORRECT",
+   "r_takeoff3": "CORRECT",
+   "r_takeoff4": "CORRECT",
+   "r_takeoff5": "CORRECT",
+   "r_land1": "CORRECT",
+   "r_land2": "CORRECT",
+   "r_land3": "CORRECT",
+   "r_land4": "CORRECT",
+   "r_land5": "CORRECT",
+   "r_pol_up5": "CORRECT",
+   "r_pol_fwd3": "CORRECT",
+   "r_pol_left2": "CORRECT",
+   "r_pol_down1": "CORRECT",
+   "r_pol_spin": "CORRECT",
+   "r_fill1": "CORRECT",
+   "r_fill2": "CORRECT",
+   "r_fill3": "CORRECT",
+   "r_fill4": "CORRECT",
+   "r_fill5": "CORRECT",
+   "r_alt10": "CORRECT",
+   "r_alt20": "CORRECT",
+   "r_low": "CORRECT",
+   "r_rise3": "CORRECT",
+   "r_updown": "CORRECT",
+   "r_bit_left": "CORRECT",
+   "r_bit_up": "CORRECT",
+   "r_bit_back": "CORRECT",
+   "r_higher": "wrong-len(0vs1)",
+   "r_bit_fwd": "CORRECT",
+   "r_turn_r90": "CORRECT",
+   "r_turn_l45": "CORRECT",
+   "r_half_turn": "CORRECT",
+   "r_quart_r": "CORRECT",
+   "r_full": "CORRECT",
+   "r_around": "valid(open)",
+   "r_num_first": "CORRECT",
+   "r_m_half": "CORRECT",
+   "r_2_half": "CORRECT",
+   "r_digit50": "CORRECT",
+   "r_digit7": "CORRECT",
+   "r_meter1": "CORRECT",
+   "r_mis1": "CORRECT",
+   "r_mis2": "CORRECT",
+   "r_mis3": "CORRECT",
+   "r_mis4": "CORRECT",
+   "r_mis5": "wrong-len(3vs4)",
+   "r_mis6": "CORRECT",
+   "r_mis7": "CORRECT",
+   "r_mis8": "wrong-len(1vs2)",
+   "r_mis9": "CORRECT",
+   "r_mis10": "CORRECT",
+   "r_dis1": "valid(open)",
+   "r_dis2": "valid(open)",
+   "r_dis3": "valid(open)",
+   "r_dis4": "valid(open)",
+   "r_q1": "CORRECT",
+   "r_q2": "CORRECT",
+   "r_q3": "CORRECT",
+   "r_q4": "CORRECT",
+   "r_q5": "CORRECT",
+   "r_q6": "CORRECT",
+   "r_q7": "CORRECT",
+   "r_q8": "CORRECT",
+   "r_neg1": "CORRECT",
+   "r_neg2": "CORRECT",
+   "r_neg3": "CORRECT",
+   "r_neg4": "CORRECT",
+   "r_neg5": "CORRECT",
+   "r_wait1": "CORRECT",
+   "r_wait2": "CORRECT",
+   "r_wait3": "CORRECT",
+   "r_wait4": "routed:emergency",
+   "r_big100": "CORRECT",
+   "r_deg10": "CORRECT",
+   "r_deg135": "CORRECT",
+   "r_z_03": "CORRECT",
+   "r_back15": "CORRECT",
+   "r_ord1": "CORRECT",
+   "r_ord2": "CORRECT",
+   "r_ord3": "CORRECT",
+   "r_ord4": "CORRECT",
+   "l_deg_frac": "CORRECT",
+   "l_deg_precise": "CORRECT",
+   "l_half_cw": "CORRECT",
+   "l_dbl_neg": "CORRECT",
+   "l_postpone": "wrong-len(1vs0)",
+   "l_pause_idiom": "wrong-len(1vs0)",
+   "l_combo_tamtin": "CORRECT",
+   "l_fwd_future": "CORRECT",
+   "l_land_going": "CORRECT",
+   "l_pres_pic": "CORRECT",
+   "l_pres_you": "CORRECT",
+   "l_color_near": "CORRECT",
+   "l_tower_count": "CORRECT",
+   "l_lighthouse_count": "CORRECT",
+   "l75_climb8": "CORRECT",
+   "l75_down4_pls": "CORRECT",
+   "l75_left3_back3": "CORRECT",
+   "l75_drive_fwd8": "CORRECT",
+   "l75_move_back9": "CORRECT",
+   "l75_turn20_right": "CORRECT",
+   "l75_turn_left120": "CORRECT",
+   "l75_full_ccw": "CORRECT",
+   "l75_wait8": "CORRECT",
+   "l75_takeoff_up2": "CORRECT",
+   "l75_land_gate": "CORRECT",
+   "l75_rise3_up": "CORRECT",
+   "l75_neg_emphatic": "CORRECT",
+   "l75_q_ability_back": "CORRECT",
+   "l75_q_altitude": "CORRECT",
+   "l75_possible_up5": "CORRECT",
+   "l75_could_right2": "CORRECT",
+   "l75_lets_down2": "CORRECT",
+   "l75_possible_land": "CORRECT",
+   "l75_rise_to6": "CORRECT",
+   "l75_climb_to20": "CORRECT",
+   "l75_turn540": "wrong-degrees(180vs540)",
+   "l75_turn270": "CORRECT",
+   "l75_half_left": "CORRECT",
+   "l75_turn_back": "wrong-verb(fly_byvsspin_by)",
+   "l75_up2_ccw120": "CORRECT",
+   "l75_neg_land_up4": "CORRECT",
+   "l75_neg_fwd_back3": "CORRECT",
+   "l75_q_can_land": "CORRECT",
+   "l75_q_why_not_up": "CORRECT",
+   "l75_hover_stand": "valid(open)",
+   "l75_photo_then_back2": "wrong-len(0vs1)",
+   "l75_hesitate_up7": "CORRECT",
+   "l75_name_fwd2": "CORRECT",
+   "l75_yalla_land": "CORRECT",
+   "l75_thanks_land": "CORRECT",
+   "l75_return_home": "valid(open)",
+   "l75_stay_put": "valid(open)",
+   "l75_bit_forward": "valid(open)",
+   "l75_higher": "valid(open)",
+   "l75_fast_fwd7": "CORRECT",
+   "l75_slowly_down1": "CORRECT",
+   "l75_do_hover": "valid(open)",
+   "l75_forward_latin": "CORRECT",
+   "l75_ten_feet": "valid(open)",
+   "l75_approx_up4": "CORRECT",
+   "l75_gimbal_down": "valid(open)",
+   "l75_toward_white_bldg": "valid(open)",
+   "l75_q_flight_time": "CORRECT",
+   "l75_up4_photo": "CORRECT"
+  },
+  "verbose": {
+   "v_listen3_g0": "CORRECT",
+   "v_listen3_g1": "CORRECT",
+   "v_listen3_g2": "CORRECT",
+   "v_listen3_g3": "CORRECT",
+   "v_finish3_g0": "CORRECT",
+   "v_finish3_g1": "CORRECT",
+   "v_finish3_g2": "CORRECT",
+   "v_finish3_g3": "CORRECT",
+   "v_start4_g0": "CORRECT",
+   "v_start4_g1": "CORRECT",
+   "v_start4_g2": "CORRECT",
+   "v_start4_g3": "wrong-len(3vs4)",
+   "v_okso4_g0": "CORRECT",
+   "v_okso4_g1": "CORRECT",
+   "v_okso4_g2": "CORRECT",
+   "v_okso4_g3": "CORRECT",
+   "v_first3_g0": "CORRECT",
+   "v_first3_g1": "CORRECT",
+   "v_first3_g2": "CORRECT",
+   "v_first3_g3": "CORRECT",
+   "v_favor4_g0": "CORRECT",
+   "v_favor4_g1": "CORRECT",
+   "v_favor4_g2": "CORRECT",
+   "v_favor4_g3": "CORRECT",
+   "v_mission3_g0": "CORRECT",
+   "v_mission3_g1": "CORRECT",
+   "v_mission3_g2": "CORRECT",
+   "v_mission3_g3": "CORRECT",
+   "v_yalla2_g0": "CORRECT",
+   "v_yalla2_g1": "CORRECT",
+   "v_yalla2_g2": "CORRECT",
+   "v_yalla2_g3": "CORRECT",
+   "v_ready3_g0": "CORRECT",
+   "v_ready3_g1": "CORRECT",
+   "v_ready3_g2": "CORRECT",
+   "v_ready3_g3": "CORRECT",
+   "v_seq5_g0": "CORRECT",
+   "v_seq5_g1": "CORRECT",
+   "v_seq5_g2": "CORRECT",
+   "v_seq5_g3": "CORRECT",
+   "v_note3_g0": "CORRECT",
+   "v_note3_g1": "CORRECT",
+   "v_note3_g2": "CORRECT",
+   "v_note3_g3": "CORRECT",
+   "v_round3_g0": "CORRECT",
+   "v_round3_g1": "CORRECT",
+   "v_round3_g2": "CORRECT",
+   "v_round3_g3": "CORRECT",
+   "v_neg1": "CORRECT",
+   "v_neg2": "CORRECT",
+   "v_q1": "CORRECT",
+   "v_q2": "CORRECT",
+   "v_mix1": "CORRECT",
+   "v_mix2": "CORRECT",
+   "l75_v_listen_chain": "CORRECT",
+   "l75_v_yalla_sortie": "CORRECT",
+   "l75_v_if_possible": "CORRECT",
+   "l75_v_slow_chain": "CORRECT",
+   "l75_v_rega_no_wait": "CORRECT",
+   "l75_v_shniya_twice": "CORRECT",
+   "l75_v_self_correct": "CORRECT",
+   "l75_v_climb_then_count": "wrong-len(0vs1)",
+   "l75_v_okso_full_turn": "CORRECT"
+  }
+ },
+ "stage0_false_positives": [
+  [
+   "std190",
+   "r_wait4",
+   "עצור שם לעשר שניות"
+  ]
+ ],
+ "recognized": {
+  "emergency": [
+   {
+    "case": "e_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stopstop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_now",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_emergency",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_stop_all",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_english",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e_game_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e75_two_words",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e75_dai_maspik",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e75_hafsek_hakol",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e75_retracted_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "e75_conditional_stop",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   }
+  ],
+  "std190": [
+   {
+    "case": "up10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin90cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 90.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "combo3",
+    "kind": "command",
+    "payload": "עלה 10 מטרים, הסתובב 90 מעלות clockwise ואז טוס קדימה 5 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "combo_tl",
+    "kind": "command",
+    "payload": "בצע take off, עלה 5 מטרים, המתן 3 שניות ונחת",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "back2left3",
+    "kind": "command",
+    "payload": "טוס אחורה 2 מטרים ואז זוז שמאלה 3 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "ccw45",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question",
+    "kind": "command",
+    "payload": "מה אתה רואה עכשיו?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "square",
+    "kind": "command",
+    "payload": "טוס בריבוע של 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "left7",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -7.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "back10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "fwd15",
+    "kind": "command",
+    "payload": "התקדם 15 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "spin180cw",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 180.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "spin360",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 360.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "wait5",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 5.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "up_half",
+    "kind": "command",
+    "payload": "עלה חצי מטר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "combo2b",
+    "kind": "command",
+    "payload": "take off ואז עלה 3 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "combo4",
+    "kind": "command",
+    "payload": "טוס קדימה 4 מטרים, זוז ימינה 2 מטרים, זוז אחורה 4 מטרים ואז זוז שמאלה 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "combo5",
+    "kind": "command",
+    "payload": "בצע take off, עלה 2 מטרים, הסתובב 90 מעלות clockwise, טוס קדימה 3 מטרים ונחת",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "clockwise-inline",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "digit12",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 12.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "digit45deg",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 45.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "question2",
+    "kind": "command",
+    "payload": "כמה אנשים אתה רואה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "q_land_trap",
+    "kind": "command",
+    "payload": "האם אתה מתכוון לנחות בקרוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "neg_trap",
+    "kind": "command",
+    "payload": "אל תטוס קדימה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "colloq_up",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "land_now",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "takeoff_ctx",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up1",
+    "kind": "command",
+    "payload": "עלה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_up25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down1",
+    "kind": "command",
+    "payload": "תרד מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_down25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd1",
+    "kind": "command",
+    "payload": "טוס קדימה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd2",
+    "kind": "command",
+    "payload": "התקדם 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd4",
+    "kind": "command",
+    "payload": "התקדם 4 מטרים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd8",
+    "kind": "command",
+    "payload": "התקדם 8 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd20",
+    "kind": "command",
+    "payload": "התקדם 20 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_fwd25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back1",
+    "kind": "command",
+    "payload": "זוז אחורה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_back25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right1",
+    "kind": "command",
+    "payload": "טוס ימינה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_right25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": 25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left1",
+    "kind": "command",
+    "payload": "זוז שמאלה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left3",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -3.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left4",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left6",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -6.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left20",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -20.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_left25",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dy": -25.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw30",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -30.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw60",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -60.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_cw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": 270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_ccw270",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -270.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait2",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 2.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_wait10",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 10.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_0",
+    "kind": "command",
+    "payload": "עלה מטר 1 ואז תעלה 20 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_1",
+    "kind": "command",
+    "payload": "תעלה 4 מטרים ואז רד 4 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_2",
+    "kind": "command",
+    "payload": "עלה 9 מטרים ואז תרד 25 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_3",
+    "kind": "command",
+    "payload": "תרד מטר 1 ואז טוס קדימה 6 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_4",
+    "kind": "command",
+    "payload": "רד 4 מטרים ואז זוז אחורה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_5",
+    "kind": "command",
+    "payload": "תרד 9 מטרים ואז טוס אחורה 8 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_6",
+    "kind": "command",
+    "payload": "טוס קדימה מטר 1 ואז זוז ימינה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo2_7",
+    "kind": "command",
+    "payload": "התקדם 4 מטרים ואז טוס ימינה 9 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo3_0",
+    "kind": "command",
+    "payload": "עלה מטר אחד, תעלה 4 מטרים ואז תעלה 8 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo3_1",
+    "kind": "command",
+    "payload": "תעלה 20 מטרים, רד 8 מטרים ואז טוס קדימה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo3_2",
+    "kind": "command",
+    "payload": "רד 8 מטרים, התקדם 20 מטרים ואז זוז אחורה 6 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "g_combo3_3",
+    "kind": "command",
+    "payload": "התקדם 4 מטרים, טוס ימינה מטר 1 ואז טוס ימינה 25 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff2",
+    "kind": "command",
+    "payload": "take off",
+    "flags": [
+     "register",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff3",
+    "kind": "command",
+    "payload": "take off",
+    "flags": [
+     "register",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff4",
+    "kind": "command",
+    "payload": "יאללה take off",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_takeoff5",
+    "kind": "command",
+    "payload": "take off בבקשה",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land1",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "land"
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land2",
+    "kind": "command",
+    "payload": "תנחת",
+    "flags": [
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land3",
+    "kind": "command",
+    "payload": "תנחת בבקשה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land4",
+    "kind": "command",
+    "payload": "תנחת",
+    "flags": [
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_land5",
+    "kind": "command",
+    "payload": "סיימנו, תנחת",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_pol_up5",
+    "kind": "command",
+    "payload": "אתה יכול לעלות 5 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_pol_fwd3",
+    "kind": "command",
+    "payload": "תוכל לטוס קדימה 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_pol_left2",
+    "kind": "command",
+    "payload": "אם אפשר, 2 מטרים שמאלה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_pol_down1",
+    "kind": "command",
+    "payload": "רד בבקשה מטר 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_pol_spin",
+    "kind": "command",
+    "payload": "תסתובב בבקשה 90 מעלות ימינה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_fill1",
+    "kind": "command",
+    "payload": "אה טוס קדימה 3 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_fill2",
+    "kind": "command",
+    "payload": "אוקיי עכשיו תעלה 4 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_fill3",
+    "kind": "command",
+    "payload": "טוב אז תטוס אחורה 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_fill4",
+    "kind": "command",
+    "payload": "רגע רגע קודם תעלה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_fill5",
+    "kind": "command",
+    "payload": "כן תמשיך ימינה עוד 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_alt10",
+    "kind": "command",
+    "payload": "עלה 10 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_alt20",
+    "kind": "command",
+    "payload": "תעלה 20 מטר",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_low",
+    "kind": "command",
+    "payload": "תנמיך 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_rise3",
+    "kind": "command",
+    "payload": "תתרומם 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_updown",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": -4.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_left",
+    "kind": "command",
+    "payload": "טוס טיפה שמאלה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_up",
+    "kind": "command",
+    "payload": "תעלה קצת",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_back",
+    "kind": "command",
+    "payload": "זוז קצת אחורה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_higher",
+    "kind": "command",
+    "payload": "תעוף קצת יותר גבוה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_bit_fwd",
+    "kind": "command",
+    "payload": "תתקדם עוד קצת",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_turn_r90",
+    "kind": "command",
+    "payload": "סובב את הרחפן 90 מעלות ימינה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_turn_l45",
+    "kind": "command",
+    "payload": "תפנה 45 מעלות שמאלה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_half_turn",
+    "kind": "command",
+    "payload": "תעשה חצי סיבוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_quart_r",
+    "kind": "command",
+    "payload": "רבע סיבוב ימינה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_full",
+    "kind": "command",
+    "payload": "תעשה סיבוב שלם",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_around",
+    "kind": "command",
+    "payload": "תסתובב אליי",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_num_first",
+    "kind": "command",
+    "payload": "30 מטר קדימה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_m_half",
+    "kind": "command",
+    "payload": "מטר וחצי למעלה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_2_half",
+    "kind": "command",
+    "payload": "2 וחצי מטרים ימינה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_digit50",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 50.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_digit7",
+    "kind": "command",
+    "payload": "7 מטרים למעלה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_meter1",
+    "kind": "command",
+    "payload": "זוז מטר אחד ימינה",
+    "flags": [
+     "one-meter"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis1",
+    "kind": "command",
+    "payload": "take off ותעלה לגובה 5 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis2",
+    "kind": "command",
+    "payload": "take off, עלה 3 מטרים ותישאר שם",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis3",
+    "kind": "command",
+    "payload": "טוס ימינה 3 מטרים ואחרי זה זוז שמאלה 3 מטרים בחזרה",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis4",
+    "kind": "command",
+    "payload": "עלה 5 מטרים, חכה 2 שניות ורד בחזרה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis5",
+    "kind": "command",
+    "payload": "take off, טוס קדימה 10 מטרים, תסתובב חצי סיבוב וחזור",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis6",
+    "kind": "command",
+    "payload": "קדימה 2 מטרים ואז זוז למעלה 2 מטרים ואז זוז אחורה 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis7",
+    "kind": "command",
+    "payload": "תעלה 10 מטרים ואז תסתובב לאט סיבוב שלם",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis8",
+    "kind": "command",
+    "payload": "אחורה 5 מטרים ולמטה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis9",
+    "kind": "command",
+    "payload": "take off ואז תנחת",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_mis10",
+    "kind": "command",
+    "payload": "עלה 2 מטרים, זוז ימינה 4 מטרים, זוז שמאלה 4 מטרים ורד 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "missing-verb"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_dis1",
+    "kind": "command",
+    "payload": "טוס קדימה 5 מטרים ותצלם את הבית",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_dis2",
+    "kind": "command",
+    "payload": "תעלה 3 מטרים ותסתכל מסביב",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_dis3",
+    "kind": "command",
+    "payload": "take off ותחפש את המכונית",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_dis4",
+    "kind": "command",
+    "payload": "טוס ימינה 2 מטרים ותגיד לי מה אתה רואה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q1",
+    "kind": "command",
+    "payload": "מה מצב הסוללה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q2",
+    "kind": "command",
+    "payload": "איפה אתה עכשיו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q3",
+    "kind": "command",
+    "payload": "כמה גבוה אתה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q4",
+    "kind": "command",
+    "payload": "אתה מצלם",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q5",
+    "kind": "command",
+    "payload": "ספר לי מה אתה רואה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q6",
+    "kind": "command",
+    "payload": "יש שם מישהו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q7",
+    "kind": "command",
+    "payload": "כמה זמן נשאר לך באוויר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_q8",
+    "kind": "command",
+    "payload": "אתה שומע אותי",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg1",
+    "kind": "command",
+    "payload": "אל תעלה יותר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg2",
+    "kind": "command",
+    "payload": "אל תזוז",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg3",
+    "kind": "command",
+    "payload": "לא לטוס קדימה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg4",
+    "kind": "command",
+    "payload": "בלי להסתובב בבקשה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_neg5",
+    "kind": "command",
+    "payload": "אל תנחת עדיין",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_wait1",
+    "kind": "command",
+    "payload": "חכה רגע",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_wait2",
+    "kind": "command",
+    "payload": "שנייה 1",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_wait3",
+    "kind": "command",
+    "payload": "תמתין 5 שניות ואז רד מטר אחד",
+    "flags": [
+     "hebnum-digits",
+     "one-meter"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_wait4",
+    "kind": "emergency",
+    "payload": null,
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_big100",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": 100.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_deg10",
+    "kind": "command",
+    "payload": "תסתובב 10 מעלות ימינה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_deg135",
+    "kind": "command",
+    "payload": "פנה 135 מעלות שמאלה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_z_03",
+    "kind": "command",
+    "payload": "תעלה 30 סנטימטר",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_back15",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -15.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord1",
+    "kind": "command",
+    "payload": "5 מטרים קדימה טוס",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord2",
+    "kind": "command",
+    "payload": "ימינה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord3",
+    "kind": "command",
+    "payload": "למעלה, 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "r_ord4",
+    "kind": "command",
+    "payload": "אחורה קצת",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_deg_frac",
+    "kind": "command",
+    "payload": "פני שמאלה 74.5 מעלות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_deg_precise",
+    "kind": "command",
+    "payload": "תעשה סיבוב של 174.235 מעלות counterclockwise",
+    "flags": [
+     "counterclockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l_half_cw",
+    "kind": "command",
+    "payload": "תעשה חצי סיבוב clockwise",
+    "flags": [
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l_dbl_neg",
+    "kind": "command",
+    "payload": "אל תפנה 90 מעלות שמאלה כנגד כיוון השעון ואז אל תפנה ימינה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_postpone",
+    "kind": "command",
+    "payload": "תדחה את מה שאתה עושה לשתי דקות הקרובות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_pause_idiom",
+    "kind": "command",
+    "payload": "פוס משחק לארבע שניות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_combo_tamtin",
+    "kind": "command",
+    "payload": "בצע take off, עלה 5 מטרים, תמתין 3 שניות ותנחת",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-homograph",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l_fwd_future",
+    "kind": "command",
+    "payload": "תתקדם 15 מטרים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_land_going",
+    "kind": "command",
+    "payload": "האם אתה הולך לנחות בקרוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_pres_pic",
+    "kind": "command",
+    "payload": "יש מישהו בתמונה?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_pres_you",
+    "kind": "command",
+    "payload": "האם אתה רואה מישהו בתמונה?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_color_near",
+    "kind": "command",
+    "payload": "מה הצבע של המכונית הקרובה ביותר?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_tower_count",
+    "kind": "command",
+    "payload": "האם אתה רואה מגדל בסצנה שאתה יכול לספור בו חלונות?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l_lighthouse_count",
+    "kind": "command",
+    "payload": "האם אתה רואה מגדלור בסצנה שאתה יכול לספור בו חלונות?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_climb8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dz": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_down4_pls",
+    "kind": "command",
+    "payload": "תרד 4 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_left3_back3",
+    "kind": "command",
+    "payload": "טוס שמאלה 3 מטרים ואחר כך תחזור ימינה 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_drive_fwd8",
+    "kind": "command",
+    "payload": "סע קדימה עוד 8 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_move_back9",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "fly_by",
+      "dx": -9.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn20_right",
+    "kind": "command",
+    "payload": "תסתובב 20 מעלות לכיוון ימין",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn_left120",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "spin_by",
+      "degrees": -120.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_full_ccw",
+    "kind": "command",
+    "payload": "תסתובב סיבוב שלם counterclockwise",
+    "flags": [
+     "counterclockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_wait8",
+    "kind": "mission",
+    "payload": [
+     {
+      "type": "delay",
+      "seconds": 8.0
+     }
+    ],
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_takeoff_up2",
+    "kind": "command",
+    "payload": "take off ועלה 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_land_gate",
+    "kind": "command",
+    "payload": "בבקשה תנחת כאן ליד השער",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_rise3_up",
+    "kind": "command",
+    "payload": "תתרומם 3 מטרים למעלה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_neg_emphatic",
+    "kind": "command",
+    "payload": "בשום אופן אל תרד עכשיו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_ability_back",
+    "kind": "command",
+    "payload": "האם אתה יכול לטוס אחורה?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_altitude",
+    "kind": "command",
+    "payload": "מה הגובה שלך עכשיו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_possible_up5",
+    "kind": "command",
+    "payload": "עלה 5 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_could_right2",
+    "kind": "command",
+    "payload": "תוכל לזוז ימינה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_lets_down2",
+    "kind": "command",
+    "payload": "תרד 2 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_possible_land",
+    "kind": "command",
+    "payload": "תנחת עכשיו",
+    "flags": [
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_rise_to6",
+    "kind": "command",
+    "payload": "התרומם 6 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_climb_to20",
+    "kind": "command",
+    "payload": "טפס 20 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn540",
+    "kind": "command",
+    "payload": "עשה סיבוב וחצי clockwise",
+    "flags": [
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn270",
+    "kind": "command",
+    "payload": "הסתובב שלושת רבעי סיבוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_half_left",
+    "kind": "command",
+    "payload": "חצי סיבוב שמאלה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_turn_back",
+    "kind": "command",
+    "payload": "פנה אחורה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_up2_ccw120",
+    "kind": "command",
+    "payload": "עלה 2 מטרים ואז הסתובב 120 מעלות counterclockwise",
+    "flags": [
+     "hebnum-digits",
+     "counterclockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_neg_land_up4",
+    "kind": "command",
+    "payload": "אל תנחת, תעלה 4 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_neg_fwd_back3",
+    "kind": "command",
+    "payload": "לא לטוס קדימה, תטוס אחורה 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_can_land",
+    "kind": "command",
+    "payload": "אתה יכול לנחות?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_why_not_up",
+    "kind": "command",
+    "payload": "למה אתה לא עולה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_hover_stand",
+    "kind": "command",
+    "payload": "תעמוד במקום",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_photo_then_back2",
+    "kind": "command",
+    "payload": "תצלם את המכונית האדומה ואז טוס אחורה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_hesitate_up7",
+    "kind": "command",
+    "payload": "אה... עלה, עלה 7 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_name_fwd2",
+    "kind": "command",
+    "payload": "רחפן, טוס קדימה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_yalla_land",
+    "kind": "command",
+    "payload": "יאללה נחת",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_thanks_land",
+    "kind": "command",
+    "payload": "תודה, עכשיו תנחת בבקשה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_return_home",
+    "kind": "command",
+    "payload": "חזור אליי",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_stay_put",
+    "kind": "command",
+    "payload": "תישאר במקום",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_bit_forward",
+    "kind": "command",
+    "payload": "קצת יותר קדימה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_higher",
+    "kind": "command",
+    "payload": "יותר גבוה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_fast_fwd7",
+    "kind": "command",
+    "payload": "טוס מהר קדימה 7 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_slowly_down1",
+    "kind": "command",
+    "payload": "לאט לאט תרד מטר אחד",
+    "flags": [
+     "one-meter"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_do_hover",
+    "kind": "command",
+    "payload": "תעשה hover",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_forward_latin",
+    "kind": "command",
+    "payload": "טוס forward 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_ten_feet",
+    "kind": "command",
+    "payload": "עלה 10 פיט",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_approx_up4",
+    "kind": "command",
+    "payload": "עלה בערך 4 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_gimbal_down",
+    "kind": "command",
+    "payload": "סובב את המצלמה למטה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_toward_white_bldg",
+    "kind": "command",
+    "payload": "טוס לכיוון הבניין הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_q_flight_time",
+    "kind": "command",
+    "payload": "כמה זמן טיסה נשאר לך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_up4_photo",
+    "kind": "command",
+    "payload": "עלה 4 מטרים ותצלם תמונה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   }
+  ],
+  "verbose": [
+   {
+    "case": "v_listen3_g0",
+    "kind": "command",
+    "payload": "תקשיב, אני רוצה שקודם כל take off, אחרי זה עלה 5 מטרים ואז הסתובב 90 מעלות clockwise",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_listen3_g1",
+    "kind": "command",
+    "payload": "תקשיב, אני רוצה שקודם כל עלה 20 מטרים, אחרי זה פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_listen3_g2",
+    "kind": "command",
+    "payload": "תקשיב, אני רוצה שקודם כל טוס אחורה 4 מטרים, אחרי זה זוז שמאלה 3 מטרים ואז רד 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_listen3_g3",
+    "kind": "command",
+    "payload": "תקשיב, אני רוצה שקודם כל טוס קדימה 25 מטרים, אחרי זה הסתובב 180 מעלות clockwise ואז זוז ימינה 6 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_finish3_g0",
+    "kind": "command",
+    "payload": "take off, כשתסיים עלה 5 מטרים, ובסוף הסתובב 90 מעלות clockwise בבקשה",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_finish3_g1",
+    "kind": "command",
+    "payload": "עלה 20 מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_finish3_g2",
+    "kind": "command",
+    "payload": "טוס אחורה 4 מטרים, כשתסיים זוז שמאלה 3 מטרים, ובסוף רד 2 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_finish3_g3",
+    "kind": "command",
+    "payload": "טוס קדימה 25 מטרים, כשתסיים הסתובב 180 מעלות clockwise, ובסוף זוז ימינה 6 מטרים בבקשה",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_start4_g0",
+    "kind": "command",
+    "payload": "תתחיל: take off. עכשיו עלה 5 מטרים. יופי, עכשיו הסתובב 90 מעלות clockwise וגם טוס קדימה 10 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_start4_g1",
+    "kind": "command",
+    "payload": "תתחיל: עלה 20 מטרים. עכשיו פנה ימינה 45 מעלות. יופי, עכשיו טוס קדימה 12 מטרים וגם חכה 3 שניות",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_start4_g2",
+    "kind": "command",
+    "payload": "תתחיל: טוס אחורה 4 מטרים. עכשיו זוז שמאלה 3 מטרים. יופי, עכשיו רד 2 מטרים וגם פנה שמאלה 30 מעלות",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_start4_g3",
+    "kind": "command",
+    "payload": "תתחיל: טוס קדימה 25 מטרים. עכשיו הסתובב 180 מעלות clockwise. יופי, עכשיו זוז ימינה 6 מטרים וגם עלה 15 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "register",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_okso4_g0",
+    "kind": "command",
+    "payload": "אוקיי אז ככה, take off ואז עלה 5 מטרים ואז הסתובב 90 מעלות clockwise ואז טוס קדימה 10 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_okso4_g1",
+    "kind": "command",
+    "payload": "אוקיי אז ככה, עלה 20 מטרים ואז פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים ואז חכה 3 שניות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_okso4_g2",
+    "kind": "command",
+    "payload": "אוקיי אז ככה, טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים ואז רד 2 מטרים ואז פנה שמאלה 30 מעלות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_okso4_g3",
+    "kind": "command",
+    "payload": "אוקיי אז ככה, טוס קדימה 25 מטרים ואז הסתובב 180 מעלות clockwise ואז זוז ימינה 6 מטרים ואז עלה 15 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_first3_g0",
+    "kind": "command",
+    "payload": "קודם take off, שנייה אחרי זה עלה 5 מטרים, ולסיום הסתובב 90 מעלות clockwise",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_first3_g1",
+    "kind": "command",
+    "payload": "קודם עלה 20 מטרים, שנייה אחרי זה פנה ימינה 45 מעלות, ולסיום טוס קדימה 12 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_first3_g2",
+    "kind": "command",
+    "payload": "קודם טוס אחורה 4 מטרים, שנייה אחרי זה זוז שמאלה 3 מטרים, ולסיום רד 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_first3_g3",
+    "kind": "command",
+    "payload": "קודם טוס קדימה 25 מטרים, שנייה אחרי זה הסתובב 180 מעלות clockwise, ולסיום זוז ימינה 6 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_favor4_g0",
+    "kind": "command",
+    "payload": "תעשה לי טובה, take off, אחר כך עלה 5 מטרים, אחר כך הסתובב 90 מעלות clockwise, ובסוף טוס קדימה 10 מטרים ותודה",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_favor4_g1",
+    "kind": "command",
+    "payload": "תעשה לי טובה, עלה 20 מטרים, אחר כך פנה ימינה 45 מעלות, אחר כך טוס קדימה 12 מטרים, ובסוף חכה 3 שניות ותודה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_favor4_g2",
+    "kind": "command",
+    "payload": "תעשה לי טובה, טוס אחורה 4 מטרים, אחר כך זוז שמאלה 3 מטרים, אחר כך רד 2 מטרים, ובסוף פנה שמאלה 30 מעלות ותודה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_favor4_g3",
+    "kind": "command",
+    "payload": "תעשה לי טובה, טוס קדימה 25 מטרים, אחר כך הסתובב 180 מעלות clockwise, אחר כך זוז ימינה 6 מטרים, ובסוף עלה 15 מטרים ותודה",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mission3_g0",
+    "kind": "command",
+    "payload": "המשימה היא כזאת: take off, לאחר מכן עלה 5 מטרים, ואז הסתובב 90 מעלות clockwise",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mission3_g1",
+    "kind": "command",
+    "payload": "המשימה היא כזאת: עלה 20 מטרים, לאחר מכן פנה ימינה 45 מעלות, ואז טוס קדימה 12 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mission3_g2",
+    "kind": "command",
+    "payload": "המשימה היא כזאת: טוס אחורה 4 מטרים, לאחר מכן זוז שמאלה 3 מטרים, ואז רד 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mission3_g3",
+    "kind": "command",
+    "payload": "המשימה היא כזאת: טוס קדימה 25 מטרים, לאחר מכן הסתובב 180 מעלות clockwise, ואז זוז ימינה 6 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_yalla2_g0",
+    "kind": "command",
+    "payload": "יאללה take off ואז עלה 5 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_yalla2_g1",
+    "kind": "command",
+    "payload": "יאללה עלה 20 מטרים ואז פנה ימינה 45 מעלות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_yalla2_g2",
+    "kind": "command",
+    "payload": "יאללה טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_yalla2_g3",
+    "kind": "command",
+    "payload": "יאללה טוס קדימה 25 מטרים ואז הסתובב 180 מעלות clockwise",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_ready3_g0",
+    "kind": "command",
+    "payload": "רגע, תוודא שאתה מוכן. עכשיו take off, אחרי זה עלה 5 מטרים ואז הסתובב 90 מעלות clockwise",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_ready3_g1",
+    "kind": "command",
+    "payload": "רגע, תוודא שאתה מוכן. עכשיו עלה 20 מטרים, אחרי זה פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_ready3_g2",
+    "kind": "command",
+    "payload": "רגע, תוודא שאתה מוכן. עכשיו טוס אחורה 4 מטרים, אחרי זה זוז שמאלה 3 מטרים ואז רד 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_ready3_g3",
+    "kind": "command",
+    "payload": "רגע, תוודא שאתה מוכן. עכשיו טוס קדימה 25 מטרים, אחרי זה הסתובב 180 מעלות clockwise ואז זוז ימינה 6 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_seq5_g0",
+    "kind": "command",
+    "payload": "אני צריך שתבצע את הרצף הבא: take off, עלה 5 מטרים, הסתובב 90 מעלות clockwise, טוס קדימה 10 מטרים, תנחת",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_seq5_g1",
+    "kind": "command",
+    "payload": "אני צריך שתבצע את הרצף הבא: עלה 20 מטרים, פנה ימינה 45 מעלות, טוס קדימה 12 מטרים, חכה 3 שניות, תנחת",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_seq5_g2",
+    "kind": "command",
+    "payload": "אני צריך שתבצע את הרצף הבא: טוס אחורה 4 מטרים, זוז שמאלה 3 מטרים, רד 2 מטרים, פנה שמאלה 30 מעלות, חכה 5 שניות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_seq5_g3",
+    "kind": "command",
+    "payload": "אני צריך שתבצע את הרצף הבא: טוס קדימה 25 מטרים, הסתובב 180 מעלות clockwise, זוז ימינה 6 מטרים, עלה 15 מטרים, רד 8 מטרים",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_note3_g0",
+    "kind": "command",
+    "payload": "take off ואז עלה 5 מטרים, ושים לב, הסתובב 90 מעלות clockwise לאט ובזהירות",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_note3_g1",
+    "kind": "command",
+    "payload": "עלה 20 מטרים ואז פנה ימינה 45 מעלות, ושים לב, טוס קדימה 12 מטרים לאט ובזהירות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_note3_g2",
+    "kind": "command",
+    "payload": "טוס אחורה 4 מטרים ואז זוז שמאלה 3 מטרים, ושים לב, רד 2 מטרים לאט ובזהירות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_note3_g3",
+    "kind": "command",
+    "payload": "טוס קדימה 25 מטרים ואז הסתובב 180 מעלות clockwise, ושים לב, זוז ימינה 6 מטרים לאט ובזהירות",
+    "flags": [
+     "hebnum-digits",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_round3_g0",
+    "kind": "command",
+    "payload": "טוב, תעשה סיבוב קטן: take off, עלה 5 מטרים ואז הסתובב 90 מעלות clockwise וזהו",
+    "flags": [
+     "hebnum-digits",
+     "register",
+     "clockwise-inline",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_round3_g1",
+    "kind": "command",
+    "payload": "טוב, תעשה סיבוב קטן: עלה 20 מטרים, פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים וזהו",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_round3_g2",
+    "kind": "command",
+    "payload": "טוב, תעשה סיבוב קטן: טוס אחורה 4 מטרים, זוז שמאלה 3 מטרים ואז רד 2 מטרים וזהו",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_round3_g3",
+    "kind": "command",
+    "payload": "טוב, תעשה סיבוב קטן: טוס קדימה 25 מטרים, הסתובב 180 מעלות clockwise ואז זוז ימינה 6 מטרים וזהו",
+    "flags": [
+     "hebnum-digits",
+     "register",
+     "clockwise-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_neg1",
+    "kind": "command",
+    "payload": "תקשיב, עלה 5 מטרים אבל אל תסתובב בינתיים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_neg2",
+    "kind": "command",
+    "payload": "אוקיי טוס קדימה 10 מטרים, ובבקשה אל תנחת עדיין",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_q1",
+    "kind": "command",
+    "payload": "לפני שנמשיך, כמה סוללה נשארה לך?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "v_q2",
+    "kind": "command",
+    "payload": "רגע רגע, אתה בכלל רואה אותי מפה?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mix1",
+    "kind": "command",
+    "payload": "עלה 20 מטרים ותגיד לי מה אתה רואה משם",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "v_mix2",
+    "kind": "command",
+    "payload": "פנה ימינה 90 מעלות, ואם אתה שומע אותי טוב אז גם טוס קדימה 5 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_listen_chain",
+    "kind": "command",
+    "payload": "תקשיב טוב: קודם רד 2 מטרים, אחרי זה זוז ימינה 5 מטרים, ובסוף המתן 4 שניות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_yalla_sortie",
+    "kind": "command",
+    "payload": "יאללה, take off, טוס קדימה 8 מטרים ותנחת",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_if_possible",
+    "kind": "command",
+    "payload": "אם אפשר, עלה 6 מטרים ואז פנה ימינה 90 מעלות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_slow_chain",
+    "kind": "command",
+    "payload": "בסדר, עכשיו רד לאט 3 מטרים ואז טוס אחורה 2 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_rega_no_wait",
+    "kind": "command",
+    "payload": "רגע, קודם עלה 4 מטרים ואז פנה שמאלה 90 מעלות",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_shniya_twice",
+    "kind": "command",
+    "payload": "שנייה, תעלה 3 מטרים ושנייה אחרי זה רד מטר אחד",
+    "flags": [
+     "hebnum-digits",
+     "one-meter"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_self_correct",
+    "kind": "command",
+    "payload": "עלה חמישה... לא, 3 מטרים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_climb_then_count",
+    "kind": "command",
+    "payload": "אחרי שתעלה 3 מטרים, תספור כמה אנשים יש למטה",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "l75_v_okso_full_turn",
+    "kind": "command",
+    "payload": "בסדר, אז ככה: take off, ואז 2 מטרים למעלה, ואז תסתובב מלא",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-noun-inline"
+    ],
+    "t_ms": 0
+   }
+  ],
+  "perception": [
+   {
+    "case": "i_mid_windows",
+    "kind": "command",
+    "payload": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_third_door",
+    "kind": "command",
+    "payload": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_rear_wheel",
+    "kind": "command",
+    "payload": "התמקד בגלגל האחורי של האופנוע החונה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_top_windows",
+    "kind": "command",
+    "payload": "ספור את החלונות בקומה העליונה של המגדל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_roof_corner",
+    "kind": "command",
+    "payload": "סמן את הפינה השמאלית העליונה של הגג האדום",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_chimney",
+    "kind": "command",
+    "payload": "הדגש את הארובה של הבית הנמוך ביותר ברחוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_back_entrance",
+    "kind": "command",
+    "payload": "מצא את הכניסה האחורית של המחסן הגדול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_ladder_pickup",
+    "kind": "command",
+    "payload": "סמן את הסולם שעל הגג של הטנדר הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_car_by_red",
+    "kind": "command",
+    "payload": "הדגש את המכונית שצמודה לאדם עם הלבוש האדום",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_orange_cap",
+    "kind": "command",
+    "payload": "עקוב אחרי האדם עם הכובע ה-orange",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "i_door_by_coat",
+    "kind": "command",
+    "payload": "סמן את הדלת שליד האיש עם המעיל השחור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_bike_fence",
+    "kind": "command",
+    "payload": "התמקד באופניים שנשענים על ה-fence של הבית הצהוב",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "i_dog_by_dress",
+    "kind": "command",
+    "payload": "עקוב אחרי הכלב שהולך ליד האישה עם השמלה הלבנה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_kid_bag",
+    "kind": "command",
+    "payload": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_tree_truck",
+    "kind": "command",
+    "payload": "סמן את העץ שמאחורי המשאית הצהובה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_win_over_door",
+    "kind": "command",
+    "payload": "מצא את החלון שמעל הדלת הכחולה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_cars_by_flag",
+    "kind": "command",
+    "payload": "ספור את המכוניות שחונות מול הבניין עם הדגל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_bench_trees",
+    "kind": "command",
+    "payload": "הדגש את הספסל שבין 2 העצים הגבוהים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "i_behind_moto",
+    "kind": "command",
+    "payload": "עקוב אחרי הרכב שנוסע מאחורי האופנוע האדום",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_man_on_roof",
+    "kind": "command",
+    "payload": "סמן את האיש שעומד על הגג של הבניין הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_box_by_man",
+    "kind": "command",
+    "payload": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_girl_balloon",
+    "kind": "command",
+    "payload": "עקוב אחרי הילדה עם הבלון שהולכת ליד האישה עם העגלה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_car_between",
+    "kind": "command",
+    "payload": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_door_by_tree",
+    "kind": "command",
+    "payload": "מצא את הדלת של הבית שמול העץ הגבוה ביותר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_sign_awning",
+    "kind": "command",
+    "payload": "התמקד בשלט שמעל הכניסה של החנות עם הסוכך הירוק",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_front_tire",
+    "kind": "command",
+    "payload": "הדגש את הצמיג הקדמי של המכונית שחונה הכי קרוב לשער",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_bench_fountain",
+    "kind": "command",
+    "payload": "ספור את האנשים שיושבים על הספסלים משמאל למזרקה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_exit_gray",
+    "kind": "command",
+    "payload": "עקוב אחרי האדם שיצא מהדלת של הבניין האפור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_second_car",
+    "kind": "command",
+    "payload": "סמן את הרכב השני משמאל בשורה הקדמית של החניון",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_dark_stain",
+    "kind": "command",
+    "payload": "מצא את הכתם הכהה על הקיר שמימין לחלון הגדול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_glasses_talk",
+    "kind": "command",
+    "payload": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_truck_boat",
+    "kind": "command",
+    "payload": "עקוב אחרי המשאית שגוררת את הסירה הלבנה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_empty_chair",
+    "kind": "command",
+    "payload": "סמן את הכיסא הריק ליד השולחן העגול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_bird_cable",
+    "kind": "command",
+    "payload": "התמקד בציפור שיושבת על הכבל בין 2 העמודים",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "i_fence_gap",
+    "kind": "command",
+    "payload": "מצא את הפתח בfence שמאחורי המכולה הכחולה",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "i_main_steps",
+    "kind": "command",
+    "payload": "ספור את המדרגות בכניסה הראשית של הבניין הגבוה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_helmet_mid",
+    "kind": "command",
+    "payload": "הדגש את הרוכב עם הקסדה הצהובה שנמצא במרכז הקבוצה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_cat_climb",
+    "kind": "command",
+    "payload": "עקוב אחרי החתול שמטפס על העץ שליד החומה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_lean_silver",
+    "kind": "command",
+    "payload": "סמן את הבחור שנשען על המכונית הכסופה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_flag_low",
+    "kind": "command",
+    "payload": "מצא את הדגל שמתנוסס מעל הגג של המבנה הנמוך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_broken_window",
+    "kind": "command",
+    "payload": "הדגש את החלון השבור בקומה התחתונה של הבניין הנטוש",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_last_convoy",
+    "kind": "command",
+    "payload": "עקוב אחרי המכונית האחרונה בשיירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_big_tent",
+    "kind": "command",
+    "payload": "סמן את האוהל הגדול ביותר בקצה השדה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_crane_arm",
+    "kind": "command",
+    "payload": "התמקד בזרוע של המנוף שמעל אתר הבנייה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "i_boats_pier",
+    "kind": "command",
+    "payload": "ספור את הסירות הקשורות למזח הצפוני",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_bag_chain",
+    "kind": "command",
+    "payload": "הדגש את התיק שמונח ליד הכיסא שמאחורי הדלפק של החנות עם הסוכך הכחול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_bird_branch",
+    "kind": "command",
+    "payload": "סמן את הציפור שעל הענף של העץ שליד הכניסה לבניין האפור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_kid_ball",
+    "kind": "command",
+    "payload": "עקוב אחרי הילד עם הכדור שרץ ליד ה-fence של המגרש שמאחורי בית הספר",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_win_gas",
+    "kind": "command",
+    "payload": "התמקד בחלון השבור בקומה השנייה של הבית שמול תחנת הדלק",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_hat_bench",
+    "kind": "command",
+    "payload": "מצא את הכובע שנפל ליד הספסל שמתחת לעץ הגדול בפינת הפארק",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_flag_mast",
+    "kind": "command",
+    "payload": "סמן את הדגל הקטן שעל התורן של הסירה שקשורה למזח הדרומי",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_sticker",
+    "kind": "command",
+    "payload": "הדגש את המדבקה שעל הפגוש של המכונית שחונה מאחורי המשאית הירוקה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_dog_steps",
+    "kind": "command",
+    "payload": "עקוב אחרי הכלב הקטן שמשחק ליד הילדה שיושבת על המדרגות של הבית הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_lock_gate",
+    "kind": "command",
+    "payload": "התמקד במנעול שעל השער של ה-fence שמקיפה את המגרש הריק",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_helmet_seat",
+    "kind": "command",
+    "payload": "מצא את הקסדה שמונחת על המושב של האופנוע שחונה ליד הכניסה לחניון",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_sign_between",
+    "kind": "command",
+    "payload": "סמן את השלט הקטן שמעל הדלת של החנות שבין המסעדה לבנק",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_drainpipe",
+    "kind": "command",
+    "payload": "הדגש את הצינור שיורד מהגג של הבית שליד עמוד החשמל הגבוה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_umbrella_x",
+    "kind": "command",
+    "payload": "עקוב אחרי האישה עם המטרייה האדומה שחוצה את הכביש ליד הרמזור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_hole_wall",
+    "kind": "command",
+    "payload": "התמקד בחור שבקיר של המבנה הישן שמאחורי מגרש החניה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_tilt_sign",
+    "kind": "command",
+    "payload": "מצא את התמרור שנוטה הצידה ליד הפנייה לרחוב עם העצים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_crate_trunk",
+    "kind": "command",
+    "payload": "סמן את הארגז שמציץ מתא המטען של הרכב שחונה מול השער הצהוב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_mural",
+    "kind": "command",
+    "payload": "הדגש את הציור שעל הקיר של הבניין שמימין לגשר להולכי הרגל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_cat_jump",
+    "kind": "command",
+    "payload": "עקוב אחרי החתול שקופץ מהגדר אל הגג של המחסן שבחצר האחורית",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_faucet",
+    "kind": "command",
+    "payload": "התמקד בברז שבצד של הבית שליד הערוגה עם הפרחים האדומים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_truck_text",
+    "kind": "command",
+    "payload": "מצא את הכיתוב שעל הדופן של המשאית שעוצרת ליד תחנת האוטובוס המקורה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_busstop",
+    "kind": "command",
+    "payload": "עקוב אחרי האיש עם החולצה הכחולה, זה שעומד ליד תחנת האוטובוס, בצד השמאלי של המסך, קרוב לספסל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_notmoving",
+    "kind": "command",
+    "payload": "סמן את המכונית הלבנה, לא זו שנוסעת, זו שחונה ליד המדרכה, עם הדלת הפתוחה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_antennas",
+    "kind": "command",
+    "payload": "הדגש את הבניין הגבוה, זה עם האנטנות על הגג, שנמצא מאחורי מגרש המשחקים, קצת ימינה מהמרכז",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_drone2",
+    "kind": "command",
+    "payload": "עקוב אחרי הרחפן השני, הקטן יותר, שטס נמוך מעל השדה, ליד קו העצים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_leash",
+    "kind": "command",
+    "payload": "מצא את הכלב החום, עם הרצועה האדומה, שמשחק על הדשא, בין 2 הספסלים, ליד השביל",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_window3",
+    "kind": "command",
+    "payload": "התמקד בחלון השלישי מימין, בקומה השנייה, של הבניין עם הקירות הצהובים, זה שליד בית הקפה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_notphone",
+    "kind": "command",
+    "payload": "סמן את האדם שעומד הכי קרוב לכניסה, עם התיק הגדול, לא זה עם הטלפון",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_2riders",
+    "kind": "command",
+    "payload": "עקוב אחרי האופנוע השחור, זה עם 2 הרוכבים, שנוסע בנתיב הימני, לכיוון הצומת",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_bluedoor",
+    "kind": "command",
+    "payload": "הדגש את הדלת הכחולה, השלישית משמאל, בשורת החנויות, ליד הדוכן של הפירות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_smallbike",
+    "kind": "command",
+    "payload": "מצא את הילד עם הכובע האדום, זה שרוכב על אופניים קטנים, על השביל, ליד הברזייה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_roofnear",
+    "kind": "command",
+    "payload": "סמן את הגג של הבית הכי קרוב אליך, זה עם הסולם שנשען עליו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_leaving",
+    "kind": "command",
+    "payload": "עקוב אחרי המשאית ה-orange שיוצאת עכשיו מהאתר, זו עם הארגז הפתוח",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_flagman",
+    "kind": "command",
+    "payload": "הדגש את האיש בקצה הימני של הקבוצה, זה עם הכובע, שמחזיק את הדגל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_notsail",
+    "kind": "command",
+    "payload": "התמקד בסירה הקטנה עם המנוע, לא במפרשית, זו שקרובה יותר לחוף",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_bushes",
+    "kind": "command",
+    "payload": "מצא את הפתח בfence, בערך באמצע שלה, איפה שהשיחים נמוכים",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_campole",
+    "kind": "command",
+    "payload": "סמן את העמוד עם המצלמה, זה שנמצא בפינה של החניון, ליד היציאה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_fastwalk",
+    "kind": "command",
+    "payload": "עקוב אחרי האישה עם המעיל הארוך, זו שהולכת מהר, בצד הרחוק של הכיכר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_planks",
+    "kind": "command",
+    "payload": "הדגש את הערימה של הקרשים, ליד הקיר האחורי, מתחת לחלון",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_halfgate",
+    "kind": "command",
+    "payload": "התמקד בשער הכחול בקצה השביל, זה שחצי פתוח",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_spare",
+    "kind": "command",
+    "payload": "מצא את הצמיג הרזרבי שמחובר לחלק האחורי של הגיפ האפור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_stage3",
+    "kind": "command",
+    "payload": "סמן את הקבוצה של שלושת האנשים שעומדים הכי קרוב לבמה, משמאל לרמקול הגדול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_hay",
+    "kind": "command",
+    "payload": "עקוב אחרי הטרקטור הירוק שעובד בשדה, זה שגורר את העגלה עם החציר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_fullbin",
+    "kind": "command",
+    "payload": "הדגש את הפח ה-orange ליד הכניסה האחורית, זה שמלא עד למעלה",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_wirebirds",
+    "kind": "command",
+    "payload": "התמקד בציפורים שיושבות על החוטים, רק אלה שמעל הכביש, לא אלה שמעל המדרכה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_extstairs",
+    "kind": "command",
+    "payload": "מצא את המדרגות החיצוניות בצד של הבניין, אלה שמובילות לגג",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_wrongway",
+    "kind": "command",
+    "payload": "סמן את הרכב היחיד בחניון שחונה הפוך, עם הפנים ליציאה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_firstrun",
+    "kind": "command",
+    "payload": "עקוב אחרי הקבוצה של הרצים, ספציפית אחרי זה עם ה-vest הצהוב שרץ ראשון",
+    "flags": [
+     "inline-english"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_barrel",
+    "kind": "command",
+    "payload": "הדגש את החבית שמונחת על הצד, ליד ערימת החול, מאחורי הבטונדות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_puddle",
+    "kind": "command",
+    "payload": "התמקד בשלולית הגדולה באמצע הדרך, זו שמשקפת את הבניין",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_scaffold",
+    "kind": "command",
+    "payload": "מצא את הסולם הכי גבוה בין אלה שנשענים על הפיגום, בצד המערבי",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_idledozer",
+    "kind": "command",
+    "payload": "סמן את הדחפור הצהוב שעומד בלי לזוז ליד הבור הגדול, לא את זה שעובד",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_cart",
+    "kind": "command",
+    "payload": "עקוב אחרי העגלה של הקניות שמישהו דוחף במעלה הרחוב, ליד המכוניות החונות",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_graffiti",
+    "kind": "command",
+    "payload": "הדגש את הכתובת שרשומה על הקיר, מתחת לחלון השני משמאל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_ferris",
+    "kind": "command",
+    "payload": "התמקד בגלגל הענק בקצה הפארק, ספציפית בתא התחתון שלו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "j_pin_planters",
+    "kind": "command",
+    "payload": "מצא את 2 העציצים הגדולים משני צידי הדלת הראשית של המלון",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "lp_white_car",
+    "kind": "command",
+    "payload": "תעקוב אחרי המכונית הלבנה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "lp_nearest_person",
+    "kind": "command",
+    "payload": "תדגיש את האדם שהכי קרוב אליך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "lp_look_down",
+    "kind": "command",
+    "payload": "תסתכל למטה בבקשה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_see_now",
+    "kind": "command",
+    "payload": "מה אתה רואה עכשיו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_see_frame",
+    "kind": "command",
+    "payload": "מה אתה רואה בפריים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_count_people_see",
+    "kind": "command",
+    "payload": "כמה אנשים אתה רואה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_count_cars_see",
+    "kind": "command",
+    "payload": "כמה מכוניות אתה רואה בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_see_suspicious",
+    "kind": "command",
+    "payload": "מה אתה רואה חשוד בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_count_vehicles_road",
+    "kind": "command",
+    "payload": "כמה רכבים אתה רואה על הכביש",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_see_ahead",
+    "kind": "command",
+    "payload": "מה אתה רואה לפניך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_count_windows_see",
+    "kind": "command",
+    "payload": "כמה חלונות אתה רואה בבניין",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_person",
+    "kind": "command",
+    "payload": "האם יש אדם בתמונה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_vehicle",
+    "kind": "command",
+    "payload": "האם יש רכב בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_red_car",
+    "kind": "command",
+    "payload": "האם יש מכונית אדומה בפריים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_roof_person",
+    "kind": "command",
+    "payload": "האם יש מישהו על הגג",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_weapon",
+    "kind": "command",
+    "payload": "האם יש מישהו חמוש בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_backpack_left",
+    "kind": "command",
+    "payload": "האם יש תיק גב בצד שמאל",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_any_movement",
+    "kind": "command",
+    "payload": "האם יש תנועה בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_whats_in_frame",
+    "kind": "command",
+    "payload": "מה נמצא בפריים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_whats_ahead",
+    "kind": "command",
+    "payload": "מה נמצא לפניך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_describe_scene",
+    "kind": "command",
+    "payload": "תאר את מה שאתה רואה בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_identify_threats",
+    "kind": "command",
+    "payload": "זהה איומים אפשריים בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_find_people",
+    "kind": "command",
+    "payload": "מצא את כל האנשים בפריים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_count_buildings",
+    "kind": "command",
+    "payload": "ספור את הבניינים בזירה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_search_vehicle",
+    "kind": "command",
+    "payload": "חפש רכב חשוד באזור",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_look_ground",
+    "kind": "command",
+    "payload": "הסתכל על הקרקע ותאר מה יש",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_identify_color",
+    "kind": "command",
+    "payload": "זהה את הצבע של הרכב הקרוב ביותר",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "pq_focus_describe",
+    "kind": "command",
+    "payload": "התמקד באדם הקרוב ותאר אותו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_open_window_2nd",
+    "kind": "command",
+    "payload": "סמן את החלון הפתוח בקומה השנייה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_follow_blue_bike",
+    "kind": "command",
+    "payload": "עקוב אחרי האופניים הכחולים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_count_entrance",
+    "kind": "command",
+    "payload": "כמה אנשים עומדים ליד הכניסה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_describe_right",
+    "kind": "command",
+    "payload": "תאר לי מה יש מימין",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_all_vehicles",
+    "kind": "command",
+    "payload": "הדגש את כל הרכבים",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_purple_bag",
+    "kind": "command",
+    "payload": "סמן את האדם עם התיק הסגול",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_count_cars_behind_white",
+    "kind": "command",
+    "payload": "כמה מכוניות חונות מאחורי הבניין הלבן",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_anyone_armed",
+    "kind": "command",
+    "payload": "יש כאן מישהו עם נשק?",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_look_right",
+    "kind": "command",
+    "payload": "תסתכל ימינה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "p75_approach_blue_car",
+    "kind": "command",
+    "payload": "התקרב לרכב הכחול",
+    "flags": [],
+    "t_ms": 0
+   }
+  ],
+  "military": [
+   {
+    "case": "s_indian_circle",
+    "kind": "command",
+    "payload": "תבצע מעגל אינדיאני על המטרה מולך",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_sitrep",
+    "kind": "command",
+    "payload": "טפס לגובה ותן לי תמונת מצב",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_jump_point",
+    "kind": "command",
+    "payload": "קפוץ לנקודה ותשאר עליה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_gentle_scan",
+    "kind": "command",
+    "payload": "תעשה לי סריקה עדינה על האזור",
+    "flags": [
+     "slang-sector"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_eye_junction",
+    "kind": "command",
+    "payload": "שים עין על הצומת ואל תרד ממנו",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_zoom_suspect",
+    "kind": "command",
+    "payload": "תן זום על הרכב החשוד ותחזיק אותו במרכז",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_route_escort",
+    "kind": "command",
+    "payload": "עלה על ציר התנועה ותלווה אותו עד הפנייה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_dead_ground",
+    "kind": "command",
+    "payload": "תפוס גובה, יש לך שטח מת מאחורי הגבעה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_give_distance",
+    "kind": "command",
+    "payload": "רחפן 2 נכנס לאזור שלך, תן לו מרחק",
+    "flags": [
+     "hebnum-digits",
+     "slang-sector"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_one_more_pass",
+    "kind": "command",
+    "payload": "תעשה עוד סיבוב מעל השכונה ואז תחזור הביתה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_grid_out",
+    "kind": "command",
+    "payload": "עבור לנקודת הציון שנתתי לך",
+    "flags": [
+     "acronym-grid",
+     "proc-out-final"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_roger_over",
+    "kind": "command",
+    "payload": "קיבלתי, ממשיך בסריקה",
+    "flags": [
+     "proc-roger",
+     "proc-over-final"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_cp_visual",
+    "kind": "command",
+    "payload": "יש לי קשר עין עם עמדת הפיקוד ליד המבנה",
+    "flags": [
+     "acronym-cp"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_eyes_on",
+    "kind": "command",
+    "payload": "תדווח כשיש לך עיניים על המטרה",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s_rally_point",
+    "kind": "command",
+    "payload": "קיבלתי, חוזר לנקודת האיסוף",
+    "flags": [
+     "abbrev-point"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_feet_hold",
+    "kind": "command",
+    "payload": "תעלה לשמונה מאות פיט ותחכה בהמתנה מעל האזור",
+    "flags": [
+     "feet-unit"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_lost_uav",
+    "kind": "command",
+    "payload": "אבד קשר עם כלי הטיס הבלתי מאויש, תתחיל סריקה באזור הצפונית",
+    "flags": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_scramble",
+    "kind": "command",
+    "payload": "בצע המראה מיידית, יש משימת חירום",
+    "flags": [
+     "takeoff-homograph",
+     "slang-scramble"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_obs_report",
+    "kind": "command",
+    "payload": "החזק תצפית על הבית הלבן, דווח כל תזוזה",
+    "flags": [
+     "proc-over-final"
+    ],
+    "t_ms": 0
+   },
+   {
+    "case": "s_wadi_route",
+    "kind": "command",
+    "payload": "טוס נמוך על הוואדי עד המפגש עם הציר, שם תמתין",
+    "flags": [],
+    "t_ms": 0
+   },
+   {
+    "case": "s75_observe_junction",
+    "kind": "command",
+    "payload": "תן לי תצפית על הצומת ודווח",
+    "flags": [],
+    "t_ms": 0
+   }
+  ]
+ },
+ "wall_s": 81
+}

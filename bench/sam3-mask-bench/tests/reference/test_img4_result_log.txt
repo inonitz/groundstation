@@ -1,0 +1,16 @@
+[recognize] 2026-08-19 22:36:16
+[recognize] argv    : recognize.py ../../test_img4.png Highlight all the people detected in the image and also highlight the boilers at the top of the left building --mask -o ../../test_img4_result.jpg
+[recognize] image   : ../../test_img4.png  (1024x768)
+[recognize] prompt  : Highlight all the people detected in the image and also highlight the boilers at the top of the left building
+[recognize] backend : Qwen3-VL @ http://127.0.0.1:8080   mask=True
+[recognize] querying VLM...
+
+=== VLM ANSWER  (4.9s) ===
+There are two people walking in the foreground, and a third person is visible sitting on debris in the background. The boilers at the top of the left building are not highlighted as they are not clearly identifiable in the image.
+
+=== OBJECTS (3) ===
+  people                   (567, 616, 599, 718)
+  people                   (626, 609, 672, 719)
+  people                   (547, 544, 582, 585)
+
+[recognize] saved image -> ../../test_img4_result.jpg
