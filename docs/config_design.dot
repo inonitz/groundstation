@@ -1,0 +1,32 @@
+digraph config {
+  rankdir=TB; compound=true; splines=ortho; ranksep=0.8; nodesep=0.95;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+        margin="0.24,0.15", fillcolor="#eef2f7", color="#334155"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#475569"];
+
+  subgraph cluster_intent {
+    label="Intended design — 3 config layers"; labelloc=t; fontsize=12;
+    color="#94a3b8"; style="rounded";
+    K [label="config_constants.py  (_K)\nBAKED — never per-run\n• ports, sizes, colors\n• model paths, SEG=sam3",
+       fillcolor="#dbeafe", color="#2563eb"];
+    D [label="config_defaults.py  (_D)\nPER-RUN — env-overridable\n• VIDEO / CONTROL / PHONE_IP / TTS\n• wire_target(), video_input()",
+       fillcolor="#dbeafe", color="#2563eb"];
+    C [label="config.py — the ONE adapter\nthe app's single import surface\n• maps _K/_D → app names\n• sets MIOPEN before torch",
+       fillcolor="#f5d0fe", color="#a21caf"];
+    { rank=same; K; D; }
+  }
+
+  APP [label="most modules\nimport config → config.X\n(the intended path)", fillcolor="#fef9c3", color="#ca8a04"];
+  G   [label="test_config_golden.py\npins _K + _D → golden values\n(3 app scenarios)\n→ makes any rewrite SAFE",
+       fillcolor="#dcfce7", color="#16a34a"];
+  DEV [label="Deviations today (why it doesn't earn its keep)\n• mvd.py imports _K/_D directly — bypasses the adapter\n• ports hardcoded in pipeline / concept / phone_asr\n• config.py re-wraps _K in env-get — split re-decided",
+       fillcolor="#fee2e2", color="#dc2626"];
+
+  K -> C [label="baked"];
+  D -> C [label="+ resolvers"];
+  C -> APP [label="config.X"];
+  K -> G [label="pins"];
+  D -> G [label="pins"];
+  C -> DEV [label="ignored / bypassed", style=dashed, color="#dc2626", fontcolor="#dc2626"];
+  { rank=same; APP; G; }
+}

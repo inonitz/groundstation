@@ -43,7 +43,7 @@ bash tools/devenv/install-runtime-deps.sh   # after any container rebuild
 
 # MVD desk test, no drone (mock control + webcam):
 python3 tools/dji_mock/mock_apiserver.py 127.0.0.1 8079     # terminal 1
-bash projects/integration/run_mvd.sh webcam mock            # terminal 2
+bash projects/integration_harden2/run.sh up webcam mock     # terminal 2
 
 # SITL (PX4 + Gazebo + FMU):
 projects/llm_to_action/test/sitl/run.sh --list

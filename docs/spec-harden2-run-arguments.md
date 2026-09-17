@@ -1,18 +1,18 @@
 # harden2 run arguments — what each one actually does (2026-09-10)
 
-Read from the code (run_mvd.sh, run_llama_server.sh, mvd.py, recognizer/pipeline, perception,
+Read from the code (run.sh, run_llama_server.sh, mvd.py, recognizer/pipeline, perception,
 and the desk-test wrappers), not from comments. Default in [brackets].
 
-## Positional (run_mvd.sh VIDEO CONTROL; up.sh sets them for you)
+## Positional (run.sh up VIDEO CONTROL)
 - VIDEO [webcam]: webcam | dji | rtmp. Picks the video source. webcam -> a /dev/video device (WEBCAM_DEV);
   dji -> the phone's H.264 over the ROS gstreamer node; rtmp/drone -> an rtsp url.
 - CONTROL [mock]: mock | real. mock -> REST to 127.0.0.1:8079. real -> the phone at 8080, HUMAN-ONLY,
   prompts you to type ARMED. The agent never runs real.
 
 ## System / which tree
-- MVD_HOME [integration_harden] (up.sh/preflight/status): which project tree to boot. ALWAYS pass
-  integration_harden2; the script default points at the dead tree.
-- MVD_DRONE [set to 1 by run_mvd]: turns on the in-process drone router.
+- MVD_HOME [integration_harden2] (bench/score only): which tree the bench imports in place; run.sh
+  hardcodes harden2, so you never pass this to run the app.
+- MVD_DRONE [set to 1 by run.sh]: turns on the in-process drone router.
 
 ## Model, planner, translator
 - MVD_PLANNER [gemma4]: gemma4 | qwen3vl. gemma4 = one Gemma 4 E4B for routing + planning + vision +
@@ -51,7 +51,7 @@ and the desk-test wrappers), not from comments. Default in [brackets].
 - To silence TTS use MVD_TTS=0. On the webcam with no phone, use SCENE_TTS=phonikud for an offline Hebrew
   voice; SCENE_TTS=phone needs a reachable phone (and the phone needs data for Google TTS).
 
-## Control wire (set by run_mvd from CONTROL)
+## Control wire (set by run.sh from CONTROL)
 - MVD_WIRE_HOST [127.0.0.1 mock | PHONE_IP real], MVD_WIRE_PORT [8079 | 8080], MVD_WIRE_REAL [empty | 1].
 - PHONE_IP [derived from the default route]: the phone/hotspot gateway, used for real control AND as the
   gstreamer video source. Never hardcode it; it changes per hotspot session.
@@ -65,9 +65,9 @@ and the desk-test wrappers), not from comments. Default in [brackets].
   session clips folder.
 
 ## Session, recording, logs
-- MVD_SESSION_DIR: the session folder (utterances.jsonl + clips/). up.sh sets it; a direct run_mvd makes
+- MVD_SESSION_DIR: the session folder (trace.jsonl + asr_clips/). run.sh sets it; a direct run makes
   its own.
-- MVD_SESSIONS_ROOT, DESK_TEST_RECORD [1], DESK_TEST_LOGDIR, TMPDIR: up.sh's session/log locations.
+- MVD_SESSIONS_ROOT, DESK_TEST_RECORD [1], DESK_TEST_LOGDIR, TMPDIR: run.sh's session/log locations.
 
 ## Display / audio
 - DISPLAY [:0]: X display for the app window. PULSE_SERVER [unix:/tmp/pulse-socket]: audio socket.
@@ -81,10 +81,10 @@ and the desk-test wrappers), not from comments. Default in [brackets].
 
 ## SCENE_TTS (voice-out) — valid values
 
-`SCENE_TTS = phone | phonikud | espeak | piper | both | off` (default `phone`). An unrecognized value
-(e.g. `on`) now prints a warning and falls to off. `phone` speaks via the phone's Android TextToSpeech
-(needs cellular/Wi-Fi data). `phonikud` is the OFFLINE Hebrew voice: phonikud G2P (niqqud+stress -> IPA)
--> Piper onnx voice -> aplay; models default to /root/models/tts/phonikud/ (override with
-SCENE_PHONIKUD_G2P / _VOICE / _CONFIG), installed by tools/devenv/install-runtime-deps.sh; falls back to
-espeak if missing. `espeak` is a robotic last-resort fallback (bad Hebrew). `piper` needs a piper binary +
-voice + aplay. Model license: phonikud voice is cc-nc -- demo/competition use only (see HISTORY 2026-09-16).
+`SCENE_TTS = phone | phonikud | off` (default `phone`). An unrecognized value prints a warning and falls
+to off. We speak Hebrew ONLY. `phone` speaks via the phone's Android TextToSpeech (Google he-IL; needs
+data). `phonikud` is the OFFLINE Hebrew voice: phonikud G2P (niqqud+stress -> IPA) -> Piper onnx voice ->
+aplay; models default to /root/models/tts/phonikud/ (override with SCENE_PHONIKUD_G2P / _VOICE / _CONFIG),
+installed by tools/devenv/install-runtime-deps.sh. If SCENE_TTS=phonikud and the model is missing the app
+CRASHES (fail loud, no silent fallback). espeak/piper were removed (add a SOTA English voice back if ever
+needed). The phonikud voice is cc-nc -- demo/competition use only.

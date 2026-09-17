@@ -26,11 +26,11 @@ imports them in place. Python speaks the frozen ApiServer wire — no C++ FMU en
 |---|---|
 | control/ | transcript -> drone verb, deterministic: commands.py (4-tier grammar, emergency-regex source of truth), router.py (dispatch), dji_wire.py (frozen-wire client, loopback-guarded) |
 | audio/ | voice I/O channels: ros2_asr.py (ROS2 transcript subscriber), phone_asr.py (phone-as-mic REST+TCP inlet, deduped), tts_io.py (TTS outlet: phone /tts, local piper/espeak fallback). ASR itself is EXTERNAL (asr_node + sttserv) |
-| video/ | camera_stream.py (every frame source behind a cv2.VideoCapture-like surface), video_doctor.py (layer-by-layer path diagnosis), video_watchdog.py (stall monitor + gst respawn) |
+| video/ | camera_stream.py (every frame source behind a cv2.VideoCapture-like surface), video_watchdog.py (stall monitor + gst respawn) |
 | recognizer/ | the Hebrew Recognizer, stages 0-6 (own README, sync rule inside) |
 | perception/ | the perception engine, injected models (own README) |
 | test/ | 32 wiring tests (models faked) + live_mock_smoke.py (all 4 tiers over real HTTP vs the mock) |
-| top-level glue | mvd.py (the app), config.py, run_mvd.sh, run_router.py, run_llama_server.sh |
+| top-level glue | mvd.py (the app), config.py, run.sh, run_llama_server.sh |
 
 ## Data flow
 
@@ -65,9 +65,9 @@ After a container rebuild run `bash /root/groundstation/tools/devenv/install-run
 
 ```bash
 # mock (safe, agent-testable):
-bash /root/groundstation/projects/integration_harden2/run_mvd.sh webcam mock
+bash /root/groundstation/projects/integration_harden2/run.sh up webcam mock
 # real drone video + real control (HUMAN-only, aircraft SECURED):
-PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden2/run_mvd.sh dji real
+PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden2/run.sh up dji real
 ```
 `dji` video flows gstreamer_rx -> camera/stream -> CameraStream (sole :5600 client).
 
@@ -99,9 +99,9 @@ ip route | awk '/^default/{print $3}'
 # 2. verify the wire reaches the aircraft (safe, read-only) -> expect aircraft JSON:
 curl http://<PHONE_IP>:8080/status/
 # 3a. FIRST flight = control-focused, no drone-video dependency (webcam for the CV window):
-PHONE_IP=<PHONE_IP> bash /root/groundstation/projects/integration_harden2/run_mvd.sh webcam real
+PHONE_IP=<PHONE_IP> bash /root/groundstation/projects/integration_harden2/run.sh up webcam real
 # 3b. Full demo (drone footage via gstreamer_rx -> camera/stream): use once 3a works
-PHONE_IP=<PHONE_IP> bash /root/groundstation/projects/integration_harden2/run_mvd.sh dji real
+PHONE_IP=<PHONE_IP> bash /root/groundstation/projects/integration_harden2/run.sh up dji real
 #     -> type ARMED, then press H to talk
 ```
 
