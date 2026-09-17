@@ -115,7 +115,7 @@ def rapl_delta(prev, cur):
 
 def pct(xs, q):
     if not xs: return None
-    s = sorted(xs); return s[min(len(s) - 1, int(q / 100 * len(s)))]
+    s = sorted(xs); return s[min(len(s) - 1, int(round(q / 100 * (len(s) - 1))))]
 
 
 def integ(ts, ws):
