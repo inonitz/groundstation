@@ -121,6 +121,7 @@ class Pipeline:
             else:
                 self.say(self.REJECT_HE + text); action = "reject"
         self.observe(timings={"recognizer_ms": _rec_ms, "plan_ms": _plan_ms, "e2e_ms": round((time.time() - t0) * 1000)})
+        self.observe(action=action)
         self.trace.record(text=text, kind=kind, flags=flags, action=action, payload=obj, ms=round((time.time() - t0) * 1000))
         return action
 
