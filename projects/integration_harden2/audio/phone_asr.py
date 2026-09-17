@@ -18,11 +18,13 @@ import json
 import threading
 import time
 
+import config
+
 _HTTP_METHODS = ("POST", "GET", "PUT", "HEAD", "OPTIONS", "DELETE", "PATCH")
 
 
 class PhoneEars:
-    def __init__(self, on_text, host="0.0.0.0", port=8080, dedup_window=1.5):
+    def __init__(self, on_text, host="0.0.0.0", port=config.PHONE_ASR_PORT, dedup_window=1.5):
         self._on_text = on_text
         self.host = host
         self.port = port

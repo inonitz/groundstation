@@ -15,6 +15,7 @@ import json
 import os
 import re
 import time
+import config
 try:
     from perception2.lexicon import fix_target                  # harden2 root is on sys.path (mvd / tests)
 except Exception:                                               # pragma: no cover - never block routing on the lexicon
@@ -31,7 +32,7 @@ except ImportError:                    # run flat from inside the package direct
     from recognizer import _nums_en, recognize_direct, numbers_vs_mission
     from trace import Trace
 
-QWEN_PORT = 18090       # the Gemma server (name kept for the bench's qwen_port= call)
+QWEN_PORT = config.LLAMA_SERVER_PORT       # the Gemma server (name kept for the bench's qwen_port= call)
 
 # The planner's own few-shot missions. A planned mission identical to one of them, from an input that
 # carries none of that example's numbers, is a COPY of the example, not a plan (live 2026-09-08 u74).

@@ -6,7 +6,7 @@ them without editing a script. Fixed values live in config_constants.py. Names d
 env keys in brackets are what you type at launch.
 """
 import os, socket, subprocess, time
-from config_constants import MOCK_WIRE_PORT, REAL_WIRE_PORT
+from .constants import MOCK_WIRE_PORT, REAL_WIRE_PORT
 
 def _default_route_ip():
     """The single device connected to the laptop = the WiFi hotspot gateway (the phone). Always derive

@@ -5,8 +5,8 @@ single import surface, but the VALUES live in the two merged config files:
 This file only maps those to the names the app uses and keeps the env overrides (so a launch can still
 tune a knob). It imports no other app module, so it also loads from a bare script."""
 import os
-import config_constants as _K
-import config_defaults as _D
+from . import constants as _K
+from . import defaults as _D
 
 # ROCm/MIOpen: fast kernel-search so the one-time GPU kernel compile at startup is short (harmless on
 # non-AMD). Must be set before torch initializes the GPU.
@@ -63,3 +63,32 @@ PHONIKUD_CONFIG = _D.PHONIKUD_CONFIG
 resolve_device       = _D.resolve_device
 resolve_torch_device = _D.resolve_torch_device
 default_gateway      = _D.default_gateway
+
+# ============================ 8. Perception knobs =========================
+# Env resolution lives here (moved out of mvd.py) so config is the single place. Consumers read config.X.
+SEG          = os.environ.get("SCENE_SEG", _K.SEGMENTER)
+SAM3_PERIOD  = float(os.environ.get("SCENE_SAM3_PERIOD", str(_K.SAM3_MIN_SECONDS_BETWEEN_FORWARDS)))
+HL_GIVEUP    = float(os.environ.get("SCENE_HL_GIVEUP", str(_K.HIGHLIGHT_GIVEUP_SECONDS)))
+GATE         = _D.HIGHLIGHT_PRESENCE_GATE
+COUNT_FRAMES = int(os.environ.get("SCENE_COUNT_FRAMES", str(_K.COUNT_MEDIAN_FRAMES)))
+COUNT_GAP    = float(os.environ.get("SCENE_COUNT_GAP", str(_K.COUNT_FRAME_GAP_SECONDS)))
+MIN_BOX_FRAC = float(os.environ.get("SCENE_MIN_BOX_FRAC", str(_K.MIN_BOX_FRACTION_OF_FRAME)))
+HL_TOPK      = int(os.environ.get("SCENE_HL_TOPK", str(_K.SAM3_MAX_BOXES_PER_QUERY)))
+HL_MAX       = int(os.environ.get("SCENE_HL_MAX", str(_K.MAX_HIGHLIGHTS_DRAWN_PER_FRAME)))
+DETECT_FLOOR = float(os.environ.get("SCENE_DETECT_FLOOR", str(_K.DETECTOR_QUERY_THRESHOLD)))
+HL_CONF      = float(os.environ.get("SCENE_HL_CONF", str(_K.MIN_DRAW_CONFIDENCE)))
+HL_REL       = _D.RELATIVE_CONFIDENCE_GATE
+
+# ============================ 9. Ports + channels =========================
+LLAMA_SERVER_PORT = _K.LLAMA_SERVER_PORT          # bare Gemma port (recognizer/pipeline.py)
+PHONE_ASR_PORT    = int(os.environ.get("MVD_PHONE_ASR_PORT", str(_K.PHONE_ASR_PORT)))
+PHONE_ASR_ENABLED = os.environ.get("MVD_PHONE_ASR", "1" if _K.PHONE_ASR_ENABLED else "0") != "0"
+TTS_ENABLED       = _D.TTS_ENABLED
+
+# ============================ 10. Video watchdog ==========================
+WATCHDOG_STALL_SEC = float(os.environ.get("WATCHDOG_STALL_SEC", str(_K.WATCHDOG_STALL_SECONDS)))
+WATCHDOG_RETRY_SEC = float(os.environ.get("WATCHDOG_RETRY_SEC", str(_K.WATCHDOG_RETRY_SECONDS)))
+
+# ============================ 11. Scenario resolvers ======================
+wire_target = _D.wire_target       # (host, port, is_real) for CONTROL=mock|real
+video_input = _D.video_input       # the app's --source for VIDEO=webcam|dji

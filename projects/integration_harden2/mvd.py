@@ -17,7 +17,6 @@ import cv2, numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # self-contained: import only local modules
 import config
-import config_constants as _K, config_defaults as _D   # the two merged config files are the source of truth
 from perception import PerceptionEngine, parse_highlight, ascii_only, parse_count
 from perception import vlm_client as vlm
 from perception.detectors import Eyes
@@ -58,20 +57,20 @@ def _fmt_cmd(c):
 SESSION = None
 # Highlight backend: SAM3 only. One SAM3-nf4 forward gives boxes AND masks (perception2.Sam3Backend).
 # The old OmDet-Turbo + SAM2.1 pair was removed 2026-09-17.
-SEG = os.environ.get("SCENE_SEG", _K.SEGMENTER)      # only "sam3" is valid; build_highlight rejects anything else
-SAM3_PERIOD = float(os.environ.get("SCENE_SAM3_PERIOD", str(_K.SAM3_MIN_SECONDS_BETWEEN_FORWARDS)))   # min seconds between SAM3 forwards
-HL_GIVEUP = float(os.environ.get("SCENE_HL_GIVEUP", str(_K.HIGHLIGHT_GIVEUP_SECONDS)))
-GATE = _D.HIGHLIGHT_PRESENCE_GATE    # highlight presence: sam3 (DEFAULT, owner ruling 2026-09-09 07:35: Gemma plans, SAM3 sees) | either | vlm (Gemma decides)
-COUNT_FRAMES = int(os.environ.get("SCENE_COUNT_FRAMES", str(_K.COUNT_MEDIAN_FRAMES)))         # frames per count answer, median taken (2026-09-09)
-COUNT_GAP = float(os.environ.get("SCENE_COUNT_GAP", str(_K.COUNT_FRAME_GAP_SECONDS)))           # seconds between those frames
-MIN_BOX_FRAC = float(os.environ.get("SCENE_MIN_BOX_FRAC", str(_K.MIN_BOX_FRACTION_OF_FRAME)))
+SEG = config.SEG      # only "sam3" is valid; build_highlight rejects anything else
+SAM3_PERIOD = config.SAM3_PERIOD   # min seconds between SAM3 forwards
+HL_GIVEUP = config.HL_GIVEUP
+GATE = config.GATE    # highlight presence: sam3 (DEFAULT, owner ruling 2026-09-09 07:35: Gemma plans, SAM3 sees) | either | vlm (Gemma decides)
+COUNT_FRAMES = config.COUNT_FRAMES         # frames per count answer, median taken (2026-09-09)
+COUNT_GAP = config.COUNT_GAP           # seconds between those frames
+MIN_BOX_FRAC = config.MIN_BOX_FRAC
 # No arbitrary object cap. SAM3 returns boxes+masks in ONE cached pass, so there is no per-box cost to
 # limit (the old 3/8 caps were inherited from OmDet+SAM2.1, where each box cost a separate SAM2.1 mask).
 # The real ceiling is SAM3's own object-query budget (sam3-mask-bench: 47 windows, 51 in market-2; exact
 # budget not yet measured). We set these ABOVE that budget so we never clip a real scene; they exist only
 # as a latency safety-valve, tunable by env, not as a product limit. Counting must never be clipped.
-HL_TOPK = int(os.environ.get("SCENE_HL_TOPK", str(_K.SAM3_MAX_BOXES_PER_QUERY)))   # SAM3 boxes per query; above SAM3's own budget so it never clips
-HL_MAX  = int(os.environ.get("SCENE_HL_MAX", str(_K.MAX_HIGHLIGHTS_DRAWN_PER_FRAME)))    # detections DRAWN per frame; effectively draw-all
+HL_TOPK = config.HL_TOPK   # SAM3 boxes per query; above SAM3's own budget so it never clips
+HL_MAX  = config.HL_MAX    # detections DRAWN per frame; effectively draw-all
 OM = {"det": None}
 ENGINE = {"e": None}       # PerceptionEngine, built in main() once eyes exist
 
@@ -382,9 +381,9 @@ def main():
         detect=detect,
         mask_for_box=mask_for_box,
         vlm_ask=vlm.ask,
-        floor=float(os.environ.get("SCENE_DETECT_FLOOR", str(_K.DETECTOR_QUERY_THRESHOLD))),
-        draw_conf=float(os.environ.get("SCENE_HL_CONF", str(_K.MIN_DRAW_CONFIDENCE))),
-        rel=_D.RELATIVE_CONFIDENCE_GATE,
+        floor=config.DETECT_FLOOR,
+        draw_conf=config.HL_CONF,
+        rel=config.HL_REL,
         mask_k=HL_MAX)   # 2026-09-09: was the constructor default 3; "highlight all the cars" needs many
 
     voice = None
@@ -437,7 +436,7 @@ def main():
     if os.environ.get("MVD_PHONE_ASR", "1") != "0" and not a.no_ears:
         try:
             from audio.phone_asr import PhoneEars
-            phone_ears = PhoneEars(on_text, port=int(os.environ.get("MVD_PHONE_ASR_PORT", "8080")))
+            phone_ears = PhoneEars(on_text, port=config.PHONE_ASR_PORT)
         except Exception as e:
             print("[mvd] PhoneEars unavailable:", e, flush=True)
     if a.target:

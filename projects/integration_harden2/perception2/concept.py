@@ -179,11 +179,8 @@ def make_vlm_asker(url=None, timeout=15):
     """Build a text-only ask(question)->text bound to the resident llama-server. No image: concept
     extraction is a text task. Returns '' on any failure so extract_concepts falls back offline."""
     import requests
-    try:
-        import config
-        base = url or config.LLAMA_URL
-    except Exception:
-        base = url or "http://127.0.0.1:18090"
+    import config
+    base = url or config.LLAMA_URL
 
     def ask(question):
         body = {"messages": [{"role": "user", "content": question}],
