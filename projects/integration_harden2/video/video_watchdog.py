@@ -4,8 +4,8 @@ Subscribes to camera_stream.TOPIC via the shared FrameCounter. If frames stop fo
 gst tmux pane (fresh tcpclientsrc connect to the phone), retrying every RETRY_SEC until video returns,
 then announces RECOVERED. Meant to run as its own window alongside the app.
 
-Run as a MODULE from the integration_harden root:
-    cd /root/groundstation/projects/integration_harden && python3 -m video.video_watchdog
+Run as a MODULE from the integration_harden2 root:
+    cd /root/groundstation/projects/integration_harden2 && python3 -m video.video_watchdog
 """
 import os, time, subprocess
 

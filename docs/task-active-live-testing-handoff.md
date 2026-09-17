@@ -160,3 +160,30 @@ the demo TTS remains the phone (Google he-IL). piper Hebrew would need a he voic
 - 5a VERIFIED: SCENE_TTS is read through the python config chain -- env SCENE_TTS -> config.py
   TTS_BACKEND (os.environ.get) -> tts_io Voice. Tested: phonikud/phone/off map through, default phone.
   The run.sh fix (forward SCENE_TTS to the app env) makes the CLI value reach that chain reliably.
+
+## FROZEN-TREE / STALE-PATH BUG SWEEP 2026-09-17 (owner-requested)
+
+Two bug types hunted repo-wide, squashed in the LIVE integration_harden2 tree (never touched the frozen
+integration_tts or the other dev's llm_to_action). Verified: 66 tests pass; final greps clean.
+
+TYPE A -- runtime output written INTO the frozen tree (resolved off __file__/$HERE):
+- recognizer/trace.py: default traces/ (next to the package) -> <repo>/logs/traces (+ MVD_TRACE_DIR override).
+- config_defaults.py: SESSIONS_ROOT default _HERE/sessions -> <repo>/logs/sessions (CLIPS_DIR/SESSION_DIR derive from it).
+- run_mvd.sh: MVD_SESSION_DIR default $HERE/sessions -> <repo>/logs/sessions.
+- Checked clean: run.sh (RUN_ROOT + session_dir already logs/), session_log.py, show_session.py, score_session.py,
+  video_watchdog BIN, recognizer/llama.py (logs to /tmp), perception vlm_client (/tmp).
+
+TYPE B -- stale paths to archived/moved locations:
+- projects/integration_harden (the fork archived in the restructure) -> projects/integration_harden2 in
+  video/{video_watchdog,video_doctor,camera_stream}.py, perception{,2}/detectors.py comments,
+  perception2/chain_demo.py, and README run commands.
+- tools/bench (moved to bench/) -> bench/ in perception2/{sam3_backend,chain_demo}.py + README, recognizer/{README,__init__}.
+- PRESERVED as history (correct, not bugs): README.md:1 "FORK of integration_harden", recognizer.py:39 "copied from
+  projects/integration_harden/commands.py". MVD_HOME defaults already = integration_harden2 (correct).
+
+FLAGGED, not fixed here (out of the two bug types):
+- README.md:7 heading "# integration_harden/ -- the revised MVD" is stale prose -> the README doc-pass, not a path fix.
+- run_mvd.sh is a LEGACY launcher superseded by run.sh (referenced only in comments); the restructure slated it for
+  archival. Recommend archiving it rather than keeping two launchers.
+- bench/ still has tools/bench + integration_harden refs (retired campaigns + the owner-accepted run_all.sh default);
+  separate from the frozen harden2 tree.

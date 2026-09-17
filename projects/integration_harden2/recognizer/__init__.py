@@ -1,5 +1,5 @@
 """The Recognizer module. Functional code only; the benchmark lives in
-tools/bench/hebrew-command-bench and is the development home (sync rule in README.md)."""
+bench/hebrew-command-bench and is the development home (sync rule in README.md)."""
 from .recognizer import _nums_en, route, emergency, selftest
 from .pipeline import Pipeline
 

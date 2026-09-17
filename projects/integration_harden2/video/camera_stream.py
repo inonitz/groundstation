@@ -176,9 +176,9 @@ def open_capture(src):
 
 if __name__ == "__main__":
     # Self-contained smoke: read frames from any source for 3 s and report. No ROS needed for
-    # webcam/file sources. Run as a MODULE from the integration_harden root, which puts that root
+    # webcam/file sources. Run as a MODULE from the integration_harden2 root, which puts that root
     # on sys.path for free -- no path shim:
-    #     cd /root/groundstation/projects/integration_harden && python3 -m video.camera_stream 0
+    #     cd /root/groundstation/projects/integration_harden2 && python3 -m video.camera_stream 0
     import sys
     src = sys.argv[1] if len(sys.argv) > 1 else "0"
     cap = open_capture(src)

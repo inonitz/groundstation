@@ -4,9 +4,9 @@ layer by layer and names the ONE that's broken, so "waiting for video" is never 
 Layers: phone IP -> control reachable -> gst node running -> gst connected to :5600 ->
 phone actually sending frames -> ROS topic publishing.
 
-Run as a MODULE from the integration_harden root (that root is then on sys.path, so `import config`
+Run as a MODULE from the integration_harden2 root (that root is then on sys.path, so `import config`
 and `from video.camera_stream import ...` both resolve with no path shim):
-    cd /root/groundstation/projects/integration_harden && python3 -m video.video_doctor
+    cd /root/groundstation/projects/integration_harden2 && python3 -m video.video_doctor
 """
 import glob, os, subprocess, time
 

@@ -12,11 +12,11 @@ tiers (emergency, override, basic verbs) are untouched.
 | `pipeline.py` | the glue: `Pipeline(wire, vlm_query, say).handle(text)`, drop-in for on_complex |
 | `prompts.py` | prompts and grammars for both models |
 | `llama.py` | the chat call and (for tools) the server context manager |
-| `trace.py` | per-utterance JSONL recorder -> ../traces/, gitignored |
+| `trace.py` | per-utterance JSONL recorder -> <repo>/logs/traces/ (gitignored; MVD_TRACE_DIR overrides) |
 | `run_dicta_server.sh` | DictaLM on CPU, port 18091 (`SCENE_XLATE_PORT`) |
 | `run_hymt2_server.sh` | Hy-MT2-1.8B-Q4 on the GPU, same port, -c 1024 -np 1 (the deployed translator, ruling 2026-09-07) |
 
-## Guards added 2026-09-08 (all bench-gated, see tools/bench/hebrew-command-bench/README.md)
+## Guards added 2026-09-08 (all bench-gated, see bench/hebrew-command-bench/README.md)
 
 - Stage 4b answer-mode guard: a first-person reply ("I am", "I see", "I cannot", "please say", "my
   function") is retried with `translate(strict=True)`, then REJECTED and read back. Live cause: the
@@ -43,7 +43,7 @@ Servers: run_dicta_server.sh (CPU) or run_hymt2_server.sh (GPU) on the translato
 
 This folder is the component's SINGLE home (dedup ruling): the bench imports it from here
 and measures it in place. Rules change HERE, then
-`python3 /root/groundstation/tools/bench/hebrew-command-bench/bench.py` re-measures; a rule
+`python3 /root/groundstation/bench/hebrew-command-bench/bench.py` re-measures; a rule
 without a full re-measure is unverified. Measured state (2026-09-02): 301/364 overall,
 commands 98% at the planner ceiling; scorecard in the bench README.
 

@@ -4,5 +4,6 @@ __pycache__/
 logs
 datasets
 archive
-docs/private
+docs/stale/*
+docs/private/*
 *.log

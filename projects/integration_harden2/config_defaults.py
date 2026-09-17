@@ -52,7 +52,8 @@ ASR_CAPTURE_DEVICE = os.environ.get("ASR_CAPTUREID")                      # [ASR
 # ── Recording + session (ONE root; clips and logs derive from it) ─────────────────────────
 RECORD_SESSION = os.environ.get("RECORD", "1") != "0"         # [RECORD] record the whole session (utterances + clips)
 _HERE          = os.path.dirname(os.path.abspath(__file__))
-SESSIONS_ROOT  = os.environ.get("MVD_SESSIONS_ROOT", os.path.join(_HERE, "sessions"))   # [MVD_SESSIONS_ROOT]
+SESSIONS_ROOT  = os.environ.get("MVD_SESSIONS_ROOT",
+                     os.path.abspath(os.path.join(_HERE, "..", "..", "logs", "sessions")))  # [MVD_SESSIONS_ROOT] repo logs/, NOT the frozen tree
 SESSION_DIR    = os.environ.get("MVD_SESSION_DIR") or os.path.join(                      # [MVD_SESSION_DIR]
                      SESSIONS_ROOT, "session-%s-%s" % (time.strftime("%Y%m%d-%H%M%S"), socket.gethostname()))
 CLIPS_DIR      = os.path.join(SESSION_DIR, "clips")           # derived from SESSION_DIR (was ASR_RECORD_DIR)

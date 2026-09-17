@@ -41,7 +41,7 @@ concepts = extract_concepts(phrase, ask=ask)            # 'the vehicles' -> 'car
 
 SAM3 is a concept segmenter. It wants bare nouns and does not generalize one class to another
 (ask for `car` and vans stay unmarked). The front-end expands a phrase into an explicit synonym
-set before it reaches SAM3. Evidence: `tools/bench/sam3-mask-bench/RESULTS.md`.
+set before it reaches SAM3. Evidence: `bench/sam3-mask-bench/RESULTS.md`.
 
 ## Precision + speed
 
@@ -54,7 +54,7 @@ set before it reaches SAM3. Evidence: `tools/bench/sam3-mask-bench/RESULTS.md`.
 | `fp8` | yes | 202 ms | 1710 MiB | fastest; needs `compile=True` (torchao fp8 kernels) |
 
 `compile=True` builds on the first call (~1-3 min, one-time per process): use it for a long-running
-service, not short CLI runs. Full table + method: `tools/bench/sam3-mask-bench/results/2026-09-03-sam3-quant-latency.md`.
+service, not short CLI runs. Full table + method: `bench/sam3-mask-bench/results/2026-09-03-sam3-quant-latency.md`.
 
 ## Open findings
 
@@ -73,7 +73,7 @@ into SAM3 concepts with `phrase_concepts()` (attribute-preserving, no model call
 backpack` -> `red backpack`, `all the vehicles` -> the synonym set. The VLM front-end
 (`extract_concepts`) stays available but is not on the live path, because its prompt drops
 colours and would highlight every car when the user asked for the white one (SAM3 discriminates
-attributes: `tools/bench/sam3-mask-bench/RESULTS.md`, Web candidates, finding 2). Per-frame
+attributes: `bench/sam3-mask-bench/RESULTS.md`, Web candidates, finding 2). Per-frame
 SAM3 forwards are rate-limited by `SCENE_SAM3_PERIOD` (default 1.0 s) so the highlight loop does
 not hog the GPU the VLM and whisper share. Boot the SAM3 stack with
 `SCENE_SEG=sam3 MVD_TRANSLATOR=hymt2 bash tools/desk-test/up.sh`. OWNER DECISION pending: flip
@@ -83,4 +83,4 @@ this package (`engine.py`, `vlm_client.py`, `detectors.py` here are still verbat
 ## Status
 
 `chain_demo.py` runs the full instruction -> concept -> SAM3 -> masks path.
-Measured comparison lives in `tools/bench/sam3-mask-bench/`.
+Measured comparison lives in `bench/sam3-mask-bench/`.

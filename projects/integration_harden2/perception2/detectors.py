@@ -7,7 +7,7 @@ engine.py stays model-free. Contents moved from highlight_seg.py (OmDet) and eye
 """
 import torch
 
-import config      # integration_harden root is on sys.path for every consumer of this package
+import config      # integration_harden2 root is on sys.path for every consumer of this package
 
 
 class OmDet:

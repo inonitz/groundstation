@@ -25,7 +25,7 @@ present, box = engine.presence_gate(frame, phrase)                 # per new tar
 ```
 
 Tuning knobs are constructor arguments, read once from SCENE_DETECT_FLOOR / SCENE_HL_CONF /
-SCENE_HL_REL at startup. The package needs the integration_harden root on sys.path.
+SCENE_HL_REL at startup. The package needs the integration_harden2 root on sys.path.
 
 ## History
 

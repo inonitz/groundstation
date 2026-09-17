@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """End-to-end chain demo for perception2: instruction -> concept (VLM) -> presence gate (VLM) ->
-SAM3 grounding -> masks. Prints each stage and writes an overlay image. Run from integration_harden:
+SAM3 grounding -> masks. Prints each stage and writes an overlay image. Run from integration_harden2:
 
     python3 perception2/chain_demo.py [image] [instruction]
 """
@@ -10,7 +10,7 @@ import perception2
 from perception2 import parse_highlight, extract_concepts, make_vlm_asker, build_engine
 from perception2 import vlm_client as vlm
 
-BENCH = "/root/groundstation/tools/bench/sam3-mask-bench"
+BENCH = "/root/groundstation/bench/sam3-mask-bench"
 
 
 def run(image, instruction, precision="nf4"):

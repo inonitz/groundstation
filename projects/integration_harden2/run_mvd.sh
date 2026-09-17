@@ -31,7 +31,7 @@ ASR_BACKEND="${ASR_BACKEND:-whisper-whisper}"
 ASR_LANGUAGE="${ASR_LANGUAGE:-he}"
 # Session folder (trace.jsonl + asr_clips/ + perception/): up.sh passes MVD_SESSION_DIR; a direct run (dji real, 2026-09-09 block C)
 # makes its own so the take is recorded the same way. `set -u` made the old bare $MVD_SESSION_DIR abort the real run.
-MVD_SESSION_DIR="${MVD_SESSION_DIR:-$HERE/sessions/session-$(date +%Y%m%d-%H%M%S)-$(hostname)}"
+MVD_SESSION_DIR="${MVD_SESSION_DIR:-$(cd "$HERE/../.." && pwd)/logs/sessions/session-$(date +%Y%m%d-%H%M%S)-$(hostname)}"  # repo logs/, NOT the frozen tree
 mkdir -p "$MVD_SESSION_DIR/asr_clips"
 ASR_RECORD="${ASR_RECORD:-1}"                 # 1 = save each utterance as a .wav (dataset); default ON since 2026-09-09
 ASR_RECORD_DIR="${ASR_RECORD_DIR:-$MVD_SESSION_DIR/asr_clips}"   # clip output dir (up.sh points this at the session folder)

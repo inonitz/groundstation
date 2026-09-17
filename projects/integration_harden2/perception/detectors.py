@@ -2,7 +2,7 @@
 background YOLO26-seg (Eyes). OmDet and the lazy SAM2 mask were deleted with the old highlight backend
 on 2026-09-11; the live highlight is SAM3 (perception2.Sam3Backend, wired in mvd.build_highlight).
 Eyes.background() is the closed-set detector kept for possible reuse (owner ruling 2026-09-11)."""
-import config      # integration_harden root is on sys.path for every consumer of this package
+import config      # integration_harden2 root is on sys.path for every consumer of this package
 
 
 class Eyes:

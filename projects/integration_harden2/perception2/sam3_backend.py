@@ -7,7 +7,7 @@ mask_for_box() returns the cached mask. There is no second inference.
 
 Model: facebook/sam3 (transformers-native), loaded int4-nf4 (bitsandbytes). Measured on an
 RTX 5070 (8 GiB Blackwell): ~918 MiB peak, ~0.4 s per phrase. Detection is on-demand (the
-'highlight' keyword), never per background frame. Evidence: tools/bench/sam3-mask-bench/RESULTS.md.
+'highlight' keyword), never per background frame. Evidence: bench/sam3-mask-bench/RESULTS.md.
 
 SAM3 is a CONCEPT segmenter. It wants bare nouns ('person','window','car'), not instructions,
 and it does NOT generalize one class to another ('car' will not return a van). Feed it explicit
@@ -29,7 +29,7 @@ class Sam3Backend:
         """precision: 'nf4' (smallest VRAM, default, fast load), 'bf16' (lossless), or 'fp8'
         (torchao dynamic-activation). compile: torch.compile the model -- REQUIRED for fp8 to hit
         its 202 ms; adds ~1-3 min one-time build on the first call. Latency evidence:
-        tools/bench/sam3-mask-bench/results/2026-09-03-sam3-quant-latency.md."""
+        bench/sam3-mask-bench/results/2026-09-03-sam3-quant-latency.md."""
         self.model_dir = model_dir
         self.precision = precision
         self.compile = compile
@@ -104,7 +104,7 @@ class Sam3Backend:
 def _smoke():
     """Real smoke test (needs the GPU + model). `python3 sam3_backend.py`."""
     import cv2
-    img = "/root/groundstation/tools/bench/sam3-mask-bench/candidates/img0.png"
+    img = "/root/groundstation/bench/sam3-mask-bench/candidates/img0.png"
     frame = cv2.imread(img)
     be = Sam3Backend()
     dets = be.detect(frame, "window", conf=0.30)
