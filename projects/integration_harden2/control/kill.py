@@ -5,14 +5,20 @@ never sends /c/stop to a real aircraft (CLAUDE.md drone-safety rules).
   kill()  -> wire.stop() = POST /c/stop = controller.stop(emergency=true): stops motion AND relinquishes our
              virtual-stick authority (the RC flies). The running /c/fly mission is cancelled phone-side.
   latch   -> takeoff / land / fly_mission / spin_by / fly_by / gimbal_pitch / scan_ground / go_home_to_user /
-             follow_me return REFUSED (409) and are NOT sent until rearm(). halt() and stop() stay allowed.
+             follow_me return REFUSED (409) and are NOT sent until rearm(). stop() stays allowed (direct /c/stop);
+             halt() is ALSO refused after a kill -- it routes through the guarded fly_mission (a /c/fly that
+             re-takes stick control), which the latch correctly prevents.
 Wraps the wire INSTANCE, so every caller (router basic verbs, pipeline missions, recorders) is covered.
 Live key (mvd window must have focus): M toggles -- first press kills, next press re-arms."""
 
 
 class KillSwitch:
+    # Every motion verb is refused after a kill. takeoff/land POST directly; the rest route through
+    # fly_mission -- listed explicitly (not left to transitive coverage) so a future refactor cannot
+    # silently unguard one. Do NOT shrink this to {takeoff,land,fly_mission}: a kill switch must not
+    # depend on every verb continuing to call fly_mission.
     MOTION = ("takeoff", "land", "fly_mission", "spin_by", "fly_by", "gimbal_pitch",
-              "scan_ground", "go_home_to_user", "follow_me")
+              "scan_ground", "go_home_to_user", "follow_me", "track_me", "wave")
     REFUSED = 409
 
     def __init__(self, wire, say=print):
