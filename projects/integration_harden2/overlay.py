@@ -123,15 +123,14 @@ def draw_box(img, box, color, label=None, thick=2):
         cv2.putText(img, label, (x1, max(y1 - 6, 12)), FONT, 0.5, color, 1, cv2.LINE_AA)
 
 
-def _model_lines(om_name):
+def _model_lines():
     """The live model stack, one (label, value) per subsystem, read from the env/config so it reflects
     what is actually wired -- not a hardcoded string. harden2 is single-stack (Gemma 4 / SAM3 / whisper);
     the env knobs still drive these, so a future swap shows here automatically."""
     planner = os.environ.get("MVD_PLANNER", "gemma4")
     planner = {"gemma4": "Gemma-4-E4B", "qwen3vl": "Qwen3-VL-4B"}.get(planner, planner)
-    seg = os.environ.get("SCENE_SEG", "sam3")
     prec = os.environ.get("SCENE_SAM3_PRECISION", "nf4")
-    eyes = {"sam3": f"SAM3-{prec}", "omdet": "OmDet+SAM2.1"}.get(seg, om_name or seg)
+    eyes = f"SAM3-{prec}"
     asr = os.environ.get("ASR_MODEL_PATH", "")
     if "ivrit" in asr:   ears = "whisper-ivrit-v3"
     elif asr:            ears = os.path.basename(os.path.dirname(asr)) or "whisper"
@@ -139,7 +138,7 @@ def _model_lines(om_name):
     return [("brain", planner), ("eyes", eyes), ("ears", ears)]
 
 
-def render_chat(height, chat, thinking, killed, session_dir, om_name):
+def render_chat(height, chat, thinking, killed, session_dir):
     """Build the chat panel from a SNAPSHOT. The caller holds S.lock and passes chat/thinking/killed;
     this function touches no shared state. chat: list of (role, text). A turn runs from one user line
     to the next; async results (highlight/describe land from a worker thread) stay in their turn."""
@@ -154,7 +153,7 @@ def render_chat(height, chat, thinking, killed, session_dir, om_name):
     # the dump path + key hints. Each line follows the real config, so it never lies -- if the env names
     # a different backend, the line changes with it. "·" is the mid-line dot (not ".").
     header = [("MVD harden2 — Hebrew voice drone", C["light"], "val")]
-    for _lbl, _val in _model_lines(om_name):
+    for _lbl, _val in _model_lines():
         header.append((f"{_lbl:<6}{_val}", C["dim"], "tag"))
     if session_dir:
         _dump = "/".join(session_dir.rstrip("/").split("/")[-2:])

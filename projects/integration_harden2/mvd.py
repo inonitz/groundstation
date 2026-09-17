@@ -56,12 +56,9 @@ def _fmt_cmd(c):
 
 
 SESSION = None
-# Highlight backend, chosen by SCENE_SEG:
-#   omdet (default) = OmDet-Turbo detect + SAM2.1 mask, two models -- the proven demo path.
-#   sam3            = one SAM3-nf4 forward gives boxes AND masks (perception2.Sam3Backend); OmDet
-#                     and SAM2.1 never load, which frees the ~705 MiB a GPU translator needs
-#                     (ruling 2026-09-07). Flip the default only after the live test passes on it.
-SEG = os.environ.get("SCENE_SEG", _K.SEGMENTER)      # default sam3 since 2026-09-08 (owner ruling); omdet = the old OmDet+SAM2.1 pair
+# Highlight backend: SAM3 only. One SAM3-nf4 forward gives boxes AND masks (perception2.Sam3Backend).
+# The old OmDet-Turbo + SAM2.1 pair was removed 2026-09-17.
+SEG = os.environ.get("SCENE_SEG", _K.SEGMENTER)      # only "sam3" is valid; build_highlight rejects anything else
 SAM3_PERIOD = float(os.environ.get("SCENE_SAM3_PERIOD", str(_K.SAM3_MIN_SECONDS_BETWEEN_FORWARDS)))   # min seconds between SAM3 forwards
 HL_GIVEUP = float(os.environ.get("SCENE_HL_GIVEUP", str(_K.HIGHLIGHT_GIVEUP_SECONDS)))
 GATE = _D.HIGHLIGHT_PRESENCE_GATE    # highlight presence: sam3 (DEFAULT, owner ruling 2026-09-09 07:35: Gemma plans, SAM3 sees) | either | vlm (Gemma decides)
@@ -75,7 +72,7 @@ MIN_BOX_FRAC = float(os.environ.get("SCENE_MIN_BOX_FRAC", str(_K.MIN_BOX_FRACTIO
 # as a latency safety-valve, tunable by env, not as a product limit. Counting must never be clipped.
 HL_TOPK = int(os.environ.get("SCENE_HL_TOPK", str(_K.SAM3_MAX_BOXES_PER_QUERY)))   # SAM3 boxes per query; above SAM3's own budget so it never clips
 HL_MAX  = int(os.environ.get("SCENE_HL_MAX", str(_K.MAX_HIGHLIGHTS_DRAWN_PER_FRAME)))    # detections DRAWN per frame; effectively draw-all
-OM = {"det": None, "name": "SAM3"}
+OM = {"det": None}
 ENGINE = {"e": None}       # PerceptionEngine, built in main() once eyes exist
 
 
@@ -86,7 +83,6 @@ class Shared:
         self.bg_dets, self.hl_dets, self.hl_masks = [], [], []
         self.target = None; self.thinking = False; self.vlm_box = None
         self.use_sam, self.show_bg = True, True
-        self.conf, self.mask_k = 0.62, 3
         self.chat = collections.deque(maxlen=60)
         self.fps = 0.0; self.running = True
         self.kill = None                      # KillSwitch once the wire exists (M toggles kill / re-arm)
@@ -94,27 +90,11 @@ class Shared:
 S = Shared()
 
 
-_last_hl_dbg = [0.0]
-def _hl_debug(tgt, raw, shape, thr=0.0):
-    """Throttled: show what OmDet actually returns for the gated target, with box coverage %.
-    Reads: 'found but low conf' vs 'found but too big' vs 'not found at all'."""
-    now = time.time()
-    if now - _last_hl_dbg[0] < 2.0: return
-    _last_hl_dbg[0] = now
-    Hf, Wf = shape[:2]; fa = float(Hf * Wf)
-    if not raw:
-        print(f"[hl-cand] '{tgt}': {OM['name']} found NOTHING above floor", flush=True); return
-    top = ", ".join(f"{d['label']}={d['conf']:.2f}@{100*((d['box'][2]-d['box'][0])*(d['box'][3]-d['box'][1])/fa):.0f}%"
-                    for d in raw[:5])
-    kept = sum(1 for d in raw if d["conf"] >= thr)
-    print(f"[hl-cand] '{tgt}' keep>={thr:.2f} ({kept}/{len(raw)}): {top}", flush=True)
-
-
 def worker(eyes):
     while S.running:
         with S.lock:
             frame = None if S.frame is None else S.frame.copy()
-            target, use_sam, show_bg, conf, mk = S.target, S.use_sam, S.show_bg, S.conf, S.mask_k
+            target, use_sam, show_bg = S.target, S.use_sam, S.show_bg
             vbox_px = S.vlm_box
         if frame is None:
             time.sleep(0.005); continue
@@ -122,8 +102,7 @@ def worker(eyes):
         hl, masks = [], []
         engine = ENGINE["e"]
         if target and engine is not None:
-            hl, masks, dbg = engine.highlight_step(frame, target, vbox_px, use_sam)
-            _hl_debug(target, dbg.get("raw", []), frame.shape, dbg.get("threshold", 0.0))
+            hl, masks, _ = engine.highlight_step(frame, target, vbox_px, use_sam)
             if hl and MIN_BOX_FRAC > 0:                     # drop speck boxes (same floor as the gate and the count)
                 fa = frame.shape[0] * frame.shape[1]; ms = list(masks) if masks else []
                 keep = [i for i, d in enumerate(hl) if (d["box"][2] - d["box"][0]) * (d["box"][3] - d["box"][1]) >= fa * MIN_BOX_FRAC]
@@ -159,9 +138,9 @@ def build_highlight(seg, eyes, loader=None):
 
     def _load():
         try:
-            OM["det"] = make(); print(f"[mvd] {OM['name']} ready", flush=True)
+            OM["det"] = make(); print(f"[mvd] SAM3 ready", flush=True)
         except Exception as e:
-            print(f"[mvd] {OM['name']} load FAILED:", e, flush=True)
+            print(f"[mvd] SAM3 load FAILED:", e, flush=True)
     th = threading.Thread(target=_load, daemon=True); th.start()
 
     last = {"phrase": None, "t": 0.0, "dets": []}
@@ -270,7 +249,7 @@ class TextHandler:
     def _count_thread(self, fr, phrase):
         """Count = median over COUNT_FRAMES consecutive frames of the contained-box-deduplicated SAM3
         instances at conf >= 0.5 (live 2026-09-09 block A: one frame, no dedup, gave 2/5/4/6 for the same chairs)."""
-        concepts = phrase_concepts(phrase) if SEG == "sam3" else phrase
+        concepts = phrase_concepts(phrase)
         counts = []
         cap_frame = None; cap_raw = []; cap_kept = []          # first analysed frame + its dets, for the record
         try:
@@ -328,7 +307,7 @@ class TextHandler:
         gate_raw, hits = [], []                                 # SAM3 dets for the record (empty on the VLM-only gate)
         if GATE != "sam3" and fr is not None and ENGINE["e"] is not None:
             present, px = ENGINE["e"].presence_gate(fr, tgt)
-        concepts = phrase_concepts(tgt) if SEG == "sam3" else tgt   # SAM3 grounds bare concepts
+        concepts = phrase_concepts(tgt)   # SAM3 grounds bare concepts
         if fr is not None and ENGINE["e"] is not None and (GATE == "sam3" or (GATE == "either" and not present)):
             try:
                 gate_raw = ENGINE["e"].detect(fr, concepts, 0.1)   # LOW floor so the absent message can report near-misses
@@ -395,10 +374,10 @@ def main():
     threading.Thread(target=vlm.ensure_server, daemon=True).start()
     eyes = Eyes()
     we_started_llama = subprocess.run(["pgrep", "-f", "llama-server"], capture_output=True).returncode != 0
-    # The engine is pure logic; the highlight backend (OmDet+SAM2.1 or SAM3, see SEG) arrives on
+    # The engine is pure logic; the highlight backend (SAM3, see SEG) arrives on
     # its background thread, so the callables check OM at call time. Env knobs are read once here.
     detect, mask_for_box, _ = build_highlight(SEG, eyes)
-    print(f"[mvd] highlight backend: {OM['name']} (SCENE_SEG={SEG})", flush=True)
+    print(f"[mvd] highlight backend: SAM3 (SCENE_SEG={SEG})", flush=True)
     ENGINE["e"] = PerceptionEngine(
         detect=detect,
         mask_for_box=mask_for_box,
@@ -410,9 +389,11 @@ def main():
 
     voice = None
     if os.environ.get("MVD_TTS", "1") != "0":
+        from audio.tts_io import Voice, TTSConfigError
         try:
-            from audio.tts_io import Voice
             voice = Voice()
+        except TTSConfigError:
+            raise                                   # fatal: phonikud asked for but its model is missing
         except Exception as e:
             print("[mvd] voice/TTS unavailable:", e, flush=True)
 
@@ -439,12 +420,6 @@ def main():
             # COMPLEX text now runs the Recognizer: a Hebrew command becomes a mission on the
             # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
             pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say, observe=(SESSION.set if SESSION else None))
-            _orig_handle = pipe.handle                    # record the pipeline's REAL action string
-            def _handle_rec(text, _o=_orig_handle):
-                out = _o(text)
-                if SESSION: SESSION.set(action=out)
-                return out
-            pipe.handle = _handle_rec
             router = Router(wire, on_complex=pipe.handle)
             S.kill = KillSwitch(wire, say=_say)   # owner ruling 2026-09-08: M = manual override toggle (stop + RC control + latch)
             on_text.router = router
@@ -524,9 +499,9 @@ def main():
                 _chat, _thinking = list(S.chat), S.thinking
                 _killed = bool(S.kill and S.kill.killed)
             chat_panel = render_chat(disp.shape[0], _chat, _thinking, _killed,
-                                     SESSION.dir if SESSION else None, OM["name"])
+                                     SESSION.dir if SESSION else None)
             canvas = cv2.hconcat([disp, chat_panel])
-            hud = f"{fps:4.1f} fps | {OM['name']}:{'ready' if OM['det'] else 'loading'} | {_srclabel} | {_wlabel}"
+            hud = f"{fps:4.1f} fps | SAM3:{'ready' if OM['det'] else 'loading'} | {_srclabel} | {_wlabel}"
             cv2.putText(canvas, hud, (10, 22), FONT, 0.55, (0, 0, 0), 3, cv2.LINE_AA)            # shadow -> readable on a white wall
             cv2.putText(canvas, hud, (10, 22), FONT, 0.55, config.COL_HUD, 1, cv2.LINE_AA)       # cyan
             ptt = "F5 to talk (F5, speak, F5)"
