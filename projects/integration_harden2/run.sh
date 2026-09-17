@@ -206,7 +206,7 @@ source $ROS_SETUP
 cd $HERE
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export SCENE_TMUX_SESSION=$SESSION MVD_DRONE=1 SCENE_SEG=$SEG
-export SCENE_TTS_LANG="${SCENE_TTS_LANG:-he}" SCENE_BG="${SCENE_BG:-off}" MVD_TTS="${MVD_TTS:-1}"
+export SCENE_TTS="${SCENE_TTS:-phone}" SCENE_TTS_LANG="${SCENE_TTS_LANG:-he}" SCENE_BG="${SCENE_BG:-off}" MVD_TTS="${MVD_TTS:-1}"
 export MVD_SESSION_DIR="$session_dir"
 export MVD_WIRE_HOST=$wire_host MVD_WIRE_PORT=$wire_port MVD_WIRE_REAL=$wire_real
 export SCENE_INPUT="$scene_input"

@@ -44,11 +44,12 @@ and the desk-test wrappers), not from comments. Default in [brackets].
 - SCENE_INPUT [set from VIDEO]: the video source string CameraStream reads.
 
 ## Speech answers / TTS
-- MVD_TTS [1]: 1 tries to bring up the phone TTS voice; 0 disables it. THIS is the real off switch.
-- SCENE_TTS_LANG [he]: language for the phone's spoken answers.
-- GOTCHA: SCENE_TTS is NOT read by anything. "SCENE_TTS=off" in old comments/commands is a NO-OP. To
-  silence TTS use MVD_TTS=0. On the webcam with no phone, TTS is off anyway because the voice backend
-  fails to attach, not because of any flag.
+- MVD_TTS [1]: 1 brings up the TTS voice (backend = SCENE_TTS); 0 disables it. THIS is the master off switch.
+- SCENE_TTS [phone]: selects the voice backend (see the SCENE_TTS section below). run.sh forwards it to the
+  app now; earlier builds did not, so old "SCENE_TTS=..." run.sh commands were no-ops (fixed 2026-09-17).
+- SCENE_TTS_LANG [he]: language for the spoken answers.
+- To silence TTS use MVD_TTS=0. On the webcam with no phone, use SCENE_TTS=phonikud for an offline Hebrew
+  voice; SCENE_TTS=phone needs a reachable phone (and the phone needs data for Google TTS).
 
 ## Control wire (set by run_mvd from CONTROL)
 - MVD_WIRE_HOST [127.0.0.1 mock | PHONE_IP real], MVD_WIRE_PORT [8079 | 8080], MVD_WIRE_REAL [empty | 1].
