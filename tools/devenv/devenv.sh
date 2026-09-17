@@ -11,6 +11,9 @@ ContainerPathASRModelPath="/root/models/asr"
 HostPathTranslationModel="$HOME/models/translate"
 ContainerPathTranslationModelPath="/root/models/translate"
 
+HostPathTTSModel="$HOME/models/tts"
+ContainerPathTTSModelPath="/root/models/tts"
+
 HostPathVLMModel="$HOME/models/vlm"
 ContainerPathVLMModelPath="/root/models/vlm"
 
@@ -41,6 +44,7 @@ set -- "$@" -v "$HOME/.config/pulse/cookie:/root/.config/pulse/cookie:ro"
 set -- "$@" -e "PULSE_SERVER=unix:/tmp/pulse-socket"
 set -- "$@" -v "${HostPathASRModel}:${ContainerPathASRModelPath}"
 set -- "$@" -v "${HostPathTranslationModel}:${ContainerPathTranslationModelPath}"
+set -- "$@" -v "${HostPathTTSModel}:${ContainerPathTTSModelPath}"
 set -- "$@" -v "${HostPathVLMModel}:${ContainerPathVLMModelPath}"
 set -- "$@" -v "${HostPathVisionModel}:${ContainerPathVisionModelPath}"
 set -- "$@" -v "vscode_server_cache:/root/.vscode-server"
