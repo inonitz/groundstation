@@ -13,6 +13,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     dos2unix \
     netcat-openbsd \
     pulseaudio-utils \
+    espeak-ng \
+    alsa-utils \
     fonts-freefont-ttf \
     libasound2-plugins \
     git \
@@ -72,7 +74,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/in
 #     instead, build with tools/devenv/build-devenv.sh (auto-detects NVIDIA/AMD/CPU) which sets --build-arg TORCH_INDEX for you.
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG TORCH_INDEX=https://download.pytorch.org/whl/cpu
-RUN --mount=type=cache,target=/root/.cache/pip pip install --index-url ${TORCH_INDEX} torch torchvision && pip install "numpy<2" "opencv-python<4.12" ultralytics "transformers>=5.15" pillow safetensors lapx requests timm aiohttp sentencepiece python-bidi "bitsandbytes==0.50.2" "accelerate==1.14.0"
+RUN --mount=type=cache,target=/root/.cache/pip pip install --index-url ${TORCH_INDEX} torch torchvision && pip install "numpy<2" "opencv-python<4.12" ultralytics "transformers>=5.15" pillow safetensors lapx requests timm aiohttp sentencepiece python-bidi "bitsandbytes==0.50.2" "accelerate==1.14.0" phonikud phonikud-onnx phonikud-tts
 
 # 3. Define VS Code Environment Variables
 ENV VSCodeClangdAbsPath=/usr/bin/clangd

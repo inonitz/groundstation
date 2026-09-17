@@ -37,6 +37,11 @@ TTS_TIMEOUT      = float(os.environ.get("SCENE_TTS_TIMEOUT", "3"))    # [SCENE_T
 TTS_PIPER_MODEL  = os.environ.get("SCENE_TTS_MODEL", "/root/models/tts/voices/en_US-lessac-medium.onnx")  # desk-debug only
 TTS_PIPER_BIN    = os.environ.get("SCENE_TTS_PIPER_BIN", "/root/models/tts/piper/piper")                  # desk-debug only
 TTS_PIPER_SR     = int(os.environ.get("SCENE_TTS_SR", "22050"))       # desk-debug piper raw sample rate
+# Phonikud offline Hebrew TTS (SCENE_TTS=phonikud): G2P adds niqqud+stress -> IPA -> Piper onnx voice.
+# Models are cc-nc (demo/competition use only); fetched by tools/devenv/install-runtime-deps.sh.
+PHONIKUD_G2P     = os.environ.get("SCENE_PHONIKUD_G2P",    "/root/models/tts/phonikud/phonikud-1.0.int8.onnx")
+PHONIKUD_VOICE   = os.environ.get("SCENE_PHONIKUD_VOICE",  "/root/models/tts/phonikud/model.onnx")
+PHONIKUD_CONFIG  = os.environ.get("SCENE_PHONIKUD_CONFIG", "/root/models/tts/phonikud/model.config.json")
 
 # ── ASR escape hatches (keep all; the restore-English / swap-model path) ──────────────────
 ASR_MODEL_PATH     = os.environ.get("ASR_MODEL_PATH", "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin")

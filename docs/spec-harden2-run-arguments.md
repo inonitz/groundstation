@@ -77,3 +77,13 @@ and the desk-test wrappers), not from comments. Default in [brackets].
 - preflight.sh: checks models, cameras, and the stack before a boot. Reads MVD_HOME, MVD_TRANSLATOR,
   SCENE_SEG.
 - status.sh [--watch [secs]]: one-shot health, or --watch streams the phone 503 gate (watch_503.sh).
+
+## SCENE_TTS (voice-out) — valid values
+
+`SCENE_TTS = phone | phonikud | espeak | piper | both | off` (default `phone`). An unrecognized value
+(e.g. `on`) now prints a warning and falls to off. `phone` speaks via the phone's Android TextToSpeech
+(needs cellular/Wi-Fi data). `phonikud` is the OFFLINE Hebrew voice: phonikud G2P (niqqud+stress -> IPA)
+-> Piper onnx voice -> aplay; models default to /root/models/tts/phonikud/ (override with
+SCENE_PHONIKUD_G2P / _VOICE / _CONFIG), installed by tools/devenv/install-runtime-deps.sh; falls back to
+espeak if missing. `espeak` is a robotic last-resort fallback (bad Hebrew). `piper` needs a piper binary +
+voice + aplay. Model license: phonikud voice is cc-nc -- demo/competition use only (see HISTORY 2026-09-16).

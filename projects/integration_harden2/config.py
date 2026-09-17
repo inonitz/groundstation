@@ -55,6 +55,9 @@ TTS_TIMEOUT = _D.TTS_TIMEOUT
 TTS_MODEL     = _D.TTS_PIPER_MODEL
 TTS_PIPER_BIN = _D.TTS_PIPER_BIN
 TTS_SR        = _D.TTS_PIPER_SR
+PHONIKUD_G2P    = _D.PHONIKUD_G2P
+PHONIKUD_VOICE  = _D.PHONIKUD_VOICE
+PHONIKUD_CONFIG = _D.PHONIKUD_CONFIG
 
 # =============================== 7. Resolvers =============================
 resolve_device       = _D.resolve_device

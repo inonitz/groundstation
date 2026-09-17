@@ -475,7 +475,7 @@ def main():
         print("cannot open", a.source); return
 
     threading.Thread(target=worker, args=(eyes,), daemon=True).start()
-    win = "integration:mvd"; cv2.namedWindow(win, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+    win = "integration:mvd"; cv2.namedWindow(win, cv2.WINDOW_AUTOSIZE)   # AUTOSIZE: opens at content size (frame+chat), not resizable to empty margins
     tprev = time.time(); readfail = 0
     live = str(a.source) in ROS_SOURCES or "://" in str(a.source) or "!" in str(a.source)
     _src = str(a.source)                                 # HUD: what we are watching + who we talk to (static per run)
