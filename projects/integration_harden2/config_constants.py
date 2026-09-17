@@ -3,7 +3,9 @@
 Decided values that do not change between runs. One place, by category, readable at a glance. Names
 describe intent. Anything you change per run is in config_defaults.py. Deleted knobs (the MVD_HOME fork-selector — harden2 is the only system, launchers hardcode it now —
 translator, qwen3vl, omdet/sam2/yolo, thinking flag, SCENE_TTS backend-switch, the MVD_DRONE router toggle) do not
-appear here at all. Routing is unconditional now: CONTROL_TARGET alone decides the wire, so there is no
+appear here at all. Routing is unconditional now: the live wire is set by MVD_WIRE_REAL/MVD_WIRE_HOST (run.sh derives
+them from the CONTROL arg; the Python CONTROL_TARGET constant here is NOT read by the live app), and
+DjiWire's loopback guard is the real mock/real gate. There is no
 "enable router" flag. Values here are the baseline proven in the 2026-09-11 golden capture (B1).
 """
 

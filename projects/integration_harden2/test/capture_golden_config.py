@@ -14,7 +14,7 @@ import os, sys, json
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG  = os.path.dirname(HERE)
 
-# Exactly what run_mvd.sh exports into the app, by (VIDEO, CONTROL). "bench" = the naked defaults the
+# Exactly what run.sh exports into the app, by (VIDEO, CONTROL). "bench" = the naked defaults the
 # unified_bench sees (no launcher). PHONE_IP is network-derived -> sentinel in the real scenario.
 def launcher_env(video, control):
     e = {
