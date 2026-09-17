@@ -652,3 +652,20 @@ run.sh, safety in comments) -- a focused coding pass, deserves testing on the re
   field-tested final system (a pre-freeze reading churns). Aligns with the field-power/embedded roadmap goal.
 - All assistant cleanup work is now DONE. Remaining is entirely owner git: run desk-test-to-stale.sh, then commit
   the three groups (docs restructure; run+diagnose fold; integration_tts .pt fix).
+
+## PHASE 1 COMPLETE 2026-09-16
+All cleanup committed: aa787ca (harden2 run.sh fold), 56d5893 (docs flatten), 8ade81a (integration_tts),
+92f2803 (bench results + gitignore *.log), 8b6c7d8 (tools kept), 158a8d4 (skills dropped: diagram-authoring->global,
+recognizer-bench retired), 32bd2fd (sitl-legacy -> sitl/legacy). Working tree clean except docs/stale (deleted at freeze).
+docs/ is flat (only stale/ + private/). NEXT: webcam smoke test -> nuclear review -> field test -> freeze.
+
+## WEBCAM SMOKE TEST + handoff 2026-09-16 (final entry)
+- Webcam+mock test: functionally GREEN. preflight PASS; 5 panes; ASR all Hebrew tests pass; planner+perception
+  (highlight/count/describe); mission -> mock POST; recording -> logs/sessions (trace+clips); run.sh status/show OK.
+- OPEN (handed to live-testing-4): #4 scene window opens tiny/fullscreen-empty -> open at content size (mvd.py/overlay.py);
+  #5 SCENE_TTS=on is invalid -> silently off. Valid: phone|espeak|piper|both|off. Laptop TTS needs SCENE_TTS=espeak.
+- espeak-ng baked: tools/devenv/Dockerfile + install-runtime-deps.sh (line 11); SCENE_TTS documented in
+  docs/spec-harden2-run-arguments.md. Run `bash tools/devenv/install-runtime-deps.sh` on the already-built container.
+- HANDOFF for the next agent: docs/task-active-live-testing-handoff.md (subagent 4). NEXT: fix #4/#5 -> nuclear + ponytail review.
+- These final edits are UNCOMMITTED (owner git): docs/{spec-harden2-run-arguments, task-active-restructure-progress,
+  task-scheduled-harden2-field-test-and-freeze, task-active-live-testing-handoff}.md + tools/devenv/{Dockerfile,install-runtime-deps.sh}.
