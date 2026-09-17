@@ -13,7 +13,7 @@ translator, then Qwen3-VL plans the command lines, exactly as bench.py does. Eac
 against the expected notation (dz+10 / -90 deg / takeoff / land / delay 5 / EMPTY / halt / VLM...);
 lines whose expectation says "record", "or", "open" are marked REVIEW and shown, not judged.
 
-    python3 run_list.py ../../desk-test/live-test-75.md --translator hymt2 [--out report.md]   (lives in tools/bench/whole-system)
+    python3 run_list.py ../../desk-test/live-test-75.md --translator hymt2 [--out report.md]   (lives in bench/whole-system)
     python3 run_list.py <list.md> --from-clips <session_dir>     # AUDIO REPLAY: the session's recorded
         push-to-talk clips go through whisper-cli (the node's model + flags) instead of the list's text;
         clip N is aligned with list line N (speak lists in order). Isolates the language stack.

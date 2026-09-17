@@ -45,8 +45,7 @@ class FrameCounter:
             time.sleep(3)
             print(fc.frames, fc.gap)
 
-    video_doctor and video_watchdog each hand-rolled this subscription in a different lifecycle
-    style; only one of them had the teardown fix. This is the single home."""
+    video_watchdog hand-rolled this subscription in its own lifecycle style; this is the single home."""
 
     def __init__(self, topic=TOPIC, node_name="frame_counter"):
         if not _HAVE_ROS:

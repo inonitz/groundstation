@@ -5,7 +5,7 @@ Speaks the FROZEN protocol (docs/specs/spec-dji-websocket-protocol.md):
   POST /c/fly [Action...]                  native flight actions (bare JSON array)
 
 Telemetry (GET /status/) is NOT spoken here: it is read-only, and its consumers
-(test/live_mock_smoke.py, video/video_doctor.py, tools/dji_mock/*) each call it directly over
+(test/live_mock_smoke.py, tools/dji_mock/*) each call it directly over
 urllib/curl. This client is the command path only.
 
 SAFETY (CLAUDE.md): sending takeoff/land/fly ARMS a real drone. This client defaults
