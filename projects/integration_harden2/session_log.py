@@ -5,6 +5,7 @@ completed utterance is appended to trace.jsonl as one fsync-free but flushed JSO
 half-written line. Vision is captured per request as raw frames + json (model-agnostic; the replayer
 draws boxes). Audio clips are renamed into place (atomic). sessions/ is gitignored."""
 import os, time, json, threading
+import config
 import cv2
 
 
@@ -61,11 +62,11 @@ class SessionLog:
             _atomic_json(os.path.join(self.dir, "meta.json"),
                          {"session": os.path.basename(self.dir), "host": host,
                           "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                          "asr_backend": os.environ.get("ASR_BACKEND", ""),
-                          "asr_language": os.environ.get("ASR_LANGUAGE", ""),
-                          "asr_model": os.environ.get("ASR_MODEL_PATH", ""),
-                          "segmenter": os.environ.get("SCENE_SEG", "sam3"),
-                          "planner": os.environ.get("MVD_PLANNER", "gemma4")}, indent=2)
+                          "asr_backend": config.ASR_BACKEND,
+                          "asr_language": config.ASR_LANGUAGE,
+                          "asr_model": config.ASR_MODEL_PATH,
+                          "segmenter": config.SEG,
+                          "planner": config.PLANNER}, indent=2)
         except Exception:
             pass
         print(f"[mvd] session -> {self.dir}", flush=True)

@@ -92,3 +92,15 @@ WATCHDOG_RETRY_SEC = float(os.environ.get("WATCHDOG_RETRY_SEC", str(_K.WATCHDOG_
 # ============================ 11. Scenario resolvers ======================
 wire_target = _D.wire_target       # (host, port, is_real) for CONTROL=mock|real
 video_input = _D.video_input       # the app's --source for VIDEO=webcam|dji
+
+# ============================ 12. Single-source (T1b) =====================
+PLANNER        = "gemma4"                 # the only planner (MVD_PLANNER toggle deleted)
+ASR_MODEL_PATH = _D.ASR_MODEL_PATH
+ASR_BACKEND    = _D.ASR_BACKEND
+ASR_LANGUAGE   = _D.ASR_LANGUAGE
+# Live wire target: config OWNS MVD_WIRE_* (run.sh derives them from CONTROL). DjiWire.from_env, the
+# startup print and the HUD read these. wire_target(control) above is the control-based resolver the
+# golden test uses; the two agree because run.sh sets MVD_WIRE_* from CONTROL.
+WIRE_HOST = os.environ.get("MVD_WIRE_HOST", "127.0.0.1")
+WIRE_PORT = int(os.environ.get("MVD_WIRE_PORT", str(_K.REAL_WIRE_PORT)))
+WIRE_REAL = os.environ.get("MVD_WIRE_REAL", "").lower() in ("1", "true", "yes")

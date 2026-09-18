@@ -42,10 +42,8 @@ class DjiWire:
     def from_env(cls):
         """Build from MVD_WIRE_* env: host (default 127.0.0.1 mock), port (8080), REAL (off).
         Real-drone use = MVD_WIRE_HOST=<phone-ip> MVD_WIRE_REAL=1, and a HUMAN runs it."""
-        host = os.environ.get("MVD_WIRE_HOST", "127.0.0.1")
-        port = int(os.environ.get("MVD_WIRE_PORT", "8080"))
-        real = os.environ.get("MVD_WIRE_REAL", "").lower() in ("1", "true", "yes")
-        return cls(host=host, port=port, allow_real=real)
+        import config   # config owns MVD_WIRE_* (single source); DjiWire stays import-light until here
+        return cls(host=config.WIRE_HOST, port=config.WIRE_PORT, allow_real=config.WIRE_REAL)
 
     # --- discrete verbs ----------------------------------------------------------------
     def _post(self, path: str) -> int:

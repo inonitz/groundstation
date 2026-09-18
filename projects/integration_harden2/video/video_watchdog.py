@@ -12,8 +12,8 @@ import os, time, subprocess
 import config
 from video.camera_stream import FrameCounter, TOPIC   # one home for the topic + the teardown fix
 
-STALL_SEC = float(os.environ.get("WATCHDOG_STALL_SEC", "6"))
-RETRY_SEC = float(os.environ.get("WATCHDOG_RETRY_SEC", "15"))
+STALL_SEC = config.WATCHDOG_STALL_SEC
+RETRY_SEC = config.WATCHDOG_RETRY_SEC
 SESSION   = os.environ.get("SCENE_TMUX_SESSION", "mvd")
 BIN       = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "build", "release", "shared", "dji", "bin"))
 

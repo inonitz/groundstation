@@ -75,7 +75,7 @@ def _dets_text(dets):
     return "\n".join(f'- {d["label"]} at {list(d["box"])}' for d in dets[:20])
 
 
-GEMMA = os.environ.get("MVD_PLANNER", "gemma4") == "gemma4"      # harden2 default
+GEMMA = config.PLANNER == "gemma4"      # harden2 default
 VLM_GRAMMAR = r"""
 root ::= "LONG RESPONSE: " line "\nSHORT RESPONSE: " line ("\nHIGHLIGHT: " hl "\nVLM_BOX: " box)?
 line ::= [^\n]+
