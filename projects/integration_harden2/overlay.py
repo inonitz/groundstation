@@ -127,20 +127,36 @@ def _model_lines():
     """The live model stack, one (label, value) per subsystem, read from the env/config so it reflects
     what is actually wired -- not a hardcoded string. harden2 is single-stack (Gemma 4 / SAM3 / whisper);
     the env knobs still drive these, so a future swap shows here automatically."""
-    planner = os.environ.get("MVD_PLANNER", "gemma4")
+    planner = config.PLANNER
     planner = {"gemma4": "Gemma-4-E4B", "qwen3vl": "Qwen3-VL-4B"}.get(planner, planner)
     prec = os.environ.get("SCENE_SAM3_PRECISION", "nf4")
     eyes = f"SAM3-{prec}"
-    asr = os.environ.get("ASR_MODEL_PATH", "")
+    asr = config.ASR_MODEL_PATH
     if "ivrit" in asr:   ears = "whisper-ivrit-v3"
     elif asr:            ears = os.path.basename(os.path.dirname(asr)) or "whisper"
     else:                ears = "whisper-ivrit-v3"
     return [("brain", planner), ("eyes", eyes), ("ears", ears)]
 
 
+def _is_miss(t):
+    """A model line reporting the target is not present (tags miss + the red status light)."""
+    return (t.startswith('no "') or t.startswith("I don't see")
+            or t.startswith("\u05dc\u05d0 \u05e8\u05d5\u05d0\u05d4") or t.startswith("\u05dc\u05d0 \u05de\u05e6\u05d0\u05ea\u05d9"))
+
+
+def chat_kind(text):
+    """Classify a GENERIC model say() line to its kind. Used ONLY at the say() write site, where the
+    kind is not known structurally; every other write site tags directly. Overlay never re-parses."""
+    if text.startswith("rejected -- "):  return "reject"
+    if _is_miss(text):                    return "miss"
+    if text.startswith("Highlighting:"):  return "action"
+    if text.startswith("\u05e1\u05e4\u05e8\u05ea\u05d9"):          return "answer"
+    return "scene"
+
+
 def render_chat(height, chat, thinking, killed, session_dir):
     """Build the chat panel from a SNAPSHOT. The caller holds S.lock and passes chat/thinking/killed;
-    this function touches no shared state. chat: list of (role, text). A turn runs from one user line
+    this function touches no shared state. chat: list of (role, text, kind). A turn runs from one user line
     to the next; async results (highlight/describe land from a worker thread) stay in their turn."""
     w = config.CHAT_W
     panel = np.empty((height, w, 3), np.uint8); panel[:] = (31, 25, 22)   # mockup dark ground (#16191f)
@@ -169,59 +185,43 @@ def render_chat(height, chat, thinking, killed, session_dir):
     # async lines -- it split a turn from its own result, so a miss bled into the next turn's Kind
     # colour. Grouping on the user line fixes that; the legacy separator row is ignored.
     turns, cur = [], []
-    for role, text in chat:
-        if role == "meta" and text == "":
-            continue                                             # legacy separator, no longer used
+    for role, text, kind in chat:
         if role == "user":
             if cur: turns.append(cur)
-            cur = [(role, text)]
+            cur = [(role, text, kind)]
         else:
             if not cur: cur = []
-            cur.append((role, text))
+            cur.append((role, text, kind))
     if cur: turns.append(cur)
     if thinking:                                                 # belongs to the live (last) turn
-        if turns: turns[-1].append(("model", "thinking..."))
-        else: turns.append([("model", "thinking...")])
+        if turns: turns[-1].append(("model", "thinking...", "scene"))
+        else: turns.append([("model", "thinking...", "scene")])
 
-    def _miss(t):
-        return (t.startswith('no "') or t.startswith("I don't see")
-                or t.startswith("לא רואה") or t.startswith("לא מצאתי"))
-
-    def _hit(role, t):
-        return (role == "model" and t.startswith("Highlighting:")) or (role == "meta" and t.startswith("SAM3"))
-
+    # Row rendering switches on the KIND tagged at the write site -- no startswith, no partition.
+    _KIND_TAG = {"user": "You", "scene": "Scene", "spoken": "Spoken", "answer": "Answer",
+                 "action": "Action", "reject": "reject", "miss": "miss", "en": "En",
+                 "kind_hl": "Kind", "kind_meta": "Kind", "action_meta": "Action", "sam3": "SAM3",
+                 "cmd_head": "Cmds", "cmd": ""}
+    _RTL_FIXED = {"answer": True, "action": False, "kind_hl": False, "cmd_head": False, "cmd": False}
     rows = []
     for ti, lines in enumerate(turns):
         if ti: rows.append(None)                                 # divider between turns
-        fail = any(role == "model" and _miss(t) for role, t in lines)
-        ok = any(_hit(role, t) for role, t in lines)
-        hl_col = C["red"] if fail else (C["green"] if ok else C["amber"])   # Kind: highlight outcome colour
-        for role, text in lines:
-            if role == "meta":
-                tag, _, val = text.partition("|"); tag = tag.strip(); val = val.strip()
-                if tag == "Kind" and val == "highlight":
-                    rows.append((tag, val, hl_col, False))
-                elif tag == "SAM3":
-                    rows.append((tag, val, C["green"], _is_rtl(val)))
-                else:
-                    rows.append((tag, val, C["light"], _is_rtl(val)))
-            elif role == "cmd":
-                tag, _, val = text.partition("|"); rows.append((tag.strip(), val.strip(), C["cmd"], False))
-            elif role == "user":
-                rows.append(("You", text, C["you"], _is_rtl(text)))
-            elif role == "spoken":
-                rows.append(("Spoken", text, C["spoken"], _is_rtl(text)))
-            else:                                                # model / scene / answer / reject / miss
-                if text.startswith("rejected -- "):
-                    rows.append(("reject", text[len("rejected -- "):], C["red"], _is_rtl(text)))
-                elif _miss(text):
-                    rows.append(("miss", text, C["amber"], _is_rtl(text)))
-                elif text.startswith("Highlighting:"):
-                    rows.append(("Action", text, C["green"], False))
-                elif text.startswith("ספרתי"):    # "ספרתי N" -> count answer
-                    rows.append(("Answer", text, C["model"], True))
-                else:
-                    rows.append(("Scene", text, C["model"], _is_rtl(text)))
+        fail = any(k == "miss" for _r, _t, k in lines)
+        ok   = any(k in ("action", "sam3") for _r, _t, k in lines)
+        hl_col = C["red"] if fail else (C["green"] if ok else C["amber"])   # highlight outcome colour
+        for role, text, kind in lines:
+            tag = _KIND_TAG.get(kind, "Scene")
+            if kind == "kind_hl":                             col = hl_col
+            elif kind in ("action", "sam3"):                  col = C["green"]
+            elif kind == "reject":                            col = C["red"]
+            elif kind == "miss":                              col = C["amber"]
+            elif kind == "user":                              col = C["you"]
+            elif kind == "spoken":                            col = C["spoken"]
+            elif kind in ("cmd_head", "cmd"):                 col = C["cmd"]
+            elif kind in ("en", "kind_meta", "action_meta"):  col = C["light"]
+            else:                                             col = C["model"]     # scene, answer
+            rtl = _RTL_FIXED.get(kind, _is_rtl(text))
+            rows.append((tag, text, col, rtl))
     if not rows:
         rows = [("", "press F5, speak, press F5.", (150, 150, 150), False),
                 ("", 'e.g. "highlight the red car"', (150, 150, 150), False)]

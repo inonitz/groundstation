@@ -32,7 +32,7 @@ try:
 except Exception:
     _HAVE_EARS = False
 
-from overlay import FONT, draw_box, render_chat
+from overlay import FONT, draw_box, render_chat, chat_kind
 from session_log import SessionLog, reject_why
 
 
@@ -114,7 +114,7 @@ def worker(eyes):
                 if S.hl_miss_since is None or S.hl_miss_target != target: S.hl_miss_since, S.hl_miss_target = time.time(), target
                 elif time.time() - S.hl_miss_since > HL_GIVEUP:
                     S.target = None; S.vlm_box = None; S.hl_miss_since = None
-                    S.chat.append(("model", f"לא מצאתי: {target}")); print(f"[mvd] highlight dropped after {HL_GIVEUP:.0f}s without a SAM3 hit: {target}", flush=True)
+                    S.chat.append(("model", f"לא מצאתי: {target}", "miss")); print(f"[mvd] highlight dropped after {HL_GIVEUP:.0f}s without a SAM3 hit: {target}", flush=True)
                     if SESSION: SESSION.end_request({"gave_up": True, "after_s": HL_GIVEUP})
             else:
                 S.hl_miss_since = None
@@ -175,7 +175,7 @@ class TextHandler:
         if not text:
             return
         print("[mvd] you:", text, flush=True)
-        with S.lock: S.chat.append(("user", text))
+        with S.lock: S.chat.append(("user", text, "user"))
         if SESSION: SESSION.begin(text)
         try:
             if self._handle_drone(text):
@@ -188,18 +188,16 @@ class TextHandler:
                     en = rec.get("english")
                     mis = rec.get("mission")
                     with S.lock:
-                        if en: S.chat.append(("meta", f"{'En':<7}| " + en))
+                        if en: S.chat.append(("meta", en, "en"))
                         if rec.get("kind"):
-                            S.chat.append(("meta", f"{'Kind':<7}| " + str(rec["kind"])))
+                            _kv = str(rec["kind"]); S.chat.append(("meta", _kv, "kind_hl" if _kv == "highlight" else "kind_meta"))
                         if mis:
                             for i, c in enumerate(mis):
-                                lbl = "Cmds" if i == 0 else ""
-                                S.chat.append(("cmd", f"{lbl:<7}| {i}  " + _fmt_cmd(c)))
+                                S.chat.append(("cmd", f"{i}  " + _fmt_cmd(c), "cmd_head" if i == 0 else "cmd"))
                         if rec.get("action") and not str(rec.get("action")).startswith("perception("):
-                            S.chat.append(("meta", f"{'Action':<7}| " + str(rec["action"])))
+                            S.chat.append(("meta", str(rec["action"]), "action_meta"))
                         if str(rec.get("action", "")).startswith("reject") or rec.get("kind") == "reject":
-                            S.chat.append(("model", "rejected -- " + reject_why(rec.get("action", ""))))
-                        S.chat.append(("meta", ""))
+                            S.chat.append(("model", reject_why(rec.get("action", "")), "reject"))
                 SESSION.commit()
 
     def perceive(self, text):
@@ -226,7 +224,7 @@ class TextHandler:
         try:
             res = self.router.handle(text)
         except Exception as e:
-            with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]"))
+            with S.lock: S.chat.append(("model", f"[drone unreachable: {e}]", "scene"))
             if SESSION: SESSION.set(action=f"error: {e}")
             return True
         if SESSION:
@@ -235,7 +233,7 @@ class TextHandler:
             if _rec is not None and not _rec.get("action"):  # pipeline wrap sets the real action
                 _rec["action"] = getattr(res, "action", None)
         if res.tier is not Tier.COMPLEX:                 # basic/emergency/override acted on the wire
-            with S.lock: S.chat.append(("model", f"[drone] {res.action}"))
+            with S.lock: S.chat.append(("model", f"[drone] {res.action}", "scene"))
         return True                                      # COMPLEX handled by the Recognizer (on_complex)
 
     def _handle_count(self, phrase):
@@ -269,7 +267,7 @@ class TextHandler:
         with S.lock:
             S.thinking = False
             S.target = concepts if n else None; S.vlm_box = None
-            S.chat.append(("model", f"ספרתי {n}: {phrase}"))
+            S.chat.append(("model", f"ספרתי {n}: {phrase}", "answer"))
         print(f"[mvd] count '{phrase}' -> {n} (median of {counts}; SAM3 @0.5 + dedup, concepts '{concepts}')", flush=True)
         if SESSION: SESSION.end_request({"n": n, "per_frame_counts": counts})
         if self.voice is not None:
@@ -279,7 +277,7 @@ class TextHandler:
     def _handle_clear(self):
         with S.lock:
             S.target = None; S.hl_dets = []; S.hl_masks = []
-            S.chat.append(("model", "Cleared the highlight."))
+            S.chat.append(("model", "Cleared the highlight.", "scene"))
         if SESSION: SESSION.end_request("cleared")
 
     def _handle_highlight(self, phrase):
@@ -316,21 +314,20 @@ class TextHandler:
             elif hits: present, px = True, None; print(f"[mvd] gate '{tgt}': VLM said absent, SAM3 has {len(hits)} at >=0.5 -> present (SCENE_GATE=either)", flush=True)
         if px is not None and (px[2] - px[0] < 8 or px[3] - px[1] < 8):   # a zero/degenerate box = the VLM saw nothing (live 2026-09-08, line 34)
             present, px = False, None
-        if os.environ.get("MVD_PLANNER", "gemma4") == "gemma4":         # Gemma's boxes: median IoU 0.02 -> never draw them as a fallback
-            px = None
+        px = None   # Gemma is the only planner: never draw its boxes as a fallback (median IoU 0.02)
         with S.lock:
             S.thinking = False
             if present:
-                S.target = concepts; S.vlm_box = px; S.chat.append(("model", f"Highlighting: {tgt}"))
+                S.target = concepts; S.vlm_box = px; S.chat.append(("model", f"Highlighting: {tgt}", "action"))
                 _best = max((float(d["conf"]) for d in gate_raw), default=0.0)
-                S.chat.append(("meta", f"{'SAM3':<7}| {concepts} · best {_best:.2f} ✓"))
+                S.chat.append(("meta", f"{concepts} · best {_best:.2f} ✓", "sam3"))
             else:
                 S.target = None; S.vlm_box = None; S.hl_dets = []; S.hl_masks = []
                 _best = max((float(d["conf"]) for d in gate_raw), default=0.0)
                 if not gate_raw:      _why = "SAM3 found nothing"
                 elif _best < 0.5:     _why = f"SAM3 best {_best:.2f} < 0.50 gate"
                 else:                 _why = f"SAM3 best {_best:.2f} but below the size floor"
-                S.chat.append(("model", f'no "{concepts}" in view -- {_why}'))
+                S.chat.append(("model", f'no "{concepts}" in view -- {_why}', "miss"))
         print(f"[mvd] gate '{tgt}': present={present} -> px={px}", flush=True)
         if SESSION and not present:
             SESSION.end_request({"present": False, "best_conf": round(_best, 3), "why": _why})
@@ -339,9 +336,9 @@ class TextHandler:
         try: desc, _, _, spoken = vlm.ask(fr, q, [])
         except Exception as e: desc = f"[VLM err: {e}]"; spoken = ""
         with S.lock:
-            S.chat.append(("model", desc))                       # long -> Scene:
+            S.chat.append(("model", desc, "scene"))                       # long -> Scene:
             if spoken and spoken != desc and not desc.startswith("["):
-                S.chat.append(("spoken", spoken))                # short -> Spoken: (also on screen)
+                S.chat.append(("spoken", spoken, "spoken"))                # short -> Spoken: (also on screen)
             S.thinking = False
         print("[mvd] scene:", desc, "|| spoken:", spoken, flush=True)
         if SESSION:
@@ -357,7 +354,7 @@ class TextHandler:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--source", default=os.environ.get("SCENE_INPUT", "rtsp://127.0.0.1:8554/live"))
+    ap.add_argument("--source", default=config.INPUT)
     ap.add_argument("--target", default=None, help="seed a highlight without ASR (testing)")
     ap.add_argument("--no-ears", action="store_true")
     ap.add_argument("--keep-llama", action="store_true")
@@ -387,7 +384,7 @@ def main():
         mask_k=HL_MAX)   # 2026-09-09: was the constructor default 3; "highlight all the cars" needs many
 
     voice = None
-    if os.environ.get("MVD_TTS", "1") != "0":
+    if config.TTS_ENABLED:
         from audio.tts_io import Voice, TTSConfigError
         try:
             voice = Voice()
@@ -398,42 +395,42 @@ def main():
 
     on_text = TextHandler(None, voice)          # router assigned below (breaks the wiring cycle)
 
-    if os.environ.get("MVD_DRONE"):
-        try:
-            wire = DjiWire.from_env()
-            _orig_fly = wire.fly_mission                  # record the mission the system sends
-            def _fly_rec(mission, _o=_orig_fly):
-                if SESSION: SESSION.set(mission=mission)
-                return _o(mission)
-            wire.fly_mission = _fly_rec
-            _orig_halt = wire.halt
-            def _halt_rec(_o=_orig_halt):
-                if SESSION: SESSION.set(mission=[{"delay": 0}])
-                return _o()
-            wire.halt = _halt_rec
-            from recognizer import Pipeline
-            def _say(msg):
-                with S.lock: S.chat.append(("model", msg))
-                print("[say]", msg, flush=True)          # always in app.log: the KILL / refused lines were chat-only in block A (2026-09-09)
-                if voice is not None: voice.say(msg)
-            # COMPLEX text now runs the Recognizer: a Hebrew command becomes a mission on the
-            # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
-            pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say, observe=(SESSION.set if SESSION else None))
-            router = Router(wire, on_complex=pipe.handle)
-            S.kill = KillSwitch(wire, say=_say)   # owner ruling 2026-09-08: M = manual override toggle (stop + RC control + latch)
-            on_text.router = router
-            print("[mvd] MVD drone router ON ->",
-                  os.environ.get("MVD_WIRE_HOST", "127.0.0.1"),
-                  "(real)" if os.environ.get("MVD_WIRE_REAL") else "(mock)", flush=True)
-        except Exception as e:
-            print("[mvd] drone router DISABLED:", e, flush=True)
+    # Drone router is unconditional (MVD_DRONE toggle deleted; run.sh always set it). A wire failure
+    # still degrades gracefully via the except.
+    try:
+        wire = DjiWire.from_env()
+        _orig_fly = wire.fly_mission                  # record the mission the system sends
+        def _fly_rec(mission, _o=_orig_fly):
+            if SESSION: SESSION.set(mission=mission)
+            return _o(mission)
+        wire.fly_mission = _fly_rec
+        _orig_halt = wire.halt
+        def _halt_rec(_o=_orig_halt):
+            if SESSION: SESSION.set(mission=[{"delay": 0}])
+            return _o()
+        wire.halt = _halt_rec
+        from recognizer import Pipeline
+        def _say(msg):
+            with S.lock: S.chat.append(("model", msg, chat_kind(msg)))
+            print("[say]", msg, flush=True)          # always in app.log: the KILL / refused lines were chat-only in block A (2026-09-09)
+            if voice is not None: voice.say(msg)
+        # COMPLEX text now runs the Recognizer: a Hebrew command becomes a mission on the
+        # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
+        pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say, observe=(SESSION.set if SESSION else None))
+        router = Router(wire, on_complex=pipe.handle)
+        S.kill = KillSwitch(wire, say=_say)   # owner ruling 2026-09-08: M = manual override toggle (stop + RC control + latch)
+        on_text.router = router
+        print("[mvd] MVD drone router ON ->", config.WIRE_HOST,
+              "(real)" if config.WIRE_REAL else "(mock)", flush=True)
+    except Exception as e:
+        print("[mvd] drone router DISABLED:", e, flush=True)
 
     ears = None
     if _HAVE_EARS and not a.no_ears:
         try: ears = Ears(on_text); print("[mvd] ASR live", flush=True)
         except Exception as e: print("[mvd] Ears unavailable:", e)
     phone_ears = None                                  # the PHONE as the user's mic (inbound ASR socket)
-    if os.environ.get("MVD_PHONE_ASR", "1") != "0" and not a.no_ears:
+    if config.PHONE_ASR_ENABLED and not a.no_ears:
         try:
             from audio.phone_asr import PhoneEars
             phone_ears = PhoneEars(on_text, port=config.PHONE_ASR_PORT)
@@ -456,11 +453,7 @@ def main():
     if "://" in _src:   _srclabel = _src.split("://", 1)[0] + "://" + _src.split("://", 1)[1].split("/")[0]
     elif _src.isdigit(): _srclabel = "webcam " + _src
     else:               _srclabel = os.path.basename(_src) or _src
-    if os.environ.get("MVD_DRONE"):
-        _wlabel = (("REAL " if os.environ.get("MVD_WIRE_REAL") else "mock ")
-                   + os.environ.get("MVD_WIRE_HOST", "127.0.0.1") + ":" + os.environ.get("MVD_WIRE_PORT", "8080"))
-    else:
-        _wlabel = "no-drone"
+    _wlabel = ("REAL " if config.WIRE_REAL else "mock ") + config.WIRE_HOST + ":" + str(config.WIRE_PORT)
     try:
         while True:
             ok, frame = cap.read()

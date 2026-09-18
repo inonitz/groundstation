@@ -80,7 +80,7 @@ def test_emergency_halts_via_router_not_pipeline():
     on_text("עצור")
     assert wire.halts == 1                              # router tier-4 halt, not the Pipeline backup
     assert seen == [] and wire.missions == []
-    assert ("model", "[drone] stop") in list(scene.S.chat)
+    assert any(r[0] == "model" and r[1] == "[drone] stop" for r in scene.S.chat)
 
 
 def test_no_router_falls_through_to_perceive():
