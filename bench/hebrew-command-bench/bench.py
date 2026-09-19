@@ -18,7 +18,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 # The component lives in the harden2 tree; the bench measures it IN PLACE (dedup ruling
 # 2026-09-02: no copies in two homes).
-sys.path.insert(0, os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"), "recognizer"))
+_HOME = os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"))
+sys.path.insert(0, os.path.join(_HOME, "recognizer"))
+sys.path.insert(0, _HOME)          # harden2 root: pipeline.py does `import config` (the config/ package)
 sys.path.insert(0, HERE)
 
 import recognizer

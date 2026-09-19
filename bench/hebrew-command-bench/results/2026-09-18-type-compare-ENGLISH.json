@@ -1,0 +1,4074 @@
+{
+ "fresh": {
+  "n": 200,
+  "ok": 176,
+  "ff": 0,
+  "miss": 24,
+  "rows": [
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move right 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly back 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "advance 7 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "veer left 4.5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move forward 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 7 and a half meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly back half a meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "forward 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "left 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb 15 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move right 13 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward two and a half meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "back 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up one meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move 11 meters left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "advance 30 meters forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 90 degrees right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 60 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn 180 degrees right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 30 degrees left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a full spin"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 45 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 120 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn right 90 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do two full spins"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 270 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 15 degrees left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a full half turn"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off now"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take us into the air"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off into the air already"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "lift off the ground"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land here"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land gently"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend and land on the ground"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land the drone"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "fly a bit higher"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up a little more"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down a bit"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend a little more"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "come closer to me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move a bit farther back"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "advance slowly forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move a little left"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "a little to the right"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "hover in place"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "hold position in the air"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "stay where you are"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "a bit more up"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "come down a bit"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "ascend slowly"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move forward a little"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "follow me"
+   ],
+   [
+    "move",
+    "not_move",
+    "highlight",
+    "follow the man walking there"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "keep following me"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "fly back to me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "return to the takeoff point"
+   ],
+   [
+    "move",
+    "not_move",
+    "describe",
+    "circle the area"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "orbit around the point"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "wave hello"
+   ],
+   [
+    "move",
+    "not_move",
+    "describe",
+    "scan the area"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "circle around me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 5 meters then fly forward 10 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, go up 3 meters and land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly back 2 meters then left 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 90 degrees then advance 7 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 2 meters, wait 5 seconds and descend"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 5 meters then rotate 180 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "gain 10 meters altitude then go right 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, climb high and do a spin"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend 3 meters then land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go left 5 meters then forward 2"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 60 degrees left then go up 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward, wait 2 seconds then back"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 4 meters then follow me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn right 90 then advance 10 meters"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "point the camera down"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "point the camera up"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "level the camera forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 3 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 5 seconds then continue"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly far forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "dash left"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "drive back slowly"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go very high"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend close to the ground"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "strafe right 5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward and also right"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "move to another spot"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "align in front of me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "approach the building"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "fly over there"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "come here"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "lift yourself 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move forward a little carefully"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "swing left in an arc"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see in front of you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "describe the scene for me"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is happening down there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "tell me what you recognize"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "give an overview of the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is in the image now"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "look and tell me what is there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you notice"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "describe the street"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is in the field of view"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "do a general survey"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see on the right"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many people are in the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "count the cars in the street"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many windows are in the building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many vehicles are parked here"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "count the trees"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many doors are on the first floor"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many people are near the vehicle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "count the motorcycles for me"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many buildings are in the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many children are on the field"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "tell me how many trucks there are"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "how many floors does the tower have"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "count the flags"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many dogs do you see"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many red cars are there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the red car"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the tall building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the main entrance"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the person in the blue shirt for me"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the red roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the bicycle by the fence"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the broken window"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the sign at the entrance"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the white vehicle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the open door"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the pole in the corner"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the orange bin"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the stairs"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the pipe on the roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the northern gate"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the tap by the wall"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the car parked on the sidewalk"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "find the running person"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "mark the large crate"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "highlight the ladder"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the blue car on screen"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the person with the bag"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the running dog"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the moving motorcycle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the truck pulling out"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the child with the ball"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the person on the bicycle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the red vehicle moving away"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there someone on the roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a vehicle parked at the entrance"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "are there people in the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is the door open"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there an obstacle ahead of you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a dog in the yard"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there smoke in the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "is the field empty"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there traffic in the street"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a flag on the building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a light in the window"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is someone approaching"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is the battery percentage"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how much battery is left"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what altitude are you at"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is your location"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "are you connected"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is the wind speed"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how long have you been in the air"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is the temperature outside"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "which direction are you facing"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is the signal strength"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "is there good reception"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how far are you from me"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is your status"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is next to the red car"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is behind the building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "describe what is above the door"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is between the two trees"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is under the bridge"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "who is standing by the entrance"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is in the left corner"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is on the bench"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "describe what is to the right of the truck"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is at the end of the street"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is in the background"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "who is sitting on the fence"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "do not take off at all"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "stop describing"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "stop talking"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "not now"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "never mind, forget it"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "thank you very much"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "well done"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "wait, do not do anything"
+   ]
+  ]
+ },
+ "existing": {
+  "n": 476,
+  "ok": 454,
+  "ff": 11,
+  "miss": 11,
+  "rows": [
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 10 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 90 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 10 meters, rotate 90 degrees clockwise, then fly forward 5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, go up 5 meters, wait 3 seconds, and land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 2 meters then left 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 45 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 3 meters"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see right now?"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly in a square of 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move left 7 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 10 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "advance 15 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 180 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a full turn clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 5 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up half a meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off then go up 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 4 meters, right 2 meters, backward 4 meters, then left 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, go up 2 meters, rotate 90 degrees clockwise, fly forward 3 meters, and land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn right 45 degrees"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many people do you see"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "are you going to land soon"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "don't fly forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb 10 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land now"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "perform takeoff"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 1 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 1 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 30 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 30 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 60 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 60 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 120 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 120 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 270 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 270 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 2 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 10 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 1 meter, then go up 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 4 meters, then go down 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 9 meters, then go down 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 1 meter, then fly forward 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 4 meters, then fly backward 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 9 meters, then fly backward 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 1 meters, then fly right 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 4 meters, then fly right 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 1 meter, go up 4 meters, then go up 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 20 meters, go down 8 meters, then fly forward 1 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 8 meters, fly forward 20 meters, then fly backward 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 4 meters, fly right 1 meter, then fly right 25 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "let's take off"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "you can take off"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "come on, take off"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "let's land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "please land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "you can land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "we're done, land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "can you go up 5 meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "could you fly forward 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "if possible, 2 meters to the left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "please descend 1 meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "please turn 90 degrees right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "uh fly forward 3 meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "okay now climb 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "alright so let's fly back 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait wait first go up 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "yes continue right another 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb to a height of 10 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up to 20 meters altitude"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "descend 2 meters lower"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rise 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly a bit to the left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up a little"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move back a little"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "fly a bit higher"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move forward a bit more"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn the drone 90 degrees right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn 45 degrees left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a half turn"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "quarter turn to the right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a full turn"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "turn around toward me"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "30 meters forward"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "a meter and a half up"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "two and a half meters right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 50 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "7 meters up"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move a meter to the right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off and climb to 5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, go up 3 meters and stay there"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 3 meters and then 3 meters left back"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 5 meters, wait 2 seconds and come back down"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, fly forward 10 meters, do a half turn and come back"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "forward 2 meters then up 2 meters then back 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb 10 meters then slowly do a full turn"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "back 5 meters and down 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off and then land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "up 2 meters, right 4 meters, left 4 meters and down 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 5 meters and photograph the house"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 3 meters and look around"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off and search for the car"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly right 2 meters and tell me what you see"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what's the battery status"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "where are you now"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how high are you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "are you recording"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "tell me what you see"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is anyone there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how much flight time do you have left"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "can you hear me"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "don't go up any more"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "don't move"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "do not fly forward"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "without turning please"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "don't land yet"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "wait a moment"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "one second"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 5 seconds and then descend a meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "hold there for ten seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 100 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn 10 degrees right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn 135 degrees left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 30 centimeters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go back 15 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "five meters forward, fly"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "right 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "upward, 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "backward a little"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn left 74.5 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "make a 174.235 degree counter-clockwise turn"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "make a half turn clockwise"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "don't turn left 90 degrees counter-clockwise, then don't turn right"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "hold off on what you're doing for the next two minutes"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "whoa, timeout for four seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, climb five meters, wait three seconds and land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "advance 15 meters"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "are you going to land soon"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there anyone in the picture?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "do you see anyone in the picture?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is the color of the nearest car?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "do you see a tower in the scene where you can count windows?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "do you see a lighthouse in the scene where you can count windows?"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 4 meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly left 3 meters and then come back right 3 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go forward another 8 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move backward 9 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn 20 degrees to the right"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn left 120 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do a full turn counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "wait 8 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off and go up 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "please land here next to the gate"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rise 3 meters up"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "do not go down now under any circumstances"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "can you fly backward?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "what is your altitude now"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 5 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "move right 2 meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go down 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "land now"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rise 6 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb 20 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 540 degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 270 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "rotate 180 degrees to the left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "turn around 180 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 2 meters then rotate 120 degrees counterclockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "don't land, go up 4 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "do not fly forward, fly backward 3 meters"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "can you land?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "why are you not going up"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "hold position"
+   ],
+   [
+    "move",
+    "not_move",
+    "highlight",
+    "take a picture of the red car and then fly backward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "uh... go up, go up 7 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "drone, fly forward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "come on, land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "thanks, now land please"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "come back to me"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "stay in place"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "a bit more forward"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "higher"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 7 meters fast"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "slowly go down one meter"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "do a hover"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 10 feet"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up about 4 meters"
+   ],
+   [
+    "move",
+    "not_move",
+    "reject",
+    "point the camera down"
+   ],
+   [
+    "move",
+    "not_move",
+    "highlight",
+    "fly toward the white building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "how much flight time do you have left"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 4 meters and take a picture"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Listen, I want you to first take off, after that climb five meters and then rotate ninety degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Listen, I want you to first climb twenty meters, after that turn right 45 degrees and then fly forward 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Listen, I want you to first fly backward four meters, after that move left three meters and then descend two meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Listen, I want you to first fly forward twenty five meters, after that rotate one hundred eighty degrees clockwise and then move right six meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, when you finish climb five meters, and at the end rotate ninety degrees clockwise please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb twenty meters, when you finish turn right 45 degrees, and at the end fly forward 12 meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward four meters, when you finish move left three meters, and at the end descend two meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward twenty five meters, when you finish rotate one hundred eighty degrees clockwise, and at the end move right six meters please"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Let's start: take off. Now climb five meters. Good, now rotate ninety degrees clockwise and also fly forward ten meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Let's start: climb twenty meters. Now turn right 45 degrees. Good, now fly forward 12 meters and also wait three seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Let's start: fly backward four meters. Now move left three meters. Good, now descend two meters and also turn left thirty degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Let's start: fly forward twenty five meters. Now rotate one hundred eighty degrees clockwise. Good, now move right six meters and also climb fifteen meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Okay so, take off and then climb five meters and then rotate ninety degrees clockwise and then fly forward ten meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Okay so, climb twenty meters and then turn right 45 degrees and then fly forward 12 meters and then wait three seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Okay so, fly backward four meters and then move left three meters and then descend two meters and then turn left thirty degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Okay so, fly forward twenty five meters and then rotate one hundred eighty degrees clockwise and then move right six meters and then climb fifteen meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "First take off, a second after that climb five meters, and to finish rotate ninety degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "First climb twenty meters, a second after that turn right 45 degrees, and to finish fly forward 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "First fly backward four meters, a second after that move left three meters, and to finish descend two meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "First fly forward twenty five meters, a second after that rotate one hundred eighty degrees clockwise, and to finish move right six meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Do me a favor, take off, afterwards climb five meters, afterwards rotate ninety degrees clockwise, and finally fly forward ten meters, thanks"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Do me a favor, climb twenty meters, afterwards turn right 45 degrees, afterwards fly forward 12 meters, and finally wait three seconds, thanks"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Do me a favor, fly backward four meters, afterwards move left three meters, afterwards descend two meters, and finally turn left thirty degrees, thanks"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Do me a favor, fly forward twenty five meters, afterwards rotate one hundred eighty degrees clockwise, afterwards move right six meters, and finally climb fifteen meters, thanks"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "The mission is this: take off, then climb five meters, and then rotate ninety degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "The mission is this: climb twenty meters, then turn right 45 degrees, and then fly forward 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "The mission is this: fly backward four meters, then move left three meters, and then descend two meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "The mission is this: fly forward twenty five meters, then rotate one hundred eighty degrees clockwise, and then move right six meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Come on, take off and then climb five meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Come on, climb twenty meters and then turn right 45 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Come on, fly backward four meters and then move left three meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Come on, fly forward twenty five meters and then rotate one hundred eighty degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Wait, make sure you are ready. Now take off, after that climb five meters and then rotate ninety degrees clockwise"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Wait, make sure you are ready. Now climb twenty meters, after that turn right 45 degrees and then fly forward 12 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Wait, make sure you are ready. Now fly backward four meters, after that move left three meters and then descend two meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Wait, make sure you are ready. Now fly forward twenty five meters, after that rotate one hundred eighty degrees clockwise and then move right six meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "I need you to perform the following sequence: take off, climb five meters, rotate ninety degrees clockwise, fly forward ten meters, land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "I need you to perform the following sequence: climb twenty meters, turn right 45 degrees, fly forward 12 meters, wait three seconds, land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "I need you to perform the following sequence: fly backward four meters, move left three meters, descend two meters, turn left thirty degrees, wait five seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "I need you to perform the following sequence: fly forward twenty five meters, rotate one hundred eighty degrees clockwise, move right six meters, climb fifteen meters, descend eight meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off and then climb five meters, and pay attention, rotate ninety degrees clockwise slowly and carefully"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "climb twenty meters and then turn right 45 degrees, and pay attention, fly forward 12 meters slowly and carefully"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly backward four meters and then move left three meters, and pay attention, descend two meters slowly and carefully"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "fly forward twenty five meters and then rotate one hundred eighty degrees clockwise, and pay attention, move right six meters slowly and carefully"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Alright, let's do a small round: take off, climb five meters and then rotate ninety degrees clockwise and that's it"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Alright, let's do a small round: climb twenty meters, turn right 45 degrees and then fly forward 12 meters and that's it"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Alright, let's do a small round: fly backward four meters, move left three meters and then descend two meters and that's it"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Alright, let's do a small round: fly forward twenty five meters, rotate one hundred eighty degrees clockwise and then move right six meters and that's it"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Listen, climb five meters but do not rotate in the meantime"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Okay fly forward ten meters, and please do not land yet"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Before we continue, how much battery do you have left?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Wait wait, can you even see me from here?"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Climb twenty meters and tell me what you see from there"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "Turn right ninety degrees, and if you hear me well then also fly forward five meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "first go down 2 meters, then move right 5 meters, and finally wait 4 seconds"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, fly forward 8 meters and land"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 6 meters and then turn right 90 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "now go down 3 meters slowly and then fly backward 2 meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "first go up 4 meters and then turn left 90 degrees"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 3 meters and right after that go down one meter"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up three meters"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "go up 3 meters, then count how many people are below"
+   ],
+   [
+    "move",
+    "move",
+    "mission",
+    "take off, then go up 2 meters, then do a full turn"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the middle windows of the rightmost building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the front door of the third house from the left"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the rear wheel of the parked motorcycle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "Count the windows on the top floor of the tower"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the top left corner of the red roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the chimney of the lowest house on the street"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the back entrance of the big warehouse"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the ladder on the roof of the white pickup"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the car adjacent to the person with the red attire"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the person with the orange cap"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the door next to the man with the black coat"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the bicycle leaning on the fence of the yellow house"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the dog walking beside the woman in the white dress"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the bag that the child with the green shirt is holding"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the tree behind the yellow truck"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the window above the blue door"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "Count the cars parked in front of the building with the flag"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the bench between the two tall trees"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the vehicle driving behind the red motorcycle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the man standing on the roof of the white building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the box next to the man standing on the roof of the white building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the girl with the balloon walking near the woman with the stroller"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the car parked between the white pickup and the red truck"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the door of the house facing the tallest tree"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the sign above the entrance of the store with the green awning"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the front tire of the car parked closest to the gate"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "Count the people sitting on the benches to the left of the fountain"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the person who came out of the door of the gray building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the second vehicle from the left in the front row of the parking lot"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the dark stain on the wall to the right of the big window"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the man with the glasses talking to the woman in the yellow shirt"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the truck towing the white boat"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the empty chair next to the round table"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the bird sitting on the cable between the two poles"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the opening in the fence behind the blue container"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "Count the steps at the main entrance of the tall building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the rider with the yellow helmet in the middle of the group"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the cat climbing the tree next to the wall"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the guy leaning on the silver car"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the flag flying above the roof of the low structure"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the broken window on the bottom floor of the abandoned building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the last car in the convoy"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the biggest tent at the edge of the field"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the arm of the crane above the construction site"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "Count the boats tied to the northern pier"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the bag lying next to the chair behind the counter of the store with the blue awning"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the bird on the branch of the tree next to the entrance of the gray building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the kid with the ball running along the fence of the field behind the school"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the broken window on the second floor of the house opposite the gas station"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the hat that fell next to the bench under the big tree at the corner of the park"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the small flag on the mast of the boat tied to the southern pier"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the sticker on the bumper of the car parked behind the green truck"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the small dog playing near the girl sitting on the steps of the white house"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the lock on the gate of the fence surrounding the empty lot"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the helmet on the seat of the motorcycle parked near the entrance of the parking garage"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the small sign above the door of the store between the restaurant and the bank"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the drainpipe coming down from the roof of the house next to the tall pole"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the woman with the red umbrella crossing the road near the traffic light"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the hole in the wall of the old structure behind the parking lot"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the road sign leaning sideways near the turn to the street with the trees"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the crate sticking out of the trunk of the vehicle parked opposite the yellow gate"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the painting on the wall of the building to the right of the pedestrian bridge"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the cat jumping from the fence onto the roof of the shed in the backyard"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the faucet on the side of the house next to the flowerbed with the red flowers"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the lettering on the side of the truck stopping near the covered bus stop"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the man with the blue shirt, the one standing next to the bus station, on the left side of the frame, close to the bench"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the white car, not the one driving, the one parked next to the sidewalk, with the open door"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the tall building, the one with the antennas on the roof, behind the playground, slightly to the right of the center"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the second drone, the smaller one, flying low over the field, near the tree line"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the brown dog, with the red leash, playing on the grass, between the two benches, near the path"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the third window from the right, on the second floor, of the building with the yellow walls, the one next to the coffee shop"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the person standing closest to the entrance, with the big bag, not the one with the phone"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the black motorcycle, the one with the two riders, driving in the right lane, toward the intersection"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the blue door, the third from the left, in the row of shops, next to the fruit stand"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the kid with the red cap, the one riding the small bicycle, on the path, near the drinking fountain"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the roof of the house closest to you, the one with the ladder leaning on it"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the orange truck leaving the site now, the one with the open box"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the man at the right edge of the group, the one with the hat, holding the flag"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the small boat with the motor, not the sailboat, the one closer to the shore"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the gap in the fence, around the middle of it, where the bushes are low"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the pole with the camera, the one at the corner of the parking lot, near the exit"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the woman with the long coat, the one walking fast, on the far side of the square"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the pile of wooden planks, near the back wall, under the window"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the blue gate at the end of the path, the one that is half open"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the spare tire attached to the back of the gray jeep"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the group of three people standing closest to the stage, to the left of the big speaker"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the green tractor working in the field, the one towing the cart with the hay"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the orange bin next to the back entrance, the one that is full to the top"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the birds sitting on the wires, only the ones above the road, not the ones above the sidewalk"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the outdoor stairs on the side of the building, the ones leading to the roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the only car in the parking lot parked the wrong way, facing the exit"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the group of runners, specifically the one with the yellow vest running first"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the barrel lying on its side, next to the pile of sand, behind the concrete barriers"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the big puddle in the middle of the road, the one reflecting the building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the tallest ladder among the ones leaning on the scaffolding, on the west side"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the yellow bulldozer standing still next to the big pit, not the one that is working"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Track the shopping cart someone is pushing up the street, near the parked cars"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the writing on the wall, under the second window from the left"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Focus on the ferris wheel at the edge of the park, specifically its bottom cabin"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Find the two large planters on both sides of the main door of the hotel"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Follow the white car"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight the person closest to you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Look down please"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see now"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see in the frame"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many people do you see"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many cars do you see in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what suspicious thing do you see in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many vehicles do you see on the road"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what do you see ahead of you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "how many windows do you see on the building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a person in the picture"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a vehicle in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a red car in the frame"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there anyone on the roof"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there anyone armed in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there a backpack on the left side"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "is there movement in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is in the frame"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "what is ahead of you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "describe what you see in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "identify possible threats in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "find all the people in the frame"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "count the buildings in the scene"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "search for a suspicious vehicle in the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "look at the ground and describe what is there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "identify the color of the nearest vehicle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "focus on the nearest person and describe them"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the open window on the second floor"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Follow the blue bicycle"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "How many people are standing near the entrance"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Describe what is on the right"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Highlight all the vehicles"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Mark the person with the purple bag"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "count",
+    "How many cars are parked behind the white building"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Is there anyone here with a weapon?"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Look to the right"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "Get closer to the blue car"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Perform an Indian circle around the target in front of you"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Climb to altitude and give me a situation picture"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Jump to the point and stay on it"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Do a gentle scan over the sector"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Keep an eye on the junction and do not come off it"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Zoom in on the suspicious vehicle and hold it in the center"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Get on the movement route and follow it until the turn"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Gain altitude, you have dead ground behind the hill"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "A second drone is entering your sector, give it distance"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "Do one more pass over the neighborhood and then come back home"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Proceed to the grid reference I gave you, out"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Roger, continuing the scan, over"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "I have eye contact with the command post near the structure"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Report when you have eyes on the target"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Roger, returning to the collection point"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "Climb to eight hundred feet and hold over the area"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "reject",
+    "Contact with the UAV was lost, start scanning in the northern sector"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "Immediate takeoff, there is a scramble"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "highlight",
+    "Maintain observation on the white house, report any movement, over"
+   ],
+   [
+    "not_move",
+    "move",
+    "mission",
+    "Fly low along the wadi until it meets the route, and wait there"
+   ],
+   [
+    "not_move",
+    "not_move",
+    "describe",
+    "Give me an observation of the junction and report"
+   ]
+  ]
+ }
+}

@@ -1,0 +1,1804 @@
+{
+ "rows": [
+  {
+   "name": "m_fwd8",
+   "he": "טוס קדימה שמונה מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_right3",
+   "he": "זוז ימינה שלושה מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_back12",
+   "he": "עוף אחורה שנים עשר מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_adv7",
+   "he": "התקדם שבעה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_left45",
+   "he": "סטה שמאלה ארבעה מטרים וחצי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_fwd1",
+   "he": "נוע קדימה מטר אחד",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_right20",
+   "he": "טוס ימינה עשרים מטר",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_down2",
+   "he": "רד שני מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_up6",
+   "he": "עלה שבעה מטרים וחצי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_back_half",
+   "he": "טוס אחורה חצי מטר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_fwd25",
+   "he": "קדימה עשרים וחמישה מטר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_left9",
+   "he": "שמאלה תשעה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_up15",
+   "he": "תעלה חמישה עשר מטר",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_down8",
+   "he": "תרד שמונה מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_right13",
+   "he": "תזוז ימינה שלושה עשר מטר",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_fwd_two_half",
+   "he": "טוס קדימה שניים וחצי מטר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_back6",
+   "he": "אחורה שישה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_up_one",
+   "he": "עלה מטר אחד למעלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_left11",
+   "he": "זוז אחד עשר מטרים שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_fwd30",
+   "he": "התקדם שלושים מטר קדימה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_cw90",
+   "he": "תסתובב תשעים מעלות ימינה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_ccw60",
+   "he": "תסתובב שישים מעלות נגד כיוון השעון",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_cw180",
+   "he": "פנה מאה שמונים מעלות ימינה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_yaw30left",
+   "he": "סובב שלושים מעלות שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_spin_full",
+   "he": "עשה סיבוב שלם",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_cw45",
+   "he": "הסתובב ארבעים וחמש מעלות עם השעון",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_ccw120",
+   "he": "תסתובב מאה עשרים מעלות נגד השעון",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_turn_right90",
+   "he": "פנה ימינה תשעים מעלות",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_spin2",
+   "he": "תעשה שני סיבובים שלמים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_cw270",
+   "he": "הסתובב מאתיים שבעים מעלות",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_ccw15",
+   "he": "סובב חמש עשרה מעלות שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_half_turn",
+   "he": "הסתובב חצי סיבוב שלם",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_takeoff1",
+   "he": "המרא עכשיו",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_takeoff2",
+   "he": "קח אותנו לאוויר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_takeoff3",
+   "he": "תמריא כבר לאוויר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_takeoff4",
+   "he": "תתרומם מהקרקע",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_land1",
+   "he": "תנחת כאן",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_land2",
+   "he": "תנחת בעדינות",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_land3",
+   "he": "רד ונחת על הקרקע",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_land4",
+   "he": "הנחת את הרחפן",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_higher1",
+   "he": "טוס טיפה יותר גבוה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_higher2",
+   "he": "עלה עוד טיפה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_lower1",
+   "he": "רד קצת",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_lower2",
+   "he": "תרד עוד מעט למטה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_closer",
+   "he": "תתקרב אליי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_farther",
+   "he": "תתרחק קצת אחורה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_slow_fwd",
+   "he": "תתקדם לאט קדימה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_a_bit_left",
+   "he": "זוז טיפה שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_a_bit_right",
+   "he": "קצת ימינה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_hover1",
+   "he": "תעשה הברחה במקום",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_hover2",
+   "he": "תעמוד במקום באוויר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_hold",
+   "he": "תישאר איפה שאתה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_up_more",
+   "he": "עוד קצת למעלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_come_down_bit",
+   "he": "בוא רד קצת",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_ascend_slow",
+   "he": "עלה לאט",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_nudge_fwd",
+   "he": "זוז קצת קדימה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_follow_me",
+   "he": "עקוב אחריי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_follow_him",
+   "he": "עקוב אחרי האיש שהולך שם",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_track_me",
+   "he": "תעקוב אחריי כל הזמן",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_come_home",
+   "he": "טוס בחזרה אליי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_return",
+   "he": "תחזור לנקודת ההמראה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_orbit_out",
+   "he": "תקיף את האזור",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_orbit_in",
+   "he": "תסרוק במעגל סביב הנקודה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_wave",
+   "he": "תנופף לשלום",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_scan_area",
+   "he": "סרוק את השטח",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_circle_me",
+   "he": "הקף אותי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_c1",
+   "he": "עלה חמישה מטרים ואז טוס קדימה עשרה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c2",
+   "he": "המרא, עלה שלושה מטרים ונחת",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c3",
+   "he": "טוס אחורה שני מטרים ואז שמאלה ארבעה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c4",
+   "he": "הסתובב תשעים מעלות ואז התקדם שבעה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c5",
+   "he": "עלה שני מטרים, המתן חמש שניות ורד",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c6",
+   "he": "טוס קדימה חמישה מטרים ואז הסתובב מאה שמונים מעלות",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c7",
+   "he": "קח גובה עשרה מטרים ואז סע ימינה שלושה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c8",
+   "he": "תמריא, תעלה גבוה ותעשה סיבוב",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c9",
+   "he": "רד שלושה מטרים ואז נחת",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c10",
+   "he": "זוז שמאלה חמישה מטרים ואז קדימה שניים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c11",
+   "he": "הסתובב שישים מעלות שמאלה ואז עלה מטר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c12",
+   "he": "טוס קדימה, המתן שתי שניות ואז אחורה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c13",
+   "he": "עלה ארבעה מטרים ואז תעקוב אחריי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_c14",
+   "he": "פנה ימינה תשעים ואז התקדם עשרה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_gim_down",
+   "he": "כוון את המצלמה למטה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_gim_up",
+   "he": "הפנה את המצלמה למעלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_gim_fwd",
+   "he": "יישר את המצלמה קדימה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_wait3",
+   "he": "המתן שלוש שניות",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_wait_then",
+   "he": "חכה חמש שניות ואז המשך",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_fwd_far",
+   "he": "טוס רחוק קדימה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_dash_left",
+   "he": "תזנק שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_back_slow",
+   "he": "תיסע אחורה לאט",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_up_high",
+   "he": "תעלה גבוה מאוד",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_down_ground",
+   "he": "רד קרוב לקרקע",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_strafe_r",
+   "he": "החלק ימינה חמישה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_diag",
+   "he": "טוס קדימה וגם ימינה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_reposition",
+   "he": "תזוז למקום אחר",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_align",
+   "he": "תסתדר מולי",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_approach_bldg",
+   "he": "תתקרב לבניין",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_over_there",
+   "he": "טוס לשם",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_this_way",
+   "he": "בוא לכאן",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "m_lift",
+   "he": "תרים את עצמך שני מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_creep_fwd",
+   "he": "תתקדם קצת קדימה בזהירות",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "m_swing_left",
+   "he": "תנוע בקשת שמאלה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see1",
+   "he": "מה אתה רואה מולך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see2",
+   "he": "תאר לי את הסצנה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see3",
+   "he": "מה קורה שם למטה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see4",
+   "he": "ספר לי מה אתה מזהה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see5",
+   "he": "תן סקירה של האזור",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see6",
+   "he": "מה יש בתמונה עכשיו",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see7",
+   "he": "תסתכל ותגיד לי מה יש",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see8",
+   "he": "במה אתה מבחין",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see9",
+   "he": "תאר את הרחוב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see10",
+   "he": "מה נמצא בשדה הראייה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see11",
+   "he": "תעשה סקירה כללית",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_see12",
+   "he": "מה אתה רואה בצד ימין",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt1",
+   "he": "כמה בני אדם יש בשטח",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt2",
+   "he": "ספור את המכוניות ברחוב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt3",
+   "he": "כמה חלונות יש בבניין",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt4",
+   "he": "כמה כלי רכב חונים כאן",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt5",
+   "he": "תספור את העצים",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt6",
+   "he": "כמה דלתות יש בקומה הראשונה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt7",
+   "he": "כמה אנשים ליד הרכב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt8",
+   "he": "ספור לי את האופנועים",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt9",
+   "he": "כמה מבנים יש באזור",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt10",
+   "he": "כמה ילדים במגרש",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt11",
+   "he": "תגיד לי כמה משאיות יש",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt12",
+   "he": "כמה קומות יש למגדל",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt13",
+   "he": "ספור את הדגלים",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt14",
+   "he": "כמה כלבים אתה רואה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_cnt15",
+   "he": "כמה מכוניות אדומות יש",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl1",
+   "he": "סמן את המכונית האדומה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl2",
+   "he": "הדגש את הבניין הגבוה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl3",
+   "he": "מצא את הכניסה הראשית",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl4",
+   "he": "סמן לי את האדם עם החולצה הכחולה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl5",
+   "he": "הדגש את הגג האדום",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl6",
+   "he": "מצא את האופניים ליד הגדר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl7",
+   "he": "סמן את החלון השבור",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl8",
+   "he": "הדגש את השלט בכניסה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl9",
+   "he": "מצא את הרכב הלבן",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl10",
+   "he": "סמן את הדלת הפתוחה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl11",
+   "he": "הדגש את העמוד בפינה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl12",
+   "he": "מצא את הפח הכתום",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl13",
+   "he": "סמן את המדרגות",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl14",
+   "he": "הדגש את הצינור על הגג",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl15",
+   "he": "מצא את השער הצפוני",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl16",
+   "he": "סמן את הברז ליד הקיר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl17",
+   "he": "הדגש את המכונית שחונה על המדרכה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl18",
+   "he": "מצא את האדם שרץ",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl19",
+   "he": "סמן את הארגז הגדול",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_hl20",
+   "he": "הדגש את הסולם",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr1",
+   "he": "תמקד על המכונית הכחולה במסך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr2",
+   "he": "תמקד באדם עם התיק",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr3",
+   "he": "תתמקד בכלב שרץ",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr4",
+   "he": "תמקד על האופנוע הנוסע",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr5",
+   "he": "תמקד במשאית שיוצאת",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr6",
+   "he": "תתמקד בילד עם הכדור",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr7",
+   "he": "תמקד באדם שעל האופניים",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_tr8",
+   "he": "תמקד ברכב האדום שמתרחק",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is1",
+   "he": "יש מישהו על הגג",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is2",
+   "he": "האם יש רכב חונה בכניסה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is3",
+   "he": "יש אנשים בשטח",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is4",
+   "he": "האם הדלת פתוחה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is5",
+   "he": "יש מכשול לפניך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is6",
+   "he": "האם יש כלב בחצר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is7",
+   "he": "יש עשן באזור",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is8",
+   "he": "האם המגרש ריק",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is9",
+   "he": "יש תנועה ברחוב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is10",
+   "he": "האם יש דגל על הבניין",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is11",
+   "he": "יש אור בחלון",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_is12",
+   "he": "האם מישהו מתקרב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st1",
+   "he": "מה אחוז הסוללה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st2",
+   "he": "כמה סוללה נשארה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st3",
+   "he": "באיזה גובה אתה נמצא",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st4",
+   "he": "מה המיקום שלך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st5",
+   "he": "האם אתה מחובר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st6",
+   "he": "מה מהירות הרוח",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st7",
+   "he": "כמה זמן אתה באוויר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st8",
+   "he": "מה הטמפרטורה בחוץ",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st9",
+   "he": "לאיזה כיוון אתה פונה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st10",
+   "he": "מה חוזק האות",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st11",
+   "he": "האם יש קליטה טובה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st12",
+   "he": "כמה רחוק אתה ממני",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_st13",
+   "he": "מה הסטטוס שלך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp1",
+   "he": "מה נמצא ליד המכונית האדומה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp2",
+   "he": "מה יש מאחורי הבניין",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp3",
+   "he": "תאר את מה שמעל הדלת",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp4",
+   "he": "מה נמצא בין שני העצים",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp5",
+   "he": "מה יש מתחת לגשר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp6",
+   "he": "מי עומד ליד הכניסה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp7",
+   "he": "מה נמצא בפינה השמאלית",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp8",
+   "he": "מה יש על הספסל",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp9",
+   "he": "תאר את מה שמימין למשאית",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp10",
+   "he": "מה נמצא בקצה הרחוב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp11",
+   "he": "מה יש ברקע",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_sp12",
+   "he": "מי יושב על הגדר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg1",
+   "he": "אל תמריא בכלל",
+   "gt": "not_move",
+   "det_kind": "reject",
+   "det": "not_move",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg2",
+   "he": "אל תמשיך לתאר",
+   "gt": "not_move",
+   "det_kind": "reject",
+   "det": "not_move",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg3",
+   "he": "תפסיק לדבר",
+   "gt": "not_move",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg4",
+   "he": "לא עכשיו",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg5",
+   "he": "עזוב, לא משנה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg6",
+   "he": "תודה רבה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg7",
+   "he": "כל הכבוד",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "p_neg8",
+   "he": "רגע, אל תעשה כלום",
+   "gt": "not_move",
+   "det_kind": "reject",
+   "det": "not_move",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  }
+ ]
+}

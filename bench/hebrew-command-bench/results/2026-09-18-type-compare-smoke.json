@@ -1,0 +1,229 @@
+{
+ "rows": [
+  {
+   "name": "up10",
+   "he": "עלה עשרה מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "fwd5",
+   "he": "טוס קדימה חמישה מטרים",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "spin90cw",
+   "he": "הסתובב תשעים מעלות עם כיוון השעון",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "takeoff",
+   "he": "המראה",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "land",
+   "he": "נחת",
+   "gt": "move",
+   "det_kind": "mission",
+   "det": "move",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "v_listen3_g0",
+   "he": "תקשיב, אני רוצה שקודם כל תמריא, אחרי זה עלה חמישה מטרים ואז הסתובב תשעים מעלות עם כיוון השעון",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "v_listen3_g1",
+   "he": "תקשיב, אני רוצה שקודם כל עלה עשרים מטרים, אחרי זה פנה ימינה 45 מעלות ואז טוס קדימה 12 מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "v_listen3_g2",
+   "he": "תקשיב, אני רוצה שקודם כל טוס אחורה ארבעה מטרים, אחרי זה זוז שמאלה שלושה מטרים ואז רד שני מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "v_listen3_g3",
+   "he": "תקשיב, אני רוצה שקודם כל טוס קדימה עשרים וחמישה מטרים, אחרי זה הסתובב מאה שמונים מעלות עם כיוון השעון ואז זוז ימינה שישה מטרים",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "v_finish3_g0",
+   "he": "תמריא, כשתסיים עלה חמישה מטרים, ובסוף הסתובב תשעים מעלות עם כיוון השעון בבקשה",
+   "gt": "move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "mission",
+   "gemma": "move"
+  },
+  {
+   "name": "i_mid_windows",
+   "he": "הדגש את החלונות האמצעיים של הבניין הימני ביותר",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "i_third_door",
+   "he": "סמן את הדלת הקדמית של הבית השלישי משמאל",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "i_rear_wheel",
+   "he": "התמקד בגלגל האחורי של האופנוע החונה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "i_top_windows",
+   "he": "ספור את החלונות בקומה העליונה של המגדל",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "count",
+   "gemma": "not_move"
+  },
+  {
+   "name": "i_roof_corner",
+   "he": "סמן את הפינה השמאלית העליונה של הגג האדום",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "s_indian_circle",
+   "he": "תבצע מעגל אינדיאני על המטרה מולך",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "s_sitrep",
+   "he": "טפס לגובה ותן לי תמונת מצב",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "s_jump_point",
+   "he": "קפוץ לנקודה ותשאר עליה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "reject",
+   "gemma": "not_move"
+  },
+  {
+   "name": "s_gentle_scan",
+   "he": "תעשה לי סריקה עדינה על הגזרה",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "describe",
+   "gemma": "not_move"
+  },
+  {
+   "name": "s_eye_junction",
+   "he": "שים עין על הצומת ואל תרד ממנו",
+   "gt": "not_move",
+   "det_kind": "direct",
+   "det": "defer",
+   "gemma_kind": "highlight",
+   "gemma": "not_move"
+  },
+  {
+   "name": "e_stop",
+   "he": "עצור",
+   "gt": "emergency",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": null,
+   "gemma": null
+  },
+  {
+   "name": "e_stopstop",
+   "he": "עצור עצור",
+   "gt": "emergency",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": null,
+   "gemma": null
+  },
+  {
+   "name": "e_stop_now",
+   "he": "תעצור עכשיו",
+   "gt": "emergency",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": null,
+   "gemma": null
+  },
+  {
+   "name": "e_emergency",
+   "he": "חירום חירום",
+   "gt": "emergency",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": null,
+   "gemma": null
+  },
+  {
+   "name": "e_stop_all",
+   "he": "עצור הכל בבקשה",
+   "gt": "emergency",
+   "det_kind": "emergency",
+   "det": "emergency",
+   "gemma_kind": null,
+   "gemma": null
+  }
+ ]
+}

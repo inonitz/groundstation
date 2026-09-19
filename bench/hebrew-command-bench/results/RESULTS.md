@@ -38,26 +38,28 @@ test; latency is reported as percentiles.
 
 Current stack. The active chain is Gemma 4 E4B reading Hebrew directly, with thinking disabled.
 There is no translator stage. One model call does routing, planning, and the SAM3 perception
-phrase. The harness for this chain is `unified_bench.py`, run with `MVD_HOME=integration_harden2`
-and `MVD_TRANSLATOR=none`.
+phrase. The harness for this chain is `unified_bench.py`, run with `MVD_HOME=integration_harden2` (a
+bench-only variable that `unified_bench.py` reads; the harden2 config module no longer does). There
+is no `MVD_TRANSLATOR` knob — it was deleted with the translator.
 
 ## 3. Results
 
 ### Current scorecard
 
-Source: `results/2026-09-11-negation-guard.json`, harden2 unified call, Gemma 4 E4B, thinking
-off, 2026-09-11. Wilson intervals for this run are (not recorded).
+Source: `results/2026-09-19-gemma4-routing-noscan-2026-09-19.json`, harden2 unified call, Gemma 4
+E4B, thinking off, 2026-09-19 (tag `gemma4-routing-noscan`, scan_ground removed). Wilson intervals
+for this run are (not recorded).
 
 | set | cases | correct | note |
 |---|---|---|---|
 | emergency (stage 0) | 12 | 12/12 | production regex, verbatim |
-| standard commands | 253 | 236/253 | the unified prompt costs 9 standard cases against the planner-only lane: 6 rejects, 3 wrong routes |
+| standard commands | 253 | 240/253 | one of the 254 filed standard cases is not scored in the unified run |
 | verbose commands | 63 | 59/63 | |
-| perception | 138 | 103/138 | keyword-group scorer on "<kind> the <target>" |
+| perception | 138 | 101/138 | keyword-group scorer on "<kind> the <target>" |
 | military | 21 | 0/21 | keyword-translation scorer; the unified call routes instead of translating, so this set is not comparable |
-| ALL | 487 | 410/487 | |
+| ALL | 487 | 412/487 | |
 
-Latency, per case, same run: p50 515 ms, p95 1070 ms. Wall time 243 s.
+Latency, per case, same run: p50 551 ms, p95 1131 ms. Wall time 260 s.
 
 ### Negation guard — adversarial set
 
@@ -71,7 +73,7 @@ before the model. It rejects a pure action-negation that carries no positive ord
 | must-pass (a real order present) | 25 | 25/25 passed, 0 false fires |
 
 Three tests green. Against the same-code baseline the guard changed 0 cases and produced 0 false
-fires, so the bench total stays 410/487. At temperature 0 the model already rejected every pure
+fires. The bench total was 410/487 at the time (412/487 today, after routing unification). At temperature 0 the model already rejected every pure
 negation; the guard makes those rejections deterministic rather than model-dependent.
 
 ### Evolution — one row per milestone
@@ -100,11 +102,13 @@ not across rows. The standard-command set is denoted std-N for its size at that 
 | 2026-09-11 | Negation guard, iterations A1–A7 + final | 410/487; 0 cases changed vs baseline; 0 false fires; 24-refuse / 25-pass adversarial set |
 | 2026-09-11 | Purge stage 1 | 410/487, no scoring change |
 | 2026-09-12 | Trace/replayer build | 410/487, no scoring change |
+| 2026-09-17 | Recognizer cut — deterministic sieve + BASIC-English verb path removed | 410/487 |
+| 2026-09-19 | Routing unification — one Gemma call routes + plans + names; scan_ground removed | 411/487 with scan_ground → 412/487 without (tag `gemma4-routing-noscan`) |
 
 ## 4. Analysis
 
-1. The current stack scores 410/487. Commands are strong: emergency 12/12, standard 236/253,
-   verbose 59/63. Perception is the weak set at 103/138. Military scores 0/21 only because the
+1. The current stack scores 412/487. Commands are strong: emergency 12/12, standard 240/253,
+   verbose 59/63. Perception is the weak set at 101/138. Military scores 0/21 only because the
    unified call routes those inputs instead of translating them; the keyword-translation scorer
    does not apply to the current chain, so that set is not a meaningful measure here.
 
@@ -143,9 +147,9 @@ not across rows. The standard-command set is denoted std-N for its size at that 
 
 1. Deployed stack: Gemma 4 E4B, direct Hebrew, thinking off, no translator, SAM3 for the
    perception phrase. One model call per utterance.
-2. Headline result: 410/487, p50 515 ms, p95 1070 ms.
+2. Headline result: 412/487, p50 551 ms, p95 1131 ms.
 3. The negation guard is closed: deterministic, adversarially tested, 0 false fires.
-4. Open — perception at 103/138 is the weakest set and the next target for improvement.
+4. Open — perception at 101/138 is the weakest set and the next target for improvement.
 5. Open — one stage-0 false positive is unresolved: a wait command that contains the emergency
    word emergency-stops. The standing recommendation is to keep the filter greedy, because it
    fails in the safe direction. No owner ruling yet.
