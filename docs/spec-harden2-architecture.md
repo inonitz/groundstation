@@ -21,7 +21,7 @@ flowchart LR
     DRONE(("DJI drone"))
     subgraph GS["Ground Station (laptop, everything local)"]
         ASR["ASR: whisper.cpp Hebrew, F5"]
-        RX{"Regex: emergency stop, basic verbs"}
+        RX{"Regex: emergency stop / override / resume"}
         subgraph GEMMA["Gemma 4 E4B (was: Qwen + DictaLM)"]
             PLAN["Routing + Flight Planning<br/>kind, target, mission"]
             GATE["Presence Gate on the frame"]
@@ -37,7 +37,7 @@ flowchart LR
     PRX -->|"caught"| API
     PRX -->|"not caught: text"| RX
     PILOT -->|"voice"| ASR --> RX
-    RX -->|"stop, simple move"| API
+    RX -->|"stop / override / resume"| API
     RX -->|"complex"| PLAN
     PLAN -->|"mission"| NG --> API
     PLAN -->|"highlight, count: target"| GATE --> SAM
@@ -56,7 +56,7 @@ Changes against the demo-day system, one per line:
 - Scene Transcribing + Text Simplifier -> one box, Scene Q&A in Hebrew. No translation to English and back any more.
 - Highlighting: OmDet + SAM2 -> SAM3, fed by the English target phrase the planner writes.
 - New: Number Guard between the plan and the wire. New: Kill Switch on the M key, straight to /c/stop.
-- The Regex stays as tier 0 (emergency words, basic verbs). Every command reaches the aircraft through the phone's REST API server, then the DJI Remote Controller; the same server speaks the TTS and forwards the H.264 video, which the gstreamer node in ROS2 turns into our frame source for any platform. The WebSocket /c/ws/sticks is the virtual-stick channel with its keepalive.
+- The Regex stays as tier 0: emergency stop + override/resume only — all command typing and mission planning runs through the one Gemma call. Every command reaches the aircraft through the phone's REST API server, then the DJI Remote Controller; the same server speaks the TTS and forwards the H.264 video, which the gstreamer node in ROS2 turns into our frame source for any platform. The WebSocket /c/ws/sticks is the virtual-stick channel with its keepalive.
 - Not in the picture because not built: target approach, SAM3 counting.
 
 To put it into draw.io: Arrange -> Insert -> Advanced -> Mermaid, paste the block above.
@@ -65,11 +65,9 @@ To put it into draw.io: Arrange -> Insert -> Advanced -> Mermaid, paste the bloc
 
 ```mermaid
 flowchart LR
-    T["Hebrew text"] --> S0{"emergency word"}
-    S0 -->|"yes"| STOP["halt on the wire"]
-    S0 -->|"no"| S1{"exact simple command"}
-    S1 -->|"yes"| BY["deterministic mission, no model"]
-    S1 -->|"no"| S2["Hebrew rewrites:<br/>number words, idioms, register"]
+    T["Hebrew text"] --> S0{"safety word:<br/>emergency / override / resume"}
+    S0 -->|"yes"| STOP["deterministic:<br/>halt / stop / mode flip"]
+    S0 -->|"no"| S2["Hebrew rewrites:<br/>number words, idioms, register"]
     S2 --> G["Gemma 4, one call, grammar-constrained<br/>kind + target phrase + mission"]
     G -->|"mission"| NG{"every spoken number<br/>in the mission"}
     NG -->|"yes"| EC{"copies a prompt example"}
@@ -96,7 +94,7 @@ flowchart LR
     QA --> TTS["phone /tts"]
 ```
 
-Slide sources (2026-09-09 01:30): graphviz DOT files `docs/active/assets/harden2-{simplified,language,perception,detailed}.dot`, rendered locally with `dot -Tpng` / `dot -Tsvg` at dpi 192 (the llm_to_action lane's recipe: styled nodes, semantic fills, rank rows, aspect near 1.7:1). The mermaid blocks in this document are the in-doc previews of the same content. The webcam desk path (`VIDEO=webcam WEBCAM_DEV=2`) is a test input only and is left out of every diagram on purpose.
+Slide sources (2026-09-09 01:30): graphviz DOT files `../archive/diagrams/diagrams-old/harden2-{simplified,language,perception,detailed}.dot`, rendered locally with `dot -Tpng` / `dot -Tsvg` at dpi 192 (the llm_to_action lane's recipe: styled nodes, semantic fills, rank rows, aspect near 1.7:1). The mermaid blocks in this document are the in-doc previews of the same content. The webcam desk path (`VIDEO=webcam WEBCAM_DEV=2`) is a test input only and is left out of every diagram on purpose.
 
 ## Detailed (every component, with the measured numbers below)
 
@@ -117,7 +115,7 @@ flowchart TB
     subgraph APP["mvd.py, the ground-station app"]
         EARS["Ears: ROS2 subscriber to /asr_server/transcribe<br/>phone_ears: POST /input from the phone"]
         TH["TextHandler"]
-        ROUTER["Router (control/): tier 0 emergency regex, basic verbs"]
+        ROUTER["Router (control/): safety tiers<br/>emergency / override / resume"]
         DIRECT["recognize_direct: emergency, bypass, Hebrew rewrites"]
         GUARD["number guard + few-shot echo guard"]
         WIRE["DjiWire: POST /c/fly, /c/stop"]
@@ -134,7 +132,7 @@ flowchart TB
     ASRN --> EARS
     PSR -->|"not caught"| API -->|"/input"| EARS
     EARS --> TH --> ROUTER
-    ROUTER -->|"stop, simple move"| WIRE
+    ROUTER -->|"emergency / override"| WIRE
     ROUTER -->|"complex"| DIRECT --> GEMMA
     GEMMA -->|"mission"| GUARD --> WIRE --> API
     KILL --> WIRE
@@ -161,9 +159,9 @@ flowchart TB
 | VRAM, whole stack resident | ~6.5 GiB peak of 8.15 (owner-observed) | live session |
 
 ## Switches
-MVD_PLANNER=gemma4|qwen3vl · MVD_TRANSLATOR=none|hymt2|dicta · SCENE_SEG=sam3|omdet · SCENE_BG=off|<yolo.pt> ·
-VIDEO=webcam|dji|rtmp · WEBCAM_DEV=<n> · SCENE_TTS=phone|off · SCENE_TTS_LANG=he · SCENE_SAM3_PERIOD · SCENE_HL_GIVEUP.
-Boot: `MVD_HOME=integration_harden2 VIDEO=webcam WEBCAM_DEV=2 SCENE_TTS=off bash tools/desk-test/up.sh`.
+VIDEO=webcam|dji|rtmp · CONTROL=mock|real · WEBCAM_DEV=<n> · SCENE_TTS=phone|phonikud|off · SCENE_GATE=sam3|either|vlm ·
+SCENE_HL_REL · SCENE_SAM3_PERIOD · SCENE_HL_GIVEUP · SCENE_BG=off|<yolo.pt>. Everything else is a config constant.
+Boot: `VIDEO=webcam WEBCAM_DEV=2 SCENE_TTS=off bash projects/integration_harden2/run.sh up webcam mock`.
 
 ## integration_tts — the frozen fallback
 

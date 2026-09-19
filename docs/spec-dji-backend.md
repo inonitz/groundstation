@@ -1,22 +1,22 @@
 # Spec — Linux `DjiBackend` (talks to the Android recon-swarm app over LAN)
 
 **Owner:** UNASSIGNED (this or a parallel agent). **Status:** ready to start against the mock.
-**Runs parallel to** `spec-fmu-cleanup.md` — entirely new files, no collision.
+**Runs parallel to** `stale/spec-fmu-cleanup.md` — entirely new files, no collision.
 
 ---
 
 ## Context — read these first (a cold agent MUST load these)
-- **`docs/active/mission-brief-2026-08-15.md`** — the project. Voice-commanded drone demo, Israeli
+- **`stale/mission-brief-2026-08-15.md`** — the project. Voice-commanded drone demo, Israeli
   MOD contest (~2026-08-27). Linux does perception + planning; a drone backend does I/O. Platform is
   a **DJI Mini via an Android phone bridge** (MSDK v5 is Android-only; there is no Linux DJI SDK).
-- **`docs/active/dji-apiserver-review.md`** — what the Android app (a teammate's Kotlin Ktor server,
+- **`stale/dji-apiserver-review.md`** — what the Android app (a teammate's Kotlin Ktor server,
   `ExoSkeletons/DJI-android-sdk-v5-recon-swarm`) exposes, the 3 fixes we asked for, and the open
   integration questions. This is the punch list for the app author.
-- **`docs/specs/spec-dji-websocket-protocol.md`** — the FROZEN wire contract this backend targets.
+- **`spec-dji-websocket-protocol.md`** — the FROZEN wire contract this backend targets.
 - **`tools/dji_mock/mock_apiserver.py`** — a faithful mock of the app's API. **Build and test
   the whole backend against this**, with no drone and no phone. Run:
   `pip install aiohttp && python3 tools/dji_mock/mock_apiserver.py 0.0.0.0 8080`.
-- **`docs/code-guidelines.md`** — **no virtual dispatch, no exceptions** (CRTP + tagged dispatch),
+- **`guidelines.md`** — **no virtual dispatch, no exceptions** (CRTP + tagged dispatch),
   guard clauses, WHY-comments, ~150-400 LOC files.
 - **`CLAUDE.md`** — **reads/greps via `rtk`; run NO git writes** (human owns git; suggest house-style
   commits). The **`Edit` tool is blocked** — edit via `python3` string-replace or full-file `Write`.

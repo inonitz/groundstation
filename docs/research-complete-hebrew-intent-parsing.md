@@ -1,5 +1,9 @@
 # Hebrew intent parsing without translation — research lane (opened 2026-09-02, owner-directed)
 
+> SUPERSEDED (2026-09-19): harden2 reads Hebrew directly via one Gemma-4-E4B call, no translator.
+> The lane's goal (skip translation) was met by Gemma 4, not the DictaLM ladder proposed here.
+> Historical; kept as the record.
+
 Goal. Replace Qwen3-VL for COMMAND parsing with something smaller, ideally Hebrew-native, and
 skip the translation stage entirely. Perception stays on the VLM by definition.
 

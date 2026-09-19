@@ -1,6 +1,6 @@
 > **STATUS 2026-08-26 — read first.** This is the low-level **wire contract**, kept for reference.
 > The **MVD does NOT drive via `WS /c/ws/sticks`** — it uses **REST `POST /c/fly {mission:[…]}`
-> mission actions** (see `mvd-voice-command-table.md`). The WS-sticks velocity stream below is the
+> mission actions** (see `../projects/integration_tts/README.md`). The WS-sticks velocity stream below is the
 > channel for the **C++ `llm_to_action` `DjiBackend`** track, not the Python MVD.
 > Fix-status since this was frozen: **#2 video path is DONE** (raw H.264 over TCP `:5600`, auto-starts
 > with the app). **Still open (dev-owned):** takeoff/land response bodies, **gimbal (broken

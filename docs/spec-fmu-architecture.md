@@ -501,57 +501,21 @@ Not fully AGPL-free yet: YOLO26 + SAM2 + BoT-SORT (Ultralytics) remain AGPL; OmD
 
 ---
 
-## Integration MVD — voice -> 4-tier router -> DJI backend + perception (2026-08-25)
+## Integration MVD — SUPERSEDED (see spec-harden2-architecture.md)
 
-> **Status:** DONE / the Demo-Day system. Lives in `projects/integration/` (self-contained). A PARALLEL
-> subsystem to the FMU above — the FMU (`llm_to_action`) remains the destination C++ product; this
-> Python MVD is the shipped prototype. Full detail: `docs/active/2026-08-25-mvd-integration-handoff.md`.
-
-**Data flow.** `voice (laptop mic / phone ASR) -> on_text -> Router.classify (4 tiers) -> {BASIC verb ->
-DjiWire -> DJI REST (POST /c/...) | COMPLEX -> perception (Qwen-VL + OmDet/SAM2)}`. Drone camera ->
-phone `:5600` raw-H.264/TCP -> `gstreamer_rx` -> ROS `camera/stream` -> perception window. Perception
-answer -> LONG (screen) + SHORT (spoken: phone `/tts` + laptop espeak).
-
-**Control authority model.** Total user control: deterministic verbs move the drone; the VLM never
-drives motion. Tiers: EMERGENCY (`stop`=`POST /c/fly [{delay:0}]`, preempts + keeps control) >
-OVERRIDE (`manual`=`/c/stop` RC handoff) / RESUME > BASIC verbs > COMPLEX (perception, no drone POST).
-`controller.fly{}` cancels the prior mission and re-`takeControl()`s, so missions naturally preempt.
-
-**Interfaces.** `dji_wire.py` is the sole aircraft client (full REST/WS: `/c/fly` mission actions,
-`/key`, `/tts`, `/status`, `/c/ws/sticks`). Inbound phone ASR via `phone_ears.py` (laptop `:8080`,
-`/input` + raw TCP, matches `GroundStationSpeechResolver.kt`). VLM on `llama-server :18090` (`-np 1`).
-Ports: phone `:8080` (control+tts) / laptop `:8080` (phone_ears) / `:5600` (video) / `:18090` (VLM).
-
-**Backend gaps (DJI app dev):** dynamic groundstation-IP discovery; gimbal commands (broken backend-side);
-API-Server foreground-service reliability. See the handoff §9.
-
-## Voice pipeline components (2026-09-02)
-
-System chain: **ASR => RECOGNIZER => VLM/LLM => REST API (MSDK server)**.
-
-Wired live in the app (2026-09-03): `scene_omdet.py` runs COMPLEX text through the Recognizer
-(`Pipeline` as `Router.on_complex`) -> mission on the wire / perception / spoken reject. Translate =
-DictaLM on CPU `:18091` (`run_mvd.sh` `dicta` pane); plan + VLM = Qwen3-VL on GPU `:18090`. This is
-the live wiring of the frozen-proven pattern; production app boot is the live-test session's step.
-
-- `projects/integration_harden/recognizer/` — Hebrew utterance in; mission JSON, planner-bound
-  English, VLM-bound English, or a spoken rejection out. Six deterministic stages around one
-  injected translator call. Details + diagram: its README and bench/hebrew-command-bench/README.md.
-- `projects/integration_harden/perception/` — detection/masking/VLM-gating logic with injected
-  models. Details: its README.
-- Remaining top-level integration_harden files are three not-yet-clustered components plus glue:
-  drone control (router.py, commands.py, dji_wire.py), audio I/O (ears.py, phone_ears.py,
-  voice.py), video plumbing (camera_stream.py, video_doctor.py, video_watchdog.py), and the app
-  glue (scene_omdet.py, config.py, run scripts). Clustering them is roadmapped, not urgent.
-
-**Status update (2026-09-06, desk-verified).** The full Hebrew chain ran live at the desk on
-2026-09-05: laptop mic (F5 push-to-talk) -> `asr_node` whisper.cpp (ivrit whisper-large-v3-turbo
-q5_k, language forced `he`) -> Recognizer -> missions as HTTP 200 on the mock wire (bare `/c/fly`
-arrays), with real phone video. New since the last entry: the mock mirrors the current
-`ApiServer.kt` endpoint-for-endpoint and logs every received command; all four `dji_wire` clients
-send the bare `/c/fly` array (frozen `integration/` included, owner-authorized freeze exception);
-`tools/desk-test/` boots and tears down the whole desk test detached and records a per-session
-dataset (`utterances.jsonl` + WAV clips, gitignored); `scene_omdet` renders a Hebrew-RTL + English
-overlay with the full per-utterance chain (implemented; needs one app restart to be seen live).
-ASR latency: ~300 ms warm, ~3.9 s cold (Vulkan shader compile). Open: COMPLEX runs synchronously on
-the ASR callback thread; the C++ DjiBackend `/status` parse resync stays deferred to integration time.
+> **Status: SUPERSEDED (2026-09-19).** The Python voice MVD once described here lived in the retired
+> `projects/integration/` tree. It used a 4-tier router (a deterministic BASIC verb tier straight to
+> `DjiWire`) and a multi-model perception stack (Qwen-VL + OmDet/SAM2 with a DictaLM translator on a
+> second port). That whole path is gone. The live voice MVD is now `projects/integration_harden2/`:
+> ONE Gemma-4-E4B call does the Hebrew routing, mission planning and scene answers, SAM3 does the
+> segmentation, and a deterministic safety-tier router keeps only emergency / override / resume — the
+> BASIC verb tier and the no-model mission path were deleted. The C++ FMU architecture above is a
+> separate, still-parked engine and is unaffected by this note.
+>
+> - Live source of record: `spec-harden2-architecture.md`.
+> - Frozen English fallback: `../projects/integration_tts/README.md`.
+> - Historical handoff (archived): `stale/2026-08-25-mvd-integration-handoff.md`.
+>
+> Notes from that stack: ASR latency ~300 ms warm / ~3.9 s cold (Vulkan shader compile); COMPLEX ran
+> synchronously on the ASR callback thread; the C++ `DjiBackend` `/status` parse resync was deferred
+> to integration time.

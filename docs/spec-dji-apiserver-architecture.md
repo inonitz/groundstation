@@ -26,11 +26,11 @@ All citations below are relative to
 
 ## Diagrams
 
-![Simplified architecture](assets/dji-apiserver-simplified.png)
+![Simplified architecture](../archive/diagrams/diagrams-old/dji-apiserver-simplified.png)
 
-![Detailed architecture](assets/dji-apiserver-detailed.png)
+![Detailed architecture](../archive/diagrams/diagrams-old/dji-apiserver-detailed.png)
 
-Sources: `assets/dji-apiserver-simplified.dot`, `assets/dji-apiserver-detailed.dot`.
+Sources: `../archive/diagrams/diagrams-old/dji-apiserver-simplified.dot`, `../archive/diagrams/diagrams-old/dji-apiserver-detailed.dot`.
 SVG versions sit beside the PNGs.
 
 ## Ports and lifecycle

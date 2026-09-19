@@ -1,5 +1,8 @@
 # Qwen3-VL-4B: Hebrew vs English command planning (2026-09-01)
 
+> SUPERSEDED (2026-09-19): harden2 reads Hebrew directly, no translator — the HE→EN translation
+> hop this study recommends was later reversed. Historical; kept as the record.
+
 Question (owner): does Qwen handle Hebrew well enough to skip the HE->EN translation hop
 (backlog B)? Method: 12 paired HE/EN commands (simple verbs, numerics, 3-4-step
 decompositions, a question, one open-ended) against the live 4B Q4_K_M via llama-server,

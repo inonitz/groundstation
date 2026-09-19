@@ -19,8 +19,8 @@ All values ms. Telemetry = WS transport + the drone-read cost (MSDK fetching FC 
 Median gap ~19 ms = that drone-read cost.
 
 ## Graphs
-![overview](latency_overview.png)
-![overlay](latency_overlay.png)
+![overview](research-complete-latency-2026-08-22-overview.png)
+![overlay](research-complete-latency-2026-08-22-overlay.png)
 
 Regenerate: `python3 tools/dji_mock/plot_latency.py <telemetry.csv> <wsrtt.csv> <out_dir>`
 

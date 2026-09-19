@@ -2,7 +2,7 @@
 
 > 2026-09-01: this list feeds PHASE 2 of the reoriented roadmap - the post-sprint architecture
 > research aimed at raising the system's SR% against its initial objective (see
-> `2026-09-01-interview-sprint-handoff.md` section 2). Not sprint material.
+> `stale/2026-09-01-interview-sprint-handoff.md` section 2). Not sprint material.
 
 Owner request: papers + repos with READABLE SOURCE where an LLM/VLM plus internal context generates
 behaviour trees for autonomous control. Ranked by studyable code. Benchmarks quoted are the authors'
