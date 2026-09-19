@@ -7,5 +7,17 @@
     "clangd-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "caveman@caveman": true
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /root/groundstation/.claude/hooks/ste_check.py"
+          }
+        ]
+      }
+    ]
   }
 }
