@@ -23,6 +23,34 @@ MODEL_DIR = config.SAM3_MODEL_DIR
 
 from fatal import die
 
+def _iou_contain(a, b):
+    ax1, ay1, ax2, ay2 = a; bx1, by1, bx2, by2 = b
+    ix1, iy1 = max(ax1, bx1), max(ay1, by1); ix2, iy2 = min(ax2, bx2), min(ay2, by2)
+    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+    if inter <= 0:
+        return 0.0, 0.0
+    aa = max(1, (ax2 - ax1) * (ay2 - ay1)); bb = max(1, (bx2 - bx1) * (by2 - by1))
+    return inter / (aa + bb - inter), inter / aa      # (IoU, fraction of a inside b)
+
+
+def _dedup_overlaps(dets, iou_thr=0.5, contain_thr=0.7):
+    """One box per object. Drop a lower-conf det that overlaps a kept det of the SAME label by
+    IoU>iou_thr, or sits mostly (>contain_thr) inside it. `dets` must be sorted by conf, high first.
+    SAM3 returns several nested boxes for one object; this collapses them. Distinct objects survive."""
+    keep = []
+    for d in dets:
+        drop = False
+        for k in keep:
+            if k["label"] != d["label"]:
+                continue
+            iou, contain = _iou_contain(d["box"], k["box"])
+            if iou > iou_thr or contain > contain_thr:
+                drop = True; break
+        if not drop:
+            keep.append(d)
+    return keep
+
+
 class Sam3Backend:
     """detect(frame_bgr, phrase, conf) -> [{"label","conf","box"} ...] sorted by conf desc.
     mask_for_box(frame_bgr, box) -> bool mask (HxW) or None. Both contracts match the engine's."""
@@ -97,6 +125,7 @@ class Sam3Backend:
                 self._cache[box] = mk
                 dets.append({"label": concept, "conf": float(sc), "box": box})
         dets.sort(key=lambda d: -d["conf"])
+        dets = _dedup_overlaps(dets)          # SAM3 emits nested boxes per object; keep one each
         return dets[:topk]
 
     def mask_for_box(self, frame_bgr, box):
