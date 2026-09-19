@@ -129,8 +129,7 @@ def _model_lines():
     the env knobs still drive these, so a future swap shows here automatically."""
     planner = config.PLANNER
     planner = {"gemma4": "Gemma-4-E4B", "qwen3vl": "Qwen3-VL-4B"}.get(planner, planner)
-    prec = os.environ.get("SCENE_SAM3_PRECISION", "nf4")
-    eyes = f"SAM3-{prec}"
+    eyes = os.path.basename(config.SAM3_MODEL_DIR)
     asr = config.ASR_MODEL_PATH
     if "ivrit" in asr:   ears = "whisper-ivrit-v3"
     elif asr:            ears = os.path.basename(os.path.dirname(asr)) or "whisper"

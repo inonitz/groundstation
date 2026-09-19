@@ -30,18 +30,14 @@ RELATIVE_CONFIDENCE_GATE = float(os.environ.get("SCENE_HL_REL", "0.65"))  # [SCE
 HIGHLIGHT_PRESENCE_GATE  = os.environ.get("SCENE_GATE", "sam3")           # [SCENE_GATE] sam3 | either | vlm (default sam3)
 
 # ── Speech (phone owns TTS; these are the tunables + the desk-debug fallbacks) ───────────────
-TTS_ENABLED      = os.environ.get("MVD_TTS", "1") != "0"       # [MVD_TTS] phone TTS on; 0 to silence (desk tests)
-TTS_HOST         = os.environ.get("SCENE_TTS_HOST", "")        # [SCENE_TTS_HOST] "" -> derive from video host / gateway
-TTS_RATE         = float(os.environ.get("SCENE_TTS_RATE", "1.0"))     # [SCENE_TTS_RATE] POST /tts speech rate
-TTS_TIMEOUT      = float(os.environ.get("SCENE_TTS_TIMEOUT", "3"))    # [SCENE_TTS_TIMEOUT] POST timeout (s)
-TTS_PIPER_MODEL  = os.environ.get("SCENE_TTS_MODEL", "/root/models/tts/voices/en_US-lessac-medium.onnx")  # desk-debug only
-TTS_PIPER_BIN    = os.environ.get("SCENE_TTS_PIPER_BIN", "/root/models/tts/piper/piper")                  # desk-debug only
-TTS_PIPER_SR     = int(os.environ.get("SCENE_TTS_SR", "22050"))       # desk-debug piper raw sample rate
+TTS_HOST         = ""        # always derived from the phone/video host (tts_io); not an env knob
+TTS_RATE         = 1.0     # POST /tts speech rate; fixed
+TTS_TIMEOUT      = 3.0    # POST timeout (s); fixed
 # Phonikud offline Hebrew TTS (SCENE_TTS=phonikud): G2P adds niqqud+stress -> IPA -> Piper onnx voice.
 # Models are cc-nc (demo/competition use only); fetched by tools/devenv/install-runtime-deps.sh.
-PHONIKUD_G2P     = os.environ.get("SCENE_PHONIKUD_G2P",    "/root/models/tts/phonikud/phonikud-1.0.int8.onnx")
-PHONIKUD_VOICE   = os.environ.get("SCENE_PHONIKUD_VOICE",  "/root/models/tts/phonikud/model.onnx")
-PHONIKUD_CONFIG  = os.environ.get("SCENE_PHONIKUD_CONFIG", "/root/models/tts/phonikud/model.config.json")
+PHONIKUD_G2P     = "/root/models/tts/phonikud/phonikud-1.0.int8.onnx"
+PHONIKUD_VOICE   = "/root/models/tts/phonikud/model.onnx"
+PHONIKUD_CONFIG  = "/root/models/tts/phonikud/model.config.json"
 
 # ── ASR escape hatches (keep all; the restore-English / swap-model path) ──────────────────
 ASR_MODEL_PATH     = os.environ.get("ASR_MODEL_PATH", "/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin")
@@ -52,12 +48,11 @@ ASR_CAPTURE_DEVICE = os.environ.get("ASR_CAPTUREID")                      # [ASR
 # ── Recording + session (ONE root; clips and logs derive from it) ─────────────────────────
 RECORD_SESSION = os.environ.get("RECORD", "1") != "0"         # [RECORD] record the whole session (utterances + clips)
 _HERE          = os.path.dirname(os.path.abspath(__file__))
-SESSIONS_ROOT  = os.environ.get("MVD_SESSIONS_ROOT",
-                     os.path.abspath(os.path.join(_HERE, "..", "..", "logs", "sessions")))  # [MVD_SESSIONS_ROOT] repo logs/, NOT the frozen tree
+SESSIONS_ROOT  = os.path.abspath(os.path.join(_HERE, "..", "..", "logs", "sessions"))   # repo logs/, NOT the frozen tree; fixed constant
 SESSION_DIR    = os.environ.get("MVD_SESSION_DIR") or os.path.join(                      # [MVD_SESSION_DIR]
                      SESSIONS_ROOT, "session-%s-%s" % (time.strftime("%Y%m%d-%H%M%S"), socket.gethostname()))
 CLIPS_DIR      = os.path.join(SESSION_DIR, "clips")           # derived from SESSION_DIR (was ASR_RECORD_DIR)
-LOG_DIR        = os.environ.get("DESK_TEST_LOGDIR", SESSION_DIR)   # [DESK_TEST_LOGDIR] derived from SESSION_DIR
+LOG_DIR        = SESSION_DIR   # fixed: derived from SESSION_DIR
 
 # Derived, NOT stored (functions; computed from the above so they can never drift):
 def video_input(video_source=None):
@@ -68,6 +63,8 @@ def video_input(video_source=None):
         return str(WEBCAM_DEVICE_INDEX)
     if v == "dji":
         return "ros"
+    if v in ("rtmp", "drone"):
+        return "rtsp://127.0.0.1:8554/live"
     return v
 
 def wire_target(control_target=None):
@@ -122,9 +119,8 @@ def default_gateway():
 
 def resolve_he_font():
     """A monospace font file that has Hebrew glyphs. DejaVuSansMono has NONE (renders boxes); FreeMono
-    does. Override with SCENE_HE_FONT."""
-    for c in (os.environ.get("SCENE_HE_FONT"),
-              "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
+    does. Fixed; not an env knob."""
+    for c in ("/usr/share/fonts/truetype/freefont/FreeMono.ttf",
               "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):
         if c and _op.exists(c):
             return c

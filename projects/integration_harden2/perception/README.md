@@ -1,8 +1,12 @@
-# perception/ — the perception engine inside integration_harden
+# perception/ — the OmDet+SAM2.1 perception engine inside integration_harden2
 
-What the drone sees and highlights: open-vocab detection, mask hygiene, and the VLM presence
-gate, extracted from the live desk loop on 2026-09-02. The glue (video window, chat pane, keys,
-threads, ASR wiring) stays in mvd.py; this package holds the logic and the models.
+**Non-default since 2026-09-08.** This is the legacy two-model highlight path (OmDet open-vocab
+detection + SAM2.1 masks). The DEFAULT engine is `perception2` (one SAM3-nf4 model); this package
+loads only under `SCENE_SEG=omdet`.
+
+What the drone sees and highlights: open-vocab detection, mask hygiene, and the VLM presence gate,
+extracted from the live desk loop on 2026-09-02. The glue (video window, chat pane, keys, threads,
+ASR wiring) stays in mvd.py; this package holds the logic and the models.
 
 ## Files
 
@@ -10,7 +14,7 @@ threads, ASR wiring) stays in mvd.py; this package holds the logic and the model
 |---|---|
 | `engine.py` | THE COMPONENT: relative-confidence gate, mask hygiene, VLM fallback, presence gate, highlight-phrase parsing. Models are injected callables. `python3 engine.py` = self-test, no GPU. |
 | `detectors.py` | the model owners: OmDet (open-vocab detector, offline-safe loading) and Eyes (background YOLO26-seg + lazy SAM2; the legacy yoloe/grounder backends were deleted 2026-09-03). Moved verbatim from highlight_seg.py / eyes.py. |
-| `vlm_client.py` | Qwen3-VL client: ask / analyze / ground / ensure_server. `parse_reply()` is split out so the reply parsing is testable without a server. Moved from vlm.py. |
+| `vlm_client.py` | Gemma 4 E4B VLM client: ask / analyze / ground / ensure_server. `parse_reply()` is split out so the reply parsing is testable without a server. Moved from vlm.py. |
 
 ## Wiring (what mvd.py does)
 

@@ -28,14 +28,14 @@ DEVICE       = os.environ.get("SCENE_DEVICE", "")
 ASR_TOPIC = os.environ.get("SCENE_ASR_TOPIC", _K.ASR_TRANSCRIBE_TOPIC)
 
 # ============================ 4. Camera + window ==========================
-INPUT        = os.environ.get("SCENE_INPUT", os.environ.get("SCENE_CAM", str(_D.WEBCAM_DEVICE_INDEX)))
-CAM_W        = int(os.environ.get("SCENE_CAM_W", str(_K.CAMERA_REQUEST_WIDTH)))
-CAM_H        = int(os.environ.get("SCENE_CAM_H", str(_K.CAMERA_REQUEST_HEIGHT)))
-CHAT_W       = int(os.environ.get("SCENE_CHAT_W", str(_K.CHAT_PANE_WIDTH)))
+INPUT        = _D.video_input(_D.VIDEO_SOURCE)   # derived from VIDEO=webcam|dji|rtmp; no SCENE_INPUT knob
+CAM_W        = _K.CAMERA_REQUEST_WIDTH
+CAM_H        = _K.CAMERA_REQUEST_HEIGHT
+CHAT_W       = _K.CHAT_PANE_WIDTH
 HE_FONT_PATH = _D.resolve_he_font()
-HE_FONT_SIZE = int(os.environ.get("SCENE_HE_FONT_SIZE", str(_K.HE_FONT_SIZE)))
+HE_FONT_SIZE = _K.HE_FONT_SIZE
 OPEN_TIMEOUT = float(os.environ.get("SCENE_OPEN_TIMEOUT", str(_K.INPUT_OPEN_TIMEOUT_SECONDS)))
-READ_RETRY   = int(os.environ.get("SCENE_READ_RETRY", str(_K.INPUT_READ_RETRY_LIMIT)))
+READ_RETRY   = _K.INPUT_READ_RETRY_LIMIT
 
 # ============================ 5. Overlay colours ==========================
 COL_BACKGROUND = _K.COL_BACKGROUND
@@ -48,13 +48,10 @@ COL_CHAT_MODEL = _K.COL_CHAT_MODEL
 # ============================ 6. Voice out (TTS) ==========================
 TTS_BACKEND = os.environ.get("SCENE_TTS", _K.TTS_BACKEND)
 TTS_HOST    = _D.TTS_HOST
-TTS_PORT    = int(os.environ.get("SCENE_TTS_PORT", str(_K.TTS_PORT)))
-TTS_LANG    = os.environ.get("SCENE_TTS_LANG", _K.TTS_LANGUAGE)
+TTS_PORT    = _K.TTS_PORT
+TTS_LANG    = _K.TTS_LANGUAGE
 TTS_RATE    = _D.TTS_RATE
 TTS_TIMEOUT = _D.TTS_TIMEOUT
-TTS_MODEL     = _D.TTS_PIPER_MODEL
-TTS_PIPER_BIN = _D.TTS_PIPER_BIN
-TTS_SR        = _D.TTS_PIPER_SR
 PHONIKUD_G2P    = _D.PHONIKUD_G2P
 PHONIKUD_VOICE  = _D.PHONIKUD_VOICE
 PHONIKUD_CONFIG = _D.PHONIKUD_CONFIG
@@ -83,7 +80,6 @@ HL_REL       = _D.RELATIVE_CONFIDENCE_GATE
 LLAMA_SERVER_PORT = _K.LLAMA_SERVER_PORT          # bare Gemma port (recognizer/pipeline.py)
 PHONE_ASR_PORT    = int(os.environ.get("MVD_PHONE_ASR_PORT", str(_K.PHONE_ASR_PORT)))
 PHONE_ASR_ENABLED = os.environ.get("MVD_PHONE_ASR", "1" if _K.PHONE_ASR_ENABLED else "0") != "0"
-TTS_ENABLED       = _D.TTS_ENABLED
 
 # ============================ 10. Video watchdog ==========================
 WATCHDOG_STALL_SEC = float(os.environ.get("WATCHDOG_STALL_SEC", str(_K.WATCHDOG_STALL_SECONDS)))
@@ -91,16 +87,17 @@ WATCHDOG_RETRY_SEC = float(os.environ.get("WATCHDOG_RETRY_SEC", str(_K.WATCHDOG_
 
 # ============================ 11. Scenario resolvers ======================
 wire_target = _D.wire_target       # (host, port, is_real) for CONTROL=mock|real
-video_input = _D.video_input       # the app's --source for VIDEO=webcam|dji
+video_input = _D.video_input       # the app's source for VIDEO=webcam|dji|rtmp
 
-# ============================ 12. Single-source (T1b) =====================
+# ============================ 12. Ports, planner, wire, ASR ================
 PLANNER        = "gemma4"                 # the only planner (MVD_PLANNER toggle deleted)
 ASR_MODEL_PATH = _D.ASR_MODEL_PATH
 ASR_BACKEND    = _D.ASR_BACKEND
 ASR_LANGUAGE   = _D.ASR_LANGUAGE
-# Live wire target: config OWNS MVD_WIRE_* (run.sh derives them from CONTROL). DjiWire.from_env, the
-# startup print and the HUD read these. wire_target(control) above is the control-based resolver the
-# golden test uses; the two agree because run.sh sets MVD_WIRE_* from CONTROL.
-WIRE_HOST = os.environ.get("MVD_WIRE_HOST", "127.0.0.1")
-WIRE_PORT = int(os.environ.get("MVD_WIRE_PORT", str(_K.REAL_WIRE_PORT)))
-WIRE_REAL = os.environ.get("MVD_WIRE_REAL", "").lower() in ("1", "true", "yes")
+# Live wire target: derived from ONE decision, CONTROL (mock|real), via wire_target above. DjiWire.from_env,
+# the startup print and the HUD read WIRE_HOST/PORT/REAL. run.sh exports CONTROL (+ PHONE_IP); config derives.
+WIRE_HOST, WIRE_PORT, WIRE_REAL = _D.wire_target(_D.CONTROL_TARGET)   # one decision: CONTROL=mock|real
+
+# ============================ 13. SAM3 model identity =====================
+SAM3_MODEL_DIR = _K.SAM3_MODEL_DIR   # single source: the SAM3 loader + the overlay label read this
+SAM3_PRECISION = _K.SAM3_PRECISION   # nf4, fixed at load; no env override

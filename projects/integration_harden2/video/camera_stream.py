@@ -23,6 +23,8 @@ TOPIC = "camera/stream"          # == gstreamer_udp_cam_rx kOutCameraPipelineRaw
 ROS_SOURCES = ("ros", "camera_stream", TOPIC)   # source strings that mean "subscribe to the topic"
 
 
+from fatal import die
+
 def _teardown(spin, executor, node):
     """Shut a spin thread + node down in the ONE order that does not core-dump on exit: JOIN the
     spin loop first, then remove and destroy the node. Destroying a node while its executor is
@@ -49,7 +51,7 @@ class FrameCounter:
 
     def __init__(self, topic=TOPIC, node_name="frame_counter"):
         if not _HAVE_ROS:
-            raise RuntimeError(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
+            die(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
         if not rclpy.ok():
             rclpy.init()
         self.frames = 0
@@ -100,7 +102,7 @@ class FrameCounter:
 class CameraStream:
     def __init__(self, topic=TOPIC, first_frame_timeout=15.0):
         if not _HAVE_ROS:
-            raise RuntimeError(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
+            die(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
         if not rclpy.ok():
             rclpy.init()
         self._node = rclpy.create_node("scene_camera_stream_sub")

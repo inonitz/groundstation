@@ -1,5 +1,5 @@
 import os
-"""llama-server client for the reasoning brain (Qwen3-VL-4B). Sends the current frame + the
+"""llama-server client for the reasoning model (the VLM; the model is chosen in run_llama_server.sh). Sends the current frame + the
 detector's findings + the user's question. Returns a spoken-style answer and, when the user asked
 to find something, a target phrase plus the VLM's own box guess. Never raises.
 Moved verbatim from vlm.py on 2026-09-02; parse_reply() split out of ask() so the text parsing

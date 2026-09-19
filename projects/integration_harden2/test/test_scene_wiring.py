@@ -115,8 +115,16 @@ def test_build_highlight_sam3_one_model_serves_both_callables():
 
 
 def test_build_highlight_rejects_unknown_backend():
-    try:
-        scene.build_highlight("yoloe", eyes=None)
-    except ValueError:
-        return
-    raise AssertionError("an unknown SCENE_SEG must raise")
+    # unknown backend -> die() (a hard crash, not an exception). Check the child process crashes loudly.
+    import subprocess
+    here = os.path.dirname(__file__)
+    code = ("import sys, os;"
+            "sys.path.insert(0, os.path.join(%r, '..'));"
+            "sys.path.insert(0, os.path.join(%r, '..', 'recognizer'));"
+            "import mvd as scene;"
+            "scene.build_highlight('yoloe', eyes=None)" % (here, here))
+    r = subprocess.run([sys.executable, "-c", code],
+                       env={**os.environ, "MVD_HOME": "integration_harden2", "MVD_TRANSLATOR": "none"},
+                       capture_output=True, text=True)
+    assert r.returncode != 0, "unknown SCENE_SEG must crash"
+    assert "no vision backend" in r.stderr, r.stderr

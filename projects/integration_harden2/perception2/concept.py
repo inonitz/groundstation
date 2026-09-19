@@ -6,7 +6,7 @@ unmarked (proven on the OCR street scene, RESULTS.md). So a user phrase must bec
 set of class synonyms before it reaches SAM3.
 
 Two paths, same output -- a comma-separated concept string SAM3 can ground:
-  1. VLM path: a Qwen3-VL text call extracts the object noun(s) from the phrase, returned as
+  1. VLM path: a model text call extracts the object noun(s) from the phrase, returned as
      'CONCEPTS: a, b, c'. This runs ONCE per highlight request, never per frame.
   2. Offline path: a deterministic head-noun + synonym table. No server, so tests and the
      no-VLM fallback both work.

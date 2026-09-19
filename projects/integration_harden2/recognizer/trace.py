@@ -2,7 +2,7 @@
 
 One JSONL line per utterance: what was heard, what every stage did, what came out, how long
 it took. One file per session under <repo>/logs/traces/ (outside the frozen harden2 tree; logs/ is
-gitignored, so transcripts and audio never enter git). Override with MVD_TRACE_DIR.
+gitignored, so transcripts and audio never enter git).
 """
 import json
 import os
@@ -13,7 +13,7 @@ class Trace:
 
     def __init__(self, directory=None):
         # Default OUTSIDE the frozen harden2 tree: <repo>/logs/traces (logs/ is gitignored).
-        directory = directory or os.environ.get("MVD_TRACE_DIR") or os.path.join(
+        directory = directory or os.path.join(
             os.path.dirname(__file__), "..", "..", "..", "logs", "traces")
         os.makedirs(directory, exist_ok=True)
         stamp = time.strftime("%Y%m%d-%H%M%S")

@@ -64,12 +64,16 @@ class Pipeline:
         self.qwen_port = qwen_port
         self.plan2_fn = plan2_fn                # tests inject the unified Gemma call here
         self.observe = observe or (lambda **k: None)   # optional: report he2/flags/kind/target to a trace sink
+        self.flight_allowed = lambda: True             # mvd wires this to Router.mode (manual -> no flight)
         self.trace = Trace(trace_dir)
 
     def _fly(self, mission, tag):
-        """Send the mission; name the outcome so the session log tells a flight from a kill-latch refusal."""
-        code = self.wire.fly_mission(mission)
+        """Send the mission; name the outcome so the session log tells a flight from a refusal.
+        Refuses in manual mode (Router handed control to the RC) -- perception still answers."""
         base = f"mission({len(mission)} steps, {tag})"
+        if not self.flight_allowed():
+            return f"refused-manual {base}"
+        code = self.wire.fly_mission(mission)
         return f"REFUSED-kill-latch {base}" if code == 409 else base
 
     def handle(self, text):

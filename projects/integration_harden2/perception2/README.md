@@ -1,8 +1,7 @@
 # perception2
 
 SAM3 twin of the `perception` package. Same interface, one model instead of two: SAM3 does
-open-vocab detection AND masks in a single forward, replacing OmDet + SAM2.1. It exists so we can
-swap backends and compare the two paths for equivalence and speed.
+open-vocab detection AND masks in a single forward, replacing OmDet + SAM2.1. It is now the DEFAULT highlight backend (config `SEGMENTER=sam3`, i.e. `SCENE_SEG=sam3`); `perception` (OmDet+SAM2.1) is the legacy path behind `SCENE_SEG=omdet`.
 
 | File | What it is |
 |------|-----------|
@@ -32,7 +31,7 @@ At highlight time, turn the user phrase into concepts once (never per frame):
 
 ```python
 from perception2 import extract_concepts, make_vlm_asker
-ask = make_vlm_asker()                                  # text-only Qwen3-VL call
+ask = make_vlm_asker()                                  # text-only Gemma call
 concepts = extract_concepts(phrase, ask=ask)            # 'the vehicles' -> 'car, van, truck, bus, ...'
 # store `concepts` as the engine target; the per-frame detect() grounds it with SAM3
 ```
@@ -50,6 +49,9 @@ set before it reaches SAM3. Evidence: `bench/sam3-mask-bench/RESULTS.md`.
 | precision | compile | fwd p50 | VRAM | note |
 |-----------|:------:|--------:|-----:|------|
 | `nf4` (default) | no | 452 ms | 1054 MiB | smallest VRAM, fast load, no compile |
+
+The live app fixes precision to `nf4` (config `SAM3_PRECISION`, a load-time constant, no env
+override). The `precision=`/`compile=` arguments below are for the bench, which sweeps the other rows.
 | `bf16` | yes | 265 ms | 2219 MiB | lossless |
 | `fp8` | yes | 202 ms | 1710 MiB | fastest; needs `compile=True` (torchao fp8 kernels) |
 
@@ -66,19 +68,19 @@ service, not short CLI runs. Full table + method: `bench/sam3-mask-bench/results
 
 ## Wired into mvd (2026-09-07)
 
-`mvd.py` selects the highlight backend with `SCENE_SEG`: `omdet` (default, OmDet+SAM2.1,
-the proven demo path) or `sam3` (`Sam3Backend`, one model). `build_highlight()` in mvd
-owns the switch; with `sam3` OmDet and SAM2.1 never load. The live path turns the user phrase
+`mvd.py` selects the highlight backend with `SCENE_SEG`: `sam3` (DEFAULT, `Sam3Backend`, one
+model) or the legacy `omdet` (OmDet+SAM2.1). `build_highlight()` in mvd owns the switch; with
+`sam3` OmDet and SAM2.1 never load. The live path turns the user phrase
 into SAM3 concepts with `phrase_concepts()` (attribute-preserving, no model call): `the red
 backpack` -> `red backpack`, `all the vehicles` -> the synonym set. The VLM front-end
 (`extract_concepts`) stays available but is not on the live path, because its prompt drops
 colours and would highlight every car when the user asked for the white one (SAM3 discriminates
 attributes: `bench/sam3-mask-bench/RESULTS.md`, Web candidates, finding 2). Per-frame
 SAM3 forwards are rate-limited by `SCENE_SAM3_PERIOD` (default 1.0 s) so the highlight loop does
-not hog the GPU the VLM and whisper share. Boot the SAM3 stack with
-`SCENE_SEG=sam3 MVD_TRANSLATOR=hymt2 bash tools/desk-test/up.sh`. OWNER DECISION pending: flip
-the default to `sam3` after the live test passes on it; then delete `perception/` and rename
-this package (`engine.py`, `vlm_client.py`, `detectors.py` here are still verbatim copies).
+not hog the GPU the VLM and whisper share. Boot the desk stack with
+`VIDEO=webcam SCENE_TTS=off bash tools/desk-test/up.sh` (sam3 is the default; no translator knob).
+The default flip to `sam3` is DONE. OUTSTANDING: delete `perception/` and rename this package
+(`engine.py`, `vlm_client.py`, `detectors.py` here are still verbatim copies).
 
 ## Status
 

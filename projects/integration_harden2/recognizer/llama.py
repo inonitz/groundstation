@@ -1,9 +1,9 @@
 """Model serving for the bench. This file, and only this file, starts llama-server.
 
-Three models exist in the system: the Recognizer's translator (DictaLM, or Hy-MT2 -- the
-deployed pick since the 2026-09-07 ruling) and Qwen3-VL (the planner). Both run through the LlamaServer context manager below: one model resident at a
-time, loaded on enter, verified dead on exit. Server stderr goes to LOG_PATH, and a startup
-failure raises with the log tail, never silently.
+harden2 runs ONE model server: the planner (the vision-language model). The model is chosen in
+run_llama_server.sh; there is no translator in the live path. It runs through the LlamaServer context
+manager below: one model resident at a time, loaded on enter, verified dead on exit. Server stderr
+goes to LOG_PATH, and a startup failure crashes (die) with the log tail, never silently.
 """
 import json
 import os
@@ -23,6 +23,8 @@ GEMMA4_EXTRA = (("--jinja", "--chat-template-kwargs", '{"enable_thinking":true}'
                 else ("--jinja", "--chat-template-kwargs", '{"enable_thinking":false}', "--reasoning-budget", "0"))   # GEMMA4_THINK=1 = thinking ON (A/B arm)
 # ^ thinking OFF for real (2026-09-08): --reasoning-budget 0 alone still narrated on 57/413 translations; enable_thinking=false
 #   via the jinja template stopped 12/12 narrating cases (llama.cpp discussion 21338; --reasoning off needs build b8738+).
+from fatal import die
+
 def port_up(port):
     try:
         urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1)
@@ -50,9 +52,9 @@ class LlamaServer:
                 return self
             if self.proc.poll() is not None:
                 tail = open(LOG_PATH, "rb").read()[-500:].decode(errors="replace")
-                raise RuntimeError(f"llama-server died on startup (rc={self.proc.returncode}):\n{tail}")
+                die(f"llama-server died on startup (rc={self.proc.returncode}):\n{tail}")
             time.sleep(1)
-        raise RuntimeError(f"llama-server not healthy after 120s (port {self.port})")
+        die(f"llama-server not healthy after 120s (port {self.port})")
 
     def __exit__(self, *exc):
         self.proc.terminate()
@@ -88,5 +90,5 @@ def chat(port, system, user, max_tokens=300, grammar=None, shots=(), retries=90)
             if e.code == 503 and attempt < retries - 1:
                 time.sleep(1)
                 continue
-            raise
-    raise RuntimeError("server never became ready")
+            die(f"model server HTTP {e.code} on port {port} (after {attempt+1} tries)")
+    die(f"model server on port {port} never became ready after {retries} tries")

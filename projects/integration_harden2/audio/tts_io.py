@@ -4,14 +4,14 @@ Hebrew only. Two backends:
   phone    -- POST /tts to the DJI phone app; it speaks via Android TextToSpeech (Google he-IL).
               Needs the phone reachable and on data. say() never raises into the caller.
   phonikud -- OFFLINE Hebrew on the laptop: phonikud G2P (niqqud+stress -> IPA) -> Piper onnx
-              voice -> aplay. If the model/deps are missing, construction RAISES TTSConfigError
+              voice -> aplay. If the model/deps are missing, construction die()s (a loud crash)
               (fail LOUD -- never run the demo with no voice; owner ruling 2026-09-17).
 English/espeak/piper backends were removed: we only speak Hebrew. If English TTS is ever needed,
 add a SOTA model back -- do not resurrect espeak.
 
-Select:  SCENE_TTS = phone | phonikud | off      (default: phone)
-Phone:   SCENE_TTS_HOST=<ip>  SCENE_TTS_PORT=8080  SCENE_TTS_LANG=he  SCENE_TTS_RATE=1.0
-Phonikud models: SCENE_PHONIKUD_G2P / _VOICE / _CONFIG (default /root/models/tts/phonikud/).
+Select:  SCENE_TTS = phone | phonikud | off      (the ONLY TTS knob; default: phone)
+Everything else -- phone host (derived from the video host), port, language, rate, timeout, and the
+phonikud model paths -- is a fixed constant in config, not env-tunable.
 """
 import os, re, shutil, subprocess, threading, queue
 import numpy as np
@@ -22,13 +22,10 @@ except Exception:
     requests = None
 
 
-class TTSConfigError(RuntimeError):
-    """SCENE_TTS=phonikud requested but the offline Hebrew model/deps are missing. Fatal by design:
-    fix the config or install the model -- do NOT run the demo silently voiceless."""
-
+from fatal import die
 
 def _resolve_phone_host():
-    """Same phone as the video: explicit override -> host= in SCENE_INPUT -> WiFi default gateway."""
+    """Same phone as the video: config.TTS_HOST (unset by default) -> host= in the source -> WiFi gateway."""
     if config.TTS_HOST:
         return config.TTS_HOST
     m = re.search(r"host=(\S+)", str(config.INPUT))
@@ -49,18 +46,16 @@ class Voice:
 
         if b == "phonikud":
             if not shutil.which("aplay"):
-                raise TTSConfigError("phonikud TTS needs aplay (alsa-utils); it is not installed")
+                die("phonikud TTS needs aplay (alsa-utils); it is not installed")
             for pth in (config.PHONIKUD_G2P, config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG):
                 if not os.path.exists(pth):
-                    raise TTSConfigError(f"phonikud model file missing: {pth} "
-                                         "(run tools/devenv/install-runtime-deps.sh)")
+                    die(f"phonikud model file missing: {pth} (run tools/devenv/install-runtime-deps.sh)")
             try:
                 from phonikud_onnx import Phonikud
                 from phonikud import phonemize as _pk_phonemize
                 from phonikud_tts import Piper as _PkPiper
             except Exception as e:
-                raise TTSConfigError(f"phonikud packages not importable: {e} "
-                                     "(pip install phonikud phonikud-onnx phonikud-tts)")
+                die(f"phonikud packages not importable: {e} (pip install phonikud phonikud-onnx phonikud-tts)")
             self._pk = Phonikud(config.PHONIKUD_G2P)
             self._pk_voice = _PkPiper(config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG)
             self._pk_phonemize = _pk_phonemize

@@ -40,9 +40,9 @@ class DjiWire:
 
     @classmethod
     def from_env(cls):
-        """Build from MVD_WIRE_* env: host (default 127.0.0.1 mock), port (8080), REAL (off).
-        Real-drone use = MVD_WIRE_HOST=<phone-ip> MVD_WIRE_REAL=1, and a HUMAN runs it."""
-        import config   # config owns MVD_WIRE_* (single source); DjiWire stays import-light until here
+        """Build from config.WIRE_* (derived from CONTROL=mock|real): mock -> 127.0.0.1:8079 not real;
+        real -> PHONE_IP:8080 real (HUMAN-run only). CONTROL is the one decision; config derives the rest."""
+        import config   # config derives the wire from CONTROL (single source); DjiWire import-light until here
         return cls(host=config.WIRE_HOST, port=config.WIRE_PORT, allow_real=config.WIRE_REAL)
 
     # --- discrete verbs ----------------------------------------------------------------
@@ -59,6 +59,9 @@ class DjiWire:
         except Exception as e:
             print(f"[dji] POST {path} -> UNREACHABLE: {e}", flush=True); raise
 
+    # Motion verbs. The recognizer no longer calls these directly: Gemma sends each action as a mission
+    # dict through fly_mission() -> POST /c/fly (2026-09-19). They are kept on purpose, NOT dead code --
+    # control/kill.py guards each by name (KillSwitch.MOTION) as defence-in-depth, and test_kill.py checks it.
     def takeoff(self) -> int:
         return self._post("/c/takeoff")
 

@@ -15,16 +15,19 @@ concepts; the concept front-end (concept.py) builds those. A comma-separated phr
 several concepts and their results are unioned -- the same convention OmDet uses.
 """
 import torch
+import config
 from PIL import Image
 
-MODEL_DIR = "/root/models/vision/sam3-official"
+MODEL_DIR = config.SAM3_MODEL_DIR
 
+
+from fatal import die
 
 class Sam3Backend:
     """detect(frame_bgr, phrase, conf) -> [{"label","conf","box"} ...] sorted by conf desc.
     mask_for_box(frame_bgr, box) -> bool mask (HxW) or None. Both contracts match the engine's."""
 
-    def __init__(self, model_dir=MODEL_DIR, precision="nf4", compile=False,
+    def __init__(self, model_dir=MODEL_DIR, precision=config.SAM3_PRECISION, compile=False,
                  mask_threshold=0.5, lazy=False):
         """precision: 'nf4' (smallest VRAM, default, fast load), 'bf16' (lossless), or 'fp8'
         (torchao dynamic-activation). compile: torch.compile the model -- REQUIRED for fp8 to hit
@@ -54,7 +57,7 @@ class Sam3Backend:
                 from torchao.quantization import quantize_, Float8DynamicActivationFloat8WeightConfig
                 quantize_(self.model, Float8DynamicActivationFloat8WeightConfig())
             elif self.precision != "bf16":
-                raise ValueError(f"precision must be nf4|bf16|fp8, got {self.precision!r}")
+                die(f"precision must be nf4|bf16|fp8, got {self.precision!r}")
         if self.compile:
             self.model = torch.compile(self.model)
         self.proc = Sam3Processor.from_pretrained(self.model_dir)

@@ -1,12 +1,10 @@
-"""harden2 BAKED constants — DRAFT (2026-09-10, completed 2026-09-11), not yet wired into the app.
+"""harden2 BAKED constants — values baked into the app (read through config/__init__.py).
 
 Decided values that do not change between runs. One place, by category, readable at a glance. Names
-describe intent. Anything you change per run is in config_defaults.py. Deleted knobs (the MVD_HOME fork-selector — harden2 is the only system, launchers hardcode it now —
+describe intent. Anything you change per run is in config/defaults.py. Deleted knobs (the MVD_HOME fork-selector — harden2 is the only system, launchers hardcode it now —
 translator, qwen3vl, omdet/sam2/yolo, thinking flag, SCENE_TTS backend-switch, the MVD_DRONE router toggle) do not
-appear here at all. Routing is unconditional now: the live wire is set by MVD_WIRE_REAL/MVD_WIRE_HOST (run.sh derives
-them from the CONTROL arg; the Python CONTROL_TARGET constant here is NOT read by the live app), and
-DjiWire's loopback guard is the real mock/real gate. There is no
-"enable router" flag. Values here are the baseline proven in the 2026-09-11 golden capture (B1).
+appear here at all. Routing is unconditional: the live wire target is derived from CONTROL (mock|real) via config.wire_target;
+DjiWire's loopback guard is the mock/real gate. There is no "enable router" flag.
 """
 
 # ── Model / planner (Gemma 4 E4B only) ─────────────────────────────────────────────────────
@@ -25,6 +23,11 @@ VIDEO_TCP_PORT    = 5600              # gstreamer_rx receives the phone's H.264
 
 # ── Segmentation / perception ────────────────────────────────────────────────────────────
 SEGMENTER                       = "sam3"   # omdet path deleted (may return with a better vision system)
+# SAM3 vision model: ONE local file at SAM3_MODEL_DIR. Loaded locally (HF_HUB_OFFLINE=1, no download)
+# and compressed to 4-bit (nf4) IN MEMORY at load by bitsandbytes -- there is NO separate quantized
+# file. SAM3_PRECISION is fixed here, not an env knob. The overlay shows the model NAME.
+SAM3_MODEL_DIR                  = "/root/models/vision/sam3-official"
+SAM3_PRECISION                  = "nf4"
 BACKGROUND_SEGMENTER            = None      # background YOLO OFF (saves ~282 MiB)
 SAM3_MAX_BOXES_PER_QUERY        = 128       # cap on boxes SAM3 returns — high so a real scene never clips
 MAX_HIGHLIGHTS_DRAWN_PER_FRAME  = 128       # cap on detections actually drawn — effectively draw-all

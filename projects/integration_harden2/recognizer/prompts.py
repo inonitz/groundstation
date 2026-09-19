@@ -154,13 +154,16 @@ root ::= "{" ws "\"kind\"" ws ":" ws kind ws "," ws "\"target_en\"" ws ":" ws "\
 kind ::= "\"mission\"" | "\"highlight\"" | "\"count\"" | "\"describe\"" | "\"reject\""
 str ::= [^"\n\\]*
 missionarr ::= "[" ws (action (ws "," ws action)*)? ws "]"
-action ::= takeoff | land | flyby | spinby | delay
+action ::= takeoff | land | flyby | spinby | gimbal | home | wave | delay
 takeoff ::= "{" ws "\"type\"" ws ":" ws "\"takeoff\"" ws "}"
 land ::= "{" ws "\"type\"" ws ":" ws "\"land\"" ws "}"
 flyby ::= "{" ws "\"type\"" ws ":" ws "\"fly_by\"" (ws "," ws axis)+ ws "}"
 axis ::= ("\"dx\"" | "\"dy\"" | "\"dz\"" | "\"velocity\"") ws ":" ws num
 spinby ::= "{" ws "\"type\"" ws ":" ws "\"spin_by\"" ws "," ws "\"degrees\"" ws ":" ws num ws "}"
 delay ::= "{" ws "\"type\"" ws ":" ws "\"delay\"" ws "," ws "\"seconds\"" ws ":" ws num ws "}"
+gimbal ::= "{" ws "\"type\"" ws ":" ws "\"gimbal_pitch\"" ws "," ws "\"angle\"" ws ":" ws num ws "}"
+home ::= "{" ws "\"type\"" ws ":" ws "\"home\"" ws "}"
+wave ::= "{" ws "\"type\"" ws ":" ws "\"wave\"" ws "}"
 num ::= "-"? [0-9]+ ("." [0-9]+)?
 ws ::= [ \t\n]*
 """
@@ -171,11 +174,14 @@ UNIFIED_PROMPT = REVISED_PROMPT + """
 
 - The request is in Hebrew (sometimes with an English word inside). Understand it directly.
 - Output ONE JSON object: {"kind": ..., "target_en": ..., "mission": [...]}.
-- kind = "mission" when the user wants the drone to MOVE (take off, land, fly, turn, wait). Fill "mission" with the actions; "target_en" is "".
+- kind = "mission" when the user wants the drone to ACT: take off, land, fly, turn, wait, aim the camera, come home, or wave. Fill "mission" with the actions; "target_en" is "".
+- Camera aim uses gimbal_pitch (this aims the CAMERA, it does NOT move the drone): "look down"/"camera down" -> angle -60; "look up" -> angle 30; "look ahead"/"look forward" -> angle 0. Moving the drone up/down is fly_by with dz.
+- "come back"/"go home"/"return to me" -> mission [{"type":"home"}].
+- A greeting ("hello","hi","hey","how are you") -> mission [{"type":"wave"}].
 - kind = "highlight" when the user wants a thing found, marked, followed, focused on or pointed at in the camera image. "target_en" = that thing as a short English noun phrase with its attributes (e.g. "red car", "person with the purple bag", "open window on the second floor"). "mission" is [].
 - kind = "count" when the user asks how many of a thing are visible. "target_en" = the thing in English. "mission" is [].
 - kind = "describe" when the user asks what is seen, asks about a place or direction in the image, or asks any other question about the camera view. "target_en" = the thing or region asked about, in English (e.g. "right side", "the building"), or "" for a general "what do you see". "mission" is [].
-- kind = "reject" for a question about the drone itself (altitude, battery, flight time), a negation with no other order, a greeting, or anything the actions cannot do. "target_en" is "". "mission" is [].
+- kind = "reject" for a question about the drone itself (altitude, battery, flight time), a negation with no other order, or anything the actions cannot do. "target_en" is "". "mission" is [].
 - Never put actions in "mission" for a kind other than "mission". An emphatic "do not" with no other order is "reject".
 """
 
@@ -183,6 +189,10 @@ def _unified(kind, target_en, mission):
     return json.dumps({"kind": kind, "target_en": target_en, "mission": mission}, ensure_ascii=False)
 
 UNIFIED_SHOTS = [(q, _unified("mission", "", json.loads(a))) for q, a in PLANNER_SHOTS_D] + [
+    ("תסתכל למטה", _unified("mission", "", [{"type": "gimbal_pitch", "angle": -60}])),      # look down (camera)
+    ("הפנה את המצלמה למעלה", _unified("mission", "", [{"type": "gimbal_pitch", "angle": 30}])),  # aim camera up
+    ("חזור הביתה", _unified("mission", "", [{"type": "home"}])),                                     # come home
+    ("שלום, מה שלומך", _unified("mission", "", [{"type": "wave"}])),                       # greeting -> wave
     ("סמן את המכונית האדומה", _unified("highlight", "red car", [])),
     ("עקוב אחרי האדם עם התיק הסגול", _unified("highlight", "person with the purple bag", [])),
     ("כמה אנשים עומדים ליד הכניסה", _unified("count", "people near the entrance", [])),

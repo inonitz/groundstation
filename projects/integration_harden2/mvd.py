@@ -5,7 +5,7 @@ to the old OmDet+SAM2.1 pair. Background is the closed-set YOLO26-seg (kept, off
 vlm.py/ears.py/eyes.py.
 
   voice "highlight the red backpack" -> SAM3 finds it and masks it every frame (box follows)
-  voice "what do you see / how many people" -> Qwen3-VL answers in the chat pane
+  voice "what do you see / how many people" -> the model answers in the chat pane
   voice "clear" -> drop the highlight
   python3 mvd.py --source 0 --target "guitar case"   # webcam, no ASR (test)
   python3 mvd.py                                       # drone RTSP + live ASR
@@ -40,6 +40,8 @@ from session_log import SessionLog, reject_why
 
 
 
+
+from fatal import die
 
 def _fmt_cmd(c):
     """One mission Action -> compact 'type k=v k=v' for the overlay Cmd List."""
@@ -122,24 +124,23 @@ def worker(eyes):
 
 
 def build_highlight(seg, eyes, loader=None):
-    """The highlight backend behind the engine's two injected callables (detect, mask_for_box).
-    The model loads on a background thread; until it is ready detect() returns [] (no highlight).
-    sam3: detect() is rate-limited to one SAM3 forward per SCENE_SAM3_PERIOD seconds per phrase --
-    the worker runs highlight_step every frame, and an unthrottled ~0.45 s forward would hog the
-    GPU the VLM and whisper share. Between forwards the last boxes (and their cached masks) stand.
-    `loader` injects a backend factory (tests). Returns (detect, mask_for_box, loader_thread)."""
-    if seg != "sam3":
-        raise ValueError(f"SCENE_SEG must be sam3, got {seg!r}")
-    def make():
-        from perception2.sam3_backend import Sam3Backend
-        return Sam3Backend()
-    make = loader or make
+    """The vision backend behind the engine's two injected callables (detect, mask_for_box).
+    The backend is chosen once from SCENE_SEG (perception2/backend.py::BACKENDS) and loads on a
+    background thread; until it is ready detect() returns [] (no highlight). detect() is rate-limited
+    to one forward per SCENE_SAM3_PERIOD seconds per phrase -- the worker runs highlight_step every
+    frame, and an unthrottled ~0.45 s forward would hog the GPU the model and whisper share. Between
+    forwards the last boxes (and their cached masks) stand. `loader` injects a factory (tests).
+    Returns (detect, mask_for_box, loader_thread)."""
+    from perception2.backend import BACKENDS
+    make = loader or BACKENDS.get(seg)
+    if make is None:
+        die(f"SCENE_SEG={seg!r} has no vision backend (known: {', '.join(sorted(BACKENDS))})")
 
     def _load():
         try:
-            OM["det"] = make(); print(f"[mvd] SAM3 ready", flush=True)
-        except Exception as e:
-            print(f"[mvd] SAM3 load FAILED:", e, flush=True)
+            OM["det"] = make(); print(f"[mvd] vision backend ready: {seg}", flush=True)
+        except Exception as e:                       # a model-load failure degrades: no highlight, rest runs
+            print(f"[mvd] vision backend load FAILED ({seg}):", e, flush=True)
     th = threading.Thread(target=_load, daemon=True); th.start()
 
     last = {"phrase": None, "t": 0.0, "dets": []}
@@ -355,9 +356,6 @@ class TextHandler:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default=config.INPUT)
-    ap.add_argument("--target", default=None, help="seed a highlight without ASR (testing)")
-    ap.add_argument("--no-ears", action="store_true")
-    ap.add_argument("--keep-llama", action="store_true")
     a = ap.parse_args()
     os.environ.setdefault("OPENCV_FFMPEG_CAPTURE_OPTIONS", "rtsp_transport;tcp")
 
@@ -373,7 +371,7 @@ def main():
     # The engine is pure logic; the highlight backend (SAM3, see SEG) arrives on
     # its background thread, so the callables check OM at call time. Env knobs are read once here.
     detect, mask_for_box, _ = build_highlight(SEG, eyes)
-    print(f"[mvd] highlight backend: SAM3 (SCENE_SEG={SEG})", flush=True)
+    print(f"[mvd] vision backend: {SEG}", flush=True)
     ENGINE["e"] = PerceptionEngine(
         detect=detect,
         mask_for_box=mask_for_box,
@@ -384,12 +382,10 @@ def main():
         mask_k=HL_MAX)   # 2026-09-09: was the constructor default 3; "highlight all the cars" needs many
 
     voice = None
-    if config.TTS_ENABLED:
-        from audio.tts_io import Voice, TTSConfigError
+    if config.TTS_BACKEND != "off":
+        from audio.tts_io import Voice
         try:
-            voice = Voice()
-        except TTSConfigError:
-            raise                                   # fatal: phonikud asked for but its model is missing
+            voice = Voice()                         # die()s on a fatal phonikud misconfig (no exceptions)
         except Exception as e:
             print("[mvd] voice/TTS unavailable:", e, flush=True)
 
@@ -418,6 +414,7 @@ def main():
         # wire, a see-question routes back to perception via on_text.perceive, a reject is said.
         pipe = Pipeline(wire, vlm_query=on_text.perceive, say=_say, observe=(SESSION.set if SESSION else None))
         router = Router(wire, on_complex=pipe.handle)
+        pipe.flight_allowed = lambda: router.mode == "auto"   # manual override (voice) blocks flight; perception still answers
         S.kill = KillSwitch(wire, say=_say)   # owner ruling 2026-09-08: M = manual override toggle (stop + RC control + latch)
         on_text.router = router
         print("[mvd] MVD drone router ON ->", config.WIRE_HOST,
@@ -426,18 +423,16 @@ def main():
         print("[mvd] drone router DISABLED:", e, flush=True)
 
     ears = None
-    if _HAVE_EARS and not a.no_ears:
+    if _HAVE_EARS:
         try: ears = Ears(on_text); print("[mvd] ASR live", flush=True)
         except Exception as e: print("[mvd] Ears unavailable:", e)
     phone_ears = None                                  # the PHONE as the user's mic (inbound ASR socket)
-    if config.PHONE_ASR_ENABLED and not a.no_ears:
+    if config.PHONE_ASR_ENABLED:
         try:
             from audio.phone_asr import PhoneEars
             phone_ears = PhoneEars(on_text, port=config.PHONE_ASR_PORT)
         except Exception as e:
             print("[mvd] PhoneEars unavailable:", e, flush=True)
-    if a.target:
-        with S.lock: S.target = a.target
 
     cap = open_capture(a.source); t0 = time.time()
     while not cap.isOpened() and time.time() - t0 < config.OPEN_TIMEOUT:
@@ -517,7 +512,7 @@ def main():
         S.running = False; time.sleep(0.05)
         cap.release(); cv2.destroyAllWindows(); cv2.waitKey(1)
         if ears: ears.shutdown()
-        if we_started_llama and not a.keep_llama:
+        if we_started_llama:
             subprocess.run(["pkill", "-f", "llama-server"], check=False)
         sess = os.environ.get("SCENE_TMUX_SESSION")
         if sess:                              # launched by the tmux script -> quit = full teardown

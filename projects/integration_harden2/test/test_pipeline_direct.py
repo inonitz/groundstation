@@ -49,3 +49,27 @@ def test_direct_bypass_and_emergency_skip_the_model():
     p, w, said, seen = make({})
     assert p.handle("עלה עשרה מטרים").startswith("mission(1 steps, bypass)") and w.calls[-1][0] == "fly"
     assert p.handle("עצור") == "emergency-halt(backup)" and w.calls[-1] == "halt"
+
+
+def test_new_action_verbs_pass_through_to_fly():
+    # Gemma emits the extra actions in the mission array; _fly sends them to /c/fly unchanged.
+    for phrase, mission in [
+        ("תסתכל למטה", [{"type": "gimbal_pitch", "angle": -60}]),
+        ("חזור הביתה", [{"type": "home"}]),
+        ("שלום", [{"type": "wave"}]),
+    ]:
+        p, w, said, seen = make({phrase: {"kind": "mission", "target_en": "", "mission": mission}})
+        a = p.handle(phrase)
+        assert a.startswith("mission(1 steps, planned)"), (phrase, a)
+        assert w.calls == [("fly", mission)], (phrase, w.calls)
+
+
+def test_manual_mode_refuses_flight_but_perception_answers():
+    p, w, said, seen = make({
+        "טוס קדימה שני מטרים": {"kind": "mission", "target_en": "", "mission": [{"type": "fly_by", "dx": 2}]},
+        "מה אתה רואה": {"kind": "describe", "target_en": "", "mission": []}})
+    p.flight_allowed = lambda: False                            # manual override active
+    a = p.handle("טוס קדימה שני מטרים")
+    assert a.startswith("refused-manual") and w.calls == []      # mission NOT flown in manual
+    b = p.handle("מה אתה רואה")
+    assert b == "perception(describe)" and seen[-1] == "מה אתה רואה"   # perception still answers
