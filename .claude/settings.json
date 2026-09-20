@@ -14,7 +14,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /root/groundstation/.claude/hooks/ste_check.py"
+            "command": "python3 /root/groundstation/.claude/hooks/ste_record.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /root/groundstation/.claude/hooks/ste_feedback.py"
           }
         ]
       }
