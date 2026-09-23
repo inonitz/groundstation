@@ -4,7 +4,7 @@ Matches the app EXACTLY (com/kcg/dr/voice/GroundStationSpeechResolver.kt + utils
 the phone, per spoken command, sends the SAME payload TWO ways to the groundstation:
   1. REST : POST http://<groundstation-ip>:<port>/input   body {"text":"<transcript>"}   (expects 200)
   2. TCP  : a persistent socket to <groundstation-ip>:<port>, one newline-delimited JSON
-            line per command:  {"text":"<transcript>"}\\n
+            line per command:  {"text":"<transcript>"}\n
 BOTH on the SAME port (app default 8080; VoiceControlFragment has `("0.0.0.0", 8080)` with a
 fixme to set the address to THIS laptop's IP on the phone hotspot). Because the app fires both
 channels every time, we DEDUPE identical text within a short window so a command runs once.
@@ -15,10 +15,13 @@ socket server that sniffs HTTP vs raw-line so a single port serves both. Runs in
 """
 import asyncio
 import json
+import queue
 import threading
 import time
 
 import config
+from fatal import asyncio_crash_handler
+from system.status import BOARD, STARTING, UP, fail
 
 _HTTP_METHODS = ("POST", "GET", "PUT", "HEAD", "OPTIONS", "DELETE", "PATCH")
 
@@ -32,90 +35,139 @@ class PhoneEars:
         self._last = ("", 0.0)
         self._loop = None
         self._server = None
+        BOARD.report("phone speech", STARTING)
+        # Transcripts go to the app on ONE delivery thread, never inside the asyncio loop: a command can
+        # plan for seconds (Gemma), and a blocked loop read the duplicate REST/TCP copy after the dedup
+        # window and flew the mission TWICE (review R21). The queue keeps the order; get() blocks, no poll.
+        self._inbox = queue.Queue()
+        self._deliverer = threading.Thread(target=self._deliver, name="phone-speech-deliver", daemon=True)
+        self._deliverer.start()
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
 
     def _extract(self, raw):
+        """Pull the transcript from a payload: a {'text': ...} JSON line, or the raw text itself.
+        Phone input is untrusted network data: a garbled line is dropped with a log line and returns ""
+        (so _feed skips it). It must not end the connection or the app (review finding R7)."""
         raw = (raw or "").strip()
-        if raw.startswith("{"):
-            try:
-                return str(json.loads(raw).get("text", "")).strip()
-            except Exception:
-                return raw
-        return raw
+        if not raw.startswith("{"):
+            return raw
+        try:
+            obj = json.loads(raw)
+        except json.JSONDecodeError as e:         # json reports bad input only by a throw
+            print(f"[phone_ears] dropped a malformed line ({e}): {raw[:80]!r}", flush=True)
+            return ""
+        if not isinstance(obj, dict):
+            return ""
+        return str(obj.get("text", "")).strip()
 
     def _feed(self, text):
+        """Dedup at RECEIPT, then queue the transcript for the delivery thread. Runs on the asyncio loop and
+        returns at once, so the loop reads the phone's second copy immediately and the dedup catches it."""
         text = (text or "").strip()
         if not text:
             return
         now = time.monotonic()
         if text == self._last[0] and (now - self._last[1]) < self._dedup_window:
-            return                                  # app sends each command via BOTH REST and TCP
+            return                      # the app sends each command via BOTH REST and TCP
         self._last = (text, now)
-        try:
+        self._inbox.put(text)
+        return
+
+    def _deliver(self):
+        """The one consumer: hand each transcript to the app, in order. None = stop."""
+        while True:
+            text = self._inbox.get()
+            if text is None:
+                return
             self._on_text(text)
-        except Exception as e:
-            print("[phone_ears] on_text err:", e, flush=True)
+
+    @staticmethod
+    async def _readline(reader):
+        """One line, or b"" when the connection is unusable: dropped (ConnectionError) or a line over the
+        64 KiB stream limit (ValueError). asyncio reports both only by a throw. b"" ends that ONE connection
+        like a normal close; untrusted input never reaches the crash handler (review R7, R12)."""
+        try:
+            return await reader.readline()
+        except (ConnectionError, ValueError) as e:
+            print(f"[phone_ears] connection ended: {e!r}", flush=True)
+            return b""
 
     async def _handle(self, reader, writer):
         peer = writer.get_extra_info("peername")
-        try:
-            first = await reader.readline()
-            if not first:
-                writer.close(); return
-            line = first.decode("utf-8", "replace").rstrip("\r\n")
+        first = await self._readline(reader)
+        if not first:
+            writer.close()
+            return
+        line = first.decode("utf-8", "replace").rstrip("\r\n")
+        if any(line.startswith(m + " ") for m in _HTTP_METHODS):
+            await self._handle_http(reader, writer)
+        else:
+            await self._handle_tcp(reader, writer, peer, line)
 
-            if any(line.startswith(m + " ") for m in _HTTP_METHODS):
-                # --- HTTP request (the REST /input path) ---
-                headers = {}
-                while True:
-                    h = await reader.readline()
-                    if h in (b"\r\n", b"\n", b""):
-                        break
-                    k, _, v = h.decode("utf-8", "replace").partition(":")
-                    headers[k.strip().lower()] = v.strip()
-                clen = int(headers.get("content-length", "0") or 0)
-                body = (await reader.readexactly(clen)).decode("utf-8", "replace") if clen else ""
-                self._feed(self._extract(body))
-                payload = b'{"ok": true}'
-                writer.write(
-                    b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
-                    b"Content-Length: " + str(len(payload)).encode() + b"\r\nConnection: close\r\n\r\n" + payload
-                )
-                await writer.drain()
+    async def _handle_http(self, reader, writer):
+        """The REST /input path: read the headers and body, feed the transcript, answer 200."""
+        headers = {}
+        while True:
+            header = await self._readline(reader)
+            if header in (b"\r\n", b"\n", b""):
+                break
+            key, _, value = header.decode("utf-8", "replace").partition(":")
+            headers[key.strip().lower()] = value.strip()
+        declared = headers.get("content-length", "0")
+        length = int(declared) if declared.isdigit() else 0      # a bad header reads as no body
+        body = ""
+        if length:
+            try:
+                body = (await reader.readexactly(length)).decode("utf-8", "replace")
+            except (asyncio.IncompleteReadError, ConnectionError) as e:   # the phone left mid-body
+                print(f"[phone_ears] short HTTP body, connection ended: {e!r}", flush=True)
                 writer.close()
-            else:
-                # --- raw TCP, newline-delimited JSON lines (persistent) ---
-                print(f"[phone_ears] TCP client {peer} connected", flush=True)
-                self._feed(self._extract(line))
-                while True:
-                    l = await reader.readline()
-                    if not l:
-                        break
-                    self._feed(self._extract(l.decode("utf-8", "replace").rstrip("\r\n")))
-                print(f"[phone_ears] TCP client {peer} disconnected", flush=True)
-                writer.close()
-        except Exception as e:
-            print("[phone_ears] conn err:", e, flush=True)
-            try: writer.close()
-            except Exception: pass
+                return
+        self._feed(self._extract(body))
+        payload = b'{"ok": true}'
+        writer.write(
+            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
+            b"Content-Length: " + str(len(payload)).encode() + b"\r\nConnection: close\r\n\r\n" + payload
+        )
+        try:
+            await writer.drain()
+        except ConnectionError as e:                  # the phone left before our 200 was written
+            print(f"[phone_ears] reply not delivered: {e!r}", flush=True)
+        writer.close()
+
+    async def _handle_tcp(self, reader, writer, peer, first_line):
+        """The raw TCP path: newline-delimited JSON lines on a persistent socket."""
+        print(f"[phone_ears] TCP client {peer} connected", flush=True)
+        self._feed(self._extract(first_line))
+        while True:
+            line = await self._readline(reader)
+            if not line:
+                break
+            self._feed(self._extract(line.decode("utf-8", "replace").rstrip("\r\n")))
+        print(f"[phone_ears] TCP client {peer} disconnected", flush=True)
+        writer.close()
 
     def _run(self):
         self._loop = asyncio.new_event_loop()
+        self._loop.set_exception_handler(asyncio_crash_handler)   # an escaped handler error is a bug -> die
         asyncio.set_event_loop(self._loop)
+        coro = asyncio.start_server(self._handle, self.host, self.port)
         try:
-            coro = asyncio.start_server(self._handle, self.host, self.port)
             self._server = self._loop.run_until_complete(coro)
-        except Exception as e:
-            print(f"[phone_ears] could not bind {self.host}:{self.port} -> {e}", flush=True)
-            return
+        except OSError as e:            # a taken port is a misconfiguration for this channel; crash loud
+            fail("phone speech", f"cannot bind {self.host}:{self.port}",
+                 f"phone ASR could not bind {self.host}:{self.port}: {e}")
+        BOARD.report("phone speech", UP)
         print(f"[phone_ears] listening on {self.host}:{self.port} "
               f"(REST POST /input + raw TCP JSON lines) -- phone ASR channel", flush=True)
         self._loop.run_forever()
 
     def shutdown(self):
-        if self._loop:
-            try:
-                self._loop.call_soon_threadsafe(self._loop.stop)
-            except Exception:
-                pass
+        self._inbox.put(None)            # stop the delivery thread
+        if not self._loop:
+            return
+        try:
+            self._loop.call_soon_threadsafe(self._loop.stop)
+        except RuntimeError as e:       # the loop may already be closed; report, do not swallow
+            print(f"[phone_ears] shutdown: {e}", flush=True)

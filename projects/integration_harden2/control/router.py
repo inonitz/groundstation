@@ -15,6 +15,7 @@ from dataclasses import dataclass
 
 from . import commands
 from .commands import Tier
+from .dji_wire import LATCHED, sent
 
 
 @dataclass
@@ -22,6 +23,16 @@ class Result:
     tier: Tier
     action: str          # what we did, for logs/tests
     dispatched: bool     # did it reach the wire / recognizer
+
+
+def _outcome(action, code):
+    """The action text the chat shows. A stop that did not reach the aircraft must never read as done,
+    and a verb the kill latch refused must not read as a comms failure (review R19)."""
+    if sent(code):
+        return action
+    if code == LATCHED:
+        return f"{action} refused: the kill latch is on (press M to re-arm)"
+    return f"{action} FAILED (HTTP {code}): the command did NOT reach the aircraft -- take over with the RC"
 
 
 class Router:
@@ -34,13 +45,13 @@ class Router:
         cmd = commands.classify(text)
 
         if cmd.tier is Tier.EMERGENCY:
-            self.wire.halt()                       # delay:0 preempts current motion; NOT /c/stop. Keeps control.
-            return Result(cmd.tier, "stop", True)  # NO mode change: the user keeps control after a stop.
+            code = self.wire.halt()                # delay:0 preempts current motion; NOT /c/stop. Keeps control.
+            return Result(cmd.tier, _outcome("stop", code), True)   # NO mode change after a stop.
 
         if cmd.tier is Tier.OVERRIDE:
-            self.wire.stop()
-            self.mode = "manual"
-            return Result(cmd.tier, "override->manual", True)
+            code = self.wire.stop()
+            self.mode = "manual"                   # refuse our flight even if the stop did not arrive
+            return Result(cmd.tier, _outcome("override->manual", code), True)
 
         if cmd.tier is Tier.RESUME:
             self.mode = "auto"

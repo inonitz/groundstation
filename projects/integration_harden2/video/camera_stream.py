@@ -8,16 +8,27 @@ CameraStream mimics the slice of cv2.VideoCapture that mvd uses:
     isOpened() / read() -> (ok, bgr_frame) / release().
 So `open_capture("ros")` returns one of these and the perception loop is unchanged.
 """
-import threading, time
+import importlib.util
+import os
+import sys
+import threading
+import time
+
+import cv2
 import numpy as np
 
-try:
+import config
+from system.status import RECOVERING, UP
+from system.supervisor import native_env
+
+# ROS2 is optional at import time (a webcam run needs none). Check without importing, so there is
+# no try on the import; the die() below fires only if a ROS source is actually opened.
+_HAVE_ROS = (importlib.util.find_spec("rclpy") is not None
+             and importlib.util.find_spec("sensor_msgs") is not None)
+if _HAVE_ROS:
     import rclpy
+    from rclpy.executors import SingleThreadedExecutor
     from sensor_msgs.msg import Image
-    _HAVE_ROS = True
-except Exception as _e:          # ROS2 not sourced -> fail loudly only when actually used
-    _HAVE_ROS = False
-    _IMPORT_ERR = _e
 
 TOPIC = "camera/stream"          # == gstreamer_udp_cam_rx kOutCameraPipelineRawFrameTopic
 ROS_SOURCES = ("ros", "camera_stream", TOPIC)   # source strings that mean "subscribe to the topic"
@@ -28,89 +39,33 @@ from fatal import die
 def _teardown(spin, executor, node):
     """Shut a spin thread + node down in the ONE order that does not core-dump on exit: JOIN the
     spin loop first, then remove and destroy the node. Destroying a node while its executor is
-    still spinning is what dumped core. Shared by CameraStream and FrameCounter so the fix cannot
-    drift out of one of them again."""
-    try: spin.join(timeout=1.5)
-    except Exception: pass
-    try: executor.remove_node(node)
-    except Exception: pass
-    try: node.destroy_node()
-    except Exception: pass
-
-
-class FrameCounter:
-    """Counts frames arriving on a ROS2 topic, in its OWN SingleThreadedExecutor and spin thread
-    (never the global executor -- that contends with Ears). Context manager, so teardown always
-    goes through _teardown.
-
-        with FrameCounter() as fc:
-            time.sleep(3)
-            print(fc.frames, fc.gap)
-
-    video_watchdog hand-rolled this subscription in its own lifecycle style; this is the single home."""
-
-    def __init__(self, topic=TOPIC, node_name="frame_counter"):
-        if not _HAVE_ROS:
-            die(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
-        if not rclpy.ok():
-            rclpy.init()
-        self.frames = 0
-        self.last = time.time()          # wall time of the most recent frame
-        self.topic = topic
-        self._node = rclpy.create_node(node_name)
-        self._sub = self._node.create_subscription(Image, topic, self._cb, 10)
-        from rclpy.executors import SingleThreadedExecutor
-        self._exec = SingleThreadedExecutor()
-        self._exec.add_node(self._node)
-        self._stop = False
-        self._spin = threading.Thread(target=self._spin_loop, daemon=True)
-        self._spin.start()
-
-    def _cb(self, _msg):
-        self.frames += 1
-        self.last = time.time()
-
-    def _spin_loop(self):
-        try:
-            while not self._stop and rclpy.ok():
-                self._exec.spin_once(timeout_sec=0.1)
-        except Exception:
-            pass
-
-    @property
-    def gap(self):
-        """Seconds since the last frame arrived."""
-        return time.time() - self.last
-
-    @property
-    def alive(self):
-        """False once ROS shuts down or the counter is closed -- the loop condition for a monitor."""
-        return (not self._stop) and rclpy.ok()
-
-    def close(self):
-        self._stop = True
-        _teardown(self._spin, self._exec, self._node)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        self.close()
-        return False
+    still spinning is what dumped core."""
+    try:
+        spin.join(timeout=1.5)
+    except Exception as e:                 # rclpy teardown can throw during shutdown; report, keep going
+        print(f"[camera_stream] teardown join: {e}", flush=True)
+    try:
+        executor.remove_node(node)
+    except Exception as e:
+        print(f"[camera_stream] teardown remove_node: {e}", flush=True)
+    try:
+        node.destroy_node()
+    except Exception as e:
+        print(f"[camera_stream] teardown destroy_node: {e}", flush=True)
 
 
 class CameraStream:
     def __init__(self, topic=TOPIC, first_frame_timeout=15.0):
         if not _HAVE_ROS:
-            die(f"ROS2 not available for camera_stream: {_IMPORT_ERR}")
+            die("ROS2 (rclpy) not available for camera_stream; source the ROS2 environment")
         if not rclpy.ok():
             rclpy.init()
         self._node = rclpy.create_node("scene_camera_stream_sub")
         self._sub  = self._node.create_subscription(Image, topic, self._cb, 10)
-        from rclpy.executors import SingleThreadedExecutor
         self._exec = SingleThreadedExecutor()          # OWN executor: never share the global one with Ears
         self._exec.add_node(self._node)
         self._frame = None
+        self.frames = 0                   # new frames received; the stall guard watches this count
         self._lock  = threading.Lock()
         self._stop  = False
         self._t0    = time.time()
@@ -123,18 +78,20 @@ class CameraStream:
         try:
             while not self._stop and rclpy.ok():
                 self._exec.spin_once(timeout_sec=0.1)   # spin OUR executor only — cancellable, no global-executor contention
-        except Exception:
-            pass
+        except Exception as e:   # a spin error kills this thread; leave a trace, do not vanish
+            print(f"[camera_stream] camera spin stopped: {e}", flush=True)
 
     def _cb(self, msg):
         h, w = msg.height, msg.width
         try:
-            arr = np.frombuffer(bytes(msg.data), dtype=np.uint8).reshape(h, msg.step)
+            arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(h, msg.step)   # a view: no extra copy
             img = arr[:, : w * 3].reshape(h, w, 3)      # bgr8, stride-safe
-        except Exception:
+        except (ValueError, TypeError) as e:            # a malformed frame -> drop it, keep the callback alive
+            print(f"[camera_stream] bad frame dropped: {e}", flush=True)
             return
         with self._lock:
             self._frame = img
+            self.frames += 1
 
     # --- cv2.VideoCapture-compatible surface ---------------------------------------
     def isOpened(self):
@@ -156,31 +113,92 @@ class CameraStream:
         _teardown(self._spin, self._exec, self._node)   # join-before-destroy: the core-dump fix
 
 
+def source_kind(src):
+    """ros | webcam | gstreamer | stream | file: the ONE place that classifies a video source string."""
+    s = str(src)
+    if s in ROS_SOURCES:
+        return "ros"
+    if s.isdigit():
+        return "webcam"
+    if "!" in s:
+        return "gstreamer"
+    if "://" in s:
+        return "stream"
+    return "file"
+
+
 def open_capture(src):
     """One opener for every source kind: ROS topic, webcam index, GStreamer pipe, or URL/file.
     Moved from highlight_seg.py on 2026-09-02."""
-    import cv2
-    import config
+    kind = source_kind(src)
     src = str(src)
-    if src in ROS_SOURCES:
+    if kind == "ros":
         return CameraStream()
-    if src.isdigit():
+    if kind == "webcam":
         cap = cv2.VideoCapture(int(src))
         cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))   # 2026-09-08: UVC cams (C920) give 720p at 10 fps in YUYV, 30 fps in MJPG
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAM_W)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAM_H)
         return cap
-    if "!" in src:
+    if kind == "gstreamer":
         return cv2.VideoCapture(src, cv2.CAP_GSTREAMER)
     return cv2.VideoCapture(src)
 
+
+
+def gstreamer_argv(phone_ip):
+    """The gstreamer receiver's command line (was run.sh's gst pane): the phone's H.264 -> camera/stream."""
+    return [os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_gstreamer_rx"), "--dji", phone_ip]
+
+
+def start_services(supervisor, log_dir, source):
+    """Start the video processes a source needs. Only a ROS source (dji) needs one: the gstreamer
+    receiver. The phone is the WiFi gateway; no gateway at start-up is fatal (the source is required)."""
+    if source_kind(source) != "ros":
+        return
+    if not config.PHONE_IP:
+        die("VIDEO=dji but no phone IP: connect to the phone hotspot, or export PHONE_IP")
+    supervisor.start("gstreamer", gstreamer_argv(config.PHONE_IP), env=native_env(),
+                     log_path=os.path.join(log_dir, "proc-gstreamer.log"))
+    return
+
+
+class StallGuard:
+    """Replaces the old video_watchdog process. The display loop calls tick() once per loop with
+    whether a new frame arrived. No frame for STALL seconds -> report `video` RECOVERING and ask the
+    supervisor for a deliberate gstreamer restart, again every RETRY seconds, forever (a stalled phone
+    stream must not crash the app). Frames again -> `video` UP.
+    @m_lastFrame: monotonic time of the last new frame. @m_lastRetry: of the last restart request."""
+
+    def __init__(self, supervisor, board, stall_s=config.WATCHDOG_STALL_SEC, retry_s=config.WATCHDOG_RETRY_SEC):
+        self.supervisor = supervisor
+        self.board = board
+        self.mk_stallS = stall_s
+        self.mk_retryS = retry_s
+        self.m_lastFrame = time.monotonic()
+        self.m_lastRetry = 0.0
+
+    def tick(self, got_frame, now=None):
+        now = time.monotonic() if now is None else now
+        if got_frame:
+            self.m_lastFrame = now
+            self.board.report("video", UP)            # the board records (and logs) only a change
+            return
+        gap = now - self.m_lastFrame
+        if gap <= self.mk_stallS:
+            return
+        if now - self.m_lastRetry < self.mk_retryS:
+            return
+        self.m_lastRetry = now
+        self.board.report("video", RECOVERING, f"no frames for {gap:.0f}s; restarting gstreamer")
+        self.supervisor.restart("gstreamer", f"video stalled {gap:.0f}s")
+        return
 
 if __name__ == "__main__":
     # Self-contained smoke: read frames from any source for 3 s and report. No ROS needed for
     # webcam/file sources. Run as a MODULE from the integration_harden2 root, which puts that root
     # on sys.path for free -- no path shim:
     #     cd /root/groundstation/projects/integration_harden2 && python3 -m video.camera_stream 0
-    import sys
     src = sys.argv[1] if len(sys.argv) > 1 else "0"
     cap = open_capture(src)
     frames, shape, t0 = 0, None, time.time()

@@ -5,11 +5,13 @@ never sends /c/stop to a real aircraft (CLAUDE.md drone-safety rules).
   kill()  -> wire.stop() = POST /c/stop = controller.stop(emergency=true): stops motion AND relinquishes our
              virtual-stick authority (the RC flies). The running /c/fly mission is cancelled phone-side.
   latch   -> takeoff / land / fly_mission / spin_by / fly_by / gimbal_pitch / scan_ground / go_home_to_user /
-             follow_me return REFUSED (409) and are NOT sent until rearm(). stop() stays allowed (direct /c/stop);
+             follow_me return LATCHED (409) and are NOT sent until rearm(). stop() stays allowed (direct /c/stop);
              halt() is ALSO refused after a kill -- it routes through the guarded fly_mission (a /c/fly that
              re-takes stick control), which the latch correctly prevents.
 Wraps the wire INSTANCE, so every caller (router basic verbs, pipeline missions, recorders) is covered.
 Live key (mvd window must have focus): M toggles -- first press kills, next press re-arms."""
+
+from control.dji_wire import LATCHED, sent
 
 
 class KillSwitch:
@@ -19,7 +21,6 @@ class KillSwitch:
     # depend on every verb continuing to call fly_mission.
     MOTION = ("takeoff", "land", "fly_mission", "spin_by", "fly_by", "gimbal_pitch",
               "scan_ground", "go_home_to_user", "follow_me", "track_me", "wave")
-    REFUSED = 409
 
     def __init__(self, wire, say=print):
         self.wire, self.say = wire, say
@@ -34,15 +35,22 @@ class KillSwitch:
             if self.killed:
                 self.refused += 1
                 self.say(f"KILL latch: refused {name} -- press M to re-arm")
-                return self.REFUSED
+                return LATCHED
             return fn(*a, **k)
         guarded.__name__ = name
         return guarded
 
     def kill(self):
-        self.killed = True; self.kills += 1
+        """POST /c/stop and latch every motion verb. Reports the REAL result: when the stop did not reach the
+        aircraft, say so, and tell the operator to take over with the RC or the power button."""
+        self.killed = True   # plain bool, set from the key thread; the guard reads it under the GIL
+        self.kills += 1
         code = self.wire.stop()
-        self.say(f"KILL: /c/stop -> HTTP {code}. Motion stopped, the RC has control, missions refused until M is pressed again.")
+        if sent(code):
+            self.say(f"KILL: /c/stop -> HTTP {code}. Motion stopped, the RC has control, missions refused until M is pressed again.")
+        else:
+            self.say(f"KILL FAILED: /c/stop -> HTTP {code}. The stop did NOT reach the aircraft. "
+                     "Take over with the RC, or hold the aircraft power button. Missions stay refused.")
         return code
 
     def rearm(self):
@@ -51,6 +59,8 @@ class KillSwitch:
 
     def toggle(self):
         """The M key: kill when armed, re-arm when killed. Returns True when the switch is now KILLED."""
-        if self.killed: self.rearm()
-        else: self.kill()
+        if self.killed:
+            self.rearm()
+        else:
+            self.kill()
         return self.killed

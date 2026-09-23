@@ -4,35 +4,43 @@
 passes the snapshot in. Font composition (owner-inspected 2026-09-12, mockup tools/ui-mockups/
 live-pane.html): DejaVu Sans for Hebrew, DejaVu Sans Mono for the tag column, Ubuntu Regular for
 English values + header. Degrades to ASCII-only cv2 Hershey text if PIL/bidi/font are missing."""
-import os, textwrap
-import cv2, numpy as np
+import importlib.util
+import os
+import textwrap
+
+import cv2
+import numpy as np
+
 import config
-from perception import ascii_only
+from system.status import UP
+from fatal import die
+from perception2.text_parse import ascii_only
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 # Hebrew/RTL for the chat overlay. OpenCV's Hershey font is ASCII-only, so Hebrew is drawn with a
 # TrueType font (DejaVuSans has Hebrew glyphs) and python-bidi for correct right-to-left order.
-try:
-    from PIL import Image, ImageDraw, ImageFont
+# PIL/bidi are optional (checked without importing -> no try on the import); a MISSING FONT is fatal.
+_HAVE_HE = (importlib.util.find_spec("PIL") is not None
+            and importlib.util.find_spec("bidi") is not None)
+if _HAVE_HE:
+    from PIL import Image, ImageDraw, ImageFont, features as _pil_features
     from bidi.algorithm import get_display
     _SZ = config.HE_FONT_SIZE
-    def _ttf(path, sz, fb):
-        try: return ImageFont.truetype(path, sz) if os.path.exists(path) else fb
-        except Exception: return fb
-    _FONT_HE  = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", _SZ)               # Hebrew
-    _FONT_VAL = _ttf("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", _SZ, _FONT_HE)                     # English values/header
-    _FONT_TAG = _ttf("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", _SZ - 2, _FONT_HE)           # tags + HUD (mono)
+    # The Hebrew font is REQUIRED (a missing one is fatal, per the owner). Ubuntu (English) and the mono
+    # font (tags) are optional niceties: fall back to the Hebrew font if absent. os.path.exists, no try.
+    _HE_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    if not os.path.exists(_HE_PATH):
+        die(f"overlay Hebrew font missing: {_HE_PATH} (apt-get install fonts-dejavu)")
+    _FONT_HE = ImageFont.truetype(_HE_PATH, _SZ)
+    _VAL_PATH = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"
+    _TAG_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    _FONT_VAL = ImageFont.truetype(_VAL_PATH, _SZ) if os.path.exists(_VAL_PATH) else _FONT_HE
+    _FONT_TAG = ImageFont.truetype(_TAG_PATH, _SZ - 2) if os.path.exists(_TAG_PATH) else _FONT_HE
     _HE_FONT = _FONT_HE
-    try:
-        from PIL import features as _pil_features
-        _RAQM = bool(_pil_features.check("raqm"))   # Raqm does bidi natively -> do NOT pre-reverse
-    except Exception:
-        _RAQM = False
-    _HAVE_HE = True
-except Exception as _he_err:
-    print("[overlay] Hebrew overlay off (PIL/bidi/font missing):", _he_err, flush=True)
-    _HAVE_HE = False
+    _RAQM = bool(_pil_features.check("raqm"))   # Raqm does bidi natively -> do NOT pre-reverse
+else:
+    print("[overlay] Hebrew overlay off (PIL/bidi missing); ASCII fallback", flush=True)
 
 
 def _is_rtl(s):
@@ -63,6 +71,9 @@ def _wrap_px(text, maxpx, font=None):
 
 
 _TAG_COL = (163, 149, 139)   # dim tag column (BGR = mockup #8b95a3)
+PANE_GROUND = (31, 25, 22)  # the dark ground of the status + chat panes (#16191f)
+_TAG_RIGHT = 66              # tags are right-aligned, ending at this x
+_VALUE_X = 76               # values start at this x
 
 
 def _draw_pane(panel, header, rows, conv_top, height):
@@ -70,48 +81,69 @@ def _draw_pane(panel, header, rows, conv_top, height):
     header: list of (text, bgr_color, fontkey). rows: (tag, value, bgr_color, rtl) or None (turn split).
     Fonts per element: Hebrew values = DejaVuSans, English values = Ubuntu, tags = DejaVuSansMono.
     Hebrew values are right-aligned (RTL); English values start after the tag. Falls back to cv2 Hershey."""
-    W = panel.shape[1]; TAG_R = 66; VALX = 76        # tags RIGHT-aligned ending at TAG_R; values start at VALX
     if not _HAVE_HE:
-        y = 22
-        for text, col, _fk in header:
-            cv2.putText(panel, ascii_only(text), (12, y), FONT, 0.5, tuple(int(x) for x in col), 1, cv2.LINE_AA); y += 19
-        yy = height - 14
-        for r in reversed(rows):
-            if yy < conv_top + 14:
-                break
-            if r is None:
-                yy -= 11; continue
-            tag, value, col, _ = r; col = tuple(int(x) for x in col)
-            if tag:
-                (tw, _), _ = cv2.getTextSize(ascii_only(tag), FONT, 0.42, 1)
-                cv2.putText(panel, ascii_only(tag), (max(6, TAG_R - tw), yy), FONT, 0.42, _TAG_COL, 1, cv2.LINE_AA)
-            cv2.putText(panel, ascii_only(value), (VALX, yy), FONT, 0.46, col, 1, cv2.LINE_AA); yy -= 21
-        return panel
-    _F = {"tag": _FONT_TAG, "val": _FONT_VAL, "he": _FONT_HE}
-    img = Image.fromarray(panel); d = ImageDraw.Draw(img)
+        return _draw_pane_ascii(panel, header, rows, conv_top, height)
+    return _draw_pane_pil(panel, header, rows, conv_top, height)
+
+
+def _draw_pane_ascii(panel, header, rows, conv_top, height):
+    """Fallback pane in cv2 Hershey (ASCII only), used when PIL/bidi/font are missing."""
+    y = 22
+    for text, col, _fontkey in header:
+        cv2.putText(panel, ascii_only(text), (12, y), FONT, 0.5, tuple(int(x) for x in col), 1, cv2.LINE_AA)
+        y += 19
+    yy = height - 14
+    for row in reversed(rows):
+        if yy < conv_top + 14:
+            break
+        if row is None:
+            yy -= 11
+            continue
+        tag, value, col, _rtl = row
+        col = tuple(int(x) for x in col)
+        if tag:
+            (tag_w, _), _ = cv2.getTextSize(ascii_only(tag), FONT, 0.42, 1)
+            cv2.putText(panel, ascii_only(tag), (max(6, _TAG_RIGHT - tag_w), yy), FONT, 0.42, _TAG_COL, 1, cv2.LINE_AA)
+        cv2.putText(panel, ascii_only(value), (_VALUE_X, yy), FONT, 0.46, col, 1, cv2.LINE_AA)
+        yy -= 21
+    return panel
+
+
+def _draw_pane_pil(panel, header, rows, conv_top, height):
+    """The full pane in PIL: TrueType Hebrew (RTL) + Ubuntu English values + mono tags."""
+    width = panel.shape[1]
+    fonts = {"tag": _FONT_TAG, "val": _FONT_VAL, "he": _FONT_HE}
+    img = Image.fromarray(panel)
+    draw = ImageDraw.Draw(img)
     y = 12
-    for text, col, fk in header:                               # header top-down
-        f = _F.get(fk, _FONT_VAL); d.text((12, y), text, font=f, fill=tuple(int(x) for x in col)); y += 19
-    d.line((10, conv_top - 8, W - 10, conv_top - 8), fill=(59, 49, 43))
+    for text, col, fontkey in header:                          # header top-down
+        font = fonts.get(fontkey, _FONT_VAL)
+        draw.text((12, y), text, font=font, fill=tuple(int(x) for x in col))
+        y += 19
+    draw.line((10, conv_top - 8, width - 10, conv_top - 8), fill=(59, 49, 43))
     yy = height - 14 - _FONT_HE.size
-    for r in reversed(rows):
+    for row in reversed(rows):
         if yy < conv_top:
             break
-        if r is None:                                          # turn separator
-            d.line((10, yy + 13, W - 10, yy + 13), fill=(59, 49, 43)); yy -= 14; continue
-        tag, value, col, rtl = r; col = tuple(int(x) for x in col)
+        if row is None:                                        # turn separator
+            draw.line((10, yy + 13, width - 10, yy + 13), fill=(59, 49, 43))
+            yy -= 14
+            continue
+        tag, value, col, rtl = row
+        col = tuple(int(x) for x in col)
         vfont = _FONT_HE if rtl else _FONT_VAL
-        wrapped = _wrap_px(value, W - VALX - 12, vfont)
-        for j, wl in enumerate(reversed(wrapped)):             # bottom wrapped line first
+        wrapped = _wrap_px(value, width - _VALUE_X - 12, vfont)
+        for j, wrapped_line in enumerate(reversed(wrapped)):   # bottom wrapped line first
             ly = yy - j * 21
             if rtl:
-                vis = wl if _RAQM else get_display(wl); tw = d.textlength(vis, font=vfont)
-                d.text((max(VALX, W - tw - 12), ly), vis, font=vfont, fill=col)
+                visual = wrapped_line if _RAQM else get_display(wrapped_line)
+                text_w = draw.textlength(visual, font=vfont)
+                draw.text((max(_VALUE_X, width - text_w - 12), ly), visual, font=vfont, fill=col)
             else:
-                d.text((VALX, ly), wl, font=vfont, fill=col)
+                draw.text((_VALUE_X, ly), wrapped_line, font=vfont, fill=col)
         if tag:                                                # tag on the row's TOP line, right-aligned, mono
-            tw = d.textlength(tag, font=_FONT_TAG)
-            d.text((max(6, TAG_R - tw), yy - (len(wrapped) - 1) * 21), tag, font=_FONT_TAG, fill=_TAG_COL)
+            tag_w = draw.textlength(tag, font=_FONT_TAG)
+            draw.text((max(6, _TAG_RIGHT - tag_w), yy - (len(wrapped) - 1) * 21), tag, font=_FONT_TAG, fill=_TAG_COL)
         yy -= 21 * len(wrapped)
     return np.array(img)
 
@@ -128,7 +160,7 @@ def _model_lines():
     what is actually wired -- not a hardcoded string. harden2 is single-stack (Gemma 4 / SAM3 / whisper);
     the env knobs still drive these, so a future swap shows here automatically."""
     planner = config.PLANNER
-    planner = {"gemma4": "Gemma-4-E4B", "qwen3vl": "Qwen3-VL-4B"}.get(planner, planner)
+    planner = {"gemma4": "Gemma-4-E4B"}.get(planner, planner)
     eyes = os.path.basename(config.SAM3_MODEL_DIR)
     asr = config.ASR_MODEL_PATH
     if "ivrit" in asr:   ears = "whisper-ivrit-v3"
@@ -153,12 +185,13 @@ def chat_kind(text):
     return "scene"
 
 
-def render_chat(height, chat, thinking, killed, session_dir):
+def render_chat(width, height, chat, thinking, killed, session_dir, scroll=0):
     """Build the chat panel from a SNAPSHOT. The caller holds S.lock and passes chat/thinking/killed;
     this function touches no shared state. chat: list of (role, text, kind). A turn runs from one user line
-    to the next; async results (highlight/describe land from a worker thread) stay in their turn."""
-    w = config.CHAT_W
-    panel = np.empty((height, w, 3), np.uint8); panel[:] = (31, 25, 22)   # mockup dark ground (#16191f)
+    to the next; async results (highlight/describe land from a worker thread) stay in their turn.
+    scroll: how many of the newest rows to skip (0 = follow the newest). The pane draws bottom-up."""
+    panel = np.empty((height, width, 3), np.uint8)
+    panel[:] = PANE_GROUND
 
     C = {"you": (120, 210, 255), "light": (240, 235, 231), "dim": (163, 149, 139),
          "green": (100, 220, 60), "amber": (41, 180, 240), "model": (176, 235, 160),
@@ -173,7 +206,7 @@ def render_chat(height, chat, thinking, killed, session_dir):
     if session_dir:
         _dump = "/".join(session_dir.rstrip("/").split("/")[-2:])
         header.append(("dump: " + ascii_only(_dump)[:54], C["dim"], "tag"))
-    header.append(("F5 talk  ·  c clear  ·  q quit", C["dim"], "tag"))
+    header.append(("F5 talk  ·  c clear  ·  [ ] or wheel scroll  ·  q quit", C["dim"], "tag"))
     if killed:
         header.append(("MANUAL OVERRIDE — press M to re-arm", C["red"], "val"))
     conv_top = 12 + 19 * len(header) + 8
@@ -224,4 +257,36 @@ def render_chat(height, chat, thinking, killed, session_dir):
     if not rows:
         rows = [("", "press F5, speak, press F5.", (150, 150, 150), False),
                 ("", 'e.g. "highlight the red car"', (150, 150, 150), False)]
+    scroll = max(0, min(scroll, len(rows) - 1))
+    if scroll:
+        rows = rows[:len(rows) - scroll]
+        header.append((f"scrolled up {scroll} rows  ·  ] to go back down", C["amber"], "tag"))
+        conv_top += 19
     return _draw_pane(panel, header, rows, conv_top, height)
+
+
+def render_status(width, height, rows):
+    """The system status pane (owner ruling 2026-09-22): one row per subsystem, a green box when UP and a
+    red box in every other state, the state name, and the detail wrapped under a red row.
+    rows: a system.status snapshot, [(system, state, detail), ...]. Touches no shared state."""
+    w = width
+    panel = np.empty((height, w, 3), np.uint8)
+    panel[:] = PANE_GROUND
+    cv2.putText(panel, "SYSTEM STATUS", (12, 26), FONT, 0.55, config.COL_HUD, 1, cv2.LINE_AA)
+    y = 50
+    for system, state, detail in rows:
+        up = state == UP
+        col = config.COL_STATUS_UP if up else config.COL_STATUS_DOWN
+        cv2.rectangle(panel, (12, y - 12), (26, y + 2), col, -1)
+        cv2.putText(panel, ascii_only(system), (36, y), FONT, 0.5, (235, 235, 235), 1, cv2.LINE_AA)
+        (state_w, _), _ = cv2.getTextSize(state, FONT, 0.45, 1)
+        cv2.putText(panel, state, (w - 12 - state_w, y), FONT, 0.45, col, 1, cv2.LINE_AA)
+        y += 22
+        if not up and detail:
+            for line in textwrap.wrap(ascii_only(detail), 38)[:3]:
+                cv2.putText(panel, line, (36, y), FONT, 0.4, (170, 170, 170), 1, cv2.LINE_AA)
+                y += 17
+        y += 6
+        if y > height - 10:
+            break
+    return panel

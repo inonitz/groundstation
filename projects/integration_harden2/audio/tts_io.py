@@ -4,7 +4,7 @@ Hebrew only. Two backends:
   phone    -- POST /tts to the DJI phone app; it speaks via Android TextToSpeech (Google he-IL).
               Needs the phone reachable and on data. say() never raises into the caller.
   phonikud -- OFFLINE Hebrew on the laptop: phonikud G2P (niqqud+stress -> IPA) -> Piper onnx
-              voice -> aplay. If the model/deps are missing, construction die()s (a loud crash)
+              voice -> sounddevice. If the model/deps are missing, construction die()s (a loud crash)
               (fail LOUD -- never run the demo with no voice; owner ruling 2026-09-17).
 English/espeak/piper backends were removed: we only speak Hebrew. If English TTS is ever needed,
 add a SOTA model back -- do not resurrect espeak.
@@ -12,17 +12,37 @@ add a SOTA model back -- do not resurrect espeak.
 Select:  SCENE_TTS = phone | phonikud | off      (the ONLY TTS knob; default: phone)
 Everything else -- phone host (derived from the video host), port, language, rate, timeout, and the
 phonikud model paths -- is a fixed constant in config, not env-tunable.
+
+Threading: the worker holds ONE slot for the latest answer, guarded by a lock, woken by an event.
+say() overwrites the slot, cuts current playback, and signals; the worker blocks on the event at zero
+CPU until then. Latest answer wins; there is no queue and no polling.
 """
-import os, re, shutil, subprocess, threading, queue
+import importlib.util
+import http.client
+import json
+import os
+import re
+import threading
+import time
+import urllib.error
+import urllib.request
+
 import numpy as np
+
 import config
-try:
-    import requests
-except Exception:
-    requests = None
-
-
 from fatal import die
+from system.status import BOARD, RECOVERING, UP, fail
+from system.supervisor import port_open
+
+# phonikud is an OPTIONAL offline-TTS dependency (SCENE_TTS=phonikud). Checked here at module level, so
+# there is no import inside a function; _load_phonikud die()s if it is selected but missing.
+_HAVE_PHONIKUD = all(importlib.util.find_spec(pkg) is not None
+                     for pkg in ("phonikud_onnx", "phonikud", "phonikud_tts", "sounddevice"))
+if _HAVE_PHONIKUD:
+    from phonikud_onnx import Phonikud
+    from phonikud import phonemize as _pk_phonemize
+    from phonikud_tts import Piper
+
 
 def _resolve_phone_host():
     """Same phone as the video: config.TTS_HOST (unset by default) -> host= in the source -> WiFi gateway."""
@@ -36,93 +56,131 @@ def _resolve_phone_host():
 
 class Voice:
     def __init__(self):
-        b = (config.TTS_BACKEND or "phone").lower()
-        _valid = ("phone", "phonikud", "off")
-        if b not in _valid:
-            print(f"[voice] SCENE_TTS={b!r} not recognized (use {'|'.join(_valid)}) -> OFF", flush=True)
-            b = "off"
-        self._phone = b == "phone"
-        self._pk = self._pk_voice = self._pk_phonemize = None
+        """Only built when TTS is on (mvd.build_voice returns None for SCENE_TTS=off)."""
+        backend = (config.TTS_BACKEND or "phone").lower()
+        if backend not in ("phone", "phonikud"):
+            die(f"SCENE_TTS={backend!r} is not a valid voice backend (use phone | phonikud; off builds no Voice)")
+        self._phone = backend == "phone"
+        self._pk = self._pk_voice = self._pk_phonemize = self._sd = None
+        self.host = ""
+        self._tts_url = ""
+        self.backend = backend
+        # Choose the speak function ONCE, so the worker loop has no per-iteration backend branch.
+        if self._phone:
+            self._setup_phone()
+            self._say = self._say_phone
+            where = f"phone {self._tts_url}"
+        else:
+            self._load_phonikud()
+            self._say = self._say_phonikud
+            where = "laptop phonikud"
 
-        if b == "phonikud":
-            if not shutil.which("aplay"):
-                die("phonikud TTS needs aplay (alsa-utils); it is not installed")
-            for pth in (config.PHONIKUD_G2P, config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG):
-                if not os.path.exists(pth):
-                    die(f"phonikud model file missing: {pth} (run tools/devenv/install-runtime-deps.sh)")
-            try:
-                from phonikud_onnx import Phonikud
-                from phonikud import phonemize as _pk_phonemize
-                from phonikud_tts import Piper as _PkPiper
-            except Exception as e:
-                die(f"phonikud packages not importable: {e} (pip install phonikud phonikud-onnx phonikud-tts)")
-            self._pk = Phonikud(config.PHONIKUD_G2P)
-            self._pk_voice = _PkPiper(config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG)
-            self._pk_phonemize = _pk_phonemize
-
-        self.host = _resolve_phone_host() if self._phone else ""
-        if self._phone and (requests is None or not self.host):
-            print(f"[voice] phone TTS unavailable (requests={requests is not None} host={self.host!r})", flush=True)
-            self._phone = False
-
-        self.backend = b if (self._phone or self._pk_voice) else "off"
-        self._q, self._cur, self._lock, self._run = queue.Queue(), None, threading.Lock(), True
-        if self.backend != "off":
-            threading.Thread(target=self._worker, daemon=True).start()
-        where = (f"phone http://{self.host}:{config.TTS_PORT}/tts" if self._phone
-                 else "laptop phonikud" if self._pk_voice else "OFF")
+        # One-slot mailbox: the latest text to speak, a lock, and a wake event.
+        self._pending = None
+        self._lock = threading.Lock()
+        self._wake = threading.Event()
+        self._run = True
+        threading.Thread(target=self._worker, daemon=True).start()
         print(f"[voice] speaking on: {where}", flush=True)
+        BOARD.report("tts", UP)
+
+    def _setup_phone(self):
+        """Resolve the phone host and verify it answers. A phone TTS with no connection is fatal (owner)."""
+        self.host = _resolve_phone_host()
+        if not self.host:
+            die("SCENE_TTS=phone but no phone host resolved (check the WiFi hotspot or set PHONE_IP)")
+        self._tts_url = f"http://{self.host}:{config.TTS_PORT}/tts"
+        if not port_open(self.host, config.TTS_PORT, config.TTS_TIMEOUT):   # unreachable at start-up is fatal
+            fail("tts", f"{self.host}:{config.TTS_PORT} unreachable at start-up",
+                 f"SCENE_TTS=phone but {self.host}:{config.TTS_PORT} is unreachable")
+
+    def _load_phonikud(self):
+        """Load the offline Hebrew voice, or die() loudly with the fix. No silent fallback."""
+        for path in (config.PHONIKUD_G2P, config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG):
+            if not os.path.exists(path):
+                die(f"phonikud model file missing: {path} (run tools/devenv/install-runtime-deps.sh)")
+        if not _HAVE_PHONIKUD:
+            die("phonikud stack missing (pip install phonikud phonikud-onnx phonikud-tts sounddevice)")
+        import sounddevice   # phonikud-only playback; needs native PortAudio, so it stays out of module scope
+        self._sd = sounddevice
+        self._pk = Phonikud(config.PHONIKUD_G2P)
+        self._pk_voice = Piper(config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG)
+        self._pk_phonemize = _pk_phonemize
 
     def say(self, text):
-        """Queue an answer; drops anything stale so the latest question's answer wins."""
+        """Hand the worker the latest answer. Drops any unspoken text, so the newest wins. Never raises."""
         text = (text or "").strip()
-        if not text or self.backend == "off":
+        if not text:
             return
-        try:
-            while True: self._q.get_nowait()
-        except queue.Empty:
-            pass
-        self._stop_current()
-        self._q.put(text)
+        with self._lock:
+            self._pending = text        # overwrite: the latest answer is the only one that matters
+        self._stop_current()            # cut the current playback so the new answer starts now
+        self._wake.set()                # wake the worker
 
     def _stop_current(self):
-        with self._lock:
-            p = self._cur
-        if p is not None and hasattr(p, "poll") and p.poll() is None:
-            try: p.terminate()
-            except Exception: pass
+        """Stop any playback in progress, so a newer answer starts at once."""
+        if self._pk_voice:
+            self._sd.stop()
 
     def _worker(self):
+        """Block on the wake event, take the latest text, speak it. Zero CPU while idle."""
         while self._run:
-            try:
-                text = self._q.get(timeout=0.2)
-            except queue.Empty:
-                continue
-            if self._phone:
-                try: self._say_phone(text)
-                except Exception as e: print(f"[voice] phone tts: {e}", flush=True)
-            elif self._pk_voice:
-                try: self._say_phonikud(text)
-                except Exception as e: print(f"[voice] phonikud tts: {e}", flush=True)
+            self._wake.wait()
+            self._wake.clear()
+            with self._lock:
+                text = self._pending
+                self._pending = None
+            if text is not None:        # None = a shutdown wake, or an already-taken slot
+                self._say(text)
+
+    def _post(self, body):
+        """One POST /tts. -> the HTTP status, or None when the phone did not answer at all (urllib, like every
+        other HTTP call in the app; it reports an error status or no answer only by a throw)."""
+        req = urllib.request.Request(self._tts_url, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=config.TTS_TIMEOUT) as r:
+                return r.status
+        except urllib.error.HTTPError as e:           # the phone answered with an error status
+            return e.code
+        except (urllib.error.URLError, OSError, http.client.HTTPException) as e:
+            print(f"[voice] phone /tts did not answer: {e!r}", flush=True)
+            return None
 
     def _say_phone(self, text):
+        """POST the text to the phone. A phone that does not answer is RECOVERED like every supervised
+        service (owner ruling 2026-09-22): report RECOVERING, try again up to SUPERVISOR_MAX_RESTARTS times,
+        back to UP when it answers, else report FAILED and die() with the reason."""
         body = {"text": text, "lang": config.TTS_LANG, "rate": config.TTS_RATE}
-        r = requests.post(f"http://{self.host}:{config.TTS_PORT}/tts", json=body, timeout=config.TTS_TIMEOUT)
-        print(f"[voice] -> phone /tts HTTP {r.status_code}: {text[:50]!r}", flush=True)
+        tries = config.SUPERVISOR_MAX_RESTARTS
+        for attempt in range(tries + 1):
+            code = self._post(body)
+            if code is not None and 200 <= code < 300:        # a 4xx/5xx is a failed delivery too (R28)
+                if attempt:
+                    BOARD.report("tts", UP)
+                print(f"[voice] -> phone /tts HTTP {code}: {text[:50]!r}", flush=True)
+                return True
+            if attempt == tries:
+                break
+            reason = "did not answer" if code is None else f"answered HTTP {code}"
+            BOARD.report("tts", RECOVERING, f"phone /tts {reason}; retry {attempt + 1}/{tries}")
+            time.sleep(config.SERVICE_RETRY_SECONDS)
+            with self._lock:                                   # a newer answer arrived: speak that one
+                if self._pending is not None:
+                    text, self._pending = self._pending, None
+                    body["text"] = text
+        fail("tts", f"phone /tts failed {tries + 1} times",
+             f"phone TTS at {self._tts_url} failed {tries + 1} times; {tries} recoveries failed")
 
     def _say_phonikud(self, text):
-        """Offline Hebrew: phonikud adds niqqud+stress -> IPA phonemes -> Piper onnx voice -> aplay."""
+        """Offline Hebrew: phonikud niqqud+stress -> IPA -> Piper onnx voice -> sounddevice. Returns a status."""
         vocalized = self._pk.add_diacritics(text)
-        phonemes  = self._pk_phonemize(vocalized)
-        samples, sr = self._pk_voice.create(phonemes, is_phonemes=True)
-        pcm = (np.clip(samples, -1.0, 1.0) * 32767.0).astype(np.int16).tobytes()
-        play = subprocess.Popen(["aplay", "-q", "-r", str(sr), "-f", "S16_LE", "-t", "raw", "-"],
-                                stdin=subprocess.PIPE)
-        with self._lock: self._cur = play
-        play.stdin.write(pcm); play.stdin.close(); play.wait()
-        if play.returncode not in (0, None):
-            raise RuntimeError(f"aplay rc={play.returncode}")
+        phonemes = self._pk_phonemize(vocalized)
+        samples, sample_rate = self._pk_voice.create(phonemes, is_phonemes=True)
+        self._sd.play(np.clip(samples, -1.0, 1.0).astype(np.float32), sample_rate)
+        self._sd.wait()   # blocks until playback ends, or until _stop_current() cuts it for a newer answer
+        return True
 
     def shutdown(self):
         self._run = False
+        self._wake.set()        # wake the worker so it sees _run is False and exits
         self._stop_current()

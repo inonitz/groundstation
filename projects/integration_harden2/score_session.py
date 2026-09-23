@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""Score a recorded live session against a live-test list (2026-09-09). Matches each utterance's heard text to the best list
+line by token overlap after Hebrew number normalisation (>= 0.3), parses the list's expected notation (dz+20, +45 deg, takeoff,
+land, delay N, EMPTY, halt, open, VLM: ...) and judges the recorded mission. Writes REPORT.md into the session folder.
+    python3 score_session.py <list.md> <session dir>        e.g. tools/desk-test/live-test-e2e-50.md projects/integration_harden2/sessions/<latest>"""
+import json, re, sys, os
+
+
 def _u(root):  # the per-utterance log: trace.jsonl (2026-09-12), then legacy utterances.jsonl layouts
     import os as _o
     for c in ("trace.jsonl", "asr/utterances.jsonl", "utterances.jsonl"):
@@ -5,13 +13,6 @@ def _u(root):  # the per-utterance log: trace.jsonl (2026-09-12), then legacy ut
         if _o.path.exists(p):
             return p
     return _o.path.join(root, "trace.jsonl")
-
-#!/usr/bin/env python3
-"""Score a recorded live session against a live-test list (2026-09-09). Matches each utterance's heard text to the best list
-line by token overlap after Hebrew number normalisation (>= 0.3), parses the list's expected notation (dz+20, +45 deg, takeoff,
-land, delay N, EMPTY, halt, open, VLM: ...) and judges the recorded mission. Writes REPORT.md into the session folder.
-    python3 score_session.py <list.md> <session dir>        e.g. tools/desk-test/live-test-e2e-50.md projects/integration_harden2/sessions/<latest>"""
-import json, re, sys, os
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"), "recognizer"))
 from recognizer import hebnum_to_digits

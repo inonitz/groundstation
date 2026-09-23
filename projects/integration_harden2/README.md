@@ -24,14 +24,16 @@ in place. Python speaks the frozen ApiServer wire — no C++ FMU engine in the l
 
 | path | role |
 |---|---|
-| control/ | transcript -> safety tier, deterministic: commands.py (emergency/override/resume classifier, the emergency-regex source of truth), router.py (dispatch), dji_wire.py (frozen-wire client, loopback-guarded) |
-| audio/ | voice I/O channels: ros2_asr.py (ROS2 transcript subscriber), phone_asr.py (phone-as-mic REST+TCP inlet, deduped), tts_io.py (TTS outlet: phone /tts, local phonikud fallback). ASR itself is EXTERNAL (asr_node + sttserv) |
-| video/ | camera_stream.py (every frame source behind a cv2.VideoCapture-like surface), video_watchdog.py (stall monitor + gst respawn) |
+| control/ | transcript -> safety tier, deterministic: commands.py (emergency/override/resume classifier), router.py (dispatch), dji_wire.py (the command client: status codes, loopback-guarded; starts the mock), kill.py (the M kill switch) |
+| audio/ | voice I/O: ros2_asr.py (ROS2 transcript subscriber; starts the whisper ASR server + keyboard hook), phone_asr.py (phone-as-mic REST+TCP inlet), tts_io.py (TTS: phone /tts with recovery, or offline phonikud) |
+| video/ | camera_stream.py (every frame source behind a cv2.VideoCapture-like surface; starts the gstreamer receiver; the stall guard that restarts it) |
 | recognizer/ | the Hebrew Recognizer: ONE Gemma call types + plans + names the target (own README) |
-| perception2/ | the DEFAULT perception engine: one SAM3-nf4 model (own README) |
-| perception/ | the non-default OmDet+SAM2.1 engine, kept behind `SCENE_SEG=omdet` (own README) |
-| test/ | wiring tests (models faked) + live_mock_smoke.py (the safety tiers over real HTTP vs the mock) |
-| top-level glue | mvd.py (the app), config/ (package: constants.py baked values + defaults.py env-overridable), run.sh, run_llama_server.sh |
+| perception2/ | vision: the SAM3 backend, the engine, the one-consumer task queue, text parsing, concepts, counting, verify, the Gemma vision prompt (own README) |
+| gemma/ | keeps the ONE Gemma server alive (server.py) and gives the one client to it (client.py) |
+| system/ | status.py (the status board every system reports into) + supervisor.py (starts, watches and restarts every process) |
+| config/ | constants.py (baked values) + defaults.py (env-overridable); the one home of every setting |
+| test/ | one test file per package (audio, control, gemma, perception2, recognizer, system, video) + mvd, overlay, session_log |
+| top-level | mvd.py (the app), overlay.py (camera + status + chat screen), session_log.py (the recording), fatal.py (die + crash hooks), run.sh (launches the app) |
 
 ## Data flow
 
@@ -63,7 +65,6 @@ python3 -m pytest /root/groundstation/projects/integration_harden2/test/ -q     
 python3 /root/groundstation/projects/integration_harden2/recognizer/recognizer.py   # Recognizer self-test
 python3 /root/groundstation/projects/integration_harden2/perception2/sam3_backend.py # SAM3 backend smoke test
 cd /root/groundstation/projects/integration_harden2 && python3 -m video.camera_stream 0   # webcam frames, no ROS
-python3 /root/groundstation/projects/integration_harden2/test/live_mock_smoke.py    # safety tiers vs the mock
 ```
 After a container rebuild run `bash /root/groundstation/tools/devenv/install-runtime-deps.sh`
 (the mock needs aiohttp); `bash /root/groundstation/tools/preflight.sh` checks all of it.
@@ -78,9 +79,9 @@ PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden2/run.sh up dj
 ```
 `dji` video flows gstreamer_rx -> camera/stream -> CameraStream (sole :5600 client).
 
-Panes (tmux windows): `vlm` (the Gemma 4 E4B server, :18090) · `keys` · `asr` · (`gst` + `dog`
-in dji mode) · `app` · (`mock` in mock mode). The model server is `run_llama_server.sh`; it runs
-Gemma by default (`MVD_PLANNER=qwen3vl` selects the legacy Qwen3-VL server, not the default).
+Panes (tmux windows): `keys` · `asr` · (`gst` + `dog` in dji mode) · `app` · `vlm` · (`mock` in mock
+mode). The app starts Gemma 4 E4B (:18090) itself, through its process supervisor (gemma/server.py);
+the `vlm` pane only shows Gemma's log.
 
 External binaries: `build/release/shared/dji/bin/llm_to_action_{gstreamer_rx,asr_server,keyboard_hook}`.
 
@@ -88,8 +89,8 @@ External binaries: `build/release/shared/dji/bin/llm_to_action_{gstreamer_rx,asr
 
 # REAL FLIGHT — runbook (HUMAN runs every motor command)
 
-**Status:** control path re-verified on the mock 2026-09-02 (live_mock_smoke: the safety tiers,
-real HTTP). **Never flown on real hardware.** Treat the first flight as a bring-up, not a demo.
+**Status:** the old mock smoke script was deleted 2026-09-22 (it tested a retired English tier). The
+webcam mock test is the next end-to-end check. **Never flown on real hardware.** Treat the first flight as a bring-up, not a demo.
 
 ## Pre-flight (all required — kill procedure is in CLAUDE.md)
 - Battery > 30%, RC on, phone on the drone hotspot, app **API Server ON**.
