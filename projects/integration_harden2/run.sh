@@ -17,18 +17,12 @@ export TZ="${TZ:-Asia/Jerusalem}"
 # ------------------------------------------------------------------ config
 HERE="$(cd "$(dirname "$0")" && pwd)"
 BIN="$(cd "$HERE/../.." && pwd)/build/release/shared/dji/bin"
-MOCK=/root/groundstation/tools/dji_mock/mock_apiserver.py      # shared DJI API test double
 ROS_SETUP=/opt/ros/jazzy/setup.bash
 SESSION=mvd
 VLM_PORT=18090
 OUR_PORTS=(18090 8079 8080 5600)                               # Gemma, mock, phone, gstreamer_rx
 RUN_ROOT="${DESK_TEST_LOGDIR:-$(cd "$HERE/../.." && pwd)/logs/runs}"
 SEG=sam3
-ASR_MODEL="${ASR_MODEL_PATH:-/root/models/asr/ivrit_ai/whisper-large-v3-turbo/ggml-model-q5_k.bin}"
-ASR_BACKEND="${ASR_BACKEND:-whisper-whisper}"
-ASR_LANGUAGE="${ASR_LANGUAGE:-he}"
-GEMMA_GGUF=/root/models/vlm/Gemma-4-E4B/gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf
-GEMMA_MMPROJ=/root/models/vlm/Gemma-4-E4B/mmproj-BF16.gguf
 
 log(){ echo "[run] $*"; }
 die(){ echo "[run] ERROR: $*" >&2; exit 1; }
@@ -56,7 +50,7 @@ make_camera_nodes(){   # a camera plugged in after the container started has no 
 kill_stack(){
     local name pp
     for name in mvd.py llm_to_action_asr_server llm_to_action_keyboard_hook \
-                llm_to_action_gstreamer_rx llama-server video.video_watchdog mediamtx mock_apiserver.py; do
+                llm_to_action_gstreamer_rx llama-server mediamtx mock_apiserver.py; do
         pkill -9 -f "$name" 2>/dev/null || true
     done
     for pp in $(tmux list-panes -s -t "$SESSION" -F '#{pane_pid}' 2>/dev/null); do
@@ -112,6 +106,9 @@ cmd_preflight(){
     done
 
     echo "== models =="
+    local ASR_MODEL GEMMA_GGUF GEMMA_MMPROJ    # config/ is the one home of every path
+    read -r ASR_MODEL GEMMA_GGUF GEMMA_MMPROJ < <(cd "$HERE" && python3 -c \
+        'import config; print(config.ASR_MODEL_PATH, config.GEMMA_MODEL_PATH, config.GEMMA_MMPROJ_PATH)')
     [ -f "$ASR_MODEL" ] && _ok "ASR: $(basename "$ASR_MODEL")" || _bad "ASR model MISSING: $ASR_MODEL"
     local m
     for m in "$GEMMA_GGUF" "$GEMMA_MMPROJ"; do
@@ -154,7 +151,6 @@ cmd_up(){
 
     local run_dir="$RUN_ROOT/$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$run_dir"; ln -sfn "$run_dir" "$RUN_ROOT/latest"
-    touch "$run_dir/mock_commands.log"
     log "logs -> $run_dir"
 
     # --- control wire target ---
@@ -187,11 +183,7 @@ BANNER
     # --- fresh slate, then the mock ---
     kill_stack; free_ports
     wait_port "$VLM_PORT" down 12 || die "port $VLM_PORT still held; see: ss -tlnp | grep $VLM_PORT"
-    if [ "$control" = mock ]; then
-        MOCK_CMD_LOG="$run_dir/mock_commands.log" setsid python3 "$MOCK" 127.0.0.1 8079 >"$run_dir/mock.log" 2>&1 &
-        wait_port 8079 up 25 || die "mock did not bind 8079 (see $run_dir/mock.log)"
-        log "mock control up on 127.0.0.1:8079"
-    fi
+    # the app starts every process itself (Gemma, ASR, keys, gstreamer, mock) through its supervisor
 
     # --- session dir (recording lands here) ---
     local session_dir="${MVD_SESSIONS_ROOT:-$(cd "$HERE/../.." && pwd)/logs/sessions}/session-$(date +%Y%m%d-%H%M%S)-$(hostname)"
@@ -199,6 +191,10 @@ BANNER
     log "session -> $session_dir"
 
     # --- the app pane's env, written once (one export per line, quoting-safe) ---
+    # PHONE_IP means the PHONE (video + real control). Mock control is always 127.0.0.1 inside config, so
+    # PHONE_IP is exported only in real mode; exporting the mock's 127.0.0.1 broke the video (review R3).
+    local phone_export=""
+    [ "$control" = real ] && phone_export="export PHONE_IP=$wire_host"
     local app="$run_dir/app.sh"
     cat > "$app" <<APP
 #!/usr/bin/env bash
@@ -206,9 +202,10 @@ source $ROS_SETUP
 cd $HERE
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export SCENE_TMUX_SESSION=$SESSION SCENE_SEG=$SEG
-export SCENE_TTS="${SCENE_TTS:-phone}" SCENE_BG="${SCENE_BG:-off}"
+export SCENE_TTS="${SCENE_TTS:-phone}"
 export MVD_SESSION_DIR="$session_dir"
-export CONTROL=$control PHONE_IP=$wire_host   # config derives the control wire from this one decision
+export CONTROL=$control   # config derives the control wire from this one decision
+$phone_export
 export VIDEO="$video" WEBCAM_DEV="${WEBCAM_DEV:-0}"   # config derives the source from VIDEO
 export DISPLAY="${DISPLAY:-:0}" PULSE_SERVER="${PULSE_SERVER:-unix:/tmp/pulse-socket}"
 sleep 3
@@ -216,29 +213,20 @@ exec python3 mvd.py
 APP
     chmod +x "$app"
 
-    # --- C++ pane command strings ---
-    local ld="export LD_LIBRARY_PATH=$BIN:\$LD_LIBRARY_PATH"
-    local rec="" cap=""
-    [ "${ASR_RECORD:-1}" = 1 ] && rec="--record --recordDir=$session_dir/asr_clips"
-    [ -n "${ASR_CAPTUREID:-}" ] && cap="--captureid=$ASR_CAPTUREID"
-    local pulse="${PULSE_SERVER:-unix:/tmp/pulse-socket}"
-    local phone; phone="$(phone_ip)"
-
     # --- the tmux stack, DETACHED (this returns; the app self-tears-down on quit) ---
-    tmux new-session -d -s "$SESSION" -n vlm "bash -c '$HERE/run_llama_server.sh; echo [vlm exited]; exec bash'"
-    tmux new-window -t "$SESSION" -n keys "bash -c 'source $ROS_SETUP && $ld && $BIN/llm_to_action_keyboard_hook; echo [keys exited]; exec bash'"
-    tmux new-window -t "$SESSION" -n asr  "bash -c 'source $ROS_SETUP && $ld PULSE_SERVER=$pulse && $BIN/llm_to_action_asr_server --backend=$ASR_BACKEND --model=$ASR_MODEL --fa --language=$ASR_LANGUAGE --threads=1 --gid=0 $cap $rec; echo [asr exited]; exec bash'"
-    if [ "$video" = dji ]; then
-        tmux new-window -t "$SESSION" -n gst "bash -c 'source $ROS_SETUP && $ld && $BIN/llm_to_action_gstreamer_rx --dji $phone; echo [gst exited]; exec bash'"
-        tmux new-window -t "$SESSION" -n dog "bash -c 'source $ROS_SETUP && cd $HERE && SCENE_TMUX_SESSION=$SESSION python3 -m video.video_watchdog; echo [dog exited]; exec bash'"
-    fi
-    tmux new-window -t "$SESSION" -n app "bash -c '$app; echo [app exited]; exec bash'"
-    [ "$control" = mock ] && tmux new-window -t "$SESSION" -n mock "bash -c 'tail -n +1 -F $run_dir/mock_commands.log; exec bash'"
+    # The app starts and supervises every process; each other pane only SHOWS a process log.
+    tail_pane(){ tmux new-window -t "$SESSION" -n "$1" "bash -c 'touch $2; tail -n +1 -F $2; exec bash'"; }
+    tmux new-session -d -s "$SESSION" -n app "bash -c '$app; echo [app exited]; exec bash'"
+    tail_pane vlm "$session_dir/proc-gemma.log"
+    tail_pane asr "$session_dir/proc-asr.log"
+    tail_pane keys "$session_dir/proc-keys.log"
+    [ "$video" = dji ] && tail_pane gst "$session_dir/proc-gstreamer.log"
+    [ "$control" = mock ] && tail_pane mock "$session_dir/mock_commands.log"
     tmux select-window -t "$SESSION:app"
 
     # --- mirror each pane to its own log ---
     local w
-    for w in vlm keys asr gst dog app; do
+    for w in app; do
         tmux pipe-pane -o -t "$SESSION:$w" "cat >> $run_dir/$w.log" 2>/dev/null || true
     done
 
@@ -276,14 +264,19 @@ cmd_status(){
         echo "  $SESSION ALIVE: $(tmux list-windows -t "$SESSION" -F '#{window_name}' 2>/dev/null | paste -sd, -)"
     else echo "  $SESSION not running"; fi
     [ -d "$run_dir" ] || { echo "(no run dir at $run_dir)"; return 0; }
+    # the app writes every process log into its session dir; the run's app.sh names that dir
+    local sess; sess="$(grep -o 'MVD_SESSION_DIR="[^"]*"' "$run_dir/app.sh" 2>/dev/null | cut -d'"' -f2)"
+    echo "-- session: ${sess:-<unknown>} --"
     echo "-- last ASR transcripts --"
-    [ -f "$run_dir/asr.log" ] && grep -aiE "text|transcri|heard|>" "$run_dir/asr.log" 2>/dev/null | tail -5 | sed 's/^/    /' || echo "    <none>"
+    [ -f "$sess/proc-asr.log" ] && grep -aiE "text|transcri|heard|>" "$sess/proc-asr.log" 2>/dev/null | tail -5 | sed 's/^/    /' || echo "    <none>"
     echo "-- last mock REST commands --"
-    [ -f "$run_dir/mock_commands.log" ] && tail -8 "$run_dir/mock_commands.log" | sed 's/^/    /' || echo "    <none>"
+    [ -f "$sess/mock_commands.log" ] && tail -8 "$sess/mock_commands.log" | sed 's/^/    /' || echo "    <none>"
     # ported from the retired tools/desk-test/status.sh
     _sig(){ local f="$run_dir/$1"; shift; local lbl="$1"; shift; if [ -f "$f" ]; then echo "  $lbl: $(grep -aE "$*" "$f" 2>/dev/null | tail -1 || echo "<none>")"; else echo "  $lbl: <no $1>"; fi; }
-    echo "-- app wiring --";  _sig app.log router "drone router \(ON\|DISABLED\)"; _sig app.log PhoneEars "PhoneEars|ASR"
-    echo "-- video --";       _sig gst.log gst "frame|fps|EOS|error|connect"; _sig dog.log dog "stall|reconnect|ok|frames"
+    echo "-- app wiring --";  _sig app.log router "drone router ON"; _sig app.log phone "\\[status\\] phone speech"
+    echo "-- video --";       _sig app.log video "\\[status\\] (video|gstreamer)"
+    [ -f "$sess/proc-gstreamer.log" ] && echo "  gst: $(grep -aE 'frame|fps|EOS|error|connect' "$sess/proc-gstreamer.log" | tail -1)"
+    echo "-- process states (the app's status board) --"; _sig app.log last "\\[status\\]"
     echo "-- phone gate --";  local ip; ip="$(phone_ip)"; if [ -n "$ip" ]; then echo "  $ip:8080/status/ -> $(curl -s -m 3 -o /dev/null -w "%{http_code}" "http://$ip:8080/status/" 2>/dev/null || echo 000)"; else echo "  (no phone IP)"; fi
     echo "-- cameras (WEBCAM_DEV=<n>; the running app holds its own) --"; make_camera_nodes; python3 "$HERE/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
 }

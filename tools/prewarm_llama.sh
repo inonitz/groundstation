@@ -2,7 +2,7 @@
 # prewarm_llama.sh -- fire dummy image inferences at the VLM so the FIRST real perception query
 # doesn't eat the cold vision-pipeline spike (measured 1.3s..4.8s cold on Vulkan). The recurring
 # per-new-frame cost (~1.2s here) is inherent and UNCHANGED by this -- prewarm only hides the
-# one-time warmup. Run AFTER run_llama_server.sh is up; e.g. run_mvd backgrounds this after the VLM pane.
+# one-time warmup. Run AFTER the app has started Gemma (its supervisor reports gemma UP).
 set -euo pipefail
 PORT="${SCENE_LLAMA_PORT:-18090}"
 URL="http://127.0.0.1:${PORT}"

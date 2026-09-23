@@ -1,33 +1,22 @@
-"""harden2 OVERRIDABLE settings — DRAFT (2026-09-10, completed 2026-09-11), not yet wired into the app.
+"""harden2 OVERRIDABLE settings — the live default source (config/__init__.py imports this).
 
 Variables that HAVE a default but we change per run. Each reads an env var and falls back to the
 default here, so there is one place to see and edit defaults, and a launch can still override any of
 them without editing a script. Fixed values live in config_constants.py. Names describe intent; the
 env keys in brackets are what you type at launch.
 """
-import os, socket, subprocess, time
+import os, socket, time
 from .constants import MOCK_WIRE_PORT, REAL_WIRE_PORT
-
-def _default_route_ip():
-    """The single device connected to the laptop = the WiFi hotspot gateway (the phone). Always derive
-    it; never hardcode. Export PHONE_IP only to force a value."""
-    try:
-        for line in subprocess.run(["ip", "route"], capture_output=True, text=True).stdout.splitlines():
-            if line.startswith("default"):
-                return line.split()[2]
-    except Exception:
-        pass
-    return None
 
 # ── Run context (the handful you actually pass) ────────────────────────────────────────────
 VIDEO_SOURCE        = os.environ.get("VIDEO", "webcam")        # [VIDEO]   webcam | dji
 CONTROL_TARGET      = os.environ.get("CONTROL", "mock")        # [CONTROL] mock | real  (real = HUMAN-ONLY)
 WEBCAM_DEVICE_INDEX = int(os.environ.get("WEBCAM_DEV", "0"))   # [WEBCAM_DEV] 0 = lid camera, 2 = C920
-PHONE_IP            = os.environ.get("PHONE_IP") or _default_route_ip()   # [PHONE_IP] always derived; export to force
 
 # ── Perception knobs we actually tune ───────────────────────────────────────────────────────
 RELATIVE_CONFIDENCE_GATE = float(os.environ.get("SCENE_HL_REL", "0.65"))  # [SCENE_HL_REL] lower (0.45) for crowded scenes
 HIGHLIGHT_PRESENCE_GATE  = os.environ.get("SCENE_GATE", "sam3")           # [SCENE_GATE] sam3 | either | vlm (default sam3)
+HIGHLIGHT_VERIFY         = os.environ.get("SCENE_VERIFY", "on")          # [SCENE_VERIFY] on | off: split-and-verify related nouns (perception2/verify.py); default ON (2026-09-20 ruling)
 
 # ── Speech (phone owns TTS; these are the tunables + the desk-debug fallbacks) ───────────────
 TTS_HOST         = ""        # always derived from the phone/video host (tts_io); not an env knob
@@ -48,10 +37,10 @@ ASR_CAPTURE_DEVICE = os.environ.get("ASR_CAPTUREID")                      # [ASR
 # ── Recording + session (ONE root; clips and logs derive from it) ─────────────────────────
 RECORD_SESSION = os.environ.get("RECORD", "1") != "0"         # [RECORD] record the whole session (utterances + clips)
 _HERE          = os.path.dirname(os.path.abspath(__file__))
-SESSIONS_ROOT  = os.path.abspath(os.path.join(_HERE, "..", "..", "logs", "sessions"))   # repo logs/, NOT the frozen tree; fixed constant
+SESSIONS_ROOT  = os.path.abspath(os.path.join(_HERE, "..", "..", "..", "logs", "sessions"))   # <repo>/logs/sessions (config/ is 3 deep)
 SESSION_DIR    = os.environ.get("MVD_SESSION_DIR") or os.path.join(                      # [MVD_SESSION_DIR]
                      SESSIONS_ROOT, "session-%s-%s" % (time.strftime("%Y%m%d-%H%M%S"), socket.gethostname()))
-CLIPS_DIR      = os.path.join(SESSION_DIR, "clips")           # derived from SESSION_DIR (was ASR_RECORD_DIR)
+CLIPS_DIR      = os.path.join(SESSION_DIR, "asr_clips")       # derived from SESSION_DIR; the ASR server records here, session_log reads it
 LOG_DIR        = SESSION_DIR   # fixed: derived from SESSION_DIR
 
 # Derived, NOT stored (functions; computed from the above so they can never drift):
@@ -75,8 +64,7 @@ def wire_target(control_target=None):
         return (PHONE_IP, REAL_WIRE_PORT, True)
     return ("127.0.0.1", MOCK_WIRE_PORT, False)
 
-# ── Host-derived resolvers (functions + the font path; computed per machine, never stored) ──
-import os.path as _op
+# ── Host-derived resolvers (functions; computed per machine, never stored) ──
 
 def resolve_device():
     """Best available compute device, vendor-neutral, CPU fallback, never raises. torch.cuda covers
@@ -84,15 +72,12 @@ def resolve_device():
     dev = os.environ.get("SCENE_DEVICE", "")
     if dev:
         return dev
-    try:
-        import torch
-        if torch.cuda.is_available():
-            return "0"
-        mps = getattr(torch.backends, "mps", None)
-        if mps is not None and mps.is_available():
-            return "mps"
-    except Exception:
-        pass
+    import torch   # a hard dependency here; a missing torch is a real failure, not a silent cpu fallback
+    if torch.cuda.is_available():
+        return "0"
+    mps = getattr(torch.backends, "mps", None)
+    if mps is not None and mps.is_available():
+        return "mps"
     return "cpu"
 
 def resolve_torch_device():
@@ -104,24 +89,20 @@ def default_gateway():
     """The workstation's WIRELESS default-route gateway = the phone on its hotspot. Returns None when
     there is no wireless default route (callers MUST handle None; a literal 'None' in a command is a
     real bug we shipped once). One home for the lookup."""
-    routes = []
-    try:
-        for line in open("/proc/net/route").readlines()[1:]:
-            f = line.split()
-            if len(f) > 2 and f[1] == "00000000":
-                routes.append((f[0], ".".join(str(int(f[2][i:i + 2], 16)) for i in (6, 4, 2, 0))))
-    except Exception:
+    if not os.path.exists("/proc/net/route"):   # no proc route table -> no gateway
         return None
+    routes = []
+    with open("/proc/net/route") as route_file:
+        lines = route_file.readlines()[1:]
+    for line in lines:
+        fields = line.split()
+        if len(fields) > 2 and fields[1] == "00000000":
+            routes.append((fields[0], ".".join(str(int(fields[2][i:i + 2], 16)) for i in (6, 4, 2, 0))))
     for iface, gw in routes:
         if os.path.isdir("/sys/class/net/" + iface + "/wireless"):
             return gw
     return None
 
-def resolve_he_font():
-    """A monospace font file that has Hebrew glyphs. DejaVuSansMono has NONE (renders boxes); FreeMono
-    does. Fixed; not an env knob."""
-    for c in ("/usr/share/fonts/truetype/freefont/FreeMono.ttf",
-              "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):
-        if c and _op.exists(c):
-            return c
-    return "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+PHONE_IP = os.environ.get("PHONE_IP") or default_gateway()   # [PHONE_IP] the phone = the WIRELESS gateway; export to force (review R15)
+
+
