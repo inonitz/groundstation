@@ -1,0 +1,76 @@
+digraph sam3_controlflow {
+    rankdir=TB;
+    splines=ortho;
+    compound=true;
+    bgcolor="white";
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+          margin="0.20,0.13", color="#8a8f98", penwidth=1.2];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#5b6069", penwidth=1.2];
+    nodesep=0.55;
+    ranksep=0.62;
+
+    cmd   [label="Voice command\n~phone / ROS ASR", fillcolor="#d6e4ff"];
+    disp  [label="Dispatch\nparse the text, pick the task type", fillcolor="#d6e4ff"];
+    enqc  [label="Enqueue COUNT\none-shot, high priority", fillcolor="#d6e4ff"];
+    enqh  [label="Enqueue HIGHLIGHT\nnew target, high priority", fillcolor="#d6e4ff"];
+    clr   [label="Enqueue CLEAR\ndrop a record", fillcolor="#d6e4ff"];
+    gemma [label="VLM ask: Gemma\nanswer / describe\nnot a SAM3 path", fillcolor="#e6d6f7"];
+
+    queue [label="Priority task queue\n• condition-variable, no poll\n• fresh command preempts refresh\n• one-shots + due refreshes",
+           fillcolor="#0e9aa7", fontcolor="#ffffff", color="#0b6b74", penwidth=2.2];
+
+    wloop [label="Worker: one consumer\nwait on CV, pop next task", fillcolor="#cdefd6"];
+    backend [label="SAM3 forward\n• every detect, budget-gated\n• box + mask, serial, <=2 / s\n~Sam3Backend", fillcolor="#bfe8cb"];
+    gpu     [label="Shared GPU\nGemma + whisper resident\nso ~2 forwards / s", fillcolor="#f7d0d0"];
+
+    tcount   [label="COUNT body\n• 3 SAM3 detects @0.5\n• dedup + median\n• write n, speak", fillcolor="#cdefd6"];
+    tgate    [label="GATE body\n1 SAM3 detect -> present?", fillcolor="#cdefd6"];
+    trefresh [label="REFRESH body\n1 SAM3 detect -> found?", fillcolor="#cdefd6"];
+
+    mkrec  [label="Create record\nbox, mask, give-up=8s", fillcolor="#fdeecb"];
+    absent [label="Announce: not found", fillcolor="#fdeecb"];
+    upd    [label="Update box + mask\nreset give-up", fillcolor="#fdeecb"];
+    give   [label="within 8s\ngive-up?", fillcolor="#eef0f2"];
+    hold   [label="Hold last box\nreschedule", fillcolor="#fdeecb"];
+    drop   [label="Drop record\nannounce miss", fillcolor="#fdeecb"];
+    sched  [label="Schedule next refresh", fillcolor="#cdefd6"];
+
+    state   [label="Highlight records + count\nbox, mask, phrase, give-up clock", fillcolor="#fdeecb"];
+    display [label="Display loop (every frame)\nread state, draw box + mask\nnever calls SAM3", fillcolor="#fdeecb"];
+
+    cmd  -> disp;
+    disp -> enqc  [label="count"];
+    disp -> enqh  [label="highlight"];
+    disp -> clr   [label="clear"];
+    disp -> gemma [label="ask"];
+    enqc -> queue;
+    enqh -> queue;
+    clr  -> queue;
+
+    queue -> wloop    [label="signal / pop"];
+    wloop -> backend  [style=dashed, color="#3f8f5f"];
+    backend -> gpu    [label="shares", style=dashed, color="#b06060"];
+    wloop -> tcount   [label="COUNT"];
+    wloop -> tgate    [label="GATE"];
+    wloop -> trefresh [label="REFRESH (due)"];
+
+    tcount -> state [label="write n"];
+    tgate -> mkrec  [label="yes"];
+    tgate -> absent [label="no"];
+    mkrec -> state  [label="add record"];
+    mkrec -> sched;
+    trefresh -> upd  [label="yes"];
+    trefresh -> give [label="no"];
+    upd  -> state [label="update"];
+    upd  -> sched;
+    give -> hold  [label="yes"];
+    give -> drop  [label="no"];
+    hold -> sched;
+    drop -> state [label="remove"];
+    sched -> queue [label="re-enqueue refresh", constraint=false];
+    state -> display [label="read each frame"];
+
+    { rank=same; enqc; enqh; clr; }
+    { rank=same; tcount; tgate; trefresh; }
+    { rank=same; mkrec; upd; }
+}

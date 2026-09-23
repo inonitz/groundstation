@@ -3459,3 +3459,25 @@ These were pulled from docs now retired to stale, so the binding content survive
 - DictaLM stays the command path on CPU (99% commands) if a split is chosen; weak perception, CPU latency tail.
 - Direction: everything-on-GPU at Q4 does not fit; one of tgemma/whisper moves to CPU, or tgemma drops to Q3.
   (Superseded later by the harden2 single-Gemma-direct-Hebrew planner; kept here as the measured record.)
+
+
+## 2026-09-19 -- harden2 pre-freeze hardening: Gemma routing, crash-not-raise, swappable vision, doc pass
+
+- Config knobs collapsed to SCENE_TTS / CONTROL / VIDEO / RECORD; the rest are baked constants.
+- Command routing moved to the one Gemma call. The deterministic English BASIC verb tier was deleted;
+  classify() now returns EMERGENCY / OVERRIDE / RESUME / COMPLEX only. Gemma emits takeoff, land, fly_by,
+  spin_by, delay, gimbal_pitch, home, wave; a greeting becomes wave; follow/track/mark stay a camera
+  highlight. Manual mode refuses flight (Pipeline.flight_allowed) while perception still answers.
+  unified_bench held at 412/487 (was 410); zero false-fire on a non-command.
+- No exceptions in our own code: fatal.py::die prints a loud reason and crashes (os._exit). Our raises in
+  mvd/sam3_backend/llama/tts_io/camera_stream became die(); TTSConfigError was removed. Third-party errors
+  we must catch (aplay, model HTTP retries) stay caught.
+- The vision backend sits behind a contract (perception2/backend.py: VisionBackend Protocol + BACKENDS
+  registry). build_highlight picks the backend once from SCENE_SEG; an unknown name crashes. SAM3 is the
+  one backend today; another drops in without touching the engine.
+- SAM3 highlight over-detected: it emitted several nested boxes per object. detect() now merges overlaps
+  (IoU>0.5 or >70% containment), so one object draws one box. Caught by the webcam test.
+- run_llama_server.sh pinned to gemma4 (qwen3vl alternate removed). Translator servers + the census bench
+  removed; the live path has no translator.
+- Full documentation staleness audit + fixes: specs, harden2 and bench READMEs repointed to the live
+  system; CLAUDE.md links -> guidelines.md; 8 finished task docs archived to stale/.

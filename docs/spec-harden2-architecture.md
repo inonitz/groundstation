@@ -163,6 +163,18 @@ VIDEO=webcam|dji|rtmp · CONTROL=mock|real · WEBCAM_DEV=<n> · SCENE_TTS=phone|
 SCENE_HL_REL · SCENE_SAM3_PERIOD · SCENE_HL_GIVEUP · SCENE_BG=off|<yolo.pt>. Everything else is a config constant.
 Boot: `VIDEO=webcam WEBCAM_DEV=2 SCENE_TTS=off bash projects/integration_harden2/run.sh up webcam mock`.
 
+## Conventions (2026-09-19)
+
+- The no-exceptions rule lives in `guidelines.md`; harden2 follows it. Our error conditions call
+  `fatal.py::die(msg)` (a loud crash), never a raise. Third-party code that throws is still caught.
+- The vision backend sits behind a contract, chosen once at startup. `perception2/backend.py` holds the
+  `VisionBackend` Protocol (two calls: `detect(frame, phrase, conf, topk)` and `mask_for_box(frame, box)`) and
+  a `BACKENDS` name->factory registry. `build_highlight` reads `SCENE_SEG`, builds that one backend, and the
+  engine calls it directly. The choice is one-time, not a per-frame dispatch. SAM3 is the only backend today;
+  a new one is a class plus one line in `BACKENDS`. An unknown `SCENE_SEG` crashes with a clear reason.
+- SAM3 returns one box per object. `detect()` merges overlapping or contained boxes (IoU>0.5 or >70%
+  containment) so a single object draws a single box.
+
 ## integration_tts — the frozen fallback
 
 `integration_tts` is the proven English MVD kept as the demo safety net; changes never land there.

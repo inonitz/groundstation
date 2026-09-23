@@ -1,0 +1,38 @@
+digraph sam3_worker_arch {
+    rankdir=TB;
+    splines=ortho;
+    compound=true;
+    bgcolor="white";
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+          margin="0.24,0.16", color="#8a8f98", penwidth=1.2];
+    edge [fontname="DejaVu Sans", fontsize=10, color="#5b6069", penwidth=1.3];
+    nodesep=0.45;
+    ranksep=0.55;
+
+    voice    [label="Voice commands\n• Phone ASR\n• ROS mic ASR\n~audio/phone_asr.py", fillcolor="#d6e4ff"];
+    dispatch [label="Dispatch\n• parse the text\n• count / highlight / clear / ask\n~TextHandler.perceive()", fillcolor="#d6e4ff"];
+
+    queue    [label="SAM3 task queue\n• condition-variable, no poll\n• fresh command preempts refresh", fillcolor="#d9f2e6"];
+    worker   [label="SAM3 worker: one consumer\n• the only thread that calls SAM3\n• budget: 2 forwards / second",
+              fillcolor="#0e9aa7", fontcolor="#ffffff", color="#0b6b74", penwidth=2.2];
+    backend  [label="SAM3 backend\n• one forward = box + mask\n• serial on the GPU\n~perception2/Sam3Backend", fillcolor="#cdefd6"];
+
+    gpu      [label="Shared GPU\n• Gemma + whisper also resident\n• so SAM3 gets ~2 forwards/s", fillcolor="#f7d0d0"];
+    vlm      [label="VLM ask: Gemma\n• answer / describe questions\n• not a SAM3 path\n~perception2/vlm_client", fillcolor="#e6d6f7"];
+
+    state    [label="Highlight + count state\n• record per target: phrase, box, mask\n• drop at 8s give-up or clear", fillcolor="#fdeecb"];
+    display  [label="Display loop\n• draws latest box + mask each frame\n• never calls SAM3", fillcolor="#fdeecb"];
+
+    voice    -> dispatch;
+    dispatch -> queue   [label="count / highlight / clear"];
+    dispatch -> vlm     [label="ask"];
+    queue    -> worker  [label="one consumer"];
+    worker   -> backend [label="forward, 2/s max"];
+    worker   -> state   [label="box, mask, count"];
+    backend  -> gpu     [label="shares GPU", style=dashed, color="#b06060"];
+    state    -> display [label="read"];
+
+    { rank=same; queue; vlm; }
+    { rank=same; backend; state; }
+    { rank=same; gpu; display; }
+}
