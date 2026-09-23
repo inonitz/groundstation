@@ -7,7 +7,7 @@ import json, os, sys, glob, cv2, numpy as np
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "projects", "integration_harden2"))
 from perception2.sam3_backend import Sam3Backend
-from perception.engine import scale_vlm_box
+from perception2.engine import scale_vlm_box
 BENCH = os.path.join(ROOT, "tools", "bench", "sam3-mask-bench")
 
 
@@ -23,7 +23,7 @@ def main(src, out_dir):
         f = cv2.imread(paths[img])
         if f.shape[1] > 1280:
             s = 1280 / f.shape[1]; f = cv2.resize(f, (1280, int(f.shape[0] * s)))
-        ref = sam3.detect(f, ph, conf=0.5, topk=50)
+        _, ref = sam3.detect(f, ph, conf=0.5, topk=50)
         panels, said = [], {}
         for model in ("qwen3vl", "gemma4"):
             rr = [r for r in rows if r["model"] == model and r["image"] == img and r["phrase"] == ph]
@@ -32,7 +32,7 @@ def main(src, out_dir):
                 r = rr[0]
                 if r["vlm_present"]:
                     label = f"{model}: '{r['vlm_target']}'"
-                    for dd in sam3.detect(f, r["vlm_target"], conf=0.3, topk=20):
+                    for dd in sam3.detect(f, r["vlm_target"], conf=0.3, topk=20)[1]:
                         x1, y1, x2, y2 = dd["box"]; cv2.rectangle(pan, (x1, y1), (x2, y2), (60, 220, 60), 2)
                     if r.get("vlm_box"):
                         x1, y1, x2, y2 = scale_vlm_box(tuple(r["vlm_box"]), f.shape); cv2.rectangle(pan, (x1, y1), (x2, y2), (0, 230, 255), 3)

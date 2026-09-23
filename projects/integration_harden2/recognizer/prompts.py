@@ -1,5 +1,3 @@
-import json
-import re
 """Every prompt, grammar, and few-shot set the bench uses, in one place.
 Run `python3 prompts.py` after editing to regenerate PROMPTS.md (the owner-readable copy).
 APP_PROMPT = what the phone app ships today (reconstructed from SpeechResolving.kt:599-635,
@@ -8,6 +6,7 @@ few-shot pairs ride as chat turns, PLANNER_SHOTS_D). Planner calls carry WIRE_GR
 Translator calls: TRANSLATE_SYS + TRANSLATE_SHOTS + LINE_GRAMMAR for chat models; TranslateGemma
 uses its native template TGEMMA_PROMPT on /completion (its jinja is unparseable by llama-server);
 TGEMMA_REFINE is the measured-and-rejected draft-finalize experiment (round 6)."""
+import json
 
 # ---- app prompt, reconstructed. Scaffold: SpeechResolving.kt:599-635. Schema block:
 # ---- app's appendPropertyShortJson format (desc comment line, "name":  type, (optional) mark),

@@ -28,8 +28,8 @@ sys.path.insert(0, os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "in
 sys.path.insert(0, CMD_BENCH)
 import recognizer
 from bench import make_translator, plan
-from llama import LlamaServer, MODELS, QWEN3VL_EXTRA, PORT, port_up
-from perception.engine import parse_highlight
+from gemma.server import LlamaServer, MODELS, QWEN3VL_EXTRA, PORT, port_up   # QWEN3VL_EXTRA was removed 2026-09-19: this bench is already broken
+from perception2.text_parse import parse_highlight
 
 LINE_RE = re.compile(r"^\s*(\d+)\.\s*(?:NEW\s+)?(.+?)\s*->\s*(.+?)\s*(?:\|.*)?$")
 BIN = os.path.join(ROOT, "build", "release", "shared", "dji", "bin")

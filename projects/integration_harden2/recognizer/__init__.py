@@ -1,7 +1,8 @@
 """The Recognizer module. Functional code only; the benchmark lives in
 bench/hebrew-command-bench and is the development home (sync rule in README.md)."""
-from .recognizer import _nums_en, emergency
+from .recognizer import _nums_en, emergency, numbers_vs_mission, recognize_direct, register_imperative
 from .selftest import selftest
 from .pipeline import Pipeline
 
-from .recognizer import register_imperative, recognize_direct, numbers_vs_mission  # noqa: E402,F401 -- exported for the tests (2026-09-08)
+__all__ = ["_nums_en", "emergency", "numbers_vs_mission", "recognize_direct", "register_imperative",
+           "selftest", "Pipeline"]

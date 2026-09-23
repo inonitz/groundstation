@@ -14,8 +14,12 @@ and it does NOT generalize one class to another ('car' will not return a van). F
 concepts; the concept front-end (concept.py) builds those. A comma-separated phrase is treated as
 several concepts and their results are unioned -- the same convention OmDet uses.
 """
+import threading
+
 import torch
+
 import config
+from perception2.backend import DETECT_OK
 from PIL import Image
 
 MODEL_DIR = config.SAM3_MODEL_DIR
@@ -52,8 +56,8 @@ def _dedup_overlaps(dets, iou_thr=0.5, contain_thr=0.7):
 
 
 class Sam3Backend:
-    """detect(frame_bgr, phrase, conf) -> [{"label","conf","box"} ...] sorted by conf desc.
-    mask_for_box(frame_bgr, box) -> bool mask (HxW) or None. Both contracts match the engine's."""
+    """detect(frame_bgr, phrase, conf) -> (status, hits); hits = [{"label","conf","box"} ...] sorted by conf desc.
+    mask_for_box(frame_bgr, box) -> bool mask (HxW) or None. Contract: docs/spec-perception2-backend-contract.md."""
 
     def __init__(self, model_dir=MODEL_DIR, precision=config.SAM3_PRECISION, compile=False,
                  mask_threshold=0.5, lazy=False):
@@ -68,6 +72,9 @@ class Sam3Backend:
         self.model = None
         self.proc = None
         self._cache = {}          # {box_tuple: bool mask} for the frame detect() last ran on
+        # One SAM3 model is shared by the worker, the gate thread and the count thread. Serialize detect()
+        # and mask_for_box() so two forwards never run at once and the box->mask cache cannot be raced.
+        self._lock = threading.Lock()
         if not lazy:
             self._load()
 
@@ -108,29 +115,37 @@ class Sam3Backend:
         return boxes, masks, scores
 
     def detect(self, frame_bgr, phrase, conf=0.30, topk=8):
-        """Run SAM3 on each comma-separated concept, union the results, cache box->mask."""
-        if self.model is None:
-            self._load()
-        self._cache = {}
-        if not phrase:
-            return []
-        concepts = [c.strip() for c in phrase.split(",") if c.strip()] or [phrase]
-        pil = Image.fromarray(frame_bgr[:, :, ::-1])       # engine passes cv2 BGR; SAM3 wants RGB
-        dets = []
-        for concept in concepts:
-            boxes, masks, scores = self._run(pil, concept, conf)
-            for bx, mk, sc in zip(boxes, masks, scores):
-                x1, y1, x2, y2 = (int(v) for v in bx)
-                box = (x1, y1, x2, y2)
-                self._cache[box] = mk
-                dets.append({"label": concept, "conf": float(sc), "box": box})
-        dets.sort(key=lambda d: -d["conf"])
-        dets = _dedup_overlaps(dets)          # SAM3 emits nested boxes per object; keep one each
-        return dets[:topk]
+        """Run SAM3 on each comma-separated concept, union the results, cache box->mask.
+        Returns (DETECT_OK, hits). A GPU out-of-memory is fatal: die() (owner ruling 2026-09-22).
+        Serialized by self._lock: one forward at a time."""
+        with self._lock:
+            if self.model is None:
+                self._load()
+            self._cache = {}
+            if not phrase:
+                return DETECT_OK, []
+            concepts = [c.strip() for c in phrase.split(",") if c.strip()] or [phrase]
+            pil = Image.fromarray(frame_bgr[:, :, ::-1])   # engine passes cv2 BGR; SAM3 wants RGB
+            dets = []
+            for concept in concepts:
+                try:
+                    boxes, masks, scores = self._run(pil, concept, conf)
+                except torch.cuda.OutOfMemoryError as e:   # torch reports OOM only by a throw
+                    die(f"SAM3 ran out of GPU memory on {concept!r}: {e}")
+                for bx, mk, sc in zip(boxes, masks, scores):
+                    x1, y1, x2, y2 = (int(v) for v in bx)
+                    box = (x1, y1, x2, y2)
+                    self._cache[box] = mk
+                    dets.append({"label": concept, "conf": float(sc), "box": box})
+            dets.sort(key=lambda d: -d["conf"])
+            dets = _dedup_overlaps(dets)      # SAM3 emits nested boxes per object; keep one each
+            return DETECT_OK, dets[:topk]
 
     def mask_for_box(self, frame_bgr, box):
-        """Return the mask SAM3 already produced for this box in the last detect(). None on miss."""
-        return self._cache.get(tuple(box))
+        """Return the mask SAM3 already produced for this box in the last detect(). None on miss.
+        Under the same lock, so a read never races a concurrent detect() rebuilding the cache."""
+        with self._lock:
+            return self._cache.get(tuple(box))
 
 
 def _smoke():
@@ -139,7 +154,7 @@ def _smoke():
     img = "/root/groundstation/bench/sam3-mask-bench/candidates/img0.png"
     frame = cv2.imread(img)
     be = Sam3Backend()
-    dets = be.detect(frame, "window", conf=0.30)
+    _status, dets = be.detect(frame, "window", conf=0.30)
     ok = len(dets) > 0 and be.mask_for_box(frame, dets[0]["box"]) is not None
     m = be.mask_for_box(frame, dets[0]["box"]) if dets else None
     same = (m is not None and m.shape[:2] == frame.shape[:2])

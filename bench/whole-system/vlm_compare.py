@@ -17,8 +17,8 @@ BENCH = os.path.join(ROOT, "tools", "bench", "sam3-mask-bench")      # the image
 HARDEN = os.path.join(ROOT, "projects", "integration_harden2")
 BIN = os.path.join(ROOT, "build", "release", "shared", "dji", "bin")
 sys.path.insert(0, HARDEN)
-from perception import vlm_client
-from perception.engine import scale_vlm_box
+from perception2 import vlm_client
+from perception2.engine import scale_vlm_box
 from perception2.sam3_backend import Sam3Backend
 
 MODELS = {
@@ -121,7 +121,7 @@ def main():
         fr = frames[p]
         for ph in phrases + ["person"]:
             if (p, ph) in ref: continue
-            dets = sam3.detect(fr, ph, conf=0.5, topk=50)
+            _, dets = sam3.detect(fr, ph, conf=0.5, topk=50)
             ref[(p, ph)] = {"present": len(dets) > 0, "count": len(dets), "box": dets[0]["box"] if dets else None}
     print(f"[ref] done in {time.time()-t0:.0f} s", flush=True)
     del sam3

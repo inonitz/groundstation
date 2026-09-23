@@ -21,8 +21,15 @@ class Trace:
         self._n = 0
 
     def record(self, **fields):
+        """Append one line. -> True when written. A failed write is logged and never crashes a session
+        (the same policy as session_log: status, not an exception)."""
         self._n += 1
         fields["utterance"] = self._n
         fields["ts"] = round(time.time(), 3)
-        with open(self.path, "a") as f:
-            f.write(json.dumps(fields, ensure_ascii=False) + "\n")
+        try:
+            with open(self.path, "a") as f:
+                f.write(json.dumps(fields, ensure_ascii=False) + "\n")
+        except OSError as e:                      # the filesystem reports a failed write only by a throw
+            print(f"[trace] write failed: {self.path}: {e}", flush=True)
+            return False
+        return True

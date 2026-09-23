@@ -25,7 +25,7 @@ sys.path.insert(0, HERE)
 
 import recognizer
 # re-exposed for unified_bench.py (the single home for the llama-server config)
-from llama import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
+from gemma.server import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
 from cases_commands import CASES as CMD_CASES, VERBOSE_CASES, EMERGENCY_CASES
 from cases_perception import PERC100, SLANG20, check_refs
 

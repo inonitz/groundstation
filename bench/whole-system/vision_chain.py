@@ -38,7 +38,7 @@ def main(src, out):
     for r in rows:
         key = (r["image"], r["phrase"])
         if key not in ref:
-            ref[key] = sam3.detect(frame(r["image"]), r["phrase"], conf=0.5, topk=50)
+            ref[key] = sam3.detect(frame(r["image"]), r["phrase"], conf=0.5, topk=50)[1]
         dets = ref[key]; present = len(dets) > 0
         k = f"{r['model']}/{r['mode']}"; p = per.setdefault(k, {"gate": 0, "n": 0, "pres_n": 0, "said": 0, "hit": 0, "empty": 0, "fb": 0, "fbn": 0})
         p["n"] += 1; p["gate"] += (r["vlm_present"] == present); s3 = "-"; fb = "-"
@@ -46,7 +46,7 @@ def main(src, out):
             p["pres_n"] += 1
             if r["vlm_present"]:
                 p["said"] += 1
-                vd = sam3.detect(frame(r["image"]), r["vlm_target"], conf=0.3, topk=20) if r["vlm_target"] else []
+                vd = sam3.detect(frame(r["image"]), r["vlm_target"], conf=0.3, topk=20)[1] if r["vlm_target"] else []
                 if not vd:
                     p["empty"] += 1; s3 = "NOTHING"
                 else:

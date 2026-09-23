@@ -36,7 +36,7 @@ def worker(name, out):
             be.detect(frame, "person", conf=0.30)
         ms = []
         for _ in range(REPS):
-            t = time.time(); d = be.detect(frame, "person", conf=0.30); ms.append((time.time()-t)*1000)
+            t = time.time(); _, d = be.detect(frame, "person", conf=0.30); ms.append((time.time()-t)*1000)
         res["warm_detect_p50_ms"] = round(float(np.percentile(ms, 50)), 1)
         res["vram_mib"] = round(torch.cuda.max_memory_allocated()/2**20)
         res["dets"] = len(d)

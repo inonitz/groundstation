@@ -35,7 +35,7 @@ def detect(out, floor):
         fr = load(p)
         if fr is None: continue
         for ph in phrases:
-            t0 = time.time(); dets = sam3.detect(fr, ph, conf=floor, topk=50); ms = (time.time() - t0) * 1000
+            t0 = time.time(); _, dets = sam3.detect(fr, ph, conf=floor, topk=50); ms = (time.time() - t0) * 1000
             scores = sorted([float(d.get("score", d.get("conf", 0.0))) for d in dets], reverse=True)
             rows.append({"image": os.path.basename(p), "set": group, "phrase": ph, "scores": scores,
                          "max": scores[0] if scores else 0.0, "ms": round(ms), "top_box": [int(v) for v in dets[0]["box"]] if dets else None})

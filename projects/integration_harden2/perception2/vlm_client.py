@@ -1,49 +1,18 @@
-import os
-"""llama-server client for the reasoning model (the VLM; the model is chosen in run_llama_server.sh). Sends the current frame + the
-detector's findings + the user's question. Returns a spoken-style answer and, when the user asked
-to find something, a target phrase plus the VLM's own box guess. Never raises.
-Moved verbatim from vlm.py on 2026-09-02; parse_reply() split out of ask() so the text parsing
-is testable without a server."""
-import base64, json, os, re, subprocess, time, cv2, requests
+"""Gemma vision questions: frame + detector hints + the user's question -> a spoken-style answer, and,
+for a find/highlight request, a target phrase plus Gemma's own box guess.
+
+The prompt and the reply parsing are perception's own. Talking to Gemma goes through the ONE shared
+client (gemma/client.py); keeping Gemma alive is the gemma package's job, not this file's.
+parse_reply() is pure text, so it is testable offline.
+"""
+import base64
+import re
+
+import cv2
+
 import config
+from gemma.client import request
 
-
-def _server_up():
-    try:
-        r = requests.get(config.LLAMA_URL + "/health", timeout=2)
-        if r.status_code == 200:
-            return True
-        if r.status_code == 503:
-            return False
-        return requests.get(config.LLAMA_URL + "/v1/models", timeout=2).status_code == 200
-    except Exception:
-        return False
-
-
-def ensure_server(wait=240):
-    """Make sure llama-server is answering config.LLAMA_URL; launch run_llama_server.sh if not, and wait
-    for the model to load. Safe against double-launch: if one is already starting (e.g. run_demo's tmux
-    pane), just wait instead of spawning a second."""
-    if _server_up():
-        return True
-    here = os.path.dirname(os.path.abspath(__file__))
-    script = os.path.join(here, "run_llama_server.sh")
-    already = subprocess.run(["pgrep", "-f", "llama-server"], capture_output=True).returncode == 0
-    if not already:
-        if not os.path.exists(script):
-            print("[vlm] llama-server down and run_llama_server.sh missing:", script, flush=True); return False
-        print("[vlm] llama-server not running -> launching it (model load ~30-60s)...", flush=True)
-        with open("/tmp/integration_vlm.log", "a") as log:
-            subprocess.Popen(["bash", script], stdout=log, stderr=log,
-                             stdin=subprocess.DEVNULL, start_new_session=True)
-    else:
-        print("[vlm] llama-server is starting; waiting...", flush=True)
-    t0 = time.time()
-    while time.time() - t0 < wait:
-        if _server_up():
-            print(f"[vlm] llama-server ready ({time.time()-t0:.0f}s).", flush=True); return True
-        time.sleep(2)
-    print("[vlm] timed out waiting for llama-server.", flush=True); return False
 
 SYSTEM = (
     "You are a computer-vision system looking through a live camera. Answer the user's question "
@@ -75,7 +44,6 @@ def _dets_text(dets):
     return "\n".join(f'- {d["label"]} at {list(d["box"])}' for d in dets[:20])
 
 
-GEMMA = config.PLANNER == "gemma4"      # harden2 default
 VLM_GRAMMAR = r"""
 root ::= "LONG RESPONSE: " line "\nSHORT RESPONSE: " line ("\nHIGHLIGHT: " hl "\nVLM_BOX: " box)?
 line ::= [^\n]+
@@ -86,25 +54,19 @@ num ::= [0-9]+ ("." [0-9]+)?
 
 
 def ask(frame_bgr, question, dets):
-    """-> (answer_text, highlight_target|None, vlm_box|None). vlm_box is normalized xyxy."""
+    """-> (status, reply). status is True on success. reply = (long_text, highlight_target|None,
+    vlm_box|None, short_text) when status is True, else None. vlm_box is normalized xyxy."""
     content = [
         {"type": "text",
          "text": f"Detector found:\n{_dets_text(dets)}\n\nUser asks: {question}"},
         {"type": "image_url",
          "image_url": {"url": "data:image/jpeg;base64," + _b64(frame_bgr)}},
     ]
-    body = {"messages": [{"role": "system", "content": SYSTEM},
-                         {"role": "user", "content": content}],
-            "temperature": 0.0 if GEMMA else 0.6, "max_tokens": 256}
-    if GEMMA:                                   # harden2: Gemma needs the format grammar or it free-writes
-        body["grammar"] = VLM_GRAMMAR
-    try:
-        r = requests.post(config.LLAMA_URL + "/v1/chat/completions", json=body, timeout=config.VLM_TIMEOUT)
-        r.raise_for_status()
-        txt = r.json()["choices"][0]["message"]["content"].strip()
-    except Exception as e:
-        return (f"[VLM unavailable: {e}]", None, None, "")
-    return parse_reply(txt)
+    messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}]
+    ok, text = request(messages, grammar=VLM_GRAMMAR, max_tokens=256, timeout_s=config.VLM_TIMEOUT)
+    if not ok:
+        return False, None
+    return True, parse_reply(text)
 
 
 def parse_reply(txt):

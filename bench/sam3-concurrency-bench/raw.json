@@ -1,0 +1,58 @@
+{
+  "source": "synthetic-720p",
+  "precision": "nf4",
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "single_ms": {
+    "p50": 409.2,
+    "p95": 437.8,
+    "min": 385.2,
+    "max": 447.6,
+    "reps": 12
+  },
+  "serial_vs_concurrent": [
+    {
+      "N": 2,
+      "serial_ms": 812.7,
+      "concurrent_ms": 834.4,
+      "speedup": 0.97
+    },
+    {
+      "N": 4,
+      "serial_ms": 1643.4,
+      "concurrent_ms": 1656.0,
+      "speedup": 0.99
+    },
+    {
+      "N": 8,
+      "serial_ms": 3287.8,
+      "concurrent_ms": 3325.1,
+      "speedup": 0.99
+    }
+  ],
+  "batching": [
+    {
+      "K": 2,
+      "separate_ms": 808.4,
+      "batched_ms": 780.2,
+      "returned": 2,
+      "speedup": 1.04,
+      "peak_mib": 1231
+    },
+    {
+      "K": 4,
+      "separate_ms": 1595.1,
+      "batched_ms": 1538.0,
+      "returned": 4,
+      "speedup": 1.04,
+      "peak_mib": 1991
+    },
+    {
+      "K": 8,
+      "separate_ms": 3223.0,
+      "batched_ms": 3161.6,
+      "returned": 8,
+      "speedup": 1.02,
+      "peak_mib": 3457
+    }
+  ]
+}
