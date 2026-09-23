@@ -7,3 +7,6 @@ archive
 docs/stale/*
 docs/private/*
 *.log
+
+# Private capture frames (owner room, session/street/desk shots): keep local, never commit
+bench/vision-verify-bench/dataset/images/
