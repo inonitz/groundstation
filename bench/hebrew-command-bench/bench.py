@@ -3,7 +3,8 @@
 The measurement lane now lives in unified_bench.py (the single-Gemma, direct-Hebrew harness).
 This module keeps only what unified_bench imports (to_scorer_schema and the re-exposed
 llama-server config) plus two offline, no-GPU utilities:
-    --audit   scorer references + recognizer self-test (never measure with a broken scorer)
+    --audit   scorer references + the recognizer's tests (never measure with a broken
+              scorer)
     --cases   regenerate CASES.md
 
 The legacy translated harness (make_translator, plan, run_recognizer, run_perfect_en) was
@@ -11,25 +12,52 @@ retired with the translated path (2026-09-12); its prompt imports are gone. Supe
 live in git history; their numbers stay under results/ and results/HISTORY.md.
 """
 import argparse
+import atexit
+import contextlib
 import os
+import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 # The component lives in the harden2 tree; the bench measures it IN PLACE (dedup ruling
 # 2026-09-02: no copies in two homes).
 _HOME = os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"))
-sys.path.insert(0, os.path.join(_HOME, "recognizer"))
-sys.path.insert(0, _HOME)          # harden2 root: pipeline.py does `import config` (the config/ package)
+sys.path.insert(0, _HOME)          # harden2 root: import the recognizer package from here
 sys.path.insert(0, HERE)
 
-import recognizer
-# re-exposed for unified_bench.py (the single home for the llama-server config)
-from gemma.server import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
+from gemma import server as gemma_process
+from gemma.client import Gemma
+from system.fatal import die
+from system.supervisor import Supervisor
 from cases_commands import CASES as CMD_CASES, VERBOSE_CASES, EMERGENCY_CASES
 from cases_perception import PERC100, SLANG20, check_refs
 
-# The planner speaks the wire schema (dx/dy/dz); the scorer speaks x/y/z.
+PORT = 18091                                    # the bench Gemma never collides with the app's
+THINKING = os.environ.get("GEMMA4_THINK") == "1"  # the bench A/B arm: GEMMA4_THINK=1 = on
+
+
+@contextlib.contextmanager
+def gemma_server():
+    """Start Gemma the way the app does (owner ruling 2026-09-23): the supervisor and
+    gemma.server.process(), on the bench port. -> a gemma.client.Gemma inside the
+    with-block. atexit stops the server even when a bench crashes, so no GPU process is
+    left behind."""
+    supervisor = Supervisor()
+    atexit.register(supervisor.stop_all)
+    log_dir = tempfile.mkdtemp(prefix="bench-gemma-")
+    handle = supervisor.start(gemma_process.process(log_dir, port=PORT, thinking=THINKING))
+    if not handle.wait_up(300):
+        die(f"the bench Gemma was not ready after 300 s; log: {log_dir}/proc-gemma.log")
+
+    yield Gemma(PORT)
+
+    supervisor.stop_all()
+    return
+
+
+# The planner speaks the phone app schema (dx/dy/dz); the scorer speaks x/y/z.
 SCORER_KEY = {"dx": "x", "dy": "y", "dz": "z", "degrees": "degrees", "seconds": "seconds"}
 
 
@@ -47,12 +75,22 @@ def to_scorer_schema(mission):
 
 def audit():
     """No GPU: every hand-written English reference must satisfy its own keyword groups,
-    and the component self-test must be clean."""
-    bad = check_refs() + recognizer.selftest()
+    and the recognizer's tests (test/test_recognizer.py, the rules against their
+    evidence) must pass."""
+    bad = check_refs()
+    tests = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         os.path.join(_HOME, "test", "test_recognizer.py")],
+        cwd=_HOME,
+        capture_output=True,
+        text=True
+    )
+    if tests.returncode != 0:
+        bad.append("recognizer tests FAILED:\n" + tests.stdout[-2000:])
     if bad:
         print("\n".join(str(b) for b in bad))
         raise SystemExit(1)
-    print("audit CLEAN: scorer references and recognizer self-test all pass")
+    print("audit CLEAN: scorer references and recognizer tests all pass")
 
 
 def write_cases_md():

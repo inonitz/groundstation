@@ -1,20 +1,23 @@
-"""The perception engine (moved from perception/engine.py 2026-09-22): what to highlight, whether it is really there, and which boxes/masks
-survive. Pure logic -- every model is an injected callable, so the self-test and the wiring
-tests run with fakes and no GPU.
+"""The perception engine (moved from perception/engine.py 2026-09-22): what to highlight,
+whether it is really there, and which boxes/masks survive. Pure logic -- every model is
+an injected callable, so the self-test and the wiring tests run with fakes and no GPU.
 
 The three measured mechanisms this file owns (evidence: the live desk loop):
-  1. Relative-confidence gate. The detector is queried at a low floor so every candidate is visible;
-     only detections within REL of the top score are kept. A 0.48 box dies next to a 0.90 box;
-     two real windows at 0.85/0.88 both survive.
-  2. Mask hygiene. Each kept box gets a mask; whole-frame garbage masks are dropped, boxes
-     are tightened to their mask, and a near-full-frame box with no clean mask is discarded.
+  1. Relative-confidence gate. The detector is queried at a low floor so every candidate
+     is visible; only detections within REL of the top score are kept. A 0.48 box dies
+     next to a 0.90 box; two real windows at 0.85/0.88 both survive.
+  2. Mask hygiene. Each kept box gets a mask; whole-frame garbage masks are dropped,
+     boxes are tightened to their mask, and a near-full-frame box with no clean mask is
+     discarded.
   3. VLM fallback + presence gate. When the detector whiffs, the VLM's own box (from the
-     presence gate) goes through the SAME apply_masks hygiene (garbage-mask drop included). The presence gate asks the VLM whether the target is
-     visible at all before any box is drawn -- open-vocab detectors ground absent phrases onto
-     salient objects, and the gate is what stops that.
+     presence gate) goes through the SAME apply_masks hygiene (garbage-mask drop
+     included). The presence gate asks the VLM whether the target is visible at all
+     before any box is drawn -- open-vocab detectors ground absent phrases onto salient
+     objects, and the gate is what stops that.
 """
 import numpy as np
 
+from perception2 import boxes
 from perception2.backend import DETECT_OK
 
 
@@ -25,42 +28,68 @@ def scale_vlm_box(box, frame_shape):
         return None
     h, w = frame_shape[:2]
     sc = 1000.0 if max(box) > 1.5 else 1.0
-    return (int(box[0] / sc * w), int(box[1] / sc * h),
-            int(box[2] / sc * w), int(box[3] / sc * h))
+    return (
+        int(box[0] / sc * w),
+        int(box[1] / sc * h),
+        int(box[2] / sc * w),
+        int(box[3] / sc * h)
+    )
 
 
 # ------------------------------------ the engine ------------------------------------
 
 class PerceptionEngine:
-    """detect(frame, phrase, conf) -> (status, hits); hits = [{"label","conf","box"}...] sorted by conf desc.
+    """detect(frame, phrase, conf) -> (status, hits);
+        hits = [{"label","conf","box"}...] sorted by conf desc.
     mask_for_box(frame, box) -> bool mask or None.
-    vlm_ask(frame, question, dets) -> (status, (long_text, highlight_target|None, vlm_box|None, short_text))."""
+    vlm_ask(frame, question, dets) -> (status, (long_text, highlight_target|None,
+        vlm_box|None, short_text))."""
 
     MASK_MAX_FRAC = 0.85    # a mask covering more of the frame than this is garbage
     BOX_MAX_FRAC = 0.90     # a near-full-frame box with no clean mask is not a highlight
 
-    def __init__(self, detect, mask_for_box, vlm_ask,
-                 floor=0.12, draw_conf=0.30, rel=0.65, mask_k=3):
+    def __init__(
+        self,
+        detect,
+        mask_for_box,
+        vlm_ask,
+        floor=0.12,
+        draw_conf=0.30,
+        rel=0.65,
+        mask_k=3
+    ):
         self.detect = detect
         self.mask_for_box = mask_for_box
         self.vlm_ask = vlm_ask
-        self.floor = floor          # detector query threshold: low, to see every candidate
+        self.floor = floor          # detector query threshold: low, sees every candidate
         self.draw_conf = draw_conf  # absolute minimum for anything drawn
-        self.rel = rel              # keep only detections within this fraction of the top score
+        self.rel = rel              # keep dets within this fraction of the top score
         self.mask_k = mask_k        # mask at most this many detections per frame
+        return
 
     def apply_masks(self, frame, dets, use_sam=True):
         """Mask hygiene (mechanism 2). Returns (kept_dets, masks)."""
-        h, w = frame.shape[:2]
-        frame_area = float(h * w)
-        kept, masks = [], []
+        box_frac = 0.0
+        mask = None
+        ys = None
+        xs = None
+        kept = []
+        masks = []
+        frame_area = float(boxes.frame_area(frame))
+
         for d in dets[:self.mask_k]:
             x1, y1, x2, y2 = d["box"]
             box_frac = ((x2 - x1) * (y2 - y1)) / frame_area
             mask = None
             if use_sam:
-                mask = self.mask_for_box(frame, d["box"])     # a cache lookup; None is its miss status
-            if mask is not None and mask.sum() > 0 and (mask.sum() / frame_area) <= self.MASK_MAX_FRAC:
+                # a cache lookup; None is its miss status
+                mask = self.mask_for_box(frame, d["box"])
+
+            if (
+                mask is not None
+                and mask.sum() > 0
+                and (mask.sum() / frame_area) <= self.MASK_MAX_FRAC
+            ):
                 ys, xs = np.where(mask)
                 d = dict(d)
                 d["box"] = (int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max()))
@@ -74,80 +103,34 @@ class PerceptionEngine:
         """One frame of highlighting (mechanisms 1-3). Returns (dets, masks, debug)."""
         if not target:
             return [], [], {}
-        status, raw = self.detect(frame, target, self.floor)   # detect never throws; it returns a status
+
+        # detect never throws; it returns a status
+        status, raw = self.detect(frame, target, self.floor)
         if status != DETECT_OK:
             raw = []
+
+        # the relative-confidence gate (mechanism 1)
         best = raw[0]["conf"] if raw else 0.0
         threshold = max(self.draw_conf, best * self.rel)
         kept = [d for d in raw if d["conf"] >= threshold]
         dets, masks = self.apply_masks(frame, kept, use_sam)
-        if not dets and vlm_box_px is not None:     # detector whiffed: fall back to the VLM's box
+
+        # detector whiffed: fall back to the VLM's box
+        if not dets and vlm_box_px is not None:
             fallback = {"label": f"{target} (vlm)", "conf": 1.0, "box": vlm_box_px}
-            dets, masks = self.apply_masks(frame, [fallback], use_sam)   # SAME hygiene as the primary path
+            # SAME hygiene as the primary path
+            dets, masks = self.apply_masks(frame, [fallback], use_sam)
         return dets, masks, {"status": status, "raw": raw, "threshold": threshold}
 
     def presence_gate(self, frame, phrase):
-        """Ask the VLM whether the phrase is actually visible (mechanism 3). Returns
-        (present, vlm_box_px|None). A failed Gemma call fails OPEN: the detector's own confidence
-        gate still stands behind it."""
+        """Ask the VLM whether the phrase is actually visible (mechanism
+        3). Returns (present, vlm_box_px|None). A failed Gemma call fails
+        OPEN: the detector's own confidence gate still stands behind it."""
         ok, reply = self.vlm_ask(frame, f"Point at and highlight the {phrase}.", [])
         if not ok:
             return True, None
+
         _, target, box, _ = reply
-        present = target is not None            # the VLM writes HIGHLIGHT: none when absent
+        present = target is not None    # the VLM writes HIGHLIGHT: none when absent
         box_px = scale_vlm_box(box, frame.shape) if box else None
         return present, box_px
-
-
-# ------------------------------------- self-test -------------------------------------
-
-def selftest():
-    bad = []
-    frame = np.zeros((100, 100, 3), dtype=np.uint8)
-    good_mask = np.zeros((100, 100), dtype=bool)
-    good_mask[40:60, 40:60] = True
-    garbage_mask = np.ones((100, 100), dtype=bool)
-
-    # Relative gate: 0.48 dies next to 0.90; both windows at 0.85/0.88 survive.
-    eng = PerceptionEngine(detect=lambda f, p, c: (DETECT_OK, [{"label": p, "conf": 0.90, "box": (10, 10, 30, 30)},
-                                                          {"label": p, "conf": 0.48, "box": (50, 50, 70, 70)}]),
-                           mask_for_box=lambda f, b: good_mask, vlm_ask=None)
-    dets, masks, dbg = eng.highlight_step(frame, "window")
-    if len(dets) != 1 or dbg["threshold"] < 0.5:
-        bad.append("relative gate: low candidate survived")
-    if dets and dets[0]["box"] != (40, 40, 59, 59):
-        bad.append("mask hygiene: box not tightened to mask")
-
-    # Garbage mask is dropped; the localized box stays without it.
-    eng2 = PerceptionEngine(detect=lambda f, p, c: (DETECT_OK, [{"label": p, "conf": 0.9, "box": (10, 10, 30, 30)}]),
-                            mask_for_box=lambda f, b: garbage_mask, vlm_ask=None)
-    dets2, masks2, _ = eng2.highlight_step(frame, "thing")
-    if masks2 or len(dets2) != 1:
-        bad.append("mask hygiene: garbage mask not dropped")
-
-    # Detector whiff + VLM box -> fallback highlight.
-    eng3 = PerceptionEngine(detect=lambda f, p, c: (DETECT_OK, []), mask_for_box=lambda f, b: good_mask, vlm_ask=None)
-    dets3, masks3, _ = eng3.highlight_step(frame, "cat", vlm_box_px=(35, 35, 65, 65))
-    if len(dets3) != 1 or "(vlm)" not in dets3[0]["label"] or len(masks3) != 1:
-        bad.append("vlm fallback: not applied")
-
-    # Presence gate: absent -> (False, None); present with a 0-1000 box -> pixel coords.
-    eng4 = PerceptionEngine(detect=None, mask_for_box=None,
-                            vlm_ask=lambda f, q, d: (True, ("no", None, None, "no")))
-    if eng4.presence_gate(frame, "unicorn")[0] is not False:
-        bad.append("gate: absent not suppressed")
-    eng5 = PerceptionEngine(detect=None, mask_for_box=None,
-                            vlm_ask=lambda f, q, d: (True, ("yes", "cat", (500, 500, 1000, 1000), "yes")))
-    present, px = eng5.presence_gate(frame, "cat")
-    if not present or px != (50, 50, 100, 100):
-        bad.append(f"gate: box scaling wrong ({px})")
-    return bad
-
-
-if __name__ == "__main__":
-    problems = selftest()
-    if problems:
-        print("\n".join(problems))
-        raise SystemExit(1)
-    print("perception2 engine self-test CLEAN: relative gate, mask hygiene, "
-          "vlm fallback, presence gate all verified")

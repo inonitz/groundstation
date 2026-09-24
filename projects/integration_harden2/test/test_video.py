@@ -1,134 +1,128 @@
-"""Tests for video/: the gstreamer receiver's start-up and the stall guard that replaced the watchdog
-process. No process is started: the supervisor is a recorder; time is passed in."""
+"""Tests for video/: the source classifier, the gstreamer process, Video over a REAL
+video file (written with OpenCV), and the ROS stream + stall guard over a REAL ROS2
+topic."""
 import os
 import subprocess
 import sys
 import textwrap
+import time
+
+import cv2
+import numpy as np
+import rclpy
+from sensor_msgs.msg import Image
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
-from system.status import RECOVERING, UP, StatusBoard
-from video import camera_stream
-from video.camera_stream import StallGuard
+from system.status import RECOVERING, UP
+from video import ros_stream
+from video.video import Video, source_kind
+
+from support import wait_for
 
 HARDEN2 = os.path.join(os.path.dirname(__file__), "..")
 
 
-class RecordingSupervisor:
+def _wait_for(pred, timeout=5.0):
+    return wait_for(pred, timeout)
+
+
+# ==================== the source ====================
+def test_source_kind_names_every_source():
+    assert source_kind("ros") == "ros" and source_kind("camera/stream") == "ros"
+    assert source_kind("0") == "webcam" and source_kind(2) == "webcam"
+    assert source_kind("videotestsrc ! appsink") == "gstreamer"
+    assert source_kind("rtsp://10.0.0.1:8554/live") == "stream"
+    assert source_kind("/data/clip.mp4") == "file"
+
+
+def test_the_gstreamer_process_waits_instead_of_dying(tmp_path):
+    spec = ros_stream.process(str(tmp_path), "10.0.0.7")
+    receiver = os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_gstreamer_rx")
+    assert spec.argv == [receiver, "--dji", "10.0.0.7"]
+    assert spec.required is False           # it depends on the phone app: it WAITS
+    assert spec.log_path == str(tmp_path / "proc-gstreamer.log")
+
+
+# ==================== Video over a real file ====================
+def _clip(path, frames=5):
+    writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"MJPG"), 10, (64, 48))
+    for i in range(frames):
+        writer.write(np.full((48, 64, 3), i * 40, np.uint8))
+    writer.release()
+    return str(path)
+
+
+def test_a_file_opens_reads_and_hands_out_copies(tmp_path):
+    video = Video(_clip(tmp_path / "clip.avi"))
+    assert video.status()[0][1] == UP and not video.live
+    ok, frame = video.read()
+    assert ok and frame.shape == (48, 64, 3)
+    copy = video.snapshot()
+    copy[:] = 255                    # a private copy: the latest frame is untouched
+    assert not np.array_equal(copy, video.snapshot())
+    video.close()
+
+
+def test_a_source_that_never_opens_dies_with_the_reason():
+    code = textwrap.dedent(f"""
+        import sys
+        sys.path.insert(0, {HARDEN2!r})
+        import config
+        config.OPEN_TIMEOUT = 0.0
+        from video.video import Video
+        Video("/nonexistent/clip.mp4")
+        print("STILL RUNNING", flush=True)
+    """)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       timeout=60)
+    assert r.returncode != 0 and "STILL RUNNING" not in r.stdout
+    assert "cannot open the video source" in r.stderr
+
+
+# ============== the ROS stream and the stall guard, over real ROS2 ==============
+class RecordingGstreamer:
+    """Stands in for the gstreamer Process handle: records each restart request."""
+
     def __init__(self):
-        self.started = []
         self.restarts = []
 
-    def start(self, name, argv, env=None, ready=None, ready_timeout_s=0, log_path=None):
-        self.started.append((name, argv))
-
-    def restart(self, name, reason):
-        self.restarts.append((name, reason))
+    def restart(self, reason):
+        self.restarts.append(reason)
         return True
 
 
-def test_gstreamer_argv():
-    assert camera_stream.gstreamer_argv("10.0.0.1") == [
-        os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_gstreamer_rx"), "--dji", "10.0.0.1"]
+def _publish_frame():
+    node = rclpy.create_node("test_camera_publisher")
+    pub = node.create_publisher(Image, ros_stream.TOPIC, 10)
+    _wait_for(lambda: pub.get_subscription_count() > 0)
+    msg = Image(height=4, width=6, encoding="bgr8", step=6 * 3)
+    msg.data = bytes(range(4 * 6 * 3))
+    pub.publish(msg)
+    return node
 
 
-def test_webcam_starts_no_video_process(tmp_path):
-    sup = RecordingSupervisor()
-    camera_stream.start_services(sup, str(tmp_path), "0")
-    assert sup.started == []
+def test_ros_frames_arrive_and_the_row_goes_up(monkeypatch):
+    video = Video("ros", RecordingGstreamer())
+    assert video.live and not video.read()[0]      # no frame yet: the UI shows "waiting"
+    node = _publish_frame()
+    assert _wait_for(lambda: video.read()[0])
+    ok, frame = video.read()
+    assert frame.shape == (4, 6, 3) and video.status()[0][1] == UP
+    node.destroy_node()
+    video.close()
 
 
-def test_dji_starts_gstreamer_to_the_phone(tmp_path, monkeypatch):
-    monkeypatch.setattr(config, "PHONE_IP", "10.0.0.7")
-    sup = RecordingSupervisor()
-    camera_stream.start_services(sup, str(tmp_path), "ros")
-    assert sup.started == [("gstreamer", camera_stream.gstreamer_argv("10.0.0.7"))]
-
-
-def test_dji_without_a_phone_ip_dies():
-    code = textwrap.dedent(f'''
-        import sys; sys.path.insert(0, {HARDEN2!r})
-        import config; config.PHONE_IP = None
-        from video import camera_stream
-        camera_stream.start_services(None, "/tmp", "ros")
-    ''')
-    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=60)
-    assert r.returncode == 1 and "no phone IP" in r.stderr
-
-
-def test_stall_guard_restarts_on_a_stall_and_retries_on_its_period():
-    board, sup = StatusBoard(), RecordingSupervisor()
-    g = StallGuard(sup, board, stall_s=6.0, retry_s=15.0)
-    g.tick(True, now=100.0)
-    assert board.state("video") == UP
-    g.tick(False, now=105.0)                          # 5 s: not a stall yet
-    assert sup.restarts == []
-    g.tick(False, now=107.0)                          # 7 s: stall -> restart once
-    assert len(sup.restarts) == 1 and board.state("video") == RECOVERING
-    g.tick(False, now=115.0)                          # inside the retry period: no second restart
-    assert len(sup.restarts) == 1
-    g.tick(False, now=122.5)                          # retry period passed: restart again
-    assert len(sup.restarts) == 2 and sup.restarts[0][0] == "gstreamer"
-    g.tick(True, now=123.0)                           # frames again
-    assert board.state("video") == UP
-
-
-# ==================== open_capture + CameraStream (all cases) ====================
-import numpy as np
-
-
-def test_open_capture_picks_the_reader_by_source_kind(monkeypatch):
-    opened = []
-    monkeypatch.setattr(camera_stream.cv2, "VideoCapture", lambda *a: (opened.append(a), _FakeCap())[1])
-    monkeypatch.setattr(camera_stream, "CameraStream", lambda: "ros-stream")
-    assert camera_stream.open_capture("ros") == "ros-stream"
-    camera_stream.open_capture("2")
-    assert opened[-1] == (2,)                                       # a webcam index
-    camera_stream.open_capture("v4l2src ! videoconvert ! appsink")
-    assert opened[-1][1] == camera_stream.cv2.CAP_GSTREAMER          # a gstreamer pipeline
-    camera_stream.open_capture("/tmp/clip.mp4")
-    assert opened[-1] == ("/tmp/clip.mp4",)                         # a file or URL
-
-
-class _FakeCap:
-    def set(self, *a):
-        return True
-
-
-class _Msg:
-    def __init__(self, h, w, step, data):
-        self.height, self.width, self.step, self.data = h, w, step, data
-
-
-def _bare_stream():
-    s = camera_stream.CameraStream.__new__(camera_stream.CameraStream)   # no ROS node: frame logic only
-    import threading
-    import time as _t
-    s._lock, s._frame, s.frames, s._t0, s._timeout = threading.Lock(), None, 0, _t.time(), 60.0
-    return s
-
-
-def test_camera_stream_parses_a_stride_padded_frame_and_counts_it():
-    s = _bare_stream()
-    h, w, step = 2, 3, 12                                            # 9 bytes of pixels + 3 bytes of padding per row
-    s._cb(_Msg(h, w, step, bytes(range(h * step))))
-    ok, frame = s.read()
-    assert ok and frame.shape == (2, 3, 3) and s.frames == 1
-    assert frame[1, 0, 0] == 12                                      # row 2 starts after the padding
-
-
-def test_camera_stream_drops_a_malformed_frame_and_keeps_going():
-    s = _bare_stream()
-    s._cb(_Msg(2, 3, 12, b"short"))
-    assert s.read() == (False, None) and s.frames == 0
-    assert s.isOpened()                                               # still inside the first-frame window
-
-
-def test_camera_stream_read_returns_a_copy():
-    s = _bare_stream()
-    s._cb(_Msg(1, 1, 3, bytes([1, 2, 3])))
-    _, a = s.read()
-    a[:] = 0
-    _, b = s.read()
-    assert np.array_equal(b, np.array([[[1, 2, 3]]], np.uint8))
+def test_a_stalled_stream_restarts_gstreamer(monkeypatch):
+    monkeypatch.setattr(config, "WATCHDOG_STALL_SEC", 0.1)
+    monkeypatch.setattr(config, "WATCHDOG_RETRY_SEC", 60.0)
+    gstreamer = RecordingGstreamer()
+    video = Video("ros", gstreamer)
+    time.sleep(0.2)
+    video.read()                                   # no NEW frame for 0.2 s: stalled
+    assert video.status()[0][1] == RECOVERING
+    assert gstreamer.restarts and "stalled" in gstreamer.restarts[0]
+    video.read()                                   # within the retry window: no repeat
+    assert len(gstreamer.restarts) == 1
+    video.close()

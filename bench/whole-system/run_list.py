@@ -23,7 +23,6 @@ import argparse, json, os, re, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 CMD_BENCH = os.path.join(ROOT, "tools", "bench", "hebrew-command-bench")   # bench.py, llama.py, cases_*
-sys.path.insert(0, os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"), "recognizer"))
 sys.path.insert(0, os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2")))
 sys.path.insert(0, CMD_BENCH)
 import recognizer

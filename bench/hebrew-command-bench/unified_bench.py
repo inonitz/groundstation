@@ -1,30 +1,33 @@
 #!/usr/bin/env python3
 """The harden2 lane (2026-09-08): Gemma 4 E4B ALONE through harden2's unified call on EVERY set of the dataset.
-Commands are scored by the wire scorer (score), perception and military by the keyword groups applied to
+Commands are scored by the phone app scorer (score), perception and military by the keyword groups applied to
 "<kind words> the <target_en>" (kind words: highlight -> "highlight find mark follow track focus", count -> "count how
 many", describe -> "describe tell what"), emergency by stage 0. Number guard and shot-echo guard as in the pipeline.
 Run: MVD_HOME=integration_harden2 python3 unified_bench.py [--tag T]. One llama-server (Gemma 4, thinking off)."""
 import os, sys, json, time, argparse, datetime
 os.environ.setdefault("MVD_HOME", "integration_harden2"); os.environ.setdefault("MVD_TRANSLATOR", "none")
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from bench import to_scorer_schema, LlamaServer, MODELS, GEMMA4_EXTRA, PORT
+from bench import to_scorer_schema, gemma_server
 import cases_commands as C, cases_perception as P
 from recognizer import recognize_direct, numbers_vs_mission
-from pipeline import Pipeline, is_shot_echo
+from recognizer import Recognizer
+from recognizer.guards import is_shot_echo
 score = C.score
 KIND_WORDS = {"highlight": "highlight find mark follow track focus", "count": "count how many", "describe": "describe tell what see look scene area frame image", "reject": ""}
 
 class W:
-    def halt(self): return 200
-    def fly_mission(self, m): return 200
+    def emergency_halt(self): return 200
+    def fly(self, m): return 200
+    def manual(self): return 200
+    def auto(self): return None
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--tag", default="unified-gemma4"); ap.add_argument("--smoke", action="store_true"); a = ap.parse_args()
     cut = 5 if a.smoke else None
     sets = {"emergency": C.EMERGENCY_CASES[:cut], "std190": C.CASES[:cut], "verbose": C.VERBOSE_CASES[:cut], "perception": P.PERC100[:cut], "military": P.SLANG20[:cut]}
     out = {}; verdicts = {}; rows_all = {}; t_all = time.time()
-    with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
-        pipe = Pipeline(W(), qwen_port=PORT)
+    with gemma_server() as gemma:
+        pipe = Recognizer(W(), None, gemma)
         for set_name, cases in sets.items():
             rows = []
             for c in cases:
@@ -41,7 +44,7 @@ def main():
                     if kind == "mission":
                         v = score(to_scorer_schema(payload), expected)
                     else:
-                        obj = pipe._plan2(payload) or {}; k2 = obj.get("kind"); mission = obj.get("mission") or []
+                        obj = pipe.plan(payload) or {}; k2 = obj.get("kind"); mission = obj.get("mission") or []
                         if k2 == "mission":
                             missing = numbers_vs_mission(payload, mission)
                             if not mission: v = score([], expected)
@@ -54,7 +57,7 @@ def main():
                     groups = c[3]
                     if kind == "mission": v = "wrong-route(bypass)"
                     else:
-                        obj = pipe._plan2(payload) or {}; k2 = obj.get("kind"); tgt = (obj.get("target_en") or "")
+                        obj = pipe.plan(payload) or {}; k2 = obj.get("kind"); tgt = (obj.get("target_en") or "")
                         text = f"{KIND_WORDS.get(k2, '')} the {tgt}"
                         v = "CORRECT" if (k2 in ("highlight", "count", "describe") and not P.score_perception(text, groups)) else (f"wrong-route({k2})" if k2 not in ("highlight", "count", "describe") else f"keywords-missed({tgt[:30]})")
                 rows.append({"case": name, "score": v, "obj": obj, "t_ms": round((time.time() - t0) * 1000)})

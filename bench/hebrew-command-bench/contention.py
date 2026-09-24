@@ -3,8 +3,8 @@ os.environ.setdefault("MVD_HOME","integration_harden2"); os.environ.setdefault("
 HARDEN="/root/groundstation/projects/integration_harden2"; sys.path.insert(0,HARDEN)
 BENCH="/root/groundstation/bench/hebrew-command-bench"; sys.path.insert(0,BENCH)
 import numpy as np, bench
-from bench import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
-from pipeline import Pipeline
+from bench import gemma_server
+from recognizer import Recognizer
 from perception2.sam3_backend import Sam3Backend
 def pct(a,q): a=sorted(a); return a[min(len(a)-1,int(round(q/100*(len(a)-1))))]
 def nv():
@@ -22,8 +22,10 @@ class Sampler(threading.Thread):
             time.sleep(0.2)
     def stop(s): s.on=False; s.join()
 class W:
-    def halt(self): return 200
-    def fly_mission(self,m): return 200
+    def emergency_halt(self): return 200
+    def fly(self,m): return 200
+    def manual(self): return 200
+    def auto(self): return None
 name,_,_=nv(); print("GPU:",name,flush=True)
 print("loading SAM3 (this can take a bit)...",flush=True)
 sam3=Sam3Backend()
@@ -35,12 +37,12 @@ def t_sam3(n):
         t=time.perf_counter(); sam3.detect(frame,"person",0.3); o.append((time.perf_counter()-t)*1000)
     return o
 res={"gpu":name}
-with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
-    pipe=Pipeline(W(), qwen_port=PORT); pipe._plan2("טוס קדימה")   # warmup
+with gemma_server() as gemma:
+    pipe=Recognizer(W(), None, gemma); pipe.plan("טוס קדימה")   # warmup
     def t_gem(n):
         o=[]
         for _ in range(n):
-            t=time.perf_counter(); pipe._plan2("טוס קדימה חמישה מטרים"); o.append((time.perf_counter()-t)*1000)
+            t=time.perf_counter(); pipe.plan("טוס קדימה חמישה מטרים"); o.append((time.perf_counter()-t)*1000)
         return o
     # --- SAM3 isolated ---
     s=Sampler(); s.start(); res["sam3_iso"]=t_sam3(30); res["u_sam3_iso"]=s.u; s.stop()
@@ -50,7 +52,7 @@ with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
     stop=threading.Event(); gc=[0]
     def gload():
         while not stop.is_set():
-            try: pipe._plan2("טוס קדימה חמישה מטרים"); gc[0]+=1
+            try: pipe.plan("טוס קדימה חמישה מטרים"); gc[0]+=1
             except Exception: pass
     gt=threading.Thread(target=gload,daemon=True); gt.start(); time.sleep(2)
     s=Sampler(); s.start(); res["sam3_con"]=t_sam3(30); res["u_sam3_con"]=s.u; s.stop()

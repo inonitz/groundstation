@@ -27,7 +27,7 @@ def worker(name, out):
     try:
         frame = cv2.imread(IMG)
         t = time.time()
-        be = Sam3Backend(precision=prec, compile=comp)
+        be = Sam3Backend(precision=prec, use_compile=comp)
         res["load_s"] = round(time.time() - t, 1)
         t = time.time()
         be.detect(frame, "person", conf=0.30)            # COLD first call (compiles if compile=True)

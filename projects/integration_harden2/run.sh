@@ -49,7 +49,7 @@ make_camera_nodes(){   # a camera plugged in after the container started has no 
 
 kill_stack(){
     local name pp
-    for name in mvd.py llm_to_action_asr_server llm_to_action_keyboard_hook \
+    for name in "python3 -m app.main" llm_to_action_asr_server llm_to_action_keyboard_hook \
                 llm_to_action_gstreamer_rx llama-server mediamtx mock_apiserver.py; do
         pkill -9 -f "$name" 2>/dev/null || true
     done
@@ -127,7 +127,7 @@ cmd_preflight(){
     if [ "$video" = webcam ]; then
         echo "== cameras (pick the CAPTURE line with a picture; WEBCAM_DEV=<n>) =="
         make_camera_nodes
-        python3 "$HERE/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
+        python3 "$HERE/video/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
     elif [ "$video" = dji ]; then
         echo "== phone reachable =="
         local ip code
@@ -153,14 +153,14 @@ cmd_up(){
     mkdir -p "$run_dir"; ln -sfn "$run_dir" "$RUN_ROOT/latest"
     log "logs -> $run_dir"
 
-    # --- control wire target ---
-    local wire_host wire_port wire_real
+    # --- phone-app target ---
+    local dji_host dji_port dji_real
     if [ "$control" = real ]; then
-        wire_host="$(phone_ip)"; [ -n "$wire_host" ] || die "real mode needs PHONE_IP"
-        wire_port=8080; wire_real=1
+        dji_host="$(phone_ip)"; [ -n "$dji_host" ] || die "real mode needs PHONE_IP"
+        dji_port=8080; dji_real=1
         cat <<BANNER
 ==================================================================
-  REAL DRONE CONTROL -> ${wire_host}:${wire_port}
+  REAL DRONE CONTROL -> ${dji_host}:${dji_port}
   Aircraft SECURED (clamped/held), props off for first checks.
   Kill = phone API Server toggle OFF / power button 3-5 s. YOU run this.
 ==================================================================
@@ -168,7 +168,7 @@ BANNER
         read -r -p "Type ARMED to proceed, anything else aborts: " confirm
         [ "$confirm" = ARMED ] || die "aborted."
     else
-        wire_host=127.0.0.1; wire_port=8079; wire_real=""
+        dji_host=127.0.0.1; dji_port=8079; dji_real=""
     fi
 
     # --- video source ---
@@ -194,7 +194,7 @@ BANNER
     # PHONE_IP means the PHONE (video + real control). Mock control is always 127.0.0.1 inside config, so
     # PHONE_IP is exported only in real mode; exporting the mock's 127.0.0.1 broke the video (review R3).
     local phone_export=""
-    [ "$control" = real ] && phone_export="export PHONE_IP=$wire_host"
+    [ "$control" = real ] && phone_export="export PHONE_IP=$dji_host"
     local app="$run_dir/app.sh"
     cat > "$app" <<APP
 #!/usr/bin/env bash
@@ -202,14 +202,14 @@ source $ROS_SETUP
 cd $HERE
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export SCENE_TMUX_SESSION=$SESSION SCENE_SEG=$SEG
-export SCENE_TTS="${SCENE_TTS:-phone}"
+export TTS_OUTPUTS="${TTS_OUTPUTS-phone}"   # "" = silent; "phone,laptop" = both
 export MVD_SESSION_DIR="$session_dir"
-export CONTROL=$control   # config derives the control wire from this one decision
+export CONTROL=$control   # config derives the phone-app target from this one decision
 $phone_export
 export VIDEO="$video" WEBCAM_DEV="${WEBCAM_DEV:-0}"   # config derives the source from VIDEO
 export DISPLAY="${DISPLAY:-:0}" PULSE_SERVER="${PULSE_SERVER:-unix:/tmp/pulse-socket}"
 sleep 3
-exec python3 mvd.py
+exec python3 -m app.main
 APP
     chmod +x "$app"
 
@@ -230,7 +230,7 @@ APP
         tmux pipe-pane -o -t "$SESSION:$w" "cat >> $run_dir/$w.log" 2>/dev/null || true
     done
 
-    log "UP. video=$video control=$control wire=$wire_host:$wire_port seg=$SEG"
+    log "UP. video=$video control=$control dji=$dji_host:$dji_port seg=$SEG"
     log "  attach: tmux attach -t $SESSION     (F5 to talk; Ctrl-b then a number to switch panes)"
     log "  status: bash $HERE/run.sh status"
     log "  down:   bash $HERE/run.sh down"
@@ -255,7 +255,7 @@ cmd_status(){
     echo "=== status: $run_dir ==="
     echo "-- ports (LISTEN expected once up) --"
     local pl p name
-    for pl in "18090:Gemma VLM" "8079:mock control" "8080:PhoneEars" "5600:gstreamer_rx"; do
+    for pl in "18090:Gemma VLM" "8079:mock control" "8080:phone speech" "5600:gstreamer_rx"; do
         p="${pl%%:*}"; name="${pl#*:}"
         if ss -tln 2>/dev/null | grep -q ":$p "; then echo "  LISTEN $p  $name"; else echo "  --     $p  $name (down)"; fi
     done
@@ -278,15 +278,15 @@ cmd_status(){
     [ -f "$sess/proc-gstreamer.log" ] && echo "  gst: $(grep -aE 'frame|fps|EOS|error|connect' "$sess/proc-gstreamer.log" | tail -1)"
     echo "-- process states (the app's status board) --"; _sig app.log last "\\[status\\]"
     echo "-- phone gate --";  local ip; ip="$(phone_ip)"; if [ -n "$ip" ]; then echo "  $ip:8080/status/ -> $(curl -s -m 3 -o /dev/null -w "%{http_code}" "http://$ip:8080/status/" 2>/dev/null || echo 000)"; else echo "  (no phone IP)"; fi
-    echo "-- cameras (WEBCAM_DEV=<n>; the running app holds its own) --"; make_camera_nodes; python3 "$HERE/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
+    echo "-- cameras (WEBCAM_DEV=<n>; the running app holds its own) --"; make_camera_nodes; python3 "$HERE/video/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
 }
 
 # ------------------------------------------------------------------ score / show (diagnose a recorded session)
 cmd_score(){  # run.sh score [list.md] [session];  SAFETY: read-only, writes REPORT.md into the session
     local list="${1:-$(cd "$HERE/../.." && pwd)/datasets/e2e/live-test-e2e-50.md}"
-    python3 "$HERE/score_session.py" "$list" "${2:-}"
+    python3 "$HERE/log/score.py" "$list" "${2:-}"
 }
-cmd_show(){ python3 "$HERE/show_session.py" "${1:-latest}"; }  # read-only pretty-print
+cmd_show(){ python3 "$HERE/log/show.py" "${1:-latest}"; }  # read-only pretty-print
 
 # ------------------------------------------------------------------ dispatch
 cmd="${1:-up}"; shift || true

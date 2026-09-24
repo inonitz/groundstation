@@ -1,13 +1,13 @@
 # Real-cadence GPU contention: SAM3 held at 1 forward/sec (the live cadence) while
-# Gemma _plan2 calls fire per command. Measures the LIVE per-command cost, not the
+# Gemma plan() calls fire per command. Measures the LIVE per-command cost, not the
 # saturation bound in contention.py. See docs/research-2026-09-18-command-typing-fast-vs-gemma.md.
 import os,sys,time,subprocess,threading,json,datetime
 os.environ.setdefault("MVD_HOME","integration_harden2"); os.environ.setdefault("MVD_TRANSLATOR","none")
 HARDEN="/root/groundstation/projects/integration_harden2"; sys.path.insert(0,HARDEN)
 BENCH="/root/groundstation/bench/hebrew-command-bench"; sys.path.insert(0,BENCH)
 import numpy as np, bench
-from bench import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
-from pipeline import Pipeline
+from bench import gemma_server
+from recognizer import Recognizer
 from perception2.sam3_backend import Sam3Backend
 
 CMD="טוס קדימה חמישה מטרים"     # deployed-style movement command
@@ -37,8 +37,10 @@ class Sampler(threading.Thread):
     def stop(s): s.on=False; s.join()
 
 class W:
-    def halt(self): return 200
-    def fly_mission(self,m): return 200
+    def emergency_halt(self): return 200
+    def fly(self,m): return 200
+    def manual(self): return 200
+    def auto(self): return None
 
 # SAM3 background at exactly 1 forward/sec, recording each forward interval.
 class Sam3Cadence(threading.Thread):
@@ -74,11 +76,11 @@ res={"gpu":name,"cmd":CMD,"gap_s":GAP,"n_load":N_LOAD,"repeats":REPEATS,
      "sam3_iso":[], "gem_iso":[], "gem_overlap":[], "gem_free":[], "sam3_underload":[],
      "overlap_rate":[], "util_loaded":[]}
 
-with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
-    pipe=Pipeline(W(), qwen_port=PORT); pipe._plan2(CMD)  # warmup
+with gemma_server() as gemma:
+    pipe=Recognizer(W(), None, gemma); pipe.plan(CMD)  # warmup
 
     def t_gem_once():
-        t=time.perf_counter(); pipe._plan2(CMD); return (time.perf_counter()-t)*1000.0
+        t=time.perf_counter(); pipe.plan(CMD); return (time.perf_counter()-t)*1000.0
     def t_sam3_once():
         t=time.perf_counter(); sam3.detect(frame,"person",0.3); return (time.perf_counter()-t)*1000.0
 
@@ -92,7 +94,7 @@ with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
         smp=Sampler(); smp.start(); time.sleep(1.5)  # let cadence settle
         ov=0
         for i in range(N_LOAD):
-            g0=time.perf_counter(); pipe._plan2(CMD); g1=time.perf_counter()
+            g0=time.perf_counter(); pipe.plan(CMD); g1=time.perf_counter()
             ivals,_=cad.snapshot()
             hit=overlaps(g0,g1,ivals)
             lat=(g1-g0)*1000.0
@@ -138,7 +140,7 @@ try:
     cdf(ax1,res["gem_iso"],"Gemma isolated")
     cdf(ax1,res["gem_free"],"Gemma no-overlap")
     cdf(ax1,res["gem_overlap"],"Gemma overlap SAM3")
-    ax1.set_title("Gemma _plan2 latency (real cadence)"); ax1.set_xlabel("ms"); ax1.set_ylabel("CDF"); ax1.legend(); ax1.grid(alpha=0.3)
+    ax1.set_title("Gemma plan() latency (real cadence)"); ax1.set_xlabel("ms"); ax1.set_ylabel("CDF"); ax1.legend(); ax1.grid(alpha=0.3)
     cats=["SAM3\niso","SAM3\nunder\nload","Gemma\niso","Gemma\nno-ov","Gemma\noverlap"]
     vals=[s["sam3_iso"]["p50"],s["sam3_underload"]["p50"],s["gem_iso"]["p50"],s["gem_free"]["p50"],s["gem_overlap"]["p50"]]
     p99=[s["sam3_iso"]["p99"],s["sam3_underload"]["p99"],s["gem_iso"]["p99"],s["gem_free"]["p99"],s["gem_overlap"]["p99"]]

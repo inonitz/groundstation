@@ -27,8 +27,8 @@ sys.path.insert(0, "/root/groundstation/projects/integration_harden2")
 os.environ.setdefault("MVD_HOME", "integration_harden2")
 
 import config
-import overlay
-from overlay import draw_box, FONT   # the demo's own box and label style
+import app.render as overlay   # the demo's own screen code (was overlay.py)
+from app.render import draw_box, FONT   # the demo's own box and label style
 
 COL_GUESS = config.COL_YOLOE_HL       # green: the SAM3 / estimate guess
 COL_HUMAN = (255, 140, 0)             # orange: a box you added yourself

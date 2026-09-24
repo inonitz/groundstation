@@ -1,2 +1,4 @@
-"""video/ -- the video path: camera_stream.py (frame sources behind a cv2.VideoCapture-like
-surface, the gstreamer receiver's start-up, and the stall guard). Self-test: python3 -m video.camera_stream 0"""
+"""video/ -- ONE video interface (video.py: Video) over one source, picked by
+config.VIDEO: the phone's video through gstreamer + ROS2 (ros_stream.py), a webcam, a
+pipeline, a URL or a file. cam_list.py lists the cameras this host has (a read-only
+tool)."""

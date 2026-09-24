@@ -1,36 +1,36 @@
-"""Tests for audio/: the mic ASR processes the app starts (the whisper ASR server + the keyboard hook).
-No process is started here: the supervisor is a recorder."""
-import http.server
+"""Tests for audio/: speech in (the ROS mic source's process, the phone source over REAL
+sockets, SpeechIn) and speech out (the phone voice over a REAL local HTTP server, the
+laptop voice, SpeechOut)."""
 import os
 import socket
 import subprocess
 import sys
 import textwrap
-import threading
 import time
+
+import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
-from audio import ros2_asr
-from audio.phone_asr import PhoneEars
-from system.status import BOARD, RECOVERING, UP
-
-
-class RecordingSupervisor:
-    def __init__(self):
-        self.started = []
-
-    def start(self, name, argv, env=None, ready=None, ready_timeout_s=0, log_path=None):
-        self.started.append({"name": name, "argv": argv, "env": env, "log_path": log_path})
+from audio import asr_ros, tts_laptop
+from audio.asr_phone import PhoneAsr
+from audio.speech_in import SpeechIn
+from audio.speech_out import SpeechOut
+from audio.tts_phone import PhoneTts
+from system.status import UP
+from support import RecordingPhone, dead_port, state_of, wait_for
 
 
 def test_asr_argv_is_built_from_config(monkeypatch):
     monkeypatch.setattr(config, "RECORD_SESSION", True)
     monkeypatch.setattr(config, "ASR_CAPTURE_DEVICE", None)
-    argv = ros2_asr.asr_argv()
+    argv = asr_ros.argv()
     assert argv[0] == os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_asr_server")
-    assert f"--backend={config.ASR_BACKEND}" in argv and f"--model={config.ASR_MODEL_PATH}" in argv
+    assert (
+        f"--backend={config.ASR_BACKEND}" in argv
+        and f"--model={config.ASR_MODEL_PATH}" in argv
+    )
     assert f"--language={config.ASR_LANGUAGE}" in argv
     assert "--record" in argv and f"--recordDir={config.CLIPS_DIR}" in argv
     assert not any(a.startswith("--captureid") for a in argv)
@@ -39,24 +39,12 @@ def test_asr_argv_is_built_from_config(monkeypatch):
 def test_capture_device_and_no_recording(monkeypatch):
     monkeypatch.setattr(config, "RECORD_SESSION", False)
     monkeypatch.setattr(config, "ASR_CAPTURE_DEVICE", "3")
-    argv = ros2_asr.asr_argv()
+    argv = asr_ros.argv()
     assert "--captureid=3" in argv and "--record" not in argv
 
 
 def test_clips_land_where_the_session_log_reads_them():
     assert os.path.basename(config.CLIPS_DIR) == "asr_clips"
-
-
-def test_start_services_starts_asr_and_keys(tmp_path, monkeypatch):
-    monkeypatch.setattr(config, "CLIPS_DIR", str(tmp_path / "asr_clips"))
-    sup = RecordingSupervisor()
-    ros2_asr.start_services(sup, str(tmp_path))
-    names = [s["name"] for s in sup.started]
-    assert names == ["asr", "keys"]
-    asr, keys = sup.started
-    assert "PULSE_SERVER" in asr["env"] and asr["log_path"] == str(tmp_path / "proc-asr.log")
-    assert keys["argv"] == [os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_keyboard_hook")]
-    assert os.path.isdir(tmp_path / "asr_clips")
 
 
 # ==================== phone speech channel (review R7) ====================
@@ -69,12 +57,7 @@ def _free_port():
 
 
 def _wait_for(pred, timeout=5.0):
-    end = time.monotonic() + timeout
-    while time.monotonic() < end:
-        if pred():
-            return True
-        time.sleep(0.02)
-    return False
+    return wait_for(pred, timeout)
 
 
 def _listening(port):
@@ -83,7 +66,7 @@ def _listening(port):
 
 
 def test_extract_drops_a_malformed_line_and_keeps_good_ones():
-    ears = PhoneEars.__new__(PhoneEars)                 # the parser only; no server
+    ears = PhoneAsr.__new__(PhoneAsr)                 # the parser only; no server
     assert ears._extract('{"text": " hello "}') == "hello"
     assert ears._extract("plain words") == "plain words"
     assert ears._extract('{"text": "cut off') == ""
@@ -93,125 +76,85 @@ def test_extract_drops_a_malformed_line_and_keeps_good_ones():
 def test_real_listener_survives_garbage_drops_and_short_bodies():
     heard = []
     port = _free_port()
-    PhoneEars(heard.append, host="127.0.0.1", port=port)
+    listener = PhoneAsr(
+        lambda text, source: heard.append(text),
+        host="127.0.0.1",
+        port=port
+    )
     assert _wait_for(lambda: _listening(port))
-    assert _wait_for(lambda: BOARD.state("phone speech") == UP)
-    with socket.create_connection(("127.0.0.1", port)) as s:    # TCP: garbage, then a good line on the SAME socket
+    assert _wait_for(lambda: state_of(listener) == UP)
+    # TCP: garbage, then a good line on the SAME socket
+    with socket.create_connection(("127.0.0.1", port)) as s:
         s.sendall(b'{"text": "broken\n{"text": "take off"}\n')
         assert _wait_for(lambda: heard == ["take off"])
-    with socket.create_connection(("127.0.0.1", port)) as s:    # HTTP body shorter than its Content-Length
-        s.sendall(b"POST /input HTTP/1.1\r\nContent-Length: 500\r\n\r\n{\"text\": \"x\"}")
+    # HTTP body shorter than its Content-Length
+    with socket.create_connection(("127.0.0.1", port)) as s:
+        s.sendall(
+            b"POST /input HTTP/1.1\r\nContent-Length: 500\r\n\r\n{\"text\": \"x\"}"
+        )
         s.shutdown(socket.SHUT_WR)
-    with socket.create_connection(("127.0.0.1", port)) as s:    # a bad Content-Length header
+    # a bad Content-Length header
+    with socket.create_connection(("127.0.0.1", port)) as s:
         s.sendall(b"POST /input HTTP/1.1\r\nContent-Length: abc\r\n\r\n")
         s.shutdown(socket.SHUT_WR)
-    with socket.create_connection(("127.0.0.1", port)) as s:    # the listener still serves a good request
+    # the listener still serves a good request
+    with socket.create_connection(("127.0.0.1", port)) as s:
         body = b'{"text": "land"}'
-        s.sendall(b"POST /input HTTP/1.1\r\nContent-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body)
+        s.sendall(
+            b"POST /input HTTP/1.1\r\nContent-Length: "
+            + str(len(body)).encode()
+            + b"\r\n\r\n"
+            + body
+        )
         assert _wait_for(lambda: heard == ["take off", "land"])
 
 
-
 def test_an_over_long_line_ends_only_that_connection():
-    """R12: a line over asyncio's 64 KiB limit ends that connection; the listener keeps serving."""
+    """R12: a line over asyncio's 64 KiB limit ends that
+    connection; the listener keeps serving."""
     heard = []
     port = _free_port()
-    PhoneEars(heard.append, host="127.0.0.1", port=port)
+    PhoneAsr(
+        lambda text, source: heard.append(text),
+        host="127.0.0.1",
+        port=port
+    )
     assert _wait_for(lambda: _listening(port))
     with socket.create_connection(("127.0.0.1", port)) as s:
-        s.sendall(b"x" * 70000)                                  # no newline, over the limit
+        # no newline, over the limit
+        s.sendall(b"x" * 70000)
         s.shutdown(socket.SHUT_WR)
     with socket.create_connection(("127.0.0.1", port)) as s:
         s.sendall(b'{"text": "hover"}\n')
         assert _wait_for(lambda: heard == ["hover"])
 
 
-
-# ==================== phone TTS recovery (owner ruling R10) ====================
 HARDEN2 = os.path.join(os.path.dirname(__file__), "..")
 
 
-class _FakePhone(http.server.BaseHTTPRequestHandler):
-    """Stands in for the phone's POST /tts: answers 200."""
-    def do_POST(self):
-        self.rfile.read(int(self.headers["Content-Length"]))
-        self.send_response(200)
-        self.end_headers()
-
-    def log_message(self, *args):
-        return
-
-
-def _phone(port):
-    srv = http.server.HTTPServer(("127.0.0.1", port), _FakePhone)
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
-    return srv
-
-
-def _phone_voice(monkeypatch, port):
-    from audio import tts_io
-    for key, value in (("TTS_BACKEND", "phone"), ("TTS_HOST", "127.0.0.1"), ("TTS_PORT", port),
-                       ("TTS_TIMEOUT", 0.5), ("SERVICE_RETRY_SECONDS", 0.3), ("SUPERVISOR_MAX_RESTARTS", 3)):
-        monkeypatch.setattr(config, key, value)
-    return tts_io.Voice()
-
-
-def test_tts_is_up_at_start_and_recovers_when_the_phone_comes_back(monkeypatch):
-    port = _free_port()
-    srv = _phone(port)
-    voice = _phone_voice(monkeypatch, port)
-    assert BOARD.state("tts") == UP
-    srv.shutdown()
-    srv.server_close()
-    seen = []
-    orig = BOARD.report
-    monkeypatch.setattr(BOARD, "report", lambda s, st, d="": (seen.append((s, st)), orig(s, st, d))[1])
-    back = threading.Timer(0.5, lambda: seen.append(("phone", _phone(port))))   # the phone returns mid-recovery
-    back.start()
-    assert voice._say_phone("שלום") is True
-    assert ("tts", RECOVERING) in seen and BOARD.state("tts") == UP
-    next(v for k, v in seen if k == "phone").shutdown()
-
-
-def test_tts_gives_up_after_the_restart_budget_and_dies_with_the_reason():
-    port = _free_port()
-    code = textwrap.dedent(f'''
-        import sys, threading, http.server; sys.path.insert(0, {HARDEN2!r})
-        import config
-        config.TTS_BACKEND, config.TTS_HOST, config.TTS_PORT = "phone", "127.0.0.1", {port}
-        config.TTS_TIMEOUT, config.SERVICE_RETRY_SECONDS, config.SUPERVISOR_MAX_RESTARTS = 0.3, 0.1, 2
-        class P(http.server.BaseHTTPRequestHandler):
-            def do_POST(self): self.send_response(200); self.end_headers()
-        srv = http.server.HTTPServer(("127.0.0.1", {port}), P)
-        threading.Thread(target=srv.serve_forever, daemon=True).start()
-        from audio import tts_io
-        v = tts_io.Voice()
-        srv.shutdown(); srv.server_close()
-        v._say_phone("x")
-        print("STILL RUNNING", flush=True)
-    ''')
-    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=60)
-    assert r.returncode == 1 and "STILL RUNNING" not in r.stdout
-    assert "[status] tts: RECOVERING -- phone /tts did not answer; retry 2/2" in r.stdout
-    assert "[status] tts: FAILED" in r.stdout and "failed 3 times; 2 recoveries failed" in r.stderr
-
-
-
 def test_a_slow_command_does_not_let_the_duplicate_copy_through():
-    """R21 SAFETY: the phone sends each command over REST AND TCP. A slow first command (Gemma planning)
-    must not block the loop so long that the second copy misses the dedup window and flies twice."""
+    """R21 SAFETY: the phone sends each command over REST AND TCP. A slow first
+    command (Gemma planning) must not block the loop so long that the second copy
+    misses the dedup window and flies twice."""
     heard = []
 
-    def slow(text):
+    def slow(text, source):
         heard.append(text)
-        time.sleep(2.5)                                     # longer than the 1.5 s dedup window
+        # longer than the 1.5 s dedup window
+        time.sleep(2.5)
     port = _free_port()
-    PhoneEars(slow, host="127.0.0.1", port=port)
+    PhoneAsr(slow, host="127.0.0.1", port=port)
     assert _wait_for(lambda: _listening(port))
     body = b'{"text": "fly forward 3 meters"}'
     rest = socket.create_connection(("127.0.0.1", port))
-    rest.sendall(b"POST /input HTTP/1.1\r\nContent-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body)
-    time.sleep(0.3)                                          # the TCP copy lands while command 1 is planning
+    rest.sendall(
+        b"POST /input HTTP/1.1\r\nContent-Length: "
+        + str(len(body)).encode()
+        + b"\r\n\r\n"
+        + body
+    )
+    # the TCP copy lands while command 1 is planning
+    time.sleep(0.3)
     with socket.create_connection(("127.0.0.1", port)) as tcp:
         tcp.sendall(body + b"\n")
         time.sleep(3.5)
@@ -219,21 +162,148 @@ def test_a_slow_command_does_not_let_the_duplicate_copy_through():
     assert heard == ["fly forward 3 meters"]                 # delivered ONCE
 
 
+def test_the_asr_server_process_is_a_laptop_part(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "CLIPS_DIR", str(tmp_path / "asr_clips"))
+    spec = asr_ros.process(str(tmp_path))
+    assert spec.name == "asr" and spec.argv == asr_ros.argv()
+    assert "PULSE_SERVER" in spec.env and spec.log_path == str(tmp_path / "proc-asr.log")
+    assert os.path.isdir(tmp_path / "asr_clips")
+    assert spec.required                     # a laptop part: 3 restarts, then die
 
-def test_an_http_error_from_the_phone_is_a_failed_delivery_and_retries_speak_the_newest(monkeypatch):
-    """R28: a 500 from /tts is not 'spoken'; while it recovers, a newer answer replaces the stale one."""
+
+# ==================== speech in ====================
+def test_speech_in_runs_every_source_and_names_it(monkeypatch):
     port = _free_port()
-    srv = _phone(port)
-    voice = _phone_voice(monkeypatch, port)
-    codes = iter([500, 200])
-    sent = []
+    heard = []
+    monkeypatch.setattr(config, "PHONE_ASR_PORT", port)
+    speech_in = SpeechIn(
+        ["phone"],
+        lambda text, source: heard.append((text, source))
+    )
+    assert _wait_for(lambda: _listening(port))
+    with socket.create_connection(("127.0.0.1", port)) as s:
+        s.sendall(b'{"text": "take off"}\n')
+        assert _wait_for(lambda: heard == [("take off", "phone")])
+    speech_in.close()
 
-    def post(body):
-        sent.append(body["text"])
-        return next(codes)
-    monkeypatch.setattr(voice, "_post", post)
-    with voice._lock:
-        voice._pending = "the newer answer"
-    assert voice._say_phone("the old answer") is True
-    assert sent == ["the old answer", "the newer answer"] and BOARD.state("tts") == UP
-    srv.shutdown()
+
+def test_an_unknown_speech_source_dies():
+    code = textwrap.dedent(f"""
+        import sys
+        sys.path.insert(0, {HARDEN2!r})
+        from audio.speech_in import SpeechIn
+        SpeechIn(["telepathy"], print)
+        print("STILL RUNNING", flush=True)
+    """)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       timeout=60)
+    assert r.returncode != 0 and "STILL RUNNING" not in r.stdout
+    assert "unknown sources ['telepathy']" in r.stderr
+
+
+# ==================== speech out ====================
+def test_the_phone_voice_is_a_request_to_the_phone_app():
+    phone = RecordingPhone()
+    assert PhoneTts(phone.dji).say("שלום") is True
+    body = {"text": "שלום", "lang": config.TTS_LANG, "rate": config.TTS_RATE}
+    assert phone.seen[-1] == ("/tts", body)
+    phone.close()
+
+
+def test_the_phone_voice_speaks_even_in_manual_mode():
+    phone = RecordingPhone()
+    phone.control.manual()           # transmit off: motion refused, speech is not
+    assert PhoneTts(phone.dji).say("עצרתי") is True and phone.paths()[-1] == "/tts"
+    phone.close()
+
+
+def test_a_dead_phone_app_is_waiting_and_never_kills_the_app():
+    """No answer: the speech fails, the "dji app" row goes WAITING (orange), the app
+    lives."""
+    from dji_app.client import DjiApp
+    dji = DjiApp("127.0.0.1", dead_port(), timeout=0.3)
+    assert PhoneTts(dji).say("שלום") is False
+    assert _wait_for(lambda: state_of(dji) == "WAITING")
+    dji.close()
+
+
+def test_speech_out_sends_every_sentence_to_each_output():
+    phone = RecordingPhone()
+    speech_out = SpeechOut(["phone"], phone.dji)
+    speech_out.say("שלום")
+    assert _wait_for(lambda: phone.paths() == ["/tts"])
+    speech_out.close()
+    phone.close()
+
+
+def test_an_unknown_speech_output_dies():
+    code = textwrap.dedent(f"""
+        import sys
+        sys.path.insert(0, {HARDEN2!r})
+        from audio.speech_out import SpeechOut
+        SpeechOut(["smoke signals"], None)
+        print("STILL RUNNING", flush=True)
+    """)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       timeout=60)
+    assert r.returncode != 0 and "STILL RUNNING" not in r.stdout
+    assert "unknown outputs" in r.stderr
+
+
+class _StandInSoundDevice:
+    """Stands in for sounddevice ONLY to inject a device error (a real device cannot fail
+    on demand). `broken` = every play() throws."""
+    class PortAudioError(Exception):
+        pass
+
+    def __init__(self, broken):
+        self.broken = broken
+        self.played = 0
+
+    def play(self, samples, rate):
+        if self.broken:
+            raise self.PortAudioError("device unplugged")
+        self.played += 1
+
+    def wait(self):
+        return
+
+    def stop(self):
+        return
+
+
+def _laptop_voice():
+    """A LaptopTts with the model calls stubbed (no model files needed)."""
+    voice = tts_laptop.LaptopTts.__new__(tts_laptop.LaptopTts)
+    voice._g2p = type("G2P", (), {"add_diacritics": lambda self, t: t})()
+    voice._voice = type("Piper", (), {"create": lambda self, p, is_phonemes: (
+        np.zeros(10), 16000)})()
+    return voice
+
+
+def test_the_laptop_voice_plays(monkeypatch):
+    device = _StandInSoundDevice(broken=False)
+    monkeypatch.setattr(tts_laptop, "sounddevice", device, raising=False)
+    monkeypatch.setattr(tts_laptop, "phonemize", lambda text: text, raising=False)
+    assert _laptop_voice().say("שלום") is True and device.played == 1
+
+
+def test_the_laptop_voice_dies_at_once_on_a_playback_error():
+    """Owner ruling 9a-1: no retry; the sound system itself broke."""
+    code = textwrap.dedent(f"""
+        import sys
+        sys.path.insert(0, {HARDEN2!r})
+        sys.path.insert(0, {os.path.dirname(__file__)!r})
+        from audio import tts_laptop
+        from test_audio import _StandInSoundDevice, _laptop_voice
+        tts_laptop.sounddevice = _StandInSoundDevice(broken=True)
+        tts_laptop.phonemize = lambda text: text
+        _laptop_voice().say("x")
+        print("STILL RUNNING", flush=True)
+    """)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       timeout=60, env={**os.environ, "MVD_HOME": "integration_harden2"})
+    assert r.returncode != 0 and "STILL RUNNING" not in r.stdout
+    # no catch: the crash hook dies with the device's own error
+    assert "PortAudioError" in r.stderr and "device unplugged" in r.stderr
+

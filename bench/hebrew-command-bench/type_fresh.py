@@ -2,25 +2,27 @@ import os,sys,time,json,datetime
 os.environ.setdefault("MVD_HOME","integration_harden2"); os.environ.setdefault("MVD_TRANSLATOR","none")
 BENCH="/root/groundstation/bench/hebrew-command-bench"; sys.path.insert(0,BENCH)
 import bench
-from bench import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
+from bench import gemma_server
 from recognizer import recognize_direct
-from pipeline import Pipeline
+from recognizer import Recognizer
 from cases_typing_fresh import FRESH
 class W:
-    def halt(self): return 200
-    def fly_mission(self,m): return 200
+    def emergency_halt(self): return 200
+    def fly(self,m): return 200
+    def manual(self): return 200
+    def auto(self): return None
 def det_type(k): return {"mission":"move","emergency":"emergency","reject":"not_move","direct":"defer"}.get(k,k)
 def gem_type(k):
     if k=="mission": return "move"
     if k in ("highlight","count","describe","perceive","perception","see","reject"): return "not_move"
     return "other"
 rows=[]; t0=time.time()
-with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
-    pipe=Pipeline(W(), qwen_port=PORT)
+with gemma_server() as gemma:
+    pipe=Recognizer(W(), None, gemma)
     for name,he,gt in FRESH:
         kind,payload,flags=recognize_direct(he)
         text=payload if kind=="direct" else he
-        obj=pipe._plan2(text) or {}
+        obj=pipe.plan(text) or {}
         rows.append({"name":name,"he":he,"gt":gt,"det_kind":kind,"det":det_type(kind),
                      "gemma_kind":obj.get("kind"),"gemma":gem_type(obj.get("kind"))})
 gtm=[r for r in rows if r["gt"]=="move"]; gtn=[r for r in rows if r["gt"]=="not_move"]

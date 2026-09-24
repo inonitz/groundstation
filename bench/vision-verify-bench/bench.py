@@ -5,7 +5,7 @@ The question this bench answers: does the system draw the right object, and does
 refuse when the described object is not in the frame? It runs offline on saved frames,
 so the score is repeatable.
 
-Three arms, each matched to the live mvd gate (mvd.py::TextHandler._gate_task):
+Three arms, each matched to the live gate (app/main.py::TextHandler._gate_task):
     control   draws for every query and never refuses. The no-gate anchor.
     baseline  today's path: SAM3 draws when the head noun clears the count gate.
     verify    baseline plus perception2/verify.py: it also checks the related noun,

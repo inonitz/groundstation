@@ -2,14 +2,16 @@ import os, sys, time, json, argparse, datetime
 os.environ.setdefault("MVD_HOME", "integration_harden2"); os.environ.setdefault("MVD_TRANSLATOR", "none")
 BENCH="/root/groundstation/bench/hebrew-command-bench"; sys.path.insert(0, BENCH)
 import bench
-from bench import LlamaServer, MODELS, GEMMA4_EXTRA, PORT
+from bench import gemma_server
 import cases_commands as C, cases_perception as P
 from recognizer import recognize_direct
-from pipeline import Pipeline
+from recognizer import Recognizer
 
 class W:
-    def halt(self): return 200
-    def fly_mission(self, m): return 200
+    def emergency_halt(self): return 200
+    def fly(self, m): return 200
+    def manual(self): return 200
+    def auto(self): return None
 
 def gt_type(expected):            # command GT: a mission expected (list or open None) = move; [] = not_move
     return "not_move" if expected == [] else "move"
@@ -27,12 +29,12 @@ def main():
     cases+=[(c[0],c[1],"not_move") for c in P.PERC100[:cut]+P.SLANG20[:cut]]
     emerg=[(c[0],c[1]) for c in C.EMERGENCY_CASES[:cut]]
     rows=[]; t0=time.time()
-    with LlamaServer(MODELS["gemma4"], extra=GEMMA4_EXTRA):
-        pipe=Pipeline(W(), qwen_port=PORT)
+    with gemma_server() as gemma:
+        pipe=Recognizer(W(), None, gemma)
         for name, he, gt in cases:
             kind, payload, flags = recognize_direct(he)
             text = payload if kind=="direct" else he
-            obj = pipe._plan2(text) or {}
+            obj = pipe.plan(text) or {}
             rows.append({"name":name,"he":he,"gt":gt,"det_kind":kind,"det":det_type(kind),
                          "gemma_kind":obj.get("kind"),"gemma":gemma_type(obj.get("kind"))})
         for name, he in emerg:

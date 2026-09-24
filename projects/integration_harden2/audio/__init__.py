@@ -1,4 +1,4 @@
-"""audio/ -- the voice I/O channels: ros2_asr.py (ROS2 transcript subscriber), phone_asr.py
-(phone-as-mic REST+TCP inlet, deduped), tts_io.py (TTS outlet: phone /tts, piper/espeak local
-fallback). ASR itself is EXTERNAL (asr_node + sttserv); this package starts at "transcript
-arrives" and ends at "text spoken"."""
+"""audio/ -- speech in and speech out, each ONE interface over a list of backends (owner
+ruling 2026-09-23). speech_in.SpeechIn runs config.ASR_SOURCES (asr_ros: the laptop mic
+through our ASR server; asr_phone: the phone app's speech). speech_out.SpeechOut drives
+config.TTS_OUTPUTS (tts_phone: the phone app's /tts; tts_laptop: offline phonikud)."""
