@@ -53,7 +53,8 @@ docs/spec-harden2-cleanup.md (last sections). Suite: `test/` = 185 pass. Excepti
 - Five principles: invalid config/input -> die; missing required resource -> die at start (the drone link
   flags + reconnects instead); prefer a library to a hand-rolled CLI; choose dispatch once; wrap an
   unavoidable third-party throw, die on a severe error, never swallow to a quiet return.
-- SAM3 = producer/consumer: ONE consumer thread (perception2/task_queue.py) makes every SAM3 call and writes
+- SUPERSEDED 2026-09-23 (owner design: a dispatcher spawns one thread per task, max 8; see spec-harden2-cleanup.md).
+  Old text: SAM3 = producer/consumer: ONE consumer thread (perception2/task_queue.py) makes every SAM3 call and writes
   highlight state. COUNT = one-shot task; HIGHLIGHT = gate, then a persistent record re-detected in budget
   until the 8 s give-up or CLEAR; CLEAR goes through the queue. Task cap VISION_MAX_TASKS = 8, a constant.
 - SAM3 alone ~2.4 forwards/s; threads and batching give no gain (bench/sam3-concurrency-bench). ~2/s is
@@ -66,8 +67,8 @@ docs/spec-harden2-cleanup.md (last sections). Suite: `test/` = 185 pass. Excepti
 - Layout: camera full width on top; below it status | chat; the chat scrolls.
 - Tests: ONE test file per package (audio, control, gemma, perception2, recognizer, system, video) + one per
   root module (mvd, overlay, session_log). config has no tests. Each file must test ALL cases of its package.
-- Git: the owner commits everything ONCE, after the cleanup is done and the webcam mock run works, just
-  before the field test and freeze. Do not suggest commits before then.
+- Git: SUPERSEDED 2026-09-23. The owner commits now, in stages, each message marked BROKEN BUILD / not run
+  end to end. The owner reviews the code after the commit.
 - Global phase 7, after the webcam mock test: make SAM3.1 work and experiment with EOVSAM, both quantized.
 
 ### 4b. DONE (each verified by the 2026-09-22 self-test)
@@ -353,3 +354,164 @@ dirs (gemma/, system/, the new test files, perception2 new files). The earlier S
 (perception2/verify.py, bench/vision-verify-bench/, docs/task-active-harden2-session-handoff.md) was meant as a
 SEPARATE commit per the previous handoff. Also modified by others: .claude/hooks/ste_check.py, docs/HISTORY.md.
 Scratchpad backups under /tmp/claude-0/... are disposable.
+
+## 9. PLAN (agreed with the owner 2026-09-23) -- supersedes the 4c order
+Rulings behind each step: docs/spec-harden2-cleanup.md, "Owner rulings 2026-09-23" and after.
+0. Owner commits the current state in stages, each marked BROKEN BUILD (commands given in chat).
+1. [x] SAFETY (done 2026-09-23, 2 passes): the kill key is F4 from /keyboard/in/raw (app/keys.py), any window.
+   M removed from the window. ROS2 is now required (the kill key needs it). Quit stays window-only.
+2. [x] API v2 written (2026-09-23): docs/api-harden2/, one header per module. WAIT for the owner's review
+   before step 3 (the layout follows the headers).
+3. [x] Module layout (done 2026-09-23, 2 passes): app/{main,ui,render,state,keys}.py, log/{session,trace,
+   show,score}.py, dji_app/client.py (class DjiApp), system/fatal.py, video/cam_list.py. The banned word is
+   gone from every identifier (DJI_HOST, MOCK_DJI_PORT, ...). Launch: python3 -m app.main. Tests: one file
+   per module (10). PUSH_TO_TALK_KEY_NAME in config. LEFT FOR LATER: app/main.py is 621 lines; its vision
+   tasks move to perception2 (step 6) and its turn handler to the recognizer (step 4). Long lines in the
+   moved tests are fixed when step 9 rewrites the tests.
+4. [x] (done 2026-09-23, 2 passes + 3 mutation checks) dji_app client owns the transmit switch (BLOCKED=409;
+   /c/stop never blocked); control/flight.py executes flight and is the switch's ONLY user; one wording:
+   control.flight.outcome_text. The recognizer parses every sentence: fast path (recognizer/fast_path.py:
+   emergency/manual/auto) -> control. Deleted: control/{router,kill,commands}.py, KillSwitch.MOTION,
+   flight_allowed, the 8 unused helper verbs, the pipeline flat-import try (benches import the package).
+   Emergency in manual -> /c/stop. Every failed mission is SAID. Status row renamed "dji app".
+   CARRIED to step 5: TTS through dji_app + the WAITING (orange) state. CARRIED to step 6: the typed
+   Routed result (the recognizer stops calling say()) and typed vision requests; app/main.py long lines.
+5. [x] (done 2026-09-23, 2 passes) New state WAITING (orange). The phone app: a request with no answer ->
+   WAITING + a probe (GET /status/, read-only) every WAITING_RETRY_SECONDS -> UP; never dies. Supervisor
+   start(required=False) for the mock and gstreamer: past the budget WAITING + slow retry, no die. Laptop
+   processes stay required (3 restarts, then die). Phone TTS = DjiApp.speak() (POST /tts, same app/port;
+   in mock mode the mock gets it); its retry loop, row and TTS_HOST/PORT/TIMEOUT are gone. Laptop TTS:
+   PortAudio error -> re-open 3 times, then die. Log: start check (folder creatable + writable) or die;
+   no 'recording' row; a later failed write dies; a missing audio clip is skipped. SAM3 unchanged (die).
+   The flaky SIGKILL log test now waits for the first write.
+9b. [ ] Line-length pass (added 2026-09-23): ~140 older lines over 100 chars in the touched files. Do it
+   AFTER steps 6-9 rewrite them; guideline ceiling ~95.
+6. [x] (done 2026-09-23, 2 passes + 3 mutation checks) perception2/dispatcher.py (a condition-variable thread
+   starts one thread per task, max 8), sam3_lock.py (priority lock: commands before refreshes), vision.py
+   (count / highlight / clear / describe; results through Sinks callbacks; the period counts from the
+   detect START; one highlight at a time). The recognizer routes vision TYPED and returns a Routed (it
+   never speaks); a spoken clear (EN + HE) is routed without Gemma. app/main.py 609 -> 182 lines: the
+   turn and the vision results live in app/turns.py. Removed: task_queue.py, text_parse.py, the one-key
+   dict globals (9a-4). Session log: one record slot per task. All .py lines <= 89 chars.
+7. [x] DONE 2026-09-24 (file by file; 2 checks). 22 try blocks -> 5: util/guarded.py holds ONE
+   per failure domain (http_request, parse_json, file_op, stream_call); fatal.py keeps its crash-path
+   catch. Replaced by non-throwing calls: port_open (connect_ex), the supervisor's stop (poll loop,
+   util/process.wait_exit), the ROS frame (checked sizes before reshape), the phone port (a check
+   before bind). Removed as redundant with the crash hook: SAM3 out-of-memory, laptop PortAudio.
+   Self-tests moved into test files (recognizer/selftest.py deleted; engine/concept self-tests and
+   sam3_backend._smoke -> test_perception2.py; the real SAM3 test is opt-in: HARDEN2_GPU_TESTS=1,
+   run once, passed). No SystemExit/sys.exit in app code. The board is a passed service (no global).
+   Test rewrites (behavior unchanged, construction changed): tests that relied on the global board
+   or SessionLog() now pass a StatusBoard / a folder; the laptop-voice death test checks the
+   PortAudioError text (the crash hook's words); the Gemma HTTP-error test uses a real HTTP 500
+   from the stand-in server instead of patching urllib. New: 8 recognizer rule tests (were the
+   self-test), 4 engine tests, 1 concept test, 1 box-math test, 1 GPU test.
+   Was: try/except to the minimum (audit 2026-09-23): 4 shared helpers that live WITH fatal.py in system/
+   (owner: maybe rename fatal.py; propose a name at step 3); rclpy stop via executor.shutdown();
+   remove the pipeline flat-import try (owner: committed+documented benches are no longer relevant);
+   self-tests move into test files, ideally leaving only fatal's cleanup catch.
+   Method (owner): after EVERY step, check the work in 2 passes: did it do what the step says, and does
+   it follow docs/guidelines.md and the house exception rule. Tick the step here when both pass.
+8. One dependency-check file at start-up (replaces the scattered find_spec guards).
+9. Tests: one file per module against real components; test_app.py over ROS topics (headless, 3 questions,
+   M on, M off, kill Gemma and see it recover, quit).
+10. Measure the display loop; change it only if the numbers say so.
+11. Dead benches: repoint run_list.py; delete compare_engines.py and run_indepth.py (recorded in HISTORY.md).
+12. Stale-doc sweep. HISTORY.md updated at every step (Why / Setup / Result / Verdict / Where).
+13. Code review, the webcam mock run of the real app, then prepare the owner's commits.
+After: phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured), freeze, fuse into llm_to_action.
+
+### 9a. Validation of steps 1-5 (2026-09-23, against sections 4c/4d/8b/9 and the spec rulings)
+Verified in the code: F4 global kill (step 1); API v2.1 headers compile and match the code after
+two fixes (system.h SupProcess.required, control.h emergency-in-manual); layout, no banned
+identifier, one test file per module (step 3); one switch, control its only user, fast path in
+the recognizer (step 4); WAITING orange, supervisor required flag, phone TTS via dji_app, log
+start check (step 5). Spec entries that read OPEN but were resolved are now marked RESOLVED/DONE.
+Gaps found, added to the plan (none were in it before):
+- [x] 9a-1 CLOSED 2026-09-23 night: die at once, remove the re-open loop (spec). Was: Laptop TTS keeps its own re-open loop (3 tries). It is not a process, so the supervisor
+      cannot restart it, but the ruling says "no per-system retry loops". ASK the owner.
+- [x] 9a-2 (recognizer part) DONE 2026-09-24: recognizer/ split by job (largest file 284). render.py (542) and log/session.py (363) remain. Was: recognizer/recognizer.py is 470 lines; app/render.py 298; log/session.py 256. Only
+      app/main.py (609) had a planned split (steps 4/6). Split these too (KISS, ~150-200).
+- [ ] 9a-3 gemma/server.py LlamaServer (bench launcher) repeats the supervisor's start/wait/stop
+      (4d leftover, never ruled). ASK: benches use the supervisor, or keep it.
+- [x] 9a-4 (done in step 6) app/main.py module-level one-key dict globals (OM, ENGINE, VISION, SUPERVISOR) and config
+      aliases (4d leftover). Resolve in the step 6 rewrite.
+- [x] 9a-5 DONE 2026-09-24: renamed use_compile (quant_bench.py updated). Was: sam3_backend's `compile` parameter shadows the builtin (8b leftover); rename it and the
+      bench caller (bench/sam3-mask-bench/quant_bench.py).
+- [x] 9a-6 DONE 2026-09-24: SessionLog(folder); the app passes config.SESSION_DIR. Was: log/session.py reads MVD_SESSION_DIR from the environment directly: a config bypass
+      (config.SESSION_DIR already reads it). Use config only.
+- [ ] 9a-7 No single interface is shared by every module (owner question 2026-09-23). Only gemma,
+      audio, video and dji_app expose start_services(supervisor, log_dir). OPEN for the owner.
+- [x] 9a-8 Line length: ALL harden2 .py lines <= 89 chars (owner 2026-09-23, "less than 90"),
+      replacing 9b. Done by 4 parallel agents, each file proven AST-identical by
+      scratchpad/check_wrap.py, tests green.
+- [ ] 9a-9  perception2 leaks its assembly: app/main.py builds BackendLoader + PerceptionEngine +
+      vlm_client by hand. perception2 should expose ONE factory that returns the Vision service.
+- [ ] 9a-10 the recognizer imports dji_app's status codes (BLOCKED, UNREACHABLE, sent). It should
+      only talk to control; control gives it the outcome.
+- [ ] 9a-11 the recognizer imports perception2.lexicon (the HE->EN target fix). Only the recognizer
+      uses it: it belongs in recognizer/.
+- [ ] 9a-12 Density pass (owner 2026-09-23): blank lines between logical steps, one statement per line,
+      no packed assignments or dense lambdas, in every file touched this session.
+- 9a-10 detail: pipeline._fly reads raw HTTP codes (BLOCKED / UNREACHABLE / sent) because control.fly()
+      returns the phone's HTTP code. Fix: control returns its own result; the recognizer never sees HTTP.
+- [ ] 9a-13 "Internals by hand" in app/main.py (owner: constructors exist for this): build_vision wires
+      BackendLoader + PerceptionEngine + Vision with a two-phase set_engine; build_flight REPLACES
+      dji.fly_mission / dji.halt with recording wrappers from outside; the app opens the video source,
+      retries it, reports the "video" row and builds StallGuard itself. Each module's constructor must
+      build its own parts.
+- [ ] 9a-14 Speech in vs speech out: Voice hides its two backends in one object, but speech IN is two
+      objects (Ears, PhoneEars) the app builds and wires by hand. One audio object for speech in.
+- [ ] 9a-15 Shared standalone helpers living inside one module (owner: shared = a shared folder):
+      port_open, native_env (system/supervisor.py; used by dji_app, audio, gemma, video), sent
+      (dji_app; used by control, recognizer), hebnum_to_digits (recognizer; used by log/score.py).
+      Misplaced single-user helpers: perception2/lexicon.py (only the recognizer uses it),
+      log.session.reject_why (words the recognizer's rejects; used by app/turns.py).
+- 9a-3 DECIDED by the agent (owner: "decide"): the benches start Gemma through the SAME launcher as the
+      app: system.supervisor.Supervisor + gemma.server.start_services(sup, log_dir, port=..., thinking=...).
+      LlamaServer is deleted. One start mechanism.
+- 9a-1 finding: in this setup laptop audio goes to the host through the PulseAudio socket
+      (PULSE_SERVER=unix:/tmp/pulse-socket). It fails when the host sound server restarts, the output
+      device is unplugged, or the socket is missing; a retry 1 s later fixes none of these reliably.
+      Recommendation: die at once (no retry loop). Waiting for the owner.
+- Ears: the owner says Ears was abolished. No ruling found in the docs, the git history (class Ears
+      exists since 3ccbcf7) or this session's messages. Asked the owner which ruling (Eyes was deleted
+      in phase 3.4a).
+
+### 9b. Target design (owner rulings 2026-09-23 night) -- replaces 9a-9, 9a-10, 9a-13, 9a-14
+Every class: constructor, close(), internal methods; then a user of the class.
+SERVICES (the app creates them first, choosing each from config ONCE; any failure -> die):
+  StatusBoard | SessionLog(folder) | Supervisor | process handles from Supervisor.start():
+  Gemma server (always), keyboard hook (always: F4), ASR server (only if "ros" in ASR_SOURCES),
+  gstreamer (only if VIDEO=dji), the mock (only if CONTROL=mock) | Gemma(port) client |
+  DjiApp(host, port) | Sam3 (backend loader).
+  A process runs only when a configured option needs it: no idle GPU/CPU, no false red rows.
+MODULES (each gets the services it needs in its constructor; callbacks, not other modules):
+  SpeechIn(sources=config.ASR_SOURCES, on_heard) | SpeechOut(outputs=config.TTS_OUTPUTS, dji) |
+  Video(source=config.VIDEO, gstreamer handle or None) | Control(dji, log) -- the drone ONLY |
+  Vision(sam3, gemma, video, sinks) | Recognizer(control, vision, gemma, log) | Keys(on_key) |
+  Ui(video, status board, chat). The app connects callbacks (on_heard -> recognizer, F4 -> control).
+SHUTDOWN: the app closes every module (reverse order), then every service (reverse order).
+HTTP results: http.HTTPStatus (.is_success; 409 = CONFLICT = blocked); None = no answer.
+- [x] 9b-1 BUILT 2026-09-24 (2 passes). Services -> modules -> reverse shutdown in app/main.py; every
+      class has close(). ProcessSpec + Process handle (supervisor); gemma/server.process() is the ONE Gemma
+      launcher (app + benches; LlamaServer deleted; 9a-3). Gemma, DjiApp, BackendLoader, SessionLog are
+      service objects. SpeechIn(ASR_SOURCES) / SpeechOut(TTS_OUTPUTS) with asr_ros/asr_phone/tts_phone/
+      tts_laptop; laptop voice dies at once (9a-1). Video(source, gstreamer handle). Control(dji, log) records
+      missions itself (no method replaced from outside). Vision builds its own engine. Keys(on_key); the app's
+      on_global_key acts on F4 only. Ui(video, board). http.HTTPStatus everywhere; the recognizer no longer
+      imports dji_app. util/ (net, process, hebrew); lexicon + reject_why -> recognizer/. system/ros.py = one
+      ROS2 context. All harden2 .py pass flake8 E30x/E501(89)/E70x/E731. 195 tests, 3 clean runs.
+      Closes 9a-3, 9a-9, 9a-10, 9a-13, 9a-14, 9a-15 (guarded helpers: step 7).
+- [x] 9a-12 DONE 2026-09-24 (2 passes). Older files regrouped by intent in the owner's _track style:
+      recognizer.py, render.py, session.py, perception2/{verify,engine,concept,counting,sam3_backend,
+      vlm_client}.py (by the agent); log/{score,show,trace}.py, video/cam_list.py, recognizer/prompts.py
+      (helper agent A); config/*, app/{turns,ui}.py (helper agent B); both agents' work re-checked by the
+      agent (diffs read, config values compared old vs new: identical). Box overlap math: one home,
+      perception2/boxes.py (was 3 copies) + a test pinning its values (mutation-checked). Removed dead
+      code: EN_NUM_REV, LOG_DIR, _wrap_px's unreachable ASCII branch, render's `if not cur: cur = []`.
+      score.py reads config.SESSIONS_ROOT (was a second home) and dies when no session exists.
+      196 tests, 2 runs; flake8 layout + pyflakes clean on all harden2 .py; bench audit CLEAN.
+      Left open (owner calls): _number_token vs _is_number_he differ on 'ו5' (merging changes behavior);
+      env overrides read in both config/__init__.py and config/defaults.py; stale docstrings in
+      prompts.py (names removed prompts) and config (names config_constants.py / config_defaults.py).

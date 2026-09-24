@@ -29,7 +29,7 @@ flowchart LR
         end
         NG{"Number Guard"}
         SAM["SAM3: Highlighting + Counting"]
-        KILL["Kill Switch, M key"]
+        KILL["Kill Switch, global F4 key"]
         GST["gstreamer node in ROS2<br/>H.264 in from any platform"]
         CAM["CameraStream + overlay"]
     end
@@ -55,7 +55,7 @@ Changes against the demo-day system, one per line:
 - Qwen -> Gemma 4. One model does routing, flight planning, the presence gate and the Hebrew scene answers.
 - Scene Transcribing + Text Simplifier -> one box, Scene Q&A in Hebrew. No translation to English and back any more.
 - Highlighting: OmDet + SAM2 -> SAM3, fed by the English target phrase the planner writes.
-- New: Number Guard between the plan and the wire. New: Kill Switch on the M key, straight to /c/stop.
+- New: Number Guard between the plan and the wire. New: Kill Switch on the global F4 key (any window has focus), straight to /c/stop.
 - The Regex stays as tier 0: emergency stop + override/resume only — all command typing and mission planning runs through the one Gemma call. Every command reaches the aircraft through the phone's REST API server, then the DJI Remote Controller; the same server speaks the TTS and forwards the H.264 video, which the gstreamer node in ROS2 turns into our frame source for any platform. The WebSocket /c/ws/sticks is the virtual-stick channel with its keepalive.
 - Not in the picture because not built: target approach, SAM3 counting.
 
@@ -101,7 +101,7 @@ Slide sources (2026-09-09 01:30): graphviz DOT files `../archive/diagrams/diagra
 ```mermaid
 flowchart TB
     subgraph L2A["Reused llm_to_action ROS2 nodes (C++, unchanged)"]
-        KEYS["keyboard_hook<br/>F5 push-to-talk -> /keyboard/in/raw"]
+        KEYS["keyboard_hook<br/>every key -> /keyboard/in/raw (F5 push-to-talk, F4 kill)"]
         ASRN["asr_server<br/>whisper.cpp ivrit large-v3-turbo q5_k<br/>-> /asr_server/transcribe"]
         GST["gstreamer_rx<br/>H.264 :5600 -> camera/stream"]
     end
@@ -112,30 +112,30 @@ flowchart TB
     end
     RC["DJI Remote Controller"] <--> DRONE(("DJI drone"))
     API <--> RC
-    subgraph APP["mvd.py, the ground-station app"]
-        EARS["Ears: ROS2 subscriber to /asr_server/transcribe<br/>phone_ears: POST /input from the phone"]
-        TH["TextHandler"]
-        ROUTER["Router (control/): safety tiers<br/>emergency / override / resume"]
-        DIRECT["recognize_direct: emergency, bypass, Hebrew rewrites"]
+    subgraph APP["app/, the ground-station app"]
+        EARS["SpeechIn (ASR_SOURCES): asr_ros subscribes to /asr_server/transcribe<br/>asr_phone: POST /input + TCP from the phone"]
+        TH["Turns: one spoken turn -> the Recognizer -> show + say"]
+        DIRECT["recognizer: fast path (emergency / manual / auto),<br/>bypass, negation guard, Hebrew rewrites"]
         GUARD["number guard + few-shot echo guard"]
-        WIRE["DjiWire: POST /c/fly, /c/stop"]
-        KILL["KillSwitch, M key: /c/stop + latch"]
+        CTRL["control: executes flight; the ONE user of the transmit switch"]
+        DJI["dji_app client: POST /c/fly, /c/stop; transmit switch"]
+        KILL["F4 key (global): manual / auto toggle"]
         GATE["presence gate: one frame to Gemma, format grammar"]
         SAM["SAM3-nf4 (perception2)<br/>highlight 1 forward/s, count at 0.5, 8 s give-up"]
-        CS["CameraStream: camera/stream"]
-        HUD["overlay HUD: masks, chat, fps, kill state"]
-        REC["session recorder: utterances.jsonl + clips"]
+        CS["Video (one source): ros_stream subscribes to camera/stream"]
+        HUD["Ui: camera, status pane (each part's own rows), chat, masks"]
+        REC["SessionLog: trace.jsonl + clips + perception passes"]
     end
     GEMMA["Gemma 4 E4B, llama-server :18090, thinking off<br/>UNIFIED_GRAMMAR: kind, target_en, mission<br/>VLM answers in Hebrew"]
     MIC(["microphone"]) --> ASRN
     KEYS -->|"record on/off"| ASRN
     ASRN --> EARS
     PSR -->|"not caught"| API -->|"/input"| EARS
-    EARS --> TH --> ROUTER
-    ROUTER -->|"emergency / override"| WIRE
-    ROUTER -->|"complex"| DIRECT --> GEMMA
-    GEMMA -->|"mission"| GUARD --> WIRE --> API
-    KILL --> WIRE
+    EARS --> TH --> DIRECT
+    DIRECT -->|"emergency / manual / auto, bypass mission"| CTRL
+    DIRECT -->|"everything else"| GEMMA
+    GEMMA -->|"mission"| GUARD --> CTRL --> DJI --> API
+    KILL --> CTRL
     GEMMA -->|"highlight, count: target_en"| GATE --> SAM --> HUD
     GEMMA -->|"describe: Hebrew answer"| API --> SPK
     DRONE -.->|"video"| RC -.-> API -.->|"H.264"| GST --> CS
@@ -166,11 +166,11 @@ Boot: `VIDEO=webcam WEBCAM_DEV=2 SCENE_TTS=off bash projects/integration_harden2
 ## Conventions (2026-09-19)
 
 - The no-exceptions rule lives in `guidelines.md`; harden2 follows it. Our error conditions call
-  `fatal.py::die(msg)` (a loud crash), never a raise. Third-party code that throws is still caught.
+  `system/fatal.py::die(msg)` (a loud crash), never a raise. Third-party code that throws is still caught.
 - The vision backend sits behind a contract, chosen once at startup. `perception2/backend.py` holds the
   `VisionBackend` Protocol (two calls: `detect(frame, phrase, conf, topk)` and `mask_for_box(frame, box)`) and
-  a `BACKENDS` name->factory registry. `build_highlight` reads `SCENE_SEG`, builds that one backend, and the
-  engine calls it directly. The choice is one-time, not a per-frame dispatch. SAM3 is the only backend today;
+  a `BACKENDS` name->factory registry. The app builds `BackendLoader(config.SEG)`, which loads that one
+  backend on its own thread, and the engine calls it directly. The choice is one-time, not a per-frame dispatch. SAM3 is the only backend today;
   a new one is a class plus one line in `BACKENDS`. An unknown `SCENE_SEG` crashes with a clear reason.
 - SAM3 returns one box per object. `detect()` merges overlapping or contained boxes (IoU>0.5 or >70%
   containment) so a single object draws a single box.

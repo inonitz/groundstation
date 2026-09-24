@@ -3481,3 +3481,275 @@ These were pulled from docs now retired to stale, so the binding content survive
   removed; the live path has no translator.
 - Full documentation staleness audit + fixes: specs, harden2 and bench READMEs repointed to the live
   system; CLAUDE.md links -> guidelines.md; 8 finished task docs archived to stale/.
+
+
+## Bench and decision record, harden2 (format from 2026-09-23)
+
+Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where**. Time order.
+
+### 2026-09-03 -- SAM3 vs OmDet + SAM2.1, in depth (sam3-mask-bench/run_indepth.py)
+- **Why:** decide if SAM3 alone can replace OmDet-Turbo (boxes) + SAM2.1 (masks).
+- **Setup:** 17 candidate images; SAM3 detections vs OmDet, SAM3 masks vs SAM2.1 by mask IoU.
+- **Result:** bench/sam3-mask-bench/RESULTS.md, section "In-depth"; raw results/2026-09-03-indepth.json.
+- **Verdict:** SAM3-nf4 adopted as the one vision backend.
+- **Where:** the script needs OmDet, removed later. It no longer runs. The results stay.
+
+### 2026-09-09 -- engine-level A/B (sam3-mask-bench/compare_engines.py)
+- **Why:** prove the perception2 swap: the SAME PerceptionEngine on OmDet+SAM2.1 vs SAM3.
+- **Setup:** each backend in its own process; presence gate bypassed; bare concepts.
+- **Result:** the only bench that ran the full engine. It exposed the OmDet-era cap (mask_k=3):
+  live drew 3 boxes max while raw SAM3 found 26-47 windows. Cap lifted (HL_MAX 15, HL_TOPK 24).
+- **Verdict:** the bench-vs-live gap was the inherited cap, not SAM3.
+- **Where:** calls perception2.build_engine (removed 2026-09-11). It no longer runs.
+
+### 2026-09-19 -- whole-system lane 1 (whole-system/run_list.py)
+- **Why:** replay a live-test list (text, or recorded clips through whisper) through the real recognizer.
+- **Verdict:** still the lane-1 tool in bench/whole-system/README.md.
+- **Where:** it reads the Qwen3-VL model entry removed 2026-09-19. It does not run until repointed.
+
+### 2026-09-20 -- split-and-verify for related nouns (vision-verify-bench)
+- **Why:** on the 2026-09-19 webcam run SAM3 drew objects that were not there ("backpack held by a
+  child" drew guitar cases). SAM3 scores the matching parts of a phrase and ignores the missing parts.
+- **Setup:** 137 human-labelled rows over 48 images (53 present, 84 absent); SAM3-nf4, live-matched gates;
+  arms control / baseline (today) / verify (perception2/verify.py).
+- **Result:** false draws 84 / 24 / 8. Full-correct rows 34 / 89 / 105. Related-noun-absent class:
+  verify refuses 20 of 20, baseline 11. Cost: 829 vs 413 ms p50 on relation phrases only.
+- **Verdict:** SCENE_VERIFY default ON (owner ruling 2026-09-20). SAM3 instance recall (130 of 322
+  missed) is the remaining limiter, not the cap.
+- **Where:** bench/vision-verify-bench/README.md.
+
+### 2026-09-22 -- SAM3 under concurrency and batching (sam3-concurrency-bench)
+- **Why:** SAM3 is the bottleneck. How many parallel vision requests can it serve?
+- **Setup:** RTX 5070 Laptop, SAM3 nf4 ALONE (optimistic), synthetic 720p frame.
+- **Result:** one forward 409 ms p50 (about 2.4 forwards/s). N threads: 0.97-0.99x. K prompts batched:
+  1.02-1.04x, VRAM to 3457 MiB at K=8.
+- **Verdict:** threads and batching buy no throughput. About 2 requests/s is enough for now (owner).
+  The task design is chosen for readability, not speed: see the next entry.
+- **Where:** bench/sam3-concurrency-bench/RESULTS.md.
+
+### 2026-09-21 to 2026-09-23 -- harden2 cleanup refactor
+- **Why:** the thermonuclear review (docs/review-harden2-thermonuclear-2026-09-21.md) found exception
+  flow, silent failures and unsafe reports across the app. House rule: no exceptions in our code, die()
+  on fatal, status codes otherwise.
+- **Decisions (owner):** docs/spec-harden2-cleanup.md holds every ruling. The main ones:
+  - The app starts every process through one supervisor; 3 restarts, then die.
+  - A status board shows every system: green UP, red otherwise, with the reason.
+  - Gemma is shared: one gemma/ package keeps it alive; the client returns (ok, text).
+  - perception2 replaces perception.
+  - One test file per package.
+  - SAM3 tasks (restated 2026-09-23): a dispatcher spawns one thread per task, max 8; count is fire
+    and forget; a highlight lives until clear or give-up. The built single-consumer queue does not
+    follow this yet.
+- **Found and fixed (real bugs):**
+  - The kill key said "Motion stopped" when the stop never reached the phone.
+  - The loopback guard accepted any host starting "127.".
+  - The phone speech channel could deliver one mission twice.
+  - cv2 4.11 has no getMouseWheelDelta: the first chat scroll would have crashed the app.
+  - die() raced when two threads died at once.
+  - SESSIONS_ROOT pointed one folder too high; ASR clips and the session log split apart.
+- **Findings for the next change:**
+  - Phone TTS is POST /tts on the SAME phone app and port (8080) as the drone commands. TTS is not a
+    separate service: if the app does not answer, both are down.
+  - rclpy: Executor.spin() returns cleanly after executor.shutdown(). An exception comes only when the
+    ROS context is shut down from outside (rclpy's own SIGINT handler). No try is needed with
+    signal_handler_options=NO and executor.shutdown() first.
+- **Work done, by area (each item: what changed, and why):**
+  - Start-up and recovery:
+    - The app starts every process itself (Gemma, mic ASR, push-to-talk keys, gstreamer, the mock). run.sh
+      only starts the app. Why: one owner for every process, so none is left orphaned.
+    - One supervisor restarts a dead process up to 3 times, then the app dies with the reason.
+    - die() now runs every cleanup even if one throws, and a second die() waits for the first. A flaky
+      test exposed two threads dying at once.
+    - Any uncaught exception in a thread or in asyncio now calls die(). Before, a dead SAM3 thread left
+      every later vision request queued forever, with no error shown.
+    - If the video source never opens, the app dies. Before, it returned and left its child processes running.
+    - An unwritable session folder is fatal at start-up.
+  - Status: a status board shows every system, green UP or red with the state and the reason. It replaced
+    scattered chat error lines.
+  - Gemma: one gemma/ package starts it and serves one client call that returns (ok, text). A malformed
+    or partial reply is a failed call, never an escaped exception. A failed call reads "gemma-failed", not
+    "the user said something invalid".
+  - Drone commands and the kill key:
+    - The kill key said "Motion stopped" even when the stop never reached the phone. It now says the stop
+      FAILED and tells the user to take over with the RC or the power button.
+    - A request refused by the kill latch said "did not reach the aircraft". It now says the latch refused
+      it (press M to re-arm).
+    - Any HTTP answer other than 2xx counted as "flown". Only 2xx counts now.
+    - A malformed reply from the phone escaped as an exception; during a kill that would have crashed the
+      app. Every such reply is now an "unreachable" status.
+    - The mock-only guard accepted any host starting "127." (for example "127.drone.lan"). It now accepts
+      only localhost, ::1, or a real 127.x.x.x address.
+    - The phone IP now comes from the wireless default route only. The first route could be the wired one.
+  - Phone speech channel:
+    - A mission could be delivered twice: the ~3 s Gemma plan ran inside the network loop and blocked it.
+      Transcripts now go through a queue to one delivery thread.
+    - A bad line, a line over 64 KiB, a short read or a reset now ends that one connection. Before, each
+      one crashed the handler.
+  - Speech out: the phone TTS uses urllib (one HTTP library in the app). An HTTP 500 no longer counts as
+    spoken, and a retry speaks the newest text, not a stale one. (Its retry loop is wrong; see the finding
+    above: TTS is part of the phone app.)
+  - Vision:
+    - perception2 replaced perception. The text parsers moved to perception2/text_parse.py.
+    - detect() returns (status, hits). "SAM3 still loading" no longer reads as "object absent", which
+      used to clear a live highlight.
+    - A count where every frame failed said "0" and cleared the highlight. It now says vision is not ready.
+    - A cache made count frames 2 and 3 reuse frame 1, so the median was over one frame. Removed.
+    - A highlight refresh refused by a full queue ended the refresh silently (frozen boxes). A refresh
+      now never counts against the cap.
+    - SAM3 running out of GPU memory calls die().
+  - Session recording:
+    - The ASR recorded clips into one folder and the session log read another. Both now use config.
+    - The vision thread and the Gemma thread shared one open request and closed each other's. Each has
+      its own slot now.
+    - A phone transcript (no audio) could claim the mic's audio clip. Claims are now mic-only, under a lock.
+    - Every write returns a status. A failed write turns the "recording" row red.
+  - Screen: camera on top, status and a scrolling chat below. The mouse wheel crashed on cv2 4.11
+    (no getMouseWheelDelta); it now reads the wheel from the event flags.
+  - run.sh: status reads the per-process logs the app writes, and PHONE_IP is exported only in real mode.
+    Before, mock mode set PHONE_IP to 127.0.0.1 and broke DJI video.
+  - Tests: one file per package. A check of public names against their tests found 59 of 163 untested;
+    tests were added. Lesson: a fix is proven only when its test FAILS on the old code.
+- **Kept on purpose:** a taken phone-ASR port kills the app at start-up (owner). Lazy imports stay for
+  heavy optional libraries (torch in config, sounddevice and phonikud in TTS).
+- **State:** unit tests pass (185). The app has NOT run end to end. Committed as WIP, marked broken.
+- **Where:** docs/task-active-harden2-refactor-handoff.md.
+
+### 2026-09-23 -- the kill key works from any window
+- **Why:** the M kill key was read with cv2.waitKey, so it worked only while the video window had focus.
+  With focus on a terminal, M did nothing and gave no sign. The app already ran the global keyboard hook
+  (for push-to-talk) but never listened to it.
+- **Change:** the kill key is F4, read from /keyboard/in/raw (app/keys.py). A function key, because the
+  hook sees every key in every window, and letters are typed elsewhere (owner). F5 stays push-to-talk.
+  Press only; release and auto-repeat are ignored, so holding F4 toggles once. ROS2 is now required.
+- **Result:** 5 tests over a real ROS2 topic. Removing the press filter makes the hold test fail.
+- **Where:** app/keys.py, test/test_app.py, control/kill.py.
+
+### 2026-09-23 -- harden2 module layout
+- **Why:** one module per job (owner module map), small files, and no banned word in any identifier.
+- **Change:** mvd.py became app/ (main.py, ui.py = the only code that draws, render.py = the panes,
+  state.py, keys.py). session_log.py, trace.py and the two session tools became log/. The phone-app
+  client became dji_app/client.py (class DjiApp). fatal.py moved into system/, cam_list.py into video/.
+  Every "wire" identifier was renamed (DJI_HOST, MOCK_DJI_PORT, dji_target, ...). One test file per module.
+- **Found on the way:** the session viewer (show_session.py) looked for sessions one folder too high;
+  it now reads config.SESSIONS_ROOT. The push-to-talk key name is in config, not in three strings.
+- **Result:** 190 tests pass, unchanged except their import paths. The app starts with python3 -m app.main.
+- **Where:** projects/integration_harden2/README.md (layout table).
+
+### 2026-09-23 -- one transmit switch; the recognizer parses every command
+- **Why:** three places sent to the drone (the router, the recognizer, the kill switch), there were two
+  switches (the kill latch and the router's manual mode), and emergency detection ran twice.
+- **Change:** the phone-app client owns ONE transmit switch; off = every motion request returns BLOCKED
+  and nothing leaves the laptop; /c/stop is never blocked. control/flight.py executes flight and is the
+  switch's only user. The recognizer parses every sentence: its fast path (emergency / manual / auto)
+  calls control before any model (owner ruling). F4 and the spoken "manual" / "auto" end in control.
+- **Safety detail:** an emergency in manual mode sends /c/stop. A halt is a /c/fly request, which would
+  take stick control back from the RC. Every mission that does not fly is now said out loud.
+- **Result:** 186 tests over a real local HTTP server and the real client. Three mutations (switch
+  ignored, emergency ignores manual, manual forgets the switch) each fail a test.
+- **Where:** control/flight.py, dji_app/client.py, recognizer/fast_path.py, test/support.py.
+
+### 2026-09-23 -- what happens when each part fails
+- **Why:** owner module map: laptop parts restart then crash; the phone app is outside the laptop, so
+  the app waits for the user; the log cannot fail in a way a restart fixes.
+- **Change:** a new state, WAITING, drawn orange: the user must fix something outside the laptop.
+  - Phone app: a request with no answer turns the "dji app" row WAITING; a probe (GET /status/, the
+    read-only telemetry) turns it UP when the app answers. The app never dies because of the phone.
+  - The mock and gstreamer depend on the phone app: past the restart budget they WAIT and retry.
+  - Phone text-to-speech is one more phone-app request (POST /tts, same app and port). Its own retry
+    loop and status row are gone. Finding: in mock mode the speech now goes to the mock, not the phone.
+  - Laptop text-to-speech: an audio device error re-opens the output 3 times, then the app dies.
+  - Log: at start the session folder must be creatable and writable, or the app dies; a later failed
+    write means a broken disk and the app dies; the "recording" row is gone.
+- **Result:** 194 tests. The laptop-voice test injects device errors through a stand-in sounddevice:
+  a real device cannot fail on demand.
+- **Where:** system/supervisor.py, dji_app/client.py, audio/tts_io.py, log/session.py.
+
+### 2026-09-23 -- every harden2 line under 90 characters
+- **Why:** owner rule: lines must be under 90 characters; 1,317 were longer.
+- **How:** a first automatic reflow was rejected (it merged aligned lists and left ragged tails).
+  The lines were then wrapped by hand in four parallel groups. Each file was proven identical to its
+  backup by comparing the parsed program (docstrings compared with whitespace collapsed); string
+  values, the Gemma prompts included, are unchanged. Two child-program strings in the tests were
+  rewritten by hand (same behavior, the tests prove it).
+- **Result:** 0 lines over 89 characters; 194 tests pass; the recognizer self-test is clean.
+
+### 2026-09-23 -- one thread per vision task (owner design)
+- **Why:** the single SAM3 consumer ran every task itself, so a count's sleep between frames and a
+  highlight's wait blocked every other vision request. The owner's design: a dispatcher starts one
+  thread per task; only the SAM3 forward pass is serialized. Chosen for clarity, not speed (SAM3
+  gains nothing from threads: sam3-concurrency-bench).
+- **Change:** perception2/dispatcher.py (one condition-variable thread starts a thread per task,
+  max 8; past that a request is refused), sam3_lock.py (a priority lock: a user command before a
+  highlight refresh, arrival order within a priority, like the Linux rt_mutex), vision.py (count /
+  highlight / clear / describe; results to the app through callbacks). The highlight period now
+  counts from the START of each detect (a true 1 Hz). The recognizer hands vision requests over
+  typed (no English text parsed again) and returns a typed result; it no longer speaks. A spoken
+  "clear" in Hebrew now works (before, it went to Gemma as a question). app/main.py: 609 -> 182 lines.
+- **Result:** 193 tests. The vision tests run the real service, dispatcher and lock on a stand-in
+  backend. Three mutations (no mutual exclusion, priority ignored, period from the end) each fail a
+  test.
+- **Where:** perception2/README.md, app/turns.py.
+
+### 2026-09-23 -- a rename changed bench data (found and fixed)
+- **What:** the step 3 rename of the banned word ("wire" -> "dji") also hit two scoring keywords in
+  bench/hebrew-command-bench/cases_perception.py, where "wire" means a physical wire (birds on the
+  wires). The bench audit (bench.py --audit) caught it: the scorer refs no longer matched.
+- **Fix:** both keywords restored. A diff of every quoted string the rename touched found no other data.
+- **Lesson:** a word ban applies to names and our prose, never to data; a mass rename must skip strings.
+
+### 2026-09-24 -- each part owns its status; the recognizer split by job
+- **Why:** the supervisor wrote other parts' rows through a shared board; recognizer.py mixed four
+  jobs in 647 lines; several helpers had two or three copies; the UI reached control through a
+  global; the tests wrote trace files into the repo.
+- **Change:** a Status row per part, reported by the part's own status(); the board only asks.
+  recognizer/ = parse, fast_path, bypass, guards, rewrites, numbers, lexicon, prompts + the
+  Recognizer class (plan() public). One home each for the ROS subscription, a mission step as
+  text, the newest session, the Hebrew range, a frame's area, the JSON header, the test wait. The
+  UI gets manual_on. API headers v2.3 (new util.h), all compile.
+- **Result:** 207 tests (2 runs) + the GPU test; bench audit CLEAN; 5 except handlers (the audit
+  script); the and-number rule changes none of the 305 bench sentences; no test writes to logs/.
+
+### 2026-09-24 -- exceptions down to one catch per failure domain (plan step 7)
+- **Why:** the house rule allows a try only around a third-party call that throws; 22 blocks were
+  spread over 13 files, several around calls with a non-throwing twin, two that only called die().
+- **Change:** util/guarded.py holds one try per failure domain (HTTP, JSON, filesystem, asyncio
+  streams); fatal.py keeps the crash-path catch. Non-throwing calls replace the rest (connect_ex,
+  a poll loop, size checks before a reshape, a port check before bind). The status board became a
+  passed service (the hidden global is gone); every env read moved into config/defaults.py;
+  self-tests became test functions. A full re-read of the helper agents' files fixed what their
+  reports and the diff review missed.
+- **Bug found on the way:** the emergency halt recorded `[{"delay": 0}]` in the session log while it
+  sent `[{"type": "delay", "seconds": 0.0}]`; it now records exactly what is sent.
+- **Result:** 207 tests (2 runs) + 1 GPU test run once on the real SAM3; flake8 layout + pyflakes
+  clean on all harden2 .py; bench audit CLEAN. Unverified: the real phone app with http.client
+  (urllib used to add a Content-Type header to empty POSTs; the mock accepts both).
+
+### 2026-09-24 -- older harden2 files regrouped by intent (plan 9a-12)
+- **Why:** the files older than this refactor still mixed packed statements, dense lambdas, nested
+  ternaries and tables rebuilt on every call; the owner's _track rewrite is the style for all code.
+- **Change:** every older file regrouped by intent (guard clauses, loop locals at the top, blank lines
+  between steps, one statement per line). render_chat split into header / turns / colour / rows with its
+  tables as module constants. The box overlap math had three copies (counting, verify, sam3_backend):
+  now one home, perception2/boxes.py. Sam3Backend `compile` -> `use_compile`. Two helper agents did
+  the log/video/prompts and config/app files (owner permission, 2 agents); their work was re-checked.
+- **Result:** behavior unchanged: the 195 existing tests pass untouched, plus one new test that pins the
+  box math (it catches the two mutations the old suite missed). Config: all 73 names and values equal
+  old vs new. score.py compared old vs new on 1280 judge cases: equal.
+
+### 2026-09-24 -- services first, then modules (owner lifecycle design)
+- **Why:** modules built each other's parts by hand (the app wired perception's engine, replaced two
+  methods of the phone-app client to log missions, and did the video module's job); speech in was two
+  objects the app wired while speech out was one; our own layer wrapped plain HTTP codes.
+- **Change:** app/main.py builds the SERVICES (session log, supervisor + only the processes the settings
+  need, Gemma client, phone-app client, SAM3 loader), gives each MODULE the services it needs in its
+  constructor, runs the screen, then closes modules and services in reverse. SpeechIn / SpeechOut take a
+  LIST of backends from config (ASR_SOURCES, TTS_OUTPUTS); Video takes one source; Keys only reports keys
+  (the app's F4 handler calls control); results are the standard http.HTTPStatus. Shared helpers moved to
+  util/. The benches start Gemma the same way as the app (one launcher).
+- **Bugs found on the way:** (1) closing the phone speech listener with a connection open made asyncio
+  report "Task was destroyed but it is pending", which our crash handler turned into a crash at shutdown;
+  it now cancels its handlers and stops cleanly. (2) The phone source read its port from config at import,
+  not when built. (3) The step 3 rename had changed two bench data keywords (restored; see above).
+- **Result:** 195 tests, three clean runs; every file passes the layout checks; bench audit clean.
+  Not measured yet: the bench Gemma now also loads the vision projector, as the app does.
+- **Where:** docs/api-harden2/ (v2.2), docs/task-active-harden2-refactor-handoff.md (9b).

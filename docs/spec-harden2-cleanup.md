@@ -234,12 +234,17 @@ Gemma serves both the recognizer (planning) and perception2 (vision). It is a sh
 - `raise SystemExit` has no place: use die().
 - Commit everything now, in stages, on the feature branch. Every commit message warns: BUILD BROKEN,
   do not pull expecting a working app. The owner reviews the code AFTER the commit.
-- Every system gets a proper interface (an API). The UI too. Draft: docs/draft-harden2-app-api.h (not ruled yet).
-- Rename DjiWire / control/dji_wire.py: "wire" is a banned word, identifiers included. New name: open.
+- Every system gets a proper interface (an API). The UI too. Draft v1 rejected; v2: docs/api-harden2/.
+- Rename DjiWire / control/dji_wire.py: "wire" is a banned word, identifiers included. DONE (step 3):
+  dji_app/client.py, class DjiApp; every "wire" identifier renamed.
 - ONE transmit switch. The drone link sends every command laptop -> phone, so it owns an enable/disable
-  switch in its API. The main app is the one caller. Replaces KillSwitch.MOTION + pipeline.flight_allowed.
-- Recovery: the supervisor supervises EVERY system, the phone TTS included. No per-system retry loops.
-- Drone link recovery: open; the owner asked where in the chain it can recover.
+  switch in its API. Replaces KillSwitch.MOTION + pipeline.flight_allowed. SUPERSEDED same day: control is
+  the switch's only user (see below). DONE (step 4).
+- Recovery: the supervisor supervises every process the app starts. No per-system retry loops.
+  CORRECTED same day: phone TTS is POST /tts on the same phone app and port as the drone commands.
+  It is not a separate service. Its health is the phone app's health.
+- Drone link recovery: RESOLVED (step 5): only laptop -> phone app is ours; no answer = WAITING (orange)
+  + a GET /status/ probe; the app never dies because of the phone.
 - Files: small and modular, each one does one small job or manages one system (KISS).
   If mvd.py stays too big, make an app/ (or main/) folder.
 - Display loop: measure first. Camera redraws every frame; chat updates only on new text; status is
@@ -249,4 +254,180 @@ Gemma serves both the recognizer (planning) and perception2 (vision). It is a sh
   and the pipeline flat-import try).
 - SAM3 tasks (owner design, restated): a dispatcher thread on a condition variable spawns one thread per
   task, max 8. Count is fire and forget. A highlight thread lives until clear or give-up. Only the SAM3
-  forward is serialized. The single-consumer build did NOT follow this design.
+  forward is serialized. DONE (step 6, 2026-09-23): perception2/{dispatcher,sam3_lock,vision}.py.
+
+### Follow-up rulings 2026-09-23
+- The API draft v1 is REJECTED: it undersells the system. Redo it. v2 (one header per module):
+  docs/api-harden2/ (2026-09-23), waiting for the owner's review.
+- No new DroneLink. The one module that talks to the DJI phone app owns every DJI app service
+  (commands, TTS, the transmit switch), like llm_to_action's DjiBackend.
+- HISTORY.md: record every useful finding and decision, not only benches. Format: Why / Setup /
+  Result / Verdict / Where, in time order.
+- Problems that should not exist (e.g. the pipeline flat-import try): KEEP RAISING them (code quality).
+  The owner's anger was that such errors exist at all, not that they were reported.
+- SAM3 task design: chosen because it is easier to reason about, not for speed.
+- Tests: test/test_<system>.py for EVERY system. A passing suite must mean each piece works, so the app
+  works when the pieces are put together. Tests exercise the real component, not a canned fake.
+  The four module self-tests (_smoke / selftest) move into these files.
+- RESOLVED (owner module map + rulings below; built in step 5): which systems crash the app, which
+  restart themselves, which wait for the user.
+
+### Module map (owner, 2026-09-23)
+- Systems: video, audio (ASR + TTS), perception (vision), control, recognizer (the router for audio),
+  logging (exists, not a module yet).
+- system/ (status, supervisor): makes sure every system works. No "System" abstraction is needed.
+- gemma/: a module used by the recognizer and by vision for simple requests.
+- config/: every constant and start-up parameter of the whole of integration_harden2.
+- test/: one test file per MODULE (not per system).
+- test_app.py (owner): open the app headless, ask 3 questions, enter manual mode, leave it, check that
+  one system recovers. Done.
+- (owner, 2026-09-23, cont.) The UI is its own file in app/. The logging module is named log/.
+- The phone app API is a resource of its own, decoupled from video, audio and control, with its own
+  status. Those modules use it; none of them owns it.
+- test_app.py injects input the way the real system does: questions as ROS2 messages on the ASR topic
+  (/asr_server/transcribe), the M key as a key event on /keyboard/in/raw (llm_to_action keyboard node).
+  Gap found: the app reads M from the OpenCV window only; it must also take M from /keyboard/in/raw.
+- RESOLVED 2026-09-23 (rulings below; built in step 5): laptop TTS failure policy; what counts as a
+  "SAM3 failure"; whether logging can fail at all.
+- (owner, 2026-09-23) The push-to-talk keys stay in config/. They do not move into audio/.
+- (owner, 2026-09-23) SAM3: load failure -> die; GPU out of memory -> die (no retry for now); any other
+  forward error -> crash hook -> die. "Not ready" and "no hits" are not failures.
+- Logging: at app start, check the session folder can be created and written. If not, crash at start.
+  Recording has no status row and no recovery.
+- The phone app API becomes its own module, dji_app/, with its own status.
+- Test files per module, as listed 2026-09-23 (test_video ... test_dji_app, test_app).
+- SAFETY GAP (found 2026-09-23): the app reads the M kill key only through cv2.waitKey, so M works only
+  while the OpenCV window has focus. The app already launches the global keyboard hook
+  (llm_to_action_keyboard_hook, "keys") for push-to-talk, and it publishes /keyboard/in/raw, but the
+  app never subscribes. Fix: the app subscribes to /keyboard/in/raw. DONE (step 1) with F4, not M.
+- STEP 1 FINDINGS (2026-09-23), RESOLVED: the kill key is F4 (a function key, owner); letters are
+  ignored globally. DONE (step 1). The findings:
+  - llm_to_action_keyboard_hook binds only W S A D H, the arrows, Enter, Space and F1-F5
+    (keyboard_node.hpp). It never publishes M, Q or Esc. Binding M is a C++ change (owner-written code).
+  - The hook reads /dev/input with no exclusive grab: it sees every key typed in ANY window. A global M
+    would toggle the kill whenever the operator types an "m" anywhere (e.g. "make" in a terminal).
+    Engaging the kill by accident is the safe direction; RE-ARMING by accident is not.
+- (owner, 2026-09-23) API v2 approved except control/recognizer. The WAITING state (external, the user
+  must fix it) is shown ORANGE, not red (DONE, step 5). One transmit switch: yes (its user is control,
+  ruled below).
+- (owner, 2026-09-23) The recognizer parses EVERY command, the fast path included. A critical command
+  (emergency, manual, auto) goes straight to control; otherwise it parses on (bypass, guards, Gemma) and
+  routes: missions to control, vision requests to perception. Control parses nothing; it executes
+  flight. API v2.1: docs/api-harden2/control.h, recognizer.h, app.h.
+- (owner, 2026-09-23) Control USES the drone interface: it owns the comms to the drone. The cut-off
+  happens in control, through dji_app's switch. Both paths end in control: F4 (app) -> control, and
+  spoken manual/auto (recognizer) -> control. dji_app provides the switch; control is its only user.
+  Vision requests go to perception typed, not as re-parsed English.
+
+### Owner rulings 2026-09-23 (evening)
+- Code density: the code is too dense. Use blank lines between logical steps, one statement per line,
+  no packed tuple assignments or dense lambdas. Applies to every file touched this session.
+- Document EVERYTHING (restated): every ruling here, every step in the handoff plan, every finding in
+  HISTORY.md.
+- 9a-7 reframed by the owner: which interface does each module expose to the other modules? Answered in
+  chat 2026-09-23 with a table; leaks found (see the plan, 9a-9 .. 9a-11).
+
+### Owner rulings 2026-09-23 (night): object lifecycle and backends
+- HTTP results use the standard library (http.HTTPStatus: .is_success, CONFLICT, ...), not our own
+  sent()/BLOCKED/UNREACHABLE layer. "No answer at all" is None.
+- Speech IN works like speech OUT: ONE audio interface receives which backends to use and initializes
+  them. CORRECTED by the owner the same night: speech in takes a LIST of sources (config option, today
+  ros + phone, both on); running several at once is intended (a remote ASR source must never take away
+  ground control). It was only wrong that the list was hard-coded. SAME RULE for TTS (owner): speech out
+  takes a LIST of outputs (config option, e.g. phone + laptop); every sentence goes to each of them.
+- Video works the same way: ONE video interface receives its backend (webcam, dji/ros, file, stream).
+- Every class follows the C++ shape: constructor, destructor (close), internal methods, maybe static
+  ones; then something that uses the class.
+- App lifecycle (owner's preferred option):
+  1. Init every SERVICE that needs init (processes, the phone app, SAM3, Gemma, the session log...).
+  2. Give every MODULE the services it needs (passed into its constructor).
+  3. Anything fails during init -> crash and say why.
+  4. On shutdown the app closes every module, then every service (reverse order).
+- Replaces 9a-9 / 9a-13 / 9a-14 (plan) with this design.
+- (owner, 2026-09-23 night) Control = the way we interact with the autonomous system (the drone) ONLY.
+  Keys is its own module (the keyboard hook's ROS node): it reports key presses through a callback;
+  the app connects F4 to control. Keys does not receive control.
+- Only process handles are passed, never the Supervisor itself: Video(dji) receives the gstreamer
+  process handle (to restart it on a stall). No other module restarts a process.
+- The keyboard hook is ALWAYS started: F4 (the kill key) needs it, whatever the ASR sources are.
+- (owner, 2026-09-23 night) Design 9b agreed: process handles, Keys separate, Control = drone only,
+  Video = one video option, the UI reads the status board.
+- 9a-1 CLOSED: the laptop speaker fails only when the laptop sound system itself breaks (the host
+  PulseAudio socket, the device unplugged). A retry fixes none of that, so there is nothing to
+  recover: a playback error dies at once with the reason. The 3-try re-open loop is removed.
+- (owner, 2026-09-23 night) util/ agreed: util/net.py (port_open), util/process.py (native_env),
+  util/hebrew.py (hebnum_to_digits), util/guarded.py (step 7's wrapped third-party calls). lexicon.py and
+  reject_why move to recognizer/. system/ keeps fatal, status, supervisor. More may move to util/ later.
+- (owner, 2026-09-23 night) Code style, by the owner's own rewrite of Vision._track:
+  - a guard clause for the unusual case first (e.g. `if frame is None:`), not a nested normal path;
+  - a long call wraps with ONE argument per line, the closing paren on its own line;
+  - a short trailing comment on the line it explains is fine;
+  - blank lines group the steps by intent; two blank lines before the final block;
+  - loop variables declared at the top of the function.
+- 9a-1, the owner's words (2026-09-23 20:10): "Why would the laptop speak output fail? genuinely!
+  Besides using ALSA, what kind of issue could cause this??????" Same principle as 2026-09-22: "Why
+  would gemma go unreachable mid-session? What fucking failure case is this?" -> do not build recovery
+  for a failure that does not happen: the laptop voice dies at once on a playback error.
+
+## Owner rulings 2026-09-24
+- (owner, 2026-09-24) Every environment read lives in ONE file: config/defaults.py ("Yes", to the
+  question whether all env overrides should move there). config/__init__.py only maps names.
+  Done: 15 reads moved from config/__init__.py, plus PULSE_SERVER (was read in audio/asr_ros.py),
+  SCENE_TMUX_SESSION (was read in app/main.py), WEBCAM_DEV (was read in video/cam_list.py) and the
+  two env WRITES (MIOPEN_FIND_MODE, OPENCV_FFMPEG_CAPTURE_OPTIONS).
+- (owner, 2026-09-24) Stale docstrings are fixed NOW, not in the step 12 sweep ("Well HOW ABOUT YOU
+  UPDATE THEM CLAUDE??? NOW???").
+- (owner, 2026-09-24) "Why does a supervisor take a BOARD???" Answer given: the supervisor is the
+  only code that knows each process's state, so it writes that row; the defect was the hidden
+  global BOARD plus a test-only `board=` hook (two mechanisms). Fixed to the 9b design already
+  ruled: the app builds ONE StatusBoard as a service and passes it (required, `board=` keyword) to
+  the supervisor, the phone-app client, video, the SAM3 loader and the phone speech listener. The
+  global BOARD is deleted.
+- (owner, 2026-09-24) Step 7 done, file by file: the try blocks left are the ONE per failure domain
+  in util/guarded.py (HTTP, JSON, filesystem, asyncio streams) plus fatal.py's crash-path catch
+  (5 in total, was 22). No SystemExit / sys.exit in app code. Self-tests live in test files.
+- (owner, 2026-09-24) "Check the agents' work again. Don't insist that you're done, actually
+  properly check." A full read of every agent-touched file found what the diff review missed
+  (show.py's sys.exit calls and stale message, cam_list's hardcoded size and stale up.sh name,
+  box-drawing comments). Rule: re-check an agent's files by reading them WHOLE, not by its diff.
+- OPEN for the owner: `_number_token` (stage 2) and `_is_number_he` (the number guard) differ on a
+  digit glued to "and" ("ו5"); see the answer of 2026-09-24 in chat and the session log.
+- OPEN for the owner: log/trace.py writes a second per-utterance record to <repo>/logs/traces
+  (317 files) that no code reads; the session log's trace.jsonl holds the same data. Its docstring
+  calls it "the owner's database (2026-09-02)". Keep or delete?
+
+## Owner rulings 2026-09-24 (later)
+- (owner) The status board: "the supervisor managing the status board is stupid ... Each service
+  should report its own status with a function in its API, that way the StatusBoard can iterate
+  through each service, grab its status and call it a day." DONE: every part with a row owns a
+  Status and answers status() -> [(name, state, detail)]: each supervised Process handle, DjiApp,
+  BackendLoader (sam3), Video, SpeechIn (its PhoneAsr; the ROS source has no row of its own).
+  StatusBoard(sources) only asks; the app builds it once from [processes, dji, sam3, video,
+  speech_in]. The supervisor writes no status except its processes' own rows (held by the handles).
+- (owner) "ו5" is mostly a non-issue ("the vast majority of people never talk like this"); fix it if
+  the patch does. DONE: numbers.meter_has_number: a number after מטר that starts with ו begins the
+  next item (except וחצי); one rule for the rewrite and the number guard. Proven on all 305 bench
+  sentences: none changes. FLAGGED, not changed: a leading ו-number word (וחמישה) is never turned
+  into digits, so the number guard does not see it; fixing it changes Gemma's input (needs a bench
+  re-measure).
+- (owner) "Why is recognizer.py 800 something lines?" / "Why does pipeline.py look like shit?" DONE:
+  recognizer/ split by job: parse.py (the front half), fast_path, bypass, guards, rewrites,
+  numbers, lexicon, prompts; recognizer.py is the API class Recognizer (the module table's name;
+  was Pipeline in pipeline.py). plan() is public (the benches measure it); the test hook plan2_fn
+  is gone (tests pass a PlannerStub as Gemma).
+- (owner) "Are you actually utilizing the utilities ... in EVERY SINGLE MODULE?" DONE, one home each:
+  system/ros.Subscription (keys, asr_ros, ros_stream), util/mission.step_text (turns, score),
+  log/session.latest_session (show, score), util/hebrew.HE / is_hebrew (rewrites, render),
+  perception2/boxes.frame_area (vision, verify, engine), util/net.JSON_HEADERS (gemma, dji_app),
+  test/support.wait_for (5 test files).
+- (owner) "Are the connections correct, as we planned?" Checked by the real import graph: every
+  cross-package edge is an allowed API name (recognizer -> control.outcome_text, perception2
+  TASK_FULL, log.Trace; control -> dji_app HALT_MISSION). Fixed: the UI read control through the
+  global S.control; it now gets a manual_on callback (S.control removed).
+- OPEN for the owner (trace): log/trace.py (2026-09-02) writes logs/traces/session-<time>.jsonl per
+  Recognizer; log/session.py (2026-09-12) writes the same utterance to <session>/trace.jsonl. Since
+  2026-09-12 every live utterance is recorded twice; nothing reads logs/traces. The tests also wrote
+  there (3 files per run): fixed, the tests now write to their tmp folder. Keep or delete trace.py?
+- (owner, 2026-09-24) "Yes, delete trace.py." DONE: log/trace.py deleted; the Recognizer records
+  only through the session log (kind, target, mission, action, timings). The old files in
+  <repo>/logs/traces are the owner's to delete (gitignored data).
