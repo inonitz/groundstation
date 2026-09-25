@@ -3697,45 +3697,6 @@ Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where*
 - **Fix:** both keywords restored. A diff of every quoted string the rename touched found no other data.
 - **Lesson:** a word ban applies to names and our prose, never to data; a mass rename must skip strings.
 
-### 2026-09-24 -- each part owns its status; the recognizer split by job
-- **Why:** the supervisor wrote other parts' rows through a shared board; recognizer.py mixed four
-  jobs in 647 lines; several helpers had two or three copies; the UI reached control through a
-  global; the tests wrote trace files into the repo.
-- **Change:** a Status row per part, reported by the part's own status(); the board only asks.
-  recognizer/ = parse, fast_path, bypass, guards, rewrites, numbers, lexicon, prompts + the
-  Recognizer class (plan() public). One home each for the ROS subscription, a mission step as
-  text, the newest session, the Hebrew range, a frame's area, the JSON header, the test wait. The
-  UI gets manual_on. API headers v2.3 (new util.h), all compile.
-- **Result:** 207 tests (2 runs) + the GPU test; bench audit CLEAN; 5 except handlers (the audit
-  script); the and-number rule changes none of the 305 bench sentences; no test writes to logs/.
-
-### 2026-09-24 -- exceptions down to one catch per failure domain (plan step 7)
-- **Why:** the house rule allows a try only around a third-party call that throws; 22 blocks were
-  spread over 13 files, several around calls with a non-throwing twin, two that only called die().
-- **Change:** util/guarded.py holds one try per failure domain (HTTP, JSON, filesystem, asyncio
-  streams); fatal.py keeps the crash-path catch. Non-throwing calls replace the rest (connect_ex,
-  a poll loop, size checks before a reshape, a port check before bind). The status board became a
-  passed service (the hidden global is gone); every env read moved into config/defaults.py;
-  self-tests became test functions. A full re-read of the helper agents' files fixed what their
-  reports and the diff review missed.
-- **Bug found on the way:** the emergency halt recorded `[{"delay": 0}]` in the session log while it
-  sent `[{"type": "delay", "seconds": 0.0}]`; it now records exactly what is sent.
-- **Result:** 207 tests (2 runs) + 1 GPU test run once on the real SAM3; flake8 layout + pyflakes
-  clean on all harden2 .py; bench audit CLEAN. Unverified: the real phone app with http.client
-  (urllib used to add a Content-Type header to empty POSTs; the mock accepts both).
-
-### 2026-09-24 -- older harden2 files regrouped by intent (plan 9a-12)
-- **Why:** the files older than this refactor still mixed packed statements, dense lambdas, nested
-  ternaries and tables rebuilt on every call; the owner's _track rewrite is the style for all code.
-- **Change:** every older file regrouped by intent (guard clauses, loop locals at the top, blank lines
-  between steps, one statement per line). render_chat split into header / turns / colour / rows with its
-  tables as module constants. The box overlap math had three copies (counting, verify, sam3_backend):
-  now one home, perception2/boxes.py. Sam3Backend `compile` -> `use_compile`. Two helper agents did
-  the log/video/prompts and config/app files (owner permission, 2 agents); their work was re-checked.
-- **Result:** behavior unchanged: the 195 existing tests pass untouched, plus one new test that pins the
-  box math (it catches the two mutations the old suite missed). Config: all 73 names and values equal
-  old vs new. score.py compared old vs new on 1280 judge cases: equal.
-
 ### 2026-09-24 -- services first, then modules (owner lifecycle design)
 - **Why:** modules built each other's parts by hand (the app wired perception's engine, replaced two
   methods of the phone-app client to log missions, and did the video module's job); speech in was two
@@ -3753,3 +3714,106 @@ Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where*
 - **Result:** 195 tests, three clean runs; every file passes the layout checks; bench audit clean.
   Not measured yet: the bench Gemma now also loads the vision projector, as the app does.
 - **Where:** docs/api-harden2/ (v2.2), docs/task-active-harden2-refactor-handoff.md (9b).
+
+### 2026-09-24 -- older harden2 files regrouped by intent (plan 9a-12)
+- **Why:** the files older than this refactor still mixed packed statements, dense lambdas, nested
+  ternaries and tables rebuilt on every call; the owner's _track rewrite is the style for all code.
+- **Change:** every older file regrouped by intent (guard clauses, loop locals at the top, blank lines
+  between steps, one statement per line). render_chat split into header / turns / colour / rows with its
+  tables as module constants. The box overlap math had three copies (counting, verify, sam3_backend):
+  now one home, perception2/boxes.py. Sam3Backend `compile` -> `use_compile`. Two helper agents did
+  the log/video/prompts and config/app files (owner permission, 2 agents); their work was re-checked.
+- **Result:** behavior unchanged: the 195 existing tests pass untouched, plus one new test that pins the
+  box math (it catches the two mutations the old suite missed). Config: all 73 names and values equal
+  old vs new. score.py compared old vs new on 1280 judge cases: equal.
+
+### 2026-09-24 -- exceptions down to one catch per failure domain (plan step 7)
+- **Why:** the house rule allows a try only around a third-party call that throws; 22 blocks were
+  spread over 13 files, several around calls with a non-throwing twin, two that only called die().
+- **Change:** util/guarded.py holds one try per failure domain (HTTP, JSON, filesystem, asyncio
+  streams); fatal.py keeps the crash-path catch. Non-throwing calls replace the rest (connect_ex,
+  a poll loop, size checks before a reshape, a port check before bind). The status board became a
+  passed service (the hidden global is gone); every env read moved into config/defaults.py;
+  self-tests became test functions. A full re-read of the helper agents' files fixed what their
+  reports and the diff review missed.
+- **Bug found on the way:** the emergency halt recorded `[{"delay": 0}]` in the session log while it
+  sent `[{"type": "delay", "seconds": 0.0}]`; it now records exactly what is sent.
+- **Result:** 207 tests (2 runs) + 1 GPU test run once on the real SAM3; flake8 layout + pyflakes
+  clean on all harden2 .py; bench audit CLEAN. Unverified: the real phone app with http.client
+  (urllib used to add a Content-Type header to empty POSTs; the mock accepts both).
+
+### 2026-09-24 -- each part owns its status; the recognizer split by job
+- **Why:** the supervisor wrote other parts' rows through a shared board; recognizer.py mixed four
+  jobs in 647 lines; several helpers had two or three copies; the UI reached control through a
+  global; the tests wrote trace files into the repo.
+- **Change:** a Status row per part, reported by the part's own status(); the board only asks.
+  recognizer/ = parse, fast_path, bypass, guards, rewrites, numbers, lexicon, prompts + the
+  Recognizer class (plan() public). One home each for the ROS subscription, a mission step as
+  text, the newest session, the Hebrew range, a frame's area, the JSON header, the test wait. The
+  UI gets manual_on. API headers v2.3 (new util.h), all compile.
+- **Result:** 207 tests (2 runs) + the GPU test; bench audit CLEAN; 5 except handlers (the audit
+  script); the and-number rule changes none of the 305 bench sentences; no test writes to logs/.
+- **Then (owner ruling):** log/trace.py deleted. It wrote a second copy of every utterance to
+  logs/traces (since 2026-09-12; nothing read it; tests had added 3 files per run); the session log
+  holds the same fields. 205 tests.
+
+### 2026-09-25 -- Gemma died on every image question: mixed ggml versions in one bin folder
+- **Symptom:** the first live run after the refactor: Gemma exited with code -7 (SIGBUS) on every
+  "what do you see" (the only request with an image); text requests worked. Everything felt slow.
+- **Cause (proven):** build/release/shared/dji/bin holds two ggml builds with the same sonames.
+  llama-server (built 2026-09-23 15:17, ggml 0.18.0) loads libggml.so.0 and libggml-vulkan.so.0,
+  which a C++ build of the ASR server on 2026-09-24 03:05 repointed to ggml 0.15.3. The kernel
+  log: "trap stack segment ... in libggml-vulkan.so.0.15.3". Not GPU memory: Gemma alone at 4.0 of
+  8.1 GiB crashed the same way. The app code change is not the cause.
+- **Proof:** a private folder whose .so.0 names all point at 0.18.0, first on LD_LIBRARY_PATH: three
+  image questions answered (2.5 s, 1.9 s, 1.8 s), a plan in 1.6 s, load in 4 s; no crash.
+- **Open:** the fix (one library folder per native program, or one ggml version) is the owner's
+  build decision. The ASR server now also runs on mixed versions (base/cpu 0.18, ggml/vulkan 0.15.3).
+
+### 2026-09-25 -- every run measured the same way; a chat crash; a fast preflight
+- **Why:** the first live run felt slow and nothing measured where the time went. The same run
+  crashed on a transcript with a line break. run.sh preflight paused 5-10 s every time.
+- **Change:** log/perf.py, a service like the session log: one JSON line per event in
+  <session>/perf.jsonl, always on. Stages: asr (F5 release -> transcript, mic only), turn,
+  gemma (plan | vision), sam3 (lock wait + forward), highlight_gate, count, describe, say (per
+  output), frame (per second: fps, read / draw / show), gpu (per second: memory, load).
+  `run.sh perf` prints p50 / p95 / max per stage. The scripted run (`SCRIPT=default run.sh up
+  webcam mock`, app/feed.py + app/perf_script.txt) publishes fixed sentences on the ASR topic, so
+  runs compare; it refuses unless control is the mock. The chat wraps at a line break (PIL cannot
+  measure multi-line text) and one utterance is one line. Preflight: find_spec instead of
+  importing bitsandbytes (torch + CUDA): 1.3 s in total; it also checks llama-server and fails on
+  a ggml version mix.
+- **Result:** 210 tests (2 runs); lint clean. Unverified: the numbers of a real run (next run).
+
+### 2026-09-25 -- the first measured run: the screen is limited by a dark room
+- **Why:** the owner found the app slow; this is the first run with perf.jsonl.
+- **Setup:** session-20260925-045109, webcam C920 (WEBCAM_DEV=2, MJPG 1280x720), CONTROL=mock, the
+  default scripted run plus spoken F5 turns; ggml one version (0.18.0) after the owner's rebuild.
+  Report: `run.sh perf` (1376 events). Camera tests: OpenCV alone, nothing else running.
+- **Result, per stage (n, p50 / p95 / max ms) and verdict:**
+
+| stage | n | p50 | p95 | max | verdict |
+|---|---|---|---|---|---|
+| asr (F5 release -> text) | 12 | 197 | 371 | 1599 | fast |
+| turn (vision) | 11 | 568 | 891 | 1129 | fine: mostly the Gemma plan |
+| turn (reject) | 3 | 413 | 1884 | 1884 | fine |
+| turn (flight) | 2 | 2 | 1396 | 1396 | fine (the bypass: no model) |
+| gemma (plan) | 14 | 565 | 1394 | 1880 | fine |
+| gemma (vision) | 4 | 2630 | 3253 | 3253 | normal for an image question |
+| describe | 4 | 2635 | 3261 | 3261 | = the Gemma vision call |
+| highlight_gate | 5 | 476 | 2358 | 2358 | fine; p95 = one slow SAM3 pass |
+| count | 1 | 2011 | 2011 | 2011 | expected: 3 frames x (SAM3 + 0.3 s gap) |
+| sam3 forward | 48 | 558 | 1456 | 2352 | slower than ~400 alone: the GPU is shared with Gemma (unverified) |
+| sam3 lock wait | 48 | 0 | 0 | 1057 | the vision tasks do not block each other |
+| say (phone) | 8 | 1 | 60 | 60 | only the request; the phone speaks on its own |
+
+  Screen: 15 fps p50, min 3.6; 67 ms per frame p50 = read 49 + draw 8 + show 8. GPU: memory max
+  6400 of 8151 MiB, load p50 39 %, max 100 %.
+- **Camera alone (C920, 1280x720 MJPG):** auto exposure 16-18 fps, brightness 11-13 of 255; manual
+  exposure 15 or 30 ms: 30.0 fps, brightness 4. Modes asked at 60 fps (1080p and 720p): the driver
+  sets 30 and 30.0 fps arrives; 1080p30 works. The C920's ceiling is 1080p30 (Logitech spec agrees).
+- **Verdict:** the screen is limited by the dark room: the C920 halves its frame rate to gather
+  light (16-18 fps). Our loop costs 16 ms per frame (draw + show), room for 60 fps. More light is
+  the fix, not code. Everything else is inside normal limits.
+- **Open:** the 3.6 fps dips (per-second averages hide the cause; a per-second worst read / draw /
+  show would show it). SAM3 558 vs ~400 ms: measure SAM3 with Gemma idle to confirm the GPU share.

@@ -38,25 +38,36 @@ open items), 9b (the built design). Rulings: docs/spec-harden2-cleanup.md, secti
 - A word ban covers names and prose, never data.
 - Keep raising code-quality problems; document EVERY ruling and finding at once.
 
-## Next (in order; see handoff 9 + 9a)
-- 2026-09-24 (later): step 7 DONE, 9a-6 DONE, board = passed service, env reads -> defaults.py,
-  stale docs fixed, agents' files re-read whole. 207 tests. Rulings: spec 'Owner rulings 2026-09-24'.
-  Next: step 8 (one dependency-check file), then 9-13.
-- 2026-09-24 (latest): status owned by each part (status()), recognizer split + Recognizer, shared helpers
-  deduplicated, UI manual_on, API v2.3. Open: keep/delete log/trace.py. Next: step 8.
-- 9a-12 remainder: DONE 2026-09-24 (handoff 9a-12). 9a-5 DONE. 196 tests.
-- Owner 2026-09-24: "You can start 2 more Opus 5.5 subagents on medium if you need to. You need to
+## Progress after 2026-09-23 (oldest first; append new lines at the END)
+- 2026-09-24: 9a-12 DONE (older files regrouped by intent), 9a-5 DONE. 196 tests.
+- 2026-09-24: owner: "You can start 2 more Opus 5.5 subagents on medium if you need to. You need to
   make sure that once you rendevouz with them (when they finish), you actually check their work
-  according to the documentation and the session history" -- used for 9a-12 (agents A, B); their
-  briefs and reports: scratchpad regroup-brief.md / regroup-report-{A,B}.md. Permission was for
-  that batch, not standing.
-- Step 7: try/except to the minimum (21 left in app code) -> util/guarded.py; self-tests (_smoke,
-  selftest) -> test files; no raise SystemExit.
+  according to the documentation and the session history" -- used for 9a-12 (agents A, B); briefs
+  and reports: scratchpad regroup-brief.md / regroup-report-{A,B}.md. Permission was for that batch.
+- 2026-09-24: step 7 DONE (5 except handlers, all in util/guarded.py + fatal.py), 9a-6 DONE, env reads
+  -> config/defaults.py, stale docs fixed, agents' files re-read whole. 207 tests.
+- 2026-09-24: status owned by each part (status()), recognizer split + class Recognizer, shared helpers
+  deduplicated, UI gets manual_on (S.control removed), API headers v2.3.
+- 2026-09-24: log/trace.py deleted (owner). 205 tests.
+- 2026-09-25: first live run: Gemma SIGBUS on image questions = mixed ggml 0.15.3/0.18.0 sonames in
+  build/release/shared/dji/bin (HISTORY 2026-09-25). The owner rebuilds the whole project; run.sh
+  preflight now fails on a ggml mix. No CMake install change now (owner).
+- 2026-09-25: HISTORY.md entries of 2026-09-24/25 put back in date order (owner: newest LAST).
+- 2026-09-25: perf measurement BUILT (owner approved): log/perf.py, `run.sh perf`, the scripted run
+  (SCRIPT=default, mock only). Chat line-break crash fixed. Preflight 1.3 s. 210 tests.
+- 2026-09-25: first measured run: the screen (15 fps) is limited by the dark room (C920 alone 16-18 fps
+  auto, 30 fps manual but black). Open: the 3.6 fps dips; SAM3 558 ms on the shared GPU.
+
+## Next (the plan's remaining steps; handoff section 9)
+- The next run: `SCRIPT=default WEBCAM_DEV=2 run.sh up webcam mock`, then `run.sh perf`; read the
+  numbers with the owner, then decide what to speed up (this covers step 10's measurement).
 - Step 8: one dependency-check file at start.
 - Step 9: test_app.py headless over ROS topics (3 questions, F4 on/off, kill Gemma -> recovers, quit).
-- Step 10 measure the display loop; 11 dead benches (run_list.py still uses LlamaServer/QWEN3VL);
-  12 stale-doc sweep; 13 code review, webcam mock run, prepare the owner's commits.
-- Open for the owner: nothing blocking. S.control is still a shared global read by the UI (note).
+- Step 10: measure the display loop.
+- Step 11: dead benches (run_list.py still uses LlamaServer/QWEN3VL; compare_engines.py, run_indepth.py).
+- Step 12: stale-doc sweep outside harden2.
+- Step 13: code review, the webcam mock run, the owner's commits.
+- 9a-2 remainder: app/render.py (542 lines) and log/session.py (363) are still long.
 
 ---------------------------------------------------------------------------------------------
 ## DETAIL (written so nothing is lost at compaction)
@@ -191,6 +202,9 @@ everything, keep raising problems, ask before spawning agents.
 3. No inline imports, no packed assignments, no `a; b`, no one-line ifs in new code.
 4. Every ruling of the turn written to the spec; every step ticked in the handoff; HISTORY entry.
 5. The tools are now in tools/style/ (copied from the scratchpad).
+6. `pgrep -f app.main` matches its OWN command line: check a process with `pgrep -f 'app[.]main'`
+   (2026-09-25: I wrongly told the owner the app was running).
+7. Before any run: HISTORY / progress notes are appended at the END (newest last), with verdicts.
 
 ### G. How the owner wants answers (learned the hard way this session)
 - Answer the EXACT question asked. "What interface does each module expose to the others?" is not

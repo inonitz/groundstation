@@ -431,3 +431,15 @@ Gemma serves both the recognizer (planning) and perception2 (vision). It is a sh
 - (owner, 2026-09-24) "Yes, delete trace.py." DONE: log/trace.py deleted; the Recognizer records
   only through the session log (kind, target, mission, action, timings). The old files in
   <repo>/logs/traces are the owner's to delete (gitignored data).
+- (owner, 2026-09-25) The ggml mix: the owner rebuilds the whole project. "Only use the binaries from
+  release/shared/dji, not from anywhere else." Already so: config.NATIVE_BIN_DIR is the one home;
+  every native program starts from it and native_env() puts it first on LD_LIBRARY_PATH. Added:
+  run.sh preflight now checks llama-server too, and fails when the libggml*.so.0 names point at
+  more than one ggml version.
+- (owner, 2026-09-25) No CMake install change now (one library folder per program): not the focus.
+- (owner, 2026-09-25) Performance measurement APPROVED: always-on perf.jsonl in the session, a
+  scripted run (fixed sentences on the ASR topic), and `run.sh perf` (p50/p95/max per stage).
+  "ASR Time should be measured when we use ASR": the mic path is timed from the push-to-talk
+  release to the transcript.
+- (owner, 2026-09-25) run.sh preflight must be fast: no 5-10 s pause after the SAM3 model check.
+

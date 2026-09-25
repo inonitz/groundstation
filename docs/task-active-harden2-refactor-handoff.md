@@ -515,3 +515,24 @@ HTTP results: http.HTTPStatus (.is_success; 409 = CONFLICT = blocked); None = no
       Left open (owner calls): _number_token vs _is_number_he differ on 'ו5' (merging changes behavior);
       env overrides read in both config/__init__.py and config/defaults.py; stale docstrings in
       prompts.py (names removed prompts) and config (names config_constants.py / config_defaults.py).
+
+### 9c. STATUS 2026-09-25 (the current state of plan 9; supersedes the ticks above where they differ)
+| item | state |
+|---|---|
+| 1-7, 9b, 9a-5, 9a-6, 9a-12 | DONE |
+| status owned by each part (status()); recognizer split + Recognizer; shared helpers; UI manual_on | DONE (2026-09-24) |
+| log/trace.py | DELETED (owner, 2026-09-24) |
+| measurement: log/perf.py, `run.sh perf`, the scripted run (SCRIPT=default, mock only) | DONE; first measured run recorded (HISTORY 2026-09-25) |
+| 10 display loop | MEASURED: the dark room limits the C920 (16-18 fps auto); our loop is 16 ms. OPEN: the 3.6 fps dips |
+| 13 webcam mock run | ONE live run done (fixed: the ggml mix via the owner's rebuild, the chat line-break crash). OPEN: code review, owner commits |
+| 8 one dependency-check file at start | OPEN |
+| 9 test_app.py end to end over ROS (headless) | OPEN (app/feed.py is a first part) |
+| 11 dead benches (run_list.py, compare_engines.py, run_indepth.py) | OPEN |
+| 12 stale docs outside harden2 | OPEN |
+| 9a-2 split app/render.py (542) and log/session.py (363) | OPEN |
+Open findings: the number guard does not see a leading ו-number word (וחמישה); SAM3 558 ms p50 on the
+shared GPU (vs ~400 alone, unverified cause); the keyboard hook wrote 28,291 log lines in ~4 min
+(1.5 MB, proc-keys.log; the owner's C++ decides); both webcams read black in a dark room.
+After plan 9 (global): phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured),
+freeze, fuse into llm_to_action.
+
