@@ -9,6 +9,73 @@ branch), `sttserv`, `util2`, `inonitz/tree` (github repo), CPU thread/core manag
 CMakeLists.txt. `inonitz/tree` ships `.clang-format`/`.clang-tidy` — used as ground
 truth below, not guesswork.
 
+## All guidelines at a glance (read this first; the detail follows below or in the named file)
+
+Written 2026-09-25 at the owner's request: every standing rule in one list, so a new agent does
+not relearn them. CLAUDE.md (loaded automatically) holds the safety, git and tool rules in full.
+
+**Safety** (CLAUDE.md)
+- Never send a motor command (arm, takeoff, land, sticks, fly) to a real drone: prepare it; the
+  human runs it. A real aircraft is SECURED before any command that can spin motors; props-off
+  is not enough. Control tools run only against the mock at 127.0.0.1.
+- The scripted run (app/feed.py, `SCRIPT=`) refuses to run unless control is the mock.
+
+**Git** (CLAUDE.md; "Review & commits" below)
+- The human owns every git write, staging included. The agent reads only (status, log, diff)
+  and suggests the exact commands.
+- Commit message: intent, ASCII, clauses split by " | ", the Co-Authored-By line. Few, on-point
+  commits. Nothing that destroys or rewrites the repo or its history.
+
+**Working with the owner** (CLAUDE.md; "Reporting rules" and "Project rules" below)
+- Answer the EXACT question, every numbered point in order. Quote the owner word for word, with
+  the date, when asked.
+- A recommendation is not a decision: anything the owner has not ruled stays open. A ruling goes
+  into the repo docs in the same turn.
+- Concrete commands with absolute paths. Critical pair-programmer mode: lead with disagreement;
+  label anything not measured "unverified".
+- Answer first, details in files. Prose in STE: one idea per sentence, under 20 words.
+
+**Design** ("Design priorities" below; "Project rules": Architecture)
+- Simplicity, then readability, then performance. KISS and YAGNI. A file ~150-200 lines, 400 at
+  most. One home per component, value and helper; a shared helper lives in util/.
+- Services first; modules get services or callbacks in their constructors. Every class has
+  close(); the app closes modules, then services, in reverse.
+- Each part owns its status row and reports it through its own status().
+- config/ is the one source of every value; only config/defaults.py reads the environment.
+- Native programs run only from build/release/shared/dji/bin.
+
+**Errors** ("Structure & idioms" below; "Project rules": Errors)
+- Our code never throws: die() on a fatal error, a status otherwise. A try exists only in
+  util/guarded.py (one per failure domain) plus fatal.py's crash-path loop. No sys.exit or
+  SystemExit. No recovery for a failure that does not happen.
+
+**Code style** ("Structure & idioms", "Formatting" below; "Project rules": Code style)
+- The owner's Vision._track rewrite is the reference: a guard clause first; loop locals at the
+  top; blank lines between steps; one statement per line; no packed assignments, dense lambdas or
+  nested ternaries; one argument per line in a long call; one clause per line in a long
+  condition; an explicit return; WHY comments; every line under 90 characters; mb_ / mk_ member
+  prefixes where the file uses them.
+
+**Tests** ("Change-impact analysis" below; "Project rules": Tests)
+- A refactor meant to keep behavior keeps the tests unchanged; any rewrite is called out with
+  its reason. Real paths over canned mocks. One test file per module. No test writes to logs/.
+  Mutation-check new logic. Before a report: lint + pyflakes clean, the full suite twice.
+
+**Docs** ("Writing style", "Result documents" below; "Project rules": Docs)
+- HISTORY.md and progress lists are oldest first: a new entry at the END, with measurements and
+  verdicts. READMEs are the current state, not an archive. Result documents: Objective, Setup,
+  Results, Analysis. No task IDs to describe work. Banned words: wire, seam, load-bearing, sieve.
+
+**Agents** ("Project rules": Agents; CLAUDE.md)
+- Ask before spawning one (how many, what scope). Give each a written brief (context, objective,
+  hints, checks); it reports to a file. Validate its work against that brief: only the agent who
+  wrote the brief holds the context; reading the files it touched is part of the validation.
+
+**Tools** (CLAUDE.md; "Project rules")
+- rtk wrappers for reads and searches. Batch tool calls. Script every install. tools/style/ for
+  layout; tools/audit_exceptions.py for the try/except count; `run.sh preflight` and
+  `run.sh perf` for the app.
+
 ## Design priorities
 
 Every design/implementation decision should target, in this order of concern:
@@ -274,3 +341,62 @@ and they are NOT EQUIVALENT(!):
 - Address every point of a multi-point message, by number, none skipped.
 - Name things plainly. No task-ID jargon; use an ID only as a parenthetical reference.
 - A recommendation is not a decision. Anything the owner has not ruled stays open.
+
+---
+
+## Project rules learned in harden2 (owner rulings; the dated source: docs/spec-harden2-cleanup.md)
+
+Added 2026-09-25 so a new agent reads every standing rule HERE, not in a session log or a
+private memory. Where a rule below is stricter than the general sections above, it wins.
+
+### Architecture
+- The app builds its SERVICES first (session log, perf, supervisor + only the processes the
+  settings need, Gemma client, phone-app client, SAM3 loader). Each MODULE gets the services it
+  needs, or callbacks, in its constructor, never another module's internals. A failure while
+  starting dies with the reason. Shutdown closes the modules, then the services, in reverse.
+- Every class has close().
+- Each part that has a status row OWNS it (a Status) and reports it through its own status();
+  the StatusBoard only asks its sources. No global board.
+- A helper used by more than one module lives in util/. A helper used by one module lives in it.
+- config/ is the one source of every value. Only config/defaults.py reads the environment.
+- Native programs run only from build/release/shared/dji/bin (config.NATIVE_BIN_DIR), first on
+  LD_LIBRARY_PATH. The preflight fails when the libggml*.so.0 names mix versions.
+
+### Errors
+- A try/except exists only in util/guarded.py, one per failure domain (HTTP, JSON, filesystem,
+  asyncio streams). The one other catch is system/fatal.py's crash-path cleanup loop. Check with
+  `python3 tools/audit_exceptions.py projects/integration_harden2`.
+- No sys.exit and no SystemExit in app code: die() on a fatal error; a tool returns.
+- Do not build recovery for a failure that does not happen (the owner asks "why would it fail?").
+
+### Code style (the owner's own rewrite of Vision._track is the reference)
+- Every line under 90 characters (Python; stricter than the 90-95 above).
+- No packed assignments (`a, b = x, y` of unrelated values), no `a; b`, no one-line `if`, no
+  dense lambdas, no nested ternaries. A table packed several keys per line gets one key (or one
+  noun) per line.
+- Check layout: `python3 -m flake8 --isolated --select=E30,E501,E70,E731 --max-line-length=89`
+  and `python3 -m pyflakes`. Tools: tools/style/ (layout.py, refill.py, check_wrap.py).
+
+### Tests
+- One test file per module (test/test_<module>.py). Shared helpers live in test/support.py.
+- No test writes into the repo's logs/ (sessions, traces): tests use their tmp folder.
+- Mutation-check new logic: break it on purpose and see a test fail.
+
+### Docs
+- HISTORY.md and every progress list are oldest first: a new entry goes at the END of its
+  section, with its measurements AND verdicts.
+- Banned words (names and prose; data keeps its own words): wire, seam, load-bearing, sieve.
+
+### Working with the owner
+- Answer the EXACT question asked, every numbered point in order. When asked to quote the owner,
+  quote the exact words with the date.
+- Before a report: lint + pyflakes clean, the full suite twice, no new folders under logs/.
+
+### Agents
+- Ask before spawning one: say how many and the scope, then wait for a yes.
+- Give each agent a written brief (context, objective, hints, checks) and have it report to a
+  file.
+- Validate the agent's work AGAINST THE BRIEF you gave it: you hold the context the agent lacks,
+  so only you can verify it. Reading the files it touched is part of that validation, not a
+  redo of its work.
+

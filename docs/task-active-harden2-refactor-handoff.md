@@ -535,4 +535,8 @@ shared GPU (vs ~400 alone, unverified cause); the keyboard hook wrote 28,291 log
 (1.5 MB, proc-keys.log; the owner's C++ decides); both webcams read black in a dark room.
 After plan 9 (global): phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured),
 freeze, fuse into llm_to_action.
+Speedrun split (owner 2026-09-25): agent A = step 11; agent B = 9a-2 (render.py, session.py);
+the main agent = steps 8, 9 and the 3.6 fps dips; step 12 runs LAST, over the finished state
+(owner: a doc sweep before the other steps land would go stale again). Standing rules: now all in
+docs/guidelines.md ("Project rules learned in harden2").
 

@@ -1,6 +1,9 @@
 # harden2 session log, 2026-09-23 / 24 (for the next agent after compaction)
 
-RESUME HERE: docs/task-active-harden2-refactor-handoff.md section 9 (the plan), 9a (validation +
+RESUME HERE (2026-09-25): read docs/guidelines.md ("All guidelines at a glance") FIRST, then the
+handoff's section 9c (the current status + the speedrun split: agent A = step 11, agent B = 9a-2,
+me = steps 8, 9 + the 3.6 fps dips, step 12 LAST). Ask nothing more: the owner approved the split.
+Older pointer: docs/task-active-harden2-refactor-handoff.md section 9 (the plan), 9a (validation +
 open items), 9b (the built design). Rulings: docs/spec-harden2-cleanup.md, sections dated
 2026-09-23 (evening, night). History: docs/HISTORY.md, entries dated 2026-09-23 / 24.
 
@@ -57,6 +60,8 @@ open items), 9b (the built design). Rulings: docs/spec-harden2-cleanup.md, secti
   (SCRIPT=default, mock only). Chat line-break crash fixed. Preflight 1.3 s. 210 tests.
 - 2026-09-25: first measured run: the screen (15 fps) is limited by the dark room (C920 alone 16-18 fps
   auto, 30 fps manual but black). Open: the 3.6 fps dips; SAM3 558 ms on the shared GPU.
+- 2026-09-25: every standing guideline written into docs/guidelines.md (a summary at the top +
+  "Project rules learned in harden2" at the end). Speedrun split approved (handoff 9c).
 
 ## Next (the plan's remaining steps; handoff section 9)
 - The next run: `SCRIPT=default WEBCAM_DEV=2 run.sh up webcam mock`, then `run.sh perf`; read the
