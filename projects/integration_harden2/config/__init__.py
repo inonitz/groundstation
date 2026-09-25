@@ -41,6 +41,7 @@ KEY_ACTION_PRESSED = _K.KEY_ACTION_PRESSED
 KILL_KEY_CODE      = _K.KILL_KEY_CODE
 KILL_KEY_NAME      = _K.KILL_KEY_NAME
 PUSH_TO_TALK_KEY_NAME = _K.PUSH_TO_TALK_KEY_NAME
+PUSH_TO_TALK_KEY_CODE = _K.PUSH_TO_TALK_KEY_CODE
 
 # ============================== 5. Camera + window ========================
 # derived from VIDEO=webcam|dji|rtmp; no SCENE_INPUT knob

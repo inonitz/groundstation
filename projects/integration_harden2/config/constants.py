@@ -38,6 +38,7 @@ KILL_KEY_NAME      = "F4"
 # shown on screen; the binding itself is compiled into the asr_node
 # (llm_to_action asr_node.hpp kPushToTalkKeyBind)
 PUSH_TO_TALK_KEY_NAME = "F5"
+PUSH_TO_TALK_KEY_CODE = 63            # evdev KEY_F5: its release starts the ASR timing
 
 # ---- Camera + on-screen UI (fixed geometry) ----
 # requested webcam width (falls to nearest supported)

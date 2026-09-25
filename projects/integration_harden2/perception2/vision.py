@@ -31,6 +31,7 @@ from perception2.dispatcher import SUBMIT_OK, Dispatcher
 from perception2.engine import PerceptionEngine
 from perception2.sam3_lock import PRIORITY_COMMAND, PRIORITY_REFRESH, PriorityLock
 from perception2.verify import split_target, verify_highlight
+from log.perf import NO_PERF
 
 TASK_OK = "ok"
 TASK_FULL = "full"                # too many tasks alive: refused, not queued
@@ -86,12 +87,15 @@ class Vision:
         snapshot,
         sinks,
         use_masks,
-        max_tasks=config.VISION_MAX_TASKS
+        max_tasks=config.VISION_MAX_TASKS,
+        perf=NO_PERF
     ):
         """@sam3: the SAM3 service (perception2.backend.BackendLoader).
         @gemma: the Gemma service (gemma.client.Gemma), for describe and the Gemma gate.
         @snapshot: () -> a private copy of the latest video frame, or None.
-        @sinks: the app's callbacks (Sinks). @use_masks: () -> bool, the masks switch."""
+        @sinks: the app's callbacks (Sinks). @use_masks: () -> bool, the masks switch.
+        @perf: the performance record (log.perf)."""
+        self._perf = perf
         self._snapshot = snapshot
         self._sinks = sinks
         self._use_masks = use_masks
@@ -128,11 +132,19 @@ class Vision:
             priority = getattr(self._tl, "priority", PRIORITY_COMMAND)
             t0 = time.monotonic()
             with self._sam3.hold(priority):
+                t_forward = time.monotonic()
                 status, dets = raw_detect(frame, phrase, floor)
+                t_end = time.monotonic()
+            self._perf.record(
+                "sam3",
+                (t_end - t_forward) * 1000,
+                wait_ms=round((t_forward - t0) * 1000, 1),
+                priority=priority
+            )
             if status != DETECT_OK:
                 return status, dets
 
-            ms = round((time.monotonic() - t0) * 1000)
+            ms = round((t_end - t0) * 1000)
             self._sinks.on_pass(getattr(self._tl, "task", 0), frame, dets, ms)
             return status, dets
         return detect
@@ -179,6 +191,10 @@ class Vision:
         body(task, frame, phrase)
         return
 
+    def _timed(self, stage, t0, **fields):
+        self._perf.record(stage, (time.monotonic() - t0) * 1000, **fields)
+        return
+
     # --- task bodies (each on its own thread) ------------------------------------------
     def _count_task(self, task, frame, phrase):
         status = DETECT_OK
@@ -187,6 +203,7 @@ class Vision:
         kept = []
         counts = []
         concepts = phrase_concepts(phrase)
+        t0 = time.monotonic()
 
         for i in range(config.COUNT_FRAMES):
             if i:
@@ -213,6 +230,7 @@ class Vision:
             return
 
         n = median_count(counts)
+        self._timed("count", t0, frames=len(counts))
         self._sinks.on_count(task, TASK_OK, n, phrase, counts)
         if n:
             self._track(task, phrase, concepts)     # highlight what was counted
@@ -220,7 +238,9 @@ class Vision:
 
     def _highlight_task(self, task, frame, phrase):
         concepts = phrase_concepts(phrase)
+        t0 = time.monotonic()
         present, raw, best, veto, ready = self._gate(frame, phrase, concepts)
+        self._timed("highlight_gate", t0, present=present)
         if not ready:
             update = HighlightUpdate(task, HL_NOT_READY, phrase, concepts)
             self._sinks.on_highlight(update)
@@ -368,7 +388,9 @@ class Vision:
             self._sinks.on_describe(task, False, "", "", None)
             return
 
+        t0 = time.monotonic()
         ok, reply = self._engine.vlm_ask(frame, question, [])
+        self._timed("describe", t0, ok=ok)
         if not ok:
             self._sinks.on_describe(task, False, "", "", frame)
             return

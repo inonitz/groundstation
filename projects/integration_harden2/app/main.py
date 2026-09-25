@@ -37,6 +37,7 @@ from dji_app import client as dji_module
 from dji_app.client import DjiApp
 from gemma import server as gemma_process
 from gemma.client import Gemma
+from log.perf import Perf
 from log.session import SessionLog
 from perception2.backend import BackendLoader
 from perception2.vision import Vision
@@ -85,27 +86,39 @@ def main():
 
     # --- services -----------------------------------------------------------------
     log = SessionLog(config.SESSION_DIR)   # the start-up check: unwritable -> die
+    perf = Perf(log.dir)                   # every run's timings: <session>/perf.jsonl
+    perf.start_gpu_sampler()
     supervisor = Supervisor()              # every process: restart, wait, or die
     processes, gstreamer = start_processes(supervisor, log.dir, source)
-    gemma = Gemma()
+    gemma = Gemma(perf=perf)
     dji = DjiApp.from_env()    # the phone app (or the mock): commands AND /tts
     sam3 = BackendLoader(config.SEG)
 
     # --- modules ------------------------------------------------------------------
-    speech_out = SpeechOut(config.TTS_OUTPUTS, dji)
+    speech_out = SpeechOut(config.TTS_OUTPUTS, dji, perf=perf)
     say = say_with(speech_out)
     video = Video(source, gstreamer)
     control = Control(dji, log)
     sinks = VisionSinks(log, speech_out.say)
-    vision = Vision(sam3, gemma, video.snapshot, sinks.sinks(), use_masks=use_masks)
+    vision = Vision(
+        sam3,
+        gemma,
+        video.snapshot,
+        sinks.sinks(),
+        use_masks=use_masks,
+        perf=perf
+    )
     recognizer = Recognizer(control, vision, gemma, log)
-    turns = Turns(recognizer, say, log)
+    turns = Turns(recognizer, say, log, perf=perf)
     speech_in = SpeechIn(config.ASR_SOURCES, turns)
-    keys = Keys(partial(on_global_key, control=control, say=say))
+    keys = Keys(
+        partial(on_global_key, control=control, say=say),
+        on_release=partial(on_key_release, perf=perf)
+    )
 
     # the status pane asks each part for its own rows, in this order
     board = StatusBoard([*processes, dji, sam3, video, speech_in])
-    ui = Ui(video, board, log.dir, control.manual_on)
+    ui = Ui(video, board, log.dir, control.manual_on, perf=perf)
 
     # --- run: a crash in the display loop reaches the crash hook -> die ------------
     ui.run(on_clear=vision.clear)
@@ -117,6 +130,7 @@ def main():
     for service in (sam3, dji, gemma):
         service.close()
     supervisor.stop_all()      # every process the app started
+    perf.close()
     log.close()
 
     # launched by run.sh: quit tears the whole tmux session down
@@ -124,6 +138,14 @@ def main():
         subprocess.run(["tmux", "kill-session", "-t", config.TMUX_SESSION], check=False)
     # bypass the torch/ROCm interpreter-teardown crash: exit 0, no core dump
     os._exit(0)
+
+
+def on_key_release(code, perf):
+    """The push-to-talk release starts the ASR timing; Turns ends it on the text."""
+    if code != config.PUSH_TO_TALK_KEY_CODE:
+        return
+    perf.mark("ptt_release")
+    return
 
 
 def on_global_key(code, control, say):

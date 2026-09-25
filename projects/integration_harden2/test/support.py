@@ -123,7 +123,7 @@ class PlannerStub:
         self.answer = answer
         self.requests = []
 
-    def request(self, messages, grammar=None, max_tokens=256, timeout_s=0):
+    def request(self, messages, grammar=None, max_tokens=256, timeout_s=0, label=""):
         he2 = messages[-1]["content"]
         self.requests.append(he2)
         plan = self.answer(he2)
@@ -153,7 +153,7 @@ class GemmaStub:
         self.reply = reply
         self.requests = []
 
-    def request(self, messages, grammar=None, max_tokens=256, timeout_s=0):
+    def request(self, messages, grammar=None, max_tokens=256, timeout_s=0, label=""):
         self.requests.append(messages)
         return True, self.reply
 

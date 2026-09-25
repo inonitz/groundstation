@@ -101,9 +101,18 @@ cmd_preflight(){
 
     echo "== binaries =="
     local b
-    for b in llm_to_action_asr_server llm_to_action_keyboard_hook llm_to_action_gstreamer_rx; do
+    for b in llama-server llm_to_action_asr_server llm_to_action_keyboard_hook llm_to_action_gstreamer_rx; do
         [ -x "$BIN/$b" ] && _ok "$b" || _bad "$b missing in $BIN"
     done
+    # Every native program loads the ggml libraries by the SAME names (libggml*.so.0), so they
+    # must all point at ONE ggml version. A mix crashed Gemma on every image (2026-09-25).
+    local ggml_versions
+    ggml_versions="$(for l in "$BIN"/libggml*.so.0; do readlink "$l"; done | sed 's/.*\.so\.//' | sort -u)"
+    if [ "$(echo "$ggml_versions" | wc -l)" = 1 ] && [ -n "$ggml_versions" ]; then
+        _ok "ggml libraries: one version ($ggml_versions)"
+    else
+        _bad "ggml libraries mix versions: $(echo $ggml_versions) (rebuild so one build installs them all)"
+    fi
 
     echo "== models =="
     local ASR_MODEL GEMMA_GGUF GEMMA_MMPROJ    # config/ is the one home of every path
@@ -115,7 +124,8 @@ cmd_preflight(){
         [ -f "$m" ] && _ok "$(basename "$m")" || _bad "model MISSING: $m"
     done
     [ -d /root/models/vision/sam3-official ] && _ok "SAM3 model dir" || _bad "SAM3 dir MISSING"
-    python3 -c "import bitsandbytes, accelerate" >/dev/null 2>&1 \
+    # find_spec checks the install WITHOUT importing: importing bitsandbytes loads torch + CUDA (5-10 s)
+    python3 -c "import importlib.util as u, sys; sys.exit(not all(u.find_spec(m) for m in ('bitsandbytes', 'accelerate')))" \
         && _ok "bitsandbytes + accelerate (SAM3-nf4)" \
         || _bad "bitsandbytes/accelerate missing: bash /root/groundstation/tools/devenv/install-runtime-deps.sh"
 
@@ -222,6 +232,12 @@ APP
     tail_pane keys "$session_dir/proc-keys.log"
     [ "$video" = dji ] && tail_pane gst "$session_dir/proc-gstreamer.log"
     [ "$control" = mock ] && tail_pane mock "$session_dir/mock_commands.log"
+    # the scripted run (SCRIPT=<file> or SCRIPT=default): fixed sentences on the ASR topic, mock only
+    if [ -n "${SCRIPT:-}" ]; then
+        [ "$control" = mock ] || die "SCRIPT drives commands: it runs only with control=mock"
+        local script="$SCRIPT"; [ "$script" = default ] && script=""
+        tmux new-window -t "$SESSION" -n feed "bash -c 'source $ROS_SETUP; cd $HERE; export CONTROL=mock; python3 -m app.feed $script; exec bash'"
+    fi
     tmux select-window -t "$SESSION:app"
 
     # --- mirror each pane to its own log ---
@@ -286,6 +302,7 @@ cmd_score(){  # run.sh score [list.md] [session];  SAFETY: read-only, writes REP
     local list="${1:-$(cd "$HERE/../.." && pwd)/datasets/e2e/live-test-e2e-50.md}"
     python3 "$HERE/log/score.py" "$list" "${2:-}"
 }
+cmd_perf(){ python3 "$HERE/log/perf_report.py" "${1:-latest}"; }  # read-only: p50/p95/max per stage
 cmd_show(){ python3 "$HERE/log/show.py" "${1:-latest}"; }  # read-only pretty-print
 
 # ------------------------------------------------------------------ dispatch
@@ -297,5 +314,6 @@ case "$cmd" in
     preflight) cmd_preflight "$@" ;;
     score)     cmd_score "$@" ;;
     show)      cmd_show "$@" ;;
-    *) die "usage: run.sh up|down|status|preflight|score|show" ;;
+    perf)      cmd_perf "$@" ;;
+    *) die "usage: run.sh up|down|status|preflight|score|show|perf" ;;
 esac

@@ -303,3 +303,48 @@ def test_only_a_mic_utterance_claims_the_audio_clip():
     log.commit()
     log.begin("from the mic", source="mic")
     assert log.current()["audio_clip"] == "asr_clips/utt_0001.wav"
+
+
+# ==================== perf.py and perf_report.py ====================
+def test_perf_records_one_line_per_event_and_times_a_mark(tmp_path):
+    import json
+    from log.perf import Perf
+    perf = Perf(str(tmp_path))
+    perf.record("gemma", 12.34, label="plan")
+    perf.mark("ptt_release")
+    assert perf.take_since("ptt_release") >= 0
+    assert perf.take_since("ptt_release") is None          # a mark is used once
+    rows = [json.loads(line) for line in open(tmp_path / "perf.jsonl")]
+    assert rows[0]["stage"] == "gemma" and rows[0]["ms"] == 12.3
+    assert rows[0]["label"] == "plan"
+
+
+def test_no_perf_records_nothing(tmp_path):
+    from log.perf import NO_PERF
+    NO_PERF.record("gemma", 1.0)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_the_perf_report_gives_percentiles_per_stage(tmp_path):
+    from log.perf import Perf
+    from log.perf_report import percentile, report
+    perf = Perf(str(tmp_path))
+    for ms in range(1, 101):
+        perf.record("sam3", ms, wait_ms=ms / 2, priority=0)
+    perf.record("frame", 30, fps=25, read_ms=1, draw_ms=20, show_ms=9)
+    assert percentile(list(range(1, 101)), 50) == 50
+    assert percentile(list(range(1, 101)), 95) == 95
+    text = "\n".join(report(str(tmp_path)))
+    assert "sam3" in text and "waiting for the lock" in text and "fps p50 25" in text
+
+
+def test_the_scripted_run_reads_sentences_and_waits(tmp_path):
+    from app.feed import read_script
+    script = tmp_path / "s.txt"
+    script.write_text("# a comment\nמה אתה רואה?\nwait 2.5\n\nטוס קדימה # inline\n")
+    assert read_script(str(script)) == [
+        ("say", "מה אתה רואה?"),
+        ("wait", 2.5),
+        ("say", "טוס קדימה"),
+    ]
+

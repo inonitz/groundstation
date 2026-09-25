@@ -460,3 +460,11 @@ def test_the_keyboard_hook_starts_without_the_mic(monkeypatch, tmp_path):
     processes, gstreamer = M.start_processes(sup, str(tmp_path), "ros")
     assert gstreamer == "gstreamer"
     assert sup.names == ["gemma", "keys", "gstreamer"] == processes   # keys: always
+
+
+def test_a_line_break_in_a_chat_line_does_not_crash_the_pane():
+    """2026-09-25: a transcript with a line break crashed PIL's textlength (live run)."""
+    chat = [("user", "הלו?\nמה זה יפה?", "user"), ("model", "a\nb", "scene")]
+    panel = render_chat(900, 300, chat, False, False, None)
+    assert panel.shape == (300, 900, 3)
+

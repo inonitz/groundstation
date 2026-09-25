@@ -6,9 +6,11 @@ Latest answer wins: say() overwrites a one-slot mailbox, cuts what is playing, a
 the worker; the worker sleeps on an event at zero CPU until then. No queue, no
 polling."""
 import threading
+import time
 
 from audio.tts_laptop import LaptopTts
 from audio.tts_phone import PhoneTts
+from log.perf import NO_PERF
 from system.fatal import die
 
 OUTPUTS = {"phone": PhoneTts, "laptop": LaptopTts}
@@ -17,12 +19,14 @@ OUTPUTS = {"phone": PhoneTts, "laptop": LaptopTts}
 class SpeechOut:
     """@outputs: names from OUTPUTS (config.TTS_OUTPUTS). @dji: the phone-app client."""
 
-    def __init__(self, outputs, dji):
+    def __init__(self, outputs, dji, perf=NO_PERF):
         unknown = [name for name in outputs if name not in OUTPUTS]
         if unknown:
             die(f"TTS_OUTPUTS has unknown outputs {unknown} (known: {sorted(OUTPUTS)})")
 
         self._outputs = [OUTPUTS[name](dji) for name in outputs]
+        self._names = list(outputs)
+        self._perf = perf
         self._pending = None
         self._lock = threading.Lock()
         self._wake = threading.Event()
@@ -67,6 +71,13 @@ class SpeechOut:
             if text is None:                # a shutdown wake, or an already-taken slot
                 continue
 
-            for output in self._outputs:
+            for name, output in zip(self._names, self._outputs):
+                t0 = time.monotonic()
                 output.say(text)
+                self._perf.record(
+                    "say",
+                    (time.monotonic() - t0) * 1000,
+                    output=name,
+                    chars=len(text)
+                )
         return

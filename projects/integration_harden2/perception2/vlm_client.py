@@ -85,7 +85,8 @@ def ask(gemma, frame_bgr, question, dets):
         messages,
         grammar=VLM_GRAMMAR,
         max_tokens=256,
-        timeout_s=config.VLM_TIMEOUT
+        timeout_s=config.VLM_TIMEOUT,
+        label="vision"
     )
     if not ok:
         return False, None

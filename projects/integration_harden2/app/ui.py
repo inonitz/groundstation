@@ -10,6 +10,7 @@ import numpy as np
 import config
 from app.render import FONT, draw_box, render_chat, render_status
 from app.state import S
+from log.perf import NO_PERF
 from video.video import source_kind
 
 WINDOW = "integration:mvd"
@@ -21,12 +22,48 @@ SCROLL_ROWS = 3                     # chat rows per wheel notch or [ / ] press
 
 
 # ---- The window loop ----
+class _FrameTimer:
+    """Sums the loop's parts and records one "frame" event per second: fps and the mean
+    ms of reading a frame, drawing (overlays + panes) and showing it (imshow +
+    waitKey)."""
+
+    def __init__(self, perf):
+        self._perf = perf
+        self._start = time.monotonic()
+        self._frames = 0
+        self._sums = {"read": 0.0, "draw": 0.0, "show": 0.0}
+        return
+
+    def add(self, read_s, draw_s, show_s):
+        self._frames += 1
+        self._sums["read"] += read_s
+        self._sums["draw"] += draw_s
+        self._sums["show"] += show_s
+
+        elapsed = time.monotonic() - self._start
+        if elapsed < 1.0:
+            return
+
+        n = self._frames
+        self._perf.record(
+            "frame",
+            sum(self._sums.values()) / n * 1000,
+            fps=round(n / elapsed, 1),
+            read_ms=round(self._sums["read"] / n * 1000, 1),
+            draw_ms=round(self._sums["draw"] / n * 1000, 1),
+            show_ms=round(self._sums["show"] / n * 1000, 1)
+        )
+        self.__init__(self._perf)
+        return
+
+
 class Ui:
     """@video: the Video module (frames). @board: the status board (the status pane).
     @session_dir: shown in the chat pane's header. @manual_on: () -> bool, the manual
     mode banner (a callback: the screen never holds control)."""
 
-    def __init__(self, video, board, session_dir, manual_on):
+    def __init__(self, video, board, session_dir, manual_on, perf=NO_PERF):
+        self._perf = perf
         self._video = video
         self._board = board
         self._session_dir = session_dir
@@ -56,9 +93,16 @@ class Ui:
         masks = []
         use_masks = False
         display = None
+        canvas = None
+        t0 = 0.0
+        t_read = 0.0
+        t_draw = 0.0
+        timer = _FrameTimer(self._perf)
 
         while True:
+            t0 = time.monotonic()
             ok, frame = self._video.read()
+            t_read = time.monotonic()
 
             if not ok:
                 misses += 1
@@ -82,8 +126,12 @@ class Ui:
             fps = 0.9 * fps + 0.1 / max(now - previous, 1e-3)
             previous = now
 
-            cv2.imshow(WINDOW, self._canvas(display, fps))
-            if handle_key(cv2.waitKey(1) & 0xFF, on_clear):
+            canvas = self._canvas(display, fps)
+            t_draw = time.monotonic()
+            cv2.imshow(WINDOW, canvas)
+            key = cv2.waitKey(1) & 0xFF
+            timer.add(t_read - t0, t_draw - t_read, time.monotonic() - t_draw)
+            if handle_key(key, on_clear):
                 return
             if cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
                 return

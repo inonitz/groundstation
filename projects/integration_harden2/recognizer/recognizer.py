@@ -126,7 +126,8 @@ class Recognizer:
             msgs,
             grammar=UNIFIED_GRAMMAR,
             max_tokens=PLAN_MAX_TOKENS,
-            timeout_s=PLAN_TIMEOUT_S
+            timeout_s=PLAN_TIMEOUT_S,
+            label="plan"
         )
         if not ok:
             return {"kind": "failed"}

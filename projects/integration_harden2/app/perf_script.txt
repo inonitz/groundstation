@@ -1,0 +1,16 @@
+# The default scripted run: one of each request kind, the same every run.
+# A "wait" after a request gives it time to finish before the next one.
+מה אתה רואה?
+wait 10
+תסמן את הכוס
+wait 15
+תפסיק לסמן
+wait 3
+כמה אנשים יש פה?
+wait 12
+טוס קדימה חמישה מטרים
+wait 6
+עלה שלושה מטרים ואז הסתובב תשעים מעלות עם כיוון השעון
+wait 8
+מה אתה רואה?
+wait 10

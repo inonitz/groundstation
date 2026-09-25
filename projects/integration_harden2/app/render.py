@@ -139,14 +139,23 @@ def _is_rtl(s):
 
 def _wrap_px(text, maxpx, font=None):
     """Wrap to fit maxpx using the real font metrics (per-element font). PIL path
-    only."""
-    trial = ""
-    cur = ""
+    only. A line break in the text starts a new line: PIL cannot measure multi-line
+    text (a transcript with a line break crashed the app, 2026-09-25)."""
     lines = []
-
     font = font or _FONT_HE
     if not text:
         return [""]
+
+    for paragraph in text.split("\n"):
+        lines.extend(_wrap_line(paragraph, maxpx, font))
+    return lines or [""]
+
+
+def _wrap_line(text, maxpx, font):
+    """Wrap one line (no line break inside) at spaces to fit maxpx."""
+    trial = ""
+    cur = ""
+    lines = []
 
     for wd in text.split(" "):
         trial = (cur + " " + wd).strip()

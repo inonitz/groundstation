@@ -10,6 +10,8 @@ from std_msgs.msg import Int32MultiArray
 
 import config
 from system.ros import Subscription
+
+KEY_ACTION_RELEASED = 0          # evdev EV_KEY value: 0 release, 1 press, 2 auto-repeat
 from system.supervisor import ProcessSpec
 from util.process import native_env
 
@@ -18,8 +20,10 @@ class Keys:
     """@on_key(code): once per key PRESS (evdev key code). Release and auto-repeat are
     ignored, so holding a key reports it once."""
 
-    def __init__(self, on_key):
+    def __init__(self, on_key, on_release=None):
+        """@on_release(code): once per key RELEASE, or None."""
         self._on_key = on_key
+        self._on_release = on_release
         self._sub = Subscription(
             "integration_keys",
             Int32MultiArray,
@@ -34,6 +38,9 @@ class Keys:
 
     def _on_message(self, msg):
         if len(msg.data) < 2:
+            return
+        if msg.data[1] == KEY_ACTION_RELEASED and self._on_release is not None:
+            self._on_release(msg.data[0])
             return
         if msg.data[1] != config.KEY_ACTION_PRESSED:
             return

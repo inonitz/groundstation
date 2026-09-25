@@ -9,8 +9,10 @@ A reply that is not the chat-completions shape (bad JSON, a short read, a missin
 key, null content) is a failed request too, never an exception (review finding R6).
 """
 import json
+import time
 
 import config
+from log.perf import NO_PERF
 from util.guarded import http_request, parse_json
 from util.net import JSON_HEADERS
 
@@ -37,8 +39,9 @@ def _content(body):
 class Gemma:
     """One Gemma server, reached on 127.0.0.1:port."""
 
-    def __init__(self, port=config.LLAMA_SERVER_PORT):
+    def __init__(self, port=config.LLAMA_SERVER_PORT, perf=NO_PERF):
         self.port = port
+        self._perf = perf
         return
 
     def close(self):
@@ -50,10 +53,17 @@ class Gemma:
         messages,
         grammar=None,
         max_tokens=256,
-        timeout_s=config.VLM_TIMEOUT
+        timeout_s=config.VLM_TIMEOUT,
+        label="request"
     ):
-        """POST one chat completion.
-        -> (True, reply_text) on success, (False, "") on any failure."""
+        """POST one chat completion. @label names the caller in the perf record (plan,
+        vision). -> (True, reply_text) on success, (False, "") on any failure."""
+        t0 = time.monotonic()
+        ok, text = self._request(messages, grammar, max_tokens, timeout_s)
+        self._perf.record("gemma", (time.monotonic() - t0) * 1000, label=label, ok=ok)
+        return ok, text
+
+    def _request(self, messages, grammar, max_tokens, timeout_s):
         payload = {"messages": messages, "max_tokens": max_tokens, "temperature": 0.0}
         if grammar:
             payload["grammar"] = grammar

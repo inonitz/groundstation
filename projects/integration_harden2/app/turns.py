@@ -4,10 +4,13 @@ Turns: a transcript opens a log turn, goes to the recognizer (which routes it), 
 Routed result is shown and spoken. VisionSinks: perception2.vision reports each task's
 result here; this is the one place that turns a vision result into chat lines, speech and
 log records. Shared state is app.state.S."""
+import time
+
 from app.render import chat_kind
 from app.state import S
-from util.mission import step_text
+from log.perf import NO_PERF
 from log.session import SessionLog
+from util.mission import step_text
 from recognizer import reject_why
 from perception2.vision import (
     HL_ABSENT,
@@ -64,22 +67,31 @@ class Turns:
     """@recognizer: recognizer.Recognizer. @say(text): chat + speech.
     @session: log.session.SessionLog."""
 
-    def __init__(self, recognizer, say, session):
+    def __init__(self, recognizer, say, session, perf=NO_PERF):
         self.recognizer = recognizer
         self.say = say
         self.session = session
+        self._perf = perf
         return
 
     def __call__(self, text, source="mic"):
-        text = (text or "").strip()
+        # one utterance is one line: the ASR can put a line break inside a transcript
+        text = " ".join((text or "").split())
         if not text:
             return
+
+        # the mic's ASR time: from the push-to-talk release to this transcript
+        asr_ms = self._perf.take_since("ptt_release") if source == "ros" else None
+        if asr_ms is not None:
+            self._perf.record("asr", asr_ms, chars=len(text))
 
         print("[app] you:", text, flush=True)
         chat("user", text, "user")
         self.session.begin(text, source)
 
+        t0 = time.monotonic()
         routed = self.recognizer.handle(text)
+        self._perf.record("turn", (time.monotonic() - t0) * 1000, kind=routed.kind)
         if routed.say:
             self.say(routed.say)
         if routed.vision_status == TASK_FULL:
