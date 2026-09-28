@@ -23,6 +23,19 @@ A LOCAL measure -> fix -> improve loop for one component; not a global rule.
    Full result tables, never abbreviated. Wilson 95% intervals for rates, exact McNemar for paired
    A/B, latency as percentile columns (p50/p95/...).
 
+## Deleting a benchmark
+
+A benchmark may be deleted only when ALL four hold (owner ruling 2026-09-26, for every
+benchmark, now and in the future):
+  A. it is of no use to us anymore;
+  B. it is documented in the git history (committed);
+  C. its results were moved into a docs/research-complete-*.md document;
+  D. it has not been touched since, and HISTORY.md documents it.
+Owner's words: "Those tests are not relevant, SO LONG THAT: A. Are not of use to us anymore
+B. ACTUALLY DOCUMENTED THEM IN THE GIT HISTORY C. We moved them to the docs/research-complete
+designation D. We haven't touched them since & have documented them in HISTORY.md. The
+following rules apply to all benchmarks we have currently and will create in the future(!)"
+
 ## The benchmarks
 
 | bench | measures | status |

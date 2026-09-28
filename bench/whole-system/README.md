@@ -93,7 +93,7 @@ lane 4. Rulings are the owner's; this directory only measures.
 | file | role |
 |---|---|
 | `run_all.sh` | sequences the lanes (`LANES=replay,bench,perfect,vision,planning,gemma`), collects reports under results/<date>/ |
-| `run_list.py` | lane 1: a live-test list as text, or `--from-clips <session>` audio replay through whisper-cli; judged against the list's notation |
+| `run_list.py` | lane 1: a live-test list (datasets/e2e/) through the Recognizer and its Gemma planner, as text or `--from-clips <session>` audio replay through whisper-cli; judged against the list's notation |
 | `vlm_compare.py` | lane 3: both VLMs on the images, agreement with SAM3, side-by-side sheet |
 | `vision_chain.py` | lane 3b: from a vlm-compare.json, does SAM3 highlight the asked object from each VLM's phrase |
 | `sam3_alone.py` | lane 3c: SAM3 alone as the presence gate; `--detect` runs SAM3 once per ask (GPU, ~1 min), `--score` sweeps the threshold and scores SAM3 + both VLM gates against the labels (CPU only) |

@@ -11,15 +11,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$HERE/../.." && pwd)"
 CMD="$ROOT/bench/hebrew-command-bench"
 OUT="$HERE/results/$(date +%Y-%m-%d)"; mkdir -p "$OUT"
 LANES="${LANES:-replay,bench,perfect,vision,planning}"
-SESSION="${SESSION:-$ROOT/projects/integration_harden/sessions/session-20260908-003702-rog}"
-LIST="${LIST:-$ROOT/tools/desk-test/live-test-50.md}"
+SESSION="${SESSION:-}"   # a recorded session dir; the 2026-09-08 default session is gone
+LIST="${LIST:-$ROOT/datasets/e2e/live-test-50.md}"
 has(){ case ",$LANES," in *",$1,"*) return 0;; *) return 1;; esac; }
 echo "[whole-system] lanes=$LANES -> $OUT"
-if has replay; then   # lane 1: recorded push-to-talk clips -> whisper -> Recognizer -> planner, scored vs the list
-  for t in hymt2 dicta; do
-    python3 "$HERE/run_list.py" "$LIST" --translator $t --from-clips "$SESSION" --out "$OUT/replay-$(basename "$SESSION")-$t.md" > "$OUT/replay-$t.log" 2>&1
-    echo "[replay $t] $(tail -1 "$OUT/replay-$(basename "$SESSION")-$t.md")"; sleep 3
-  done
+if has replay && [ -z "$SESSION" ]; then
+  echo "[replay] skipped: set SESSION=<session dir> to replay its clips"
+elif has replay; then   # lane 1: recorded clips -> whisper -> Recognizer -> Gemma, scored vs the list
+  REPLAY="$OUT/replay-$(basename "$SESSION").md"
+  python3 "$HERE/run_list.py" "$LIST" --from-clips "$SESSION" --out "$REPLAY" > "$OUT/replay.log" 2>&1
+  echo "[replay] $(tail -1 "$REPLAY")"; sleep 3
 fi
 if has bench; then    # lane 2: the 413-case bench, both translators (raw JSON lands in hebrew-command-bench/results)
   for t in hymt2 dicta; do

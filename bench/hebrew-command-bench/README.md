@@ -110,7 +110,7 @@ Open item, unchanged: one stage-0 false positive — a wait command containing t
 | `unified_bench.py` | THE current harness: `recognize_direct` + the one Gemma `plan()` call, all five sets, ~2 min, GPU |
 | `bench.py` | retired translated-path harness; kept for shared infra: case loading and `--cases` (regenerates CASES.md) |
 | `compare_runs.py` | per-case diff of two raw JSONs: per-set counts, every changed output, every verdict flip |
-| (whole-system) | run_list.py (text-mode and audio-replay list runs) lives in tools/bench/whole-system since 2026-09-08 |
+| (whole-system) | run_list.py (text-mode and audio-replay list runs) lives in bench/whole-system |
 | `cases_commands.py` | 254 standard + 63 verbose + 12 emergency cases + mission scorer |
 | `cases_perception.py` | 138 perception + 21 military cases + keyword scorer |
 | `results/` | date-stamped raw outputs; `RESULTS.md` is the authoritative record, `HISTORY.md` holds the superseded rounds |

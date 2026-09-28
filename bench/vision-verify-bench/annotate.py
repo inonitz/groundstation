@@ -27,8 +27,9 @@ sys.path.insert(0, "/root/groundstation/projects/integration_harden2")
 os.environ.setdefault("MVD_HOME", "integration_harden2")
 
 import config
-import app.render as overlay   # the demo's own screen code (was overlay.py)
-from app.render import draw_box, FONT   # the demo's own box and label style
+import app.draw as overlay   # the demo's own fonts and wrapping (was overlay.py)
+from app.draw import draw_box, FONT   # the demo's own box and label style
+from bidi.algorithm import get_display
 
 COL_GUESS = config.COL_YOLOE_HL       # green: the SAM3 / estimate guess
 COL_HUMAN = (255, 140, 0)             # orange: a box you added yourself
@@ -82,17 +83,17 @@ def outlined(img, y, text, scale=0.62, up=False):
 
 def hebrew_line(img, text, y):
     """The spoken Hebrew, right-aligned, the demo's font and bidi rules, dark stroke instead of a bar."""
-    if not text or not getattr(overlay, "_HAVE_HE", False):
+    if not text:
         return img
     import numpy as np
     from PIL import Image, ImageDraw
     pil = Image.fromarray(img[:, :, ::-1])
     draw = ImageDraw.Draw(pil)
-    for i, wrapped in enumerate(overlay._wrap_px(text, pil.width - 20, overlay._FONT_HE)):
-        visual = wrapped if overlay._RAQM else overlay.get_display(wrapped)
-        text_width = draw.textlength(visual, font=overlay._FONT_HE)
-        y_line = y + i * (overlay._FONT_HE.size + 6)
-        draw.text((pil.width - text_width - 10, y_line), visual, font=overlay._FONT_HE,
+    for i, wrapped in enumerate(overlay.wrap_px(text, pil.width - 20, overlay.FONT_HE)):
+        visual = wrapped if overlay.RAQM else get_display(wrapped)
+        text_width = draw.textlength(visual, font=overlay.FONT_HE)
+        y_line = y + i * (overlay.FONT_HE.size + 6)
+        draw.text((pil.width - text_width - 10, y_line), visual, font=overlay.FONT_HE,
                   fill=(255, 255, 255), stroke_width=2, stroke_fill=(0, 0, 0))
     return np.array(pil)[:, :, ::-1].copy()
 
