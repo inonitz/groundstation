@@ -40,7 +40,7 @@ def argv(port, thinking):
     """Gemma's command line, from config. Gemma gotchas (2026-09-08): NO
     --image-min-tokens (breaks its CLIP load), NO q4_0 KV + flash-attn (empty output)."""
     return [
-        os.path.join(config.NATIVE_BIN_DIR, "llama-server"),
+        config.LLAMA_SERVER_BIN,
         "-m", config.GEMMA_MODEL_PATH,
         "--mmproj", config.GEMMA_MMPROJ_PATH,
         "-dev", "Vulkan0",

@@ -70,7 +70,7 @@ def process(log_dir, phone_ip):
     return ProcessSpec(
         name="gstreamer",
         argv=[
-            os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_gstreamer_rx"),
+            config.GSTREAMER_RX_BIN,
             "--dji",
             phone_ip,
         ],

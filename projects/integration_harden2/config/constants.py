@@ -31,14 +31,31 @@ TTS_LANGUAGE         = "he"           # phone answers in Hebrew
 KEYBOARD_RAW_TOPIC = "/keyboard/in/raw"
 # evdev EV_KEY value: 0 release, 1 press, 2 auto-repeat
 KEY_ACTION_PRESSED = 1
+KEY_ACTION_RELEASED = 0
 # evdev KEY_F4. A function key, never a letter: letters are typed in other windows
 # (owner 2026-09-23).
 KILL_KEY_CODE      = 62
 KILL_KEY_NAME      = "F4"
+# Every global action is a function key (owner 2026-09-23: "Use the function keys";
+# letters are typed in other windows). Quit is F1, far from F4 (kill) and F5 (talk).
+QUIT_KEY_CODE      = 59              # evdev KEY_F1
+QUIT_KEY_NAME      = "F1"
+CLEAR_KEY_CODE     = 60              # evdev KEY_F2: clear the highlight
+CLEAR_KEY_NAME     = "F2"
 # shown on screen; the binding itself is compiled into the asr_node
 # (llm_to_action asr_node.hpp kPushToTalkKeyBind)
 PUSH_TO_TALK_KEY_NAME = "F5"
 PUSH_TO_TALK_KEY_CODE = 63            # evdev KEY_F5: its release starts the ASR timing
+
+# Window keys: they act ONLY while the app window has the focus (cv2.waitKey codes)
+WINDOW_TITLE            = "integration:mvd"
+WINDOW_QUIT_KEYS        = (27, ord("q"))    # Esc, q
+WINDOW_CLEAR_KEY        = ord("c")          # clear the highlight
+WINDOW_MASKS_KEY        = ord("t")          # masks on/off
+WINDOW_SCROLL_UP_KEY    = ord("[")          # older chat rows
+WINDOW_SCROLL_DOWN_KEY  = ord("]")          # back toward the newest
+WINDOW_CLEAR_CHAT_KEY   = ord("x")
+CHAT_SCROLL_ROWS        = 3                 # chat rows per wheel notch or [ / ] press
 
 # ---- Camera + on-screen UI (fixed geometry) ----
 # requested webcam width (falls to nearest supported)
@@ -60,6 +77,8 @@ WATCHDOG_RETRY_SECONDS = 15.0         # seconds between gstreamer restarts
 COL_HIGHLIGHT  = ( 60, 220,  60)   # green  : a highlight box (SAM3)
 COL_MASK       = (220,  60, 220)   # magenta: a highlight mask (SAM3)
 COL_HUD        = (255, 255,   0)   # cyan   : fps / status line (BGR; #00ffff)
+COL_HUD_SHADOW = (  0,   0,   0)   # black  : under HUD text, readable on a white wall
+COL_PROMPT     = (163, 149, 139)   # grey   : the push-to-talk prompt
 COL_STATUS_UP   = ( 80, 200,  80)  # green  : a system that is UP
 # orange: WAITING, the user must fix it (owner 2026-09-23)
 COL_STATUS_WAITING = ( 0, 150, 255)
@@ -105,6 +124,11 @@ MOCK_APISERVER_PATH = _os.path.join(_REPO, "tools", "dji_mock", "mock_apiserver.
 # ---- Process supervisor (system/supervisor.py) ----
 # the C++ binaries + libs
 NATIVE_BIN_DIR      = _os.path.join(_REPO, "build", "release", "shared", "dji", "bin")
+# one build installs all four programs (system/deps.py checks them at start-up)
+LLAMA_SERVER_BIN    = _os.path.join(NATIVE_BIN_DIR, "llama-server")
+ASR_SERVER_BIN      = _os.path.join(NATIVE_BIN_DIR, "llm_to_action_asr_server")
+KEYBOARD_HOOK_BIN   = _os.path.join(NATIVE_BIN_DIR, "llm_to_action_keyboard_hook")
+GSTREAMER_RX_BIN    = _os.path.join(NATIVE_BIN_DIR, "llm_to_action_gstreamer_rx")
 # restarts of a dead process before the app die()s (owner 2026-09-22)
 SUPERVISOR_MAX_RESTARTS   = 3
 SUPERVISOR_STABLE_SECONDS = 60.0    # a process up this long has its restart count reset

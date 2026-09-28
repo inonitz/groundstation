@@ -9,6 +9,9 @@
 #   bash run.sh preflight [webcam|dji]                # checks only, starts nothing
 #   bash run.sh score [list.md] [session]             # score a recorded session vs an e2e list -> REPORT.md
 #   bash run.sh show  [session]                       # pretty-print a session's utterances
+#   bash run.sh perf  [session]                       # p50 / p95 / max per stage from perf.jsonl
+#   SCRIPT=default bash run.sh up webcam mock         # the scripted run (mock only)
+# Every setting and flag: docs/spec-harden2-run-arguments.md
 #
 # SAFETY (CLAUDE.md): 'real' control is HUMAN-ONLY and prompts to confirm. The assistant runs only 'mock'.
 set -euo pipefail
@@ -16,7 +19,7 @@ export TZ="${TZ:-Asia/Jerusalem}"
 
 # ------------------------------------------------------------------ config
 HERE="$(cd "$(dirname "$0")" && pwd)"
-BIN="$(cd "$HERE/../.." && pwd)/build/release/shared/dji/bin"
+BIN="$(cd "$HERE" && python3 -c 'import config; print(config.NATIVE_BIN_DIR)')"   # config: one home
 ROS_SETUP=/opt/ros/jazzy/setup.bash
 SESSION=mvd
 VLM_PORT=18090
@@ -99,11 +102,9 @@ cmd_preflight(){
         else _ok "port $p free"; fi
     done
 
-    echo "== binaries =="
-    local b
-    for b in llama-server llm_to_action_asr_server llm_to_action_keyboard_hook llm_to_action_gstreamer_rx; do
-        [ -x "$BIN/$b" ] && _ok "$b" || _bad "$b missing in $BIN"
-    done
+    echo "== python packages, programs, model files (system/deps.py, the one list) =="
+    (cd "$HERE" && python3 -m system.deps) && _ok "all present" \
+        || _bad "missing (the FATAL line above names them)"
     # Every native program loads the ggml libraries by the SAME names (libggml*.so.0), so they
     # must all point at ONE ggml version. A mix crashed Gemma on every image (2026-09-25).
     local ggml_versions
@@ -113,21 +114,6 @@ cmd_preflight(){
     else
         _bad "ggml libraries mix versions: $(echo $ggml_versions) (rebuild so one build installs them all)"
     fi
-
-    echo "== models =="
-    local ASR_MODEL GEMMA_GGUF GEMMA_MMPROJ    # config/ is the one home of every path
-    read -r ASR_MODEL GEMMA_GGUF GEMMA_MMPROJ < <(cd "$HERE" && python3 -c \
-        'import config; print(config.ASR_MODEL_PATH, config.GEMMA_MODEL_PATH, config.GEMMA_MMPROJ_PATH)')
-    [ -f "$ASR_MODEL" ] && _ok "ASR: $(basename "$ASR_MODEL")" || _bad "ASR model MISSING: $ASR_MODEL"
-    local m
-    for m in "$GEMMA_GGUF" "$GEMMA_MMPROJ"; do
-        [ -f "$m" ] && _ok "$(basename "$m")" || _bad "model MISSING: $m"
-    done
-    [ -d /root/models/vision/sam3-official ] && _ok "SAM3 model dir" || _bad "SAM3 dir MISSING"
-    # find_spec checks the install WITHOUT importing: importing bitsandbytes loads torch + CUDA (5-10 s)
-    python3 -c "import importlib.util as u, sys; sys.exit(not all(u.find_spec(m) for m in ('bitsandbytes', 'accelerate')))" \
-        && _ok "bitsandbytes + accelerate (SAM3-nf4)" \
-        || _bad "bitsandbytes/accelerate missing: bash /root/groundstation/tools/devenv/install-runtime-deps.sh"
 
     echo "== tools =="
     local t
@@ -181,12 +167,9 @@ BANNER
         dji_host=127.0.0.1; dji_port=8079; dji_real=""
     fi
 
-    # --- video source ---
-    local scene_input
+    # --- video source: config/defaults.py video_input() turns VIDEO into the app's source ---
     case "$video" in
-        webcam)      scene_input="${WEBCAM_DEV:-0}" ;;
-        dji)         scene_input="ros" ;;
-        rtmp|drone)  scene_input="rtsp://127.0.0.1:8554/live" ;;
+        webcam|dji|rtmp|drone) ;;
         *) die "unknown video mode '$video' (webcam|dji|rtmp)" ;;
     esac
 
@@ -247,7 +230,7 @@ APP
     done
 
     log "UP. video=$video control=$control dji=$dji_host:$dji_port seg=$SEG"
-    log "  attach: tmux attach -t $SESSION     (F5 to talk; Ctrl-b then a number to switch panes)"
+    log "  attach: tmux attach -t $SESSION     (F5 talk, F4 kill, F2 clear, F1 quit; Ctrl-b then a number to switch panes)"
     log "  status: bash $HERE/run.sh status"
     log "  down:   bash $HERE/run.sh down"
 }

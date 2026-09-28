@@ -44,7 +44,7 @@ class RosAsr:
 def argv():
     """The C++ ASR server's command line, from config."""
     args = [
-        os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_asr_server"),
+        config.ASR_SERVER_BIN,
         f"--backend={config.ASR_BACKEND}",
         f"--model={config.ASR_MODEL_PATH}",
         "--fa",

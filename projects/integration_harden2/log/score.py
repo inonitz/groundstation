@@ -18,7 +18,7 @@ sys.path.insert(
     0,
     os.path.join(ROOT, "projects", os.environ.get("MVD_HOME", "integration_harden2"))
 )
-from log.session import latest_session, trace_file
+from log.session_files import latest_session, trace_file
 from util.hebrew import hebnum_to_digits
 from util.mission import step_text
 

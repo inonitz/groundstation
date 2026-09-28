@@ -11,7 +11,6 @@ from std_msgs.msg import Int32MultiArray
 import config
 from system.ros import Subscription
 
-KEY_ACTION_RELEASED = 0          # evdev EV_KEY value: 0 release, 1 press, 2 auto-repeat
 from system.supervisor import ProcessSpec
 from util.process import native_env
 
@@ -39,7 +38,7 @@ class Keys:
     def _on_message(self, msg):
         if len(msg.data) < 2:
             return
-        if msg.data[1] == KEY_ACTION_RELEASED and self._on_release is not None:
+        if msg.data[1] == config.KEY_ACTION_RELEASED and self._on_release is not None:
             self._on_release(msg.data[0])
             return
         if msg.data[1] != config.KEY_ACTION_PRESSED:
@@ -54,7 +53,7 @@ def process(log_dir):
     and so does push-to-talk. A laptop part: past the budget, the app dies."""
     return ProcessSpec(
         name="keys",
-        argv=[os.path.join(config.NATIVE_BIN_DIR, "llm_to_action_keyboard_hook")],
+        argv=[config.KEYBOARD_HOOK_BIN],
         env=native_env(),
         log_path=os.path.join(log_dir, "proc-keys.log"),
     )

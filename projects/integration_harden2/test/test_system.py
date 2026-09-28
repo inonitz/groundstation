@@ -9,7 +9,7 @@ import threading
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
-from system import status
+from system import deps, status
 from system import supervisor as supervisor_module
 from system.status import (
     DOWN,
@@ -299,3 +299,37 @@ def test_die_reaches_exit_even_when_a_cleanup_fails_and_runs_once():
     assert r.returncode == 1 and "STILL RUNNING" not in r.stdout
     assert r.stdout.count("SECOND CLEANUP RAN") == 1
     assert "a cleanup failed during die(): OSError('wait failed')" in r.stderr
+
+
+# ==================== dependencies ====================
+def test_every_package_and_file_the_app_needs_is_present():
+    assert deps.missing() == {}
+    assert deps.missing_files() == []
+
+
+def test_a_missing_package_dies_with_its_install_command():
+    code = textwrap.dedent(f'''
+        import sys
+        sys.path.insert(0, {HARDEN2!r})
+        from system import deps
+        deps.check(
+            {{"numpy": "pip install numpy", "no_such_pkg": "pip install nsp"}},
+            [sys.executable, "/no/such/model.gguf"],
+        )
+        print("STILL RUNNING", flush=True)
+    ''')
+    r = subprocess.run(_py(code), capture_output=True, text=True, timeout=60)
+    assert r.returncode == 1
+    assert "STILL RUNNING" not in r.stdout
+    assert "missing python packages: no_such_pkg." in r.stderr
+    assert "Install: pip install nsp" in r.stderr
+    assert "missing files: /no/such/model.gguf (" in r.stderr
+
+
+def test_the_app_checks_packages_before_it_imports_any_module():
+    main_path = os.path.join(HARDEN2, "app", "main.py")
+    with open(main_path) as f:
+        source = f.read()
+    check_at = source.index("deps.check()")
+    assert check_at < source.index("import config")
+    assert check_at < source.index("from app ")

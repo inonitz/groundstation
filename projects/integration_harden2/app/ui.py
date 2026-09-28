@@ -2,45 +2,57 @@
 pane and the chat pane side by side (owner layout 2026-09-22). Window keys and the mouse
 wheel are read here. The kill key is NOT here: it is global (app/keys.py)."""
 import os
+import threading
 import time
 
 import cv2
 import numpy as np
 
 import config
-from app.render import FONT, draw_box, render_chat, render_status
+from app.chat_pane import render_chat
+from app.draw import FONT, draw_box
 from app.state import S
+from app.status_pane import render_status
 from log.perf import NO_PERF
 from video.video import source_kind
-
-WINDOW = "integration:mvd"
-HUD_SHADOW = (0, 0, 0)              # a shadow under HUD text: readable on a white wall
-PROMPT_COLOUR = (163, 149, 139)
-KEY_ESC = 27
-QUIT_KEYS = (KEY_ESC, ord("q"))
-SCROLL_ROWS = 3                     # chat rows per wheel notch or [ / ] press
 
 
 # ---- The window loop ----
 class _FrameTimer:
-    """Sums the loop's parts and records one "frame" event per second: fps and the mean
-    ms of reading a frame, drawing (overlays + panes) and showing it (imshow +
-    waitKey)."""
+    """Records one "frame" event per second: fps, and for each part of the loop (read a
+    frame, draw the overlays + panes, show it with imshow + waitKey) the mean AND the
+    worst ms of that second. worst_frame_ms is the longest gap between two frames: it
+    also holds any time spent outside the three parts. A mean alone hides one slow
+    frame."""
 
     def __init__(self, perf):
         self._perf = perf
-        self._start = time.monotonic()
+        self._reset(time.monotonic())
+        return
+
+    def _reset(self, now):
+        self._start = now
+        self._last = now
         self._frames = 0
         self._sums = {"read": 0.0, "draw": 0.0, "show": 0.0}
+        self._worst = {"read": 0.0, "draw": 0.0, "show": 0.0}
+        self._worst_gap = 0.0
         return
 
     def add(self, read_s, draw_s, show_s):
-        self._frames += 1
-        self._sums["read"] += read_s
-        self._sums["draw"] += draw_s
-        self._sums["show"] += show_s
+        now = time.monotonic()
+        parts = {"read": read_s, "draw": draw_s, "show": show_s}
+        elapsed = 0.0
+        n = 0
 
-        elapsed = time.monotonic() - self._start
+        self._frames += 1
+        self._worst_gap = max(self._worst_gap, now - self._last)
+        self._last = now
+        for name, seconds in parts.items():
+            self._sums[name] += seconds
+            self._worst[name] = max(self._worst[name], seconds)
+
+        elapsed = now - self._start
         if elapsed < 1.0:
             return
 
@@ -51,9 +63,13 @@ class _FrameTimer:
             fps=round(n / elapsed, 1),
             read_ms=round(self._sums["read"] / n * 1000, 1),
             draw_ms=round(self._sums["draw"] / n * 1000, 1),
-            show_ms=round(self._sums["show"] / n * 1000, 1)
+            show_ms=round(self._sums["show"] / n * 1000, 1),
+            read_max_ms=round(self._worst["read"] * 1000, 1),
+            draw_max_ms=round(self._worst["draw"] * 1000, 1),
+            show_max_ms=round(self._worst["show"] * 1000, 1),
+            worst_frame_ms=round(self._worst_gap * 1000, 1)
         )
-        self.__init__(self._perf)
+        self._reset(now)
         return
 
 
@@ -70,8 +86,15 @@ class Ui:
         self._manual_on = manual_on
         self._src_label = source_label(video.source)
         self._dji_text = dji_label()
-        cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)   # content size, no empty margins
-        cv2.setMouseCallback(WINDOW, on_mouse)          # the wheel scrolls the chat
+        self._quit = threading.Event()   # set by the global quit key (another thread)
+        # content size, no empty margins; the wheel scrolls the chat
+        cv2.namedWindow(config.WINDOW_TITLE, cv2.WINDOW_AUTOSIZE)
+        cv2.setMouseCallback(config.WINDOW_TITLE, on_mouse)
+        return
+
+    def request_quit(self):
+        """End the display loop at its next frame. Safe from any thread."""
+        self._quit.set()
         return
 
     def close(self):
@@ -99,7 +122,7 @@ class Ui:
         t_draw = 0.0
         timer = _FrameTimer(self._perf)
 
-        while True:
+        while not self._quit.is_set():
             t0 = time.monotonic()
             ok, frame = self._video.read()
             t_read = time.monotonic()
@@ -128,13 +151,15 @@ class Ui:
 
             canvas = self._canvas(display, fps)
             t_draw = time.monotonic()
-            cv2.imshow(WINDOW, canvas)
+            cv2.imshow(config.WINDOW_TITLE, canvas)
             key = cv2.waitKey(1) & 0xFF
             timer.add(t_read - t0, t_draw - t_read, time.monotonic() - t_draw)
             if handle_key(key, on_clear):
                 return
-            if cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
+            if cv2.getWindowProperty(config.WINDOW_TITLE, cv2.WND_PROP_VISIBLE) < 1:
                 return
+        print("[ui] the quit key", flush=True)
+        return
 
     def _show_waiting(self):
         """The 'waiting for video' placeholder WITH the status and chat panes, so
@@ -150,8 +175,8 @@ class Ui:
             (0, 200, 255),
             2
         )
-        cv2.imshow(WINDOW, self._canvas(placeholder, 0.0))
-        return (cv2.waitKey(50) & 0xFF) in QUIT_KEYS
+        cv2.imshow(config.WINDOW_TITLE, self._canvas(placeholder, 0.0))
+        return (cv2.waitKey(50) & 0xFF) in config.WINDOW_QUIT_KEYS
 
     def _canvas(self, display, fps):
         return compose_canvas(
@@ -240,14 +265,14 @@ def compose_canvas(display, fps, src_label, dji_text, session_dir, board, manual
     canvas = cv2.vconcat([display, cv2.hconcat([status_panel, chat_panel])])
 
     hud = f"{fps:4.1f} fps | {src_label} | {dji_text}"
-    cv2.putText(canvas, hud, (10, 22), FONT, 0.55, HUD_SHADOW, 3, cv2.LINE_AA)
+    cv2.putText(canvas, hud, (10, 22), FONT, 0.55, config.COL_HUD_SHADOW, 3, cv2.LINE_AA)
     cv2.putText(canvas, hud, (10, 22), FONT, 0.55, config.COL_HUD, 1, cv2.LINE_AA)
 
     ptt = config.PUSH_TO_TALK_KEY_NAME
     prompt = f"{ptt} to talk ({ptt}, speak, {ptt})"
     at = (10, display.shape[0] - 12)
-    cv2.putText(canvas, prompt, at, FONT, 0.48, HUD_SHADOW, 3, cv2.LINE_AA)
-    cv2.putText(canvas, prompt, at, FONT, 0.48, PROMPT_COLOUR, 1, cv2.LINE_AA)
+    cv2.putText(canvas, prompt, at, FONT, 0.48, config.COL_HUD_SHADOW, 3, cv2.LINE_AA)
+    cv2.putText(canvas, prompt, at, FONT, 0.48, config.COL_PROMPT, 1, cv2.LINE_AA)
     return canvas
 
 
@@ -260,7 +285,7 @@ def on_mouse(event, _x, _y, flags, _param):
 
     # the wheel delta is the sign of flags' upper 16 bits
     # (cv2 4.11 has no getMouseWheelDelta)
-    step = SCROLL_ROWS if flags > 0 else -SCROLL_ROWS
+    step = config.CHAT_SCROLL_ROWS if flags > 0 else -config.CHAT_SCROLL_ROWS
     with S.lock:
         S.chat_scroll = max(0, S.chat_scroll + step)
     return
@@ -270,21 +295,21 @@ def handle_key(key, on_clear):
     """Apply one window key. -> True when the app should quit. c = clear the highlight, t
     = masks on/off, [ / ] = scroll the chat, x = clear the chat. The kill key is NOT
     here: it is global (app/keys.py)."""
-    if key in QUIT_KEYS:
+    if key in config.WINDOW_QUIT_KEYS:
         return True
 
-    if key == ord("c"):
+    if key == config.WINDOW_CLEAR_KEY:
         on_clear()
-    elif key == ord("t"):
+    elif key == config.WINDOW_MASKS_KEY:
         with S.lock:
             S.use_sam = not S.use_sam
-    elif key == ord("["):
+    elif key == config.WINDOW_SCROLL_UP_KEY:
         with S.lock:
-            S.chat_scroll += SCROLL_ROWS
-    elif key == ord("]"):
+            S.chat_scroll += config.CHAT_SCROLL_ROWS
+    elif key == config.WINDOW_SCROLL_DOWN_KEY:
         with S.lock:
-            S.chat_scroll = max(0, S.chat_scroll - SCROLL_ROWS)
-    elif key == ord("x"):
+            S.chat_scroll = max(0, S.chat_scroll - config.CHAT_SCROLL_ROWS)
+    elif key == config.WINDOW_CLEAR_CHAT_KEY:
         with S.lock:
             S.chat.clear()
     return False

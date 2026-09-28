@@ -9,7 +9,7 @@ import sys
 
 # harden2 root
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from log.session import latest_session, trace_file
+from log.session_files import latest_session, trace_file
 
 
 def _pick_session(arg):

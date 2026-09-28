@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Per-session recorder + perception capture for the live window. Crash-safe by
 design: each finished utterance is appended to trace.jsonl as ONE flushed + fsynced
 JSON line, so an interrupt (Ctrl-C, power loss) keeps every finished utterance and
@@ -20,76 +19,19 @@ import socket
 import threading
 import time
 
-import cv2
-
 import config
+from log.disk import _atomic_imwrite, _atomic_json, _writable_folder, _written
 from system.fatal import die
-from util.guarded import append_line, atomic_write, rename
-
-
-def _written(ok, what):
-    """A failed write means the laptop's disk is
-    broken: die with the reason. Returns ok."""
-    if not ok:
-        die(
-            f"the session record could not write {what}: "
-            "the laptop disk refused a write"
-        )
-    return ok
-
-
-def _writable_folder(path):
-    """True when `path` exists and is writable, or its nearest existing parent is (so
-    makedirs will succeed). A plain permission check: nothing throws."""
-    probe = os.path.abspath(path)
-    while not os.path.exists(probe):
-        probe = os.path.dirname(probe)
-    return os.path.isdir(probe) and os.access(probe, os.W_OK | os.X_OK)
-
-
-def _atomic_json(path, obj, indent=1):
-    """Write JSON atomically (util.guarded.atomic_write: the old file or the new one,
-    never a truncated mix). A failed write dies (_written)."""
-    data = json.dumps(obj, ensure_ascii=False, indent=indent).encode("utf-8")
-    return _written(atomic_write(path, data), os.path.basename(path))
-
-
-def _atomic_imwrite(path, frame):
-    """The same guarantee for a JPEG frame: a kill mid-encode cannot leave a truncated
-    image. cv2.imencode reports a failed encode as False, never a throw."""
-    ok, jpeg = cv2.imencode(".jpg", frame)
-    if not ok:
-        print(f"[session] image encode failed: {path}", flush=True)
-        return _written(False, os.path.basename(path))
-    return _written(atomic_write(path, jpeg.tobytes()), os.path.basename(path))
+from util.guarded import append_line, rename
 
 
 def _slug(text):
     return re.sub(r"[^a-z0-9]+", "_", (text or "").lower()).strip("_")[:40]
 
 
-def latest_session():
-    """The newest session folder under config.SESSIONS_ROOT; die when there is none. The
-    read-only tools (show.py, score.py) use this."""
-    found = sorted(glob.glob(os.path.join(config.SESSIONS_ROOT, "session-*")))
-    if not found:
-        die(f"no session folder under {config.SESSIONS_ROOT}")
-    return found[-1]
-
-
 def _now():
     """The record's timestamp format."""
     return time.strftime("%Y-%m-%dT%H:%M:%S")
-
-
-def trace_file(root):
-    """A session's per-utterance log: trace.jsonl (since 2026-09-12), else an older
-    utterances.jsonl layout. The read-only tools (show.py, score.py) use this."""
-    for name in ("trace.jsonl", "asr/utterances.jsonl", "utterances.jsonl"):
-        path = os.path.join(root, *name.split("/"))
-        if os.path.exists(path):
-            return path
-    return os.path.join(root, "trace.jsonl")
 
 
 class SessionLog:

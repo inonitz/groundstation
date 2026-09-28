@@ -13,8 +13,11 @@ set -euo pipefail
 # espeak-ng: backs phonemizer-fork, a phonikud dependency.  libportaudio2: native lib sounddevice
 # needs to play the phonikud audio (aplay retired 2026-09-21).  fonts-freefont-ttf: FreeMono, the only
 # mono font with Hebrew glyphs (overlay tag column).  alsa-utils: legacy audio tools.
+# xvfb: the whole-app test (harden2 test/test_app.py) draws the app window on a virtual screen
+# unless HARDEN2_APP_TEST_SCREEN=1.
 echo "[install-runtime-deps] 1/5 system packages..."
-apt-get install -y espeak-ng alsa-utils libportaudio2 fonts-freefont-ttf
+apt-get update
+apt-get install -y espeak-ng alsa-utils libportaudio2 fonts-freefont-ttf xvfb
 
 # --- 2. python packages (pip) -------------------------------------------------------------
 echo "[install-runtime-deps] 2/5 python packages..."

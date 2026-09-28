@@ -11,8 +11,9 @@ it needs, runs the screen, then closes the modules and the services in reverse o
   python3 -m app.main --source 0     # from the harden2 root: webcam 0
   python3 -m app.main                # the source from config (VIDEO=webcam|dji)
 
-Keys: F4 kill toggle (global, any window) | q/Esc quit | c clear highlight | t masks
-on/off | [ ] or mouse wheel scroll the chat | x clear chat
+Global keys (any window): F4 kill toggle | F1 quit | F2 clear highlight | F5 talk.
+Window keys: q/Esc quit | c clear highlight | t masks on/off | [ ] or mouse wheel scroll
+the chat | x clear chat
 """
 import argparse
 import os
@@ -22,6 +23,9 @@ from functools import partial
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)   # the harden2 root: every module imports from here
+
+from system import deps
+deps.check()               # every package, before any module below imports one
 
 import config
 from app import keys as keys_module
@@ -111,20 +115,26 @@ def main():
     recognizer = Recognizer(control, vision, gemma, log)
     turns = Turns(recognizer, say, log, perf=perf)
     speech_in = SpeechIn(config.ASR_SOURCES, turns)
-    keys = Keys(
-        partial(on_global_key, control=control, say=say),
-        on_release=partial(on_key_release, perf=perf)
-    )
 
     # the status pane asks each part for its own rows, in this order
     board = StatusBoard([*processes, dji, sam3, video, speech_in])
     ui = Ui(video, board, log.dir, control.manual_on, perf=perf)
+    keys = Keys(
+        partial(
+            on_global_key,
+            control=control,
+            say=say,
+            quit_app=ui.request_quit,
+            clear=vision.clear
+        ),
+        on_release=partial(on_key_release, perf=perf)
+    )
 
     # --- run: a crash in the display loop reaches the crash hook -> die ------------
     ui.run(on_clear=vision.clear)
 
     # --- shutdown: the modules, then the services, each in reverse order ------------
-    for module in (ui, keys, speech_in, recognizer, vision, control, video, speech_out):
+    for module in (keys, ui, speech_in, recognizer, vision, control, video, speech_out):
         module.close()
     ros.stop()                 # after the last ROS2 node
     for service in (sam3, dji, gemma):
@@ -148,9 +158,16 @@ def on_key_release(code, perf):
     return
 
 
-def on_global_key(code, control, say):
-    """A global key press. Only the kill key acts: it toggles manual mode and says the
-    result. Letters never act: they are typed in other windows (owner 2026-09-23)."""
+def on_global_key(code, control, say, quit_app, clear):
+    """A global key press, from any window. Only function keys act (owner 2026-09-23:
+    letters are typed in other windows): the kill key toggles manual mode and says the
+    result, the quit key quits the app, the clear key drops the highlight."""
+    if code == config.QUIT_KEY_CODE:
+        quit_app()
+        return
+    if code == config.CLEAR_KEY_CODE:
+        clear()
+        return
     if code != config.KILL_KEY_CODE:
         return
 

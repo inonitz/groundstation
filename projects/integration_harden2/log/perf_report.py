@@ -7,7 +7,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from log.session import latest_session  # noqa: E402
+from log.session_files import latest_session  # noqa: E402
+
+SLOW_FPS = 10              # a second below this fps is listed as slow
 
 
 def percentile(values, p):
@@ -67,6 +69,15 @@ def report(session_dir):
             f"{percentile([r['read_ms'] for r in frames], 50):.0f} / "
             f"{percentile([r['draw_ms'] for r in frames], 50):.0f} / "
             f"{percentile([r['show_ms'] for r in frames], 50):.0f})"
+        )
+    slow = [r for r in frames if r["fps"] < SLOW_FPS and "worst_frame_ms" in r]
+    if slow:
+        lines.append(
+            f"slow seconds (fps < {SLOW_FPS}): {len(slow)}; worst frame max "
+            f"{max(r['worst_frame_ms'] for r in slow):.0f} ms (read / draw / show max: "
+            f"{max(r['read_max_ms'] for r in slow):.0f} / "
+            f"{max(r['draw_max_ms'] for r in slow):.0f} / "
+            f"{max(r['show_max_ms'] for r in slow):.0f})"
         )
     gpu = [r for r in rows if r["stage"] == "gpu"]
     if gpu:

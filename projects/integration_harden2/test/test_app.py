@@ -1,16 +1,18 @@
 """Tests for the app module (app/): the global kill key over a REAL ROS2 topic
 (keys.py), the app assembly and its vision flow (main.py), the screen helpers (ui.py),
-and the status and chat panes (render.py)."""
+and the status and chat panes (status_pane.py, chat_pane.py)."""
 import glob
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
 
 import numpy as np
+import pytest
 import rclpy
-from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Int32MultiArray, String
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import config
@@ -23,7 +25,8 @@ from log.session import SessionLog
 from perception2.backend import DETECT_NOT_READY
 from control.flight import Control
 from perception2.vision import Vision
-from app.render import render_chat, render_status
+from app.chat_pane import render_chat
+from app.status_pane import render_status
 from system.status import StatusBoard
 from support import CAR, GemmaStub, RecordingPhone, StandInBackend, PlannerStub, wait_for
 
@@ -80,24 +83,50 @@ def test_short_message_is_ignored():
     assert _run([[config.KILL_KEY_CODE]]) == []
 
 
-def test_only_the_kill_key_acts_and_letters_never_do():
-    """The app's key handler: F4 toggles manual; a letter (typed in another window) does
-    nothing (owner 2026-09-23)."""
+def test_only_function_keys_act_and_letters_never_do():
+    """The app's key handler: F4 toggles manual, F1 quits, F2 clears the highlight; a
+    letter (typed in another window) does nothing, Q included (owner 2026-09-23: "Use the
+    function keys")."""
     phone = RecordingPhone()
     said = []
-    for letter in (50, 16, 46):
-        M.on_global_key(letter, phone.control, said.append)
+    quits = []
+    clears = []
+
+    def press(code):
+        M.on_global_key(
+            code,
+            phone.control,
+            said.append,
+            lambda: quits.append(code),
+            lambda: clears.append(code)
+        )
+        return
+
+    for letter in (50, 16, 46):                 # M, Q, C
+        press(letter)
+    assert phone.seen == [] and said == [] and quits == [] and clears == []
+    press(config.QUIT_KEY_CODE)
+    press(config.CLEAR_KEY_CODE)
+    assert quits == [config.QUIT_KEY_CODE] and clears == [config.CLEAR_KEY_CODE]
     assert phone.seen == [] and said == []
-    M.on_global_key(config.KILL_KEY_CODE, phone.control, said.append)
+    press(config.KILL_KEY_CODE)
     assert phone.paths() == ["/c/stop"] and "the RC has control" in said[0]
-    M.on_global_key(config.KILL_KEY_CODE, phone.control, said.append)
+    press(config.KILL_KEY_CODE)
     assert not phone.control.manual_on() and said[1].startswith("auto")
     phone.close()
 
 
-def test_kill_key_is_a_function_key_not_push_to_talk():
+def test_every_global_key_is_a_distinct_function_key():
     assert config.KILL_KEY_CODE == 62          # evdev KEY_F4
-    assert config.KILL_KEY_CODE != 63          # evdev KEY_F5 = push-to-talk
+    assert config.QUIT_KEY_CODE == 59          # evdev KEY_F1
+    assert config.CLEAR_KEY_CODE == 60         # evdev KEY_F2
+    codes = [
+        config.KILL_KEY_CODE,
+        config.QUIT_KEY_CODE,
+        config.CLEAR_KEY_CODE,
+        config.PUSH_TO_TALK_KEY_CODE,
+    ]
+    assert len(set(codes)) == len(codes)
 
 
 # ==================== turns.py: a turn, and the vision results ====================
@@ -273,6 +302,31 @@ def test_layout_camera_on_top_status_and_chat_below():
     assert np.array_equal(canvas[:720, :, :][400:500, 400:500], disp[400:500, 400:500])
 
 
+class _RecordingPerf:
+    def __init__(self):
+        self.rows = []
+
+    def record(self, stage, ms, **fields):
+        self.rows.append(dict(fields, stage=stage, ms=ms))
+        return
+
+
+def test_the_frame_record_keeps_the_worst_frame_of_each_second(monkeypatch):
+    clock = iter([0.0, 0.1, 0.2, 0.6, 1.0])
+    monkeypatch.setattr(U.time, "monotonic", lambda: next(clock))
+    perf = _RecordingPerf()
+    timer = U._FrameTimer(perf)
+    timer.add(0.01, 0.02, 0.01)
+    timer.add(0.01, 0.02, 0.01)
+    timer.add(0.30, 0.02, 0.05)                 # one slow read, then a 400 ms gap
+    timer.add(0.01, 0.02, 0.01)
+    row = perf.rows[0]
+    assert row["stage"] == "frame" and row["fps"] == 4.0
+    assert row["read_max_ms"] == 300.0 and row["show_max_ms"] == 50.0
+    assert row["worst_frame_ms"] == 400.0
+    assert row["read_ms"] == 82.5                   # the mean hides the slow frame
+
+
 def test_scroll_keys_move_the_chat_and_never_go_below_zero():
     M.S.chat_scroll = 0
     U.handle_key(ord("["), on_clear=lambda: None)
@@ -346,11 +400,11 @@ def test_an_unknown_vision_backend_dies():
 
 
 def test_ascii_only_drops_non_ascii():
-    from app.render import ascii_only
+    from app.draw import ascii_only
     assert ascii_only("שלום hello") == " hello" and ascii_only(None) == ""
 
 
-# ==================== render.py: status and chat panes ====================
+# ============= status_pane.py, chat_pane.py: status and chat panes =============
 
 
 def _box_colour(panel, row):
@@ -413,7 +467,7 @@ def test_scrolling_hides_the_newest_rows():
 
 
 def test_draw_box_draws_the_box_and_its_label():
-    from app.render import draw_box
+    from app.draw import draw_box
     img = np.zeros((60, 60, 3), np.uint8)
     draw_box(img, (10, 20, 40, 50), (0, 255, 0), label="car")
     assert tuple(img[20, 25]) == (0, 255, 0)                         # the top edge
@@ -422,7 +476,7 @@ def test_draw_box_draws_the_box_and_its_label():
 
 
 def test_chat_kind_classifies_generic_lines():
-    from app.render import chat_kind
+    from app.chat_rows import chat_kind
     assert chat_kind("rejected -- no action") == "reject"
     assert chat_kind("Highlighting: chair") == "action"
     assert chat_kind("ספרתי 3: chairs") == "answer"
@@ -468,3 +522,199 @@ def test_a_line_break_in_a_chat_line_does_not_crash_the_pane():
     panel = render_chat(900, 300, chat, False, False, None)
     assert panel.shape == (300, 900, 3)
 
+
+# ============= the whole app over ROS on a virtual screen (plan step 9) =============
+# The REAL app (python3 -m app.main) with every process it starts: Gemma, SAM3, the ASR
+# server, the keyboard hook, the mock phone app. Speech comes in on the ASR topic and
+# keys (F4, F1) on the keyboard topic, as the C++ nodes send them. The window draws on
+# the owner's display with HARDEN2_APP_TEST_SCREEN=1, else on a virtual screen (Xvfb).
+# Needs the GPU, a webcam and the mic stack; ~1-5 min. Control is the mock ONLY.
+APP_TEST = os.environ.get("HARDEN2_APP_TEST") == "1"
+ON_SCREEN = os.environ.get("HARDEN2_APP_TEST_SCREEN") == "1"
+XVFB_DISPLAY = ":97"
+READY_SECONDS = 420.0      # Gemma and SAM3 load from a cold start
+ANSWER_SECONDS = 120.0
+DESCRIBE = "מה אתה רואה"
+COUNT = "כמה אנשים יש"
+FLY = "טוס קדימה שני מטר"
+
+
+class _LiveApp:
+    """The app in a child process, its output in a file, and ROS publishers for the
+    speech and key topics."""
+
+    def __init__(self, tmp_path):
+        self.session = str(tmp_path / "session")
+        self.out_path = str(tmp_path / "app.out")
+        self.mock_log = os.path.join(self.session, "mock_commands.log")
+        display = os.environ.get("DISPLAY", ":0")
+        self.xvfb = None
+        if not ON_SCREEN:
+            display = XVFB_DISPLAY
+            self.xvfb = subprocess.Popen(
+                [
+                    "Xvfb",
+                    XVFB_DISPLAY,
+                    "-screen", "0", "1920x1600x24",
+                    "-nolisten", "tcp",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        env = dict(
+            os.environ,
+            DISPLAY=display,
+            CONTROL="mock",
+            VIDEO="webcam",
+            TTS_OUTPUTS="phone",
+            MVD_SESSION_DIR=self.session,
+            SCENE_TMUX_SESSION="",
+            HF_HUB_OFFLINE="1",
+            TRANSFORMERS_OFFLINE="1",
+            PULSE_SERVER=os.environ.get("PULSE_SERVER", "unix:/tmp/pulse-socket"),
+        )
+        self.out = open(self.out_path, "w")
+        self.proc = subprocess.Popen(
+            [sys.executable, "-m", "app.main"],
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+            env=env,
+            stdout=self.out,
+            stderr=subprocess.STDOUT
+        )
+        M.ros.start()
+        self.node = rclpy.create_node("test_whole_app")
+        self.speech = self.node.create_publisher(String, config.ASR_TOPIC, 10)
+        self.keys = self.node.create_publisher(
+            Int32MultiArray,
+            config.KEYBOARD_RAW_TOPIC,
+            10
+        )
+        return
+
+    def close(self):
+        """Stop whatever is still running: the app dies through its crash path (which
+        stops its children first), then the virtual screen if there is one."""
+        if self.proc.poll() is None:
+            self.proc.send_signal(signal.SIGINT)
+            wait_for(lambda: self.proc.poll() is not None, 60.0)
+        if self.proc.poll() is None:
+            self.proc.kill()
+        self.node.destroy_node()
+        self.out.close()
+        if self.xvfb is None:
+            return
+        self.xvfb.terminate()
+        self.xvfb.wait()
+        return
+
+    def output(self):
+        with open(self.out_path, encoding="utf-8", errors="replace") as f:
+            return f.read()
+
+    def commands(self, path):
+        """Every body the mock phone app received on this path, in order."""
+        bodies = []
+        marker = f" {path} "
+        if not os.path.exists(self.mock_log):
+            return bodies
+
+        with open(self.mock_log, encoding="utf-8") as f:
+            for line in f:
+                if marker not in line:
+                    continue
+                bodies.append(line.split(marker, 1)[1].strip())
+        return bodies
+
+    def turns(self):
+        """The session's finished turns: the trace records, in order."""
+        path = os.path.join(self.session, "trace.jsonl")
+        if not os.path.exists(path):
+            return []
+        with open(path, encoding="utf-8") as f:
+            return [json.loads(line) for line in f if line.strip()]
+
+    def say(self, text, path="/tts"):
+        """Publish one transcript, as the ASR server does, and wait until the mock gets a
+        new request on `path`. -> the new bodies on that path."""
+        before = len(self.commands(path))
+        msg = String()
+        msg.data = text
+        wait_for(lambda: self.speech.get_subscription_count() > 0, 10.0)
+        self.speech.publish(msg)
+        assert wait_for(lambda: len(self.commands(path)) > before, ANSWER_SECONDS), (
+            f"no {path} after {text!r}\n{self.output()[-3000:]}"
+        )
+        time.sleep(1.0)            # a turn may send a second request
+        return self.commands(path)[before:]
+
+    def press(self, code):
+        """A key press and its release, as the keyboard hook publishes them."""
+        msg = Int32MultiArray()
+        wait_for(lambda: self.keys.get_subscription_count() > 0, 10.0)
+        for action in (config.KEY_ACTION_PRESSED, config.KEY_ACTION_RELEASED):
+            msg.data = [code, action]
+            self.keys.publish(msg)
+        return
+
+
+def _gemma_pid():
+    r = subprocess.run(
+        ["pgrep", "-f", f"llama-server.*--port {config.LLAMA_SERVER_PORT}"],
+        capture_output=True,
+        text=True
+    )
+    if not r.stdout.split():
+        return None
+    return int(r.stdout.split()[0])
+
+
+@pytest.mark.skipif(
+    not APP_TEST,
+    reason="the whole app: GPU, webcam, mic, ~5 min; set HARDEN2_APP_TEST=1"
+)
+def test_the_whole_app_over_ros(tmp_path):
+    running = subprocess.run(["pgrep", "-f", "app[.]main"], capture_output=True)
+    assert running.returncode == 1, "another app is running: run.sh down first"
+    assert _gemma_pid() is None, "a Gemma server holds the app's port"
+    app = _LiveApp(tmp_path)
+
+    try:
+        assert wait_for(
+            lambda: "[status] gemma: UP" in app.output()
+            and "[status] sam3: UP" in app.output(),
+            READY_SECONDS
+        ), app.output()[-3000:]
+
+        # three questions: Gemma looks, SAM3 counts, the mock flies
+        assert app.say(DESCRIBE)
+        assert app.say(COUNT)
+        assert app.say(FLY, "/c/fly")
+        kinds = {turn["heard_he"]: turn["kind"] for turn in app.turns()}
+        assert kinds[DESCRIBE] == "describe" and kinds[COUNT] == "count"
+
+        # F4: manual on stops the drone and refuses the next mission
+        app.press(config.KILL_KEY_CODE)
+        assert wait_for(lambda: app.commands("/c/stop"), 10.0)
+        assert any("refused" in body for body in app.say(FLY))
+        assert len(app.commands("/c/fly")) == 1
+        # F4 again: missions are allowed again
+        app.press(config.KILL_KEY_CODE)
+        assert wait_for(lambda: any("auto:" in b for b in app.commands("/tts")), 10.0)
+
+        # Gemma dies: the supervisor restarts it, and it answers again
+        os.kill(_gemma_pid(), signal.SIGKILL)
+        assert wait_for(lambda: "[status] gemma: RECOVERING" in app.output(), 30.0)
+        assert wait_for(
+            lambda: app.output().count("[status] gemma: UP") == 2,
+            READY_SECONDS
+        ), app.output()[-3000:]
+        assert app.say(DESCRIBE)
+
+        # F1 over ROS, as the hook sends it from any window: every process stopped
+        app.press(config.QUIT_KEY_CODE)
+        assert wait_for(lambda: app.proc.poll() is not None, 90.0)
+        assert app.proc.returncode == 0, app.output()[-3000:]
+        assert "FATAL" not in app.output()
+        assert _gemma_pid() is None
+    finally:
+        app.close()

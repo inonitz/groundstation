@@ -16,6 +16,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     espeak-ng \
     alsa-utils \
     fonts-freefont-ttf \
+    xvfb \
     libasound2-plugins \
     git \
     wget \

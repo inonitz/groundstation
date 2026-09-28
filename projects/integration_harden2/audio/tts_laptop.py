@@ -2,45 +2,25 @@
 Piper onnx voice -> sounddevice. The models are cc-nc (demo / competition use only);
 fetched by tools/devenv/install-runtime-deps.sh.
 
-A missing model or package dies at start (never run with no voice; owner 2026-09-17). A
-playback error dies at once with the reason: it only happens when the laptop sound system
-itself breaks, and no retry fixes that (owner ruling 9a-1, 2026-09-23). sounddevice
-reports it only by a throw (PortAudioError); nothing catches it, so the crash hook
-(system/fatal.py) dies with the error and its traceback."""
-import importlib.util
-import os
-
+A missing model file or package dies at start (never run with no voice; owner
+2026-09-17): system/deps.py checks them. A playback error dies at once with the reason:
+it only happens when the laptop sound system itself breaks, and no retry fixes that
+(owner ruling 9a-1, 2026-09-23). sounddevice reports it only by a throw
+(PortAudioError); nothing catches it, so the crash hook (system/fatal.py) dies with the
+error and its traceback."""
 import numpy as np
+import sounddevice
+from phonikud import phonemize
+from phonikud_onnx import Phonikud
+from phonikud_tts import Piper
 
 import config
-from system.fatal import die
-
-# phonikud is OPTIONAL: checked without importing it, so no import can throw.
-_PACKAGES = ("phonikud_onnx", "phonikud", "phonikud_tts", "sounddevice")
-_HAVE_PHONIKUD = all(importlib.util.find_spec(pkg) is not None for pkg in _PACKAGES)
-if _HAVE_PHONIKUD:
-    import sounddevice
-    from phonikud import phonemize
-    from phonikud_onnx import Phonikud
-    from phonikud_tts import Piper
 
 
 class LaptopTts:
     def __init__(self, dji=None):
-        """@dji is unused: every output takes the same arguments."""
-        for path in (config.PHONIKUD_G2P, config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG):
-            if not os.path.exists(path):
-                die(
-                    f"phonikud model file missing: {path} "
-                    "(run tools/devenv/install-runtime-deps.sh)"
-                )
-
-        if not _HAVE_PHONIKUD:
-            die(
-                "the laptop voice needs phonikud (pip install phonikud phonikud-onnx "
-                "phonikud-tts sounddevice)"
-            )
-
+        """@dji is unused: every output takes the same arguments. The model files are
+        checked at start-up (system/deps.py)."""
         self._g2p = Phonikud(config.PHONIKUD_G2P)
         self._voice = Piper(config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG)
         return

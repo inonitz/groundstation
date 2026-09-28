@@ -6,7 +6,7 @@ result here; this is the one place that turns a vision result into chat lines, s
 log records. Shared state is app.state.S."""
 import time
 
-from app.render import chat_kind
+from app.chat_rows import chat_kind
 from app.state import S
 from log.perf import NO_PERF
 from log.session import SessionLog

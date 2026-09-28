@@ -24,11 +24,11 @@ in place. Python talks to the phone app's frozen ApiServer — no C++ FMU engine
 
 | path | role |
 |---|---|
-| app/ | main.py (starts every module, in order), turns.py (one spoken turn + the vision results -> chat, speech, log), ui.py (the screen: camera, status, chat), render.py (draws the panes), state.py (shared state), keys.py (the global F4 kill key) |
+| app/ | main.py (starts every module, in order), turns.py (one spoken turn + the vision results -> chat, speech, log), ui.py (the screen: camera, status, chat), draw.py (fonts, text wrapping, a labelled box), chat_rows.py (the chat lines -> tagged, coloured rows), chat_pane.py (draws the chat pane), status_pane.py (draws the status pane), state.py (shared state), keys.py (the global keys from the keyboard hook: F1 quit, F2 clear the highlight, F4 kill; the F5 release times the ASR) |
 | dji_app/ | client.py: the phone-app client (http.HTTPStatus results, loopback-guarded, the transmit switch, /tts, the mock's ProcessSpec) |
 | util/ | standalone helpers shared by several modules: guarded.py (the ONLY try/except around third-party calls: HTTP, JSON, files, streams), net.py (port_open, the JSON header), process.py (native_env, wait_exit), hebrew.py (Hebrew numbers and letters), mission.py (a mission step as text) |
 | control/ | flight.py: executes flight (critical commands, missions) and is the ONLY user of the phone app's transmit switch; parses nothing |
-| log/ | session.py (the recording: SessionLog(folder), latest_session), perf.py (every run's timings: perf.jsonl) + perf_report.py (`run.sh perf`), show.py and score.py (read-only tools) |
+| log/ | session.py (the recording: SessionLog(folder)), disk.py (its atomic writes and the start-up folder check), session_files.py (latest_session, trace_file for the read-only tools), perf.py (every run's timings: perf.jsonl) + perf_report.py (`run.sh perf`), show.py and score.py (read-only tools) |
 | audio/ | speech_in.py (SpeechIn over config.ASR_SOURCES: asr_ros.py = the laptop mic through our ASR server, asr_phone.py = the phone's speech), speech_out.py (SpeechOut over config.TTS_OUTPUTS: tts_phone.py = the phone app's /tts, tts_laptop.py = offline phonikud) |
 | video/ | video.py (Video: ONE source from config.VIDEO; opens, retries, reports its row, hands out frames, the stall guard), ros_stream.py (the phone's video via gstreamer + ROS2), cam_list.py (lists cameras) |
 | recognizer/ | the Recognizer: parses every sentence (fast path, bypass, guards, rewrites) and routes it; ONE Gemma call plans the rest (own README) |
@@ -64,12 +64,9 @@ stick control back from the RC.
 
 ## Verification
 
-```bash
-python3 -m pytest /root/groundstation/projects/integration_harden2/test/ -q         # every test (models faked)
-HARDEN2_GPU_TESTS=1 python3 -m pytest /root/groundstation/projects/integration_harden2/test/test_perception2.py -q -k real_sam3   # the real SAM3 on the GPU
-```
-After a container rebuild run `bash /root/groundstation/tools/devenv/install-runtime-deps.sh`
-(the mock needs aiohttp); `bash /root/groundstation/tools/preflight.sh` checks all of it.
+Every test command, its flags (HARDEN2_GPU_TESTS, HARDEN2_APP_TEST, HARDEN2_APP_TEST_SCREEN) and the
+checks before a report: docs/spec-harden2-run-arguments.md, section 5.
+After a container rebuild run `bash /root/groundstation/tools/devenv/install-runtime-deps.sh`.
 
 ## Run
 
@@ -83,7 +80,8 @@ bash /root/groundstation/projects/integration_harden2/run.sh perf        # p50/p
 PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden2/run.sh up dji real
 ```
 `dji` video flows gstreamer_rx -> camera/stream -> video/ros_stream.py (sole :5600 client).
-`run.sh preflight` (1.3 s) checks ports, binaries, ONE ggml version, models and cameras.
+`run.sh preflight` checks ports, system/deps.py (packages, programs, model files), ONE ggml version
+and cameras. Every command, setting, key and flag: docs/spec-harden2-run-arguments.md.
 
 Panes (tmux windows): `app` · `vlm` · `asr` · `keys` · (`gst` in dji mode) · (`mock` in mock
 mode) · (`feed` in a scripted run). The app starts Gemma 4 E4B (:18090) itself, through its process supervisor (gemma/server.py);

@@ -338,6 +338,19 @@ def test_the_perf_report_gives_percentiles_per_stage(tmp_path):
     assert "sam3" in text and "waiting for the lock" in text and "fps p50 25" in text
 
 
+def test_the_perf_report_lists_the_slow_seconds(tmp_path):
+    from log.perf import Perf
+    from log.perf_report import report
+    perf = Perf(str(tmp_path))
+    perf.record("frame", 30, fps=25, read_ms=1, draw_ms=20, show_ms=9, read_max_ms=2,
+                draw_max_ms=22, show_max_ms=10, worst_frame_ms=40)
+    perf.record("frame", 90, fps=3.6, read_ms=80, draw_ms=5, show_ms=5, read_max_ms=250,
+                draw_max_ms=6, show_max_ms=7, worst_frame_ms=270)
+    text = "\n".join(report(str(tmp_path)))
+    assert "slow seconds (fps < 10): 1; worst frame max 270 ms" in text
+    assert "read / draw / show max: 250 / 6 / 7" in text
+
+
 def test_the_scripted_run_reads_sentences_and_waits(tmp_path):
     from app.feed import read_script
     script = tmp_path / "s.txt"
