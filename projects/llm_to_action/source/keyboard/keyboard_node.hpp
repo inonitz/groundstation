@@ -27,6 +27,9 @@ public:
         m_keyHook.bindKey(KeyCodeEnum::A, cb);
         m_keyHook.bindKey(KeyCodeEnum::D, cb);
         m_keyHook.bindKey(KeyCodeEnum::H, cb);
+        m_keyHook.bindKey(KeyCodeEnum::C, cb);
+        m_keyHook.bindKey(KeyCodeEnum::M, cb);
+        m_keyHook.bindKey(KeyCodeEnum::Q, cb);
         m_keyHook.bindKey(KeyCodeEnum::UpArrow, cb);
         m_keyHook.bindKey(KeyCodeEnum::DownArrow, cb);
         m_keyHook.bindKey(KeyCodeEnum::LeftArrow, cb);
