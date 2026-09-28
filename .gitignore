@@ -10,3 +10,7 @@ docs/private/*
 
 # Private capture frames (owner room, session/street/desk shots): keep local, never commit
 bench/vision-verify-bench/dataset/images/
+
+# Run-time agent locks and local safety archives: never commit (owner 2026-09-28, L2 + K3)
+/LOCK.md
+/backups/

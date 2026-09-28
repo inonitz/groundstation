@@ -3817,3 +3817,174 @@ Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where*
   the fix, not code. Everything else is inside normal limits.
 - **Open:** the 3.6 fps dips (per-second averages hide the cause; a per-second worst read / draw /
   show would show it). SAM3 558 vs ~400 ms: measure SAM3 with Gemma idle to confirm the GPU share.
+
+### 2026-09-26 -- dead benches: whole-system lane 1 repointed; the two SAM3 benches wait for rule C (plan step 11)
+- **Why:** after the harden2 regroup, three benches imported names that no longer exist. The owner
+  ruled that committed and documented benches are no longer relevant, so the two SAM3 benches go.
+- **Setup:** run_list.py now calls the current API: recognizer.recognize_direct, then
+  Recognizer.plan (the one Gemma call) with the number and echo guards, as the app routes it.
+  Gemma starts through bench.gemma_server (the supervisor, the bench port). whisper-cli and its
+  model come from config. The translator and Qwen3-VL arguments are gone; the stack has neither.
+  The scorer (expected notation, PASS / FAIL / REVIEW) is unchanged. run_all.sh lane 1 runs once,
+  lists default to datasets/e2e/, and SESSION must be given (the 2026-09-08 session is gone).
+- **Result:** `run_list.py --help` imports and runs; flake8 and pyflakes clean. An offline check
+  on datasets/e2e/live-test-50.md parsed 50 lines (28 steps, 15 perception, 4 empty, 2 review,
+  1 halt); a stub planner exercised every route. No Gemma or GPU run yet.
+- **Verdict:** lane 1 is live again. The two SAM3 scripts are NOT deleted: the owner's rule
+  (2026-09-26, bench/README.md) needs all of A-D, and C (their results in a
+  docs/research-complete-*.md document) does not hold yet. Their results stay in
+  sam3-mask-bench/RESULTS.md and the 2026-09-03 and 2026-09-09 entries above.
+- **Where:** bench/whole-system/run_list.py, bench/whole-system/run_all.sh.
+
+### 2026-09-26 -- one dependency check at start-up; the render and session files split (plan 8, 9a-2)
+- **Why:** find_spec guards sat in two modules, and the preflight checked programs and models with its
+  own lists. render.py (552 lines) and log/session.py (323) were over the 400-line ceiling or near it.
+- **Setup:** system/deps.py lists every python package, native program and model file; app/main.py
+  runs it before any module imports a package; `run.sh preflight` calls `python3 -m system.deps`.
+  The split was a pure move (agent B, checked line by line), then the names used across files became
+  public.
+- **Result:** the check takes 0.008 s. Importing phonikud in a phone-only run costs +0.4 s at start
+  (3 runs). New files: draw 99, chat_rows 213, chat_pane 122, status_pane 83, disk 48,
+  session_files 27 lines; session.py 266. Suite 213 passed, 2 skipped, twice.
+- **Verdict:** kept. Every package is required (no optional paths left). The ASCII chat pane is gone.
+- **Where:** system/deps.py, app/{draw,chat_rows,chat_pane,status_pane}.py, log/{disk,session_files}.py.
+
+### 2026-09-26 -- the whole app tested over ROS; quit and clear moved to function keys (plan step 9)
+- **Why:** no test ran the real app with every process it starts. The owner's 2026-09-23 ruling
+  "Use the function keys" for every global action had been half-recorded: quit and clear stayed
+  letters in the window only. Letters are typed in other windows (research in the background).
+- **Setup:** test_the_whole_app_over_ros (HARDEN2_APP_TEST=1; HARDEN2_APP_TEST_SCREEN=1 draws on the
+  owner's display, otherwise Xvfb). CONTROL=mock, lid webcam. Speech on the ASR topic, F4 and Q on
+  /keyboard/in/raw, as the C++ nodes send them. Global keys: F1 quit, F2 clear, F4 kill; letters
+  do nothing over ROS.
+- **Result:** passed in 38-45 s (warm model cache; a cold start is longer, unmeasured). Describe and
+  count answered; the mission reached the mock (/c/fly dx=2.0); F4 sent /c/stop and the next mission
+  was refused; F4 again -> auto; Gemma kill -9 -> RECOVERING -> UP -> answered; F1 -> exit 0, no
+  process left. The first run failed on a test bug: a successful mission is not spoken.
+- **Verdict:** kept as an opt-in test (GPU, webcam, mic). Mutation check: without the quit call the
+  key test fails.
+- **Where:** test/test_app.py, app/main.py (on_global_key), app/ui.py (request_quit).
+
+### 2026-09-26 -- run_list.py on the real Gemma: the guards change nothing on live-test-50
+- **Why:** the owner asked to test run_list.py fully and to measure what the number and echo guards
+  (added by the step 11 agent; the old script had none) change.
+- **Setup:** datasets/e2e/live-test-50.md, text mode, real Gemma (bench port), twice: as written, and
+  with numbers_vs_mission / is_shot_echo replaced by no-ops. Then audio replay: the 61 clips of
+  session-20260919-162349-rog through whisper-cli.
+- **Result:** both text runs: PASS 30, FAIL 2, REVIEW 18, the same verdict on every one of the 50
+  lines (wall 32 s and 21 s). The 2 FAILs (lines 21, 26) are scorer bugs: Gemma planned the right 3
+  steps, but parse_expected does not read "+90" without "deg", so it expects 2. Replay: 61 clips in
+  67 s, 19 matched to list lines; that session did not speak this list, so its score (4/11/4) is
+  meaningless; the plans match what was said (8 m back -> dx -8).
+- **Verdict:** run_list works in both modes. The guards are inert on this list. The scorer bug is
+  open; log/score.py holds a second copy of the same notation parser (two homes).
+- **Where:** bench/whole-system/run_list.py; the reports are not kept (scratch runs).
+
+### 2026-09-26 -- the API headers brought back in line with the code (v2.4)
+- **Why:** the owner reads the design in docs/api-harden2/*.h; they must never disagree with the code.
+- **Result:** six headers fixed. perception.h had drifted since step 6: it declared
+  VisionParseCount / VisionParseHighlight (their file was deleted), a per-call callback instead of
+  the Sinks, HL_GATING (not a state) and no VisionCreate. Perf (2026-09-25) was in no header. Added:
+  Perf, the feed program, UiRequestQuit, the key release, the dependency calls, the perf and label
+  arguments. All 11 headers compile.
+- **Where:** docs/api-harden2/.
+
+### 2026-09-27 -- the cost of measuring every run, and a frame record that keeps the worst frame
+- **Why:** the owner asked what the always-on perf record costs, and why the frame record held
+  only the mean (a mean hides the one slow frame behind a 3.6 fps dip).
+- **Setup:** 500 Perf.record() calls into a scratch folder; 20 nvidia-smi samples; the newest live
+  session's perf.jsonl (659 s).
+- **Result:** one record costs 0.65 ms p50 (0.74 p95; each line is fsynced). A live run writes about
+  2 records per second; the display loop writes 1 per second, so one frame per second gets +0.65
+  ms. The GPU sampler runs nvidia-smi once per second on its own thread: 22.8 ms p50 per sample. The
+  file grows by 136 KB per 11 minutes. The frame record now also holds read / draw / show max and
+  worst_frame_ms (the longest gap between two frames); `run.sh perf` lists the seconds under 10 fps.
+- **Verdict:** the overhead is negligible for the app. Kept always on.
+- **Where:** log/perf.py, app/ui.py (_FrameTimer), log/perf_report.py.
+
+### 2026-09-27 -- the SAM3 study moved to research-complete (benchmark rule C)
+- **Why:** the owner's benchmark rule (2026-09-26) needs a research-complete document before a
+  benchmark is deleted; the owner chose to write it (D2).
+- **Result:** docs/research-complete-sam3-vs-omdet.md holds both studies (SAM3 332 vs OmDet 101
+  detections, mask IoU 0.862 vs SAM2.1; the engine A/B and the lifted cap). A-D now hold for
+  compare_engines.py and run_indepth.py; the owner runs the rm.
+- **Where:** docs/research-complete-sam3-vs-omdet.md.
+
+### 2026-09-27 -- the app's start time, and what the imports cost
+- **Why:** the owner asked for the real start time after an unmeasured claim of "more than 30 s".
+- **Setup:** the real app twice on a virtual screen (CONTROL=mock, lid webcam), every output line
+  timestamped from launch, quit with F1 over ROS2. Imports: `import app.main`, twice, plus
+  `python3 -X importtime`.
+- **Result:** every status row UP at 18.49 s and 13.98 s. The last rows: Gemma (18.47 / 9.05 s) and
+  SAM3 (15.74 / 13.97 s). The first line prints at 3.60 / 2.61 s. The "dji app" row went WAITING and
+  reached UP 4.5 s after the mock: its first check came before the mock listened, and the next
+  check waits 5 s. `import app.main` costs 1.5-2.2 s: torch 935 ms (perception2/__init__.py imports
+  the SAM3 backend), phonikud 429 ms.
+- **Verdict:** the start is 14-18.5 s, bound by the two model loads. Owner rulings: load eagerly at
+  start; phonikud only with TTS_OUTPUTS "laptop"; the phone check every 2 s. SAM3's place goes to
+  the SAM3 assessment.
+- **Where:** scratch script (not kept); app/main.py, perception2/__init__.py, dji_app/client.py.
+
+### 2026-09-27 -- GPU sampling through pynvml, and the cost of a 5 s perf buffer
+- **Why:** the GPU sampler cost 22.8 ms per sample; the owner asked for record-everything with a
+  deferred write.
+- **Result:** pynvml (already installed) reads GPU memory and load in 0.018 ms p50 (35 ms once, at
+  init), about 1000 times cheaper than starting nvidia-smi. One per-frame line: 100 bytes; encoding
+  it 3.3 us; adding it to a list 0.36 us. A 5 s buffer at 30 fps: 160 lines, 15.6 KiB; writing it
+  with fsync: 0.84 ms p50 (a 1 s block: 0.82 ms).
+- **Verdict:** buffer every event and every frame, write every PERF_FLUSH_SECONDS (5) on a writer
+  thread, flush on die(). A hard kill loses at most 5 s.
+- **Where:** the approved perf draft (spec, rulings 2026-09-27 and 2026-09-28).
+
+### 2026-09-27 -- the number guard misreads fractions and front letters
+- **Why:** the owner asked how a number word with a leading "and" letter is handled.
+- **Setup:** recognizer/numbers.py nums_he on 11 phrases.
+- **Result:** one and a half 1.5 (right); one and a quarter 1.0 (1.25); two and an eighth 2.0
+  (2.125); three and a third 3.0 (3.33); twenty and five 25 (right); "to five" 1.0 (5); "about five"
+  nothing (5); "in three" nothing (3); a number after a metre that starts with "and" is not read.
+- **Verdict:** a misread "to five" rejects a correct plan; an unread "about five" lets any distance
+  pass. Owner: all seven front letters and the fractions; measure Gemma and the guard first.
+- **Where:** recognizer/numbers.py, util/hebrew.py.
+
+### 2026-09-28 -- the vision benchmark has been broken since 2026-09-23
+- **Why:** found while reading bench/vision-verify-bench for the owner.
+- **Result:** commit 7ad3012 (2026-09-23) changed SAM3 detect() to return (status, hits);
+  bench.py and propose_boxes.py still treat it as a list of hits, so both fail on the first row.
+  annotate.py does not call detect() and works. No run since 2026-09-20.
+- **Verdict:** fix both and move the bench to bench/perception/ (build plan 9d, step 5). A change
+  now lists the benchmarks that call the changed module (owner, Y2 b).
+- **Where:** bench/vision-verify-bench/.
+
+### 2026-09-28 -- the handoff documents, oldest to newest (never recorded before)
+- **Why:** the owner asked which handoff document is current, in what order they came, and whether
+  HISTORY records them. It did not: no entry named a handoff document's start or retirement.
+- **Result (dates from each document's own text):**
+  1. docs/task-active-restructure-progress.md -- 2026-09-02 .. 2026-09-22/23. The single progress doc
+     of the repo restructure, then of harden2 until its last block "SESSION 2026-09-22/23". SUPERSEDED.
+  2. docs/task-active-harden2-session-handoff.md -- the pre-freeze session, 2026-09-18 .. 2026-09-20.
+     SUPERSEDED by 4.
+  3. docs/task-active-doc-audit-2026-09-19.md -- a one-off documentation audit. SUPERSEDED (history).
+  4. docs/task-active-harden2-refactor-handoff.md -- from 2026-09-21: the refactor plan; section 9c
+     = status, 9d = the task list, 9e = the agent split and LOCK.md. CURRENT.
+  5. docs/spec-harden2-cleanup.md -- every owner ruling, dated (dated entries from 2026-09-02; the
+     harden2 rulings from 2026-09-22); ends with the decision ledger 2026-09-26 .. 28. CURRENT.
+  6. docs/task-active-harden2-session-log-2026-09-23.md -- from 2026-09-23: line 1 = where to resume,
+     then the progress list. The NEWEST; the successor of "the last document always updated". CURRENT.
+  Living references, updated in place: docs/guidelines.md (the rules), docs/HISTORY.md (this file),
+  docs/api-harden2/*.h, docs/spec-harden2-run-arguments.md.
+- **Verdict:** resume from 6, then 4 (9d, 9e), then 5 (the ledger). 1-3 are history only.
+- **Where:** docs/.
+
+### 2026-09-28 -- recorded late: the 2026-09-18 command-typing study (bench/hebrew-command-bench)
+- **Why:** HISTORY never recorded this study; found while checking what bench/hebrew-command-bench still
+  holds (owner question G1, 2026-09-28).
+- **Setup (2026-09-18):** the deterministic fast path vs one Gemma call at typing a sentence as move /
+  not-move, on the 476-case dev set and a fresh held-out set of 200 (cases_typing_fresh.py), in Hebrew
+  and in hand-written English (cases_typing_fresh_en.py); then Gemma's latency while SAM3 runs.
+  Scripts: type_compare.py, type_fresh.py, type_english.py, perf.py, contention.py, real_cadence.py.
+- **Result:** held-out 200: Gemma 174/200 (87%), 0 false flights; the fast path decided 16/200 and
+  recalled 12% of movements. Dev set: Gemma 461/476 (97%). English did not help (fresh 88% vs 87%;
+  dev false flights 2 -> 11). With SAM3 at 1 forward/s, a command costs ~500 ms either way.
+- **Verdict:** every command goes through the one Gemma call (decided 2026-09-19; the fast path for
+  typing was deleted). The study is done: its scripts are not maintained (owner, G1 2026-09-28).
+- **Where:** docs/research-2026-09-18-command-typing-fast-vs-gemma.md; bench/hebrew-command-bench/.

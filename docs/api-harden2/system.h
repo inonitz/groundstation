@@ -1,5 +1,5 @@
 /*
- * system.h -- harden2 API v2.3 (2026-09-24). Module system/: fatal errors, the status rows
+ * system.h -- harden2 API v2.4 (2026-09-26). Module system/: fatal errors, the status rows
  * and the board, the supervisor, the ROS2 context, and the start-up dependency check.
  *
  * House rule: nothing in our code throws. A fatal error calls SysDie(). Everything else
@@ -74,10 +74,15 @@ bool     ProcessWaitUp(Process* p, float timeoutS);        /* a bench waits for 
 uint32_t ProcessStatus(Process* p, StatusRow* rows, uint32_t cap);   /* its own ONE row   */
 void     SupStopAll(void);                /* registered with SysOnDie; every row -> DOWN     */
 
-/* ---------------------------------------------------------------- dependency check
- * ONE place, run first in main. Replaces the scattered find_spec guards. Every missing
- * library, binary, model file or device dies here, with the list of what is missing. */
-void SysCheckDependencies(void);
+/* ---------------------------------------------------------------- dependency check (deps.py)
+ * ONE place, run first in main, before any module imports a package. Replaces the
+ * scattered find_spec guards. Every missing python package, native program or model file
+ * dies here, with what is missing and how to install it. Every one is required. A camera
+ * is not checked here: video opens it. `python3 -m system.deps` = the preflight's check. */
+typedef struct { const char* importName; const char* installCommand; } SysPackage;
+void     SysCheckDependencies(void);   /* every package and file below; missing -> die   */
+uint32_t SysMissingPackages(const SysPackage* pkgs, uint32_t n, const char** missing);
+uint32_t SysMissingFiles(const char* const* paths, uint32_t n, const char** missing);
 
 /* ---------------------------------------------------------------- the ROS2 context (ros.py)
  * ONE for the app: started before the first node, stopped after the last. rclpy's own

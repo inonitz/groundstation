@@ -362,6 +362,26 @@ private memory. Where a rule below is stricter than the general sections above, 
 - Native programs run only from build/release/shared/dji/bin (config.NATIVE_BIN_DIR), first on
   LD_LIBRARY_PATH. The preflight fails when the libggml*.so.0 names mix versions.
 
+### Terms: module, service, system (owner definitions, 2026-09-27)
+The owner's words: "A module is a self contained piece in our code, usually a whole folder, say,
+perception/*. A Service Is usually a module that a system/another module depends on. For instance
+- The perception system depends on Both the Gemma llama-server module & the SAM3 Module.
+Initializing them is the job of the supervisor, which then supplies these services to the
+appropriate "systems". A system is a "whole" package of modules that have a defined unified
+purpose. That is not to say though, that Modules cannot be shared between systems. Quite the
+contrary - take a look at the Gemma module - It is reused between BOTH the perception system AND
+the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.")
+- Module: one folder of harden2 (app/, audio/, video/, perception2/, recognizer/, gemma/,
+  dji_app/, control/, log/, system/, util/, config/).
+- Service: a module that a system or another module depends on; started once and handed to
+  whoever needs it (Gemma, SAM3, the phone-app client, the session log, perf).
+- System: a group of modules with one purpose; a module may serve several systems (Gemma serves
+  both the perception system and the recognizer system).
+- The question "what single interface does every module expose?" (2026-09-23, plan item 9a-7) is
+  answered and closed: every class has close(); every part with a status row has status(); every
+  part that runs a process gives process(log_dir). The modules meet through constructor arguments
+  (services and callbacks), not through one shared method.
+
 ### Errors
 - A try/except exists only in util/guarded.py, one per failure domain (HTTP, JSON, filesystem,
   asyncio streams). The one other catch is system/fatal.py's crash-path cleanup loop. Check with
@@ -382,6 +402,11 @@ private memory. Where a rule below is stricter than the general sections above, 
 - No test writes into the repo's logs/ (sessions, traces): tests use their tmp folder.
 - Mutation-check new logic: break it on purpose and see a test fail.
 
+### Benchmarks
+- Delete a benchmark only when A-D hold (owner 2026-09-26): no longer of use; committed in git;
+  its results in a docs/research-complete-*.md document; untouched since and in HISTORY.md.
+  Full wording: bench/README.md, "Deleting a benchmark".
+
 ### Docs
 - HISTORY.md and every progress list are oldest first: a new entry goes at the END of its
   section, with its measurements AND verdicts.
@@ -392,10 +417,32 @@ private memory. Where a rule below is stricter than the general sections above, 
   quote the exact words with the date.
 - Before a report: lint + pyflakes clean, the full suite twice, no new folders under logs/.
 
+- A ruling goes into the docs IN THE SAME TURN, also during a discussion-only round. Recording
+  is not "doing": never hold rulings back "until we conclude" (the owner, 2026-09-28: "YOU SHOULD
+  WRITE TO YOUR FUCKING DOCUMENTS ... THAT WAY YOU WONT LOSE ANYTHING").
+- When a number is asked for, measure it in the same turn; never state an unmeasured number (the
+  owner, 2026-09-27: "Well fucking measure it? You already do things between turns").
+- Never frame a finding with several parts as a yes-or-no question; give each part its own answer
+  and options (the owner, 2026-09-27: "this is not a yes or no question. Don't belittle this point").
+- Never put Hebrew and English in the same sentence: a Hebrew example goes on its own line or in its
+  own table cell (the owner, 2026-09-27: "It messes up the format and I don't understand").
+- The owner holds no hidden context: no long lists of files to keep in mind; a review list is short
+  and grouped by purpose, per commit (the owner, 2026-09-27: "I don't have context in my brain for
+  every single here").
+- A multi-point answer ends with a decision table: an ID per question, its options, the
+  recommendation first, so the owner can reply "D1 a, D2 b" (the owner, 2026-09-26: "Make it easy
+  for me to respond to you in a list").
+
 ### Agents
 - Ask before spawning one: say how many and the scope, then wait for a yes.
 - Give each agent a written brief (context, objective, hints, checks) and have it report to a
   file.
+- Each agent keeps its own handoff document, docs/refactor/<agent-id>_doc.md: its brief on top, its
+  notes, its progress at the bottom, updated at every checkpoint (owner, 2026-09-28).
+- Triple coverage: the agent checks itself at each checkpoint; the main agent checks the progress
+  against the brief's task list; then the main agent reads every file the agent touched.
+- Agents sharing a file or resource (the GPU, the webcam, a config file) take it through LOCK.md
+  (tools/lock.sh, atomic) and release it when done; the main agent clears a dead agent's locks.
 - Validate the agent's work AGAINST THE BRIEF you gave it: you hold the context the agent lacks,
   so only you can verify it. Reading the files it touched is part of that validation, not a
   redo of its work.

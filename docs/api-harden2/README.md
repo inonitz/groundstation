@@ -1,11 +1,12 @@
-# harden2 API (v2.3, 2026-09-24: matches the code after step 7 and the status redesign)
+# harden2 API (v2.4, 2026-09-26: matches the code after steps 8, 9, 11 and 9a-2)
 
 One C header per module of `projects/integration_harden2`. The Python modules mirror these names
-and boundaries. SERVICES are built first and handed to the MODULES' constructors (app.h).
+and boundaries. Purpose (owner 2026-09-26): the owner reads the design here; every Python API
+change updates its header in the same change, so the two never disagree. SERVICES are built first and handed to the MODULES' constructors (app.h).
 
 | header | module | owns |
 |---|---|---|
-| system.h | system/ | die, the status rows (each part owns its row; the board asks each part), supervisor (ProcessSpec -> Process handle), the ROS2 context + Subscription |
+| system.h | system/ | the start-up dependency check, die, the status rows (each part owns its row; the board asks each part), supervisor (ProcessSpec -> Process handle), the ROS2 context + Subscription |
 | util.h | util/ | the guarded third-party calls (the only try/except), net, process, hebrew, mission helpers |
 | dji_app.h | dji_app/ | the phone app (or mock): commands, /tts, the transmit switch, its one status |
 | gemma.h | gemma/ | the Gemma server's life, and one request call |
@@ -14,8 +15,8 @@ and boundaries. SERVICES are built first and handed to the MODULES' constructors
 | perception.h | perception2/ | SAM3 backend, the priority lock, count / highlight / describe tasks |
 | control.h | control/ | executes flight: critical commands, missions, the transmit switch |
 | recognizer.h | recognizer/ | parses every sentence (fast path first) and routes it |
-| log.h | log/ | the session record; checked once at start, no status row |
-| app.h | app/ | start order, transcript -> actions, the transmit switch, keys, the UI |
+| log.h | log/ | the session record (checked once at start, no status row), the timings (perf), the read-only tools |
+| app.h | app/ | start order, transcript -> actions, the global keys (F1 quit, F2 clear, F4 kill), the UI, the scripted run (feed) |
 
 config/ has no header: it holds every constant and start-up value the structs above are filled from.
 

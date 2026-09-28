@@ -1,6 +1,10 @@
+RESUME HERE (2026-09-28): NOTHING IS BUILT YET; the owner said "do not start yet, we're not done".
+Read, in order: this file's progress list end; the handoff's 9d (tasks) and 9e (agents + LOCK.md, open
+points, approved); the spec's "Decision ledger 2026-09-26 .. 2026-09-28" (every decision, one row each);
+docs/guidelines.md. Old handoff docs are history only (HISTORY 2026-09-28, the handoff documents).
 # harden2 session log, 2026-09-23 / 24 (for the next agent after compaction)
 
-RESUME HERE (2026-09-25): read docs/guidelines.md ("All guidelines at a glance") FIRST, then the
+SUPERSEDED by line 1 (was RESUME HERE, 2026-09-25): read docs/guidelines.md ("All guidelines at a glance") FIRST, then the
 handoff's section 9c (the current status + the speedrun split: agent A = step 11, agent B = 9a-2,
 me = steps 8, 9 + the 3.6 fps dips, step 12 LAST). Ask nothing more: the owner approved the split.
 Older pointer: docs/task-active-harden2-refactor-handoff.md section 9 (the plan), 9a (validation +
@@ -62,6 +66,42 @@ open items), 9b (the built design). Rulings: docs/spec-harden2-cleanup.md, secti
   auto, 30 fps manual but black). Open: the 3.6 fps dips; SAM3 558 ms on the shared GPU.
 - 2026-09-25: every standing guideline written into docs/guidelines.md (a summary at the top +
   "Project rules learned in harden2" at the end). Speedrun split approved (handoff 9c).
+- 2026-09-26: step 8 DONE: system/deps.py checks every package, program and model file at start
+  (main.py runs it before any import; `run.sh preflight` calls `python3 -m system.deps`). Binary paths
+  moved into config (LLAMA_SERVER_BIN, ...). The PIL/bidi guard + ASCII pane and the phonikud guard gone.
+- 2026-09-26: 9a-2 DONE (agent B, validated): render.py -> draw, chat_rows, chat_pane, status_pane;
+  session.py -> disk, session_files (session.py 266, open). Cross-file names made public in app/.
+  bench/vision-verify-bench/annotate.py repointed.
+- 2026-09-26: step 11 DONE except two deletions (agent A, validated): run_list.py repointed. The rm of
+  compare_engines.py + run_indepth.py and the INTEGRATION-HANDOFF.md line 118 edit were refused by the
+  tool classifier: handed to the owner.
+- 2026-09-26: step 9 DONE: test_the_whole_app_over_ros (HARDEN2_APP_TEST=1): the real app, 3
+  questions, F4 on/off, Gemma kill -9 -> recovers, F1 over ROS quits. Passed.
+- 2026-09-26: global keys = function keys only (owner 2026-09-23, "Use the function keys", half of it
+  was lost in the spec): F1 quit, F2 clear, F4 kill; every letter does nothing over ROS.
+- 2026-09-26: suite 213 passed, 2 skipped (twice); audit 5; logs/ clean. NEXT: the 3.6 fps dips, then
+  step 12 (stale docs) LAST, then step 13 (code review).
+- 2026-09-26: owner debrief round: bench deletion rule A-D recorded (bench/README.md, guidelines,
+  spec); headers v2.4 synced (perception.h had drifted); docs/spec-harden2-run-arguments.md rewritten
+  (every command, setting, key, flag); run.sh BIN from config, dead scene_input removed; KEY_ACTION_RELEASED
+  -> config; 7 shebangs removed from library files; 9a-9/10/11 ticked; run_list tested on real Gemma.
+  WAITING on the owner's list answers (see the chat reply of 2026-09-26) before run_all.sh.
+- 2026-09-27: owner round 2: definitions of module / service / system recorded verbatim
+  (guidelines "Terms"); 9a-7 closed; D2 done (research-complete-sam3-vs-omdet.md); window keys, title
+  and HUD colours -> config; frame record keeps the worst frame (C.1 part 1); perf overhead measured;
+  test/README.md lists all 217 tests. Owner ruled D3 (decide and act as separate chained functions),
+  D4 a. WAITING on the owner's answers of the 2026-09-27 reply.
+- 2026-09-28: the ironing rounds ended with every decision in the spec's ledger (70 question IDs + 34
+  debrief points, checked by script); the task list (handoff 9d); the agent split + LOCK.md protocol
+  (handoff 9e, open points); HISTORY records the handoff documents' order. Waiting: the owner's answers on
+  9e (L1-L4 approved 2026-09-28: tools/lock.sh + flock, LOCK.md in .gitignore, ROS_DOMAIN_ID per agent,
+  docs/refactor/<agent-id>_doc.md per agent, triple coverage).
+- 2026-09-28: final check before compaction: C4 decided in 9d; setup task S0 + the baseline (215 passed, 2
+  skipped, lint clean, audit 5) in 9e; outside callers named in D1/D2; per-task doc updates listed in 9d.
+  G1 + G2 answered (task B7 retires the typing study; E2 takes contention.py + real_cadence.py; HISTORY now
+  records the study). ALL GREEN: no question open. Next: the owner compacts, then says "start"; begin with S0.
+- 2026-09-28, after the compaction: K1-K3 answered (spec ledger). The safety archive is made
+  (backups/); the owner commits the 55 paths; S0 begins on 'start'.
 
 ## Next (the plan's remaining steps; handoff section 9)
 - The next run: `SCRIPT=default WEBCAM_DEV=2 run.sh up webcam mock`, then `run.sh perf`; read the

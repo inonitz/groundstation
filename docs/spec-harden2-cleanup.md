@@ -443,3 +443,277 @@ Gemma serves both the recognizer (planning) and perception2 (vision). It is a sh
   release to the transcript.
 - (owner, 2026-09-25) run.sh preflight must be fast: no 5-10 s pause after the SAM3 model check.
 
+## Owner rulings 2026-09-26
+
+- (owner, 2026-09-23, recovered 2026-09-26) The full 2026-09-23 answer on the global C, M and Q:
+  "Just don't use them in the app? Again, Use the fucking function keys lol". Only the first half
+  reached this spec ("letters are ignored globally"), so quit and clear were never moved. On
+  2026-09-26 the owner restated it: "the QWERTY keys that are common when typing could work against
+  the tester if hes doing something in the background - research, etc... move Q and the other keys
+  to other function keys". DONE 2026-09-26: every global action is a function key over the ROS2
+  hook: F1 quit (far from F4 kill and F5 talk), F2 clear the highlight, F4 kill. Every letter does
+  nothing over ROS (Q, C, M included). The window keys (q/Esc, c, t, x, [ ]) act only while the app
+  window has the focus. (A Q-quits-globally version existed for ~1 hour on 2026-09-26; removed.)
+- (owner, 2026-09-26) The whole-app test draws on the owner's display when a flag says so:
+  HARDEN2_APP_TEST_SCREEN=1 -> DISPLAY (:0); otherwise a virtual screen (Xvfb). The quit key goes
+  over ROS, so no window tool (xdotool) is needed.
+- (agent decision, open to the owner) Step 8: every python package is REQUIRED, the laptop voice
+  (phonikud) included: the install script installs them all. A phone-only run now imports phonikud
+  too: +0.4 s at start (measured, 3 runs).
+- (owner, 2026-09-26) Deleting benchmarks: A benchmark may be deleted only when ALL four hold (owner ruling 2026-09-26, for every
+  benchmark, now and in the future):
+    A. it is of no use to us anymore;
+    B. it is documented in the git history (committed);
+    C. its results were moved into a docs/research-complete-*.md document;
+    D. it has not been touched since, and HISTORY.md documents it.
+  Owner's words: "Those tests are not relevant, SO LONG THAT: A. Are not of use to us anymore
+  B. ACTUALLY DOCUMENTED THEM IN THE GIT HISTORY C. We moved them to the docs/research-complete
+  designation D. We haven't touched them since & have documented them in HISTORY.md. The
+  following rules apply to all benchmarks we have currently and will create in the future(!)"
+  Applied to compare_engines.py + run_indepth.py: A, B, D hold; C did not. Owner 2026-09-27: D2
+  "Option A". DONE: docs/research-complete-sam3-vs-omdet.md (C now holds). The owner runs the rm.
+- (owner, 2026-09-26) The API headers stay, for the owner to read the design: "Make sure you actually
+  update the systems in the header files if you also update the python files, I don't want
+  mismatch. If I have hard time reading your python, reading the C definition headers is what
+  allows me to easily understand what you're trying to implement." DONE 2026-09-26: v2.4, six
+  headers synced (app, log, system, gemma, audio, perception; perception.h had drifted since step 6).
+- (owner, 2026-09-26) Keys: "Good Fix & Choice for keybindings" (F1 quit, F2 clear, F4 kill).
+- (owner, 2026-09-26) Step 8: "As long as it works and doesn't take 10 years, I'm satisfied." Speech
+  out: "We said that there is a flag to control phone/laptop/both/off, that is it." (TTS_OUTPUTS.)
+- (owner, 2026-09-26) bench docs: "It is for you (MAINLY(!)), not me."
+- (owner, 2026-09-27) The recognizer: "All of these should be at the least, separate functions that
+  are chained together. One should make the decision, one should do the acting on said decision."
+  OPEN: build it (Recognizer.route() decides and sends nothing; handle() = route + act).
+- (owner, 2026-09-27) Terms module / service / system: verbatim in docs/guidelines.md "Terms".
+- (owner, 2026-09-27) 9a-7: "Yes, close it." DONE.
+- (owner, 2026-09-27) Window keys: "Why are the window keys still defined in ui.py even though we
+  have config/* for this?" DONE: they, the window title and the HUD colours moved to config.
+- (owner, 2026-09-27) The frame record: "Why does it only hold the mean....?" DONE: it keeps the
+  worst read / draw / show and the longest frame gap per second.
+
+## Owner rulings 2026-09-27 and 2026-09-28 (the "ironing" rounds; build plan in the handoff, section 9d)
+
+Benchmarks
+- D1 a: bench/whole-system is research-complete: its results go into a docs/research-complete-*.md
+  document, then its scripts and run_all.sh are deleted under rule A-D.
+- U2 (owner): merge unified_bench.py and run_list.py into ONE recognizer benchmark in
+  bench/recognizer/ (Q1 b). Two input paths only: "A. Literally make json files out of
+  cases_commands.py & perception, load the json files and iterate over all elements. B. ... the
+  json input of a wav file, do a prepass on all voice recordings to turn them into transcriptions,
+  then proceed almost identically as option A." A recordings file carries its expected values:
+  "A recorded session should have an expected value." Plus an option to run one given file.
+- U2.3 (owner): "Scorer: Should only be one. Definitely doesn't belong in log/*". "We never needed to
+  benchmark a live session." -> log/score.py, `run.sh score` and run_list's --from-clips matching go.
+- V3 (owner): the ~500 cases move to JSON as they are; no separate review of the expected values.
+- The guards are part of the recognizer, so the recognizer benchmark measures them, through the
+  recognizer's own decide function (D3); no copy of the routing in any benchmark.
+- X1: the 138 perception sentences stay in the recognizer benchmark, graded on the kind and the
+  target words. X2 + Y1: bench/vision-verify-bench measures ONLY the vision system ("NOT THE WHOLE
+  SYSTEM NOR THE RECOGNIZER! ONLY THE VISION"), keeps its English input, is fixed (detect() returns
+  (status, hits) since 2026-09-23) and moves to bench/perception/. X3: each benchmark has its own
+  scorer ("SINCE WE ARE MEASURING DIFFERENT THINGS").
+- Z1 a: a confirm tool for the 139 recordings in datasets/asr/ (propose the sentence and expected
+  result from the nearest case, the owner listens and confirms); the result is the recordings file.
+- Y2 b: no benchmark smoke tests; a change lists the benchmarks that call the changed module
+  (guidelines, change-impact analysis), and those are checked by hand.
+- U4 a: mutation checks only when a new test is written; not part of reviews.
+- R6 + Q7: the test review = each module's purpose -> its real-world behaviours -> the test that
+  proves each; coverage only to find never-run code ("Line Coverage Is a stupid metric"). Fuzzing later.
+
+Perf (C.1 draft approved: "Draft Looks Great! No complaints from me.")
+- Record every event, every frame included, into a memory buffer; a writer thread writes it every
+  config.PERF_FLUSH_SECONDS (R7: "configurable inside the config folder, default to 5s"); die()
+  flushes first. The report: n, min, P25, P50, P75, P95, P99, max per stage; V1 a: the 20 slowest
+  frames with their times. Q3 a: GPU samples through pynvml (0.018 ms vs 22.8 ms for nvidia-smi).
+  A "startup" stage per status row.
+
+Start-up and services
+- 3.3 (owner): "Everything, should it be necessary, be 'loaded eagerly' - I don't want load times to
+  slip into the app runtime." D13/Q6: phonikud loads at start only when TTS_OUTPUTS has "laptop".
+- Q5 a + 3.2.3: no dependency check in main.py; the preflight is its one place ("If a service
+  crashes then we will run the preflight and understand why it happend"). deps tests 1 and 3 go.
+- D15 a: the start-up builds every service through ONE function ("the app should simply call a
+  single function that 'builds' all the services"); the supervisor keeps processes alive.
+- U6 a: the phone-app check every 2 s; process restarts (mock, gstreamer) stay at 5 s.
+
+Layout and terms
+- SAM3 gets its own folder; keys -> keys/keys.py (R3 a); system/ -> runtime/ (R5); feed.py ->
+  test/scripted_e2e_run.py (Q4); show, score, perf_report stay in log/ "for now" (R4) (score.py goes
+  with U2.3); D8 a: the remaining drawing values (chat colours, pane layout, font paths) -> config.
+- D6 a: the disk test goes through SessionLog; disk.py keeps its underscore names.
+- Q9 a: the whole-app test is renamed test_app_end_to_end_over_ros.
+- D14 via 1.8.2 ("I agree with everything said here"): docs and headers use the owner's terms:
+  services first, then systems.
+
+Recognizer numbers
+- C.3 + Q8: all seven front letters (and, the, in, to, from, about, that), not only vav. R8/T5 a:
+  measure Gemma and the guard on a sentence set with fractions and front letters first, then
+  complete the tables (numbers, fractions incl. quarter, third, eighth, ...).
+
+SAM3
+- R9 + R10 + U5 a: a SAM3 assessment before any SAM3 change ("properly assess what we're going to
+  do with SAM3, instead of hacking it around"): today's in-app design, its own process with a shared
+  frame buffer (no 2.7 MB per request), phase 7 (SAM3.1, EOVSAM), and C.2 (558 vs ~400 ms).
+- (owner, 2026-09-28) M2: the recognizer benchmark is bench/recognizer/accuracy.py.
+- (owner, 2026-09-28) M3: "I meant what ROADMAP.md said": command->action latency < 1 s on the real link
+  (docs/ROADMAP.md line 40). It gets its own perf stage "e2e" (F5 release or phone transcript -> the
+  command reaches the phone app, or -> the first box drawn).
+- (owner, 2026-09-28) M5: "This is not phase 2 work. This should be done." Path B of the recognizer
+  benchmark also reports whisper's accuracy (its text vs the confirmed sentence, word error rate).
+- (owner, 2026-09-28) M6: the keyboard hook's mouse-event log: "Fuck it for now". Dropped.
+- (owner, 2026-09-28) M1: "Yes, check it". Measured: the preflight takes 2.1-2.3 s; the camera listing
+  (video/cam_list.py) is 2.1 s of it; system.deps 37 ms; the binary path from config 27 ms. OPEN: the fix.
+
+## Rulings recovered by the audit of 2026-09-28 (were only in the chat)
+- (owner, 2026-09-26) "session.py looks good." log/session.py stays at 266 lines; the SessionLog split
+  is closed, not open.
+- (owner, 2026-09-26) "I never modified ste_check. That was you." A Claude session changed
+  .claude/hooks/ste_check.py on 2026-09-19 (grade only the current reply) and never committed it.
+  D12: the owner commits it with the rest (task F2).
+- (owner, 2026-09-26) "I'll not commit this. We are not finished with some of the steps ... We'll
+  finish them and commit." No commits until the task list is done (F2).
+- (owner, 2026-09-27) C.2, SAM3 558 vs ~400 ms: "Good. Correct. If its not, then this is a cause for
+  expanding investigations." If Gemma loaded-but-idle does not explain it, the SAM3 assessment (E2)
+  widens the investigation.
+- (owner, 2026-09-27) The recognizer benchmark's purpose: "This is literally just a benchmark of the
+  recognizer as a function of the backend."
+- (owner, 2026-09-27) C.4, why the keyboard hook reads the mouse: "the keyboard wasn't detected with
+  the previous laptop, and with this device also, because the drivers report mouse events through the
+  laptop keyboard, which then causes the 'device filter' function to not detect the laptop keyboard".
+  M6 (2026-09-28): left as is; trim the logs by hand or with a tool later.
+- (owner, 2026-09-27) R4: the three log readers stay in log/ "For now" (revisit later).
+
+## Decision ledger 2026-09-26 .. 2026-09-28 (every question asked in the refactor rounds, one row each)
+
+The ledger of the owner's answers to every question asked in the refactor rounds (question IDs
+D, Q, R, T, U, V, W, X, Y, Z, M, P, and the numbered points of the 2026-09-26 debrief). Built from the
+transcript on 2026-09-28 (every question ID checked by script). "Answer" is the owner's words. "Task" is the build task in the handoff,
+section 9d. A later row supersedes an earlier one where it says so. New decisions: append a row.
+
+### The debrief points (owner, 2026-09-26 and 2026-09-27)
+
+| point | question | owner's answer | decision | task / state |
+|---|---|---|---|---|
+| 0.1 | how the test presses keys | "why reinvent the wheel ... YOU LITERALLY SEND AN EVENT THROUGH THE ROS NETWORK" (2026-09-26) | the test sends keys over ROS2 like the hook; no xdotool | done |
+| 0.2 | where the whole-app test draws | "make this a flag - True means :0, false means whatever the hell you want" (2026-09-26) | HARDEN2_APP_TEST_SCREEN=1 -> your display; else Xvfb | done |
+| 1.1 | run_list.py after step 11 | "Python Looks Phenomenal! Just please make the run_all.sh script readable too." | superseded by D1 a (run_all.sh goes) | B6 |
+| 1.2 | bench docs | "Double check documentation. It is for you (MAINLY(!)), not me." | bench docs are written for the agent | F1 |
+| 1.3 | testing run_list | "Test it fully." | done: text mode on Gemma 30/2/18; replay path runs | done (HISTORY 2026-09-26) |
+| 1.4 | the two SAM3 scripts | rule A-D for every benchmark, now and future | A-D rule; applied, research-complete doc written, owner deleted both | done |
+| 1.5 | the INTEGRATION-HANDOFF sed | "I see." (after the explanation) | no edit: it records 2026-09-03 | closed |
+| 1.7 | guards in the bench | "The guards are a part of the recognizer, so they should be TESTED!" | the recognizer benchmark measures the guards through route() | A1, B1 |
+| 1.8 | decide and act | "separate functions that are chained together. One should make the decision, one should do the acting" | route() decides, handle() = route + act | A1 |
+| 1.8 | terms | module = a folder; service = a module others depend on; system = modules with one purpose | written in guidelines "Terms"; docs use "services, then systems" | F1 |
+| 1.8.1 | one module, one folder | SAM3 "Yes, correct"; keyboard "Might need to move to a different folder with a single file"; system/ "Doesn't sound to me like system/* is the right word" | sam3/ own folder; keys/keys.py; system/ -> runtime/ | D1-D3 |
+| 1.8.2 | the code in the owner's terms | "I agree with everything said here." | services: gemma, SAM3, dji_app, log, runtime; systems: recognizer, perception, flight, speech, screen | F1 |
+| 1.10 | perf overhead / GPU sampling | "IT COSTS THAT MUCH FOR JUST MEASURING TIME?" | pynvml (Q3 a) | C1 |
+| 2.1 | two mains in app/ | "If it for testing, shouldn't it be inside test/*?" / "Yes, I agree." | feed.py -> test/scripted_e2e_run.py | D4 |
+| 2.3 | disk.py exposes internals | "Alright." then D6 "Option A" | the disk test goes through SessionLog | D6 |
+| 2.4 | session.py | "session.py looks good." | 266 lines accepted; no SessionLog split | closed |
+| 3.1 | dependency check speed | "As long as it works and doesn't take 10 years, I'm satisfied." | 0.008 s check kept | done |
+| 3.2.3 | check in main.py | "This should not be part of main ... Don't increase the loading time of main.py" | no check in main; the preflight is its one place | C3 |
+| 3.3 | start time | "Well fucking measure it?" | measured: 14-18.5 s to every row UP | done (HISTORY 2026-09-27) |
+| 3.3 | loading | "Everything, should it be necessary, be 'loaded eagerly' - I don't want load times to slip into the app runtime." | load at start, never during a run | C3 |
+| 4.1 | test list | "do you seriously expect me to read through the whole of your 217 test names?" | test review by behaviours (R6); test/README.md exists | E3 |
+| 4.2 | run docs | "Good Work." | docs/spec-harden2-run-arguments.md | done |
+| 5 | window keys | "Why are the window keys still defined in ui.py even though we have config/* for this?" | moved to config (with the title and HUD colours) | done |
+| 5 | global keys | "Good Fix & Choice for keybindings" | F1 quit, F2 clear, F4 kill, F5 talk; letters never act over ROS | done |
+| 6.2 | headers | "Make sure you actually update the systems in the header files if you also update the python files" | every API change updates its header in the same change | every task |
+| B.1 | checks | "Double after we finish part A" | lint + suite twice after every task | every task |
+| C.1 | frame record | "Why does it only hold the mean....?" then "Record everything and calculate metrics later! Keep P25, P50, P75, P95, P99, min & max." | the perf draft (approved) | C1 |
+| C.2 | SAM3 558 ms | "Good. Correct. If its not, then this is a cause for expanding investigations." | measure alone / Gemma idle / Gemma busy; widen if needed | E2 |
+| C.3 | front letters | "we should just convert the 'vav' to 'and'"; "What about 'ורבע'? What about 'ושמינית'?" | Q8: all seven letters; the fraction table | A2 |
+| C.4 | keyboard hook log | the laptop keyboard reports mouse events, so the device filter cannot separate them; M6 "Fuck it for now" | left as is | closed |
+| C.8 | 9a-7 | "Yes, close it." | closed; answer in guidelines "Terms" | done |
+| C.9 | handoff ticks | "Well, what are you waiting for...?" | 9a-9, 9a-10, 9a-11 ticked | done |
+| C.12 | ste_check.py | "I never modified ste_check. That was you." | a Claude session changed it (2026-09-19) | F2 (D12) |
+| D | commits | "I'll not commit this. We are not finished ... We'll finish them and commit." | no commits until the list is done | F2 |
+
+### The question IDs
+
+| ID | question | owner's answer | decision | task / state |
+|---|---|---|---|---|
+| D1 | the whole-system bench | "I tend to agree with option A" / "I agree with A" | research-complete document, then its scripts and run_all.sh go | B6 |
+| D2 | the two SAM3 scripts | "Option A" | research-complete-sam3-vs-omdet.md; owner deleted the scripts | done |
+| D3 | routing copied in benches | "Already said my piece about this" (1.8) | route() / handle() | A1 |
+| D4 | glossary | "A" | guidelines "Terms"; 9a-7 closed | done |
+| D5 | feed.py | "option A" | test/, with a new name (Q4) | D4 |
+| D6 | disk.py and its test | "Option A" | the test goes through SessionLog; underscores stay | D6 |
+| D7 | deps tests | trace discussed; "your last answer is good" | test 1 and test 3 go, test 2 stays; no check in main | C3 |
+| D8 | other drawing values | "option A" | chat colours, pane layout, font paths -> config | D5 |
+| D9 | whole-app test name | -> Q9 "option A" | test_app_end_to_end_over_ros | D7 |
+| D10 | window keys | (5) | moved to config | done |
+| D11 | vav number word | "Already Addressed" -> Q8 | all seven front letters + fractions | A2 |
+| D12 | ste_check.py | "Give commit" | the commit command given; the owner commits it | F2 |
+| D13 | phonikud loading | "Yes!" / "Already Addressed this stupid narrative." | loaded at start only when TTS_OUTPUTS has "laptop" | C3 |
+| D14 | our terms vs the owner's | "See my comments" -> 1.8.2 | docs and headers in the owner's terms | F1 |
+| D15 | who builds the services | "You win." / "I agree with your proposal." + "the app should simply call a single function that 'builds' all the services" | the start-up builds them through ONE function; the supervisor keeps processes alive | C3 |
+| Q1 | run_list's home | "option B" | bench/recognizer/ | B1 |
+| Q2 | folders breaking one-folder | answered by 1.8.1 | see 1.8.1 | D1-D3 |
+| Q3 | GPU sampling | "option A" | pynvml | C1 |
+| Q4 | feed.py's name | "test/scripted_e2e_run" | test/scripted_e2e_run.py | D4 |
+| Q5 | app.main without run.sh | "option A. If a service crashes then we will run the preflight" | no check when started directly | C3 |
+| Q6 | phonikud by flag | "YES" | as D13 | C3 |
+| Q7 | coverage report | "YES" + R6 | coverage only for never-run code | E3 |
+| Q8 | which front letters | "ALL SEVEN! THIS WONT ARISE JUST WITH VAV!" | and, the, in, to, from, about, that | A2 |
+| Q9 | whole-app test name | "option A" | test_app_end_to_end_over_ros | D7 |
+| R1 | the benchmark's file name | "Not a good name, suggest another one." -> M2 "yes" | bench/recognizer/accuracy.py | B1 |
+| R2 | unified_bench | "Do we even need the unified_bench?" -> U2 "Yes, Merge." | merged into accuracy.py | B1 |
+| R3 | keys folder | "option a" | keys/keys.py | D3 |
+| R4 | log readers | "For now, I agree." | show, perf_report stay in log/ (score.py goes, U2.3) | B1 |
+| R5 | system/ name | "Agreed" | runtime/ | D1 |
+| R6 | test review | "I agree with everything besides mutation checks"; fuzzing "not for now" | purpose -> behaviours -> tests; e2e | E3 |
+| R7 | perf write interval | "Make this configurable inside the config folder, default to 5s." | PERF_FLUSH_SECONDS = 5 | C1 |
+| R8 | fractions | "if there is no other way then we should add more"; "I agree with everything said here" | measure Gemma + guard first, then complete the tables | A2 |
+| R9 | SAM3 "not good" | "You're right about both." | SAM3 failure ends the app; SAM3 lives in the app's process | E2 |
+| R10 | three start-time findings | "you need to properly assess what we're going to do with SAM3, instead of hacking it around"; phone app: "Nothing to change ... reduce the interval from 5s to 2s" | torch -> SAM3 assessment; phonikud by flag; phone check 2 s | E2, C3 |
+| T1 | slow-frame threshold | -> U1 -> V1 | see V1 | C1 |
+| T2 | recognizer benchmarks | -> U2 "Yes, Merge." | merge | B1 |
+| T3 | log readers | -> R4 | see R4 | — |
+| T4 | mutation checks | -> U4 "Option A" | only when a new test is written | every new test |
+| T5 | fractions | -> R8 | see R8 | A2 |
+| T6 | SAM3 own process | "Agreed. Surely there is a way that we don't have to send 2.7MiB Per request" | assess the shared frame buffer | E2 |
+| T7 | phone-app false WAITING | "Nothing to change, this behaviour is fine" + 2 s | U6 a | C3 |
+| T8 | torch loading | -> R10 | part of the SAM3 assessment | E2 |
+| T9 | done ironing? | -> U7 -> Z2 | see Z2 | — |
+| U1 | slow-frame framing | "I don't understand the framing" -> explained -> V1 | see V1 | C1 |
+| U2 | merge | "Yes, Merge." + "add an option to run a specific file of sentences" | accuracy.py with a file argument | B1 |
+| U2.2 | inputs | "we should only have 2 ways to process inputs: A. ... json files ... B. ... json input of a wav file, do a prepass" + "A recorded session should have an expected value" | path A (sentences) and path B (WAV + expected) | B1, B2 |
+| U2.3 | scorer | "Scorer: Should only be one. Definitely doesn't belong in log/*"; "We never needed to benchmark a live session." | one scorer in bench/recognizer/; log/score.py, run.sh score and --from-clips matching go | B1 |
+| U4 | mutation checks | "Option A" | only for new tests | every new test |
+| U5 | SAM3 assessment | "I agree with your assessment. Option A" | its own step before any SAM3 change | E2 |
+| U6 | 2 s retry | "Option A" | phone check 2 s; process restarts 5 s | C3 |
+| U7 | done ironing? | "We're just shy of this, yes." | -> Z2 | — |
+| V1 | slow frames | "Option A" | the 20 slowest frames, no threshold | C1 |
+| V2 | perception expected results | "Bad question. Lets discuss it properly." -> X1-X3 | see X1-X3 | — |
+| V3 | review of expected values | "I was talking about my response at the start of the message." (U2.2) | converted to JSON as they are; no separate review | B1 |
+| W1 | grading a live session | -> U2.3 "We never needed to benchmark a live session" | not done | B1 |
+| W2 | perception JSON | -> X1-X3 | see X1 | B1 |
+| W3 | review | -> V3 | see V3 | — |
+| X1 | 138 perception sentences | "Yes" | stay in the recognizer benchmark: kind + target words | B1 |
+| X2 | the vision benchmark | "Yes" + "we care about measuring the vision system, NOT THE WHOLE SYSTEM NOR THE RECOGNIZER" | English input kept; fixed; moved | B5 |
+| X3 | scorers | "Yes, each benchmark has its own way of measuring" | one scorer per benchmark | B1, B5 |
+| Y1 | vision bench home | "answered" | bench/perception/ | B5 |
+| Y2 | silent benchmark breakage | "option B." | a change lists the benchmarks that call it; checked by hand | every task |
+| Z1 | expected values for 139 recordings | "Option A." | the confirm tool; the owner labels | B3, B4 |
+| Z2 | done ironing? | "I'm pretty sure. Do a pass" | the pass; this ledger | done |
+| M1 | preflight speed | "Yes, check it" | measured: camera listing 2.1 of 2.2 s | C4 (P1) |
+| M2 | benchmark name | "yes" | accuracy.py | B1 |
+| M3 | <1 s e2e | "I meant what ROADMAP.md said." | the "e2e" perf stage (command -> action) | C2 |
+| M4 | build order | "We already discussed them and finalized" | every decision is in this ledger and 9d | done |
+| M5 | whisper accuracy | "This is not phase 2 work. This should be done." | path B reports the word error rate | B2 |
+| M6 | keyboard log | "Fuck it for now" | left as is | closed |
+| M7 | ste_check commit | "Ok." | in F2 | F2 |
+| P1 | preflight camera listing | "option A" (2026-09-28) | the preflight checks only the selected camera (WEBCAM_DEV); the full list moves to `run.sh status` | C4 |
+| P2 | wave-1 split | "Use 4 sub agents running Opus 5.5 On Medium. Divide them as you wish. Make sure that every agent checks the resources its trying to access ... Have the agents maintain a LOCK.md file for each file/resource that they're using. The top of the file should contain the contention status of the document - LOCKED ... FREE ... Each agent should: Check status of LOCK.md; Try to lock the files/resources it needs; If succeeds, it continues his work => When Finished, it unlocks ...; Otherwise, it waits or tries to start other work" (2026-09-28) | 4 agents, Opus 5.5, medium effort; the LOCK.md protocol (design: handoff 9e) | 9e |
+| P3 | the stale handoff documents | "I asked about this right now. Answer my question." (the order and relevance of the documents) | answered; the order recorded in HISTORY 2026-09-28 "the handoff documents, oldest to newest" | done |
+| L1 | atomic LOCK.md changes | "Agreed" (2026-09-28) | tools/lock.sh acquire / release / status, under flock | 9e |
+| L2 | where LOCK.md lives | "Yes" | /root/groundstation/LOCK.md, in .gitignore | 9e |
+| L3 | parallel test runs | "Sure." | each agent its own ROS_DOMAIN_ID | 9e |
+| L4 | a dead agent's lock | "Yes" + "Make sure to have every subagent document his work in docs/refactor/subagent_id_doc.md, these would effectively be handoff documents for each subagent - at the bottom of their docs they'd update their progress ... Once they're finished, you'll double verify their progress reports vs the task-list you gave them in the handoff at the top. And for a final check, you'd actually check the files that they modified/wrote-to ... This gives us triple coverage for every subagent" | the main agent clears it after confirming the agent is gone; every agent keeps docs/refactor/<agent-id>_doc.md; triple coverage | 9e |
+| G1 | the rest of bench/hebrew-command-bench after B1 (bench.py, the typing and contention scripts, perf.py, cases_typing_fresh*.py) | "tell me what is the purpose of each file. If they already served their purpose and are not used, then they can be safely ignored ... Otherwise, tell me what is wrong." (2026-09-28) | the typing study's scripts served their purpose (docs/research-2026-09-18-command-typing-fast-vs-gemma.md; decision 2026-09-19) and nothing uses them: ignored. What is wrong: see G2 | B1 |
+| G2 | the ignored scripts break under D1/D2/B1; contention.py + real_cadence.py measure SAM3 + Gemma sharing the GPU (E2's question) | "Option A!" (2026-09-28) | retire under A-D: the study doc becomes docs/research-complete-2026-09-18-command-typing.md with no banned word (C); HISTORY holds it (D); then delete type_compare.py, type_fresh.py, type_english.py, perf.py, cases_typing_fresh*.py, and bench.py after B1. contention.py + real_cadence.py go to E2 (reuse or replace, then retire) | B7, E2 |
+| K1 | the agents' model and effort | "Why do you ask this of me? You launch the subagents, not me. You should have a way to control the specific agent that you launch, i.e. giving the specific subagent type (for instance, claude-opus-4-8) alongside the effort. Am I wrong here?" (2026-09-28) | the main agent decides. The Agent tool sets the model per call ("opus" = claude-opus-5-5, checked in the Claude Code 2.1.280 binary) but takes no effort; effort comes only from an agent definition's `effort:` field. So the main agent writes .claude/agents/harden2-agent.md (model opus, effort medium), launches every agent with that type, and each agent writes its model and $CLAUDE_EFFORT at the top of its progress | S0 |
+| K2 | one shared working tree (a half-written file can fail another agent's suite run) | "What can be in parallel, should be done in parallel. Otherwise, option C. i don't mind waiting." (2026-09-28) | tasks on different files and resources run in parallel (the waves in 9d); a task that shares a file or a resource waits for its lock, one at a time; the full suite is the lock "suite"; an agent never fixes a failure in another agent's files: it notes it and reruns after that agent's checkpoint; the main agent's validation run decides. Worktrees stay out: the tool would make git writes | 9e |
+| K3 | a safety copy before the agents | "Lets commit now, and also make an archive inside /root/groundstation. I'd move it outside the container just incase." (2026-09-28; replaces "I'll not commit this" of 2026-09-26) | the main agent made backups/harden2-2026-09-28-before-agents.tar.gz (.git + every tracked and untracked file; git-ignored files excluded); /backups/ and /LOCK.md are in .gitignore; the owner commits the 55 paths (the main agent suggests the commands, runs no git write). /root/groundstation is the host folder /home/swapgs/workspaces/groundstation | S0 |
+| — | start | "do not start yet, we're not done ... thoroughly prepare for that [compaction]" (2026-09-28) | nothing is built until the owner says start | — |

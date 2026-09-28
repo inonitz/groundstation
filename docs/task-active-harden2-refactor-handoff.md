@@ -440,16 +440,21 @@ Gaps found, added to the plan (none were in it before):
       bench caller (bench/sam3-mask-bench/quant_bench.py).
 - [x] 9a-6 DONE 2026-09-24: SessionLog(folder); the app passes config.SESSION_DIR. Was: log/session.py reads MVD_SESSION_DIR from the environment directly: a config bypass
       (config.SESSION_DIR already reads it). Use config only.
-- [ ] 9a-7 No single interface is shared by every module (owner question 2026-09-23). Only gemma,
+- [x] 9a-7 CLOSED 2026-09-27 (owner: "Yes, close it"): every class has close(); status rows give
+      status(); process parts give process(log_dir); modules meet through constructor arguments.
+      Written into docs/guidelines.md "Terms". Was: No single interface is shared by every module (owner question 2026-09-23). Only gemma,
       audio, video and dji_app expose start_services(supervisor, log_dir). OPEN for the owner.
 - [x] 9a-8 Line length: ALL harden2 .py lines <= 89 chars (owner 2026-09-23, "less than 90"),
       replacing 9b. Done by 4 parallel agents, each file proven AST-identical by
       scratchpad/check_wrap.py, tests green.
-- [ ] 9a-9  perception2 leaks its assembly: app/main.py builds BackendLoader + PerceptionEngine +
+- [x] 9a-9  CLOSED by 9b-1 (checked 2026-09-26: app/main.py builds only Vision(sam3, gemma, ...);
+      Vision builds its own engine). Was: perception2 leaks its assembly: app/main.py builds BackendLoader + PerceptionEngine +
       vlm_client by hand. perception2 should expose ONE factory that returns the Vision service.
-- [ ] 9a-10 the recognizer imports dji_app's status codes (BLOCKED, UNREACHABLE, sent). It should
+- [x] 9a-10 CLOSED by 9b-1 (checked 2026-09-26: no dji_app import in recognizer/; it reads
+      http.HTTPStatus from control). Was: the recognizer imports dji_app's status codes (BLOCKED, UNREACHABLE, sent). It should
       only talk to control; control gives it the outcome.
-- [ ] 9a-11 the recognizer imports perception2.lexicon (the HE->EN target fix). Only the recognizer
+- [x] 9a-11 CLOSED by 9b-1 (checked 2026-09-26: recognizer/lexicon.py exists; perception2/lexicon.py
+      is gone). Was: the recognizer imports perception2.lexicon (the HE->EN target fix). Only the recognizer
       uses it: it belongs in recognizer/.
 - [ ] 9a-12 Density pass (owner 2026-09-23): blank lines between logical steps, one statement per line,
       no packed assignments or dense lambdas, in every file touched this session.
@@ -516,7 +521,7 @@ HTTP results: http.HTTPStatus (.is_success; 409 = CONFLICT = blocked); None = no
       env overrides read in both config/__init__.py and config/defaults.py; stale docstrings in
       prompts.py (names removed prompts) and config (names config_constants.py / config_defaults.py).
 
-### 9c. STATUS 2026-09-25 (the current state of plan 9; supersedes the ticks above where they differ)
+### 9c. STATUS 2026-09-25 (the state of plan 9 on 2026-09-25; the REMAINING work is the task list in 9d)
 | item | state |
 |---|---|
 | 1-7, 9b, 9a-5, 9a-6, 9a-12 | DONE |
@@ -525,11 +530,11 @@ HTTP results: http.HTTPStatus (.is_success; 409 = CONFLICT = blocked); None = no
 | measurement: log/perf.py, `run.sh perf`, the scripted run (SCRIPT=default, mock only) | DONE; first measured run recorded (HISTORY 2026-09-25) |
 | 10 display loop | MEASURED: the dark room limits the C920 (16-18 fps auto); our loop is 16 ms. OPEN: the 3.6 fps dips |
 | 13 webcam mock run | ONE live run done (fixed: the ggml mix via the owner's rebuild, the chat line-break crash). OPEN: code review, owner commits |
-| 8 one dependency-check file at start | OPEN |
-| 9 test_app.py end to end over ROS (headless) | OPEN (app/feed.py is a first part) |
-| 11 dead benches (run_list.py, compare_engines.py, run_indepth.py) | OPEN |
+| 8 one dependency-check file at start | DONE 2026-09-26: system/deps.py (packages, programs, model files) |
+| 9 test_app.py end to end over ROS (headless) | DONE 2026-09-26: test_the_whole_app_over_ros, HARDEN2_APP_TEST=1, passed |
+| 11 dead benches (run_list.py, compare_engines.py, run_indepth.py) | DONE 2026-09-26 except the owner's rm of the two SAM3 scripts |
 | 12 stale docs outside harden2 | OPEN |
-| 9a-2 split app/render.py (542) and log/session.py (363) | OPEN |
+| 9a-2 split app/render.py (542) and log/session.py (363) | DONE 2026-09-26 (session.py 266: accepted by the owner, "session.py looks good") |
 Open findings: the number guard does not see a leading ו-number word (וחמישה); SAM3 558 ms p50 on the
 shared GPU (vs ~400 alone, unverified cause); the keyboard hook wrote 28,291 log lines in ~4 min
 (1.5 MB, proc-keys.log; the owner's C++ decides); both webcams read black in a dark room.
@@ -540,3 +545,135 @@ the main agent = steps 8, 9 and the 3.6 fps dips; step 12 runs LAST, over the fi
 (owner: a doc sweep before the other steps land would go stale again). Standing rules: now all in
 docs/guidelines.md ("Project rules learned in harden2").
 
+### 9d. TASK LIST after the ironing rounds (2026-09-28; every decision, one row each: docs/spec-harden2-cleanup.md, "Decision ledger 2026-09-26 .. 2026-09-28")
+Each task: its files, what it needs first, its size (S/M/L), GPU use. Every task ends with: the header synced
+(docs/api-harden2), lint + the suite twice, the benchmarks that call a changed module named and fixed (Y2), and
+the current-state docs it touches updated in the same change: docs/spec-harden2-run-arguments.md (run.sh,
+settings, flags), projects/integration_harden2/README.md (layout), test/README.md (the test list),
+bench/README.md (the benchmark list). The main agent writes its HISTORY entry (newest last). ONE GPU: the main agent schedules every GPU run; no two at once.
+
+A. Recognizer
+- [ ] A1 (M) decide and act split (D3): recognizer/recognizer.py route() decides and sends nothing; handle() =
+      route + act. Tests in test_recognizer.py; recognizer.h. Needs: nothing.
+- [ ] A2 (M-L, GPU) numbers: a sentence set with fractions and all seven front letters -> measure Gemma and the
+      guard -> complete recognizer/numbers.py + util/hebrew.py tables. Needs: B1's JSON format.
+
+B. Benchmarks
+- [ ] B1 (L, GPU to verify) bench/recognizer/accuracy.py: cases_commands.py, cases_perception.py (verbose set
+      generated once), datasets/e2e lists -> JSON files in datasets/recognizer/ as they are; path A; one scorer
+      (steps, reject, emergency, perception kind + target words; it must read "+90" without "deg",
+      the bug that failed 2 lines on 2026-09-26); a file argument; calls route(). Purpose (owner): "a
+      benchmark of the recognizer as a function of the backend". Delete
+      unified_bench.py, run_list.py, log/score.py, `run.sh score`. Needs: A1. G1 + G2 a (owner): the rest of bench/hebrew-command-bench
+      is retired by B7 and E2.
+- [ ] B2 (M, GPU) path B: WAV + expected -> whisper prepass -> path A; whisper word error rate (M5). Needs: B1, B4.
+- [ ] B3 (M) the confirm tool for the 139 recordings (datasets/asr): propose the sentence + expected from the
+      nearest B1 case, play the clip, confirm or correct, write the recordings JSON. Needs: B1's format.
+- [ ] B4 (OWNER, ~15-25 min, estimate) label the 139 recordings with B3.
+- [ ] B5 (S, GPU ~3 min) vision benchmark: fix detect() in bench.py + propose_boxes.py, move
+      bench/vision-verify-bench -> bench/perception/, rerun vs the 2026-09-20 numbers. Needs: nothing.
+- [ ] B7 (S) the 2026-09-18 typing study (G2 a): docs/research-2026-09-18-command-typing-fast-vs-gemma.md ->
+      docs/research-complete-2026-09-18-command-typing.md, with the banned word removed from its text (rule C;
+      HISTORY already holds it: rule D); then delete type_compare.py, type_fresh.py, type_english.py, perf.py,
+      cases_typing_fresh.py, cases_typing_fresh_en.py, and bench.py once B1 no longer needs it. Needs: B1.
+- [ ] B6 (S-M) whole-system: docs/research-complete-*.md from its README + results, then delete its scripts and
+      run_all.sh (rule A-D; the owner runs rm if the tool refuses). Needs: nothing.
+
+C. Perf and start-up
+- [ ] C1 (M) perf module per the approved draft: buffer + writer thread (PERF_FLUSH_SECONDS=5), every frame
+      (app/ui.py loses its per-second summary), pynvml (PERF_GPU_SAMPLE_SECONDS=1), die() flush, "startup" stage,
+      report: n/min/P25/P50/P75/P95/P99/max + the 20 slowest frames. log/perf.py, log/perf_report.py, config.
+      Needs: nothing.
+- [ ] C2 (S-M) the "e2e" stage (ROADMAP: command->action < 1 s): F5 release or phone transcript -> the command
+      reaches the phone app, or -> the first box drawn. Needs: C1.
+- [ ] C3 (M) start-up: ONE build-services function in app/main.py; no deps check in main (deps tests 1 and 3
+      go); phonikud imported at start only with "laptop"; phone check every 2 s (new config value), process
+      restarts stay 5 s. Needs: C1 (both touch app/main.py).
+- [ ] C4 (S) the preflight's camera listing (2.1 s of 2.2 s). P1 a: the preflight checks only the selected camera
+      (WEBCAM_DEV); the full list moves to `run.sh status`; update docs/spec-harden2-run-arguments.md. Needs: nothing.
+
+D. Layout (many imports: ONE agent, after A1, B1, C1, C3 land)
+- [ ] D1 system/ -> runtime/ (outside callers: bench/hebrew-command-bench/bench.py lines 32-33).
+- [ ] D2 SAM3 -> its own folder (sam3/) (outside callers: bench/hebrew-command-bench/contention.py, real_cadence.py,
+      bench/sam3-mask-bench/quant_bench.py, bench/sam3-concurrency-bench/concurrency.py, and the vision benchmark
+      after B5).
+- [ ] D3 app/keys.py -> keys/keys.py.
+- [ ] D4 app/feed.py + perf_script.txt -> test/scripted_e2e_run.py; run.sh SCRIPT; the whole-app test uses it.
+- [ ] D5 the drawing values -> config.   D6 the disk test through SessionLog.
+- [ ] D7 rename the whole-app test -> test_app_end_to_end_over_ros.
+
+E. Investigations
+- [ ] E1 (M, GPU + webcam + display) the 3.6 fps dips: a scripted run with C1's per-frame data; match the 20
+      slowest frames to the other events. Needs: C1.
+- [ ] E2 (L, GPU) the SAM3 assessment document: today's in-app design; its own process with a shared frame
+      buffer; the costs measured (frame transfer, detect alone / Gemma idle / Gemma busy = C.2); phase 7;
+      a recommendation for the owner. If Gemma loaded-but-idle does not explain the 558 ms, widen the
+      investigation (owner, C.2). It takes over bench/hebrew-command-bench/contention.py and real_cadence.py
+      (G2 a): reuse or replace their method, then retire them under A-D. Needs: nothing (C1 helps).
+- [ ] E3 (M) the test review: per module, purpose -> behaviours -> the test that proves each; coverage only
+      for never-run code. A report first, no changes. Needs: A-D landed.
+
+F. Closing
+- [ ] F1 step 12: the stale-doc sweep, incl. docs + headers in the owner's terms (services, then systems),
+      and known stale text: perception2/__init__.py ("the one-consumer task queue"). LAST.
+- [ ] F2 step 13: code review; the owner's commits (incl. .claude/hooks/ste_check.py).
+
+Waves (what can run at the same time without touching the same files):
+- Wave 1: A1 | C1 | B5 + B6 | E2 (measurements serialized on the GPU)
+- Wave 2: B1 (after A1) | C2 + C3 (after C1) | E1 (after C1)
+- Wave 3: B3 -> B4 (owner) -> B2 | A2 (after B1) | C4
+- Wave 4: D (one agent) -> E3 -> F1 -> F2
+The main agent: writes each brief, validates each agent against its brief (reading the files it touched),
+runs the GPU schedule, keeps HISTORY and this list current.
+
+### 9e. AGENTS AND LOCKS (owner 2026-09-28: 4 agents, Opus 5.5, medium effort; the LOCK.md protocol)
+S0 (the main agent, BEFORE any agent starts):
+- [x] K3 (owner 2026-09-28): the safety archive backups/harden2-2026-09-28-before-agents.tar.gz (.git + every
+      tracked and untracked file); /backups/ and /LOCK.md in .gitignore; the owner commits the 55 paths first.
+- [ ] K1: .claude/agents/harden2-agent.md (model: opus = claude-opus-5-5, effort: medium). Every agent is launched
+      with that type and writes its model and $CLAUDE_EFFORT at the top of its progress.
+- [ ] tools/lock.sh (acquire | release | status, under flock); LOCK.md at the repo root, line 1 FREE; ".gitignore" lists /LOCK.md (done with K3).
+- [ ] docs/refactor/ with one <agent-id>_doc.md per agent: the brief on top (context, objective, task IDs from 9d,
+      hints, checks, resources to lock, its ROS_DOMAIN_ID), CLAUDE.md's safety + git rules, "mock only", "no git writes".
+- [ ] Baseline for every agent (checked 2026-09-28): the suite 215 passed, 2 skipped; lint clean; the exception audit 5.
+      55 paths are uncommitted on purpose (steps 8, 9, 11, 9a-2, the keys, the docs): no agent reverts them.
+NOT STARTED: the owner said "do not start yet". L1-L4 approved 2026-09-28 (spec ledger).
+Division (owner: "Divide them as you wish"); each agent keeps its own line of work, so it keeps its context:
+- Agent 1 (recognizer): A1 -> B1 -> A2.
+- Agent 2 (perf + start-up; owns app/main.py): C1 -> C2 -> C3 -> C4.
+- Agent 3 (benchmarks + tools): B5 + B6 -> B3 (after B1's JSON format) -> B7 (after B1) -> B2 (after the owner's B4).
+- Agent 4 (investigations, GPU): E2 (SAM3 assessment) -> E1 (dips, after C1).
+- After A1, B1, C1, C3: the layout (D1-D7) by ONE agent (agent 2), then E3, F1, F2.
+- The main agent: the briefs, the validation of each agent against its brief, the GPU schedule, and it is the
+  ONLY writer of docs/HISTORY.md, the spec, this handoff and the session log (agents report to files).
+Where the tasks overlap (why the locks are needed):
+- the GPU (B1, A2, B5, E2, E1) and the webcam + display (E1, the whole-app test)
+- config/constants.py + config/__init__.py (C1, C3, D5)
+- app/main.py (C1, C2, C3, D) and app/ui.py (C1, D5)
+- docs/api-harden2/*.h (agents 1, 2, 4)
+LOCK.md protocol (the owner's, as given):
+- Line 1: LOCKED (someone is writing this file now) or FREE.
+- Then one row per held resource: the resource (a path or a name: gpu, webcam, display), the agent, the time.
+- An agent: reads LOCK.md; tries to lock what it needs; on success works, then unlocks; otherwise waits or
+  does other work it has.
+Design points (approved by the owner 2026-09-28, L1-L4):
+- Atomicity: two agents can read FREE at the same moment. A small script (tools/lock.sh acquire | release |
+  status) edits LOCK.md under `flock`, so the change of line 1 and the rows is atomic.
+- Where: /root/groundstation/LOCK.md, added to .gitignore (it is run-time state, not code).
+- ROS2 isolation: each agent runs its tests with its own ROS_DOMAIN_ID, so their topics never cross (no lock
+  needed for ROS topics).
+- A stale lock (an agent died): the main agent clears it after checking the agent is gone.
+- K2 (owner 2026-09-28): what can run in parallel runs in parallel; a task that shares a file or a resource
+  waits for its lock, one at a time. The full suite is the lock "suite". An agent never fixes a failure in
+  another agent's files: it notes it and reruns after that agent's checkpoint. The main agent's run decides.
+Each agent's handoff document (owner, 2026-09-28): docs/refactor/<agent-id>_doc.md, one per agent.
+- TOP: its brief, written by the main agent: context, objective, its task list (IDs from 9d), hints, the
+  checks, the resources it will lock.
+- MIDDLE: its own notes for the next agent: what it changed, where, why.
+- BOTTOM: its progress, updated at every checkpoint: each task ticked with the evidence (the checks run,
+  their output); the agent checks its own work at each checkpoint and at the end.
+Triple coverage per agent:
+1. The agent checks itself at each checkpoint and at the end (bottom of its doc).
+2. The main agent checks the progress report against the task list at the top of the same doc.
+3. The main agent reads every file the agent modified or wrote, and checks that each task is really done.
+Only after all three does the main agent tick the task in 9d and write HISTORY.

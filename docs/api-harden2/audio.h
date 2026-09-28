@@ -1,5 +1,5 @@
 /*
- * audio.h -- harden2 API v2.3 (2026-09-24). Module audio/: speech in and speech out.
+ * audio.h -- harden2 API v2.4 (2026-09-26). Module audio/: speech in and speech out.
  * Owner rulings 2026-09-23: each is ONE interface over a LIST of backends from config;
  * all listed backends run at once (a remote source never takes the ground-control mic
  * away). A new backend is one class plus one line in the registry.
@@ -26,9 +26,12 @@ SupProcess AsrRosProcess(const char* logDir);    /* the ASR server: a laptop par
 /* ---- speech out: config.TTS_OUTPUTS, e.g. {"phone"} or {"phone", "laptop"}; {} = silent ----
  *   phone  (tts_phone.PhoneTts)  POST /tts through dji_app; its health IS the "dji app" row.
  *   laptop (tts_laptop.LaptopTts) offline phonikud; a playback error dies at once (9a-1).
+ *                            Its packages and model files: SysCheckDependencies (system.h).
  * Latest answer wins: Say() overwrites a one-slot mailbox and cuts what is playing. */
 typedef struct SpeechOut SpeechOut;
-SpeechOut* SpeechOutCreate(const char** outputs, uint32_t n, DjiApp* dji);
+typedef struct Perf Perf;
+/* @perf: a "say" record per sentence and output */
+SpeechOut* SpeechOutCreate(const char** outputs, uint32_t n, DjiApp* dji, Perf* perf);
 void       SpeechOutSay(SpeechOut* out, const char* text);   /* never blocks            */
 void       SpeechOutClose(SpeechOut* out);
 
