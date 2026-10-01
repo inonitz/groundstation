@@ -1,0 +1,25 @@
+{
+ "nf4": false,
+ "linear_swapped": 0,
+ "skip": "",
+ "prompt": "chair",
+ "frames": 30,
+ "offload_video": true,
+ "evict": false,
+ "ground_batch": 1,
+ "postprocess_batch": 1,
+ "weights_mib": 3744,
+ "load_process_mib": 4168,
+ "prompt_ms": 1532.6,
+ "first_prompt_objects": 2,
+ "objects_tracked_max": 2,
+ "peak_allocated_mib": 5552,
+ "end_process_mib": 6238,
+ "ms_per_frame": {
+  "n": 29,
+  "p50": 509.9,
+  "p95": 518.5,
+  "max": 519.1
+ },
+ "cpu_rss_max_mib": 7720
+}

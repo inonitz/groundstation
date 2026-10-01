@@ -21,7 +21,7 @@ TRI = "/tmp/cold_triton"
 
 def worker(name, out):
     import cv2, numpy as np, torch
-    from perception2 import Sam3Backend
+    from sam3.model import Sam3Backend
     prec, comp = {m[0]: (m[1], m[2]) for m in MODES}[name]
     res = {"name": name}
     try:

@@ -1,0 +1,32 @@
+{
+ "list": "live-test-subset",
+ "source": "datasets/e2e/live-test-subset.md (converted 2026-09-28) (the order a person speaks; each name is a case of a topical file, 2026-09-29)",
+ "cases": [
+  "up10",
+  "down3",
+  "up_half",
+  "g_fwd3",
+  "g_back2",
+  "back10",
+  "right4",
+  "left7",
+  "takeoff",
+  "land",
+  "spin90cw",
+  "r_pol_spin",
+  "spin360",
+  "combo3",
+  "combo_tl",
+  "back2left3",
+  "v_listen3_g2",
+  "v_finish3_g0",
+  "square",
+  "r_dis4",
+  "q_land_trap",
+  "e_stop",
+  "e_stop_now",
+  "e_emergency",
+  "pq_see_now",
+  "i_orange_cap"
+ ]
+}

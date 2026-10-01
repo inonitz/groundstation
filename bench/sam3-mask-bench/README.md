@@ -17,7 +17,8 @@ OmDet+SAM2.1 replacement -- overturning the earlier FP32-ONNX cost verdict.
 | [Method](#method-planned) | how each remaining number will be produced |
 | [Files](#files) | what each file is |
 
-The VLM comparison (Qwen3-VL vs Gemma 4 against SAM3, 2026-09-08) lives in tools/bench/whole-system (vlm_compare.py); it only reads the images here.
+The VLM comparison (Qwen3-VL vs Gemma 4 against SAM3, 2026-09-08) read the images here; its
+results: docs/research-complete-whole-system.md (the whole-system benchmark, retired 2026-09-28).
 
 ## Objective
 

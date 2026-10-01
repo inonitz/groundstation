@@ -1,0 +1,19 @@
+{
+ "set": "emergency",
+ "source": "bench/hebrew-command-bench/cases_commands.py EMERGENCY_CASES (converted 2026-09-28)",
+ "cases": [
+  {"name": "e_stop", "he": "עצור", "expect": {"kind": "emergency"}},
+  {"name": "e_stopstop", "he": "עצור עצור", "expect": {"kind": "emergency"}},
+  {"name": "e_stop_now", "he": "תעצור עכשיו", "expect": {"kind": "emergency"}},
+  {"name": "e_emergency", "he": "חירום חירום", "expect": {"kind": "emergency"}},
+  {"name": "e_stop_all", "he": "עצור הכל בבקשה", "expect": {"kind": "emergency"}},
+  {"name": "e_english", "he": "stop stop stop", "expect": {"kind": "emergency"}},
+  {"name": "e_game_stop", "he": "תעצור את המשחק ל-20 שניות", "expect": {"kind": "emergency"}},
+  {"name": "e75_two_words", "he": "חירום, עצור מיד", "expect": {"kind": "emergency"}},
+  {"name": "e75_dai_maspik", "he": "די, מספיק", "expect": {"kind": "emergency"}},
+  {"name": "e75_hafsek_hakol", "he": "הפסק הכל", "expect": {"kind": "emergency"}},
+  {"name": "e75_retracted_stop", "he": "תעצור... לא, המשך", "expect": {"kind": "emergency"}},
+  {"name": "e75_conditional_stop", "he": "כשתגיע לגובה חמישה מטרים, תעצור ותסתובב", "expect": {"kind": "emergency"}},
+  {"name": "l50_34", "he": "תפסיק", "expect": {"kind": "review"}, "note": "KNOWN GAP: should halt, currently misses EMERGENCY_RE (fix is bench-gated). Record actual behavior."}
+ ]
+}

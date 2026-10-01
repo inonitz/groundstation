@@ -1,0 +1,133 @@
+{
+ "mode": "child",
+ "marks": [
+  [
+   "load start",
+   3.162322609568946
+  ],
+  [
+   "torch imported",
+   3.9963373854989186
+  ],
+  [
+   "transformers imported",
+   4.654044163529761
+  ],
+  [
+   "model loaded",
+   7.905729834572412
+  ]
+ ],
+ "frames": 418,
+ "gap": {
+  "n": 417,
+  "p50": 59.3,
+  "p95": 61.0,
+  "min": 14.6,
+  "max": 74.3
+ },
+ "read": {
+  "n": 417,
+  "p50": 49.0,
+  "p95": 52.5,
+  "min": 3.2,
+  "max": 53.9
+ },
+ "draw": {
+  "n": 417,
+  "p50": 4.9,
+  "p95": 7.9,
+  "min": 4.0,
+  "max": 15.2
+ },
+ "show": {
+  "n": 417,
+  "p50": 3.3,
+  "p95": 3.8,
+  "min": 2.8,
+  "max": 5.9
+ },
+ "over_100ms": 0,
+ "slowest": [
+  {
+   "t": 14.7,
+   "gap": 74.3,
+   "read": 53.2,
+   "draw": 15.2,
+   "show": 5.9,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 5.7,
+   "gap": 64.2,
+   "read": 51.6,
+   "draw": 8.5,
+   "show": 4.1,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 22.1,
+   "gap": 63.4,
+   "read": 53.2,
+   "draw": 6.9,
+   "show": 3.3,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 12.2,
+   "gap": 63.4,
+   "read": 50.2,
+   "draw": 9.0,
+   "show": 4.2,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 10.5,
+   "gap": 62.5,
+   "read": 51.2,
+   "draw": 7.8,
+   "show": 3.5,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 19.9,
+   "gap": 62.5,
+   "read": 50.1,
+   "draw": 9.0,
+   "show": 3.4,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 17.8,
+   "gap": 62.5,
+   "read": 52.4,
+   "draw": 6.9,
+   "show": 3.3,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 17.7,
+   "gap": 62.1,
+   "read": 53.9,
+   "draw": 5.0,
+   "show": 3.1,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 17.9,
+   "gap": 61.8,
+   "read": 50.5,
+   "draw": 7.9,
+   "show": 3.4,
+   "phase": "after model loaded"
+  },
+  {
+   "t": 6.5,
+   "gap": 61.8,
+   "read": 52.6,
+   "draw": 5.4,
+   "show": 3.7,
+   "phase": "after transformers imported"
+  }
+ ]
+}

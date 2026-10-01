@@ -1,0 +1,30 @@
+{
+ "reps": 12,
+ "concepts": [
+  "dresser",
+  "chest of drawers",
+  "cabinet"
+ ],
+ "same_boxes": "12/12",
+ "per_concept": {
+  "n": 12,
+  "p50": 1196.4,
+  "p95": 1199.8,
+  "min": 1190.1,
+  "max": 1204.4
+ },
+ "shared": {
+  "n": 12,
+  "p50": 508.7,
+  "p95": 511.6,
+  "min": 497.0,
+  "max": 527.8
+ },
+ "encode_only": {
+  "n": 12,
+  "p50": 332.9,
+  "p95": 336.5,
+  "min": 321.2,
+  "max": 351.6
+ }
+}

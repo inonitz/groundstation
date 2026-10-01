@@ -40,8 +40,12 @@ following rules apply to all benchmarks we have currently and will create in the
 
 | bench | measures | status |
 |---|---|---|
-| hebrew-command-bench | recognizer + Gemma intent/plan accuracy, 487 Hebrew commands (text; no ASR/vision) | LIVE, 410/487 |
-| whole-system | end-to-end text + audio replay through the live stack | campaign |
+| recognizer | the recognizer as a function of the backend: route() + one scorer over datasets/recognizer/*.json (545 sentences, each once; text, no ASR/vision) | LIVE, 458 PASS / 76 FAIL / 11 REVIEW of 545 sentences (2026-09-29) |
+| hebrew-command-bench | RETIRED 2026-09-29 (G1, G2, J5); results: docs/research-complete-hebrew-command-bench.md; raw data in its results/ | retired |
+| perception | the vision system alone: SAM3 highlight + verify vs human-labelled boxes, 137 rows (English input; no recognizer) | LIVE, verify 105/137 correct |
+| whole-system | RETIRED 2026-09-28 (D1); results: docs/research-complete-whole-system.md | retired |
+| sam3-assessment | SAM3 in the app: detect alone / Gemma idle / Gemma busy, concept fan-out, frame transfer to its own process, start-up; results: docs/research-complete-sam3-assessment.md | LIVE (2026-09-28) |
+| sam3-video | SAM3 video tracking (transformers Sam3VideoModel / Sam3TrackerVideoModel) and SAM3.1 (Meta's code) in nf4: memory by objects and frames tracked, ms per frame; results: docs/research-complete-sam3-video-tracking.md | LIVE (2026-09-29) |
 | sam3-mask-bench | SAM3 open-vocab detect+mask engine (latency, quant, engine A/B) | campaign (adopted) |
 | hebrew_asr | whisper Hebrew quantization WER/CER + latency | campaign |
 | yolo26-depth-bench | YOLO26 + depth model ladder | campaign |

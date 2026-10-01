@@ -17,7 +17,7 @@ sys.path.insert(0, "/root/groundstation/projects/integration_harden2")
 import numpy as np
 import torch
 from PIL import Image
-from perception2.sam3_backend import Sam3Backend
+from sam3.model import Sam3Backend
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CAND = "/root/groundstation/bench/sam3-mask-bench/candidates/img0.png"

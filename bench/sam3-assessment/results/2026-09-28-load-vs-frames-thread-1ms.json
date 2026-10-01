@@ -1,0 +1,133 @@
+{
+ "mode": "thread-1ms",
+ "marks": [
+  [
+   "load start",
+   3.022483746986836
+  ],
+  [
+   "torch imported",
+   3.988571750000119
+  ],
+  [
+   "transformers imported",
+   5.231419869931415
+  ],
+  [
+   "model loaded",
+   10.634761280962266
+  ]
+ ],
+ "frames": 368,
+ "gap": {
+  "n": 367,
+  "p50": 67.6,
+  "p95": 75.0,
+  "min": 11.2,
+  "max": 246.4
+ },
+ "read": {
+  "n": 367,
+  "p50": 56.5,
+  "p95": 60.5,
+  "min": 2.4,
+  "max": 233.2
+ },
+ "draw": {
+  "n": 367,
+  "p50": 7.5,
+  "p95": 11.2,
+  "min": 4.1,
+  "max": 60.3
+ },
+ "show": {
+  "n": 367,
+  "p50": 3.5,
+  "p95": 5.2,
+  "min": 3.0,
+  "max": 77.5
+ },
+ "over_100ms": 9,
+ "slowest": [
+  {
+   "t": 3.2,
+   "gap": 246.4,
+   "read": 233.2,
+   "draw": 8.4,
+   "show": 4.8,
+   "phase": "after load start"
+  },
+  {
+   "t": 5.8,
+   "gap": 159.9,
+   "read": 148.6,
+   "draw": 7.4,
+   "show": 3.8,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 7.6,
+   "gap": 153.6,
+   "read": 144.3,
+   "draw": 5.8,
+   "show": 3.5,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 6.8,
+   "gap": 137.5,
+   "read": 52.6,
+   "draw": 7.5,
+   "show": 77.5,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 10.2,
+   "gap": 121.1,
+   "read": 111.8,
+   "draw": 5.5,
+   "show": 3.8,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 5.3,
+   "gap": 119.8,
+   "read": 110.8,
+   "draw": 5.2,
+   "show": 3.8,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 6.6,
+   "gap": 118.3,
+   "read": 109.7,
+   "draw": 5.2,
+   "show": 3.4,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 3.0,
+   "gap": 110.3,
+   "read": 88.5,
+   "draw": 16.5,
+   "show": 5.0,
+   "phase": "after load start"
+  },
+  {
+   "t": 6.0,
+   "gap": 109.7,
+   "read": 95.7,
+   "draw": 10.3,
+   "show": 3.7,
+   "phase": "after transformers imported"
+  },
+  {
+   "t": 8.0,
+   "gap": 87.2,
+   "read": 58.6,
+   "draw": 23.2,
+   "show": 5.4,
+   "phase": "after transformers imported"
+  }
+ ]
+}

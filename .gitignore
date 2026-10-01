@@ -2,14 +2,28 @@ build/
 __pycache__/
 .pytest_cache/
 logs
-datasets
+# datasets/ (owner V1, 2026-09-28): the JSON, JSONL and Markdown files are public; the audio
+# clips never enter git or its history ("I don't want my audio clips randomly sitting in the
+# cloud of microsoft"). A JSON file may name a clip's path; the clip itself stays local.
+datasets/**
+!datasets/**/
+!datasets/**/*.json
+!datasets/**/*.jsonl
+!datasets/**/*.md
+# audio anywhere in the repo: never committed (owner V1, 2026-09-28)
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.opus
 archive
 docs/stale/*
 docs/private/*
 *.log
 
 # Private capture frames (owner room, session/street/desk shots): keep local, never commit
-bench/vision-verify-bench/dataset/images/
+bench/perception/dataset/images/
 
 # Run-time agent locks and local safety archives: never commit (owner 2026-09-28, L2 + K3)
 /LOCK.md
