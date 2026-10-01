@@ -24,8 +24,8 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 
 import config
-from system.fatal import on_die
-from system.status import DOWN, RECOVERING, UP, WAITING, Status, fail
+from runtime.fatal import on_die
+from runtime.status import DOWN, RECOVERING, UP, WAITING, Status, fail
 from util.process import wait_exit
 
 READY_PROBE_SECONDS = 0.5     # how often a readiness probe runs during start-up

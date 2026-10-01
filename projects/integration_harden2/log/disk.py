@@ -6,7 +6,7 @@ import os
 
 import cv2
 
-from system.fatal import die
+from runtime.fatal import die
 from util.guarded import atomic_write
 
 

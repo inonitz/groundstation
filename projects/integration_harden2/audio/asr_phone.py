@@ -24,8 +24,8 @@ import threading
 import time
 
 import config
-from system.fatal import asyncio_crash_handler
-from system.status import DOWN, UP, Status, fail
+from runtime.fatal import asyncio_crash_handler
+from runtime.status import DOWN, UP, Status, fail
 from util.guarded import parse_json, stream_call
 from util.net import port_open
 

@@ -14,7 +14,14 @@ from recognizer.rewrites import register_imperative
 from control.flight import Control
 from dji_app.client import DjiApp
 from perception2.vision import TASK_FULL, TASK_OK
-from support import PLAN_FAILED, PlannerStub, RecordingPhone, dead_port, no_plan
+from support import (
+    PLAN_FAILED,
+    GemmaStub,
+    PlannerStub,
+    RecordingPhone,
+    dead_port,
+    no_plan,
+)
 
 
 # ==================== recognizer: the rules and helpers against their evidence =========
@@ -123,6 +130,13 @@ def test_bypass_answers_only_full_matches():
     assert bypass("נחת עכשיו") == [{"type": "land"}]
     assert bypass("טוס 5 מטרים") is None
     assert bypass("תקשיב, עלה 5 מטרים ואז רד") is None
+    # TR1 (owner 2026-09-28): the wait and the full-turn rules
+    assert bypass("חכה 5 שניות") == [{"type": "delay", "seconds": 5.0}]
+    assert bypass("המתן 2.5 שניות") == [{"type": "delay", "seconds": 2.5}]
+    assert bypass("עשה סיבוב שלם") == [{"type": "spin_by", "degrees": 360.0}]
+    assert bypass("עשה סיבוב שלם נגד כיוון השעון") == [
+        {"type": "spin_by", "degrees": -360.0}
+    ]
 
 
 def test_missing_verb_is_added_to_a_bare_direction():
@@ -672,3 +686,149 @@ def test_a_reject_tells_the_log_why():
     assert p.handle("אל תזוז").kind == "reject"
     assert "negation" in notes["reject_reason"]
     phone.close()
+
+
+TWO_STEPS = [{"type": "fly_by", "dx": 3}, {"type": "spin_by", "degrees": 90}]
+
+
+def test_route_decides_and_sends_nothing():
+    """route() only decides (owner 2026-09-26: "One should make the decision, one should
+    do the acting"): no request reaches the phone app or the vision service, and manual
+    mode stays off. act() then carries the same decision out."""
+    p, w, said, seen = make({
+        "טוס קדימה שלושה מטרים ואז פנה ימינה תשעים מעלות": {
+            "kind": "mission",
+            "target_en": "",
+            "mission": TWO_STEPS,
+        },
+        "סמן את המכונית האדומה": {
+            "kind": "highlight", "target_en": "red car", "mission": []
+        },
+    })
+    recognizer = p.pipeline
+    kinds = []
+    for text in (
+        "עצור",
+        "שליטה ידנית",
+        "תפסיק לעקוב",
+        "עלה עשרה מטרים",
+        "טוס קדימה שלושה מטרים ואז פנה ימינה תשעים מעלות",
+        "סמן את המכונית האדומה",
+        "אל תזוז",
+    ):
+        kinds.append(recognizer.route(text).kind)
+    assert kinds == [
+        "emergency",
+        "manual",
+        "clear",
+        "mission",
+        "mission",
+        "highlight",
+        "reject",
+    ]
+    assert w.seen == [] and seen == [] and said == []
+    assert not recognizer.control.manual_on()
+
+    decision = recognizer.route("טוס קדימה שלושה מטרים ואז פנה ימינה תשעים מעלות")
+    assert decision.tag == "planned" and decision.mission == TWO_STEPS
+    assert recognizer.act(decision).action.startswith("mission(2 steps, planned)")
+    assert flown(w) == [TWO_STEPS]
+
+
+# ==================== numbers: the seven front letters and the fractions ============
+def test_a_number_with_any_of_the_seven_front_letters_is_read():
+    """Owner Q8 (2026-09-27): "ALL SEVEN! THIS WONT ARISE JUST WITH VAV!". Before
+    2026-09-28 "about five" read nothing and "to five" read 1 (HISTORY 2026-09-27)."""
+    for he, want in (
+        ("טוס קדימה 2 מטר ושלושה מטר ימינה", [2.0, 3.0]),      # and
+        ("עלה את החמישה מטרים", [5.0]),                         # the
+        ("עלה בחמישה מטרים", [5.0]),                            # in / by
+        ("חכה לחמש שניות", [5.0]),                              # to / for
+        ("טוס קדימה לא יותר משלושה מטרים", [3.0]),              # from / than
+        ("טוס קדימה כחמישה מטרים", [5.0]),                      # about
+        ("נראה לי שחמישה מטרים יספיקו", [5.0]),                 # that
+    ):
+        assert nums_he(he) == want, he
+    assert hebnum_to_digits("עלה בחמישה מטרים", True) == "עלה ב-5 מטרים"
+    assert hebnum_to_digits("חכה כעשר שניות", True) == "חכה כ-10 שניות"
+    # stage 2 leaves them to Gemma, which reads them (2026-09-28: 23 of 23)
+    assert hebnum_to_digits("עלה בחמישה מטרים") == "עלה בחמישה מטרים"
+
+
+def test_the_article_on_a_number_is_a_count_only_before_a_unit():
+    assert hebnum_to_digits("את השלושה מטרים", True) == "את ה-3 מטרים"
+    assert hebnum_to_digits("הבית השני משמאל", True) == "הבית השני משמאל"
+
+
+def test_two_units_in_a_row_are_two_numbers():
+    # מטר אחד וחמישה מטר = one metre, and five metres (not 5)
+    assert nums_he("עלה מטר אחד וחמישה מטר קדימה") == [1.0, 5.0]
+
+
+def test_the_fractions_are_read():
+    """Owner C.3: "What about 'ורבע'? What about 'ושמינית'?"."""
+    for he, want in (
+        ("עלה מטר ורבע", [1.25]),
+        ("טוס קדימה שניים ורבע מטרים", [2.25]),
+        ("טוס ימינה שניים ושמינית מטרים", [2.125]),
+        ("רד שלושה ושליש מטרים", [3.333]),
+        ("עלה שלושה רבעי מטר", [0.75]),
+        ("טוס קדימה רבע מטר", [0.25]),
+        ("הסתובב רבע סיבוב ימינה", [90.0]),
+        ("הסתובב שלושת רבעי סיבוב", [270.0]),
+        ("הסתובב שמינית סיבוב שמאלה", [45.0]),
+        ("הסתובב שליש סיבוב", [120.0]),
+        ("עשה סיבוב ורבע", [450.0]),
+    ):
+        assert nums_he(he) == want, he
+    # a fraction of a metre is not a bare metre: the text Gemma reads keeps it
+    assert explicit_one_meter("טוס קדימה רבע מטר") == "טוס קדימה רבע מטר"
+
+
+def test_the_number_guard_matches_a_third_within_a_hundredth():
+    third = "רד 3 ושליש מטרים"
+    assert R.numbers_vs_mission(third, [{"type": "fly_by", "dz": -3.33}]) == []
+    assert R.numbers_vs_mission(third, [{"type": "fly_by", "dz": -3}]) == [3.333]
+
+
+# ==================== routing: refused and empty plans (TR3, TR5) ===================
+def test_a_plan_equal_to_a_few_shot_example_is_refused_and_nothing_flies():
+    """TR3: Gemma copied one of its own examples; the sentence carried none of its
+    numbers. The echo guard refuses it, the user hears the read-back, nothing flies."""
+    from recognizer.guards import SHOT_MISSIONS
+    p, w, said, seen = make({
+        "טוס קדימה": {"kind": "mission", "target_en": "", "mission": SHOT_MISSIONS[0]}
+    })
+    assert p.handle("טוס קדימה") == "reject-planner-echo"
+    assert w.seen == [] and seen == []
+    assert said == ["לא הבנתי: טוס קדימה"]
+
+
+def test_an_empty_plan_flies_nothing_and_says_nothing():
+    """TR5: Gemma answered a mission with no steps."""
+    p, w, said, seen = make({
+        "טוס קדימה": {"kind": "mission", "target_en": "", "mission": []}
+    })
+    assert p.handle("טוס קדימה") == "planned-empty"
+    assert w.seen == [] and seen == [] and said == []
+
+
+def test_a_reply_that_is_not_json_is_a_reject_read_back():
+    """TR5: Gemma answered text, not a plan: nothing flies, the user hears the
+    read-back (the request itself did not fail, so it is not "gemma-failed")."""
+    p, w, said, seen = make({})                  # every reply: "not a plan"
+    assert p.handle("טוס קדימה") == "reject"
+    assert w.seen == [] and seen == []
+    assert said == ["לא הבנתי: טוס קדימה"]
+
+
+def test_the_warm_up_is_one_plan_request_that_sends_nothing():
+    """Owner L1: the start-up warm-up asks Gemma the planner's own request (its long
+    prompt fills the server's cache) for a fixed sentence; nothing else happens."""
+    import config
+    from recognizer.recognizer import plan_messages, warm_up
+    gemma = GemmaStub()
+    warm_up(gemma)
+    assert gemma.requests == [plan_messages(config.PLAN_WARM_UP_SENTENCE)]
+    assert gemma.requests[0][0]["role"] == "system"
+

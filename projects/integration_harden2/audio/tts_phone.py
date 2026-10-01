@@ -2,7 +2,7 @@
 speaks it (Hebrew). /tts is served by the same phone app as the drone commands, so its
 health IS the "dji app" row: no row and no retry of its own (owner ruling 2026-09-23). In
 mock mode the mock stands in for the phone and logs the text."""
-from system.fatal import die
+from runtime.fatal import die
 
 
 class PhoneTts:

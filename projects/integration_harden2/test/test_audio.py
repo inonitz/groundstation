@@ -9,6 +9,7 @@ import textwrap
 import time
 
 import numpy as np
+import rclpy
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -18,7 +19,8 @@ from audio.asr_phone import PhoneAsr
 from audio.speech_in import SpeechIn
 from audio.speech_out import SpeechOut
 from audio.tts_phone import PhoneTts
-from system.status import UP
+from runtime.status import UP
+from scripted_e2e_run import publish_transcript, speech_publisher
 from support import RecordingPhone, dead_port, state_of, wait_for
 
 
@@ -41,10 +43,6 @@ def test_capture_device_and_no_recording(monkeypatch):
     monkeypatch.setattr(config, "ASR_CAPTURE_DEVICE", "3")
     argv = asr_ros.argv()
     assert "--captureid=3" in argv and "--record" not in argv
-
-
-def test_clips_land_where_the_session_log_reads_them():
-    assert os.path.basename(config.CLIPS_DIR) == "asr_clips"
 
 
 # ==================== phone speech channel (review R7) ====================
@@ -187,6 +185,25 @@ def test_speech_in_runs_every_source_and_names_it(monkeypatch):
     speech_in.close()
 
 
+def test_a_mic_transcript_over_ros_is_one_turn():
+    """TR4 (owner 2026-09-28, "Go for it man, option A."): the ASR server's transcript,
+    published on config.ASR_TOPIC over a REAL ROS2 topic, reaches the app once, as a
+    "ros" turn. No microphone: the test publishes what the server would."""
+    heard = []
+    speech_in = SpeechIn(["ros"], lambda text, source: heard.append((text, source)))
+    node = rclpy.create_node("test_asr_server")
+    publisher = speech_publisher(node)
+    assert _wait_for(lambda: publisher.get_subscription_count() > 0)
+
+    publish_transcript(publisher, "")                   # an empty transcript: no turn
+    publish_transcript(publisher, "טוס קדימה שלושה מטרים")
+    assert _wait_for(lambda: heard == [("טוס קדימה שלושה מטרים", "ros")])
+    time.sleep(0.5)                                     # and only once
+    assert heard == [("טוס קדימה שלושה מטרים", "ros")]
+    node.destroy_node()
+    speech_in.close()
+
+
 def test_an_unknown_speech_source_dies():
     code = textwrap.dedent(f"""
         import sys
@@ -307,3 +324,24 @@ def test_the_laptop_voice_dies_at_once_on_a_playback_error():
     # no catch: the crash hook dies with the device's own error
     assert "PortAudioError" in r.stderr and "device unplugged" in r.stderr
 
+
+def test_phonikud_loads_only_when_the_laptop_speaks():
+    """Owner D13 + Q6: phonikud (0.4 s) is imported at start only when TTS_OUTPUTS has
+    "laptop"; the app's imports never load it."""
+    code = textwrap.dedent(f'''
+        import sys
+        sys.argv = ["app"]
+        sys.path.insert(0, {HARDEN2!r})
+        import app.main
+        from audio.speech_out import output_class
+        print("AFTER IMPORT", "phonikud" in sys.modules)
+        output_class("phone")
+        print("AFTER PHONE", "phonikud" in sys.modules)
+        output_class("laptop")
+        print("AFTER LAPTOP", "phonikud" in sys.modules)
+    ''')
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       timeout=120)
+    assert "AFTER IMPORT False" in r.stdout, r.stderr[-2000:]
+    assert "AFTER PHONE False" in r.stdout
+    assert "AFTER LAPTOP True" in r.stdout

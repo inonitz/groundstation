@@ -21,7 +21,7 @@ import time
 
 import config
 from log.disk import _atomic_imwrite, _atomic_json, _writable_folder, _written
-from system.fatal import die
+from runtime.fatal import die
 from util.guarded import append_line, rename
 
 

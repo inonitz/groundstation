@@ -5,12 +5,19 @@ way.
 The number guard verifies, it does not trust. Hebrew numbers are read by the SAME
 composer that stage 2 uses (util.hebrew.hebnum_to_digits; the old ad-hoc summer could not
 compose hundreds: שלוש מאות read as 3). This file only pre-normalizes the vocabulary the
-digitizer deliberately leaves alone: construct-state numerals, חצי, and the bare-מטר
-rule.
+digitizer deliberately leaves alone: construct-state numerals, the fractions (util.hebrew
+FRACTIONS: חצי, רבע, שליש, שמינית), and the bare-מטר rule. A number may carry any of
+the seven front letters (util.hebrew FRONT_LETTERS).
 """
 import re
 
-from util.hebrew import NUM_WORDS, hebnum_to_digits
+from util.hebrew import (
+    FRACTION_PLURALS,
+    FRACTIONS,
+    FRONT_LETTERS,
+    NUM_WORDS,
+    hebnum_to_digits,
+)
 
 # Construct-state numerals (שלושת האנשים = the three people) -> plain composer forms.
 CONSTRUCT_NUM = {
@@ -27,27 +34,38 @@ CONSTRUCT_NUM = {
 _PUNCT = ".,!?;:"
 
 
-def is_number_token(token):
-    """A number token: digits, a number word, a construct numeral, or חצי with a clitic
-    prefix. A leading ו ("and") and trailing punctuation are ignored."""
-    core = token.rstrip(_PUNCT).lstrip("ו")
+def is_number_word(word):
+    """Digits, a number word, a construct numeral, or a fraction."""
     return (
-        bool(re.fullmatch(r"\d+(?:\.\d+)?", core))
-        or core in NUM_WORDS
-        or core in CONSTRUCT_NUM
-        or core.lstrip("שבלמכה") == "חצי"
+        bool(re.fullmatch(r"\d+(?:\.\d+)?", word))
+        or word in NUM_WORDS
+        or word in CONSTRUCT_NUM
+        or word in FRACTIONS
+        or word in FRACTION_PLURALS
     )
+
+
+def is_number_token(token):
+    """A number token, with or without one front letter (ב-5, ו5, בחמישה, ורבע).
+    Trailing punctuation is ignored."""
+    word = token.rstrip(_PUNCT)
+    rest = ""
+    if is_number_word(word):
+        return True
+    if word[:1] in FRONT_LETTERS:
+        rest = word[1:].lstrip("-")
+    return is_number_word(rest)
 
 
 def meter_has_number(before, after):
     """Does a מטר between the words `before` and `after` carry its own number?
     Hebrew puts the number on either side (חמישה מטר / מטר אחד). A number AFTER it
-    that starts with ו ("and") begins the NEXT item (מטר וחמישה מטר), except וחצי
-    (מטר וחצי = 1.5 m)."""
+    that starts with ו ("and") begins the NEXT item (מטר וחמישה מטר), except a
+    fraction (מטר וחצי = 1.5 m, מטר ורבע = 1.25 m)."""
     if is_number_token(before):
         return True
     if after.startswith("ו"):
-        return after.rstrip(_PUNCT) == "וחצי"
+        return after.rstrip(_PUNCT)[1:] in FRACTIONS
     return is_number_token(after)
 
 
@@ -96,15 +114,23 @@ EN_NUM = {
 }
 
 
-# חצי of a ROTATION is 180 degrees, not the number 0.5: "חצי סיבוב" read as 0.5 made the
+# A fraction of a ROTATION is degrees, not the number: "חצי סיבוב" read as 0.5 made the
 # guard overwrite DictaLM's correct "Turn right 180 degrees" with "0.5 degrees" (live
-# 2026-09-06, traces/session-20260906-231146.jsonl utterance 30). Both extractors compose
-# the idiom to 180, so a correct "180 degrees" AND a correct "half a turn" both pass the
-# check unpatched. Clitic prefixes ride on חצי too (שחצי פתוח = that is half open): live
-# 2026-09-08 rejected that sentence three times because the bare pattern missed it.
-# סיבוב וחצי (a turn and a half) is 540.
-HE_HALF_TURN_RE = re.compile(r"(?<!\S)(?:[שבלמכה]|ו)?חצי\s+(?:סיבוב|הקפה)(?!\S)")
-HE_TURN_HALF_RE = re.compile(r"(?<!\S)סיבוב\s+וחצי(?!\S)")
+# 2026-09-06, traces/session-20260906-231146.jsonl utterance 30). So חצי סיבוב = 180,
+# רבע סיבוב = 90, שלושת רבעי סיבוב = 270, סיבוב וחצי = 540. A front letter can ride on a
+# fraction (שחצי פתוח = that is half open): live 2026-09-08 rejected that sentence three
+# times because the bare pattern missed it.
+_FRONT = "".join(FRONT_LETTERS)
+_FRACTION = "|".join(FRACTIONS)
+_PLURAL = "|".join(FRACTION_PLURALS)
+_TURN = "(?:סיבוב|הקפה)"
+HE_COUNTED_TURN_RE = re.compile(rf"(?<!\S)(\d+)\s+({_PLURAL})\s+{_TURN}(?!\S)")
+HE_FRACTION_TURN_RE = re.compile(rf"(?<![^\s{_FRONT}])({_FRACTION})\s+{_TURN}(?!\S)")
+HE_TURN_AND_FRACTION_RE = re.compile(rf"(?<!\S){_TURN}\s+ו({_FRACTION})(?!\S)")
+HE_COUNTED_RE = re.compile(rf"(?<!\S)(\d+)\s+({_PLURAL})(?!\S)")
+HE_AND_FRACTION_RE = re.compile(rf"(\d+(?:\.\d+)?)\s+ו({_FRACTION})(?!\S)")
+HE_METER_AND_FRACTION_RE = re.compile(rf"(?<!\S)מטר\s+ו({_FRACTION})(?!\S)")
+HE_FRACTION_RE = re.compile(rf"(?<!\S)[{_FRONT}]?({_FRACTION})(?!\S)")
 EN_HALF_TURN_RE = re.compile(
     r"\b(?:a\s+)?half(?:\s+a|\s+an|-)?\s*(?:turn|rotation|revolution|circle|spin)s?\b",
     re.I
@@ -122,15 +148,56 @@ GLUED_PUNCT_RE = re.compile(r"(?<=\S)[.,!?;:\u2026\"'()]+(?=\s|$)")
 
 
 def _add_half(m):
-    """'N and a half' / 'N וחצי' -> N + 0.5, as text."""
+    """'N and a half' -> N + 0.5, as text."""
     return str(float(m.group(1)) + 0.5)
+
+
+def _number(value):
+    """A value as text, 3 decimals at most (a third)."""
+    return str(round(value, 3))
+
+
+def _meter_and_fraction(m):
+    """מטר ורבע -> '1.25 מטר'."""
+    return _number(1 + FRACTIONS[m.group(1)]) + " מטר"
+
+
+def read_fractions(s):
+    """Every Hebrew fraction in s -> digits (after hebnum_to_digits, so a count before a
+    fraction is already digits: 3 רבעי סיבוב)."""
+    def counted_turn(m):
+        return _number(int(m.group(1)) * FRACTION_PLURALS[m.group(2)] * 360)
+
+    def fraction_turn(m):
+        return _number(FRACTIONS[m.group(1)] * 360)
+
+    def turn_and_fraction(m):
+        return _number((1 + FRACTIONS[m.group(1)]) * 360)
+
+    def counted(m):
+        return _number(int(m.group(1)) * FRACTION_PLURALS[m.group(2)])
+
+    def and_fraction(m):
+        return _number(float(m.group(1)) + FRACTIONS[m.group(2)])
+
+    def fraction(m):
+        return _number(FRACTIONS[m.group(1)])
+
+    s = HE_COUNTED_TURN_RE.sub(counted_turn, s)
+    s = HE_FRACTION_TURN_RE.sub(fraction_turn, s)
+    s = HE_TURN_AND_FRACTION_RE.sub(turn_and_fraction, s)
+    s = HE_COUNTED_RE.sub(counted, s)
+    s = HE_AND_FRACTION_RE.sub(and_fraction, s)
+    s = HE_FRACTION_RE.sub(fraction, s)
+    return s
 
 
 def nums_he(s):
     """Every number in a Hebrew sentence, digits and composed number words, sorted.
     A bare singular unit counts as one (מטר = 1, מטר וחצי = 1.5) -- both were measured
     causes of false rejections. Composition is delegated to hebnum_to_digits, so hundreds
-    (שלוש מאות = 300) and the article exclusion behave exactly as in stage 2."""
+    (שלוש מאות = 300) and the article exclusion behave exactly as in stage 2. Unlike
+    stage 2, it also reads a number word with a front letter (בחמישה = 5)."""
     core = ""
     prefix = ""
     bare_meters = 0
@@ -138,9 +205,7 @@ def nums_he(s):
 
     # "חמישה..." -> "חמישה", "מטר." -> "מטר"
     s = GLUED_PUNCT_RE.sub("", s)
-    s = HE_HALF_TURN_RE.sub("180", s)                # חצי סיבוב = 180 degrees, not 0.5
-    s = HE_TURN_HALF_RE.sub("540", s)                # סיבוב וחצי = 540 degrees
-    s = s.replace("מטר וחצי", "1.5 מטר")
+    s = HE_METER_AND_FRACTION_RE.sub(_meter_and_fraction, s)     # מטר ורבע = 1.25
     toks = s.split()
 
     # a bare מטר counts as one meter (the shared rule: is_bare_meter)
@@ -158,9 +223,8 @@ def nums_he(s):
         prefix = "ו" if t != core else ""
         norm.append(prefix + CONSTRUCT_NUM[core])
 
-    s = hebnum_to_digits(" ".join(norm))
-    s = re.sub(r"(\d+(?:\.\d+)?)\s+וחצי(?!\S)", _add_half, s)
-    s = re.sub(r"(?<!\S)(?:[שבלמכה]|ו)?חצי(?!\S)", "0.5", s)
+    s = hebnum_to_digits(" ".join(norm), front_letters=True)
+    s = read_fractions(s)
     vals = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", s)]
     return sorted(vals + [1.0] * bare_meters)
 

@@ -10,34 +10,31 @@ from PIL import ImageFont
 from PIL import features as pil_features
 
 import config
-from system.fatal import die
+from runtime.fatal import die
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
-PANE_GROUND = (31, 25, 22)  # the dark ground of the status + chat panes (#16191f)
+PANE_GROUND = config.COL_PANE_GROUND   # the dark ground of the status + chat panes
 
 
 # ======================================= fonts =======================================
 # Hebrew/RTL for the chat overlay. OpenCV's Hershey font is ASCII-only, so Hebrew is
 # drawn with a TrueType font (DejaVuSans has Hebrew glyphs). PIL and bidi are required
-# (system/deps.py checks them at start-up); a MISSING FONT is fatal.
-_SZ = config.HE_FONT_SIZE
+# (runtime/deps.py checks them at start-up); a MISSING FONT is fatal.
 # The Hebrew font is REQUIRED (a missing one is fatal, per the owner). Ubuntu (English)
 # and the mono font (tags) are optional niceties: fall back to the Hebrew font if
-# absent. os.path.exists, no try.
-_HE_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+# absent. os.path.exists, no try. The paths and sizes live in config.
+_HE_PATH = config.FONT_HEBREW_PATH
 if not os.path.exists(_HE_PATH):
     die(f"overlay Hebrew font missing: {_HE_PATH} (apt-get install fonts-dejavu)")
-FONT_HE = ImageFont.truetype(_HE_PATH, _SZ)
+FONT_HE = ImageFont.truetype(_HE_PATH, config.HE_FONT_SIZE)
 
-_VAL_PATH = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"
 FONT_VAL = FONT_HE
-if os.path.exists(_VAL_PATH):
-    FONT_VAL = ImageFont.truetype(_VAL_PATH, _SZ)
+if os.path.exists(config.FONT_VALUE_PATH):
+    FONT_VAL = ImageFont.truetype(config.FONT_VALUE_PATH, config.HE_FONT_SIZE)
 
-_TAG_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 FONT_TAG = FONT_HE
-if os.path.exists(_TAG_PATH):
-    FONT_TAG = ImageFont.truetype(_TAG_PATH, _SZ - 2)
+if os.path.exists(config.FONT_TAG_PATH):
+    FONT_TAG = ImageFont.truetype(config.FONT_TAG_PATH, config.TAG_FONT_SIZE)
 
 # Raqm does bidi natively -> do NOT pre-reverse
 RAQM = bool(pil_features.check("raqm"))

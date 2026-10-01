@@ -4,13 +4,16 @@ Hebrew utterance in, a `Routed` out. It parses EVERY sentence: the fast path (em
 manual, auto) goes to control before any model (owner ruling 2026-09-23). Anything the parser
 cannot answer on its own takes ONE Gemma 4 E4B call, which reads the Hebrew directly and returns
 one envelope, `{"kind","target_en","mission"}`: it routes the sentence AND plans the mission.
-The Recognizer sends nothing and says nothing itself.
+It works in two chained steps (owner 2026-09-26): `route(text) -> Decision` decides and sends
+nothing; `act(decision) -> Routed` carries it out. `handle(text)` = `act(route(text))`. The
+recognizer benchmark (bench/recognizer/accuracy.py) calls `route()`, so it measures the guards
+as the app runs them. The Recognizer says nothing itself.
 
 ## Files
 
 | file | role |
 |---|---|
-| `recognizer.py` | THE API: `Recognizer(control, vision, gemma, log).handle(text) -> Routed`, and `plan(he2)`, the one Gemma call (the benches measure it). Routes critical words and missions to control, clear / count / highlight / describe to the vision service (typed). The app shows and speaks `Routed.say`. |
+| `recognizer.py` | THE API: `Recognizer(control, vision, gemma, log)`. `route(text) -> Decision` (decides, sends nothing), `act(decision) -> Routed` (critical words and missions to control, clear / count / highlight / describe to the vision service, typed), `handle(text)` = both, and `plan(he2)`, the one Gemma call. The app shows and speaks `Routed.say`. |
 | `parse.py` | the front half: `recognize_direct(he)` runs the steps below, in order, with no model |
 | `fast_path.py` | the critical words (emergency, manual, auto) and the clear words, EN + HE |
 | `bypass.py` | full-match sentences become missions with no model call (79 of 189 standard commands) |
@@ -22,7 +25,7 @@ The Recognizer sends nothing and says nothing itself.
 
 The rules are tested against their own evidence in `test/test_recognizer.py`.
 
-## Live guards (bench-gated, see bench/hebrew-command-bench/README.md)
+## Live guards (bench-gated, see bench/recognizer/README.md)
 
 - The fast path (fast_path.py): EN + HE stop, manual and auto words act immediately, before any
   model. `EMERGENCY_RE` lives there, and only there.
@@ -34,10 +37,15 @@ The rules are tested against their own evidence in `test/test_recognizer.py`.
 - Reject routing (in `UNIFIED_PROMPT`): a question about the drone (altitude/battery/flight
   time), a bare negation, or anything the actions cannot do -> `kind:"reject"`, read back in
   Hebrew.
-
-Known gap (flagged 2026-09-24, not changed): a number word that starts with ו and begins a new
-item ("וחמישה מטר") is not turned into digits, so the number guard does not see it. Changing that
-changes the text Gemma receives, which needs a bench re-measure.
+- Numbers with a front letter (numbers.py, util/hebrew.py `FRONT_LETTERS`): all seven (ו and,
+  ה the, ב in, ל to, מ from, כ about, ש that; owner Q8). The number guard reads them, written
+  as Hebrew writes a digit (בחמישה -> ב-5). Stage 2 leaves these words to Gemma: it read all
+  23 right, and the digit form lost a case (2026-09-28). ה converts only before a unit
+  (השלושה מטרים); an ordinal (השני) stays a word.
+- Fractions (util/hebrew.py `FRACTIONS`, `FRACTION_PLURALS`): חצי, רבע, שליש, שמינית. After a
+  number they add (שתיים ורבע = 2.25), alone they are their value (רבע מטר = 0.25), of a turn
+  they are degrees (רבע סיבוב = 90, שלושת רבעי סיבוב = 270, סיבוב ורבע = 450). The number
+  guard matches a spoken number within 0.01 (a third: 3.333 vs 3.33).
 
 ## Wiring (one line at assembly)
 
@@ -45,14 +53,15 @@ changes the text Gemma receives, which needs a bench re-measure.
 from recognizer import Recognizer
 recognizer = Recognizer(control, vision, gemma, log)   # the app builds it (app/main.py)
 routed = recognizer.handle(text)       # -> Routed(kind, action, say); the app says routed.say
+decision = recognizer.route(text)      # the benchmark: the decision alone, nothing sent
 ```
 
 ## Sync rule (do not break it)
 
 This folder is the component's SINGLE home: the bench imports it from here and measures it in
-place. Rules change HERE, then `python3 /root/groundstation/bench/hebrew-command-bench/unified_bench.py`
-re-measures; a rule without a full re-measure is unverified. Measured baseline: 412/487
-(2026-09-19); scorecard in the bench README.
+place. Rules change HERE, then `python3 /root/groundstation/bench/recognizer/accuracy.py`
+re-measures (take the gpu lock first); a rule without a full re-measure is unverified. The
+scorecard: bench/recognizer/README.md.
 
 Emergency words (owner ruling 2026-09-08): הפסק/הפסיקי/הפסיקו/תפסיק/תפסיקי/תפסיקו (not when
 followed by ל+עקוב/הדגיש/סמן/הראות/צלם/ספור = a perception clear) and די only as the whole

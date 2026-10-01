@@ -1,4 +1,4 @@
-"""Mission helpers shared by several modules (the chat on screen, log/score.py)."""
+"""Mission helpers: step_text, one mission step as text (the chat on screen)."""
 
 
 def step_text(step):

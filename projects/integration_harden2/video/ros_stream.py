@@ -9,8 +9,8 @@ import numpy as np
 from sensor_msgs.msg import Image
 
 import config
-from system.ros import Subscription
-from system.supervisor import ProcessSpec
+from runtime.ros import Subscription
+from runtime.supervisor import ProcessSpec
 from util.process import native_env
 
 TOPIC = "camera/stream"      # == gstreamer_udp_cam_rx kOutCameraPipelineRawFrameTopic

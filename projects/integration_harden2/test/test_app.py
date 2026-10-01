@@ -1,6 +1,6 @@
-"""Tests for the app module (app/): the global kill key over a REAL ROS2 topic
-(keys.py), the app assembly and its vision flow (main.py), the screen helpers (ui.py),
-and the status and chat panes (status_pane.py, chat_pane.py)."""
+"""Tests for the app module (app/): the global keys' handler, the app assembly and its
+vision flow (main.py), the screen helpers (ui.py), and the status and chat panes
+(status_pane.py, chat_pane.py)."""
 import glob
 import json
 import os
@@ -12,77 +12,28 @@ import time
 import numpy as np
 import pytest
 import rclpy
-from std_msgs.msg import Int32MultiArray, String
+from std_msgs.msg import Int32MultiArray
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import config
 from recognizer import Recognizer
 import app.main as M
 from app import ui as U
-from app.keys import Keys
-from app.turns import Turns, VisionSinks
+from app.turns import NOT_READY_HE, Turns, VisionSinks
 from log.session import SessionLog
-from perception2.backend import DETECT_NOT_READY
+from sam3.contract import DETECT_NOT_READY
 from control.flight import Control
+from dji_app.client import DjiApp
+from log.perf import NO_PERF, Perf
 from perception2.vision import Vision
 from app.chat_pane import render_chat
-from app.status_pane import render_status
-from system.status import StatusBoard
+from app.status_pane import detail_lines, render_status
+from runtime.status import StatusBoard
+from scripted_e2e_run import publish_transcript, speech_publisher
 from support import CAR, GemmaStub, RecordingPhone, StandInBackend, PlannerStub, wait_for
 
 
-# ==================== keys.py: the global kill key ====================
-def _publish(events):
-    """Publish each [code, action] pair from a separate node, as
-    the keyboard hook does."""
-    node = rclpy.create_node("test_keyboard_hook")
-    pub = node.create_publisher(Int32MultiArray, config.KEYBOARD_RAW_TOPIC, 10)
-    deadline = time.time() + 5.0
-    while pub.get_subscription_count() == 0 and time.time() < deadline:
-        time.sleep(0.05)
-    for data in events:
-        msg = Int32MultiArray()
-        msg.data = list(data)
-        pub.publish(msg)
-    time.sleep(0.5)
-    node.destroy_node()
-    return
-
-
-def _run(events):
-    """-> the key codes Keys reported for these key events."""
-    codes = []
-    keys = Keys(on_key=codes.append)
-    _publish(events)
-    keys.close()
-    return codes
-
-
-def test_a_press_is_reported_once():
-    press = [config.KILL_KEY_CODE, config.KEY_ACTION_PRESSED]
-    assert _run([press]) == [config.KILL_KEY_CODE]
-
-
-def test_release_and_repeat_are_not_reported():
-    # holding F4: press, auto-repeat x2, release -> exactly one report
-    events = [
-        [config.KILL_KEY_CODE, 1],
-        [config.KILL_KEY_CODE, 2],
-        [config.KILL_KEY_CODE, 2],
-        [config.KILL_KEY_CODE, 0],
-    ]
-    assert _run(events) == [config.KILL_KEY_CODE]
-
-
-def test_keys_reports_every_key_and_knows_nothing_about_the_drone():
-    # evdev KEY_M = 50, KEY_Q = 16, KEY_C = 46
-    assert _run([[50, 1], [16, 1], [46, 1]]) == [50, 16, 46]
-
-
-def test_short_message_is_ignored():
-    assert _run([[config.KILL_KEY_CODE]]) == []
-
-
+# ==================== main.py: the global keys ====================
 def test_only_function_keys_act_and_letters_never_do():
     """The app's key handler: F4 toggles manual, F1 quits, F2 clears the highlight; a
     letter (typed in another window) does nothing, Q included (owner 2026-09-23: "Use the
@@ -138,7 +89,7 @@ def _wait_for(pred, timeout=3.0):
     return wait_for(pred, timeout)
 
 
-def _app(tmp_path, monkeypatch, hits, plan2=None):
+def _app(tmp_path, monkeypatch, hits, plan2=None, perf=NO_PERF):
     """The app's wiring (as app.main builds it) over the REAL control + phone-app client
     against a REAL local HTTP server, the REAL vision service on a stand-in SAM3, and the
     REAL session log. Gemma's plan is faked by plan2.
@@ -156,7 +107,9 @@ def _app(tmp_path, monkeypatch, hits, plan2=None):
     vision = Vision(StandInBackend(hits), gemma, frame.copy, sinks.sinks(),
                     use_masks=lambda: False)
     phone = RecordingPhone()
-    control = Control(phone.dji, session)
+    # a client with the given perf, on the recording phone's server
+    dji = DjiApp("127.0.0.1", phone.srv.server_address[1], perf=perf)
+    control = Control(dji, session)
     planner = PlannerStub(plan2 or (lambda he: None))
     pipeline = Recognizer(control, vision, planner, session)
 
@@ -164,7 +117,7 @@ def _app(tmp_path, monkeypatch, hits, plan2=None):
         M.S.chat.append(("model", text, "x"))
         spoken.append(text)
 
-    turns = Turns(pipeline, say=say, session=session)
+    turns = Turns(pipeline, say=say, session=session, perf=perf)
     return turns, phone, vision, spoken
 
 
@@ -179,6 +132,10 @@ def test_a_highlight_turn_draws_and_logs_it(tmp_path, monkeypatch):
     turns("סמן את המכונית")
     assert _wait_for(lambda: len(M.S.hl_dets) == 2)
     assert "Highlighting: car" in _chat() and phone.seen == []
+    # CHANGED 2026-09-30 (owner L2): the first box is the gate's own pass, so the
+    # tracking pass is awaited before the clear
+    assert _wait_for(lambda: len(glob.glob(str(tmp_path / "perception" / "*highlight*" /
+                                               "pass_*.json"))) >= 2)
     vision.clear()
     assert _wait_for(lambda: "Cleared the highlight." in _chat())
     assert M.S.hl_dets == []
@@ -248,6 +205,61 @@ def test_a_mission_turn_flies_and_lists_the_steps(tmp_path, monkeypatch):
     phone.close()
 
 
+def _e2e_rows(folder):
+    return [
+        json.loads(line)
+        for line in open(os.path.join(folder, "perf.jsonl"))
+        if json.loads(line)["stage"] == "e2e"
+    ]
+
+
+def test_a_command_turn_ends_the_e2e_timing_when_the_phone_app_answers(tmp_path,
+                                                                        monkeypatch):
+    """C2 (owner M3: ROADMAP's command -> action under 1 s): a transcript with no
+    push-to-talk (the scripted run) starts it; the reply to /c/fly ends it. A turn
+    that sends no command records no e2e."""
+    perf = Perf(str(tmp_path / "perf"))
+    os.makedirs(tmp_path / "perf")
+    plans = iter([
+        {"kind": "mission", "target_en": "", "mission": [{"type": "fly_by", "dx": 5}]},
+        {"kind": "describe", "target_en": "", "mission": []},
+    ])
+    turns, phone, vision, spoken = _app(tmp_path, monkeypatch, {},
+                                        plan2=lambda he: next(plans), perf=perf)
+    turns("טוס קדימה חמישה מטרים בזהירות")
+    turns("מה אתה רואה")
+    perf.close()
+    rows = _e2e_rows(tmp_path / "perf")
+    assert [(r["start"], r["end"]) for r in rows] == [("transcript", "command")]
+    assert 0 <= rows[0]["ms"] < 5000
+    phone.close()
+
+
+def test_a_highlight_turn_waits_for_its_first_box_and_a_release_starts_the_timing(
+        tmp_path, monkeypatch):
+    """C2: the push-to-talk release starts e2e (asr_ms before the transcript); a
+    highlight moves it to the screen, which ends it on the first box it draws."""
+    perf = Perf(str(tmp_path / "perf"))
+    os.makedirs(tmp_path / "perf")
+    M.S.hl_first_box = False
+    turns, phone, vision, spoken = _app(
+        tmp_path, monkeypatch, {"car": CAR},
+        plan2=lambda he: {"kind": "highlight", "target_en": "car", "mission": []},
+        perf=perf)
+    M.on_key_release(config.PUSH_TO_TALK_KEY_CODE, perf)
+    time.sleep(0.6)                                       # the ASR's time
+    turns("סמן את המכונית", source="ros")
+    assert _wait_for(lambda: M.S.hl_first_box)            # the screen's cue
+    assert perf.take_since("e2e") is None                 # no command end for it
+    perf.end("e2e_box", "e2e", end="box")                 # what the screen does
+    vision.clear()
+    perf.close()
+    rows = _e2e_rows(tmp_path / "perf")
+    assert [(r["start"], r["end"]) for r in rows] == [("ptt", "box")]
+    assert rows[0]["ms"] >= 600                            # counted from the release
+    phone.close()
+
+
 def test_an_emergency_turn_is_spoken(tmp_path, monkeypatch):
     turns, phone, vision, spoken = _app(tmp_path, monkeypatch, {})
     turns("עצור")
@@ -257,15 +269,22 @@ def test_an_emergency_turn_is_spoken(tmp_path, monkeypatch):
 
 
 def test_a_phone_transcript_is_recorded_as_phone(tmp_path, monkeypatch):
-    """R27: the transcript's source travels to the session log."""
+    """R27: the transcript's source travels to the session log, and a phone transcript
+    never takes the mic's audio clip.
+    REWRITTEN 2026-09-29 (owner TR14 (2), "option A"): the REAL SessionLog writes the
+    trace; the test reads the written lines. Was: a stand-in for SessionLog.begin."""
     turns, phone, vision, spoken = _app(tmp_path, monkeypatch, {})
-    seen = []
-    monkeypatch.setattr(turns.session, "begin",
-                        lambda text, source="mic": seen.append(source))
-    monkeypatch.setattr(turns.session, "current", lambda: None)
+    clip = tmp_path / "asr_clips" / "audio_000001.wav"
+    clip.write_bytes(b"RIFF")                      # the mic's clip, as the server writes
     turns("שלום", "phone")
     turns("שלום שוב")
-    assert seen == ["phone", "mic"]
+    with open(turns.session.tracepath, encoding="utf-8") as trace:
+        rows = [json.loads(line) for line in trace]
+    assert [r["source"] for r in rows] == ["phone", "mic"]
+    assert rows[0]["audio_clip"] is None
+    # the mic turn renames the clip after its own sequence number
+    mic_clip = "utt_%04d.wav" % rows[1]["seq"]
+    assert rows[1]["audio_clip"] == os.path.join("asr_clips", mic_clip)
     phone.close()
 
 
@@ -282,6 +301,81 @@ def test_a_full_vision_service_closes_the_refused_record(tmp_path, monkeypatch):
                                                            "request.json"))]
     assert any(r["verdict"] == "refused: too many vision tasks" for r in refused)
     vision.clear()
+    phone.close()
+
+
+def _requests(tmp_path, kind):
+    """Every closed request.json of one kind in the test's session."""
+    paths = glob.glob(str(tmp_path / "perception" / f"*{kind}*" / "request.json"))
+    return [json.load(open(path)) for path in paths]
+
+
+def _verdicts(tmp_path, kind):
+    """The verdicts of the closed requests of one kind (an open one has none yet)."""
+    return [r["verdict"] for r in _requests(tmp_path, kind) if r["verdict"] is not None]
+
+
+def test_a_count_of_zero_says_not_found(tmp_path, monkeypatch):
+    """TR6 (owner 2026-09-28, "Option A."): nothing counted is said, not left silent."""
+    turns, phone, vision, spoken = _app(
+        tmp_path, monkeypatch, {},
+        plan2=lambda he: {"kind": "count", "target_en": "cars", "mission": []})
+    turns("כמה מכוניות יש")
+    assert _wait_for(lambda: "לא מצאתי" in spoken)
+    assert "ספרתי 0: cars" in _chat()
+    phone.close()
+
+
+def test_a_highlight_while_sam3_loads_says_not_ready(tmp_path, monkeypatch):
+    """TR6: a highlight asked before SAM3 is loaded says "not ready" and draws
+    nothing; it is never reported as absent."""
+    M.S.target = None                              # no highlight left by another test
+    M.S.hl_dets = []
+    turns, phone, vision, spoken = _app(
+        tmp_path, monkeypatch, {"car": DETECT_NOT_READY},
+        plan2=lambda he: {"kind": "highlight", "target_en": "car", "mission": []})
+    turns("סמן את המכונית")
+    assert _wait_for(lambda: NOT_READY_HE in spoken)
+    assert any("SAM3 is not ready yet" in c for c in _chat())
+    assert not any("in view" in c for c in _chat())
+    assert M.S.hl_dets == [] and M.S.target is None
+    assert _wait_for(lambda: _verdicts(tmp_path, "highlight"))
+    assert _verdicts(tmp_path, "highlight") == [{"not_ready": True}]
+    phone.close()
+
+
+def test_a_lost_highlight_clears_the_drawing_and_says_so(tmp_path, monkeypatch):
+    """TR6: a tracked object that stays gone for HL_GIVEUP seconds ends the highlight:
+    the boxes go, the chat says it, the record closes as given up."""
+    hits = {"car": CAR}
+    turns, phone, vision, spoken = _app(
+        tmp_path, monkeypatch, hits,
+        plan2=lambda he: {"kind": "highlight", "target_en": "car", "mission": []})
+    turns("סמן את המכונית")
+    assert _wait_for(lambda: len(M.S.hl_dets) == 2)
+    hits["car"] = []                               # the car leaves the frame
+    assert _wait_for(lambda: any(c.startswith("לא מצאתי:") for c in _chat()))
+    assert M.S.hl_dets == [] and M.S.target is None
+    assert _wait_for(lambda: _verdicts(tmp_path, "highlight"))
+    assert _verdicts(tmp_path, "highlight") == [{"gave_up": True}]
+    phone.close()
+
+
+def test_a_failed_describe_closes_its_record_with_no_chat_line(tmp_path, monkeypatch):
+    """TR6: when Gemma fails, the describe record closes as failed and the chat gets no
+    answer line (Gemma's state is on the status pane)."""
+    monkeypatch.setattr(GemmaStub, "request", lambda self, *a, **k: (False, ""))
+    turns, phone, vision, spoken = _app(
+        tmp_path, monkeypatch, {},
+        plan2=lambda he: {"kind": "describe", "target_en": "", "mission": []})
+    turns("מה אתה רואה")
+    # request.json is written when the request opens; wait for its verdict
+    assert _wait_for(lambda: _verdicts(tmp_path, "describe"))
+    assert _verdicts(tmp_path, "describe")[0] == {
+        "answer": None,
+        "gemma": "failed"
+    }
+    assert [c for c in M.S.chat if c[2] == "scene"] == [] and spoken == []
     phone.close()
 
 
@@ -311,20 +405,20 @@ class _RecordingPerf:
         return
 
 
-def test_the_frame_record_keeps_the_worst_frame_of_each_second(monkeypatch):
-    clock = iter([0.0, 0.1, 0.2, 0.6, 1.0])
-    monkeypatch.setattr(U.time, "monotonic", lambda: next(clock))
+def test_every_frame_is_recorded_with_its_parts_and_the_gap():
+    """REWRITTEN 2026-09-28 (owner ruling C.1 + V1 a): one "frame" event per frame, not
+    one summary per second.
+    Was: test_the_frame_record_keeps_the_worst_frame_of_each_second."""
     perf = _RecordingPerf()
-    timer = U._FrameTimer(perf)
-    timer.add(0.01, 0.02, 0.01)
-    timer.add(0.01, 0.02, 0.01)
-    timer.add(0.30, 0.02, 0.05)                 # one slow read, then a 400 ms gap
-    timer.add(0.01, 0.02, 0.01)
-    row = perf.rows[0]
-    assert row["stage"] == "frame" and row["fps"] == 4.0
-    assert row["read_max_ms"] == 300.0 and row["show_max_ms"] == 50.0
-    assert row["worst_frame_ms"] == 400.0
-    assert row["read_ms"] == 82.5                   # the mean hides the slow frame
+    U.record_frame(perf, 10.0, 10.3, 10.32, 10.37, 9.97)   # a slow read, a 400 ms gap
+    U.record_frame(perf, 10.37, 10.38, 10.40, 10.41, 10.37)
+    assert [r["stage"] for r in perf.rows] == ["frame", "frame"]
+    slow = perf.rows[0]
+    assert round(slow["ms"]) == 400
+    assert slow["read_ms"] == 300.0
+    assert slow["draw_ms"] == 20.0
+    assert slow["show_ms"] == 50.0
+    assert round(perf.rows[1]["ms"]) == 40
 
 
 def test_scroll_keys_move_the_chat_and_never_go_below_zero():
@@ -385,20 +479,6 @@ def test_mouse_wheel_scrolls_the_chat():
     assert M.S.chat_scroll == 0
 
 
-def test_an_unknown_vision_backend_dies():
-    """An unknown SCENE_SEG -> die() (a hard crash, not an exception), in a child."""
-    here = os.path.dirname(__file__)
-    code = ("import sys, os;"
-            "sys.path.insert(0, os.path.join(%r, '..'));"
-            "from perception2.backend import BackendLoader;"
-            "BackendLoader('yoloe')" % (here,))
-    r = subprocess.run([sys.executable, "-c", code],
-                       env={**os.environ, "MVD_HOME": "integration_harden2"},
-                       capture_output=True, text=True)
-    assert r.returncode != 0, "unknown SCENE_SEG must crash"
-    assert "no vision backend" in r.stderr, r.stderr
-
-
 def test_ascii_only_drops_non_ascii():
     from app.draw import ascii_only
     assert ascii_only("שלום hello") == " hello" and ascii_only(None) == ""
@@ -437,13 +517,29 @@ def test_up_is_green_and_any_other_state_is_red():
         )
 
 
-def test_long_detail_and_many_rows_never_overflow():
-    rows = [
-        (f"system{i}", "FAILED", "exited with code 139; restart 3/3 " * 5)
-        for i in range(40)
-    ]
-    panel = render_status(config.STATUS_W, 300, rows)
-    assert panel.shape == (300, config.STATUS_W, 3)
+def test_a_long_detail_is_cut_and_the_pane_draws_only_the_cut_lines():
+    """TR13 (the owner's design, 2026-09-29: "test that detail_lines actually cuts the
+    sentence ... and is actually given as such to the UI"). detail_lines keeps at most
+    STATUS_DETAIL_LINES lines of STATUS_DETAIL_CHARS characters; the pane drawn from the
+    long detail equals, pixel for pixel, the pane drawn from the cut text.
+    REWRITTEN 2026-09-29. Was: test_long_detail_and_many_rows_never_overflow (the shape
+    only)."""
+    detail = "exited with code 139; restart 3/3 " * 5
+    lines = detail_lines(detail)
+    cut = " ".join(lines)
+    assert len(lines) == config.STATUS_DETAIL_LINES
+    assert all(len(line) <= config.STATUS_DETAIL_CHARS for line in lines)
+    assert len(cut) < len(detail.strip())
+
+    long_rows = [(f"system{i}", "FAILED", detail) for i in range(40)]
+    cut_rows = [(f"system{i}", "FAILED", cut) for i in range(40)]
+    long_pane = render_status(config.STATUS_W, 300, long_rows)
+    cut_pane = render_status(config.STATUS_W, 300, cut_rows)
+    assert np.array_equal(long_pane, cut_pane)
+    # the detail is drawn at all: a pane without it differs
+    bare_rows = [(name, state, "") for name, state, _ in cut_rows]
+    bare_pane = render_status(config.STATUS_W, 300, bare_rows)
+    assert not np.array_equal(long_pane, bare_pane)
 
 
 def test_status_pane_takes_its_width_from_the_caller():
@@ -583,7 +679,7 @@ class _LiveApp:
         )
         M.ros.start()
         self.node = rclpy.create_node("test_whole_app")
-        self.speech = self.node.create_publisher(String, config.ASR_TOPIC, 10)
+        self.speech = speech_publisher(self.node)
         self.keys = self.node.create_publisher(
             Int32MultiArray,
             config.KEYBOARD_RAW_TOPIC,
@@ -637,10 +733,8 @@ class _LiveApp:
         """Publish one transcript, as the ASR server does, and wait until the mock gets a
         new request on `path`. -> the new bodies on that path."""
         before = len(self.commands(path))
-        msg = String()
-        msg.data = text
         wait_for(lambda: self.speech.get_subscription_count() > 0, 10.0)
-        self.speech.publish(msg)
+        publish_transcript(self.speech, text)
         assert wait_for(lambda: len(self.commands(path)) > before, ANSWER_SECONDS), (
             f"no {path} after {text!r}\n{self.output()[-3000:]}"
         )
@@ -672,7 +766,7 @@ def _gemma_pid():
     not APP_TEST,
     reason="the whole app: GPU, webcam, mic, ~5 min; set HARDEN2_APP_TEST=1"
 )
-def test_the_whole_app_over_ros(tmp_path):
+def test_app_end_to_end_over_ros(tmp_path):
     running = subprocess.run(["pgrep", "-f", "app[.]main"], capture_output=True)
     assert running.returncode == 1, "another app is running: run.sh down first"
     assert _gemma_pid() is None, "a Gemma server holds the app's port"

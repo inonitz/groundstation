@@ -37,11 +37,20 @@ def test_committed_utterances_are_durable_and_complete():
 
 
 def test_atomic_json_leaves_no_tmp_and_valid_file():
-    d, _ = _session()
-    p = os.path.join(d, "x.json")
-    SL._atomic_json(p, {"a": 1, "ב": "שלום"})
-    assert json.load(open(p))["ב"] == "שלום"
-    assert not os.path.exists(p + ".tmp")           # temp renamed away, not left behind
+    """REWRITTEN 2026-09-28 (owner D6 a): through SessionLog's own writes, not the
+    underscore helper of log/disk.py. A request's JSON (Hebrew included) and a pass's
+    JPEG + JSON are whole files, and no temp file stays behind."""
+    d, log = _session()
+    log.begin("סמן את הכוס")
+    rel = log.begin_request("highlight", "cup", query="שלום")
+    log.save_pass(np.zeros((8, 8, 3), np.uint8), {"n": 1})
+    log.end_request({"present": True})
+    req = os.path.join(d, rel)
+    assert json.load(open(os.path.join(req, "request.json")))["query"] == "שלום"
+    assert json.load(open(os.path.join(req, "pass_00000.json")))["n"] == 1
+    assert open(os.path.join(req, "pass_00000.jpg"), "rb").read(2) == b"\xff\xd8"
+    assert json.load(open(os.path.join(d, "meta.json")))["session"]
+    assert glob.glob(os.path.join(d, "**", "*.tmp"), recursive=True) == []
 
 
 def test_perception_pairing_after_clean_request():
@@ -306,53 +315,164 @@ def test_only_a_mic_utterance_claims_the_audio_clip():
 
 
 # ==================== perf.py and perf_report.py ====================
-def test_perf_records_one_line_per_event_and_times_a_mark(tmp_path):
-    import json
+def _perf_rows(folder):
+    return [json.loads(line) for line in open(os.path.join(folder, "perf.jsonl"))]
+
+
+def test_perf_buffers_every_event_and_writes_it_on_close(tmp_path):
+    """REWRITTEN 2026-09-28 (owner ruling C.1, R7): events go to a memory buffer, not
+    straight to disk. Was: test_perf_records_one_line_per_event_and_times_a_mark."""
     from log.perf import Perf
     perf = Perf(str(tmp_path))
     perf.record("gemma", 12.34, label="plan")
     perf.mark("ptt_release")
     assert perf.take_since("ptt_release") >= 0
     assert perf.take_since("ptt_release") is None          # a mark is used once
-    rows = [json.loads(line) for line in open(tmp_path / "perf.jsonl")]
+    assert not (tmp_path / "perf.jsonl").exists()          # buffered, not written yet
+    perf.close()
+    rows = _perf_rows(tmp_path)
     assert rows[0]["stage"] == "gemma" and rows[0]["ms"] == 12.3
     assert rows[0]["label"] == "plan"
+
+
+def test_a_mark_moves_and_ends_with_its_fields(tmp_path):
+    """C2: mark(ago_ms) starts a timing in the past (the push-to-talk release);
+    move_mark hands it on (a highlight -> its box); end() records it once."""
+    from log.perf import Perf
+    perf = Perf(str(tmp_path))
+    perf.mark("e2e", ago_ms=500, start="ptt")
+    perf.move_mark("e2e", "e2e_box")
+    perf.end("e2e", "e2e", end="command")                 # moved: nothing to end
+    perf.end("e2e_box", "e2e", end="box")
+    perf.end("e2e_box", "e2e", end="box")                 # a mark ends once
+    perf.move_mark("nothing", "e2e_box")
+    perf.close()
+    rows = _perf_rows(tmp_path)
+    assert [(r["stage"], r["start"], r["end"]) for r in rows] == [("e2e", "ptt", "box")]
+    assert 500 <= rows[0]["ms"] < 1500
+
+
+def test_the_writer_thread_writes_the_buffer_every_period(tmp_path, monkeypatch):
+    import config
+    from log.perf import Perf
+    monkeypatch.setattr(config, "PERF_FLUSH_SECONDS", 0.05)
+    perf = Perf(str(tmp_path))
+    for i in range(3):
+        perf.record("frame", i, read_ms=0, draw_ms=0, show_ms=0)
+    deadline = time.monotonic() + 5
+    while not (tmp_path / "perf.jsonl").exists() and time.monotonic() < deadline:
+        time.sleep(0.02)
+    assert [r["ms"] for r in _perf_rows(tmp_path)] == [0, 1, 2]   # in order, no close
+    perf.record("frame", 3, read_ms=0, draw_ms=0, show_ms=0)
+    perf.close()
+    assert [r["ms"] for r in _perf_rows(tmp_path)] == [0, 1, 2, 3]
+
+
+def test_die_writes_the_perf_buffer_before_every_other_cleanup(tmp_path):
+    """C.1: a crash keeps its timings; perf goes first, even when the supervisor
+    registered its cleanup earlier."""
+    import textwrap
+    code = textwrap.dedent(f'''
+        import os, sys; sys.path.insert(0, {HARDEN2!r})
+        from runtime.fatal import die, on_die
+        from log.perf import Perf
+        path = os.path.join({str(tmp_path)!r}, "perf.jsonl")
+        on_die(lambda: print("WRITTEN BEFORE", os.path.exists(path), flush=True))
+        perf = Perf({str(tmp_path)!r})
+        perf.record("turn", 7.0, kind="flight")
+        die("boom")
+    ''')
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert r.returncode == 1 and "FATAL: boom" in r.stderr
+    assert "WRITTEN BEFORE True" in r.stdout
+    assert _perf_rows(tmp_path)[0]["kind"] == "flight"
+
+
+def test_startup_records_each_row_when_it_is_first_up(tmp_path, monkeypatch):
+    import config
+    from log.perf import Perf
+    from runtime.status import STARTING, UP
+    monkeypatch.setattr(config, "PERF_STARTUP_POLL_SECONDS", 0.01)
+    states = {"gemma": STARTING, "sam3": STARTING}
+    perf = Perf(str(tmp_path))
+    perf.watch_startup(lambda: [(n, s, "") for n, s in states.items()], time.monotonic())
+    time.sleep(0.05)
+    states["sam3"] = UP
+    time.sleep(0.05)
+    states["sam3"] = STARTING                  # a later restart is not a start-up
+    states["gemma"] = UP
+    time.sleep(0.05)
+    states["sam3"] = UP
+    time.sleep(0.05)
+    perf.close()
+    rows = [r["row"] for r in _perf_rows(tmp_path) if r["stage"] == "startup"]
+    assert rows == ["sam3", "gemma", "every row"]
+
+
+def test_the_gpu_sampler_records_memory_and_load(tmp_path, monkeypatch):
+    import config
+    import pytest
+    from log.perf import Perf
+    if shutil.which("nvidia-smi") is None:
+        pytest.skip("no NVIDIA driver: no GPU samples by design")
+    monkeypatch.setattr(config, "PERF_GPU_SAMPLE_SECONDS", 0.02)
+    perf = Perf(str(tmp_path))
+    perf.start_gpu_sampler()
+    time.sleep(0.2)
+    perf.close()
+    gpu = [r for r in _perf_rows(tmp_path) if r["stage"] == "gpu"]
+    assert gpu and gpu[0]["mem_mib"] > 0 and 0 <= gpu[0]["load_pct"] <= 100
 
 
 def test_no_perf_records_nothing(tmp_path):
     from log.perf import NO_PERF
     NO_PERF.record("gemma", 1.0)
+    NO_PERF.flush()
     assert list(tmp_path.iterdir()) == []
 
 
 def test_the_perf_report_gives_percentiles_per_stage(tmp_path):
+    """REWRITTEN 2026-09-28 (owner ruling C.1: n, min, P25, P50, P75, P95, P99, max; the
+    frame is one event per frame): the frame row and the header changed."""
     from log.perf import Perf
     from log.perf_report import percentile, report
     perf = Perf(str(tmp_path))
     for ms in range(1, 101):
         perf.record("sam3", ms, wait_ms=ms / 2, priority=0)
-    perf.record("frame", 30, fps=25, read_ms=1, draw_ms=20, show_ms=9)
+    perf.record("frame", 30, read_ms=1, draw_ms=20, show_ms=9)
+    perf.close()
     assert percentile(list(range(1, 101)), 50) == 50
     assert percentile(list(range(1, 101)), 95) == 95
-    text = "\n".join(report(str(tmp_path)))
-    assert "sam3" in text and "waiting for the lock" in text and "fps p50 25" in text
+    lines = report(str(tmp_path))
+    text = "\n".join(lines)
+    assert "min" in lines[1] and "P25" in lines[1] and "P99" in lines[1]
+    sam3 = next(line for line in lines if line.startswith("sam3"))
+    assert sam3.split() == ["sam3", "100", "1.0", "25.0", "50.0", "75.0", "95.0", "99.0",
+                            "100.0"]
+    assert "waiting for the lock" in text and "  draw" in text
 
 
-def test_the_perf_report_lists_the_slow_seconds(tmp_path):
+def test_the_perf_report_lists_the_slowest_frames(tmp_path):
+    """REWRITTEN 2026-09-28 (owner ruling V1 a: the 20 slowest frames with their times,
+    no fps threshold). Was: test_the_perf_report_lists_the_slow_seconds."""
     from log.perf import Perf
     from log.perf_report import report
     perf = Perf(str(tmp_path))
-    perf.record("frame", 30, fps=25, read_ms=1, draw_ms=20, show_ms=9, read_max_ms=2,
-                draw_max_ms=22, show_max_ms=10, worst_frame_ms=40)
-    perf.record("frame", 90, fps=3.6, read_ms=80, draw_ms=5, show_ms=5, read_max_ms=250,
-                draw_max_ms=6, show_max_ms=7, worst_frame_ms=270)
-    text = "\n".join(report(str(tmp_path)))
-    assert "slow seconds (fps < 10): 1; worst frame max 270 ms" in text
-    assert "read / draw / show max: 250 / 6 / 7" in text
+    for gap in range(1, 31):
+        perf.record("frame", gap, read_ms=gap / 2, draw_ms=1, show_ms=2)
+    perf.record("frame", 270, read_ms=250, draw_ms=6, show_ms=7)
+    perf.close()
+    lines = report(str(tmp_path), slowest=20)
+    at = next(i for i, line in enumerate(lines) if "slowest frames" in line)
+    assert "the 20 slowest frames of 31" in lines[at]
+    frames = lines[at + 2:]
+    assert len(frames) == 20
+    assert frames[0].split()[1:] == ["270.0", "250.0", "6.0", "7.0"]
+    assert frames[-1].split()[1] == "12.0"            # 30 .. 12 follow the 270 ms one
 
 
 def test_the_scripted_run_reads_sentences_and_waits(tmp_path):
-    from app.feed import read_script
+    from scripted_e2e_run import read_script
     script = tmp_path / "s.txt"
     script.write_text("# a comment\nמה אתה רואה?\nwait 2.5\n\nטוס קדימה # inline\n")
     assert read_script(str(script)) == [
@@ -360,4 +480,16 @@ def test_the_scripted_run_reads_sentences_and_waits(tmp_path):
         ("wait", 2.5),
         ("say", "טוס קדימה"),
     ]
+
+
+def test_the_scripted_run_refuses_anything_but_the_mock():
+    """SAFETY: its sentences become commands. With CONTROL=real it dies before it
+    waits for Gemma or publishes anything. The IP is a documentation address."""
+    env = dict(os.environ, CONTROL="real", PHONE_IP="203.0.113.1")
+    script = os.path.join(HARDEN2, "test", "scripted_e2e_run.py")
+    r = subprocess.run([sys.executable, script], env=env, capture_output=True, text=True,
+                       timeout=60)
+    assert r.returncode == 1
+    assert "it runs only with CONTROL=mock" in r.stderr
+    assert "[feed]" not in r.stdout
 

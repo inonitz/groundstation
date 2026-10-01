@@ -23,8 +23,8 @@ from typing import Callable
 
 import config
 from perception2 import vlm_client
-from perception2.backend import DETECT_OK
-from perception2.boxes import frame_area
+from sam3.contract import DETECT_OK
+from util.boxes import frame_area
 from perception2.concept import phrase_concepts
 from perception2.counting import count_instances, median_count
 from perception2.dispatcher import SUBMIT_OK, Dispatcher
@@ -90,7 +90,7 @@ class Vision:
         max_tasks=config.VISION_MAX_TASKS,
         perf=NO_PERF
     ):
-        """@sam3: the SAM3 service (perception2.backend.BackendLoader).
+        """@sam3: the SAM3 service (sam3.loader.BackendLoader).
         @gemma: the Gemma service (gemma.client.Gemma), for describe and the Gemma gate.
         @snapshot: () -> a private copy of the latest video frame, or None.
         @sinks: the app's callbacks (Sinks). @use_masks: () -> bool, the masks switch.
@@ -258,7 +258,9 @@ class Vision:
             self._sinks.on_highlight(update)
             return
 
-        self._track(task, phrase, concepts, best)
+        # the gate's own boxes are the first drawn update (owner L2): no second SAM3
+        # pass before the first box
+        self._track(task, phrase, concepts, best, first_look=(frame, raw))
         return
 
     def _gate(self, frame, phrase, concepts):
@@ -277,6 +279,9 @@ class Vision:
         # GATE=vlm or either: Gemma answers first
         if config.GATE != "sam3":
             present, _ = self._engine.presence_gate(frame, phrase)
+        # GATE=vlm: Gemma alone decides, so a refusal is Gemma's (owner O4)
+        if config.GATE == "vlm" and not present:
+            veto = "Gemma does not see it"
 
         # GATE=sam3, or GATE=either when Gemma said no: SAM3 decides
         if config.GATE == "sam3" or (config.GATE == "either" and not present):
@@ -315,13 +320,16 @@ class Vision:
             veto = verdict.reason
         return present, raw, best, veto, True
 
-    def _track(self, task, phrase, concepts, best=0.0):
+    def _track(self, task, phrase, concepts, best=0.0, first_look=None):
         """Re-detect every SAM3_PERIOD, counted from the START of each detect, until
-        the highlight is cleared or lost."""
+        the highlight is cleared or lost. @first_look: (frame, raw detections) the gate
+        already has; they make the first update without a new SAM3 pass (owner L2). An
+        empty one (GATE=vlm asks Gemma, not SAM3) is not used."""
         started = 0.0
         elapsed = 0.0
         miss_since = None
         first = True
+        raw = []
 
         self.clear()  # One highlight at a time: stop the old one, register this one.
         stop = threading.Event()
@@ -340,12 +348,24 @@ class Vision:
                 continue
 
             use_masks = self._use_masks()
-            dets, masks, _ = self._engine.highlight_step(
-                frame,
-                concepts,
-                None,
-                use_masks
-            )
+            raw = first_look[1] if first_look else []
+            if raw:
+                frame = first_look[0]
+                dets, masks, _ = self._engine.draw_step(
+                    frame,
+                    raw,
+                    concepts,
+                    None,
+                    use_masks
+                )
+            else:
+                dets, masks, _ = self._engine.highlight_step(
+                    frame,
+                    concepts,
+                    None,
+                    use_masks
+                )
+            first_look = None
             dets, masks = _drop_specks(frame, dets, masks)
 
             update = HighlightUpdate(

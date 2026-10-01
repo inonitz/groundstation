@@ -7,8 +7,8 @@ import os
 from std_msgs.msg import String
 
 import config
-from system.ros import Subscription
-from system.supervisor import ProcessSpec
+from runtime.ros import Subscription
+from runtime.supervisor import ProcessSpec
 from util.process import native_env
 
 

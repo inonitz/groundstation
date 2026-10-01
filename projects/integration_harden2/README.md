@@ -24,17 +24,19 @@ in place. Python talks to the phone app's frozen ApiServer — no C++ FMU engine
 
 | path | role |
 |---|---|
-| app/ | main.py (starts every module, in order), turns.py (one spoken turn + the vision results -> chat, speech, log), ui.py (the screen: camera, status, chat), draw.py (fonts, text wrapping, a labelled box), chat_rows.py (the chat lines -> tagged, coloured rows), chat_pane.py (draws the chat pane), status_pane.py (draws the status pane), state.py (shared state), keys.py (the global keys from the keyboard hook: F1 quit, F2 clear the highlight, F4 kill; the F5 release times the ASR) |
+| app/ | main.py (starts every module, in order), turns.py (one spoken turn + the vision results -> chat, speech, log), ui.py (the screen: camera, status, chat), draw.py (fonts, text wrapping, a labelled box), chat_rows.py (the chat lines -> tagged, coloured rows), chat_pane.py (draws the chat pane), status_pane.py (draws the status pane), state.py (shared state) |
+| keys/ | keys.py (the global keys from the keyboard hook: F1 quit, F2 clear the highlight, F4 kill; the F5 release times the ASR and e2e) |
 | dji_app/ | client.py: the phone-app client (http.HTTPStatus results, loopback-guarded, the transmit switch, /tts, the mock's ProcessSpec) |
-| util/ | standalone helpers shared by several modules: guarded.py (the ONLY try/except around third-party calls: HTTP, JSON, files, streams), net.py (port_open, the JSON header), process.py (native_env, wait_exit), hebrew.py (Hebrew numbers and letters), mission.py (a mission step as text) |
+| util/ | standalone helpers shared by several modules: guarded.py (the ONLY try/except around third-party calls: HTTP, JSON, files, streams), net.py (port_open, the JSON header), process.py (native_env, wait_exit), hebrew.py (Hebrew numbers and letters), mission.py (a mission step as text), boxes.py (the box overlap math: area, intersection, iou, inside; used by sam3/ and perception2/) |
 | control/ | flight.py: executes flight (critical commands, missions) and is the ONLY user of the phone app's transmit switch; parses nothing |
-| log/ | session.py (the recording: SessionLog(folder)), disk.py (its atomic writes and the start-up folder check), session_files.py (latest_session, trace_file for the read-only tools), perf.py (every run's timings: perf.jsonl) + perf_report.py (`run.sh perf`), show.py and score.py (read-only tools) |
+| log/ | session.py (the recording: SessionLog(folder)), disk.py (its atomic writes and the start-up folder check), session_files.py (latest_session, trace_file for the read-only tools), perf.py (every run's timings: a buffer, written to perf.jsonl every 5 s) + perf_report.py (`run.sh perf`), show.py (a read-only tool) |
 | audio/ | speech_in.py (SpeechIn over config.ASR_SOURCES: asr_ros.py = the laptop mic through our ASR server, asr_phone.py = the phone's speech), speech_out.py (SpeechOut over config.TTS_OUTPUTS: tts_phone.py = the phone app's /tts, tts_laptop.py = offline phonikud) |
-| video/ | video.py (Video: ONE source from config.VIDEO; opens, retries, reports its row, hands out frames, the stall guard), ros_stream.py (the phone's video via gstreamer + ROS2), cam_list.py (lists cameras) |
+| video/ | video.py (Video: ONE source from config.VIDEO; opens, retries, reports its row, hands out frames, the stall guard), ros_stream.py (the phone's video via gstreamer + ROS2), cam_list.py (lists every camera for `run.sh status`; `--selected`: only WEBCAM_DEV, for the preflight) |
 | recognizer/ | the Recognizer: parses every sentence (fast path, bypass, guards, rewrites) and routes it; ONE Gemma call plans the rest (own README) |
-| perception2/ | vision: the vision service (one thread per task, the SAM3 priority lock), the SAM3 backend, the engine, concepts, counting, verify, the Gemma vision prompt (own README) |
+| sam3/ | the SAM3 service: contract.py (the backend contract), loader.py (BackendLoader: loads at start on its own thread; the "sam3" row), model.py (Sam3Backend) (own README) |
+| perception2/ | the vision system: the vision service (one thread per task, the SAM3 priority lock), the engine, concepts, counting, verify, the Gemma vision prompt (own README) |
 | gemma/ | keeps the ONE Gemma server alive (server.py) and gives the one client to it (client.py) |
-| system/ | fatal.py (die + crash hooks), status.py (Status: a row its owner sets; StatusBoard: asks each part for its rows), supervisor.py (ProcessSpec -> Process handle that owns its row; restarts, waits or dies), ros.py (the ONE ROS2 context + Subscription) |
+| runtime/ | fatal.py (die + crash hooks), status.py (Status: a row its owner sets; StatusBoard: asks each part for its rows), supervisor.py (ProcessSpec -> Process handle that owns its row; restarts, waits or dies), ros.py (the ONE ROS2 context + Subscription) |
 | config/ | constants.py (baked values) + defaults.py (env-overridable); the one home of every setting |
 | test/ | one test file per module: app, audio, control, dji_app, gemma, log, perception2, recognizer, system, util, video |
 | top-level | run.sh (launches the app: `python3 -m app.main`) |
@@ -75,12 +77,12 @@ After a container rebuild run `bash /root/groundstation/tools/devenv/install-run
 bash /root/groundstation/projects/integration_harden2/run.sh up webcam mock
 # the scripted run (fixed sentences on the ASR topic, mock only), then the timing report:
 SCRIPT=default bash /root/groundstation/projects/integration_harden2/run.sh up webcam mock
-bash /root/groundstation/projects/integration_harden2/run.sh perf        # p50/p95/max per stage
+bash /root/groundstation/projects/integration_harden2/run.sh perf        # min/P25..P99/max per stage + the 20 slowest frames
 # real drone video + real control (HUMAN-only, aircraft SECURED):
 PHONE_IP=<ip> bash /root/groundstation/projects/integration_harden2/run.sh up dji real
 ```
 `dji` video flows gstreamer_rx -> camera/stream -> video/ros_stream.py (sole :5600 client).
-`run.sh preflight` checks ports, system/deps.py (packages, programs, model files), ONE ggml version
+`run.sh preflight` checks ports, runtime/deps.py (packages, programs, model files), ONE ggml version
 and cameras. Every command, setting, key and flag: docs/spec-harden2-run-arguments.md.
 
 Panes (tmux windows): `app` · `vlm` · `asr` · `keys` · (`gst` in dji mode) · (`mock` in mock
@@ -156,8 +158,8 @@ Boot the desk stack with `VIDEO=webcam TTS_OUTPUTS= bash /root/groundstation/too
 ## Operator kill switch
 
 **F4** toggles the manual override, from ANY window. The global keyboard hook (the "keys" process)
-reads the key and the app gets it on /keyboard/in/raw (app/keys.py). A function key, not a letter:
+reads the key and the app gets it on /keyboard/in/raw (keys/keys.py). A function key, not a letter:
 letters are typed in other windows. First press = override ON (POST /c/stop = `stop(emergency)`: our
 virtual-stick authority is relinquished, the RC flies; every motion verb is refused with 409). Next
-press = re-arm. The HUD line turns red while the override is on. Code: control/flight.py, app/keys.py;
+press = re-arm. The HUD line turns red while the override is on. Code: control/flight.py, keys/keys.py;
 tests: test/test_control.py, test/test_app.py. Not yet pressed in a live session.

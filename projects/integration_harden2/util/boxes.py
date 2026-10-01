@@ -1,4 +1,4 @@
-"""Box geometry for perception2: ONE home for the overlap math. A box is
+"""Box geometry shared by sam3/ and perception2/: ONE home for the overlap math. A box is
 (x1, y1, x2, y2) in pixels, top-left origin."""
 
 

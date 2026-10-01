@@ -17,8 +17,8 @@ The three measured mechanisms this file owns (evidence: the live desk loop):
 """
 import numpy as np
 
-from perception2 import boxes
-from perception2.backend import DETECT_OK
+from util import boxes
+from sam3.contract import DETECT_OK
 
 
 def scale_vlm_box(box, frame_shape):
@@ -108,6 +108,17 @@ class PerceptionEngine:
         status, raw = self.detect(frame, target, self.floor)
         if status != DETECT_OK:
             raw = []
+        dets, masks, debug = self.draw_step(frame, raw, target, vlm_box_px, use_sam)
+        debug["status"] = status
+        return dets, masks, debug
+
+    def draw_step(self, frame, raw, target, vlm_box_px=None, use_sam=True):
+        """What highlight_step draws from detections it already has (the gate's own:
+        owner L2). -> (dets, masks, debug)."""
+        best = 0.0
+        threshold = 0.0
+        kept = []
+        fallback = None
 
         # the relative-confidence gate (mechanism 1)
         best = raw[0]["conf"] if raw else 0.0
@@ -120,7 +131,7 @@ class PerceptionEngine:
             fallback = {"label": f"{target} (vlm)", "conf": 1.0, "box": vlm_box_px}
             # SAME hygiene as the primary path
             dets, masks = self.apply_masks(frame, [fallback], use_sam)
-        return dets, masks, {"status": status, "raw": raw, "threshold": threshold}
+        return dets, masks, {"raw": raw, "threshold": threshold}
 
     def presence_gate(self, frame, phrase):
         """Ask the VLM whether the phrase is actually visible (mechanism

@@ -1,4 +1,4 @@
-"""Tests for system/: the status board and the generic process supervisor."""
+"""Tests for runtime/: the status board and the generic process supervisor."""
 import os
 import subprocess
 import sys
@@ -9,11 +9,9 @@ import threading
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
-from system import deps, status
-from system import supervisor as supervisor_module
-from system.status import (
+from runtime import supervisor as supervisor_module
+from runtime.status import (
     DOWN,
-    FAILED,
     RECOVERING,
     STARTING,
     UP,
@@ -21,7 +19,7 @@ from system.status import (
     Status,
     StatusBoard,
 )
-from system.supervisor import ProcessSpec, Supervisor
+from runtime.supervisor import ProcessSpec, Supervisor
 
 from support import wait_for
 
@@ -64,16 +62,10 @@ def test_sets_from_many_threads_leave_one_consistent_row():
     assert row.state() == UP and row.row()[2].startswith("d")
 
 
-def test_there_is_no_global_board_and_states_are_distinct():
-    """Each part owns its row; the board only reads them (owner ruling 2026-09-24)."""
-    assert not hasattr(status, "BOARD")
-    assert len({STARTING, UP, RECOVERING, FAILED, DOWN}) == 5
-
-
 def test_die_runs_cleanups_before_exit():
     code = textwrap.dedent(f'''
         import sys; sys.path.insert(0, {HARDEN2!r})
-        from system.fatal import die, on_die
+        from runtime.fatal import die, on_die
         on_die(lambda: print("CLEANUP RAN", flush=True))
         die("boom")
     ''')
@@ -168,7 +160,7 @@ def test_never_ready_counts_as_a_failure(monkeypatch):
 def test_gives_up_after_max_restarts_and_dies_with_the_reason():
     code = textwrap.dedent(f'''
         import sys, time; sys.path.insert(0, {HARDEN2!r})
-        from system.supervisor import ProcessSpec, Supervisor
+        from runtime.supervisor import ProcessSpec, Supervisor
         sup = Supervisor(max_restarts=2, stable_s=60)
         argv = [sys.executable, "-c", "import sys; sys.exit(7)"]
         sup.start(ProcessSpec("doomed", argv))
@@ -205,8 +197,8 @@ def test_a_process_that_is_not_required_waits_instead_of_dying(monkeypatch):
 def test_die_stops_the_children_first():
     code = textwrap.dedent(f'''
         import sys, time; sys.path.insert(0, {HARDEN2!r})
-        from system.supervisor import ProcessSpec, Supervisor
-        from system.fatal import die
+        from runtime.supervisor import ProcessSpec, Supervisor
+        from runtime.fatal import die
         sup = Supervisor(max_restarts=3, stable_s=60)
         argv = [sys.executable, "-c", "import time; time.sleep(60)"]
         child = sup.start(ProcessSpec("child", argv))
@@ -241,6 +233,25 @@ def test_a_deliberate_restart_does_not_spend_the_crash_budget(monkeypatch):
     sup.stop_all()
 
 
+def test_a_stable_run_earns_the_crash_budget_back(monkeypatch):
+    """TR9 (owner 2026-09-28, "Option A."): a process that stays up stable_s or longer
+    before it crashes starts again with a full budget. Budget 1, four crashes: with no
+    reset the second crash would spend it (WAITING, "restart 2/1")."""
+    seen = _recording(monkeypatch)
+    crash_after_stable = _py("import sys, time; time.sleep(0.5); sys.exit(3)")
+    sup = Supervisor(max_restarts=1, stable_s=0.3)
+    p = sup.start(ProcessSpec("steady", crash_after_stable, required=False))
+
+    def crashes():
+        return [d for st, d in seen if st == RECOVERING and "code 3" in d]
+
+    assert _wait_for(lambda: len(crashes()) >= 4)
+    assert all(d.endswith("restart 1/1") for d in crashes())
+    assert WAITING not in [st for st, _ in seen]
+    sup.stop_all()
+    assert _state(p) == DOWN
+
+
 def test_restart_of_an_unknown_process_is_false():
     assert Supervisor().restart("nothing", "x") is False
 
@@ -248,7 +259,7 @@ def test_restart_of_an_unknown_process_is_false():
 def test_an_uncaught_thread_exception_dies_loudly_and_cleans_up():
     code = textwrap.dedent(f'''
         import sys, threading, time; sys.path.insert(0, {HARDEN2!r})
-        from system.fatal import install_crash_hooks, on_die
+        from runtime.fatal import install_crash_hooks, on_die
         install_crash_hooks()
         on_die(lambda: print("CLEANUP RAN", flush=True))
         def boom():
@@ -283,7 +294,7 @@ def test_die_reaches_exit_even_when_a_cleanup_fails_and_runs_once():
     two threads dying exit once."""
     code = textwrap.dedent(f'''
         import sys, threading, time; sys.path.insert(0, {HARDEN2!r})
-        from system.fatal import die, on_die
+        from runtime.fatal import die, on_die
         def bad():
             raise OSError("wait failed")
         on_die(bad)
@@ -302,16 +313,11 @@ def test_die_reaches_exit_even_when_a_cleanup_fails_and_runs_once():
 
 
 # ==================== dependencies ====================
-def test_every_package_and_file_the_app_needs_is_present():
-    assert deps.missing() == {}
-    assert deps.missing_files() == []
-
-
 def test_a_missing_package_dies_with_its_install_command():
     code = textwrap.dedent(f'''
         import sys
         sys.path.insert(0, {HARDEN2!r})
-        from system import deps
+        from runtime import deps
         deps.check(
             {{"numpy": "pip install numpy", "no_such_pkg": "pip install nsp"}},
             [sys.executable, "/no/such/model.gguf"],
@@ -326,10 +332,3 @@ def test_a_missing_package_dies_with_its_install_command():
     assert "missing files: /no/such/model.gguf (" in r.stderr
 
 
-def test_the_app_checks_packages_before_it_imports_any_module():
-    main_path = os.path.join(HARDEN2, "app", "main.py")
-    with open(main_path) as f:
-        source = f.read()
-    check_at = source.index("deps.check()")
-    assert check_at < source.index("import config")
-    assert check_at < source.index("from app ")

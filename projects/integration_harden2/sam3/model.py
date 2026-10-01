@@ -22,11 +22,9 @@ import torch
 from PIL import Image
 
 import config
-from perception2.backend import DETECT_OK
-from perception2.boxes import inside, iou
-from system.fatal import die
-
-MODEL_DIR = config.SAM3_MODEL_DIR
+from runtime.fatal import die
+from sam3.contract import DETECT_OK
+from util.boxes import inside, iou
 
 
 def _by_conf(d):
@@ -57,6 +55,14 @@ def _dedup_overlaps(dets, iou_thr=0.5, contain_thr=0.7):
     return keep
 
 
+def default_dir(precision, quantize):
+    """The ready nf4 folder for the app's nf4 load; the bf16 checkpoint for anything
+    else (bf16, fp8, or quantizing it to nf4)."""
+    if precision == "nf4" and not quantize:
+        return config.SAM3_NF4_DIR
+    return config.SAM3_MODEL_DIR
+
+
 class Sam3Backend:
     """detect(frame_bgr, phrase, conf) -> (status, hits);
         hits = [{"label","conf","box"} ...] sorted by conf desc.
@@ -65,19 +71,24 @@ class Sam3Backend:
 
     def __init__(
         self,
-        model_dir=MODEL_DIR,
+        model_dir=None,
         precision=config.SAM3_PRECISION,
         use_compile=False,
         mask_threshold=0.5,
-        lazy=False
+        lazy=False,
+        quantize=False
     ):
         """precision: 'nf4' (smallest VRAM, default, fast load), 'bf16' (lossless), or
         'fp8' (torchao dynamic-activation). use_compile: torch.compile the model --
         REQUIRED for fp8 to hit its 202 ms; adds ~1-3 min one-time build on the first
         call.
+        nf4 loads the weights saved ready in config.SAM3_NF4_DIR (owner S7 c); with
+        quantize=True it quantizes the bf16 checkpoint instead (sam3/save_nf4.py, which
+        writes that folder). model_dir overrides the folder.
         Latency evidence:
         bench/sam3-mask-bench/results/2026-09-03-sam3-quant-latency.md."""
-        self.model_dir = model_dir
+        self.mb_quantize = quantize
+        self.model_dir = model_dir or default_dir(precision, quantize)
         self.precision = precision
         self.mb_compile = use_compile
         self.mask_threshold = mask_threshold
@@ -96,7 +107,13 @@ class Sam3Backend:
 
     def _load(self):
         from transformers import Sam3Model, Sam3Processor, BitsAndBytesConfig
-        if self.precision == "nf4":
+        if self.precision == "nf4" and not self.mb_quantize:
+            # saved already quantized: its config holds the 4-bit settings
+            self.model = Sam3Model.from_pretrained(
+                self.model_dir,
+                dtype=torch.bfloat16
+            ).eval()
+        elif self.precision == "nf4":
             q = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
@@ -129,21 +146,49 @@ class Sam3Backend:
             self.model = torch.compile(self.model)
             suffix = "+compile"
         self.proc = Sam3Processor.from_pretrained(self.model_dir)
-        print(f"[perception2] SAM3 ready ({self.precision}{suffix})", flush=True)
+        print(f"[sam3] SAM3 ready ({self.precision}{suffix})", flush=True)
         return
 
     def _run(self, pil, concept, conf):
-        """One SAM3 forward for one bare concept. Returns (boxes, masks, scores) as
-        numpy."""
+        """The full model once for one bare concept (image encoder included). detect()
+        no longer uses it (S1: the frame is encoded once per call); it stays as the
+        reference path of the A/B benchmark (bench/perception/ab_shared_encoding.py).
+        Returns (boxes, masks, scores) as numpy."""
         inputs = self.proc(images=pil, text=concept, return_tensors="pt").to("cuda")
         inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
         with torch.no_grad():
             out = self.model(**inputs)
+        return self._post(out, inputs["original_sizes"].tolist(), conf)
+
+    def _encode(self, pil):
+        """The image encoder, once per frame. -> (vision embeddings, the frame size
+        list post-processing needs)."""
+        image = self.proc(images=pil, return_tensors="pt").to("cuda")
+        with torch.no_grad():
+            embeds = self.model.get_vision_features(
+                image["pixel_values"].to(torch.bfloat16)
+            )
+        return embeds, image["original_sizes"].tolist()
+
+    def _run_concept(self, embeds, sizes, concept, conf):
+        """Only the text encoder and the detector, on an encoded frame. Returns
+        (boxes, masks, scores) as numpy."""
+        text = self.proc(text=concept, return_tensors="pt").to("cuda")
+        with torch.no_grad():
+            out = self.model(
+                vision_embeds=embeds,
+                input_ids=text["input_ids"],
+                attention_mask=text["attention_mask"]
+            )
+        return self._post(out, sizes, conf)
+
+    def _post(self, out, sizes, conf):
+        """The model output -> (boxes, masks, scores) as numpy, at the frame size."""
         r = self.proc.post_process_instance_segmentation(
             out,
             threshold=conf,
             mask_threshold=self.mask_threshold,
-            target_sizes=inputs.get("original_sizes").tolist()
+            target_sizes=sizes
         )[0]
         if len(r["scores"]) == 0:
             return [], [], []
@@ -154,7 +199,8 @@ class Sam3Backend:
         return boxes, masks, scores
 
     def detect(self, frame_bgr, phrase, conf=0.30, topk=8):
-        """Run SAM3 on each comma-separated concept, union the results, cache box->mask.
+        """Encode the frame ONCE (owner S1, 2026-09-29), then run the text and detector
+        step for each comma-separated concept; union the results, cache box->mask.
         Returns (DETECT_OK, hits). A GPU out-of-memory is fatal (owner ruling
         2026-09-22): torch reports it only by a throw, nothing catches it, and the crash
         hook dies with the error. Serialized by self._lock: one forward at a time."""
@@ -163,6 +209,8 @@ class Sam3Backend:
         scores = []
         box = None
         dets = []
+        embeds = None
+        sizes = None
 
         with self._lock:
             if self.model is None:
@@ -174,8 +222,9 @@ class Sam3Backend:
             concepts = [c.strip() for c in phrase.split(",") if c.strip()] or [phrase]
             # engine passes cv2 BGR; SAM3 wants RGB
             pil = Image.fromarray(frame_bgr[:, :, ::-1])
+            embeds, sizes = self._encode(pil)
             for concept in concepts:
-                boxes, masks, scores = self._run(pil, concept, conf)
+                boxes, masks, scores = self._run_concept(embeds, sizes, concept, conf)
                 for bx, mk, sc in zip(boxes, masks, scores):
                     box = tuple(int(v) for v in bx)
                     self._cache[box] = mk

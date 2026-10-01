@@ -84,6 +84,7 @@ class Turns:
         asr_ms = self._perf.take_since("ptt_release") if source == "ros" else None
         if asr_ms is not None:
             self._perf.record("asr", asr_ms, chars=len(text))
+        self._start_e2e(source, asr_ms)
 
         print("[app] you:", text, flush=True)
         chat("user", text, "user")
@@ -92,6 +93,10 @@ class Turns:
         t0 = time.monotonic()
         routed = self.recognizer.handle(text)
         self._perf.record("turn", (time.monotonic() - t0) * 1000, kind=routed.kind)
+        # a command ended "e2e" inside handle() (the phone-app client). Otherwise the
+        # timing waits for a highlight's first box on the screen: only a highlight
+        # sets that cue, and the next turn replaces a mark no box ends (describe, ...)
+        self._perf.move_mark("e2e", "e2e_box")
         if routed.say:
             self.say(routed.say)
         if routed.vision_status == TASK_FULL:
@@ -101,6 +106,20 @@ class Turns:
             )
 
         self._record_turn()
+        return
+
+    def _start_e2e(self, source, asr_ms):
+        """Start the e2e timing (command -> action; the phone-app client or the screen
+        ends it) at the push-to-talk release (asr_ms before now), at a phone transcript,
+        or at a ROS transcript that came with no release: the scripted run publishes
+        text and presses no key."""
+        if asr_ms is not None:
+            self._perf.mark("e2e", ago_ms=asr_ms, start="ptt")
+            return
+        if source == "phone":
+            self._perf.mark("e2e", start="phone")
+            return
+        self._perf.mark("e2e", start="transcript")
         return
 
     def _record_turn(self):
@@ -169,13 +188,17 @@ class VisionSinks:
             self._not_ready(u.task, u.phrase)
             return
 
+        first_highlight = u.first and self._kinds.get(u.task) == "highlight"
         if u.state == HL_TRACKING:
             with S.lock:
                 S.thinking = False
                 S.target = u.concepts
                 S.hl_dets = u.dets
                 S.hl_masks = u.masks
-            if u.first and self._kinds.get(u.task) == "highlight":
+                # the screen ends the e2e timing when it draws these first boxes
+                if first_highlight:
+                    S.hl_first_box = True
+            if first_highlight:
                 chat("model", f"Highlighting: {u.phrase}", "action")
                 chat("meta", f"{u.concepts} · best {u.best:.2f} ✓", "sam3")
             return
@@ -199,6 +222,7 @@ class VisionSinks:
             S.target = None
             S.hl_dets = []
             S.hl_masks = []
+            S.hl_first_box = False
         if u.state == HL_LOST:
             chat("model", f"לא מצאתי: {u.concepts}", "miss")
             self.session.end_request({"gave_up": True}, slot=u.task)

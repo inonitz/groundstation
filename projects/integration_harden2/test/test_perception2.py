@@ -1,4 +1,4 @@
-"""Tests for perception2/: the backend contract and loader, the engine, the SAM3 priority
+"""Tests for perception2/: the engine, the SAM3 priority
 lock, the dispatcher, the vision service (count / highlight / clear / describe),
 concepts, counting, verify, and the Gemma vision client. No GPU: the
 vision-service tests run the REAL service, dispatcher and lock on a stand-in backend
@@ -9,20 +9,18 @@ import threading
 import time
 
 import numpy as np
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from perception2 import vlm_client
-from perception2.backend import DETECT_NOT_READY, DETECT_OK
-from perception2.boxes import area, inside, intersection, iou
+from sam3.contract import DETECT_NOT_READY, DETECT_OK
 from perception2.concept import phrase_concepts
 from perception2.counting import count_instances, median_count
 from perception2.engine import PerceptionEngine, scale_vlm_box
 from perception2.dispatcher import SUBMIT_FULL, SUBMIT_OK, Dispatcher
 from perception2.sam3_lock import PRIORITY_COMMAND, PRIORITY_REFRESH, PriorityLock
 from perception2 import vision as V
-from support import CAR, GemmaStub, StandInBackend, state_of, wait_for
+from support import CAR, GemmaStub, StandInBackend, wait_for
 from perception2.verify import region_is_color, rel_holds, split_target, verify_highlight
 
 
@@ -476,9 +474,12 @@ class Recorder:
         return [e[2] for e in self.events if e[0] == "hl" and e[1] == task]
 
 
-def _vision(monkeypatch, hits, delay=0.0, max_tasks=8, **cfg):
+def _vision(monkeypatch, hits, delay=0.0, max_tasks=8, gemma_sees="none", **cfg):
+    """The REAL vision service on a stand-in SAM3. MIN_BOX_FRAC stays at its config
+    value (owner TR7). @gemma_sees: what Gemma's HIGHLIGHT line names ("none" =
+    absent), for the GATE=vlm and GATE=either tests."""
     settings = dict(COUNT_FRAMES=3, COUNT_GAP=0.05, SAM3_PERIOD=0.1, HL_GIVEUP=0.3,
-                    GATE="sam3", VERIFY="off", MIN_BOX_FRAC=0.0)
+                    GATE="sam3", VERIFY="off")
     settings.update(cfg)
     for key, value in settings.items():
         monkeypatch.setattr(V.config, key, value)
@@ -486,7 +487,7 @@ def _vision(monkeypatch, hits, delay=0.0, max_tasks=8, **cfg):
     rec = Recorder()
     frame = np.zeros((100, 100, 3), np.uint8)
     gemma = GemmaStub("LONG RESPONSE: long answer\nSHORT RESPONSE: short\n"
-                      "HIGHLIGHT: none")
+                      f"HIGHLIGHT: {gemma_sees}")
     vision = V.Vision(backend, gemma, frame.copy, rec.sinks(), use_masks=lambda: False,
                       max_tasks=max_tasks)
     return vision, backend, rec
@@ -518,6 +519,63 @@ def test_an_absent_object_is_refused_with_the_reason(monkeypatch):
     assert update.reason == "SAM3 found nothing"
 
 
+BACKPACK = [{"label": "backpack", "conf": 0.9, "box": (20, 20, 60, 70)}]
+
+
+def test_verify_refuses_a_backpack_held_by_a_child_when_no_child_is_there(monkeypatch):
+    """Owner TR2: VERIFY on, in the live service. SAM3 finds the backpack but no child,
+    so the related noun is missing: the highlight is refused, with that reason."""
+    hits = {"backpack held": BACKPACK, "backpack": BACKPACK}
+    vision, backend, rec = _vision(monkeypatch, hits, VERIFY="on")
+    _, task = vision.highlight("backpack held by a child")
+    assert _wait_for(lambda: rec.states(task) == [V.HL_ABSENT])
+    update = [e[3] for e in rec.events if e[0] == "hl"][0]
+    assert "child" in update.reason
+
+
+def test_a_speck_box_is_dropped_at_the_config_floor(monkeypatch):
+    """Owner TR7: MIN_BOX_FRAC at its config value (0.001 of the frame: 10 px on the
+    100x100 test frame). A 2x2 box is dropped; the two cars stay."""
+    speck = {"label": "car", "conf": 0.95, "box": (50, 50, 52, 52)}
+    vision, backend, rec = _vision(monkeypatch, {"car": [speck] + CAR})
+    status, task = vision.count("cars")
+    assert _wait_for(lambda: V.HL_TRACKING in rec.states(task))
+    assert ("count", task, V.TASK_OK, 2) in rec.events
+    tracked = [e[3] for e in rec.events if e[0] == "hl" and e[2] == V.HL_TRACKING][0]
+    assert [d["box"] for d in tracked.dets] == [d["box"] for d in CAR]
+    vision.clear()
+
+
+def test_gate_vlm_trusts_gemma_alone(monkeypatch):
+    """Owner TR16: GATE=vlm. Gemma says "none": refused, although SAM3 would find the
+    car, and the reason names Gemma (owner O4). Gemma names it: the highlight tracks."""
+    vision, backend, rec = _vision(monkeypatch, {"car": CAR}, GATE="vlm")
+    _, task = vision.highlight("car")
+    assert _wait_for(lambda: rec.states(task) == [V.HL_ABSENT])
+    assert backend.starts == []                    # SAM3 was not asked at the gate
+    update = [e[3] for e in rec.events if e[0] == "hl"][0]
+    assert update.reason == "Gemma does not see it"
+    vision, backend, rec = _vision(monkeypatch, {"car": CAR}, GATE="vlm",
+                                   gemma_sees="the car")
+    _, task = vision.highlight("car")
+    assert _wait_for(lambda: V.HL_TRACKING in rec.states(task))
+    vision.clear()
+
+
+def test_gate_either_draws_when_sam3_or_gemma_sees_it(monkeypatch):
+    """Owner TR16: GATE=either. Gemma says "none" but SAM3 finds the car: it tracks.
+    Neither sees it: refused."""
+    vision, backend, rec = _vision(monkeypatch, {"car": CAR}, GATE="either")
+    _, task = vision.highlight("car")
+    assert _wait_for(lambda: V.HL_TRACKING in rec.states(task))
+    vision.clear()
+    vision, backend, rec = _vision(monkeypatch, {}, GATE="either")
+    _, task = vision.highlight("car")
+    assert _wait_for(lambda: rec.states(task) == [V.HL_ABSENT])
+    update = [e[3] for e in rec.events if e[0] == "hl"][0]
+    assert update.reason == "SAM3 found nothing"     # SAM3 had the last word
+
+
 def test_a_highlight_tracks_until_cleared_and_its_thread_ends(monkeypatch):
     vision, backend, rec = _vision(monkeypatch, {"car": CAR})
     _, task = vision.highlight("car")
@@ -527,6 +585,19 @@ def test_a_highlight_tracks_until_cleared_and_its_thread_ends(monkeypatch):
     vision.clear()
     assert _wait_for(lambda: rec.states(task)[-1] == V.HL_CLEARED)
     assert _wait_for(lambda: vision.alive() == 0)
+
+
+def test_the_first_box_is_the_gate_s_own_no_second_pass(monkeypatch):
+    """Owner L2: the gate's SAM3 pass also makes the first drawn update; no second
+    pass comes before the first box. The next refresh detects as before."""
+    vision, backend, rec = _vision(monkeypatch, {"car": CAR}, SAM3_PERIOD=0.5)
+    _, task = vision.highlight("car")
+    assert _wait_for(lambda: V.HL_TRACKING in rec.states(task))
+    assert len(backend.starts) == 1                 # the gate's pass, and only it
+    first = [e[3] for e in rec.events if e[0] == "hl" and e[2] == V.HL_TRACKING][0]
+    assert first.first and [d["box"] for d in first.dets] == [d["box"] for d in CAR]
+    assert _wait_for(lambda: len(backend.starts) >= 2)   # the refresh detects again
+    vision.clear()
 
 
 def test_a_highlight_gives_up_when_the_object_leaves(monkeypatch):
@@ -590,58 +661,3 @@ def test_every_forward_pass_is_reported_with_its_task(monkeypatch):
     assert _wait_for(lambda: ("count", task, V.TASK_OK, 2) in rec.events)
     assert [e for e in rec.events if e[0] == "pass"][:3] == [("pass", task)] * 3
     vision.clear()
-
-
-def test_the_backend_loader_is_not_ready_until_loaded():
-    from perception2.backend import BackendLoader
-    release = threading.Event()
-
-    def slow_model():
-        release.wait(2)
-        return type("M", (), {"detect": lambda self, f, p, conf, topk: (DETECT_OK, CAR),
-                              "mask_for_box": lambda self, f, b: "mask"})()
-
-    loader = BackendLoader("sam3", loader=slow_model)
-    assert loader.detect(None, "car", 0.1) == (DETECT_NOT_READY, [])
-    assert state_of(loader) == "STARTING"
-    release.set()
-    loader.thread.join(2)
-    assert state_of(loader) == "UP" and loader.detect(None, "car", 0.1)[1] == CAR
-    assert loader.mask_for_box(None, (1, 2, 3, 4)) == "mask"
-
-
-def test_boxes_overlap_math():
-    """The one home of the box overlap math: exact values, not just "overlaps"."""
-    a = (0, 0, 10, 10)
-    b = (5, 0, 15, 10)
-    assert area(a) == 100 and area((10, 10, 0, 0)) == 0
-    assert intersection(a, b) == 50
-    assert iou(a, b) == 50 / 150
-    assert inside(a, b) == 0.5
-    assert inside((2, 2, 4, 4), a) == 1.0
-    far = (20, 20, 30, 30)
-    assert intersection(a, far) == 0 and iou(a, far) == 0.0 and inside(a, far) == 0.0
-
-
-# ==================== the real SAM3 (GPU; opt-in) ====================
-@pytest.mark.skipif(
-    os.environ.get("HARDEN2_GPU_TESTS") != "1",
-    reason="loads the real SAM3 model on the GPU: set HARDEN2_GPU_TESTS=1"
-)
-def test_real_sam3_detects_and_masks_a_window():
-    """The real backend on a real picture: detect finds windows, and mask_for_box
-    returns the frame-sized mask it cached. (Moved here from sam3_backend._smoke
-    2026-09-24.)"""
-    import cv2
-    from perception2.sam3_backend import Sam3Backend
-
-    frame = cv2.imread(
-        "/root/groundstation/bench/vision-verify-bench/dataset/images/img0.png"
-    )
-    assert frame is not None
-    backend = Sam3Backend()
-    status, dets = backend.detect(frame, "window", conf=0.30)
-    assert status == DETECT_OK and dets
-
-    mask = backend.mask_for_box(frame, dets[0]["box"])
-    assert mask is not None and mask.shape[:2] == frame.shape[:2]

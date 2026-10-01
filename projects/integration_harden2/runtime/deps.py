@@ -7,13 +7,13 @@ load torch + CUDA (5-10 s). Every package is REQUIRED: the install script instal
 all, so no module carries an optional path. A missing package dies with the command
 that installs it; a missing file dies with its path.
 
-  python3 -m system.deps     # the same check, run by `run.sh preflight`
+  python3 -m runtime.deps     # the same check, run by `run.sh preflight`
 """
 import importlib.util
 import os
 
 import config
-from system.fatal import die
+from runtime.fatal import die
 
 INSTALL_SCRIPT = "bash /root/groundstation/tools/devenv/install-runtime-deps.sh"
 ROS = "source /opt/ros/jazzy/setup.bash"
@@ -35,6 +35,7 @@ PACKAGES = {
     "phonikud_onnx": INSTALL_SCRIPT,
     "phonikud_tts": INSTALL_SCRIPT,
     "sounddevice": INSTALL_SCRIPT,
+    "pynvml": INSTALL_SCRIPT,
 }
 
 # every file the app runs or opens
@@ -47,6 +48,7 @@ FILES = [
     config.GEMMA_MMPROJ_PATH,
     config.ASR_MODEL_PATH,
     config.SAM3_MODEL_DIR,
+    config.SAM3_NF4_DIR,
     config.PHONIKUD_G2P,
     config.PHONIKUD_VOICE,
     config.PHONIKUD_CONFIG,

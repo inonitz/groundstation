@@ -18,9 +18,9 @@ import cv2
 import numpy as np
 
 from perception2.concept import phrase_concepts, _LEAD
-from perception2.backend import DETECT_OK
-from perception2 import boxes
-from perception2.boxes import inside, iou
+from sam3.contract import DETECT_OK
+from util import boxes
+from util.boxes import inside, iou
 from perception2.counting import count_instances
 
 # relation words -> the geometric test that verifies them
@@ -102,7 +102,7 @@ def split_target(phrase):
     )
 
 
-# ---------------- geometry (overlap math: perception2/boxes.py) ----------------
+# ---------------- geometry (overlap math: util/boxes.py) ----------------
 def _gap(a, b):
     """Shortest edge-to-edge distance between two boxes (0 when they overlap)."""
     dx = max(0, max(a[0], b[0]) - min(a[2], b[2]))

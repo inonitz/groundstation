@@ -1,7 +1,8 @@
 # perception2
 
-The vision module of harden2. SAM3 gives open-vocab boxes AND masks in one forward pass.
-`vision.py` runs every vision request as its own task thread; the rest is pure logic around it.
+The vision system of harden2. It uses two services: SAM3 (sam3/: open-vocab boxes AND masks
+in one forward pass) and Gemma. `vision.py` runs every vision request as its own task thread;
+the rest is pure logic around it.
 
 ## Sections
 
@@ -18,14 +19,15 @@ The vision module of harden2. SAM3 gives open-vocab boxes AND masks in one forwa
 | `vision.py` | `Vision`: count / highlight / clear / describe. One task thread each; results go to the app through `Sinks` callbacks. API: docs/api-harden2/perception.h. |
 | `dispatcher.py` | `Dispatcher`: one thread on a condition variable starts one thread per task, at most `config.VISION_MAX_TASKS`; past that a request is refused (FULL). |
 | `sam3_lock.py` | `PriorityLock`: one SAM3 forward pass at a time; a user command outranks a highlight refresh. |
-| `backend.py` | The backend contract (`detect -> (status, hits)`, `mask_for_box`, `DETECT_*`), the `BACKENDS` registry, and `BackendLoader` (loads it on its own thread; the "sam3" status row). |
-| `sam3_backend.py` | `Sam3Backend`: SAM3-nf4 detect + masks in one forward, box->mask cached. A GPU out-of-memory calls die(). |
 | `engine.py` | `PerceptionEngine`: relative-confidence gate, mask hygiene, VLM fallback, presence gate. Models are injected. |
 | `concept.py` | `phrase_concepts`: a user phrase -> the bare SAM3 concepts, with class synonyms. |
 | `counting.py` | `count_instances` (dedup contained boxes), `median_count`. |
 | `verify.py` | Split-and-verify for relation phrases ("backpack held by a child"). |
 | `lexicon.py` | The HE->EN target correction net under Gemma. |
 | `vlm_client.py` | The Gemma vision prompt: describe the frame, or say where a target is. |
+
+The SAM3 model, its loader and the backend contract live in `sam3/` (owner D2, 2026-09-29).
+The box overlap math is `util/boxes.py`.
 
 ## Threading
 

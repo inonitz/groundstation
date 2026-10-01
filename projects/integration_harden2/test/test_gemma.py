@@ -45,6 +45,19 @@ def test_the_process_is_one_spec_for_the_app_and_the_benches(tmp_path):
     assert '{"enable_thinking":true}' in bench.argv
 
 
+def test_the_server_row_waits_for_one_warm_up_request(tmp_path, monkeypatch):
+    """Owner L1: with a warm_up, the process is ready only after /health answers AND
+    one warm-up request ran; without one, /health alone decides."""
+    health = [False]
+    warmed = []
+    monkeypatch.setattr(server, "port_up", lambda port: health[0])
+    spec = server.process(str(tmp_path), warm_up=lambda: warmed.append(1))
+    assert spec.ready() is False and warmed == []      # not loaded: no request yet
+    health[0] = True
+    assert spec.ready() is True and warmed == [1]
+    assert server.process(str(tmp_path)).ready() is True and warmed == [1]
+
+
 # ==================== client ====================
 class _Chat(http.server.BaseHTTPRequestHandler):
     """A stand-in llama-server. `reply` sets what the next POST answers: a body (bytes)

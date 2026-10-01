@@ -5,7 +5,7 @@
 # (CLAUDE.md: script every install). These are also baked into tools/devenv/Dockerfile; this script
 # covers already-built containers until their next rebuild. Run it after every rebuild.
 #
-# Sections: (1) system packages, (2) python packages, (3) phonikud model files, (4) offline HF cache,
+# Sections: (1) system packages, (2) python packages, (3) model files (phonikud, SAM3 nf4), (4) offline HF cache,
 # (5) a self-test that fails loud if any library did not install and load.
 set -euo pipefail
 
@@ -25,16 +25,22 @@ pip install aiohttp                                          # tools/dji_mock/mo
 pip install python-bidi                                      # right-to-left Hebrew in the scene overlay
 pip install "bitsandbytes==0.50.2" "accelerate==1.14.0"      # SAM3-nf4 backend; pins match sam3-mask-bench/setup.sh
 pip install phonikud phonikud-onnx phonikud-tts sounddevice  # offline Hebrew TTS (SCENE_TTS=phonikud) + playback
+pip install nvidia-ml-py                                     # pynvml: the perf record's GPU samples (log/perf.py)
 
-# --- 3. phonikud model files --------------------------------------------------------------
+# --- 3. model files: phonikud, SAM3 nf4 -----------------------------------------------------
 # phonikud G2P (niqqud+stress -> IPA) + the Piper onnx voice. Models are cc-nc (SASpeech/ILSpeech),
 # demo/competition use only (docs decision 2026-09-16). Downloaded once, then reused.
-echo "[install-runtime-deps] 3/5 phonikud model files..."
+echo "[install-runtime-deps] 3/5 model files (phonikud, SAM3 nf4)..."
 P=/root/models/tts/phonikud
 mkdir -p "$P"
 [ -f "$P/phonikud-1.0.int8.onnx" ] || wget -O "$P/phonikud-1.0.int8.onnx" https://huggingface.co/Phonikud/phonikud-onnx/resolve/main/phonikud-1.0.int8.onnx
 [ -f "$P/model.onnx" ]            || wget -O "$P/model.onnx"            https://huggingface.co/Phonikud/phonikud-tts-checkpoints/resolve/main/model.onnx
 [ -f "$P/model.config.json" ]     || wget -O "$P/model.config.json"     https://huggingface.co/Phonikud/phonikud-tts-checkpoints/resolve/main/model.config.json
+
+# SAM3 saved once in its nf4 form (owner S7 c): the app loads these ready 4-bit weights. Needs
+# the GPU and the bf16 checkpoint in /root/models/vision/sam3-official. Skipped when present.
+[ -f /root/models/vision/sam3-nf4/model.safetensors ] \
+    || python3 /root/groundstation/projects/integration_harden2/sam3/save_nf4.py
 
 # --- 4. warm the offline HF cache ---------------------------------------------------------
 # The phonikud G2P loads the dicta-il/dictabert tokenizer from the HF cache, which a rebuild wipes.

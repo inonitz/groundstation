@@ -11,7 +11,7 @@ import time
 import cv2
 
 import config
-from system.status import RECOVERING, STARTING, UP, Status, fail
+from runtime.status import RECOVERING, STARTING, UP, Status, fail
 from video.ros_stream import RosStream
 
 ROS_SOURCES = ("ros", "camera_stream", "camera/stream")

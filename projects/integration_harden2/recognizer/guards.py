@@ -12,6 +12,9 @@ from .numbers import nums_en, nums_he
 from .prompts import PLANNER_SHOTS_D
 
 
+NUMBER_TOLERANCE = 0.01
+
+
 def mission_numbers(mission):
     """Every number in a mission's steps, as a magnitude."""
     nums = set()
@@ -28,7 +31,12 @@ def numbers_vs_mission(he2, mission):
     appear in the mission (magnitude). Returns the list of missing numbers ([] = ok)."""
     said = {abs(float(x)) for x in nums_he(he2)}
     got = mission_numbers(mission or [])
-    return sorted(x for x in said if x not in got)
+    missing = []
+    for x in sorted(said):
+        # a third is 3.333 in the Hebrew and 3.33 in a plan: equal within 0.01
+        if not any(abs(x - g) <= NUMBER_TOLERANCE for g in got):
+            missing.append(x)
+    return missing
 
 
 # ============================ the planner-echo guard =============================

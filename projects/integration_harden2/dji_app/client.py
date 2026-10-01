@@ -19,7 +19,7 @@ app did not answer at all.
 
 STATUS ("dji app" row): UP while the app answers. When a request gets no answer, the row
 goes WAITING (orange): the laptop cannot restart the phone app, the user must fix it. A
-probe then checks the port every config.WAITING_RETRY_SECONDS and turns the row UP when
+probe then checks the port every config.PHONE_APP_CHECK_SECONDS and turns the row UP when
 the app answers again. The app never dies because of the phone (owner ruling 2026-09-23).
 /tts is served by the same app on the same port, so text-to-speech is one more request
 here (speak()).
@@ -36,9 +36,10 @@ import threading
 from http import HTTPStatus
 
 import config
-from system.fatal import die
-from system.status import STARTING, UP, WAITING, Status
-from system.supervisor import ProcessSpec
+from log.perf import NO_PERF
+from runtime.fatal import die
+from runtime.status import STARTING, UP, WAITING, Status
+from runtime.supervisor import ProcessSpec
 from util.guarded import http_request
 from util.net import JSON_HEADERS, port_open
 
@@ -79,7 +80,8 @@ class DjiApp:
         host="127.0.0.1",
         port=8080,
         allow_real=False,
-        timeout=3.0
+        timeout=3.0,
+        perf=NO_PERF
     ):
         if not _is_loopback(host) and not allow_real:
             die(
@@ -90,6 +92,7 @@ class DjiApp:
         self.host = host
         self.port = port
         self.timeout = timeout
+        self._perf = perf
         self._transmit = True
         self._probe_lock = threading.Lock()
         self._probing = False
@@ -100,14 +103,15 @@ class DjiApp:
         return
 
     @classmethod
-    def from_env(cls):
+    def from_env(cls, perf=NO_PERF):
         """Build from config.DJI_* (derived from CONTROL=mock|real): mock ->
         127.0.0.1:8079, not real; real -> PHONE_IP:8080, real (HUMAN-run only). CONTROL
         is the one decision; config derives the rest."""
         return cls(
             host=config.DJI_HOST,
             port=config.DJI_PORT,
-            allow_real=config.DJI_REAL
+            allow_real=config.DJI_REAL,
+            perf=perf
         )
 
     def close(self):
@@ -182,9 +186,9 @@ class DjiApp:
                 WAITING,
                 f"no answer from {self.host}:{self.port}: the user "
                 f"must fix the phone app. Retry every "
-                f"{config.WAITING_RETRY_SECONDS:.0f}s"
+                f"{config.PHONE_APP_CHECK_SECONDS:.0f}s"
             )
-            if self._closed.wait(config.WAITING_RETRY_SECONDS):
+            if self._closed.wait(config.PHONE_APP_CHECK_SECONDS):
                 break                                  # closed: stop checking
 
         with self._probe_lock:
@@ -206,7 +210,16 @@ class DjiApp:
         if not self._transmit:
             print(f"[dji] blocked {path}: the transmit switch is off", flush=True)
             return HTTPStatus.CONFLICT     # blocked: nothing left the laptop
-        return self._request(path, data, headers)
+        return self._command(path, data, headers)
+
+    def _command(self, path, data=None, headers=None):
+        """POST a command. Any reply means it reached the phone app: that ends the e2e
+        timing (command -> action, log/perf.py) of the turn that sent it."""
+        status = self._request(path, data, headers)
+        if status is None:
+            return None
+        self._perf.end("e2e", "e2e", end="command")
+        return status
 
     # --- requests ------------------------------------------------------------------
     def takeoff(self):
@@ -220,7 +233,7 @@ class DjiApp:
         relinquishes our virtual-stick control (hands authority back to the RC). Per the
         app dev this does NOT crash the aircraft: it is the app's defined STOP. NEVER
         blocked by the transmit switch."""
-        return self._request("/c/stop")
+        return self._command("/c/stop")
 
     def fly_mission(self, actions):
         """POST /c/fly -- run native flight Actions in order on the aircraft. Returns at

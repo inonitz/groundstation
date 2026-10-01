@@ -1,6 +1,6 @@
 """The screen: the ONE module that draws. Camera full width on top; below it the status
 pane and the chat pane side by side (owner layout 2026-09-22). Window keys and the mouse
-wheel are read here. The kill key is NOT here: it is global (app/keys.py)."""
+wheel are read here. The kill key is NOT here: it is global (keys/keys.py)."""
 import os
 import threading
 import time
@@ -18,61 +18,6 @@ from video.video import source_kind
 
 
 # ---- The window loop ----
-class _FrameTimer:
-    """Records one "frame" event per second: fps, and for each part of the loop (read a
-    frame, draw the overlays + panes, show it with imshow + waitKey) the mean AND the
-    worst ms of that second. worst_frame_ms is the longest gap between two frames: it
-    also holds any time spent outside the three parts. A mean alone hides one slow
-    frame."""
-
-    def __init__(self, perf):
-        self._perf = perf
-        self._reset(time.monotonic())
-        return
-
-    def _reset(self, now):
-        self._start = now
-        self._last = now
-        self._frames = 0
-        self._sums = {"read": 0.0, "draw": 0.0, "show": 0.0}
-        self._worst = {"read": 0.0, "draw": 0.0, "show": 0.0}
-        self._worst_gap = 0.0
-        return
-
-    def add(self, read_s, draw_s, show_s):
-        now = time.monotonic()
-        parts = {"read": read_s, "draw": draw_s, "show": show_s}
-        elapsed = 0.0
-        n = 0
-
-        self._frames += 1
-        self._worst_gap = max(self._worst_gap, now - self._last)
-        self._last = now
-        for name, seconds in parts.items():
-            self._sums[name] += seconds
-            self._worst[name] = max(self._worst[name], seconds)
-
-        elapsed = now - self._start
-        if elapsed < 1.0:
-            return
-
-        n = self._frames
-        self._perf.record(
-            "frame",
-            sum(self._sums.values()) / n * 1000,
-            fps=round(n / elapsed, 1),
-            read_ms=round(self._sums["read"] / n * 1000, 1),
-            draw_ms=round(self._sums["draw"] / n * 1000, 1),
-            show_ms=round(self._sums["show"] / n * 1000, 1),
-            read_max_ms=round(self._worst["read"] * 1000, 1),
-            draw_max_ms=round(self._worst["draw"] * 1000, 1),
-            show_max_ms=round(self._worst["show"] * 1000, 1),
-            worst_frame_ms=round(self._worst_gap * 1000, 1)
-        )
-        self._reset(now)
-        return
-
-
 class Ui:
     """@video: the Video module (frames). @board: the status board (the status pane).
     @session_dir: shown in the chat pane's header. @manual_on: () -> bool, the manual
@@ -115,12 +60,14 @@ class Ui:
         boxes = []
         masks = []
         use_masks = False
+        first_box = False
         display = None
         canvas = None
         t0 = 0.0
         t_read = 0.0
         t_draw = 0.0
-        timer = _FrameTimer(self._perf)
+        t_end = 0.0
+        previous_end = None
 
         while not self._quit.is_set():
             t0 = time.monotonic()
@@ -141,6 +88,9 @@ class Ui:
                 boxes = list(S.hl_dets)
                 masks = list(S.hl_masks)
                 use_masks = S.use_sam
+                first_box = S.hl_first_box and len(boxes) > 0
+                if first_box:
+                    S.hl_first_box = False
 
             display = frame.copy()
             draw_overlays(display, boxes, masks, use_masks)
@@ -153,7 +103,14 @@ class Ui:
             t_draw = time.monotonic()
             cv2.imshow(config.WINDOW_TITLE, canvas)
             key = cv2.waitKey(1) & 0xFF
-            timer.add(t_read - t0, t_draw - t_read, time.monotonic() - t_draw)
+            t_end = time.monotonic()
+            # the first frame has no previous one: its gap is its own time
+            if previous_end is None:
+                previous_end = t0
+            record_frame(self._perf, t0, t_read, t_draw, t_end, previous_end)
+            if first_box:
+                self._perf.end("e2e_box", "e2e", end="box")  # its first box is shown
+            previous_end = t_end
             if handle_key(key, on_clear):
                 return
             if cv2.getWindowProperty(config.WINDOW_TITLE, cv2.WND_PROP_VISIBLE) < 1:
@@ -172,7 +129,7 @@ class Ui:
             (30, config.CAM_H // 2),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.9,
-            (0, 200, 255),
+            config.COL_WAITING_TEXT,
             2
         )
         cv2.imshow(config.WINDOW_TITLE, self._canvas(placeholder, 0.0))
@@ -188,6 +145,21 @@ class Ui:
             self._board,
             self._manual_on()
         )
+
+
+def record_frame(perf, t0, t_read, t_draw, t_end, previous_end):
+    """One "frame" event per frame (owner, C.1: "Record everything"). The times are
+    monotonic seconds: t0 the read starts, t_read the draw starts, t_draw the show
+    starts, t_end the frame is shown. ms is the gap since the previous frame's end: it
+    holds any time spent outside the three parts (a waiting placeholder, a stall)."""
+    perf.record(
+        "frame",
+        (t_end - previous_end) * 1000,
+        read_ms=round((t_read - t0) * 1000, 1),
+        draw_ms=round((t_draw - t_read) * 1000, 1),
+        show_ms=round((t_end - t_draw) * 1000, 1)
+    )
+    return
 
 
 # ---- HUD labels ----
@@ -225,7 +197,14 @@ def tint_masks(display, masks):
             ).astype(bool)
         blended[mask] = config.COL_SAM2_HL
 
-    cv2.addWeighted(blended, 0.45, display, 0.55, 0, display)
+    cv2.addWeighted(
+        blended,
+        config.MASK_TINT_ALPHA,
+        display,
+        1.0 - config.MASK_TINT_ALPHA,
+        0,
+        display
+    )
     return
 
 
@@ -294,7 +273,7 @@ def on_mouse(event, _x, _y, flags, _param):
 def handle_key(key, on_clear):
     """Apply one window key. -> True when the app should quit. c = clear the highlight, t
     = masks on/off, [ / ] = scroll the chat, x = clear the chat. The kill key is NOT
-    here: it is global (app/keys.py)."""
+    here: it is global (keys/keys.py)."""
     if key in config.WINDOW_QUIT_KEYS:
         return True
 

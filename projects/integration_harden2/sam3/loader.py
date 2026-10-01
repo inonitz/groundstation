@@ -1,40 +1,24 @@
-"""The vision-backend contract, and the registry the highlight engine picks from.
+"""The SAM3 SERVICE: the registry of vision backends and BackendLoader, which loads the
+chosen one on its own thread at start and answers for it meanwhile.
 
-A vision backend answers two calls (below). The engine builds ONE backend at startup,
-chosen by SCENE_SEG, then calls it directly -- the choice is one-time, not a per-frame
-dispatch. To add a backend: write a class with these two methods, then add one line to
-BACKENDS.
+The app builds ONE backend at startup, chosen by SCENE_SEG, then calls it directly -- the
+choice is one-time, not a per-frame dispatch. To add a backend: write a class with the
+two methods of sam3/contract.py, then add one line to BACKENDS.
 """
 import threading
-from typing import Protocol
+
+import numpy as np
 
 import config
-from system.fatal import die
-from system.status import UP, Status
-
-# detect status codes. A status is a code the caller reads; detect never throws.
-DETECT_OK = 0              # the call ran; hits may be empty (nothing matched)
-DETECT_NOT_READY = 1       # the backend is still loading
-
-
-class VisionBackend(Protocol):
-    """What the highlight engine needs from a vision model. SAM3 is the one backend
-    today."""
-    def detect(self, frame_bgr, phrase, conf=0.30, topk=8):
-        """BGR frame + English noun phrase -> (status, hits). status is a DETECT_* code
-        above. hits: up to topk [{'label','conf','box'(x1,y1,x2,y2)}], empty unless
-        status == DETECT_OK."""
-        ...
-
-    def mask_for_box(self, frame_bgr, box):
-        """The mask this backend cached for one box in the last detect(); None on a
-        miss."""
-        ...
+from runtime.fatal import die
+from runtime.status import UP, Status
+from sam3.contract import DETECT_NOT_READY, DETECT_OK
 
 
 def _sam3():
-    # lazy: the heavy model deps load only when built
-    from perception2.sam3_backend import Sam3Backend
+    # torch and transformers load here, on the loader's thread at start, never when
+    # the app imports its modules (owner S3, 2026-09-29)
+    from sam3.model import Sam3Backend
     return Sam3Backend()
 
 
@@ -77,7 +61,13 @@ class BackendLoader:
         return [self._status.row()]
 
     def _load(self):
-        self._backend = self._make()
+        """Load, then one warm-up pass on a blank camera-size frame (owner L1): the
+        first pass of a fresh model is 1.4-2.1 s against 0.5 s warm, and rule 3.3 keeps
+        that out of the run. The row turns UP after it."""
+        backend = self._make()
+        frame = np.zeros((config.CAM_H, config.CAM_W, 3), np.uint8)
+        backend.detect(frame, config.SAM3_WARM_UP_PHRASE, conf=0.5, topk=1)
+        self._backend = backend
         self._status.set(UP)
         return
 

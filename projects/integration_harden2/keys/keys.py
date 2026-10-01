@@ -9,9 +9,9 @@ import os
 from std_msgs.msg import Int32MultiArray
 
 import config
-from system.ros import Subscription
+from runtime.ros import Subscription
 
-from system.supervisor import ProcessSpec
+from runtime.supervisor import ProcessSpec
 from util.process import native_env
 
 

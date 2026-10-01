@@ -5,15 +5,19 @@ output is one class plus one line in OUTPUTS.
 Latest answer wins: say() overwrites a one-slot mailbox, cuts what is playing, and wakes
 the worker; the worker sleeps on an event at zero CPU until then. No queue, no
 polling."""
+import importlib
 import threading
 import time
 
-from audio.tts_laptop import LaptopTts
-from audio.tts_phone import PhoneTts
 from log.perf import NO_PERF
-from system.fatal import die
+from runtime.fatal import die
 
-OUTPUTS = {"phone": PhoneTts, "laptop": LaptopTts}
+# name -> (module, class). A module is imported when the settings select its output, at
+# start: phonikud takes 0.4 s to import and only "laptop" needs it (owner D13, Q6)
+OUTPUTS = {
+    "phone": ("audio.tts_phone", "PhoneTts"),
+    "laptop": ("audio.tts_laptop", "LaptopTts"),
+}
 
 
 class SpeechOut:
@@ -24,7 +28,7 @@ class SpeechOut:
         if unknown:
             die(f"TTS_OUTPUTS has unknown outputs {unknown} (known: {sorted(OUTPUTS)})")
 
-        self._outputs = [OUTPUTS[name](dji) for name in outputs]
+        self._outputs = [output_class(name)(dji) for name in outputs]
         self._names = list(outputs)
         self._perf = perf
         self._pending = None
@@ -81,3 +85,9 @@ class SpeechOut:
                     chars=len(text)
                 )
         return
+
+
+def output_class(name):
+    """Import the output's module (at start, by SpeechOut) and return its class."""
+    module_name, class_name = OUTPUTS[name]
+    return getattr(importlib.import_module(module_name), class_name)

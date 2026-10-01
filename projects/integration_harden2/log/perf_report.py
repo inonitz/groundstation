@@ -1,15 +1,25 @@
 #!/usr/bin/env python3
-"""Summarize a session's perf.jsonl: p50 / p95 / max per stage, the frame rate, the GPU
-peaks.
+"""Summarize a session's perf.jsonl (owner rulings C.1 and V1 a, 2026-09-28): per stage
+n, min, P25, P50, P75, P95, P99, max; the GPU peaks; then the slowest frames with their
+times, so they can be matched to the other events of that moment.
     python3 log/perf_report.py [session_dir | latest]      (run.sh perf)"""
 import json
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import config  # noqa: E402
 from log.session_files import latest_session  # noqa: E402
 
-SLOW_FPS = 10              # a second below this fps is listed as slow
+PERCENTILES = (25, 50, 75, 95, 99)
+# a field of a stage's events that gets its own row under the stage: (field, label)
+PARTS = {
+    "sam3": [("wait_ms", "of which waiting for the lock")],
+    "frame": [("read_ms", "read"), ("draw_ms", "draw"), ("show_ms", "show")],
+}
+# a field that splits a stage into groups: "gemma (plan)", "e2e (ptt) (command)"
+GROUP_FIELDS = ("label", "kind", "output", "row", "start", "end")
 
 
 def percentile(values, p):
@@ -20,72 +30,89 @@ def percentile(values, p):
 
 
 def summarize(rows):
-    """-> {key: [rows]}; key is the stage, plus its label or kind when it has one."""
+    """-> {key: [rows]}; key is the stage, plus its label, kind, output or row."""
     groups = {}
     key = ""
 
     for row in rows:
         key = row["stage"]
-        for extra in ("label", "kind", "output"):
+        for extra in GROUP_FIELDS:
             if extra in row:
                 key += f" ({row[extra]})"
         groups.setdefault(key, []).append(row)
     return groups
 
 
-def report(session_dir):
-    lines = []
+def stats_line(name, values):
+    """One table row: name, n, min, the percentiles, max (ms, one decimal)."""
+    cells = [min(values)]
+    cells.extend(percentile(values, p) for p in PERCENTILES)
+    cells.append(max(values))
+    numbers = " ".join(f"{v:8.1f}" for v in cells)
+    return f"{name:34s} {len(values):6d} {numbers}"
+
+
+def stage_table(rows):
+    """The stats table: one row per stage group, and one per part of a stage."""
+    heads = ["min"] + [f"P{p}" for p in PERCENTILES] + ["max"]
+    lines = [f"{'stage (ms)':34s} {'n':>6s} " + " ".join(f"{h:>8s}" for h in heads)]
+    stage = ""
+
+    for key, group in sorted(summarize(rows).items()):
+        stage = group[0]["stage"]
+        if stage == "gpu":
+            continue
+        lines.append(stats_line(key, [r["ms"] for r in group]))
+        for field, label in PARTS.get(stage, []):
+            lines.append(stats_line("  " + label, [r.get(field, 0) for r in group]))
+    return lines
+
+
+def gpu_line(rows):
+    gpu = [r for r in rows if r["stage"] == "gpu"]
+    if not gpu:
+        return []
+    load = [r["load_pct"] for r in gpu]
+    return [
+        f"gpu: {len(gpu)} samples; memory max {max(r['mem_mib'] for r in gpu)} MiB; "
+        f"load P50 {percentile(load, 50)} %, max {max(load)} %"
+    ]
+
+
+def slowest_frames(rows, count):
+    """The `count` frames with the longest gap, slowest first, with their wall time."""
+    frames = [r for r in rows if r["stage"] == "frame"]
+    if not frames:
+        return []
+
+    slowest = sorted(frames, key=lambda r: r["ms"], reverse=True)[:count]
+    lines = [
+        f"the {len(slowest)} slowest frames of {len(frames)} "
+        "(gap = the time since the previous frame):",
+        f"{'time':>12s} {'gap ms':>8s} {'read':>8s} {'draw':>8s} {'show':>8s}",
+    ]
+    for r in slowest:
+        stamp = datetime.fromtimestamp(r["t"]).strftime("%H:%M:%S.%f")[:-3]
+        lines.append(
+            f"{stamp} {r['ms']:8.1f} {r['read_ms']:8.1f} "
+            f"{r['draw_ms']:8.1f} {r['show_ms']:8.1f}"
+        )
+    return lines
+
+
+def report(session_dir, slowest=config.PERF_SLOWEST_FRAMES):
     path = os.path.join(session_dir, "perf.jsonl")
+    rows = []
     if not os.path.exists(path):
         return [f"no perf.jsonl in {session_dir}"]
 
     with open(path, encoding="utf-8") as fh:
         rows = [json.loads(line) for line in fh if line.strip()]
 
-    lines.append(f"# perf: {os.path.basename(session_dir)} ({len(rows)} events)")
-    lines.append(f"{'stage':32s} {'n':>5s} {'p50 ms':>9s} {'p95 ms':>9s} {'max ms':>9s}")
-    for key, group in sorted(summarize(rows).items()):
-        if key in ("gpu", "frame"):
-            continue
-        ms = [r["ms"] for r in group]
-        lines.append(
-            f"{key:32s} {len(ms):5d} {percentile(ms, 50):9.0f} "
-            f"{percentile(ms, 95):9.0f} {max(ms):9.0f}"
-        )
-        if key == "sam3":
-            waits = [r.get("wait_ms", 0) for r in group]
-            lines.append(
-                f"{'  of which waiting for the lock':32s} {len(waits):5d} "
-                f"{percentile(waits, 50):9.0f} {percentile(waits, 95):9.0f} "
-                f"{max(waits):9.0f}"
-            )
-
-    frames = [r for r in rows if r["stage"] == "frame"]
-    if frames:
-        fps = [r["fps"] for r in frames]
-        lines.append(
-            f"frame loop: fps p50 {percentile(fps, 50)}, min {min(fps)}; loop ms p50 "
-            f"{percentile([r['ms'] for r in frames], 50):.0f} (read / draw / show p50: "
-            f"{percentile([r['read_ms'] for r in frames], 50):.0f} / "
-            f"{percentile([r['draw_ms'] for r in frames], 50):.0f} / "
-            f"{percentile([r['show_ms'] for r in frames], 50):.0f})"
-        )
-    slow = [r for r in frames if r["fps"] < SLOW_FPS and "worst_frame_ms" in r]
-    if slow:
-        lines.append(
-            f"slow seconds (fps < {SLOW_FPS}): {len(slow)}; worst frame max "
-            f"{max(r['worst_frame_ms'] for r in slow):.0f} ms (read / draw / show max: "
-            f"{max(r['read_max_ms'] for r in slow):.0f} / "
-            f"{max(r['draw_max_ms'] for r in slow):.0f} / "
-            f"{max(r['show_max_ms'] for r in slow):.0f})"
-        )
-    gpu = [r for r in rows if r["stage"] == "gpu"]
-    if gpu:
-        lines.append(
-            f"gpu: memory max {max(r['mem_mib'] for r in gpu)} MiB, load p50 "
-            f"{percentile([r['load_pct'] for r in gpu], 50)} %, max "
-            f"{max(r['load_pct'] for r in gpu)} %"
-        )
+    lines = [f"# perf: {os.path.basename(session_dir)} ({len(rows)} events)"]
+    lines.extend(stage_table(rows))
+    lines.extend(gpu_line(rows))
+    lines.extend(slowest_frames(rows, slowest))
     return lines
 
 

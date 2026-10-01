@@ -11,7 +11,8 @@ must reach os._exit even when a cleanup throws.
 
 on_die(fn) registers a cleanup that runs before the exit: the supervisor uses it to
 stop every child process, so a crash never leaves Gemma or the ASR server orphaned
-(2026-09-22).
+(2026-09-22). Perf registers first: a crash writes its buffered timings before anything
+else (C.1, 2026-09-28).
 """
 import os
 import sys
@@ -23,8 +24,13 @@ _CLEANUPS = []
 _DYING = threading.Lock()
 
 
-def on_die(fn):
-    """Run fn() inside die(), before the process exits. fn must not call die()."""
+def on_die(fn, first=False):
+    """Run fn() inside die(), before the process exits. fn must not call die(). The
+    cleanups run in the order registered; first=True puts fn before all of them (perf
+    writes its buffer before the supervisor stops the processes)."""
+    if first:
+        _CLEANUPS.insert(0, fn)
+        return
     _CLEANUPS.append(fn)
     return
 

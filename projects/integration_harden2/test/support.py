@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from control.flight import Control
 from dji_app.client import DjiApp
-from perception2.backend import DETECT_NOT_READY, DETECT_OK
+from sam3.contract import DETECT_NOT_READY, DETECT_OK
 
 
 def wait_for(pred, timeout):

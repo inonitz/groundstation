@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """List the cameras the host has, whether this container can open each, and what they
-deliver. Used by preflight.sh and status.sh so the right WEBCAM_DEV index is a read, not
-a guess (2026-09-08). Each UVC camera shows two nodes; only the capture one opens and
-gives frames. Brightness < 8 = black (lid shut / covered)."""
+deliver, so the right WEBCAM_DEV index is a read, not a guess (2026-09-08). Each UVC
+camera shows two nodes; only the capture one opens and gives frames. Brightness < 8 =
+black (lid shut / covered).
+
+    python3 video/cam_list.py              every camera (run.sh status)
+    python3 video/cam_list.py --selected   only WEBCAM_DEV (run.sh preflight; owner P1 a:
+                                           opening every camera took 2.1 s of 2.2 s)"""
 import glob
 import os
 import stat
 import sys
+import time
 
 import cv2
 
@@ -63,9 +68,33 @@ def _describe(index):
     return _probe(index)
 
 
-# ---- list every camera ----
+# ---- the selected camera, or every camera ----
+
+def show_selected():
+    """One line for WEBCAM_DEV: its state; "CAPTURE" in it means it gives frames. A
+    camera that gives no frame is read once more after CAMERA_CHECK_RETRY_SECONDS: one
+    just released by a stopped run can be busy for a moment (owner O3 a, 2026-09-29)."""
+    index = config.WEBCAM_DEVICE_INDEX
+    state = ""
+    cv2.setLogLevel(0)
+
+    state = _describe(index)
+    if "CAPTURE" not in state:
+        time.sleep(config.CAMERA_CHECK_RETRY_SECONDS)
+        state = _describe(index)
+    print(f"  WEBCAM_DEV={index}: {state}")
+    return
+
 
 def main():
+    if sys.argv[1:] == ["--selected"]:
+        show_selected()
+        return
+    show_all()
+    return
+
+
+def show_all():
     chosen = str(config.WEBCAM_DEVICE_INDEX)
     rows = []
     paths = []

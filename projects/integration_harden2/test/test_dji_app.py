@@ -11,8 +11,8 @@ from http import HTTPStatus
 
 import config
 import dji_app.client
-from system.status import UP
-from system.supervisor import Supervisor
+from runtime.status import UP
+from runtime.supervisor import Supervisor
 from support import RecordingPhone, dead_port, state_of
 
 
@@ -151,7 +151,7 @@ def test_a_real_host_without_allow_real_dies():
 
 def test_the_phone_app_row_goes_up_again_when_the_app_answers(monkeypatch):
     """WAITING while nothing answers; UP once a phone app answers GET /status/ again."""
-    monkeypatch.setattr(config, "WAITING_RETRY_SECONDS", 0.1)
+    monkeypatch.setattr(config, "PHONE_APP_CHECK_SECONDS", 0.1)
     port = dead_port()
     dji = dji_app.client.DjiApp("127.0.0.1", port, timeout=0.3)
     end = time.monotonic() + 5
@@ -164,4 +164,47 @@ def test_the_phone_app_row_goes_up_again_when_the_app_answers(monkeypatch):
         time.sleep(0.02)
     assert state_of(dji) == UP
     dji.close()
+    phone.close()
+
+
+def test_a_waiting_phone_app_is_checked_every_2_s():
+    """Owner U6 a: the phone-app check runs every 2 s (the process restarts stay 5 s),
+    so a phone app that comes up is UP within about 2 s, with the default settings."""
+    assert config.PHONE_APP_CHECK_SECONDS == 2.0
+    assert config.WAITING_RETRY_SECONDS == 5.0
+    port = dead_port()
+    dji = dji_app.client.DjiApp("127.0.0.1", port, timeout=0.3)
+    end = time.monotonic() + 5
+    while state_of(dji) != "WAITING" and time.monotonic() < end:
+        time.sleep(0.02)
+    phone = RecordingPhone(port=port)
+    end = time.monotonic() + 2.6
+    while state_of(dji) != UP and time.monotonic() < end:
+        time.sleep(0.02)
+    assert state_of(dji) == UP
+    dji.close()
+    phone.close()
+
+
+def test_a_command_that_reaches_the_phone_app_ends_the_e2e_timing(tmp_path):
+    """C2: any reply to a command ends the e2e timing once; a command the transmit
+    switch blocks never left the laptop, so the timing goes on."""
+    import json
+    from log.perf import Perf
+    phone = RecordingPhone()
+    perf = Perf(str(tmp_path))
+    dji = dji_app.client.DjiApp("127.0.0.1", phone.srv.server_address[1], perf=perf)
+    perf.mark("e2e", start="phone")
+    dji.set_transmit(False)
+    assert dji.takeoff() == HTTPStatus.CONFLICT
+    assert perf.take_since("e2e") is not None      # still running after the block
+    perf.mark("e2e", start="phone")
+    dji.set_transmit(True)
+    assert dji.fly_mission([{"type": "spin_by", "degrees": 90.0}]) == 200
+    assert dji.stop() == 200                       # its turn already ended
+    dji.close()
+    perf.close()
+    rows = [json.loads(line) for line in open(tmp_path / "perf.jsonl")]
+    e2e = [r for r in rows if r["stage"] == "e2e"]
+    assert [(r["start"], r["end"]) for r in e2e] == [("phone", "command")]
     phone.close()

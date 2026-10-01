@@ -8,7 +8,7 @@ import os
 from functools import partial
 
 import config
-from system.supervisor import ProcessSpec
+from runtime.supervisor import ProcessSpec
 from util.guarded import http_request
 from util.process import native_env
 
@@ -55,19 +55,35 @@ def argv(port, thinking):
     ]
 
 
+def warm_ready(port, warm_up):
+    """port_up, then ONE warm-up request (owner L1): the first request of a fresh server
+    evaluates the whole planner prompt (1.15 s of a 1.5 s plan); the warm-up leaves it
+    in the server's prompt cache. Its answer does not matter. Runs once per launch, so a
+    restarted Gemma is warmed again before its row turns UP."""
+    if not port_up(port):
+        return False
+    warm_up()
+    return True
+
+
 def process(
     log_dir,
     port=config.LLAMA_SERVER_PORT,
-    thinking=config.GEMMA_THINKING_ENABLED
+    thinking=config.GEMMA_THINKING_ENABLED,
+    warm_up=None
 ):
-    """The Gemma process for the supervisor: STARTING -> UP once /health answers. The
-    model loads in ~15-60 s, so it gets a long start-up window. A laptop part: past the
-    restart budget the app dies."""
+    """The Gemma process for the supervisor: STARTING -> UP once /health answers, and
+    after the warm_up() request when one is given (the app gives the recognizer's
+    plan). The model loads in ~15-60 s, so it gets a long start-up window. A laptop part:
+    past the restart budget the app dies."""
+    ready = partial(port_up, port)
+    if warm_up is not None:
+        ready = partial(warm_ready, port, warm_up)
     return ProcessSpec(
         name="gemma",
         argv=argv(port, thinking),
         env=native_env(),
-        ready=partial(port_up, port),
+        ready=ready,
         ready_timeout_s=240.0,
         log_path=os.path.join(log_dir, "proc-gemma.log"),
     )

@@ -15,7 +15,7 @@ from sensor_msgs.msg import Image
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
-from system.status import RECOVERING, UP
+from runtime.status import RECOVERING, UP
 from video import ros_stream
 from video.video import Video, source_kind
 
@@ -126,3 +126,26 @@ def test_a_stalled_stream_restarts_gstreamer(monkeypatch):
     video.read()                                   # within the retry window: no repeat
     assert len(gstreamer.restarts) == 1
     video.close()
+
+
+def test_the_preflight_reads_the_camera_again_before_it_fails(monkeypatch, capsys):
+    """Owner O3 a: a camera that gives no frame is read once more, after
+    CAMERA_CHECK_RETRY_SECONDS, before the preflight fails (a camera just released by a
+    stopped run can be busy for a moment). No camera needed: _describe is replaced."""
+    from video import cam_list
+    answers = ["opens, no frames (metadata node or busy)", "CAPTURE 1280x720 @ 30 fps"]
+    naps = []
+    monkeypatch.setattr(cam_list, "_describe", lambda index: answers.pop(0))
+    monkeypatch.setattr(cam_list.time, "sleep", naps.append)
+    cam_list.show_selected()
+    assert "CAPTURE" in capsys.readouterr().out
+    assert naps == [config.CAMERA_CHECK_RETRY_SECONDS]
+
+    answers = ["opens, no frames", "opens, no frames"]
+    cam_list.show_selected()
+    assert "CAPTURE" not in capsys.readouterr().out          # still none: it fails
+    answers = ["CAPTURE 1280x720 @ 30 fps"]
+    naps.clear()
+    cam_list.show_selected()
+    assert naps == []                         # a good first read does not wait
+

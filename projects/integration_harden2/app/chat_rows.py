@@ -8,17 +8,7 @@ from app.draw import ascii_only
 from util.hebrew import is_hebrew
 
 
-CHAT_COLOURS = {
-    "you": (120, 210, 255),
-    "light": (240, 235, 231),
-    "dim": (163, 149, 139),
-    "green": (100, 220, 60),
-    "amber": (41, 180, 240),
-    "model": (176, 235, 160),
-    "red": (107, 107, 255),
-    "spoken": (74, 210, 255),
-    "cmd": (245, 235, 150),
-}
+CHAT_COLOURS = config.CHAT_COLOURS       # the palette lives in config (owner D8 a)
 
 # Rows switch on the KIND tagged at the write site -- no startswith, no partition.
 _KIND_TAG = {

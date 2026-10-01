@@ -10,12 +10,15 @@ import config
 from app.chat_rows import CHAT_COLOURS, chat_header, group_turns, turn_rows
 from app.draw import FONT_HE, FONT_TAG, FONT_VAL, PANE_GROUND, RAQM, wrap_px
 
-# ==================================== layout ====================================
-_TAG_COL = (163, 149, 139)   # dim tag column (BGR = mockup #8b95a3)
-_TAG_RIGHT = 66              # tags are right-aligned, ending at this x
-_VALUE_X = 76               # values start at this x
-_RULE_COL = (59, 49, 43)     # the header rule and the turn separators
-_HINT_COL = (150, 150, 150)   # the empty-chat hint
+# the colours and the layout live in config (owner D8 a)
+_TAG_COL = config.COL_CHAT_TAG
+_RULE_COL = config.COL_CHAT_RULE
+_HINT_COL = config.COL_CHAT_HINT
+_MARGIN = config.CHAT_MARGIN
+_TAG_RIGHT = config.CHAT_TAG_RIGHT
+_VALUE_X = config.CHAT_VALUE_X
+_HEADER_LINE = config.CHAT_HEADER_LINE
+_ROW_LINE = config.CHAT_ROW_LINE
 
 
 def render_chat(width, height, chat, thinking, killed, session_dir, scroll=0):
@@ -30,7 +33,7 @@ def render_chat(width, height, chat, thinking, killed, session_dir, scroll=0):
     panel[:] = PANE_GROUND
 
     header = chat_header(session_dir, killed)
-    conv_top = 12 + 19 * len(header) + 8
+    conv_top = _MARGIN + _HEADER_LINE * len(header) + 8
 
     rows = turn_rows(group_turns(chat, thinking))
     if not rows:
@@ -47,7 +50,7 @@ def render_chat(width, height, chat, thinking, killed, session_dir, scroll=0):
             CHAT_COLOURS["amber"],
             "tag"
         ))
-        conv_top += 19
+        conv_top += _HEADER_LINE
     return _draw_pane(panel, header, rows, conv_top, height)
 
 
@@ -71,13 +74,13 @@ def _draw_pane(panel, header, rows, conv_top, height):
     fonts = {"tag": FONT_TAG, "val": FONT_VAL, "he": FONT_HE}
     img = Image.fromarray(panel)
     draw = ImageDraw.Draw(img)
-    y = 12
-    yy = height - 14 - FONT_HE.size
+    y = _MARGIN
+    yy = height - config.CHAT_BOTTOM - FONT_HE.size
 
     for text, col, fontkey in header:                          # header top-down
         font = fonts.get(fontkey, FONT_VAL)
-        draw.text((12, y), text, font=font, fill=tuple(int(x) for x in col))
-        y += 19
+        draw.text((_MARGIN, y), text, font=font, fill=tuple(int(x) for x in col))
+        y += _HEADER_LINE
     draw.line((10, conv_top - 8, width - 10, conv_top - 8), fill=_RULE_COL)
 
     for row in reversed(rows):
@@ -85,24 +88,24 @@ def _draw_pane(panel, header, rows, conv_top, height):
             break
         if row is None:                                        # turn separator
             draw.line((10, yy + 13, width - 10, yy + 13), fill=_RULE_COL)
-            yy -= 14
+            yy -= config.CHAT_TURN_GAP
             continue
 
         tag, value, col, rtl = row
         col = tuple(int(x) for x in col)
         vfont = FONT_HE if rtl else FONT_VAL
-        wrapped = wrap_px(value, width - _VALUE_X - 12, vfont)
+        wrapped = wrap_px(value, width - _VALUE_X - _MARGIN, vfont)
 
         # bottom wrapped line first
         for j, wrapped_line in enumerate(reversed(wrapped)):
-            ly = yy - j * 21
+            ly = yy - j * _ROW_LINE
             if not rtl:
                 draw.text((_VALUE_X, ly), wrapped_line, font=vfont, fill=col)
                 continue
             visual = wrapped_line if RAQM else get_display(wrapped_line)
             text_w = draw.textlength(visual, font=vfont)
             draw.text(
-                (max(_VALUE_X, width - text_w - 12), ly),
+                (max(_VALUE_X, width - text_w - _MARGIN), ly),
                 visual,
                 font=vfont,
                 fill=col
@@ -112,10 +115,10 @@ def _draw_pane(panel, header, rows, conv_top, height):
         if tag:
             tag_w = draw.textlength(tag, font=FONT_TAG)
             draw.text(
-                (max(6, _TAG_RIGHT - tag_w), yy - (len(wrapped) - 1) * 21),
+                (max(6, _TAG_RIGHT - tag_w), yy - (len(wrapped) - 1) * _ROW_LINE),
                 tag,
                 font=FONT_TAG,
                 fill=_TAG_COL
             )
-        yy -= 21 * len(wrapped)
+        yy -= _ROW_LINE * len(wrapped)
     return np.array(img)

@@ -3,10 +3,10 @@ Piper onnx voice -> sounddevice. The models are cc-nc (demo / competition use on
 fetched by tools/devenv/install-runtime-deps.sh.
 
 A missing model file or package dies at start (never run with no voice; owner
-2026-09-17): system/deps.py checks them. A playback error dies at once with the reason:
+2026-09-17): runtime/deps.py checks them. A playback error dies at once with the reason:
 it only happens when the laptop sound system itself breaks, and no retry fixes that
 (owner ruling 9a-1, 2026-09-23). sounddevice reports it only by a throw
-(PortAudioError); nothing catches it, so the crash hook (system/fatal.py) dies with the
+(PortAudioError); nothing catches it, so the crash hook (runtime/fatal.py) dies with the
 error and its traceback."""
 import numpy as np
 import sounddevice
@@ -20,7 +20,7 @@ import config
 class LaptopTts:
     def __init__(self, dji=None):
         """@dji is unused: every output takes the same arguments. The model files are
-        checked at start-up (system/deps.py)."""
+        checked at start-up (runtime/deps.py)."""
         self._g2p = Phonikud(config.PHONIKUD_G2P)
         self._voice = Piper(config.PHONIKUD_VOICE, config.PHONIKUD_CONFIG)
         return

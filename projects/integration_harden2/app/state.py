@@ -9,6 +9,8 @@ class Shared:
         self.lock = threading.Lock()
         self.hl_dets = []
         self.hl_masks = []
+        # a highlight's first boxes wait to be drawn: the screen ends e2e (log/perf.py)
+        self.hl_first_box = False
         self.target = None
         self.thinking = False
         self.use_sam = True

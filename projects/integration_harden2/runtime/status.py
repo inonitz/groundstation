@@ -14,7 +14,7 @@ the panel. It is not a chat message (owner ruling 2026-09-22).
 """
 import threading
 
-from system.fatal import die
+from runtime.fatal import die
 
 STARTING = "STARTING"       # launched, not ready yet
 UP = "UP"                   # running and ready: the only green state

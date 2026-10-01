@@ -6,7 +6,7 @@ per-frame set jitters. Two pure-python fixes, no model code:
                    higher-confidence box (intersection / smaller area >= contain), so a
                    chair back inside the chair is one chair.
   median_count:    the median of the per-frame counts of a few consecutive frames."""
-from perception2.boxes import area, intersection
+from util.boxes import area, intersection
 
 
 def _by_conf(d):

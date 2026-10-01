@@ -1,5 +1,5 @@
-"""Tests for util/: the shared standalone helpers (Hebrew numbers, the port probe, the
-native-program environment)."""
+"""Tests for util/: the shared standalone helpers (the box overlap math, Hebrew numbers,
+the port probe, the native-program environment)."""
 import os
 import socket
 import sys
@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
+from util.boxes import area, inside, intersection, iou
 from util.hebrew import hebnum_to_digits
 from util.net import port_open
 from util.process import native_env
@@ -35,3 +36,16 @@ def test_native_env_adds_the_native_library_folder():
         env["LD_LIBRARY_PATH"].split(":")[0] == config.NATIVE_BIN_DIR
         and env["PULSE_SERVER"] == "unix:/x"
     )
+
+
+def test_boxes_overlap_math():
+    """The one home of the box overlap math: exact values, not just "overlaps"."""
+    a = (0, 0, 10, 10)
+    b = (5, 0, 15, 10)
+    assert area(a) == 100 and area((10, 10, 0, 0)) == 0
+    assert intersection(a, b) == 50
+    assert iou(a, b) == 50 / 150
+    assert inside(a, b) == 0.5
+    assert inside((2, 2, 4, 4), a) == 1.0
+    far = (20, 20, 30, 30)
+    assert intersection(a, far) == 0 and iou(a, far) == 0.0 and inside(a, far) == 0.0

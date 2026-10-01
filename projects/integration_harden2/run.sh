@@ -7,9 +7,8 @@
 #   bash run.sh down                                  # kill the stack + free ports
 #   bash run.sh status [run_dir]                      # ports, panes, last transcripts + commands
 #   bash run.sh preflight [webcam|dji]                # checks only, starts nothing
-#   bash run.sh score [list.md] [session]             # score a recorded session vs an e2e list -> REPORT.md
 #   bash run.sh show  [session]                       # pretty-print a session's utterances
-#   bash run.sh perf  [session]                       # p50 / p95 / max per stage from perf.jsonl
+#   bash run.sh perf  [session]                       # min/P25..P99/max per stage, 20 slowest frames
 #   SCRIPT=default bash run.sh up webcam mock         # the scripted run (mock only)
 # Every setting and flag: docs/spec-harden2-run-arguments.md
 #
@@ -102,8 +101,8 @@ cmd_preflight(){
         else _ok "port $p free"; fi
     done
 
-    echo "== python packages, programs, model files (system/deps.py, the one list) =="
-    (cd "$HERE" && python3 -m system.deps) && _ok "all present" \
+    echo "== python packages, programs, model files (runtime/deps.py, the one list) =="
+    (cd "$HERE" && python3 -m runtime.deps) && _ok "all present" \
         || _bad "missing (the FATAL line above names them)"
     # Every native program loads the ggml libraries by the SAME names (libggml*.so.0), so they
     # must all point at ONE ggml version. A mix crashed Gemma on every image (2026-09-25).
@@ -121,9 +120,14 @@ cmd_preflight(){
     [ -n "${DISPLAY:-}" ] && _ok "DISPLAY=$DISPLAY" || _bad "DISPLAY unset -- the scene window needs one"
 
     if [ "$video" = webcam ]; then
-        echo "== cameras (pick the CAPTURE line with a picture; WEBCAM_DEV=<n>) =="
+        # only the selected camera (owner P1 a): opening every camera took 2.1 s of 2.2 s
+        echo "== camera WEBCAM_DEV=${WEBCAM_DEV:-0} (every camera: run.sh status) =="
         make_camera_nodes
-        python3 "$HERE/video/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
+        local cam
+        cam="$(python3 "$HERE/video/cam_list.py" --selected 2>/dev/null)"
+        echo "$cam"
+        echo "$cam" | grep -q "CAPTURE" && _ok "camera gives frames" \
+            || _bad "camera ${WEBCAM_DEV:-0} gives no frames; run.sh status lists every camera"
     elif [ "$video" = dji ]; then
         echo "== phone reachable =="
         local ip code
@@ -219,7 +223,7 @@ APP
     if [ -n "${SCRIPT:-}" ]; then
         [ "$control" = mock ] || die "SCRIPT drives commands: it runs only with control=mock"
         local script="$SCRIPT"; [ "$script" = default ] && script=""
-        tmux new-window -t "$SESSION" -n feed "bash -c 'source $ROS_SETUP; cd $HERE; export CONTROL=mock; python3 -m app.feed $script; exec bash'"
+        tmux new-window -t "$SESSION" -n feed "bash -c 'source $ROS_SETUP; cd $HERE; export CONTROL=mock; python3 test/scripted_e2e_run.py $script; exec bash'"
     fi
     tmux select-window -t "$SESSION:app"
 
@@ -280,12 +284,8 @@ cmd_status(){
     echo "-- cameras (WEBCAM_DEV=<n>; the running app holds its own) --"; make_camera_nodes; python3 "$HERE/video/cam_list.py" 2>/dev/null || echo "  (no camera lister)"
 }
 
-# ------------------------------------------------------------------ score / show (diagnose a recorded session)
-cmd_score(){  # run.sh score [list.md] [session];  SAFETY: read-only, writes REPORT.md into the session
-    local list="${1:-$(cd "$HERE/../.." && pwd)/datasets/e2e/live-test-e2e-50.md}"
-    python3 "$HERE/log/score.py" "$list" "${2:-}"
-}
-cmd_perf(){ python3 "$HERE/log/perf_report.py" "${1:-latest}"; }  # read-only: p50/p95/max per stage
+# ------------------------------------------------------------------ show / perf (diagnose a recorded session)
+cmd_perf(){ python3 "$HERE/log/perf_report.py" "${1:-latest}"; }  # read-only: stats per stage
 cmd_show(){ python3 "$HERE/log/show.py" "${1:-latest}"; }  # read-only pretty-print
 
 # ------------------------------------------------------------------ dispatch
@@ -295,8 +295,7 @@ case "$cmd" in
     down)      cmd_down ;;
     status)    cmd_status "$@" ;;
     preflight) cmd_preflight "$@" ;;
-    score)     cmd_score "$@" ;;
     show)      cmd_show "$@" ;;
     perf)      cmd_perf "$@" ;;
-    *) die "usage: run.sh up|down|status|preflight|score|show|perf" ;;
+    *) die "usage: run.sh up|down|status|preflight|show|perf" ;;
 esac

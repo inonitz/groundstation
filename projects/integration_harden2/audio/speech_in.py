@@ -4,7 +4,7 @@ Several run at once on purpose: a remote source must never take away the ground-
 mic. A new source is one class plus one line in SOURCES."""
 from audio.asr_phone import PhoneAsr
 from audio.asr_ros import RosAsr
-from system.fatal import die
+from runtime.fatal import die
 
 SOURCES = {"ros": RosAsr, "phone": PhoneAsr}
 

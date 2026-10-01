@@ -1,5 +1,4 @@
-"""Hebrew text helpers shared by several modules (the recognizer, the screen,
-log/score.py)."""
+"""Hebrew text helpers shared by several modules (the recognizer, the screen)."""
 
 HE = "֐-׿"         # the Hebrew Unicode block, for a regex character class
 
@@ -34,13 +33,62 @@ NUM_TENS = {
 }
 NUM_WORDS = set(NUM_UNITS) | set(NUM_TENS) | {"עשרה", "עשר", "מאה", "מאתיים", "מאות"}
 
+# The seven front letters (owner Q8, 2026-09-27: "ALL SEVEN! THIS WONT ARISE JUST WITH
+# VAV!"). One of them glued to a number word: בחמישה = by five, כעשר = about ten.
+FRONT_LETTERS = {
+    "ו": "and",
+    "ה": "the",
+    "ב": "in",
+    "ל": "to",
+    "מ": "from",
+    "כ": "about",
+    "ש": "that",
+}
+# Before one of these, ה + a number is a count (השלושה מטרים = the three metres);
+# anywhere else it is an ordinal (הבית השני = the second house) and stays a word.
+UNIT_WORDS = {"מטר", "מטרים", "מעלות", "שניות", "שנייה", "דקות", "סיבובים"}
 
-def hebnum_to_digits(s):
+# Fractions (owner C.3: "What about 'ורבע'? What about 'ושמינית'?"). A fraction after a
+# number adds to it (שתיים ורבע = 2.25); alone it is its value (רבע מטר = 0.25); of a
+# turn it is degrees (רבע סיבוב = 90). The plural forms count: שלושת רבעי = 3/4.
+FRACTIONS = {
+    "חצי": 0.5,
+    "רבע": 0.25,
+    "שליש": 1 / 3,
+    "שמינית": 0.125,
+}
+FRACTION_PLURALS = {
+    "חצאי": 0.5,
+    "רבעי": 0.25,
+    "רבעים": 0.25,
+    "שלישי": 1 / 3,
+    "שלישים": 1 / 3,
+    "שמיניות": 0.125,
+}
+
+
+def split_front(word):
+    """A number word with one front letter -> (letter, number word). Anything else ->
+    ("", word): a word that is a number word by itself keeps its first letter (שמונה,
+    שני)."""
+    if word in NUM_WORDS:
+        return "", word
+    if word[:1] in FRONT_LETTERS and word[1:] in NUM_WORDS:
+        return word[0], word[1:]
+    return "", word
+
+
+def hebnum_to_digits(s, front_letters=False):
     """Compose adjacent Hebrew number words into one value: עשרים וחמישה -> 25,
-    מאה עשרים -> 120, חמישה עשר -> 15. A word with the definite article (השני, ordinal
-    usage) is never converted."""
+    מאה עשרים -> 120, חמישה עשר -> 15. An ordinal (השני) is never converted.
+    front_letters=True (the number guard) also converts a number word with a front
+    letter, joined by a hyphen as written Hebrew does: בחמישה -> ב-5; with ה only before
+    a unit (השלושה מטרים). Stage 2 leaves those words to Gemma: it read all 23 of them
+    right (2026-09-28), and the digit form made it fuse two steps into one."""
     word = ""
-    core = ""
+    front = ""
+    first = ""
+    after = ""
     tok = ""
     c = ""
     total = 0
@@ -53,8 +101,12 @@ def hebnum_to_digits(s):
 
     while i < len(toks):
         word = toks[i]
-        core = word[1:] if word.startswith("ו") else word
-        if core not in NUM_WORDS or word.startswith("ה"):
+        front = ""
+        first = word
+        if front_letters:
+            front, first = split_front(word)
+        after = toks[i + 1] if i + 1 < len(toks) else ""
+        if first not in NUM_WORDS or (front == "ה" and after not in UNIT_WORDS):
             out.append(word)
             i += 1
             continue
@@ -67,6 +119,10 @@ def hebnum_to_digits(s):
         while j < len(toks):
             tok = toks[j]
             c = tok[1:] if tok.startswith("ו") and consumed else tok
+            if not consumed:
+                c = first
+            if c in NUM_UNITS and unit:
+                break                           # אחד וחמישה: two numbers, not one
             if c in NUM_UNITS:
                 unit = NUM_UNITS[c]
             elif c in ("עשרה", "עשר") and unit:
@@ -90,7 +146,7 @@ def hebnum_to_digits(s):
 
         total += unit
         if consumed and total > 0:
-            out.append(str(total))
+            out.append(front + "-" * bool(front) + str(total))
             i = j
         else:
             out.append(word)
