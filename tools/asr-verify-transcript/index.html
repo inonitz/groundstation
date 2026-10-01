@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label recordings</title>
+<style>
+:root {
+  --ground: #121418;
+  --panel: #191c22;
+  --panel-2: #20242b;
+  --line: #2c313a;
+  --text: #e7e9ee;
+  --muted: #9aa1ad;
+  --accent: #f2b544;
+  --accent-ink: #1b1406;
+  --accent-soft: rgba(242, 181, 68, 0.14);
+  --ok: #6fcf97;
+  --ok-soft: rgba(111, 207, 151, 0.14);
+  --warn: #f28b6b;
+  --warn-soft: rgba(242, 139, 107, 0.14);
+  --radius: 10px;
+  --he: "Noto Sans Hebrew", "Segoe UI", "Arial Hebrew", "Rubik", system-ui, sans-serif;
+  --ui: system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+/* a display rule (flex, grid) must never override the hidden attribute */
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--ground); color: var(--text); }
+body { font: 15px/1.5 var(--ui); font-variant-numeric: tabular-nums; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button, input, textarea { font: inherit; color: inherit; }
+
+.top {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; gap: 20px;
+  padding: 12px 24px; background: rgba(18, 20, 24, 0.94);
+  border-bottom: 1px solid var(--line);
+}
+.top h1 { font-size: 16px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+.progress { flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.bar { flex: 1; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar > i {
+  display: block; height: 100%; width: 100%; background: var(--ok);
+  transform: scaleX(0); transform-origin: left; transition: transform 200ms ease-out;
+}
+.count { color: var(--muted); white-space: nowrap; }
+.goto { display: flex; gap: 6px; align-items: center; color: var(--muted); }
+.goto input { width: 64px; }
+
+main {
+  max-width: 1180px; margin: 0 auto; padding: 24px 24px 120px;
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px;
+}
+section h2 {
+  font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 8px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.clip-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.clip-head .n { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+.clip-head .of { color: var(--muted); }
+.badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+.badge.saved { background: var(--ok-soft); color: var(--ok); }
+.badge.new { background: var(--accent-soft); color: var(--accent); }
+
+.player { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.play {
+  width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  display: grid; place-items: center; flex: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  transition: transform 150ms ease-out;
+}
+.play:hover { transform: scale(1.05); }
+.play:active { transform: scale(0.97); }
+.player audio { flex: 1; min-width: 0; height: 36px; }
+
+.field { margin-bottom: 22px; }
+.heard {
+  font: 20px/1.5 var(--he); color: var(--muted);
+  padding: 10px 14px; background: var(--panel); border-radius: var(--radius);
+}
+.live { font-size: 13px; color: var(--muted); margin-top: 6px; }
+textarea, input[type=text], input[type=number] {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 10px 14px; caret-color: var(--accent);
+  transition: border-color 150ms ease-out;
+}
+textarea:focus, input:focus { border-color: var(--accent); outline: none; }
+textarea.sentence { font: 24px/1.45 var(--he); resize: vertical; min-height: 64px; }
+.plan {
+  list-style: none; margin: 0 0 10px; padding: 12px 14px;
+  background: var(--panel); border-radius: var(--radius);
+}
+.plan li { font-size: 17px; padding: 2px 0; }
+.plan li + li { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; }
+.plan.edited { box-shadow: inset 0 0 0 1px var(--accent); }
+.hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.error { color: var(--warn); font-size: 13px; margin-top: 6px; min-height: 1.2em; }
+.plan-edit { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 14px; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  text-align: start; width: 100%;
+  background: var(--panel); border: 1px solid transparent; border-radius: var(--radius);
+  padding: 10px 14px; display: grid; grid-template-columns: 22px 1fr auto; gap: 4px 10px;
+  transition: border-color 150ms ease-out, background 150ms ease-out;
+}
+.option:hover { border-color: var(--line); }
+.option.chosen { border-color: var(--accent); background: var(--accent-soft); }
+.option .key { color: var(--muted); font-size: 13px; grid-row: span 3; padding-top: 4px; }
+.option .he { font: 18px/1.4 var(--he); direction: rtl; text-align: right; }
+.option .sim { color: var(--muted); font-size: 13px; padding-top: 4px; }
+.option .words { grid-column: 2 / 4; color: var(--muted); font-size: 14px; }
+
+.actions {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 2;
+  background: rgba(25, 28, 34, 0.97); border-top: 1px solid var(--line);
+  padding: 12px 24px;
+}
+.actions .inner { max-width: 1180px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+.actions .spacer { flex: 1; }
+.remove-form { margin-bottom: 10px; }
+.remove-form label { white-space: nowrap; color: var(--muted); }
+.remove-form input { flex: 1; min-width: 0; }
+.badge.removed { background: var(--warn-soft); color: var(--warn); }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 16px; border-radius: var(--radius); border: 1px solid var(--line);
+  background: var(--panel-2); transition: background 150ms ease-out, opacity 150ms ease-out;
+}
+.btn:hover { background: #282d35; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 650; }
+.btn.primary:hover { background: #f6c464; }
+.btn kbd { font: 12px var(--ui); opacity: 0.7; }
+.status { color: var(--muted); font-size: 13px; min-width: 0; }
+.status.ok { color: var(--ok); }
+.status.bad { color: var(--warn); }
+.keys { font-size: 12px; color: var(--muted); margin-top: 28px; line-height: 1.8; }
+.keys kbd {
+  font: 12px var(--ui); background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 4px; padding: 0 5px;
+}
+.label-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.label-row h2 { margin: 0; }
+.tag { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 99px; }
+.tag.whisper { background: var(--ok-soft); color: var(--ok); }
+.tag.edited { background: var(--accent-soft); color: var(--accent); }
+.link {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--muted); font-size: 13px; text-decoration: underline; text-underline-offset: 3px;
+}
+.link:hover { color: var(--text); }
+.rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 56px 36px; gap: 8px; align-items: center; }
+.row select, .row input {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 9px 12px; color: var(--text);
+}
+.row select:focus, .row input:focus { border-color: var(--accent); outline: none; }
+.row .unit { color: var(--muted); font-size: 14px; }
+.row .remove {
+  width: 36px; height: 36px; border-radius: var(--radius); cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--muted);
+  display: grid; place-items: center;
+}
+.row .remove:hover { color: var(--warn); border-color: var(--warn); }
+.kind-note { padding: 12px 14px; background: var(--panel); border-radius: var(--radius); margin-bottom: 10px; font-size: 17px; }
+.plan-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.btn.small { padding: 7px 12px; font-size: 14px; }
+.btn.on { border-color: var(--accent); color: var(--accent); }
+.vision { margin-bottom: 10px; }
+.vision input { margin-top: 6px; }
+details.advanced { margin-top: 6px; }
+details.advanced summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+details.advanced[open] summary { margin-bottom: 8px; }
+.option .use { grid-column: 2 / 4; display: flex; gap: 14px; }
+.done { grid-column: 1 / -1; padding: 40px 0; font-size: 18px; }
+@media (max-width: 860px) {
+  main { grid-template-columns: 1fr; gap: 20px; padding: 16px; }
+  .top { flex-wrap: wrap; padding: 10px 16px; gap: 10px; }
+  .actions { position: static; padding: 10px 16px; }
+  .actions .inner { flex-wrap: wrap; }
+  .btn kbd { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Label recordings</h1>
+  <div class="progress">
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <span class="count" id="count">loading</span>
+  </div>
+  <form class="goto" id="goto">
+    <label for="goto-n">Go to clip</label>
+    <input type="number" id="goto-n" min="1" inputmode="numeric">
+  </form>
+</header>
+
+<main id="main">
+  <section>
+    <div class="clip-head">
+      <span class="n" id="clip-n">Clip</span><span class="of" id="clip-of"></span>
+      <span class="badge" id="badge"></span>
+    </div>
+    <div class="player">
+      <button class="play" id="play" aria-label="Play the clip (Alt+P)">
+        <svg id="icon-play" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+        <svg id="icon-pause" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+      </button>
+      <audio id="audio" controls preload="auto"></audio>
+    </div>
+
+    <div class="field">
+      <h2>Whisper heard</h2>
+      <div class="heard" id="heard" dir="rtl" lang="he"></div>
+      <div class="live" id="live"></div>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <h2><label for="sentence">The sentence that was said</label></h2>
+        <span class="tag whisper" id="sentence-tag">whisper's text</span>
+        <button type="button" class="link" id="to-whisper" hidden>back to whisper's text</button>
+      </div>
+      <textarea class="sentence" id="sentence" dir="rtl" lang="he" rows="2" spellcheck="false"></textarea>
+      <div class="hint">It starts as exactly what whisper wrote. Fix it if whisper misheard. Enter saves and goes to the next clip. Nothing said? "Nothing was said" saves it empty.</div>
+    </div>
+
+    <div class="field">
+      <h2>What the drone should do</h2>
+      <div class="plan-tools">
+        <button type="button" class="btn small" id="k-mission">Fly a plan</button>
+        <button type="button" class="btn small" id="k-none">Nothing flies</button>
+        <button type="button" class="btn small" id="k-emergency">Halt</button>
+        <button type="button" class="btn small" id="k-perception">Vision request</button>
+      </div>
+      <div class="kind-note" id="kind-note" hidden></div>
+      <div class="vision" id="vision" hidden>
+        <div class="plan-tools" role="group" aria-label="the kind of vision request">
+          <button type="button" class="btn small" data-vk="highlight">Highlight</button>
+          <button type="button" class="btn small" data-vk="count">Count</button>
+          <button type="button" class="btn small" data-vk="describe">Describe</button>
+          <button type="button" class="btn small" data-vk="any">Any kind</button>
+        </div>
+        <label for="vision-words" class="hint">The target, in English (what Gemma must name). A comma between words, a slash between synonyms: <b>chair / seat</b>, <b>red, car / vehicle</b></label>
+        <input type="text" id="vision-words" dir="ltr" spellcheck="false" autocomplete="off" placeholder="chair / seat">
+      </div>
+      <div class="rows" id="rows"></div>
+      <button type="button" class="btn small" id="add-step">
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2"/></svg>Add step</button>
+      <h2 style="margin-top:18px">In words</h2>
+      <ul class="plan" id="plan"></ul>
+      <div class="error" id="plan-error" role="alert"></div>
+      <details class="advanced">
+        <summary>Advanced: type the plan (notation or JSON)</summary>
+        <input type="text" class="plan-edit" id="plan-edit" dir="ltr" spellcheck="false" autocomplete="off" placeholder="dx-8, dz+10, +90, takeoff, EMPTY, halt, VLM, or {...}">
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <h2>Nearest known sentences</h2>
+    <div class="options" id="options"></div>
+    <div class="keys">
+      <kbd>Enter</kbd> accept · <kbd>Alt</kbd>+<kbd>P</kbd> play ·
+      <kbd>Alt</kbd>+<kbd>1</kbd>..<kbd>5</kbd> take that sentence and plan ·
+      <kbd>Alt</kbd>+<kbd>←</kbd> back · <kbd>Alt</kbd>+<kbd>→</kbd> next ·
+      <kbd>Alt</kbd>+<kbd>R</kbd> not gradable ·
+      <kbd>Alt</kbd>+<kbd>N</kbd> nothing was said
+    </div>
+  </section>
+</main>
+
+<footer class="actions">
+  <form class="inner remove-form" id="remove-form" hidden>
+    <label for="remove-why">Why remove clip <span id="remove-n"></span> from the set?</label>
+    <input type="text" id="remove-why" autocomplete="off" placeholder="the reason, e.g. too much of the same sentence">
+    <button type="submit" class="btn primary">Remove it</button>
+    <button type="button" class="btn" id="remove-cancel">Cancel</button>
+  </form>
+  <div class="inner">
+    <button class="btn" id="back"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none"/></svg>Back</button>
+    <button class="btn" id="next">Skip<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+    <span class="spacer"></span>
+    <button class="btn" id="remove">Remove from the set</button>
+    <button class="btn" id="silent">Nothing was said <kbd>Alt+N</kbd></button>
+    <button class="btn" id="review">Not gradable <kbd>Alt+R</kbd></button>
+    <button class="btn primary" id="accept"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>Accept <kbd>Enter</kbd></button>
+  </div>
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const S = {
+  total: 0, index: 0, clip: null, expect: null, option: 0,
+  rows: [], planBad: false, seq: 0, vision: { kind: "highlight", words: "" }
+};
+const NO_AMOUNT = new Set(["take off", "land"]);
+const UNIT = { "turn right": "°", "turn left": "°", "turn either way": "°", "wait": "s" };
+
+async function api(path, body) {
+  const init = body === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  };
+  const res = await fetch(path, init);
+  return res.json();
+}
+
+function setStatus(text, kind) {
+  const el = $("status");
+  el.textContent = text;
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+function renderProgress(saved) {
+  $("count").textContent = `${saved} of ${S.total} saved`;
+  $("bar").style.transform = `scaleX(${(saved / Math.max(S.total, 1)).toFixed(4)})`;
+}
+
+function renderWords(lines) {
+  $("plan").replaceChildren(...lines.map((line) => {
+    const li = document.createElement("li");
+    li.textContent = line;
+    return li;
+  }));
+}
+
+function planBroken(error) {
+  S.planBad = !!error;
+  $("plan-error").textContent = error || "";
+  $("accept").disabled = S.planBad;
+}
+
+// ---- the sentence: whisper's exact text until the owner edits it
+function markSentence() {
+  const isWhisper = $("sentence").value === S.clip.heard;
+  $("sentence-tag").textContent = isWhisper ? "whisper's text" : "edited";
+  $("sentence-tag").className = "tag " + (isWhisper ? "whisper" : "edited");
+  $("to-whisper").hidden = isWhisper;
+}
+
+function setSentence(text) {
+  $("sentence").value = text;
+  markSentence();
+}
+
+// the nearest cases follow the sentence the owner types (whisper may have written nothing)
+let nearTimer = null;
+function sentenceTyped() {
+  markSentence();
+  clearTimeout(nearTimer);
+  const text = $("sentence").value;
+  nearTimer = setTimeout(async () => {
+    if (!text.trim()) {
+      renderOptions();
+      return;
+    }
+    const res = await api("/api/nearest", { index: S.index, text });
+    if (!res.options || $("sentence").value !== text) return;
+    S.clip.options = res.options;
+    S.option = 0;
+    renderOptions();
+  }, 300);
+}
+
+// ---- the plan: step rows, or one of three kinds
+function renderKind() {
+  const kind = S.expect.kind;
+  for (const k of ["mission", "none", "emergency", "perception"]) {
+    $("k-" + k).classList.toggle("on", kind === k);
+  }
+  const isMission = kind === "mission";
+  $("rows").hidden = !isMission;
+  $("add-step").hidden = !isMission;
+  const isVision = kind === "perception";
+  const note = $("kind-note");
+  note.hidden = isMission || isVision;
+  if (!isMission) note.textContent = S.clip ? kindText(kind) : "";
+  $("vision").hidden = !isVision;
+  if (isVision) {
+    for (const b of document.querySelectorAll("[data-vk]")) {
+      b.classList.toggle("on", b.dataset.vk === S.vision.kind);
+    }
+  }
+}
+
+// ---- a vision request: its kind and the target words (owner UI1 (4))
+let visionTimer = null;
+function visionChanged() {
+  clearTimeout(visionTimer);
+  S.vision.words = $("vision-words").value;
+  renderKind();
+  S.planBad = true;
+  $("accept").disabled = true;
+  visionTimer = setTimeout(async () => {
+    const seq = ++S.seq;
+    const res = await api("/api/vision", S.vision);
+    if (seq !== S.seq) return;
+    if (!res.ok) {
+      renderWords([]);
+      planBroken(res.error);
+      return;
+    }
+    S.expect = res.expect;
+    renderWords(res.plan);
+    planBroken("");
+  }, 180);
+}
+
+function startVision() {
+  // propose the target from the nearest known vision request, if whisper's text has one
+  const known = S.clip.options.find((o) => o.expect.kind === "perception");
+  S.vision = known ? { ...known.vision } : { kind: "highlight", words: "" };
+  $("vision-words").value = S.vision.words;
+  S.expect = { kind: "perception", groups: [] };
+  S.rows = [];
+  $("plan-edit").value = "";
+  renderKind();
+  visionChanged();
+}
+
+function kindText(kind) {
+  if (kind === "none") return "Nothing flies: a reject, an empty plan, a vision request or a halt passes.";
+  if (kind === "emergency") return "Halt: the emergency stop.";
+  if (kind === "perception") return "A vision request: highlight, count or describe.";
+  if (kind === "review") return "Not gradable.";
+  if (kind === "open") return "Any mission that flies.";
+  return kind;
+}
+
+function renderRows() {
+  const box = $("rows");
+  box.replaceChildren(...S.rows.map((row, i) => {
+    const div = document.createElement("div");
+    div.className = "row";
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", `step ${i + 1} action`);
+    for (const action of S.clip.actions) {
+      const opt = document.createElement("option");
+      opt.value = action;
+      opt.textContent = action;
+      select.append(opt);
+    }
+    select.value = row.action;
+    select.addEventListener("change", () => {
+      row.action = select.value;
+      if (NO_AMOUNT.has(row.action)) row.amount = "";
+      renderRows();
+      rowsChanged();
+    });
+    const amount = document.createElement("input");
+    amount.type = "text";
+    amount.inputMode = "decimal";
+    amount.placeholder = "any";
+    amount.value = row.amount;
+    amount.setAttribute("aria-label", `step ${i + 1} amount`);
+    // keep the cell when there is no number, so the remove button stays in its column
+    amount.style.visibility = NO_AMOUNT.has(row.action) ? "hidden" : "visible";
+    amount.addEventListener("input", () => { row.amount = amount.value; rowsChanged(); });
+    const unit = document.createElement("span");
+    unit.className = "unit";
+    unit.textContent = NO_AMOUNT.has(row.action) ? "" : (UNIT[row.action] || "m");
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "remove";
+    remove.setAttribute("aria-label", `remove step ${i + 1}`);
+    remove.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2"/></svg>';
+    remove.addEventListener("click", () => { S.rows.splice(i, 1); renderRows(); rowsChanged(); });
+    div.append(select, amount, unit, remove);
+    return div;
+  }));
+}
+
+let rowsTimer = null;
+function rowsChanged() {
+  clearTimeout(rowsTimer);
+  $("plan-edit").value = "";
+  planBroken("");
+  S.planBad = true;                  // until the server has read the rows
+  $("accept").disabled = true;
+  rowsTimer = setTimeout(async () => {
+    const seq = ++S.seq;
+    const res = await api("/api/rows", { rows: S.rows });
+    if (seq !== S.seq) return;
+    if (!res.ok) {
+      renderWords([]);
+      planBroken(res.error);
+      return;
+    }
+    S.expect = res.expect;
+    renderWords(res.plan);
+    planBroken("");
+  }, 180);
+}
+
+function setKind(kind) {
+  if (kind === "mission") {
+    if (S.expect.kind !== "mission") {
+      S.rows = [{ action: "fly forward", amount: "" }];
+      S.expect = { kind: "mission", steps: [] };
+    }
+    renderKind();
+    renderRows();
+    rowsChanged();
+    return;
+  }
+  if (kind === "perception") {
+    if (S.expect.kind !== "perception") startVision();
+    return;
+  }
+  S.expect = { kind };
+  S.rows = [];
+  $("plan-edit").value = "";
+  planBroken("");
+  renderKind();
+  renderWords([kindText(kind)]);
+}
+
+function showPlan(expect, rows, words, vision) {
+  S.expect = expect;
+  S.vision = vision ? { ...vision } : { kind: "highlight", words: "" };
+  $("vision-words").value = S.vision.words;
+  S.rows = rows.map((r) => ({ ...r }));
+  $("plan-edit").value = "";
+  planBroken("");
+  renderKind();
+  renderRows();
+  renderWords(words);
+}
+
+// ---- the nearest sentences: offers, never pre-filled
+function renderOptions() {
+  const box = $("options");
+  if (!$("sentence").value.trim()) {
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.textContent = "Whisper wrote nothing for this clip. Type the sentence, and the nearest known sentences appear here.";
+    box.replaceChildren(note);
+    return;
+  }
+  box.replaceChildren(...S.clip.options.map((opt, i) => {
+    const card = document.createElement("div");
+    card.className = "option";
+    card.innerHTML = `<span class="key">${i + 1}</span><span class="he" lang="he"></span>` +
+      `<span class="sim"></span><span class="words"></span><span class="use">` +
+      `<button type="button" class="link" data-use="sentence">use this sentence</button>` +
+      `<button type="button" class="link" data-use="plan">use this plan</button>` +
+      `<button type="button" class="link" data-use="both">use both</button></span>`;
+    card.querySelector(".he").textContent = opt.he;
+    card.querySelector(".sim").textContent = `${Math.round(opt.similarity * 100)}%`;
+    card.querySelector(".words").textContent = opt.plan.join(" → ");
+    card.querySelector('[data-use="sentence"]').addEventListener("click", () => useOption(i, true, false));
+    card.querySelector('[data-use="plan"]').addEventListener("click", () => useOption(i, false, true));
+    card.querySelector('[data-use="both"]').addEventListener("click", () => useOption(i, true, true));
+    return card;
+  }));
+}
+
+function useOption(i, sentence, plan) {
+  const opt = S.clip.options[i];
+  if (!opt) return;
+  S.option = i;
+  if (sentence) setSentence(opt.he);
+  if (plan) showPlan(opt.expect, opt.rows, opt.plan, opt.vision);
+}
+
+// ---- one clip
+async function load(index) {
+  if (index < 0 || index >= S.total) return;
+  const clip = await api(`/api/clip/${index}`);
+  S.index = index;
+  S.clip = clip;
+  S.option = 0;
+  $("clip-n").textContent = `Clip ${index + 1}`;
+  $("clip-of").textContent = `/ ${clip.total}`;
+  const removed = clip.saved && clip.case.removed;
+  $("badge").textContent = removed ? `Removed: ${clip.case.removed_reason}` : (clip.saved ? "Saved" : "New");
+  $("badge").className = "badge " + (removed ? "removed" : (clip.saved ? "saved" : "new"));
+  $("remove-form").hidden = true;
+  $("heard").textContent = clip.heard;
+  $("live").textContent = `The app did, live: ${clip.live_action}`;
+  setSentence(clip.case.he);
+  showPlan(clip.case.expect, clip.rows, clip.plan, clip.vision);
+  $("back").disabled = index === 0;
+  $("next").disabled = index === S.total - 1;
+  $("goto-n").max = S.total;
+  renderOptions();
+  const audio = $("audio");
+  audio.src = `/audio/${index}`;
+  audio.play().catch(() => {});
+  $("sentence").focus();
+  history.replaceState(null, "", `#${index + 1}`);
+}
+
+let parseTimer = null;
+function onPlanEdit() {
+  clearTimeout(parseTimer);
+  const text = $("plan-edit").value.trim();
+  if (!text) {
+    rowsChanged();
+    return;
+  }
+  S.planBad = true;
+  $("accept").disabled = true;
+  parseTimer = setTimeout(async () => {
+    const seq = ++S.seq;
+    const res = await api("/api/parse", { text });
+    if (seq !== S.seq) return;
+    if (!res.ok) {
+      planBroken(res.error);
+      return;
+    }
+    S.expect = res.expect;
+    S.rows = res.rows;
+    S.vision = res.vision;
+    $("vision-words").value = res.vision.words;
+    renderKind();
+    renderRows();
+    renderWords(res.plan);
+    planBroken("");
+  }, 220);
+}
+
+async function save(expect, removed) {
+  // an empty sentence is valid: nothing was said (owner B4 (7))
+  const he = $("sentence").value;
+  if (S.planBad && expect === S.expect) {
+    setStatus("The plan is not ready: fix the red line, or wait a moment.", "bad");
+    return;
+  }
+  const body = { index: S.index, he, expect, option: S.option };
+  if (removed) body.removed = removed;
+  const res = await api("/api/save", body);
+  if (!res.ok) {
+    setStatus(res.error || "Not saved.", "bad");
+    return;
+  }
+  setStatus(removed ? `Clip ${S.index + 1} removed from the set.` : `Clip ${S.index + 1} saved.`, "ok");
+  renderProgress(res.saved);
+  if (S.index + 1 < S.total) {
+    load(S.index + 1);
+    return;
+  }
+  setStatus(`Clip ${S.index + 1} saved. That was the last clip.`, "ok");
+}
+
+function nothingSaid() {
+  setSentence("");
+  setKind("none");
+  save({ kind: "none" });
+}
+
+function togglePlay() {
+  const audio = $("audio");
+  if (audio.paused) {
+    audio.currentTime = audio.ended ? 0 : audio.currentTime;
+    audio.play().catch(() => {});
+    return;
+  }
+  audio.pause();
+}
+
+$("audio").addEventListener("play", () => { $("icon-play").hidden = true; $("icon-pause").hidden = false; });
+$("audio").addEventListener("pause", () => { $("icon-play").hidden = false; $("icon-pause").hidden = true; });
+$("play").addEventListener("click", togglePlay);
+$("accept").addEventListener("click", () => save(S.expect));
+$("review").addEventListener("click", () => save({ kind: "review" }));
+$("silent").addEventListener("click", nothingSaid);
+$("remove").addEventListener("click", () => {
+  $("remove-n").textContent = S.index + 1;
+  $("remove-form").hidden = false;
+  $("remove-why").focus();
+});
+$("remove-cancel").addEventListener("click", () => { $("remove-form").hidden = true; });
+$("remove-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const why = $("remove-why").value.trim();
+  if (!why) {
+    setStatus("Say why it leaves the set.", "bad");
+    return;
+  }
+  $("remove-why").value = "";
+  save({ kind: "review" }, why);
+});
+$("back").addEventListener("click", () => load(S.index - 1));
+$("next").addEventListener("click", () => load(S.index + 1));
+$("sentence").addEventListener("input", sentenceTyped);
+$("to-whisper").addEventListener("click", () => setSentence(S.clip.heard));
+$("plan-edit").addEventListener("input", onPlanEdit);
+$("vision-words").addEventListener("input", visionChanged);
+for (const b of document.querySelectorAll("[data-vk]")) {
+  b.addEventListener("click", () => { S.vision.kind = b.dataset.vk; visionChanged(); });
+}
+$("add-step").addEventListener("click", () => {
+  S.rows.push({ action: "fly forward", amount: "" });
+  renderRows();
+  rowsChanged();
+});
+for (const k of ["mission", "none", "emergency", "perception"]) {
+  $("k-" + k).addEventListener("click", () => setKind(k));
+}
+$("goto").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const n = parseInt($("goto-n").value, 10);
+  if (n >= 1 && n <= S.total) {
+    $("goto-n").value = "";
+    load(n - 1);
+    return;
+  }
+  setStatus(`Clips are numbered 1 to ${S.total}.`, "bad");
+});
+
+document.addEventListener("keydown", (e) => {
+  const tag = e.target.tagName;
+  const inGoto = e.target === $("goto-n") || e.target === $("remove-why");
+  if (e.key === "Enter" && !e.shiftKey && !inGoto && !e.altKey) {
+    if (tag === "BUTTON" || tag === "SELECT" || tag === "SUMMARY") return;
+    e.preventDefault();
+    save(S.expect);
+    return;
+  }
+  if (!e.altKey) return;
+  if (e.key === "ArrowLeft") { e.preventDefault(); load(S.index - 1); return; }
+  if (e.key === "ArrowRight") { e.preventDefault(); load(S.index + 1); return; }
+  if (e.code === "KeyP") { e.preventDefault(); togglePlay(); return; }
+  if (e.code === "KeyR") { e.preventDefault(); save({ kind: "review" }); return; }
+  if (e.code === "KeyN") { e.preventDefault(); nothingSaid(); return; }
+  const digit = /^Digit([1-5])$/.exec(e.code);
+  if (digit) { e.preventDefault(); useOption(parseInt(digit[1], 10) - 1, true, true); }
+});
+
+(async () => {
+  const state = await api("/api/state");
+  S.total = state.total;
+  renderProgress(state.saved);
+  const fromHash = parseInt(location.hash.slice(1), 10);
+  const start = fromHash >= 1 && fromHash <= state.total ? fromHash - 1 : state.first_unsaved;
+  load(Math.min(start, state.total - 1));
+})();
+</script>
+</body>
+</html>
