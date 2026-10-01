@@ -6,17 +6,18 @@ change updates its header in the same change, so the two never disagree. SERVICE
 
 | header | module | owns |
 |---|---|---|
-| system.h | system/ | the start-up dependency check, die, the status rows (each part owns its row; the board asks each part), supervisor (ProcessSpec -> Process handle), the ROS2 context + Subscription |
+| runtime.h | runtime/ | the start-up dependency check, die, the status rows (each part owns its row; the board asks each part), supervisor (ProcessSpec -> Process handle), the ROS2 context + Subscription |
 | util.h | util/ | the guarded third-party calls (the only try/except), net, process, hebrew, mission helpers |
 | dji_app.h | dji_app/ | the phone app (or mock): commands, /tts, the transmit switch, its one status |
 | gemma.h | gemma/ | the Gemma server's life, and one request call |
 | audio.h | audio/ | mic ASR, phone speech in, speech out (phone or laptop) |
 | video.h | video/ | the one frame source and its stall guard |
-| perception.h | perception2/ | SAM3 backend, the priority lock, count / highlight / describe tasks |
+| sam3.h | sam3/ | the SAM3 service: the backend contract, the loader (its "sam3" row), the SAM3 model |
+| perception.h | perception2/ | the vision system: the priority lock, count / highlight / describe tasks (uses sam3.h) |
 | control.h | control/ | executes flight: critical commands, missions, the transmit switch |
 | recognizer.h | recognizer/ | parses every sentence (fast path first) and routes it |
 | log.h | log/ | the session record (checked once at start, no status row), the timings (perf), the read-only tools |
-| app.h | app/ | start order, transcript -> actions, the global keys (F1 quit, F2 clear, F4 kill), the UI, the scripted run (feed) |
+| app.h | app/, keys/ | start order, transcript -> actions, the global keys (keys/: F1 quit, F2 clear, F4 kill), the UI, the scripted run (test/scripted_e2e_run.py) |
 
 config/ has no header: it holds every constant and start-up value the structs above are filled from.
 

@@ -1,17 +1,25 @@
-# Command Typing: Deterministic Sieve vs Gemma Planner — Accuracy and Latency
+# Command Typing: Deterministic Fast Path vs Gemma Planner — Accuracy and Latency
 
 Date: 2026-09-18. System: integration_harden2. GPU: single NVIDIA RTX 5070 Laptop GPU.
 
-> UPDATE 2026-09-19: the deterministic "sieve" this study compares against was subsequently
+> UPDATE 2026-09-19: the deterministic fast path this study compares against was subsequently
 > DELETED — command routing and typing moved to the one Gemma call. This study is the basis for
 > that decision; it describes `recognize_direct`'s fast path as it stood on 2026-09-18.
+>
+> RETIRED 2026-09-28 (owner ruling G2 a): the study is complete. Its harnesses (type_compare.py,
+> type_fresh.py, type_english.py, perf.py, bench.py) and its held-out cases (cases_typing_fresh.py,
+> cases_typing_fresh_en.py) were deleted from bench/hebrew-command-bench/; they remain in the git
+> history (last commit touching them: 8a8e022). The contention harnesses contention.py and
+> real_cadence.py were retired by the SAM3 assessment; their results are section R8 of
+> docs/research-complete-sam3-assessment.md. The raw results stay in
+> bench/hebrew-command-bench/results/.
 
 ## Objective
 
 For a Hebrew utterance, determine which mechanism better assigns the command TYPE — a movement
 command (should fly) versus a perception/other request (should not fly) — and at what latency cost:
 
-- the deterministic sieve (`recognize_direct`: bypass + Hebrew rewrites), the fast path;
+- the deterministic fast path (`recognize_direct`: bypass + Hebrew rewrites);
 - the Gemma 4 E4B planner (`_plan2`), the slow path.
 
 A secondary objective was to test whether the existing dataset biases the comparison.
@@ -30,12 +38,12 @@ Emergency is scored separately (stage 0, deterministic).
 
 ### Datasets
 - Existing (dev): 487 labelled Hebrew cases (`cases_commands.py`, `cases_perception.py`). The recognizer
-  was developed against these; it is the sieve's own dev set.
+  was developed against these; it is the fast path's own dev set.
 - Held-out: 200 new hand-authored cases (`cases_typing_fresh.py`), 100 move / 100 not_move, zero exact
-  overlap with the existing set. Authored with knowledge of the sieve regexes, so the sieve numbers on
-  this set are an upper bound, not a blind estimate.
+  overlap with the existing set. Authored with knowledge of the fast-path regexes, so the fast-path
+  numbers on this set are an upper bound, not a blind estimate.
 
-### Harnesses
+### Harnesses (deleted 2026-09-28; in the git history)
 - Accuracy: `type_compare.py` (dev set), `type_fresh.py` (held-out). Per case, det type = the
   `recognize_direct` kind; Gemma type = the `_plan2` kind on the recognized text; both scored against
   the label. One llama-server (Gemma 4 E4B, thinking off, temp 0).
@@ -69,13 +77,13 @@ commands). A translator in the routing path would add latency and a model for no
 ### Dataset bias (per subset)
 | subset | n | det fires | det movement recall | Gemma correct |
 |---|---|---|---|---|
-| dev std/verbose (sieve tuned here) | 352 | 25% | 34% | 99% |
+| dev std/verbose (fast path tuned here) | 352 | 25% | 34% | 99% |
 | l75 field (not tuned) | 59 | 8% | 7.5% | 85% |
 | perception | 45 | 0% (defers all) | — | 100% |
 | military | 20 | 0% (defers all) | — | 90% |
 
 ### Latency (n = 688)
-| percentile | fast — sieve | slow — Gemma | difference | ratio |
+| percentile | fast — deterministic | slow — Gemma | difference | ratio |
 |---|---|---|---|---|
 | p50 | 0.022 ms | 523.4 ms | 523.4 ms | ~24,000x |
 | p90 | 0.049 ms | 798.8 ms | 798.7 ms | ~16,000x |
@@ -86,7 +94,8 @@ commands). A translator in the routing path would add latency and a model for no
 Mean: fast 0.026 ms, slow 547.2 ms. Figure: `bench/hebrew-command-bench/results/2026-09-18-path-latency.png`.
 
 ### GPU contention (SAM3 vision vs Gemma routing, one GPU)
-`contention.py`. SAM3 and Gemma both resident; each latency measured isolated vs under the other's
+`contention.py` (retired; results in docs/research-complete-sam3-assessment.md, R8). SAM3 and
+Gemma both resident; each latency measured isolated vs under the other's
 continuous load; GPU sampled via nvidia-smi.
 | component | isolated p50 | under load p50 | slowdown |
 |---|---|---|---|
@@ -100,12 +109,12 @@ Result + figure: `results/2026-09-18-gpu-contention.{json,png}`. Caveat: laptop 
 
 ## Analysis
 
-1. The dataset bias is confirmed. Off its dev set, the sieve's coverage falls 25% -> 8% and its movement
+1. The dataset bias is confirmed. Off its dev set, the fast path's coverage falls 25% -> 8% and its movement
    recall 34% -> 7.5%; Gemma degrades gracefully 99% -> 85%. The existing dataset flatters the
    deterministic method.
-2. Gemma is the accurate classifier at ~87% on unseen Hebrew. The sieve catches ~1 in 8 movement
+2. Gemma is the accurate classifier at ~87% on unseen Hebrew. The fast path catches ~1 in 8 movement
    commands there, so it is near-irrelevant for accuracy on new input.
-3. The sieve is a latency optimisation, not an accuracy mechanism: 0.022 ms vs 523 ms at the median
+3. The fast path is a latency optimisation, not an accuracy mechanism: 0.022 ms vs 523 ms at the median
    (~24,000x). It answers instantly and uses no GPU for whatever it catches.
 4. Held-out Gemma failure modes (26 misses):
    - Special verbs are unreachable in Hebrew (~14): follow / come-home / track / scan / orbit / wave /
@@ -116,17 +125,21 @@ Result + figure: `results/2026-09-18-gpu-contention.{json,png}`. Caveat: laptop 
    the drone. The emergency tier is broad by design; this is a false-positive worth tightening.
 
 ## Open questions
-1. Field command mix: what fraction of real commands are the common, templated ones the sieve catches.
+1. Field command mix: what fraction of real commands are the common, templated ones the fast path catches.
    Requires session data, not a hand-authored set.
 2. Whisper (ASR) contention: measured SAM3<->Gemma only; whisper contention still to add (needs the
    persistent whisper-server). SAM3<->Gemma contention is now measured (see above).
 
 ## Artifacts
-- `bench/hebrew-command-bench/cases_typing_fresh.py` — the held-out 200.
+- `bench/hebrew-command-bench/cases_typing_fresh.py` — the held-out 200 (deleted 2026-09-28; in
+  the git history).
 - `results/2026-09-18-type-compare.json` — dev-set accuracy rows.
 - `results/2026-09-18-type-compare-FRESH200.json` — held-out accuracy rows.
 - `results/2026-09-18-path-latency.json` / `.png` — latency data and figure.
-- `type_compare.py`, `type_fresh.py`, `perf.py` — harnesses.
+- `type_compare.py`, `type_fresh.py`, `perf.py` — harnesses (deleted 2026-09-28; in the git
+  history).
+- `contention.py`, `real_cadence.py` — the contention harnesses (retired; results in
+  docs/research-complete-sam3-assessment.md, R8).
 
 ## Status / direction (owner, 2026-09-18; leaning, not final)
 Likely move to using Gemma to determine the command layer/type, pending the contention result. This
@@ -168,7 +181,8 @@ Controls: warm up; deployed model flags; 3 repeats; report medians.
 Deviation from the plan: I held SAM3 at exactly 1 forward/sec and fired Gemma at a single realistic
 gap (1.5 s), not the 2/4/8 s sweep. Per-command latency is set by the SAM3 background duty, not the
 command interval, so the sweep adds no signal. Controls: 3 repeats, warmup, deployed flags. 120 loaded
-Gemma calls, 246 SAM3 forwards. Harness: `real_cadence.py`.
+Gemma calls, 246 SAM3 forwards. Harness: `real_cadence.py` (retired; results in
+docs/research-complete-sam3-assessment.md, R8).
 
 | path | p50 | p95 | p99 | n |
 |---|---|---|---|---|
@@ -199,7 +213,7 @@ Result + figure: `results/2026-09-18-real-cadence-contention.{json,png}`.
 
 Decision: contention does NOT block routing every command through Gemma. The live per-command cost is
 ~500 ms whether or not SAM3 runs. The gate for "move command-typing to Gemma" is CLEARED on latency;
-accuracy (fresh-200: Gemma 87% vs sieve 12% movement recall) already favored it.
+accuracy (fresh-200: Gemma 87% vs the fast path's 12% movement recall) already favored it.
 
 Ruling 2026-09-19 (owner): move command routing/typing to Gemma is APPROVED -- it also matches the
 intended production design. Approach B (full-stack contention) and whisper contention are DEFERRED to

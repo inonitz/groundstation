@@ -3988,3 +3988,366 @@ Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where*
 - **Verdict:** every command goes through the one Gemma call (decided 2026-09-19; the fast path for
   typing was deleted). The study is done: its scripts are not maintained (owner, G1 2026-09-28).
 - **Where:** docs/research-2026-09-18-command-typing-fast-vs-gemma.md; bench/hebrew-command-bench/.
+
+### 2026-09-28 -- the vision benchmark runs again, as bench/perception; whole-system retired (agent bench, B5 + B6)
+- **What:** bench/vision-verify-bench moved to bench/perception/ (owner Y1). bench.py and propose_boxes.py
+  unpack detect()'s (status, hits); the benchmark had been broken since 2026-09-23 (commit 7ad3012). The
+  private-image ignore line moved with it. It measures ONLY the vision system, with English input (X2).
+  bench/whole-system is retired (D1 a): its results are in docs/research-complete-whole-system.md; its
+  README points there; labels/ and results/RESULTS.md stay as the raw data.
+- **Measured:** 137 human-labelled rows, 3 min 18 s on the GPU. The main agent compared the two result
+  files: every per-category tally and every instance count equals the 2026-09-20 run in all three arms
+  (the only setup difference is the key name hit_thr -> head_thr, value 0.5 in both). False draws:
+  control 84, baseline 24, verify 8; correct 34 / 89 / 105. Latency p50/p95 ms: 412/1259, 413/1273,
+  821/898 (2026-09-20: 413/1253, 413/1261, 829/928).
+- **Verdict:** the perception2 refactor did not change the vision system's accuracy. The whole-system
+  scripts wait for the owner's rm (the tool refused it).
+- **Where:** bench/perception/; docs/research-complete-whole-system.md; docs/refactor/bench_doc.md.
+
+### 2026-09-28 -- the confirm tool for the 139 recordings (agent bench, B3)
+- **What:** bench/recognizer/confirm.py plays each clip of datasets/asr, proposes the sentence and the
+  expected result from the nearest recognizer case (datasets/recognizer/*.json), and saves the owner's
+  answer to datasets/asr/recordings.json after every clip; a restart resumes at the next clip.
+- **Measured:** tested on 3 clips (accept, pick a case, JSON and notation expects, back, resume). One
+  changed direction word ("fly right" vs "fly forward") still scores 0.88 similarity, so a case's
+  sentence is proposed only at 0.9 or more; below that the tool proposes whisper's text.
+- **Verdict:** ready for the owner's labelling (B4). Audible playback in the container is unverified.
+- **Where:** bench/recognizer/confirm.py, bench/recognizer/README.md ("Label the recordings").
+
+### 2026-09-28 -- the SAM3 assessment: the 558 ms explained, the own-process cost measured (agent investigator, E2)
+- **Why:** the owner asked to assess SAM3 before any change to it (R9, R10, U5 a), to price a frame buffer
+  shared with a SAM3 process (T6), and to explain 558 ms in the app against ~400 ms in the benchmarks (C.2).
+- **Setup:** RTX 5070 Laptop 8 GiB; SAM3 nf4 through the app's Sam3Backend; Gemma through the app's
+  supervisor; 8 real frames at 1280x720; the app's record from session-20260925-045109-rog.
+- **Result:** one concept: alone 416.7 ms p50, Gemma loaded and idle 409.9, Gemma busy 630 (text or vision
+  requests). Three concepts: 1230 alone, 1876 with Gemma busy. In the app's 48 passes, 22 were three-concept
+  passes ("dresser" fans out to three concepts; 1321 ms p50); one-concept passes took 409 ms. The forward is
+  390 of 411 ms; the image encoding alone 333 ms. One image encoding shared by three concepts: 1196 -> 509 ms,
+  same boxes in 12 of 12 passes. Frame to another process: pipe 3.1 ms, shared memory 0.1 ms; a separate SAM3
+  process adds 0.4 ms per pass and does not change the frame loop. Start: import torch 913 ms, model load
+  3960 ms, first pass 839 ms. The main agent checked the tables against the raw JSON and the EOVSAM source
+  (arXiv 2608.02284).
+- **Verdict:** the 558 ms is the concept fan-out, not Gemma idle. The shared image encoding is the largest
+  gain. A separate process is cheap and buys failure isolation, not speed. Decisions S1-S6 are open with the
+  owner. contention.py and real_cadence.py are retired under A-D (their tables: section R8 of the document).
+- **Where:** docs/research-complete-sam3-assessment.md; bench/sam3-assessment/.
+
+### 2026-09-28 -- every frame and every stage in the perf record; the e2e stage (agent perf, C1 + C2)
+- **Why:** the owner: "Record everything and calculate metrics later!" (C.1); ROADMAP's command -> action
+  under 1 s (M3).
+- **What:** log/perf.py buffers every event in memory; a writer thread appends it every
+  PERF_FLUSH_SECONDS (5); die() writes it before any other cleanup. Every frame is one event (the gap, read,
+  draw, show); app/ui.py's per-second summary is gone. GPU samples through pynvml. A "startup" record per
+  status row. `run.sh perf`: n, min, P25-P99, max per stage, then the 20 slowest frames. The "e2e" stage
+  starts at the F5 release, a phone transcript or a scripted transcript, and ends when the phone app answers
+  the command or when the first highlight box is shown.
+- **Measured:** one record() call 1.08 us (the main agent, 100000 calls). Two scripted runs on the mock (C920,
+  virtual screen): frame gap P50 67.5 ms, P95 70 ms, max 1785 ms; camera read P50 53-55 ms, so the loop runs at
+  about 15 fps. Every row UP at 10.6-11.5 s. e2e: typed command 2-21 ms; a mission planned by Gemma 1259 ms;
+  a highlight to its first box 3511 ms (both from the transcript, without the ASR time).
+- **Verdict:** the record holds every frame at about 1 us per event. A highlight is 3.5 times over ROADMAP's
+  1 s, and a planned mission is over it before the ASR time is added. Four tests were rewritten by ruling
+  (C.1, R7, V1): each names its ruling and its old name.
+- **Where:** log/perf.py, log/perf_report.py, app/ui.py, app/turns.py, dji_app/client.py, system/fatal.py.
+
+### 2026-09-28 -- one call builds the services; no package check in the app (agent perf, C3)
+- **Why:** owner rulings D15, Q5 a, D7, D13/Q6, U6 a, and 3.3 (everything loads at start).
+- **What:** app/main.py `Services(source, imports_ms)` builds the session log, perf, the supervisor with its
+  processes, Gemma, the phone-app client and the SAM3 loader; close() runs in reverse. No deps.check() in the
+  app: `run.sh preflight` is its one place; the two tests of D7 are removed. audio/speech_out.py imports an
+  output's module only when TTS_OUTPUTS selects it (phonikud only with "laptop"). The phone-app check runs
+  every PHONE_APP_CHECK_SECONDS (2); process restarts stay at 5 s.
+- **Measured:** `import app.main` 1.38-1.40 s -> 0.91-1.18 s. The phone-app row UP at 6.7 s -> 3.2 s. Every
+  row UP 10.6-11.5 s before, 10.9 s after. The whole-app test passed twice.
+- **Verdict:** the start is bound by the Gemma and SAM3 loads, not by the imports. torch's import belongs to
+  the SAM3 decisions (S2, S3).
+- **Where:** app/main.py, audio/speech_out.py, dji_app/client.py, config/constants.py.
+
+### 2026-09-28 -- the preflight checks only the selected camera (agent perf, C4)
+- **Why:** owner P1 a; the camera listing took 2.1 s of the 2.2 s preflight.
+- **What:** `video/cam_list.py --selected` probes only WEBCAM_DEV; the preflight now FAILS when that camera
+  gives no frames (before, it only listed every camera). `run.sh status` still lists every camera.
+- **Measured:** the preflight 2.07-2.24 s -> 1.12-1.30 s. The rest is the camera's first frame (0.78 s).
+- **Verdict:** kept the frame read, which proves the camera gives a picture; an open-only check (about 0.4 s)
+  is an open question for the owner.
+- **Where:** video/cam_list.py, run.sh.
+
+### 2026-09-28 -- the recognizer decides, then acts (agent recognizer, A1)
+- **Why:** owner 1.8 ("separate functions that are chained together. One should make the decision, one should
+  do the acting") and D3 (no copy of the routing in a benchmark).
+- **What:** recognizer/recognizer.py: `route(text) -> Decision` decides and sends nothing; `act(decision) ->
+  Routed` carries it out; `handle(text)` = both, the app's one call. The order of the checks is unchanged:
+  an empty mission, the number guard, the echo guard, then fly.
+- **Result:** the 40 old recognizer tests pass unchanged; a new test proves route() sends nothing (making
+  route() act fails 5 tests).
+- **Where:** recognizer/recognizer.py; docs/api-harden2/recognizer.h (v2.4).
+
+### 2026-09-28 -- one recognizer benchmark, through route() (agent recognizer, B1)
+- **Why:** owner U2, U2.2, U2.3, V3, X1, M2: one benchmark of the recognizer "as a function of the backend",
+  one scorer, not in log/.
+- **What:** bench/recognizer/accuracy.py (path A: JSON files -> route() -> scorer.py). The Recognizer gets no
+  control and no vision, so the benchmark cannot send a command. 729 sentences in 10 files in
+  datasets/recognizer/, converted as they were. `run.sh score` is gone. unified_bench.py, run_list.py and
+  log/score.py wait for the owner's rm (the tool refused it); nothing imports them.
+- **Measured:** Gemma 4 E4B, thinking off: 592 PASS / 94 FAIL / 43 REVIEW. live-test-50 32 / 0 / 18, against
+  30 / 2 / 18 on 2026-09-26: the scorer now reads "+90" without "deg". commands, verbose, perception and
+  emergency match the 2026-09-19 scorecard. route() per case P50 523 ms.
+- **Verdict:** the benchmark measures the guards as the app runs them. The military set scores 0/21: its
+  keyword groups grade a translation, not the recognizer (open question R1).
+- **Where:** bench/recognizer/; datasets/recognizer/ (git-ignored today: open question V1).
+
+### 2026-09-28 -- the number guard reads all seven front letters and the fractions (agent recognizer, A2)
+- **Why:** owner C.3, Q8 ("ALL SEVEN! THIS WONT ARISE JUST WITH VAV!"), R8, T5: measure first, then complete
+  the tables.
+- **Measured before:** 40 sentences (datasets/recognizer/numbers.json). The guard read 7 of 40. Gemma planned
+  all 23 sentences with a front letter right, but the guard read none of their numbers, so any distance would
+  have passed. On the fractions the guard rejected 9 right plans.
+- **What:** util/hebrew.py holds FRONT_LETTERS, UNIT_WORDS, FRACTIONS, FRACTION_PLURALS; recognizer/numbers.py
+  reads a number with a front letter and every fraction (of a metre, of a turn, after a number); the guard
+  matches within 0.01 (a third). Two unit words in a row are two numbers. Stage 2 leaves prefixed number words
+  to Gemma: a variant that wrote them as digits lost one case.
+- **Measured after:** the guard reads 40 of 40; 38 of 40 pass; the whole benchmark 602 / 84 / 43, no case lost.
+  Over 398 exact-mission cases the guard now rejects 2 right plans (was 12), both by design.
+- **Where:** util/hebrew.py, recognizer/numbers.py, recognizer/guards.py.
+
+### 2026-09-28 -- the 2026-09-18 command-typing study retired (agent bench, B7)
+- **Why:** owner G2 a: retire the study under rules A-D.
+- **What:** the study became docs/research-complete-2026-09-18-command-typing.md, with the banned word
+  replaced by "fast path" and a RETIRED note saying where each harness and result went. type_compare.py,
+  type_fresh.py, type_english.py, perf.py, cases_typing_fresh.py and cases_typing_fresh_en.py are deleted
+  (in the git history, 8a8e022). bench.py follows the owner's rm with its two importers (unified_bench.py,
+  run_list.py). bench/hebrew-command-bench/README.md now lists only what remains: the case sources
+  (cases_commands.py, cases_perception.py, CASES.md) and the raw results.
+- **Verdict:** rules A-D hold for the typing study. Whether the case sources retire too depends on where
+  the JSON cases live (open question V1).
+- **Where:** docs/research-complete-2026-09-18-command-typing.md; bench/hebrew-command-bench/README.md.
+
+### 2026-09-28 -- the frame dips come from the SAM3 load, only at start (agent investigator, E1)
+- **Why:** the 3.6 fps dips (step 8's open question); C1 now records every frame.
+- **Setup:** four scripted app runs on the mock (C920, virtual screen), and a probe outside the app
+  (bench/sam3-assessment/load_vs_frames.py: a frame loop while SAM3 loads in each of three ways).
+- **Result:** the main agent recounted the four runs: before the "sam3" row was UP, 47 of 425 frames took
+  over 100 ms (max 1785 ms); after it, 1 of 5735 (max 105.5 ms, a Gemma plan and a SAM3 pass at once). The
+  probe, frames over 100 ms per 25 s run: no load 0; the load on a thread (today) 8 and 10; on a thread with
+  a 1 ms GIL switch interval 9; in its own process 0 and 0. In steady state the camera read sets the rate:
+  15-18 fps in a dim room, 30 fps in daylight.
+- **Verdict:** the dips are the SAM3 load on a thread of the app's process (the frame loop waits for the GIL;
+  inferred, not traced). They end when SAM3 is UP and do not come back. Only SAM3 in its own process removes
+  them; that is option S2 a, open with the owner.
+- **Where:** docs/research-complete-sam3-assessment.md (R9, analysis 14); bench/sam3-assessment/.
+
+### 2026-09-28 -- the layout: runtime/, keys/, the scripted run in test/, drawing values in config (agent perf, D1 + D3-D7)
+- **Why:** owner rulings R5 (system/ -> runtime/), R3 a (keys/keys.py), Q4 (test/scripted_e2e_run.py),
+  D8 a (the drawing values -> config), D6 a (the disk test through SessionLog), Q9 a (the test's name).
+- **What:** system/ is runtime/ (runtime.h; test_runtime.py); app/keys.py is keys/keys.py (its four tests
+  moved unchanged to test_keys.py); app/feed.py + perf_script.txt are test/scripted_e2e_run.py, which the
+  whole-app test also publishes through, and which still refuses anything but the mock; 35 drawing values
+  (colours, font paths, pane layout) are in config; the disk test goes through SessionLog (rewritten by
+  ruling D6 a); the whole-app test is test_app_end_to_end_over_ros (`-k end_to_end`).
+- **Measured:** the panes and the whole canvas render pixel for pixel the same (perf, numpy array_equal).
+  The main agent diffed every moved file against HEAD (only imports changed), checked the default script
+  equals the old file, and ran its gate: lint clean, audit 5, suite 230 passed, 2 skipped, twice; the
+  end-to-end test with real Gemma passed (36.9 s).
+- **Verdict:** behavior unchanged. D2 (SAM3 into sam3/) waits for the owner's S1-S3.
+  bench/hebrew-command-bench/bench.py still imports system/ and goes with the owner's rm.
+- **Where:** projects/integration_harden2/{runtime,keys,test,config}/.
+
+### 2026-09-28 -- the harden2 test review (agent investigator, E3)
+- **Why:** owner R6 + Q7 (purpose -> behaviours -> the test that proves each; coverage only for code that
+  never runs), U4 a (no mutation checks in a review).
+- **What:** docs/task-active-harden2-test-review.md: 13 modules, each with its purpose, its behaviours and the
+  test for each, a verdict (proved, stand-in, weak, none), the ranked findings and decisions TR1-TR17. A
+  report only: no code and no test changed. One coverage run of the default suite (230 passed, 2 skipped).
+- **Result:** behaviours with no test, first: two bypass patterns that fly without the model ("wait N
+  seconds", "a full turn"); verify never runs inside the live vision service (every service test turns it
+  off); the echo guard's refusal at routing level; the laptop-mic transcript path (opt-in test only).
+  Tests that prove little: four that assert config constants, a shape-only overflow test, and two with
+  stand-ins where the real path is cheap. Code no test runs: log/score.py (in the owner's rm), GATE=vlm and
+  GATE=either, and _dedup_overlaps (plain Python, run only by the GPU test). The main agent checked the bypass
+  and echo findings against the tests.
+- **Verdict:** the suite proves most behaviours on real paths; the gaps are listed for the owner (TR1-TR17).
+- **Where:** docs/task-active-harden2-test-review.md.
+
+### 2026-09-29 -- the missing app, audio and runtime tests (agent bench, TR4, TR6, TR9, TR12, TR13, TR14)
+- **Why:** the test review (E3) and the owner's rulings TR4, TR6, TR9, TR12 (2), TR13 (2)+(3), TR14 (2).
+- **What:** new tests: a transcript over a real ROS2 topic becomes one "ros" turn (TR4); a stable run earns the
+  crash budget back (TR9); a count of zero, a highlight while SAM3 loads, a lost highlight and a failed describe
+  (TR6). Rewritten: the status pane test now checks that detail_lines cuts a long detail and that the pane
+  draws exactly the cut lines, pixel for pixel (TR13); the phone-transcript test uses the real SessionLog and
+  reads its trace (TR14). Deleted: two tests that asserted only constants (TR12).
+- **Checks:** every new test failed on a mutant of the code it covers, then passed; the suite 243 passed,
+  2 skipped, twice (bench); the main agent re-ran the eight tests in the current tree.
+- **Where:** test/test_app.py, test/test_audio.py, test/test_runtime.py.
+
+### 2026-09-29 -- video tracking fits the 8 GiB GPU in nf4: SAM3 and SAM3.1 (agent investigator, S5-M)
+- **Why:** owner S5 (2) and S5-M: make SAM3.1 / video tracking work in nf4 with any loader, and find what the
+  "7000 MiB" is a function of; measured alone on the GPU.
+- **Result:** SAM3's Sam3TrackerVideoModel (boxes) and Sam3VideoModel (text) run in nf4 through transformers
+  5.17 on our checkpoint. Box tracking 407 / 604 / 1438 ms per frame for 1 / 4 / 16 objects. The tracking
+  memory is frames x objects (about 3.3 MiB per object and frame): 16 objects, 117 frames, 6958 MiB peak.
+  Keeping only the last 16 frames: 1865 MiB peak, masks identical on all 117 frames; with the state in CPU
+  memory 1175 MiB, +4 % time. SAM3.1 runs in nf4 through Meta's code (a separate package folder, patched in
+  the bench script, not in Meta's code): weights 3744 -> 1486 MiB, peak 3310 MiB (30 frames) / 4070 MiB
+  (117 frames) for 2 objects, 541 ms per frame. transformers has no SAM3.1 path.
+- **Verdict:** the 7000 MiB of 2026-09-04 was every frame's state, the detector's 16-frame look-ahead
+  (1.27 GiB) and the frames on the GPU, not the weights. Tracking costs about what a detect costs per frame
+  (407 against 410 ms); its gain is one identity per object. Open: VT1-VT4 (the tracker, the memory policy,
+  SAM3.1's next measurement, a text-mode mask difference). The main agent checked every table against the
+  raw JSON; no result came from the 05:45 unlocked GPU run (the first result file is 05:58).
+- **Where:** docs/research-complete-sam3-video-tracking.md; bench/sam3-video/.
+
+### 2026-09-29 -- one home per sentence in the recognizer benchmark (agent recognizer, J5, TR1, TR3, TR5)
+- **Why:** owner J2 (2) ("a single place for the datasets") and J5 (2).
+- **What:** every sentence is stored once, in the topical file of its kind: 545 sentences in 6 files (the 15
+  sentences only live-test-50 held and its 4 unnumbered lines included). Each live list is an ordered list of
+  case names. The notation reader reads "either way"; the scorer takes step alternatives and "halt".
+  accuracy.py counts each sentence once, runs one list (`--list NAME`) and prints one in order (`--print NAME`,
+  the Hebrew right to left). Where copies disagreed, the exact result won; the owner's subset list ("must NOT
+  fly") therefore decides "fly in a square" and "fly right 2 m and tell me what you see" until the J4 review.
+  Drafts: an expected decision for each of the 21 military sentences (J1) and accepted step lists for the 15
+  open cases (J4), marked draft and ignored by the scorer until the owner confirms. Tests: the bypass "wait"
+  and "full turn" (TR1), the echo refusal at routing level (TR3), an empty plan and a non-JSON reply (TR5).
+- **Measured:** 545 sentences on Gemma 4 E4B: 458 PASS / 76 FAIL / 11 REVIEW (each sentence once; the old
+  602 / 84 / 43 counted 188 copies). Suite 243 passed, 2 skipped, twice; the main agent re-ran the recognizer
+  tests (49 passed).
+- **Where:** bench/recognizer/, datasets/recognizer/, test/test_recognizer.py.
+
+### 2026-09-29 -- hebrew-command-bench retired under rules A-D (agent bench, B8)
+- **Why:** its cases moved to datasets/recognizer/ (J5) and its runner to bench/recognizer/ (B1).
+- **What:** docs/research-complete-hebrew-command-bench.md holds its results (from results/RESULTS.md and its
+  README); cases_commands.py, cases_perception.py and CASES.md are deleted; results/ stays as raw data; its
+  README is 3 lines. Their last importers (bench.py, unified_bench.py, planning_table.py) are in the owner's rm.
+- **Where:** docs/research-complete-hebrew-command-bench.md; bench/hebrew-command-bench/.
+
+### 2026-09-29 -- SAM3 in its own folder; one image encoding per detect (agent perf, D2 + S1)
+- **Why:** owner 1.8.1 + D2 (SAM3 gets its own folder), S3 (torch out of the app's import), S1 ("Just bench it
+  to make sure").
+- **What:** sam3/ holds the contract, the loader service and the model; the box math moved to util/boxes.py
+  (both sam3/ and perception2/ use it); every benchmark caller follows. detect() encodes each frame once, then
+  runs only the text and detector step per concept.
+- **Measured:** `import app.main` 1.31 s -> 0.15 s (torch loads on the loader's thread). Gate: the vision
+  benchmark on 137 human rows gives every verdict and instance count equal to 2026-09-28; an A/B of 215
+  concepts gives the same boxes, 0.0 px apart. A multi-concept row 1126 -> 744 ms; per row p50 738 -> 457 ms.
+- **Verdict:** kept. The end-to-end test failed once in 0.18 s (reason not captured) and passed on every rerun,
+  including the main agent's; unexplained.
+- **Where:** sam3/, util/boxes.py, bench/perception/ab_shared_encoding.py, docs/api-harden2/sam3.h.
+
+### 2026-09-29 -- SAM3 saved once in nf4 (agent perf, S7c)
+- **Why:** owner S7 (3): load ready 4-bit weights instead of converting at every start.
+- **What:** sam3/save_nf4.py writes /root/models/vision/sam3-nf4 (511 MiB) once; the install script runs it;
+  the loader and the preflight use it. Detections are identical to before.
+- **Measured:** the model load 5.7 -> 5.1 s; the "sam3" row UP 2.8 s sooner (11.9 -> 9.1 s mean). The start
+  stutter did NOT change: 10-13 frames over 100 ms before SAM3 is ready.
+- **Verdict:** kept for the faster start. The stutter is not the conversion; only SAM3 in its own process
+  removed it in the E1 probe (S2 a, on the back burner).
+- **Where:** sam3/save_nf4.py, sam3/model.py, config SAM3_NF4_DIR, tools/devenv/install-runtime-deps.sh.
+
+### 2026-09-29 -- the perception tests (agent perf, TR2, TR7, TR16, TR17)
+- **What:** verify refuses "a backpack held by a child" with no child in view (TR2); the vision test helper no
+  longer switches the speck filter off, and a speck box is dropped at the config floor (TR7); GATE=vlm and
+  GATE=either are tested (TR16); _dedup_overlaps keeps real deduplicated SAM3 boxes from 2026-09-25 sessions
+  unchanged and merges a real box with a copy of its inner part (TR17, CPU only). Each fails on a mutant.
+- **Checks (main agent):** lint clean, audit 5, suite 243 passed, 2 skipped, twice; the end-to-end test passed.
+
+### 2026-09-29 -- the preflight retries the camera once; the GATE=vlm refusal names Gemma (agent perf, O3 + O4)
+- **O3:** the preflight reads WEBCAM_DEV once more after CAMERA_CHECK_RETRY_SECONDS (1.0) before it fails;
+  a good first read does not wait. On the C920: 3 of 3 passed (3.00 / 1.11 / 1.01 s; the 3.0 s run used the
+  retry). A test covers it without a camera.
+- **O4:** with GATE=vlm, a highlight Gemma refuses gives "Gemma does not see it"; with GATE=either SAM3 decides
+  last, so its reason stays. The TR16 tests check both.
+- **Checks (main agent):** lint clean, audit 5, suite 244 passed, 2 skipped, twice.
+
+### 2026-09-29 -- the labelling web page replaces confirm.py (agent bench, UI1)
+- **Why:** owner UI1 (2): the terminal tool was not intuitive, and typed Hebrew arrived garbled (clip 13).
+- **What:** tools/asr-verify-transcript/: a standard-library server bound to 127.0.0.1:8766 and one page,
+  designed with the impeccable skill (Operate mode; its detector's 3 findings fixed). One card per clip: play,
+  what whisper heard, the sentence in a right-to-left text box, the plan in plain words with a checked edit field,
+  the 5 nearest cases as buttons; Accept, Review, Back, Next, go to clip N, edit any saved clip. It saves after
+  every clip into datasets/asr/recordings.json (same format) and resumes. The logic moved from confirm.py into
+  labels.py (one home); confirm.py is deleted.
+- **Checks:** 9 tests (a Hebrew round trip included) pass; three mutants each caught; lint clean. The page has not
+  been rendered in a browser (the container has none): the owner's first run is its first visual check.
+- **Where:** tools/asr-verify-transcript/.
+
+### 2026-09-29 -- the labelling page: a plan editor of step rows; whisper's exact text first (agent bench, UI1 (3))
+- **Why:** owner UI1 (3): "I need to change the plan. How do I do that? I also needed to make sure what whisper
+  outputted was the actual text being used."
+- **What:** the plan is a list of step rows (an action drop-down, a number, add / remove) plus "Nothing flies",
+  "Halt", "Vision request"; the typed notation is folded under "Advanced". The sentence box starts with whisper's
+  exact text, tagged until edited; the nearest cases are offers only. Found: 38 clips (63-100) have no whisper
+  text in the manifest; the page now lets the owner type their sentence instead of failing.
+- **Checks:** 14 tests (5 new; one rewritten: the saved sentence is no longer whitespace-collapsed); the signs are
+  checked against the benchmark's missions; two mutants caught; the main agent re-ran the tests.
+- **Where:** tools/asr-verify-transcript/.
+
+### 2026-09-29 -- SAM3.1 measured like SAM3; the text-mode limit explained (agent investigator, VT3 + VT4)
+- **Why:** owner VT3 ("Measure in a similar manner to SAM3 Tracking") and VT4 a.
+- **Result (nf4, boxes, the same video and metrics; SAM3 / SAM3.1):** 1 object 407 / 547 ms and 796 / 3010 MiB;
+  4 objects 604 / 810 ms and 1380 / 3530 MiB; 16 objects with the 16-frame limit 1443 / 1858 ms and
+  1865 / 3558 MiB. SAM3.1 without the limit runs out of memory at frame 4 with 16 objects (3 of 3 runs). On 5 real
+  objects the limit cuts SAM3.1's peak 4811 -> 2926 MiB with identical masks on all 117 frames. Meta's code gives
+  an empty box-prompt output after frame 0; the bench reads the tracker state instead.
+- **VT4:** two keep-all text runs gave identical masks, so the earlier difference was the limit itself: the text
+  model also reads the stored input frames. With the inputs kept for the same window, the first difference is at
+  frame 19 (max 4.0 %); with 32 frames, at frame 35 (max 5.6 %). The box trackers are unaffected.
+- **Verdict:** at 1-16 objects SAM3 tracks faster and in less memory than SAM3.1 on this GPU. Open: VT5, VT6.
+  The main agent checked the R5 numbers against the raw JSON.
+- **Where:** docs/research-complete-sam3-video-tracking.md (R5-R7); bench/sam3-video/.
+
+### 2026-09-30 -- where the command-to-action time goes (agent perf, FZ2)
+- **Why:** owner FZ2 a, before deciding what goes into the frozen system (FZ1); ROADMAP: under 1 s.
+- **Setup:** three scripted runs on the mock (10 sentences each); the perf record plus llama-server's prompt and
+  generation timings; times from the transcript (speech recognition not included).
+- **Result:** a warm highlight 1.49 s to its first box: Gemma's plan 396 ms (27 %), the gate's SAM3 forward 580 ms
+  (39 %), a second SAM3 forward before the first box 485 ms (32 %), the frame 29 ms. The first highlight of a run
+  3.8 s: a cold Gemma prompt (1998 tokens, 1.15 s) and a cold first SAM3 forward (1.4-2.1 s); C2's 3.5 s was this
+  case. A planned mission 0.77-0.88 s, 79 % of it Gemma generating 45 tokens at 13.9 ms each. No SAM3 pass waited
+  for the lock. The main agent checked the e2e rows against the three runs' perf records.
+- **Verdict:** three cuts are proposed, none decided (the owner's FZ1): warm Gemma and SAM3 at start (first
+  highlight about 1.5 s); draw the gate's boxes at once (a warm highlight about 1.0 s); a shorter plan answer.
+- **Where:** docs/research-complete-e2e-latency-breakdown.md.
+
+### 2026-09-30 -- the labelling page names a vision request's target (agent bench, UI1 (4))
+- **Why:** owner UI1 (4): clip 65, "Highlight the chair", could not say "chair".
+- **What:** "Vision request" opens an editor: the kind (highlight, count, describe, any) and the English target words
+  with synonyms; it saves {"kind": "perception", "groups": [...]}. Found: the scorer ignores the vision kind, so the
+  page saves the kind's own words (scorer.KIND_WORDS, imported) as the first group; a test with the real scorer shows a
+  wrong kind or a wrong target FAILS. Open: SC1 (grade the kind explicitly).
+- **Checks:** 19 tests pass (re-run by the main agent); a mutant that drops the kind group fails 3 tests.
+
+### 2026-09-30 -- a highlight under 1 s from the transcript: warm-up at start + the gate's boxes drawn at once (agent perf, L1 + L2)
+- **Why:** owner L1 ("Why isn't this done already?") and L2 ("Lets try it."), before the freeze (FZ1 (2)).
+- **What:** L1: at start SAM3 runs one pass on a blank camera-size frame and Gemma one warm-up plan; each status row
+  turns UP only after its warm-up; a restarted Gemma is warmed again (gemma/server.py warm_ready, the supervisor's
+  ready probe). L2: the gate's own boxes are the highlight's first drawn update; no second SAM3 pass before the first
+  box (under GATE=vlm the gate has no boxes, so tracking detects as before).
+- **Measured (the FZ2 script, 3 runs before, 3 after; from the transcript, speech not included):** the first
+  highlight of a run 3.81 -> 0.97 s; a warm highlight 1.49 -> 0.93 s; a planned mission 0.81 -> 0.77 s; every row UP
+  at start 11.9 -> 13.3 s (the warm-ups). The start stutter is unchanged. One after-run's first highlight took 1.20 s:
+  its plan took 735 ms in the app against 371 ms in llama-server's log (unexplained).
+- **Checks (main agent):** lint clean, audit 5, suite 248 passed, 2 skipped, twice; the end-to-end test passed. perf
+  found that a mutation script can leave stale bytecode when a file is restored within the same second; it cleared
+  every __pycache__ and re-ran the checks.
+- **Where:** sam3/loader.py, gemma/server.py, recognizer/recognizer.py, app/main.py, perception2 (engine, vision);
+  docs/research-complete-e2e-latency-breakdown.md ("After L1 + L2").
+
+### 2026-09-30 -- the scorer checks a vision request's kind; the labelling page fixed and seen in a browser (agents recognizer SC1, bench B4 (8))
+- **SC1 (owner "Option A"):** a perception case names its kind in the field `vision` (highlight, count, describe); a
+  request of another kind fails; without the field any kind passes. The labelling page saves the kind there. 144 kinds
+  are drafted (110 highlight, 12 count, 22 describe) for the owner's review; the scorer ignores drafts. 4 scorer tests.
+- **The page (owner B4 (8)):** the recommendations work again (a CSS rule hid nothing; clips 63-100 have no whisper
+  text, so the nearest cases now follow the typed sentence); the remove buttons sit in one column; a headless browser
+  (install-browser.sh, a separate package folder) takes 18 screenshots with no browser error; "Remove from the set"
+  with a reason, applied to clips 83, 84, 85 and 92 (checked by the main agent against the manifest).
+- **A lock breach:** bench edited labels.py and a test file while recognizer held their locks; recognizer's changes
+  survived; bench now locks the tool folder first.
+- **Checks (main agent):** the tool's tests 21 passed, 5 skipped (browser tests; 26 with the browser); the scorer 4
+  passed; lint clean; the main torch, transformers and bitsandbytes unchanged.
+- **Where:** bench/recognizer/scorer.py, tools/asr-verify-transcript/.
+
+### 2026-10-01 -- the handoff to a fresh agent
+- **Why:** the owner: after five days, "we need a fresh pair of eyes", with the full context.
+- **What:** docs/task-active-harden2-handoff-2026-10-01.md (the rules, 19 lessons with their incidents, the system,
+  the state, the road to the freeze, open issues, agents, the document map) and docs/harden2-status.md (the one-page
+  human overview). The session log's line 1 points to them. This handoff supersedes task-active-harden2-refactor-handoff.md
+  as the entry point; that file stays the detailed task record (sections 9d-9h).

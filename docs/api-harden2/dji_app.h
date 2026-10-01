@@ -3,7 +3,8 @@
  * phone app, or the mock that stands in for it: drone commands, /tts, and the transmit
  * switch. Its own status row "dji app": UP while the app answers; no answer -> WAITING
  * (orange: the user must fix the phone app) and a probe (GET /status/, read-only) every
- * config.WAITING_RETRY_SECONDS turns it UP again. The app never dies because of the phone.
+ * config.PHONE_APP_CHECK_SECONDS (2 s; owner U6 a) turns it UP again. The app never dies
+ * because of the phone.
  *
  * Results: the standard library's HTTP status (Python http.HTTPStatus), or NONE when the
  * app did not answer at all. 409 CONFLICT = the transmit switch blocked the request.
@@ -11,13 +12,16 @@
  */
 #ifndef __HARDEN2_API_DJI_APP_H__
 #define __HARDEN2_API_DJI_APP_H__
-#include "system.h"
+#include "runtime.h"
+typedef struct Perf Perf;            /* log.h                                              */
 
 typedef int32_t HttpStatus;          /* 200 OK, 409 CONFLICT, ...; see HTTP_NONE           */
 enum { HTTP_NONE = 0 };              /* no answer at all (Python: None)                    */
 
 typedef struct DjiApp DjiApp;
-DjiApp* DjiAppCreate(const char* host, uint16_t port, bool allowReal, float timeoutS);
+/* @perf: a command that gets any reply ends the "e2e" timing (PerfEnd "e2e", end=command) */
+DjiApp* DjiAppCreate(const char* host, uint16_t port, bool allowReal, float timeoutS,
+	Perf* perf);
 void    DjiAppClose(DjiApp* d);      /* stops the probe                                    */
 uint32_t DjiAppStatus(DjiApp* d, StatusRow* rows, uint32_t cap);   /* its "dji app" row */
 

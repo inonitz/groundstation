@@ -152,8 +152,8 @@ flowchart TB
 | whisper q5_k | CER 8.4 % on 107 live clips; 0.29 s per clip | tools/bench/hebrew_asr/README.md |
 | Gemma unified call, 488 bench | 415/466 without the military set (harden: 410) | tools/bench/hebrew-command-bench/results/2026-09-08-unified-gemma4.md |
 | Gemma as planner alone, commands | 318/328, thinking off | results/2026-09-08-recognizer-gemma4-direct-nothink.json |
-| Gemma gate + SAM3 highlight chain | 28/42 present objects hit (Qwen: 22/42) | tools/bench/whole-system/results/2026-09-08/vision-sam3-chain.md |
-| Gemma counting | 2/26 exact | vlm-compare.md |
+| Gemma gate + SAM3 highlight chain | 28/42 present objects hit (Qwen: 22/42) | docs/research-complete-whole-system.md, 3.3 |
+| Gemma counting | 2/26 exact | docs/research-complete-whole-system.md, 3.3 |
 | Gemma as ASR | CER 35.8 % -> rejected, whisper stays | hebrew_asr/README.md |
 | live end to end, webcam + mock | 42 PASS / 17 FAIL of 62 utterances | integration_harden2/sessions/…170015-rog/REPORT.md |
 | VRAM, whole stack resident | ~6.5 GiB peak of 8.15 (owner-observed) | live session |

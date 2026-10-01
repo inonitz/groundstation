@@ -5,11 +5,13 @@
  */
 #ifndef __HARDEN2_API_GEMMA_H__
 #define __HARDEN2_API_GEMMA_H__
-#include "system.h"
+#include "runtime.h"
 
 /* The supervised llama-server: a laptop part (3 restarts, then die). A bench passes its
  * own port so it never collides with the app's. */
-SupProcess GemmaProcess(const char* logDir, uint16_t port, bool thinking);
+/* @warmUp: NULL, or one request run once /health answers, before the row turns UP (owner
+ * L1: the app passes the recognizer's warm-up plan; a restart warms again). */
+SupProcess GemmaProcess(const char* logDir, uint16_t port, bool thinking, void (*warmUp)(void));
 
 typedef struct Gemma Gemma;
 typedef struct Perf Perf;

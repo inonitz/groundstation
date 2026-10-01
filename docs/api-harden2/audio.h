@@ -6,7 +6,7 @@
  */
 #ifndef __HARDEN2_API_AUDIO_H__
 #define __HARDEN2_API_AUDIO_H__
-#include "system.h"
+#include "runtime.h"
 #include "dji_app.h"
 
 /* ---- speech in: config.ASR_SOURCES, e.g. {"ros", "phone"} ----
@@ -26,7 +26,8 @@ SupProcess AsrRosProcess(const char* logDir);    /* the ASR server: a laptop par
 /* ---- speech out: config.TTS_OUTPUTS, e.g. {"phone"} or {"phone", "laptop"}; {} = silent ----
  *   phone  (tts_phone.PhoneTts)  POST /tts through dji_app; its health IS the "dji app" row.
  *   laptop (tts_laptop.LaptopTts) offline phonikud; a playback error dies at once (9a-1).
- *                            Its packages and model files: SysCheckDependencies (system.h).
+ *                            Its packages and model files: the preflight (runtime.h). Its module
+ *                            (phonikud, 0.4 s) is imported at start only when selected (D13).
  * Latest answer wins: Say() overwrites a one-slot mailbox and cuts what is playing. */
 typedef struct SpeechOut SpeechOut;
 typedef struct Perf Perf;

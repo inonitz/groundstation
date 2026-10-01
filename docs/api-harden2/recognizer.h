@@ -1,6 +1,9 @@
 /*
- * recognizer.h -- harden2 API v2.3 (2026-09-24). Module recognizer/: the router for speech. It parses
- * EVERY sentence and routes the result:
+ * recognizer.h -- harden2 API v2.4 (2026-09-28). Module recognizer/: the router for speech. It parses
+ * EVERY sentence in two chained steps (owner 2026-09-26: "One should make the decision, one should
+ * do the acting"): RecognizerRoute() decides and sends nothing; RecognizerAct() carries the decision
+ * out. Recognize() = Route + Act, the app's one call. The recognizer benchmark calls Route.
+ * What Route decides, in order:
  *
  *   1. Fast path (no Gemma): emergency, manual, auto -> control at once. The turn ends.
  *   2. Deterministic missions (the bypass rules, no Gemma) -> ControlFly().
@@ -14,7 +17,7 @@
  */
 #ifndef __HARDEN2_API_RECOGNIZER_H__
 #define __HARDEN2_API_RECOGNIZER_H__
-#include "system.h"
+#include "runtime.h"
 #include "control.h"
 #include "perception.h"
 
@@ -29,6 +32,21 @@ typedef enum {
 	REJECT_NONE, REJECT_NEGATED, REJECT_NUMBERS_CHANGED, REJECT_SHOT_ECHO, REJECT_NOT_A_COMMAND
 } RejectReason;
 typedef enum { VISION_COUNT, VISION_HIGHLIGHT, VISION_CLEAR, VISION_DESCRIBE } VisionKind;
+typedef enum {
+	DECIDED_EMERGENCY, DECIDED_MANUAL, DECIDED_AUTO, DECIDED_CLEAR, DECIDED_MISSION,
+	DECIDED_HIGHLIGHT, DECIDED_COUNT, DECIDED_DESCRIBE, DECIDED_REJECT,
+	DECIDED_GEMMA_FAILED, DECIDED_EMPTY
+} DecisionKind;
+typedef struct {                          /* what Route decided; nothing is sent yet         */
+	DecisionKind kind;
+	const char*  text;                    /* the sentence as said                            */
+	const char*  he2;                     /* the Hebrew Gemma read ("" when no model ran)    */
+	const char*  missionJson;             /* MISSION; also a guarded REJECT (what it refused) */
+	const char*  tag;                     /* MISSION: "bypass" (no model) or "planned"       */
+	char         target[64];              /* HIGHLIGHT / COUNT; DESCRIBE: Gemma's target_en  */
+	RejectReason reject;                  /* REJECT                                          */
+	uint32_t     recognizeMs, planMs;
+} Decision;
 typedef struct {
 	RouteKind    kind;
 	HttpStatus   control;                 /* ROUTED_CRITICAL / ROUTED_FLIGHT: what happened  */
@@ -46,9 +64,15 @@ typedef struct Vision Vision;
 typedef struct Recognizer Recognizer;
 Recognizer* RecognizerCreate(Control* control, Vision* vision, Gemma* gemma, SessionLog* log);
 void        RecognizerClose(Recognizer* r);
-void        Recognize(Recognizer* r, const char* text, Routed* out);   /* kind covers all */
+void        RecognizerRoute(Recognizer* r, const char* text, Decision* out); /* sends nothing */
+void        RecognizerAct(Recognizer* r, const Decision* d, Routed* out);  /* control, vision */
+void        Recognize(Recognizer* r, const char* text, Routed* out);       /* Route + Act     */
 /* The ONE Gemma call (the benches measure it): Hebrew -> {kind, target_en, mission} JSON.
  * false = no plan (the request failed, or the reply is not a plan). */
 bool        RecognizerPlan(Recognizer* r, const char* he2, char* planJson, size_t cap);
+
+/* The start-up warm-up (owner L1): one plan request for config.PLAN_WARM_UP_SENTENCE, so the
+ * planner's long prompt is in Gemma's cache before the first command. Nothing is sent. */
+void RecognizerWarmUp(Gemma* gemma);
 
 #endif /* __HARDEN2_API_RECOGNIZER_H__ */

@@ -8,25 +8,9 @@
  */
 #ifndef __HARDEN2_API_PERCEPTION_H__
 #define __HARDEN2_API_PERCEPTION_H__
-#include "system.h"
+#include "runtime.h"
 #include "video.h"
-
-/* ---- the vision backend (SAM3 today; SAM3.1 / EOVSAM later drop in here) ---- */
-typedef enum { DETECT_OK, DETECT_NOT_READY } DetectStatus;   /* "no hits" is DETECT_OK, n=0 */
-typedef struct { float x0, y0, x1, y1, conf; char label[32]; } Box;
-typedef struct { uint32_t width, height; uint8_t* bits; } Mask;   /* 1 byte per pixel        */
-typedef struct {
-	const char* name;                     /* config SCENE_SEG: "sam3"; unknown name -> die    */
-	const char* modelDir;
-	const char* precision;                /* "nf4", fixed at load                             */
-} BackendConfig;
-typedef struct Sam3 Sam3;               /* the backend loader: a SERVICE             */
-Sam3*        Sam3Load(const BackendConfig* cfg);   /* async; fail -> die             */
-uint32_t     Sam3Status(Sam3* s, StatusRow* rows, uint32_t cap);   /* its "sam3" row */
-DetectStatus VisionDetect(const VideoFrame* f, const char* phrase, float floor, uint32_t topk,
-	Box* hits, uint32_t cap, uint32_t* n);   /* nested boxes of one object already merged     */
-bool         VisionMaskFor(const VideoFrame* f, const Box* box, Mask* out);  /* last detect */
-/* GPU out of memory in a forward -> die (owner: no retry for now). */
+#include "sam3.h"                         /* Sam3, Box, Mask, DetectStatus    */
 
 /* ---- the SAM3 priority lock ---- */
 typedef enum { PRIO_COMMAND = 0, PRIO_REFRESH = 1 } VisionPriority;
@@ -41,7 +25,8 @@ typedef bool (*SnapshotFn)(VideoFrame* copy);   /* the video module's latest fra
 typedef uint32_t TaskId;
 typedef enum { TASK_OK, TASK_FULL, TASK_NOT_READY } TaskStatus;
 
-/* Highlight: GATE (is it there?) -> TRACKING (re-detect every period, counted from the
+/* Highlight: GATE (is it there?) -> TRACKING (the gate's own boxes are the first update, no
+ * second pass before the first box (owner L2); then re-detect every period, counted from the
  * START of the last detect) -> LOST after giveUpS without a hit, or CLEARED by the user.
  * Related-noun phrases ("the man next to the car") are split and verified: the related noun,
  * the relation and the colour must hold, or the highlight is ABSENT. */
@@ -53,7 +38,8 @@ typedef struct {
 	const char*    concepts;              /* the phrase SAM3 got                              */
 	const Box*     boxes;  uint32_t n;
 	const Mask*    masks;                 /* one per box, or NULL when masks are off          */
-	const char*    reason;                /* ABSENT: which part failed ("no car found")       */
+	const char*    reason;                /* ABSENT: which part failed ("no car found"; with
+	                                         GATE=vlm "Gemma does not see it", owner O4)     */
 	float          best;                  /* the best score the gate saw                      */
 	bool           first;                 /* the first TRACKING update after the gate         */
 } HighlightUpdate;

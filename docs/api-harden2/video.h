@@ -6,7 +6,7 @@
  */
 #ifndef __HARDEN2_API_VIDEO_H__
 #define __HARDEN2_API_VIDEO_H__
-#include "system.h"
+#include "runtime.h"
 
 typedef enum {
 	SRC_ROS,       /* the phone's video: gstreamer -> ROS2 camera/stream (VIDEO=dji)     */
@@ -32,5 +32,9 @@ bool   VideoIsLive(const Video* v);               /* a live source never "ends" 
 void   VideoClose(Video* v);
 uint32_t VideoStatus(Video* v, StatusRow* rows, uint32_t cap);   /* its "video" row       */
 SupProcess GstreamerProcess(const char* logDir, const char* phoneIp);   /* WAITS, never dies */
+
+/* The camera tool (video/cam_list.py, a script): every camera and what it delivers
+ * (`run.sh status`), or with --selected only WEBCAM_DEV (`run.sh preflight`, owner P1 a); a
+ * camera that gives no frame is read once more after CAMERA_CHECK_RETRY_SECONDS (O3 a). */
 
 #endif /* __HARDEN2_API_VIDEO_H__ */

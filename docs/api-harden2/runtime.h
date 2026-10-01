@@ -1,12 +1,12 @@
 /*
- * system.h -- harden2 API v2.4 (2026-09-26). Module system/: fatal errors, the status rows
- * and the board, the supervisor, the ROS2 context, and the start-up dependency check.
+ * runtime.h -- harden2 API v2.4 (2026-09-26). Module runtime/: fatal errors, the status rows
+ * and the board, the supervisor, the ROS2 context, and the preflight's dependency check.
  *
  * House rule: nothing in our code throws. A fatal error calls SysDie(). Everything else
  * returns a status. A third-party call that can throw is wrapped ONCE, in util.h.
  */
-#ifndef __HARDEN2_API_SYSTEM_H__
-#define __HARDEN2_API_SYSTEM_H__
+#ifndef __HARDEN2_API_RUNTIME_H__
+#define __HARDEN2_API_RUNTIME_H__
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -14,7 +14,8 @@
 
 /* ---------------------------------------------------------------- fatal (fatal.py) */
 typedef void (*SysCleanupFn)(void);
-void SysOnDie(SysCleanupFn fn);           /* run on die, newest first, each one guarded     */
+/* run on die, in the order registered, each one guarded; first = before all (Perf's flush) */
+void SysOnDie(SysCleanupFn fn, bool first);
 void SysDie(const char* reason);          /* one at a time; a 2nd caller waits. No return. */
 void SysInstallCrashHooks(void);          /* uncaught error, any thread or loop -> SysDie */
 
@@ -75,10 +76,10 @@ uint32_t ProcessStatus(Process* p, StatusRow* rows, uint32_t cap);   /* its own 
 void     SupStopAll(void);                /* registered with SysOnDie; every row -> DOWN     */
 
 /* ---------------------------------------------------------------- dependency check (deps.py)
- * ONE place, run first in main, before any module imports a package. Replaces the
- * scattered find_spec guards. Every missing python package, native program or model file
- * dies here, with what is missing and how to install it. Every one is required. A camera
- * is not checked here: video opens it. `python3 -m system.deps` = the preflight's check. */
+ * ONE place: the preflight (`run.sh preflight` runs `python3 -m runtime.deps`); main does NOT
+ * run it (owner Q5 a). Replaces the scattered find_spec guards. Every missing python package,
+ * native program or model file dies here, with what is missing and how to install it. Every
+ * one is required. A camera is not checked here: the preflight checks WEBCAM_DEV. */
 typedef struct { const char* importName; const char* installCommand; } SysPackage;
 void     SysCheckDependencies(void);   /* every package and file below; missing -> die   */
 uint32_t SysMissingPackages(const SysPackage* pkgs, uint32_t n, const char** missing);
@@ -95,4 +96,4 @@ typedef struct RosSubscription RosSubscription;
 RosSubscription* RosSubscribe(const char* node, const char* topic, RosMessageFn onMessage);
 void             RosSubscriptionClose(RosSubscription* s);   /* executor, thread, node */
 
-#endif /* __HARDEN2_API_SYSTEM_H__ */
+#endif /* __HARDEN2_API_RUNTIME_H__ */

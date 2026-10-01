@@ -1,7 +1,7 @@
 # harden2: how to run, measure and test it (every command, setting and flag)
 
 Current state, read from the code on 2026-09-26: run.sh, config/defaults.py, config/constants.py,
-app/feed.py, log/, test/. When the code changes, update this file in the same change.
+test/scripted_e2e_run.py, log/, test/. When the code changes, update this file in the same change.
 config/ is the one home of every value: only config/defaults.py reads the environment.
 
 | section | what it covers |
@@ -20,11 +20,10 @@ All commands use `bash /root/groundstation/projects/integration_harden2/run.sh <
 |---|---|
 | `up [VIDEO] [CONTROL]` | Runs the preflight, then starts the app in the tmux session `mvd`. Default: `up webcam mock`. |
 | `down` | Stops the app, every process it started, and frees the ports. |
-| `status [run_dir]` | Shows the ports, the tmux panes, the last transcripts and mock commands, the cameras. |
-| `preflight [webcam\|dji]` | Checks only; starts nothing. Ports free, system/deps.py (packages, programs, model files), one ggml version, tools, DISPLAY, cameras or the phone. |
+| `status [run_dir]` | Shows the ports, the tmux panes, the last transcripts and mock commands, every camera. |
+| `preflight [webcam\|dji]` | Checks only; starts nothing. Ports free, runtime/deps.py (packages, programs, model files), one ggml version, tools, DISPLAY, the selected camera (WEBCAM_DEV: it must give a frame; one more read after 1 s, CAMERA_CHECK_RETRY_SECONDS) or the phone. The app itself checks no package: run the preflight when a start fails. |
 | `show [session]` | Prints a session's turns (log/show.py). Default: the newest session. |
-| `score [list.md] [session]` | Judges a session against a live-test list; writes REPORT.md into the session (log/score.py). |
-| `perf [session]` | p50 / p95 / max per stage from the session's perf.jsonl (log/perf_report.py). |
+| `perf [session]` | n, min, P25-P99, max per stage, and the 20 slowest frames, from the session's perf.jsonl (log/perf_report.py). |
 
 - VIDEO: `webcam` (/dev/video<WEBCAM_DEV>), `dji` (the phone's video through gstreamer and ROS2),
   `rtmp` (rtsp://127.0.0.1:8554/live; needs an RTSP server there, which nothing here starts;
@@ -87,7 +86,9 @@ Video, speech and launch internals:
 | DISPLAY | (run.sh: :0) | the X display the app window opens on |
 
 Fixed in config/constants.py, not settings: the ports, the model paths (Gemma, SAM3, phonikud), the
-program paths (build/release/shared/dji/bin), the key codes, SAM3_PRECISION = nf4.
+program paths (build/release/shared/dji/bin), the key codes, SAM3_PRECISION = nf4. The app loads SAM3
+from SAM3_NF4_DIR (/root/models/vision/sam3-nf4), the weights saved once in nf4 form by
+sam3/save_nf4.py (the install script runs it when the folder is missing).
 
 ## 3. Keys
 
@@ -108,20 +109,26 @@ in config/constants.py (KILL_/QUIT_/CLEAR_KEY_CODE, WINDOW_*_KEY(S)).
 
 ## 4. Measure
 
-- Every run records its timings in <session>/perf.jsonl (log/perf.py); there is no switch. Stages:
+- Every run records its timings (log/perf.py); there is no switch. Every event, every frame
+  included, goes into a memory buffer. A writer thread appends it to <session>/perf.jsonl every
+  PERF_FLUSH_SECONDS (5, config/constants.py); die() writes it first. A hard kill loses at most
+  5 s. Stages: startup (per status row: launch to its first UP; also "imports" and "every row"),
   asr (F5 release to transcript, mic only), turn, gemma, sam3 (wait + forward), highlight_gate,
-  count, describe, say, frame (per second: fps; read / draw / show mean and max; worst_frame_ms,
-  the longest gap between two frames), gpu (per second).
-- Its cost (measured 2026-09-27): 0.65 ms per record, about 2 records per second; the GPU sampler
-  takes 23 ms per second on its own thread.
-- `run.sh perf [session]` prints p50 / p95 / max per stage, and the seconds under 10 fps.
+  count, describe, say, e2e (command to action, ROADMAP: under 1 s; start: the F5 release,
+  a phone transcript, or a scripted transcript; end: the command reaches the phone app, or the
+  first highlight box is shown), frame (every frame: the gap since the previous frame; read /
+  draw / show), gpu (memory and load through pynvml every PERF_GPU_SAMPLE_SECONDS, 1).
+- Its cost (measured 2026-09-27): a buffered event costs 1.1 us on the caller's thread (measured 2026-09-28, 100000 calls); a
+  5 s write with fsync takes 0.84 ms on the writer thread; one pynvml sample takes 0.018 ms.
+- `run.sh perf [session]` prints, per stage, n, min, P25, P50, P75, P95, P99 and max, the GPU
+  peaks, then the 20 slowest frames (PERF_SLOWEST_FRAMES) with their clock times.
 - The scripted run gives every measured run the same input:
   `SCRIPT=default bash /root/groundstation/projects/integration_harden2/run.sh up webcam mock`.
-  app/feed.py waits for Gemma plus 20 s, then publishes each line of the script on the ASR topic,
-  as if spoken. `default` = app/perf_script.txt; any file works: one sentence per line,
+  test/scripted_e2e_run.py waits for Gemma plus 20 s, then publishes each line of the script on
+  the ASR topic, as if spoken. `default` = its DEFAULT_SCRIPT; any file works: one sentence per line,
   `wait N` pauses N seconds, `#` starts a comment. It dies unless CONTROL=mock.
-- `run.sh score [list.md] [session]` judges a session's missions against a live-test list
-  (default list: datasets/e2e/live-test-e2e-50.md).
+- The recognizer's accuracy is measured by its benchmark, not from a session:
+  `python3 /root/groundstation/bench/recognizer/accuracy.py` (bench/recognizer/README.md).
 - A measurement result goes into docs/HISTORY.md (Why / Setup / Result / Verdict / Where), newest last.
 
 ## 5. Test
@@ -132,10 +139,10 @@ From /root/groundstation/projects/integration_harden2, with ROS2 sourced
 | command | what runs | time |
 |---|---|---|
 | `python3 -m pytest test/ -q` | every test; the models are stand-ins; real sockets, ROS2, HTTP, subprocesses | ~40 s |
-| `HARDEN2_GPU_TESTS=1 python3 -m pytest test/test_perception2.py -q -k real_sam3` | the real SAM3 on the GPU | ~1 min |
-| `HARDEN2_APP_TEST=1 python3 -m pytest test/test_app.py -q -k whole_app` | the whole-app test (below) | 40 s warm, more cold |
+| `HARDEN2_GPU_TESTS=1 python3 -m pytest test/test_sam3.py -q -k real_sam3` | the real SAM3 on the GPU | ~10 s |
+| `HARDEN2_APP_TEST=1 python3 -m pytest test/test_app.py -q -k end_to_end` | the whole-app test (below) | 40 s warm, more cold |
 
-The whole-app test (test_app.py, `test_the_whole_app_over_ros`) starts the real app
+The whole-app test (test_app.py, `test_app_end_to_end_over_ros`) starts the real app
 (`python3 -m app.main`) with every process it starts: Gemma, SAM3, the ASR server, the keyboard
 hook, the mock. It sends speech on the ASR topic and keys on the keyboard topic, as the C++ nodes
 do. It checks three questions (describe, count, a mission to the mock), F4 on (/c/stop, the next

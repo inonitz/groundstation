@@ -553,13 +553,13 @@ settings, flags), projects/integration_harden2/README.md (layout), test/README.m
 bench/README.md (the benchmark list). The main agent writes its HISTORY entry (newest last). ONE GPU: the main agent schedules every GPU run; no two at once.
 
 A. Recognizer
-- [ ] A1 (M) decide and act split (D3): recognizer/recognizer.py route() decides and sends nothing; handle() =
+- [x] A1 (M; validated 2026-09-28, HISTORY) decide and act split (D3): recognizer/recognizer.py route() decides and sends nothing; handle() =
       route + act. Tests in test_recognizer.py; recognizer.h. Needs: nothing.
-- [ ] A2 (M-L, GPU) numbers: a sentence set with fractions and all seven front letters -> measure Gemma and the
+- [x] A2 (M-L, GPU; validated 2026-09-28, HISTORY) numbers: a sentence set with fractions and all seven front letters -> measure Gemma and the
       guard -> complete recognizer/numbers.py + util/hebrew.py tables. Needs: B1's JSON format.
 
 B. Benchmarks
-- [ ] B1 (L, GPU to verify) bench/recognizer/accuracy.py: cases_commands.py, cases_perception.py (verbose set
+- [x] B1 (L, GPU to verify; validated 2026-09-28, HISTORY; the owner's rm of 3 files pending) bench/recognizer/accuracy.py: cases_commands.py, cases_perception.py (verbose set
       generated once), datasets/e2e lists -> JSON files in datasets/recognizer/ as they are; path A; one scorer
       (steps, reject, emergency, perception kind + target words; it must read "+90" without "deg",
       the bug that failed 2 lines on 2026-09-26); a file argument; calls route(). Purpose (owner): "a
@@ -567,50 +567,51 @@ B. Benchmarks
       unified_bench.py, run_list.py, log/score.py, `run.sh score`. Needs: A1. G1 + G2 a (owner): the rest of bench/hebrew-command-bench
       is retired by B7 and E2.
 - [ ] B2 (M, GPU) path B: WAV + expected -> whisper prepass -> path A; whisper word error rate (M5). Needs: B1, B4.
-- [ ] B3 (M) the confirm tool for the 139 recordings (datasets/asr): propose the sentence + expected from the
+- [x] B3 (M; validated 2026-09-28, HISTORY) the confirm tool for the 139 recordings (datasets/asr): propose the sentence + expected from the
       nearest B1 case, play the clip, confirm or correct, write the recordings JSON. Needs: B1's format.
 - [ ] B4 (OWNER, ~15-25 min, estimate) label the 139 recordings with B3.
-- [ ] B5 (S, GPU ~3 min) vision benchmark: fix detect() in bench.py + propose_boxes.py, move
+- [x] B5 (S, GPU ~3 min; validated 2026-09-28: verdicts identical to 2026-09-20) vision benchmark: fix detect() in bench.py + propose_boxes.py, move
       bench/vision-verify-bench -> bench/perception/, rerun vs the 2026-09-20 numbers. Needs: nothing.
-- [ ] B7 (S) the 2026-09-18 typing study (G2 a): docs/research-2026-09-18-command-typing-fast-vs-gemma.md ->
+- [x] B7 (S; validated 2026-09-28, HISTORY; bench.py goes with the owner's rm) the 2026-09-18 typing study (G2 a): docs/research-2026-09-18-command-typing-fast-vs-gemma.md ->
       docs/research-complete-2026-09-18-command-typing.md, with the banned word removed from its text (rule C;
       HISTORY already holds it: rule D); then delete type_compare.py, type_fresh.py, type_english.py, perf.py,
       cases_typing_fresh.py, cases_typing_fresh_en.py, and bench.py once B1 no longer needs it. Needs: B1.
-- [ ] B6 (S-M) whole-system: docs/research-complete-*.md from its README + results, then delete its scripts and
+- [x] B6 (S-M; validated 2026-09-28, HISTORY; the owner's rm of the six scripts pending) whole-system: docs/research-complete-*.md from its README + results, then delete its scripts and
       run_all.sh (rule A-D; the owner runs rm if the tool refuses). Needs: nothing.
 
 C. Perf and start-up
-- [ ] C1 (M) perf module per the approved draft: buffer + writer thread (PERF_FLUSH_SECONDS=5), every frame
+- [x] C1 (validated 2026-09-28, HISTORY) (M) perf module per the approved draft: buffer + writer thread (PERF_FLUSH_SECONDS=5), every frame
       (app/ui.py loses its per-second summary), pynvml (PERF_GPU_SAMPLE_SECONDS=1), die() flush, "startup" stage,
       report: n/min/P25/P50/P75/P95/P99/max + the 20 slowest frames. log/perf.py, log/perf_report.py, config.
       Needs: nothing.
-- [ ] C2 (S-M) the "e2e" stage (ROADMAP: command->action < 1 s): F5 release or phone transcript -> the command
+- [x] C2 (validated 2026-09-28, HISTORY) (S-M) the "e2e" stage (ROADMAP: command->action < 1 s): F5 release or phone transcript -> the command
       reaches the phone app, or -> the first box drawn. Needs: C1.
-- [ ] C3 (M) start-up: ONE build-services function in app/main.py; no deps check in main (deps tests 1 and 3
+- [x] C3 (validated 2026-09-28, HISTORY) (M) start-up: ONE build-services function in app/main.py; no deps check in main (deps tests 1 and 3
       go); phonikud imported at start only with "laptop"; phone check every 2 s (new config value), process
       restarts stay 5 s. Needs: C1 (both touch app/main.py).
-- [ ] C4 (S) the preflight's camera listing (2.1 s of 2.2 s). P1 a: the preflight checks only the selected camera
+- [x] C4 (validated 2026-09-28, HISTORY) (S) the preflight's camera listing (2.1 s of 2.2 s). P1 a: the preflight checks only the selected camera
       (WEBCAM_DEV); the full list moves to `run.sh status`; update docs/spec-harden2-run-arguments.md. Needs: nothing.
 
 D. Layout (many imports: ONE agent, after A1, B1, C1, C3 land)
-- [ ] D1 system/ -> runtime/ (outside callers: bench/hebrew-command-bench/bench.py lines 32-33).
-- [ ] D2 SAM3 -> its own folder (sam3/) (outside callers: bench/hebrew-command-bench/contention.py, real_cadence.py,
-      bench/sam3-mask-bench/quant_bench.py, bench/sam3-concurrency-bench/concurrency.py, and the vision benchmark
-      after B5).
-- [ ] D3 app/keys.py -> keys/keys.py.
-- [ ] D4 app/feed.py + perf_script.txt -> test/scripted_e2e_run.py; run.sh SCRIPT; the whole-app test uses it.
-- [ ] D5 the drawing values -> config.   D6 the disk test through SessionLog.
-- [ ] D7 rename the whole-app test -> test_app_end_to_end_over_ros.
+- [x] D1 (validated 2026-09-28, HISTORY) system/ -> runtime/ (outside callers: bench/hebrew-command-bench/bench.py lines 32-33).
+- [x] D2 (validated 2026-09-29 via 9f, perf Brief 3) SAM3 -> its own folder (sam3/) (outside callers: bench/sam3-mask-bench/quant_bench.py,
+      bench/sam3-concurrency-bench/concurrency.py, bench/perception/ (B5), and every script in bench/sam3-assessment/
+      (E2: perception2.sam3_backend; detect_cost.py also perception2.vlm_client; session.py perception2.concept).
+      contention.py and real_cadence.py are deleted (E2). The shape of sam3/ waits for the owner's S1-S3.
+- [x] D3 (validated 2026-09-28) app/keys.py -> keys/keys.py.
+- [x] D4 (validated 2026-09-28) app/feed.py + perf_script.txt -> test/scripted_e2e_run.py; run.sh SCRIPT; the whole-app test uses it.
+- [x] D5 (validated 2026-09-28) the drawing values -> config.   D6 (validated) the disk test through SessionLog.
+- [x] D7 (validated 2026-09-28; run it with -k end_to_end) rename the whole-app test -> test_app_end_to_end_over_ros.
 
 E. Investigations
-- [ ] E1 (M, GPU + webcam + display) the 3.6 fps dips: a scripted run with C1's per-frame data; match the 20
+- [x] E1 (M, GPU + webcam + display; validated 2026-09-28, HISTORY; the fix is S2, open) the 3.6 fps dips: a scripted run with C1's per-frame data; match the 20
       slowest frames to the other events. Needs: C1.
-- [ ] E2 (L, GPU) the SAM3 assessment document: today's in-app design; its own process with a shared frame
+- [x] E2 (L, GPU; validated 2026-09-28, HISTORY; decisions S1-S6 open with the owner) the SAM3 assessment document: today's in-app design; its own process with a shared frame
       buffer; the costs measured (frame transfer, detect alone / Gemma idle / Gemma busy = C.2); phase 7;
       a recommendation for the owner. If Gemma loaded-but-idle does not explain the 558 ms, widen the
       investigation (owner, C.2). It takes over bench/hebrew-command-bench/contention.py and real_cadence.py
       (G2 a): reuse or replace their method, then retire them under A-D. Needs: nothing (C1 helps).
-- [ ] E3 (M) the test review: per module, purpose -> behaviours -> the test that proves each; coverage only
+- [x] E3 (M; validated 2026-09-28, HISTORY; decisions TR1-TR17 open) the test review: per module, purpose -> behaviours -> the test that proves each; coverage only
       for never-run code. A report first, no changes. Needs: A-D landed.
 
 F. Closing
@@ -626,24 +627,67 @@ Waves (what can run at the same time without touching the same files):
 The main agent: writes each brief, validates each agent against its brief (reading the files it touched),
 runs the GPU schedule, keeps HISTORY and this list current.
 
+### 9f. ROUND 3 TASKS (owner rulings 2026-09-28/29; the spec ledger rows marked (2) and (3); briefs in docs/refactor/)
+- [x] perf, Brief 3 (validated 2026-09-29, HISTORY; open: O3, O4): D2 (SAM3 -> sam3/, torch leaves the app import) + S1 (one image encoding per pass; gate:
+      bench/perception identical, boxes within 2 px) + S7c (SAM3 saved once in nf4; measure load, start, stutter)
+      + TR2, TR7, TR16, TR17.
+- [x] investigator, Brief 3 (validated 2026-09-29, HISTORY; decisions VT1-VT4 open): S5-M (SAM3 video tracking via transformers nf4; SAM3.1 nf4 via any loader/runtime;
+      alone on the GPU).
+- [x] recognizer, Brief 2: J5 (one home per sentence), TR1, TR3, TR5 (validated 2026-09-29, HISTORY).
+- [ ] OWNER: review the J1 (21) + J4 (15) drafts: docs/refactor/recognizer_doc.md, "Review for the owner".
+- [x] bench, Brief 2 tests: TR4, TR6, TR9, TR12, TR13, TR14 (validated 2026-09-29, HISTORY).
+- [x] bench, B8 (validated 2026-09-29, HISTORY): hebrew-command-bench retired under A-D.
+- [ ] OWNER: B4 labels (confirm.py) -> B2; the rm of 10 files; the J1 + J4 draft review.
+- Deferred: S6-M (EOVSAM) in a fresh container after the freeze. On the back burner: S2 a (SAM3 in its own process).
+
+### 9g. ROUND 4 (owner rulings 2026-09-29: VT1-VT4, O3, O4, J4 (4))
+- [x] investigator, Brief 4 (validated 2026-09-29, HISTORY; VT5, VT6 open): VT3 (SAM3.1 measured exactly like SAM3 tracking) + VT4 (the run-to-run noise).
+- [x] perf, Brief 4 (validated 2026-09-29): O3 (the preflight retries the frame read once) + O4 (the GATE=vlm message names Gemma).
+- [ ] OWNER: CI1 (compound plans); confirm or review the other 34 J1/J4 drafts. Then recognizer promotes the
+      confirmed drafts, adds the square-with-turns alternative, and re-runs the benchmark.
+- [x] bench, Brief 3 (validated 2026-09-29; not yet rendered in a browser): UI1, the labelling web page in tools/asr-verify-transcript (impeccable); confirm.py retires.
+- [x] perf, Brief 5 (validated 2026-09-30, HISTORY): FZ2, the 1-second breakdown. FZ1 open (cuts L1-L3).
+- [x] perf, Brief 6 (validated 2026-09-30, HISTORY): L1 (warm-up at start) + L2 (draw the gate's boxes at once), before the freeze.
+- After the freeze: VT1 a + VT2 a (the SAM3 tracker for a live highlight, a 16-frame limit); S6-M; S2 a.
+
+### 9h. THE ROAD TO THE FREEZE AND AFTER (owner rulings RM1, POST (2), 2026-10-01)
+Pre-freeze, in order:
+1. Joint review with the owner (the main agent verifies every label): the 139 clips (remove 67-73, 82 as inaudible;
+   83-85, 92 removed; 116, 117, 120 highlight or describe?; glitchy 38/45/50/56/59; unclear 8/23; scan 60/61), the 34
+   J1/J4 drafts, the 144 SC1 kinds.
+2. B2 (whisper + recognizer on the recordings); the benchmark rerun with the confirmed drafts and kinds.
+3. Finish the cleanup + refactor (the refactor is then DONE).
+4. Code review with the review tools (/code-review, the thermo-nuclear review); fix the issues.
+5. The owner's live webcam test, with a joint input-level (gain) settings check (QC2): after the owner's review of the state with the new agent (2026-10-01).
+6. The field test on the real drone (secured), until done.
+7. The owner understands the system (a walk-through).
+8. F1 (the doc sweep) and the owner's commits, just before the freeze; then the freeze (git tag).
+Post-freeze (only if the freeze succeeds):
+- R1 benchmarks: whisper under noise, SAM3 low light.
+- R2 recognizer: L3 (a shorter plan answer) + CI1 (flight + vision in one sentence); a larger military set.
+- Near-term architecture: SAM3 in its own process (S2 a); EOVSAM AND SAM3.1 evaluated by the owner and the main
+  agent together (fresh container for EOVSAM).
+- R3 vision (a big feature): the tracker (VT1, VT2, VT6 a), scan, vision-driven action, mission context.
+- Far: the fusion onto the C++ llm_to_action engine.
+
 ### 9e. AGENTS AND LOCKS (owner 2026-09-28: 4 agents, Opus 5.5, medium effort; the LOCK.md protocol)
 S0 (the main agent, BEFORE any agent starts):
-- [x] K3 (owner 2026-09-28): the safety archive backups/harden2-2026-09-28-before-agents.tar.gz (.git + every
-      tracked and untracked file); /backups/ and /LOCK.md in .gitignore; the owner commits the 55 paths first.
-- [ ] K1: .claude/agents/harden2-agent.md (model: opus = claude-opus-5-5, effort: medium). Every agent is launched
+- [x] K3 (owner 2026-09-28): the full copy backups/groundstation-full-2026-09-28.7z (the whole folder, ignored
+      files included; 7z t Ok); /backups/ and /LOCK.md in .gitignore; the owner commits the paths first.
+- [x] K1: .claude/agents/harden2-agent.md (model: opus = claude-opus-5-5, effort: medium). Every agent is launched
       with that type and writes its model and $CLAUDE_EFFORT at the top of its progress.
-- [ ] tools/lock.sh (acquire | release | status, under flock); LOCK.md at the repo root, line 1 FREE; ".gitignore" lists /LOCK.md (done with K3).
-- [ ] docs/refactor/ with one <agent-id>_doc.md per agent: the brief on top (context, objective, task IDs from 9d,
+- [x] tools/lock.sh (acquire | wait | run | release | clear | status, under flock; race-tested: 8 acquires at once, 1 won); LOCK.md at the repo root, line 1 FREE; ".gitignore" lists /LOCK.md (done with K3).
+- [x] docs/refactor/README.md (the shared rules) + one <name>_doc.md per agent (names: ledger N1): the brief on top (context, objective, task IDs from 9d,
       hints, checks, resources to lock, its ROS_DOMAIN_ID), CLAUDE.md's safety + git rules, "mock only", "no git writes".
-- [ ] Baseline for every agent (checked 2026-09-28): the suite 215 passed, 2 skipped; lint clean; the exception audit 5.
+- [x] Baseline for every agent (checked 2026-09-28, commit 9fc6c67): the suite 215 passed, 2 skipped; lint clean; the exception audit 5.
       55 paths are uncommitted on purpose (steps 8, 9, 11, 9a-2, the keys, the docs): no agent reverts them.
-NOT STARTED: the owner said "do not start yet". L1-L4 approved 2026-09-28 (spec ledger).
+STARTED 2026-09-28 (owner: "Start!"). L1-L4 approved 2026-09-28 (spec ledger).
 Division (owner: "Divide them as you wish"); each agent keeps its own line of work, so it keeps its context:
-- Agent 1 (recognizer): A1 -> B1 -> A2.
-- Agent 2 (perf + start-up; owns app/main.py): C1 -> C2 -> C3 -> C4.
-- Agent 3 (benchmarks + tools): B5 + B6 -> B3 (after B1's JSON format) -> B7 (after B1) -> B2 (after the owner's B4).
-- Agent 4 (investigations, GPU): E2 (SAM3 assessment) -> E1 (dips, after C1).
-- After A1, B1, C1, C3: the layout (D1-D7) by ONE agent (agent 2), then E3, F1, F2.
+- Agent `recognizer`: A1 -> B1 -> A2.
+- Agent `perf` (perf + start-up; owns app/main.py): C1 -> C2 -> C3 -> C4.
+- Agent `bench` (benchmarks + tools): B5 + B6 -> B3 (after B1's JSON format) -> B7 (after B1) -> B2 (after the owner's B4).
+- Agent `investigator` (investigations, GPU): E2 (SAM3 assessment) -> E1 (dips, after C1).
+- After A1, B1, C1, C3: the layout (D1-D7) by ONE agent (perf), then E3, F1, F2.
 - The main agent: the briefs, the validation of each agent against its brief, the GPU schedule, and it is the
   ONLY writer of docs/HISTORY.md, the spec, this handoff and the session log (agents report to files).
 Where the tasks overlap (why the locks are needed):

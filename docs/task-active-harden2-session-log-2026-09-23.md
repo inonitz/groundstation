@@ -1,7 +1,5 @@
-RESUME HERE (2026-09-28): NOTHING IS BUILT YET; the owner said "do not start yet, we're not done".
-Read, in order: this file's progress list end; the handoff's 9d (tasks) and 9e (agents + LOCK.md, open
-points, approved); the spec's "Decision ledger 2026-09-26 .. 2026-09-28" (every decision, one row each);
-docs/guidelines.md. Old handoff docs are history only (HISTORY 2026-09-28, the handoff documents).
+RESUME HERE (2026-10-01): a FRESH AGENT starts from docs/task-active-harden2-handoff-2026-10-01.md (the full handoff),
+then docs/harden2-status.md. All agent tasks are done; the owner finished labelling; next is handoff 9h step 1.
 # harden2 session log, 2026-09-23 / 24 (for the next agent after compaction)
 
 SUPERSEDED by line 1 (was RESUME HERE, 2026-09-25): read docs/guidelines.md ("All guidelines at a glance") FIRST, then the
@@ -258,3 +256,83 @@ everything, keep raising problems, ask before spawning agents.
 - Answer every numbered point, in order; never mention review IDs (R1..R30) to describe work.
 - Give recommendations with a reason; when the owner says "decide", decide and state it.
 - Short sentences (STE), tables for comparisons, no filler; ask before spawning agents.
+- 2026-09-28: S0 done (tools/lock.sh race-tested; LOCK.md; .claude/agents/harden2-agent.md; docs/refactor/ README +
+  4 briefs; names per ledger N1). The launch failed: "Agent type 'harden2-agent' not found". The running session
+  does not load a new agent type. Without it an agent inherits this session's effort, measured: CLAUDE_EFFORT=xhigh,
+  not medium (P2). No agent runs; asked the owner (A1-A3 in the reply).
+- 2026-09-28: the owner restarted the session (ledger A1 a); harden2-agent loaded. Wave 1 launched in the
+  background: recognizer (A1), perf (C1), bench (B5 + B6), investigator (E2). Next: check each doc's first
+  Progress line (model + effort = medium), then validate each checkpoint (triple coverage) as the agents report.
+- 2026-09-28: all four agents run on claude-opus-5-5 with CLAUDE_EFFORT=medium (their docs). bench finished
+  B5, B6 (except the refused rm) and B3; validated three ways (its doc; against its brief; every file read,
+  the vision verdicts compared by the main agent). B5 + B3 ticked; B6 waits for the owner's rm. Found: the
+  whole datasets/ folder is git-ignored, so recognizer's JSON cases (datasets/recognizer/) are untracked:
+  asked the owner (V1), with bench's O1 (where recordings.json lives). bench WAITING for B1 and B4.
+- 2026-09-28: investigator finished E2; validated three ways (its doc; against its brief; the document and all
+  8 scripts read in full; R2 + R4 checked against the raw JSON; the EOVSAM citation checked online). E2
+  ticked; D2's caller list updated. The main agent disagrees with the document's S2 a (own process): no SAM3
+  failure in 40 sessions, and the guidelines forbid recovery for a failure that does not happen -> recommends
+  S2 b + S3 a. investigator WAITING for C1 (E1). Open with the owner: V1, O1, S1-S6.
+- 2026-09-28: perf finished C1-C4; validated three ways (its doc; against its brief; every file read: log/perf.py
+  and perf_report.py in full, every other diff; the halt still skips the transmit switch). The main agent
+  measured record() at 1.08 us and ran its own gate: lint clean, audit 5, suite 229 passed, 2 skipped, twice.
+  C1-C4 ticked. investigator resumed for E1. perf WAITING for the layout brief (needs A1 + B1). Open with the
+  owner: V1, O1, S1-S6, H1 (camera check), H2 (scripted e2e start).
+- 2026-09-28: recognizer finished A1, B1, A2; validated three ways (its doc; against its brief; every file read:
+  recognizer.py, numbers.py, util/hebrew.py, guards.py diffs, accuracy.py and scorer.py in full, tests, READMEs,
+  header; the flight order of checks unchanged; the benchmark cannot send). The main agent fixed one false
+  line in recognizer/README.md (stage 2 does NOT write prefixed numbers as digits) and ran its gate: lint
+  clean, audit 5, suite 229 passed, 2 skipped, twice. A1, A2, B1 ticked; B6 ticked; both wait for the
+  owner's rm. perf got "Brief 2" (D1, D3-D7; D2 waits for S1-S3) and resumes; bench resumes for B7.
+  Open with the owner: V1, O1, S1-S6, H1, H2, R1-R4; the rm of 9 files.
+- 2026-09-28: bench finished B7; validated (its doc; against its brief; the study diff against HEAD, the
+  README, the bench list row; no banned word). B7 ticked; bench.py joins the owner's rm (its two importers
+  are in the same command). bench WAITING for B4 (the owner's labels) before B2. bench's O2 (retire
+  cases_commands.py, cases_perception.py, CASES.md) depends on V1.
+- 2026-09-28: investigator finished E1; validated (its doc; against its brief; load_vs_frames.py read in full;
+  the four sessions recounted by the main agent: 47/425 slow frames before "sam3" UP, 1/5735 after). E1
+  ticked. investigator has no task left. New owner question S7 (the start dips if S2 b). Running: perf (D).
+- 2026-09-28: perf finished D1, D3-D7; validated three ways (its doc; against Brief 2; every moved file diffed
+  against HEAD, scripted_e2e_run.py read in full with its mock-only check, the D5 diffs, the default script
+  compared). Main agent gate: lint clean, audit 5, suite 230/2 twice, the end-to-end test passed. D1, D3-D7
+  ticked; guidelines.md paths updated (runtime/, keys/, scripted_e2e_run.py). No agent runs now.
+  Left: D2 (owner S1-S3), B4 (owner) -> B2, E3, F1, F2. Open with the owner: V1, O1, S1-S7, H1, H2, J1-J4, the rm.
+- 2026-09-28: E3 (the test review, a report, no changes) given to investigator (Brief 2 in its doc): it has
+  no task left, D2's file moves do not change behaviours, and the owner ruled "What can be in parallel,
+  should be done in parallel".
+- 2026-09-28: investigator finished E3; validated (the review read in full; the bypass and echo findings
+  checked against the tests; "config has no tests" found in handoff 4a). Its decision IDs renamed TR1-TR17
+  (T1-T9 exist in the ledger). E3 ticked. No agent runs. Left: D2 (owner S1-S3), B4 -> B2, F1, F2.
+  Open with the owner: V1, O1, S1-S7, H1, H2, J1-J4, TR1-TR17, the rm of 10 files.
+- 2026-09-28: the owner rejected a shortened decision table; rule written to guidelines (full context per item) and memory.
+- 2026-09-28: the owner's answers to V1..TR14 recorded in the ledger (verbatim). V1 applied to .gitignore. New rules: tests with the module; check earlier rulings before recommending; model research = download, load, test. Found: 4 session clips in HEAD and on GitHub (P1).
+- 2026-09-29: the owner's answers of round 2 recorded (ledger rows marked (2), P1, J5, TR15-17, CP1). confirm.py prints Hebrew through python-bidi (B4). No git command until the owner says (CP1). S6-M deferred to a fresh container after the freeze.
+- 2026-09-29: round-3 rulings recorded; confirm.py instructions rewritten; handoff 9f + Brief 3 (perf, investigator), Brief 2 (recognizer, bench) written; the four agents resumed.
+- 2026-09-29: bench's TR tests validated (read in full, re-run by the main agent); ticked in 9f. B8 waits for J5.
+- 2026-09-29: investigator finished S5-M; validated (the document read; every table checked against the raw JSON; the 05:45 incident touched no result). Decision IDs renamed VT1-VT4. S5-M ticked.
+- 2026-09-29: recognizer's Brief 2 validated (code read; the square/r_dis4 conflict traced to the owner's two lists; the labels file checked: 1 clip, untouched in content); ticked. The owner reviews the J1/J4 drafts; datasets/e2e rm added to the owner's list.
+- 2026-09-29: bench's B8 validated and ticked. bench WAITING for B4 (B2).
+- 2026-09-29: perf's Brief 3 validated (old paths searched; the nf4 loader and install line read; the 6 tests listed; main gate green incl. end-to-end). Ticked. New owner questions O3 (preflight retry after down), O4 (GATE=vlm refusal message). No agent runs.
+- 2026-09-29: consolidated report given to the owner. D2 ticked in 9d. F1 must also settle 9 old unticked lines of handoff sections 4-9a (done or open).
+- 2026-09-29: round-4 rulings recorded; Brief 4 for investigator (VT3, VT4) and perf (O3, O4); handoff 9g; line 1 updated.
+- 2026-09-29: perf's Brief 4 (O3, O4) validated and ticked. investigator runs VT3 + VT4.
+- 2026-09-29: owner: clip 13 correction (apply when confirm.py closes); manual reviews done jointly; confirm.py UI rejected -> UI1 proposed. Typed Hebrew in the terminal is garbled (clip 13 evidence).
+- 2026-09-29: UI1 a ruled; bench Brief 3 (web page, impeccable) written; bench resumed.
+- 2026-09-29: UI1 validated and ticked (tests, binding, no outside links); first browser render is the owner's.
+- 2026-09-29: UI1 (3): plan editor rows + whisper text default -> bench Brief 4. investigator finished VT3 + VT4 (to validate).
+- 2026-09-29: UI1 (3) validated (tests re-run); the owner must restart the server.
+- 2026-09-29: VT3 + VT4 validated and ticked. Owner flags distorted clips as Manual Verify (joint review later).
+- 2026-09-30: owner's clip notes, vision questions, FZ1/FZ2, CI1, VT5, VT6, UI1-a recorded; bench Brief 5 (empty sentence), perf Brief 5 (FZ2).
+- 2026-09-30: bench Brief 5 (empty sentence, 'Nothing was said') validated: 15 tests re-run; the owner must restart the server.
+- 2026-09-30: FZ2 validated (e2e rows = raw records) and ticked; FZ1 asked with cuts L1-L3.
+- 2026-09-30: rule: all open notes in one response. L1 go, L2 go, L3 after freeze; FZ1 decided; perf Brief 6.
+- 2026-09-30: CI1 b; VT6 open (leaning a); UI1 (4) vision-request editor -> bench Brief 6.
+- 2026-09-30: UI1 (4) validated (19 tests). New open item SC1 (scorer ignores the vision kind). No server runs: the owner starts it.
+- 2026-09-30: L1 + L2 validated (gate green incl. end-to-end) and ticked: highlight 0.93-0.97 s from the transcript.
+- 2026-09-30: clips 68-73 measured; B4 (8) page bugs + removed clips -> bench Brief 7; SC1 a -> recognizer Brief 3; VT6 a; post-freeze plan asked.
+- 2026-09-30: recognizer SC1 done (vision field; 144 drafted kinds); bench breached recognizer's locks on labels.py/test_server.py (told; rebases). The owner's file intact: 97 clips; no server running.
+- 2026-09-30: SC1 + B4 (8) validated (removals mapped to clips 83, 84, 85, 92; clip 73 unsaved). The owner may start the server.
+- 2026-10-01: mechanical check: 24 ledger rows still said 'open' though later rows closed them; fixed (superseded/closed) + a reading rule; result docs' decision tables annotated with the rulings.
+- 2026-10-01: AUD1: the transcript audit agent runs; its coverage check is a deterministic script (owner: 'the task needs to be mechanical').
+- 2026-10-01: audit applied (C1-C4, G1-G6, the start date 2026-09-21).
+- 2026-10-01: J3 closed (stays in util), fatal.py rename dropped, the live webcam test waits for the owner's review with the new agent.

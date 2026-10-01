@@ -4,7 +4,7 @@
  *
  * guarded.py holds the ONLY try/except blocks around third-party calls: ONE per failure
  * domain (HTTP, JSON, filesystem, asyncio streams). Each turns the throw into a status.
- * The one other catch in the app is system/fatal.py's crash-path cleanup loop.
+ * The one other catch in the app is runtime/fatal.py's crash-path cleanup loop.
  */
 #ifndef __HARDEN2_API_UTIL_H__
 #define __HARDEN2_API_UTIL_H__
@@ -45,5 +45,11 @@ void UtilHebnumToDigits(const char* in, char* out, size_t cap);   /* עשרים 
 
 /* ---- mission.py ---- */
 void UtilStepText(const char* stepJson, char* out, size_t cap);   /* "fly_by dz=5.0"    */
+
+/* ---- box overlap math (boxes.py; used by sam3/ and perception2/). A box: x1, y1, x2, y2 ---- */
+float BoxArea(const float* b);                          /* 0 for an inverted box           */
+float BoxIntersection(const float* a, const float* b);
+float BoxIou(const float* a, const float* b);
+float BoxInside(const float* a, const float* b);        /* the share of a that lies in b   */
 
 #endif /* __HARDEN2_API_UTIL_H__ */

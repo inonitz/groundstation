@@ -6,7 +6,7 @@
  */
 #ifndef __HARDEN2_API_CONTROL_H__
 #define __HARDEN2_API_CONTROL_H__
-#include "system.h"
+#include "runtime.h"
 #include "dji_app.h"
 
 typedef struct SessionLog SessionLog;

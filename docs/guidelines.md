@@ -18,7 +18,7 @@ not relearn them. CLAUDE.md (loaded automatically) holds the safety, git and too
 - Never send a motor command (arm, takeoff, land, sticks, fly) to a real drone: prepare it; the
   human runs it. A real aircraft is SECURED before any command that can spin motors; props-off
   is not enough. Control tools run only against the mock at 127.0.0.1.
-- The scripted run (app/feed.py, `SCRIPT=`) refuses to run unless control is the mock.
+- The scripted run (test/scripted_e2e_run.py, `SCRIPT=`) refuses to run unless control is the mock.
 
 **Git** (CLAUDE.md; "Review & commits" below)
 - The human owns every git write, staging included. The agent reads only (status, log, diff)
@@ -341,6 +341,11 @@ and they are NOT EQUIVALENT(!):
 - Address every point of a multi-point message, by number, none skipped.
 - Name things plainly. No task-ID jargon; use an ID only as a parenthetical reference.
 - A recommendation is not a decision. Anything the owner has not ruled stays open.
+- Before a recommendation, search the docs for an earlier owner ruling on the same subject; never
+  recommend against one without naming it (2026-09-28: "defer SAM3.1" contradicted the 2026-09-04
+  ruling "PRIORITIZED ... NOT abandoned, NOT merely deferred").
+- Researching a model means downloading, loading and testing it, not a desk study (the owner,
+  2026-09-28: "THE RESEARCH WAS TO DOWNLOAD & LOAD & TEST THE MODEL!").
 
 ---
 
@@ -355,6 +360,8 @@ private memory. Where a rule below is stricter than the general sections above, 
   needs, or callbacks, in its constructor, never another module's internals. A failure while
   starting dies with the reason. Shutdown closes the modules, then the services, in reverse.
 - Every class has close().
+- Boxes come only from SAM3. Gemma answers and verifies; it never draws boxes (the owner, 2026-09-22: "we stopped
+  doing that BECAUSE it was inaccurate!").
 - Each part that has a status row OWNS it (a Status) and reports it through its own status();
   the StatusBoard only asks its sources. No global board.
 - A helper used by more than one module lives in util/. A helper used by one module lives in it.
@@ -372,7 +379,7 @@ purpose. That is not to say though, that Modules cannot be shared between system
 contrary - take a look at the Gemma module - It is reused between BOTH the perception system AND
 the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.")
 - Module: one folder of harden2 (app/, audio/, video/, perception2/, recognizer/, gemma/,
-  dji_app/, control/, log/, system/, util/, config/).
+  dji_app/, control/, log/, runtime/ (was system/, owner R5), keys/, util/, config/).
 - Service: a module that a system or another module depends on; started once and handed to
   whoever needs it (Gemma, SAM3, the phone-app client, the session log, perf).
 - System: a group of modules with one purpose; a module may serve several systems (Gemma serves
@@ -384,10 +391,13 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
 
 ### Errors
 - A try/except exists only in util/guarded.py, one per failure domain (HTTP, JSON, filesystem,
-  asyncio streams). The one other catch is system/fatal.py's crash-path cleanup loop. Check with
+  asyncio streams). The one other catch is runtime/fatal.py's crash-path cleanup loop. Check with
   `python3 tools/audit_exceptions.py projects/integration_harden2`.
 - No sys.exit and no SystemExit in app code: die() on a fatal error; a tool returns.
 - Do not build recovery for a failure that does not happen (the owner asks "why would it fail?").
+- Never delete working code on the argument that git keeps it: nobody reads old diffs. Unused code
+  gets a test, or the owner rules (the owner, 2026-09-29, TR16: "will YOU ever remember that the git
+  history has this feature? I don't think so, no.").
 
 ### Code style (the owner's own rewrite of Vision._track is the reference)
 - Every line under 90 characters (Python; stricter than the 90-95 above).
@@ -401,6 +411,12 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
 - One test file per module (test/test_<module>.py). Shared helpers live in test/support.py.
 - No test writes into the repo's logs/ (sessions, traces): tests use their tmp folder.
 - Mutation-check new logic: break it on purpose and see a test fail.
+- A test that can pass without checking anything is a bad test (the owner, 2026-09-27: "The fact that a test can
+  pass without checking anything just tells me that same test is not good.").
+- A module's tests are written WITH the module, before it is called done. A later review must not hand
+  the owner a backlog of missing tests (the owner, 2026-09-28: "Why don't you develop tests are
+  finishing a module? Why remind me of all the 20 thousand something tests you need to build AFTER WE
+  BUILD THE DAMN MODULES!").
 
 ### Benchmarks
 - Delete a benchmark only when A-D hold (owner 2026-09-26): no longer of use; committed in git;
@@ -411,6 +427,8 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
 - HISTORY.md and every progress list are oldest first: a new entry goes at the END of its
   section, with its measurements AND verdicts.
 - Banned words (names and prose; data keeps its own words): wire, seam, load-bearing, sieve.
+- A diagram for the owner shows the full control flow: every queue, thread and hand-off, not only the boxes
+  (the owner, 2026-09-22: "I don't like that you didn't draw the interaction with the Task Queue").
 
 ### Working with the owner
 - Answer the EXACT question asked, every numbered point in order. When asked to quote the owner,
@@ -429,6 +447,13 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
 - The owner holds no hidden context: no long lists of files to keep in mind; a review list is short
   and grouped by purpose, per commit (the owner, 2026-09-27: "I don't have context in my brain for
   every single here").
+- A decision list carries its FULL context in every item: what was found, the numbers, what each
+  option does and costs, and the recommendation with its reason. Never a shortened list of
+  one-line rows (the owner, 2026-09-28: "Don't give me this shortened list! There is no FUCKING
+  CONTEXT LIKE THIS! IM ALREADY USED TO READING YOUR PAMPHLETS !").
+- Every reply that carries open items lists ALL of them, each with its full context; never spread
+  open items over several replies (the owner, 2026-09-30: "Put all your notes together, don't break
+  them into multiple responses.").
 - A multi-point answer ends with a decision table: an ID per question, its options, the
   recommendation first, so the owner can reply "D1 a, D2 b" (the owner, 2026-09-26: "Make it easy
   for me to respond to you in a list").
