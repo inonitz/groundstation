@@ -1,3 +1,5 @@
+**FROZEN RECORD (2026-10-24, RCD77).** The approved telemetry design, kept verbatim after its fold into the recorder (modules/01-recorder/recorder.md section 8). Its folder and headers are gone; the recorder is the design's truth.
+
 # telemetry: the record of a run (rev5 module review; design closed 2026-10-16)
 
 > **FOLDED into the recorder (RCD1, 2026-10-18; the fold approved as O4, RCD2).** The telemetry module's

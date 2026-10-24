@@ -4,7 +4,7 @@ The owner's framing, 2026-10-18: "Both telemetry and perf need to write to some 
 whatever they're documenting. Albeit with different requirements, yes." And: "WE ARE LOOKING TO
 MEASURE PERFORMANCE ON SPECIFIC OPERATIONS AND(!) RECORD TELEMETRY!" The names are his:
 "Call it RecorderCreate() and destroy(), recordSpan(), recordEvent(), recordFrame(), and so on."
-The files (the owner, 2026-10-18, RCD5: "If something is logically separated then put it in another file"; RCD21: one header per actor): in 00-util, `fixed_text.h`, `common_names.h`, `monotonic_clock.h`, `frame_types.h` (FrameSize, PixelFormat, FrameView), `index_queue.h` (a bounded FIFO of indexes under one lock), `spsc_record_queue.h` (one producer, one consumer, bounded, drop-new; in C a ring of record slots plus a byte area; in Python a deque of tuples, PY3). In 01-recorder, the public contracts: `recorder.h` (the lifetime, the health), `record_field.h` (typed fields with literal names, the result code, the 8 KiB bound, the cut field), `record_span.h`, `record_event.h`, `record_frame.h` (one contract each), `record_file.h` (the file: every line kind and every key as a named constant, one home for the writer and the readers). The actors: `recording_thread.h` (the producers: a thread's queue and its thread-local producer), `image_buffer_pool.h` (a buffer pool with a free list and a work queue; the job threads fill image buffers, the writer empties them), `record_writer.h` (the one consumer and the file), `recorder_internal.h` (the one instance, its state, the counters). Sixteen headers, all in `recorder_aggregate_for_review.md`. The two approved documents stay the record of their rounds. Since 2026-10-22 this document is the source of truth of the design (RCD61). **APPROVED by the owner on 2026-10-24 (RCD75), from section 2 and the six drawings.** The decision document of 2026-10-21 is merged into section 2 and frozen as a dated record. The history of the rounds moved to test/recorder-history-2026-10-24.md on 2026-10-24 (RCD72). This
+The files (the owner, 2026-10-18, RCD5: "If something is logically separated then put it in another file"; RCD21: one header per actor): in 00-util, `fixed_text.h`, `common_names.h`, `monotonic_clock.h`, `frame_types.h` (FrameSize, PixelFormat, FrameView), `index_queue.h` (a bounded FIFO of indexes under one lock), `spsc_record_queue.h` (one producer, one consumer, bounded, drop-new; in C a ring of record slots plus a byte area; in Python a deque of tuples, PY3). In 01-recorder, the public contracts: `recorder.h` (the lifetime, the health), `record_field.h` (typed fields with literal names, the result code, the 8 KiB bound, the cut field), `record_span.h`, `record_event.h`, `record_frame.h` (one contract each), `record_file.h` (the file: every line kind and every key as a named constant, one home for the writer and the readers). The actors: `recording_thread.h` (the producers: a thread's queue and its thread-local producer), `image_buffer_pool.h` (a buffer pool with a free list and a work queue; the job threads fill image buffers, the writer empties them), `record_writer.h` (the one consumer and the file), `recorder_internal.h` (the one instance, its state, the counters). Sixteen headers, all in `recorder_aggregate_for_review.md`. The two approved documents stay the record of their rounds. Since 2026-10-22 this document is the source of truth of the design (RCD61). **APPROVED by the owner on 2026-10-24 (RCD75), from section 2 and the six drawings.** The decision document of 2026-10-21 is merged into section 2 and frozen as a dated record. The history of the rounds moved to test/recorder-history-2026-10-24.md on 2026-10-24 (RCD72). Perf and telemetry folded in on 2026-10-24 (section 8, RCD77). This
 document holds the design as it stands after every ruling (the dated record lists each change against the two approved contracts). Where a number or a measurement
 is needed, it points at the two approved documents instead of copying them.
 
@@ -1051,7 +1051,10 @@ One file, one test per row, grouped by actor. Each row names what it proves. Fro
 | 23 | file | one file holds the time reference line, a span, an event and a drop line in time order | the merge rule |
 | 24 | file | the reader of run.sh perf and the replayer read one sample session file | the readers still work |
 
-## 8. The approved perf and telemetry contracts, mapped to the recorder (2026-10-21)
+## 8. Perf and telemetry, folded in (OPEN 4, done 2026-10-24, RCD77)
+Perf (PRF3 to PRF5, 2026-10-12) and telemetry (TEL2 to TEL19, 2026-10-16) were two approved designs. They are one service now: this recorder. Their folders are gone. Their documents stay as frozen dated records in `../../test/perf-approved-2026-10-12.md` and `../../test/telemetry-approved-2026-10-16.md`. This section keeps what a builder or a reviewer still needs from them. That is the map of every contract and helper to its recorder form, the rulings, the measured forces, the rejected alternatives, and where their tests went.
+
+### 8.1 The contracts and the helpers, mapped
 The short labels used in this document: W1 was RCD25's retry queue, replaced on 2026-10-22 by the pass that ends at a failed append; K1 is RCD20's "no registration"; Q1 is PY3's tuple deque; U1 is RCD19's util headers (T1 is the fault line of the decision document); D1 to D14 are the blind reads' defects in docs/api-harden2/rev5/test/recorder-review.md; the ledger rows with the bare IDs W1, K1, Q1, T1, D1 to D14 belong to other work.
 The owner asked for every function of the two approved designs that the recorder does not show, and whether it still matters. Three tables: the core contracts, the helpers, and the items with no recorder counterpart.
 
@@ -1109,3 +1112,75 @@ The owner asked for every function of the two approved designs that the recorder
 | the readers: run.sh perf's report (P25 to P99, C.1) and the replayer | perf.md, telemetry.md | they read record-*.jsonl at the implementation; test 24 pins it; no design change |
 | the GPU reader (NVML; AMD on the desktop) | PerfGpu | DROPPED with the gpu event (RCD34 B1) |
 | the writer's pause on a failed write and its resume | TelemetryHealth.m_degraded | replaced by the pass that ends at a failed append, the record left at the front, and the two flags; a fault line is written when a counter changes (TEL2) |
+
+### 8.2 The rulings that came with them
+Perf's rulings, each still in force through the recorder:
+
+| ID | the owner's words | here |
+|---|---|---|
+| C.1 (2026-09-28) | "Record everything and calculate metrics later! Keep P25, P50, P75, P95, P99, min & max." | the recorder stores raw spans; the reader computes |
+| R7 (2026-09-28) | "Make this configurable inside the config folder, default to 5s." | the flush period, `WRITER_FLUSH_TO_DISK_EVERY_NS` |
+| V1 (2026-09-28) | "Option A" | the reader lists the 20 slowest frames |
+| PRF1 (2026-10-02) | "PerfEvent@stage shouldnot be a string, unless you plan on chaining subEvents" | `SpanStage` is an enum |
+| PRF2 (2026-10-04) | an opaque logger; "PerfTimestamp = raw ns"; "API does not track this. App does."; "Nobody actually writes a marker system like this." | no marks; the caller holds every start timestamp; `MonotonicNs` |
+| RVW4 (2026-10-12) | one process-wide tracer with a ring per thread; "What about DLL/process Boundaries?" | one recorder per process; one queue per thread |
+| RVW5 (2026-10-12) | "You can measure the C++ processes from our end ... as a single metric." | llama-server, the phone app and the keyboard hook are timed request to reply, in the app |
+| RVW6, RVW7 (2026-10-12) | "Perfect." (a file per process, merged by the shared monotonic clock) | the SAM3 server writes its own file; the reader merges by the time reference lines |
+| PRF5 (2026-10-12) | the thread cap is the design's count, not nproc | `RECORDING_THREADS_MAX` 16; the 17th registration dies |
+
+Telemetry's rulings, each still in force or named where the recorder replaced it:
+
+| ID | the ruling | here |
+|---|---|---|
+| TEL2 | never kill the app after start-up; drop, count, one event, a chat line | drop and count; the fault line (T1); the status row |
+| TEL3, TEL4 | a generic sink; the records and the helpers live with their owners | one helper per span or event in the owning module's header |
+| TEL5, TEL13, TEL16 | lossless PNG level 1, at the source's resolution | unchanged |
+| TEL6 | the start-up check stays | Create returns false; the app dies at start |
+| TEL7 | a full ring or pool: drop and count; a failed write: pause, count, resume; one trace file; the stop's reply as a message | drop and count; a failed append leaves the record at the front, retried each pass (RCD-era item 11 replaced the pause); one record file per process (OPEN 2) |
+| TEL8 | the mic listener takes the newest clip name at the transcript | unchanged; `asr_clips/` is made by Create (RCD34 A1) |
+| TEL9, TEL17 | the free-space rule from the frame size, the expected vision rate and the flight length | `RecorderReserveBytes`; 40 minutes at Create, 5 minutes for the writer |
+| TEL10 | the trace fsynced every 5 s, the PNGs never; the stall rule | the flush step; `writerStalled` |
+| TEL14 | no blob call; no N-th pass knob | unchanged |
+| TEL11 | a thread past the cap is dropped and counted | REPLACED by RVW4: it dies (RCD19 item 2) |
+
+### 8.3 The measured forces that came with them
+Measured on this machine, in the telemetry rounds (2026-10-14 to 16) unless dated otherwise:
+- A frame at 720p is 2.76 MB raw. A memcpy of it takes 0.05 to 0.18 ms. A PNG level 1 encode takes 37 to 41 ms. It gives 1.0 to 1.26 MB, 0.36 to 0.45 of raw. At 1080p: 6.2 MB raw, about 90 ms, 2.8 MB.
+- A mask is one byte per pixel. Its PNG takes 3.5 to 4.3 ms and is 8 to 16 KB.
+- JPEG q95 moved one SAM3 box in 16 and the scores by up to 0.086 over 40 images. So the images are lossless.
+- The rates: a turn per 2 s. Vision runs at most 3 passes a second. The expected rate is 30 a minute; the recorded sessions ran 4 to 32, median 15.
+- The writer's work at full load: 3 x 41 ms is 123 ms a second at 720p, 12 % busy. At 1080p it is 270 ms, 27 % busy. cv2 releases the GIL while it encodes.
+- A write() returns in under 1 ms. An fsync of the record file costs 0.6 ms. This kernel's flusher runs every 5 s and writes back pages older than 30 s.
+- The free-space rule at 1080p: 2.8 MB a pass. The start check is 3.4 GB, 40 minutes at the expected rate. The writer's reserve is 0.4 GB, 5 minutes. At 720p: 1.5 GB and 0.2 GB.
+- The frame size is known before Create. The webcam is probed at start; the drone stream is 1920x1080; a video file is probed.
+- Perf's own cost table of 2026-10-12 said 330 ns a packed record and 400 ns for an f-string payload. Section 2.0's table supersedes it: 150 ns a tuple push.
+- Thread identifiers are recycled by Python and by Linux. So a thread finds its entry through its own thread-local pointer, never through an id lookup (section 2.1).
+
+### 8.4 The alternatives they rejected, still rejected
+- One shared array with an atomic fetch-add per record: a queue per thread needs no shared write (RVW4).
+- Shared memory for the records across processes. A file per process and a merge by the clock give the same result (RVW6, RVW7).
+- A binary record file: the reader and the tools read JSON lines; a binary file saves disk, not time.
+- Blocking the recording thread on a full queue, or dropping the oldest. A timing tool never slows the step it times, and drop-new keeps the count (TEL7).
+- A domain-typed sink: the sink stays the same when a schema changes; only a helper changes (TEL3).
+- A failed write that dies: a logger has no authority over a vehicle (TEL2).
+- Holding the shared frame slot until written, or waiting for a pool buffer. A stalled disk must not hold a slot (RVW3).
+- A temp file and rename per PNG, a folder fsync, or an fsync pass over the PNGs. Each is a storm of up to 30 fsyncs a second for no measured gain.
+- JPEG, raw, lossless WebP, packed bits for masks, hardware video encoders. The box moved, or the bytes doubled, or an image took 300 ms.
+- A JSON per job and per pass. One stream of lines with a kind each is what MCAP and rosbag record.
+- A reserve sized for full vision for an hour. It would refuse to start on a half-empty disk for nothing (2026-10-16).
+- Polling the writer every 10 ms: the wake flag (RCD6).
+
+### 8.5 Where their tests went
+Perf listed 23 tests and telemetry 30. The recorder ships 24 (section 7); the rest moved or fell with their mechanism.
+
+| group | from | where it is now |
+|---|---|---|
+| the push, the drop at the bound, the cut, the field cap, the thread cap | perf 1, 2, 7, 12, 16; telemetry 2, 3, 9 | recorder tests 1 to 7 |
+| the writer: every record lands, the lines of the last pass, the drop line, the retry after a failed append, whole lines | perf 1, 3, 13, 14; telemetry 10, 11, 12 | recorder tests 9 to 16 |
+| the pools: the separate mask pool, the copy before release, the frame line after the PNG, no pools in the SAM3 server | telemetry 4, 5, 6, 7, 8 | recorder tests 17 to 20 |
+| the lifetime: O_EXCL, one Create per process, Destroy with a stuck writer, the die line | perf 4, 5, 6; telemetry 13, 14, 15 | recorder tests 10, 21, 22 |
+| the file: the time reference first, the merge of two processes by the clock, a torn last line | perf 13, 18, 19; telemetry 25 | recorder tests 12, 23, 24 |
+| the readers: percentiles, the slowest frames, a request with no pass, show.py on a sample session | perf 11, 20, 21; telemetry 27, 28 | the reader tool's own tests, at the build of `run.sh perf` and the replayer |
+| the helpers' keys and the vocabulary tables | telemetry 19, 20, 21, 22, 23 | each owning module's tests, at that module's build (section 8.1) |
+| the GPU sample, PERF_NONE, the GIL check, the clip rename | perf 10, 17; telemetry 18 | dropped with their mechanism: no GPU record (RCD34 B1), no handle (PRF7), the clip claim unchanged (TEL8) |
+| the stall on a dead writer, a stuck write, a slow writer, not when idle; a first record after a long idle | telemetry 11, 12 | recorder test 15 and a new test of `writerStalled` to add at the build: a filled image older than 5 s, and none when the queue is empty |

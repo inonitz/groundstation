@@ -366,6 +366,10 @@ says; today's code; the state; the decisions taken; what it must still settle; w
   by him until the recorder is finished); (3) C1 closed (RCD31): unpadded.
 - Carried to later modules (do not raise before the refactoring pass): OsEvent and OsLock in
   runtime (done), the mask limit in config, the session folder's mkdir rule, the GPU reader.
+- THE FINAL BUILD IS integration_harden3 (RCD76); OPEN 4 DONE (RCD77), 2026-10-24: perf and telemetry are folded
+  into recorder.md section 8; their folders and headers are gone; their documents are frozen records in test/.
+  The six commits of the four days are in (032334e to 357dfc8). NEXT: the owner's two leftover points (the frame
+  buffer's capture time, the llama server's perf helper); then the second wave of designs in the section-2 form.
 - THE RECORDER APPROVED (RCD75), 2026-10-24, draft 31. The drawing sources are in test/recorder-drawings/.
   NEXT, in order: (1) the owner commits (the agent suggested the commands); (2) OPEN 4: fold perf.md and
   telemetry.md into recorder.md (decisions, measurements, tests), delete 01-perf/ and 02-telemetry/ and the
