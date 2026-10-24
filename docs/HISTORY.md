@@ -4351,3 +4351,130 @@ Each entry: **Why** (the question), **Setup**, **Result**, **Verdict**, **Where*
   the state, the road to the freeze, open issues, agents, the document map) and docs/harden2-status.md (the one-page
   human overview). The session log's line 1 points to them. This handoff supersedes task-active-harden2-refactor-handoff.md
   as the entry point; that file stays the detailed task record (sections 9d-9h).
+
+### 2026-10-01 -- the end-to-end test's start check: the 0.18 s failure explained (main agent, KI1)
+- **Why:** owner KI1, "option A": capture the failure's reason, then repeat the test.
+- **What:** the start check `pgrep -f "app[.]main"` matched any process whose command line names the app.
+  A shell that only names the app matched it (shown 2026-10-01). The check now matches "<python> -m app.main"
+  at the start of the command line; the Gemma check likewise. Each check prints what it found.
+- **Measured:** 10 runs under the locks: 10 passed, 33.95 to 42.85 s each.
+- **Verdict:** kept. The likely cause of the 2026-09-29 failure: the perf agent timed `import app.main` at that
+  time (its D2 checkpoint). This is not provable now: that output is lost.
+- **Found for the code review (step 4):** run.sh kill_stack runs `pkill -9 -f` on loose names (llama-server,
+  "python3 -m app.main", mock_apiserver.py). It also kills a benchmark's own llama-server, or any shell that names them.
+- **Where:** projects/integration_harden2/test/test_app.py.
+
+### 2026-10-01 -- the plan time split into the server's work and the time around it (main agent, KI2)
+- **Why:** owner KI2: "what is the point of measuring if you don't do it properly?", "Option A", and "Do you
+  really not have another way to bench this?" (the 735 ms plan against 371 ms in llama-server's log).
+- **What:** gemma/client.py records llama-server's own timings (prompt_ms, predicted_ms, token counts) in the
+  perf record, next to its own time; 2 tests, mutation-checked. bench/gemma-plan-timing (new, with README): the
+  app's real path (Gemma client, Recognizer.plan), three phases.
+- **Measured** (2026-10-01-0722; ms, p50 / p90 / max; "outside" = our time minus the server's prompt and generation time):
+
+| phase | plans | ours | server | outside |
+|---|---|---|---|---|
+| first plan after a start and the app's warm-up | 5 | 549 / 584 / 584 | 512 / 548 / 548 | 37 / 38 / 38 |
+| warm, GPU free | 60 | 525 / 736 / 1207 | 489 / 699 / 1169 | 38 / 39 / 41 |
+| warm, SAM3 running without a pause (1.63 passes/s) | 60 | 1401 / 2073 / 3223 | 1362 / 2034 / 3183 | 39 / 42 / 45 |
+
+- **The first run** (2026-10-01-0715) had no warm-up before the first plan: 1546 ms p50, with 2007 prompt tokens. This
+  confirms the warm-up of L1: it saves about 1 s on the first command.
+- **Verdict on the gap:** over 250 plans in both runs, the time outside the server was at most 64.8 ms, except
+  once: 497.7 ms, in the first run's SAM3 phase. The app's 364 ms gap is the same kind of rare spike. Its cause is
+  not identified (unverified: thread contention in our process).
+- **A larger finding:** SAM3 running without a pause makes Gemma's own work 2.8 times slower (p50 489 -> 1362 ms).
+  In the app, SAM3 runs at its refresh rate, not without a pause, so the app's cost is lower (estimate).
+- **Where:** gemma/client.py, test/test_gemma.py, bench/gemma-plan-timing/.
+
+### 2026-10-01 -- B2: whisper and the recognizer on the recordings; the label audit (main agent)
+- **Why:** road step 2 (B2; owner M5: "This should be done."); JR3 (the label audit); QC1 (the inaudible clips).
+- **What:** bench/recognizer/prepass.py (path B): whisper-cli with the app's ASR model and the live server's decode
+  settings (beam 8, its starting prompt, one thread); accuracy.py runs a recordings file through it; `--labels`
+  scores the owner's text instead. 4 tests. QC1 applied: clips 67-72 and 82 removed (30 of 139 removed, 109 active).
+  The label audit: docs/refactor/label-audit-2026-10-01.md (16 clips with a finding, 14 waiting for a known ruling).
+- **Measured:** whisper's word error rate 9.3 % over 109 clips (743 label words); 7.3 % with number words as digits.
+  Recognizer: 65 PASS, 29 FAIL, 15 REVIEW on whisper's text; 70, 24, 15 on the owner's labels.
+- **Analysis:** 7 clips pass on the labels and fail on whisper's text (6, 13, 44, 46, 49, 90, 101). Clips 90 and 101
+  are English; whisper runs in Hebrew, as in the app. 13 of the 24 failures on the labels are clips the audit flagged.
+- **Verdict:** the word error rate stands. The scores are provisional until the joint review fixes the labels.
+- **Where:** bench/recognizer/ (prepass.py, accuracy.py, test_prepass.py, README.md, results/2026-10-01-recordings-*),
+  datasets/asr/recordings.json.
+
+### 2026-10-01 -- the joint review of every label; the recognizer benchmark rerun (main agent with the owner)
+- **Why:** road steps 1 and 2 (RM1); rulings JR4-JR17 in the ledger, word for word.
+- **What:** the owner reviewed four batches: the recording labels (batches 1 and 2), the 36 expected-result drafts
+  (21 military, 15 open; batch 3) and 152 drafted vision kinds (batch 4). Every draft is now confirmed or replaced; no
+  `draft` field is left. 33 of 139 recordings are removed (106 active). Wording fixed: "בזירה" -> "בסצנה" in two
+  count sentences and removed from five describe sentences; one describe sentence reworded.
+- **Measured:** all 545 sentences: 473 PASS, 61 FAIL, 11 REVIEW (2026-09-29: 458, 76, 11). Military 16 of 21
+  (was 0: the drafts were not yet confirmed). Recordings: 92 PASS, 11 FAIL, 3 REVIEW on the owner's labels;
+  85, 18, 3 on whisper's text; whisper's word error rate 9.6 % over 106 clips (716 words), 7.5 % with digits.
+- **Analysis:** of the 11 failures on the labels, 4 are listed for the fix pass (21, 79, 35, 61); 17 gets the
+  wrong kind (highlight for a colour question); 34 drops "right" and "wall"; 111, 115, 116 fail on Gemma's wording
+  ("guitars inside their cases", "sign"); 38 and 50 are garbled audio graded by intent. 5 military sentences still fly (s_scramble plans `home`, not takeoff).
+  One whisper-path run had route() p50 942 ms; the rerun gave 471 ms with the same verdicts (cause unverified).
+- **Where:** datasets/asr/recordings.json, datasets/recognizer/{military,commands,perception}.json,
+  bench/recognizer/results/2026-10-01-{joint-review,recordings-labels-jr,recordings-whisper-jr2}.*
+
+### 2026-10-02 -- the triple check before the review round (main agent, TC1)
+- **Why:** the owner (TC1): "check for anything that you might've missed (ANYTHING! I LITERALLY MEAN ANYTHING!)".
+- **What:** bench/recognizer/test_datasets.py (new, 3 tests): every expected result is gradable as meant (kinds,
+  steps, vision kinds, no hyphenated or quantity words), no draft is left, every name is unique, every recording has
+  its clip and a reason when removed. It found p75_all_vehicles ("all" as a group; fixed as L88). The scorer now
+  matches a group word only at the start of a word ("man" no longer passes on "woman", "low" on "yellow", "hat" on
+  "that", "2" on "12"); 2 tests, mutation-checked. MIL1 applied: s_feet_hold climbs 800 ft (243.8-244 m).
+- **Measured:** re-scoring the stored decisions with the new scorer and labels flips no verdict (545 sentences:
+  473/61/11; recordings: none). Gemma planned s_feet_hold as a climb of 800 m: feet read as meters.
+- **Finding, whisper's error rate by label origin** (results/2026-10-01-recordings-whisper-jr2.json):
+
+| labels | clips | words | word error rate |
+|---|---|---|---|
+| typed by the owner (no whisper text existed) | 24 | 101 | 7.9 % |
+| edited by the owner | 25 | 218 | 27.1 % |
+| equal to whisper's live text | 57 | 397 | 0.5 % |
+
+- **Analysis:** 57 labels equal the live whisper text, so whisper is compared with itself there unless the owner
+  confirmed those clips by ear. The 9.6 % over all clips is valid only in that case. The typed group (7.9 %) is the
+  only sample with no whisper text behind it, and it is small.
+- **Resolved (WER1, 2026-10-02):** the owner listened to every clip, so every label is confirmed by ear and the
+  9.6 % over all 106 active clips stands.
+- **Test rewritten (called out):** tools/asr-verify-transcript test_rows_read_back_every_plan_of_the_cases now covers
+  only one-plan labels: the data now holds lists of accepted plans (J4, JR9), which the editor never supported
+  (README "Known limit").
+- **Where:** bench/recognizer/ (scorer.py, test_scorer.py, test_datasets.py), datasets/recognizer/, tools/asr-verify-transcript/.
+
+### 2026-10-02 -- the review round: findings verified; the review of the day's own changes fixed (main agent)
+- **Why:** TC1 ("then finally firing the code review round"); RM1 step 4.
+- **Pass 2 verified** (all harden2 code, 10 findings, docs/refactor/code-review-2026-10-01.md): each confirmed
+  in the code; finding 7 by running it ("turn the drone right by twenty degrees" is refused as an echo: nums_en
+  reads no number in "בעשרים"). Not fixed yet: the fix pass follows the owner's thermo-nuclear review (D1).
+- **Pass 3** (/code-review high on the day's own changes: bench/recognizer, bench/gemma-plan-timing, the Gemma
+  client, the perf report, tests): 10 findings, all fixed. The digit error rate now divides by the label's words
+  in digit form; whisper's markers ("[BLANK_AUDIO]") are not words; accuracy.py runs whisper before Gemma starts and
+  applies --first after the removed clips; the whisper temp folder is removed; the SAM3 warm-up wait is bounded;
+  one RecordingPerf (test/support.py) for the tests and the timing bench; close() on the new classes. 3 new tests,
+  mutation-checked.
+- **Measured after the fixes:** recordings 85 / 18 / 3 on whisper's text, 92 / 11 / 3 on the labels; whisper's
+  word error rate 9.6 %, 7.5 % with digits (unchanged at one decimal). Gate: lint clean (W391 too), audit 5,
+  252 passed, 2 skipped, twice; the bench tests 17 passed; the labelling tool 21 passed, 5 skipped.
+- **Found:** the fast path's "עצור always stops" (ruling recorded 2026-09-02) conflicts with JR9 ("stop for 10
+  seconds" should wait): for the owner.
+- **Where:** bench/recognizer/, bench/gemma-plan-timing/, projects/integration_harden2/test/support.py.
+
+### 2026-10-02 -- the thermo-nuclear review; the headers and the code are not 1:1; the ground-truth procedure starts (main agent with the owner)
+- **Why:** RM1 step 4 (the owner started /thermo-nuclear-code-quality-review); then the owner's API1 and GT1.
+- **What:** the review (docs/refactor/thermonuclear-review-2026-10-02.md) traced 9 of the 10 verified bugs to five
+  design problems. Checking the fixes against the plan showed that the code and the newest headers carry an agent's
+  unruled deviation ("one highlight at a time", step 6 of 2026-09-23, copied into perception.h v2.4), against the
+  plan's several highlights. A name-by-name check followed.
+- **Measured:** 262 public Python names; 162 in a header; 100 in none. Mismatches in meaning: perception.h
+  (highlights), recognizer.h (the reject reason, Routed), log.h (slots).
+- **Verdict (owner):** no ground truth exists; nothing is implemented until one is built and approved. The procedure
+  (GT1, seven steps): the v2.3 headers, plus the rulings, are the ground truth; then compare it with today's state
+  and settle each gap. Step 1 is done: docs/api-harden2/rev2/ (git f3776de).
+- **Left in the tree:** four half-done recognizer files (STOP1 (3), AUTO1, finding 7; the stop is still greedy, not
+  the table of T1 (2)); the suite passes with them (255 passed, 2 skipped, one run).
+- **Where:** docs/api-harden2/rev3/, docs/task-active-harden2-handoff-2026-10-02.md, the ledger rows TN1 .. GT1.
+- **Later the same day (rev4):** the owner reviewed rev3 (round 1) and the rev4 drafts (rounds 2 and 3; docs/api-harden2/rev4/REVIEW-*-owner.md, his words). The round-3 answers, the plan per file with its sources, the rename table and the decision table D1-D11 are in rev4/REVIEW-3-answers.md (ledger HDR5, AUD2, NAM1, PER2, PRF1, SUP1, CHAT1). Verdict: the headers change only after the owner rules on D1-D11; nothing is implemented.
+- **2026-10-04 (round 4):** the owner rejected the round-3 designs ("Each system has responsibilities that it shouldn't have") and set the house rules in code: Begin/End for every process with a graceful stop, the app owns every handle, opaque loggers that take const data, a stateless recognizer, `_Atomic` types, code as the shared language, one place per answer, the full picture before any design question (ledger HDR6 .. AUD3). Every point is answered with its full picture in rev4/REVIEW-4-answers.md. The vision design session settled the generic scheduler, the jobs pane's emphasis and per-job masks; the results path is open. Verdict: no header changes until each system's spec is approved, one system at a time in plan mode.

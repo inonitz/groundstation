@@ -10,22 +10,33 @@ A drone a human commands by voice, that understands the scene it sees, and acts.
 C++ `llm_to_action` FMU engine is the destination product; harden2's voice+guard+SAM3 layer folds onto
 it eventually. `integration_tts` is the frozen English fallback.
 
-## Phase arc (current order, owner-ruled 2026-09-14)
+## The road to the freeze (owner ruling RM1, 2026-10-01; replaces the phase arc of 2026-09-14)
 
-| # | Phase | Status |
+| # | step | state (2026-10-01) |
 |---|---|---|
-| 1 | Cleanup & restructure (repo, bench, docs) | in progress (~done) |
-| 2 | Webcam smoke test on the fresh repo | next |
-| 3 | Nuclear code-quality review (`/thermo-nuclear-code-quality-review`) | pending |
-| 4 | Outdoor field test on the real drone (human-run) -> freeze the validated commit as the baseline (git tag) | pending |
-| 5 | Post-freeze benchmarks: whisper-Hebrew noise (SNR sweep), SAM3 low-light | scheduled |
-| 6 | New features off the baseline: vision-conditioned action (mark -> approach/pass an opening), operator mission+phase context, military slang | scheduled |
-| 7 | Fuse harden2's layer onto the C++ `llm_to_action` engine | scheduled |
+| 1 | Joint review: every recording label, the expected-result drafts, the vision-kind drafts | done 2026-10-01 |
+| 2 | B2 (whisper + the recognizer on the recordings); the recognizer benchmark rerun | done 2026-10-01: 473 of 545 PASS; whisper 9.6 % |
+| 3 | Finish the cleanup and the refactor | done 2026-10-01 |
+| 4 | Code review with the review tools (/code-review, /thermo-nuclear-code-quality-review); fix the issues | in progress |
+| 5 | The owner's live webcam test, with a microphone input-level check | after 4 |
+| 6 | The field test on the real drone, secured, until done (the owner runs it) | after 5 |
+| 7 | A walk-through, so the owner understands the whole system | after 6 |
+| 8 | The doc sweep (F1, incl. every doc and header in the owner's terms) and the owner's commits; then the freeze (a git tag) | last |
 
-Rule: cleanup finishes first; the field test validates the FINAL system, then that exact commit is
-frozen. Any change after the freeze that touches harden2 behaviour forces a retest and re-freeze.
-Invariants: temperature 0, one model on the GPU at a time, full bench tables, the owner runs every
-boot and every git write.
+Rule: the field test validates the FINAL system; that exact commit is frozen. Any change after the freeze
+that touches harden2 behaviour forces a retest and a new freeze. After a successful freeze, the branch
+merges into master (owner CP3). Invariants: temperature 0, full bench tables, the owner runs every boot
+of the real drone and every git write.
+
+## After the freeze (owner ruling POST (2)); each release ends with a new field test
+
+| # | release | content |
+|---|---|---|
+| 1 | Benchmarks | whisper under noise; SAM3 in low light |
+| 2 | The recognizer | a shorter plan answer (L3, about 0.45 s per mission, estimate); a flight and a vision request in one sentence (CI1); a larger military-slang set |
+| 3 | Near-term architecture | SAM3 in its own process; SAM3.1 and EOVSAM evaluated by the owner and the agent together |
+| 4 | Vision (a big feature) | a tracker with one identity per object (the box way, VT6); scan beyond the camera's view; vision-driven action; mission context |
+| 5 | Far | fuse harden2's layer onto the C++ llm_to_action engine |
 
 ## Parked: the C++ flight-core (llm_to_action)
 
