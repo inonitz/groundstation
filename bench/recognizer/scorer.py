@@ -147,11 +147,19 @@ def score_perception(groups, decision, vision=None):
     text = f"{KIND_WORDS[decision.kind]} the {decision.target}".lower()
     missed = []
     for group in groups:
-        if not any(word in text for word in group):
+        if not any(starts_a_word(word, text) for word in group):
             missed.append("|".join(group))
     if missed:
         return "FAIL", f"words missed: {', '.join(missed)} in '{decision.target}'"
     return "PASS", ""
+
+
+def starts_a_word(word, text):
+    """`word` at the start of a word of `text`: a prefix still matches ("identif" in
+    "identify", "logo" in "logos"), a piece inside a word does not ("man" in "woman",
+    "low" in "yellow", "hat" in "that", "2" in "12"; owner, 2026-10-02: the
+    triple check)."""
+    return re.search(r"(?<![\w])" + re.escape(word.lower()), text) is not None
 
 
 def score_steps(want, mission):

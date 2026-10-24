@@ -76,3 +76,9 @@ screenshots.py saves every card state (desktop and phone width) on a copy of the
 prints every browser error.
 They run on copies in pytest's tmp folder, never on datasets/asr/recordings.json. The server
 tests use a real local HTTP server.
+
+## Known limit
+The editor edits one plan per sentence (`steps`). A label with several accepted plans
+(`alternatives`, for example clips 47 and 48) is not shown as such; saving such a clip
+again replaces its plans with the edited one.
+

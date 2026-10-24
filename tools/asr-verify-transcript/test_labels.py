@@ -138,7 +138,13 @@ def test_rows_read_back_every_plan_of_the_cases():
     the same from its rows."""
     with open(os.path.join(L.CASES_DIR, "commands.json"), encoding="utf-8") as src:
         cases = json.load(src)["cases"]
-    missions = [c["expect"] for c in cases if c["expect"]["kind"] == "mission"]
+    # REWRITTEN 2026-10-02: the editor edits one plan ("steps"); a list of accepted plans
+    # ("alternatives", owner J4 and JR9) is outside it. Was: every mission.
+    missions = [
+        c["expect"]
+        for c in cases
+        if c["expect"]["kind"] == "mission" and "steps" in c["expect"]
+    ]
     assert missions
     for expect in missions:
         back, error = L.expect_from_rows(L.rows_of(expect))

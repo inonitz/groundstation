@@ -34,45 +34,13 @@
      [
       "white"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000000_2026-09-08_17-05-05.wav",
    "file": "perception.json",
    "case": "i_box_by_man",
-   "note": "nearest perception.json/i_box_by_man (0.94); live: perception(highlight: box next to the person standing on the roof of the white building)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "box",
-      "crate",
-      "chest"
-     ],
-     [
-      "next",
-      "beside",
-      "near"
-     ],
-     [
-      "man",
-      "person"
-     ],
-     [
-      "stand"
-     ],
-     [
-      "roof"
-     ],
-     [
-      "building"
-     ],
-     [
-      "white"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/i_box_by_man (0.94); live: perception(highlight: box next to the person standing on the roof of the white building)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000001_2026-09-08_17-05-15",
@@ -122,43 +90,13 @@
      [
       "building"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000002_2026-09-08_17-05-24.wav",
    "file": "perception.json",
    "case": "j_pin_puddle",
-   "note": "nearest perception.json/j_pin_puddle (1.00); live: perception(highlight: large puddle in the middle of the road reflecting the building)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "puddle",
-      "pool",
-      "water"
-     ],
-     [
-      "big",
-      "large"
-     ],
-     [
-      "middle",
-      "center"
-     ],
-     [
-      "road",
-      "street",
-      "path"
-     ],
-     [
-      "reflect"
-     ],
-     [
-      "building"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/j_pin_puddle (1.00); live: perception(highlight: large puddle in the middle of the road reflecting the building)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000003_2026-09-08_17-05-34",
@@ -176,29 +114,13 @@
       "second",
       "2nd"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000003_2026-09-08_17-05-34.wav",
    "file": "perception.json",
    "case": "p75_open_window_2nd",
-   "note": "nearest perception.json/p75_open_window_2nd (1.00); live: perception(highlight: open window on the second floor)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "window"
-     ],
-     [
-      "open"
-     ],
-     [
-      "second",
-      "2nd"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/p75_open_window_2nd (1.00); live: perception(highlight: open window on the second floor)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000004_2026-09-08_17-05-43",
@@ -263,7 +185,9 @@
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000007_2026-09-08_17-06-25.wav",
    "file": "numbers.json",
    "case": "vav_after_meter",
-   "note": "nearest numbers.json/vav_after_meter (0.43); live: mission(1 steps, planned); the owner: not gradable"
+   "note": "nearest numbers.json/vav_after_meter (0.43); live: mission(1 steps, planned); the owner: not gradable",
+   "removed": true,
+   "removed_reason": "owner Q8, 2026-10-01"
   },
   {
    "name": "session-20260908-170015-rog__audio_000008_2026-09-08_17-06-40",
@@ -315,52 +239,13 @@
      [
       "station"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000009_2026-09-08_17-06-47.wav",
    "file": "perception.json",
    "case": "j_win_gas",
-   "note": "nearest perception.json/j_win_gas (1.00); live: perception(highlight: broken window on the second floor of the house across from the gas station)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "window"
-     ],
-     [
-      "broken"
-     ],
-     [
-      "second"
-     ],
-     [
-      "floor",
-      "story",
-      "storey"
-     ],
-     [
-      "house",
-      "home",
-      "building"
-     ],
-     [
-      "opposite",
-      "facing",
-      "across",
-      "front"
-     ],
-     [
-      "gas",
-      "fuel",
-      "petrol"
-     ],
-     [
-      "station"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/j_win_gas (1.00); live: perception(highlight: broken window on the second floor of the house across from the gas station)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000010_2026-09-08_17-06-56",
@@ -383,40 +268,8 @@
      ],
      [
       "pickup",
-      "van"
-     ],
-     [
-      "red"
-     ],
-     [
-      "truck",
-      "lorry"
-     ]
-    ]
-   },
-   "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000010_2026-09-08_17-06-56.wav",
-   "file": "perception.json",
-   "case": "i_car_between",
-   "note": "nearest perception.json/i_car_between (1.00); live: perception(highlight: car parked between the white truck and the red truck)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "car",
-      "vehicle"
-     ],
-     [
-      "park"
-     ],
-     [
-      "between"
-     ],
-     [
-      "white"
-     ],
-     [
-      "pickup",
-      "van"
+      "van",
+      "truck"
      ],
      [
       "red"
@@ -426,9 +279,12 @@
       "lorry"
      ]
     ],
-    "vision": "highlight",
-    "draft": true
-   }
+    "vision": "highlight"
+   },
+   "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000010_2026-09-08_17-06-56.wav",
+   "file": "perception.json",
+   "case": "i_car_between",
+   "note": "nearest perception.json/i_car_between (1.00); live: perception(highlight: car parked between the white truck and the red truck)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000011_2026-09-08_17-07-10",
@@ -458,41 +314,13 @@
      [
       "bridge"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000011_2026-09-08_17-07-10.wav",
    "file": "perception.json",
    "case": "j_mural",
-   "note": "nearest perception.json/j_mural (1.00); live: perception(highlight: painting on the building wall to the right of the pedestrian bridge)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "paint",
-      "mural",
-      "graffiti",
-      "drawing"
-     ],
-     [
-      "wall"
-     ],
-     [
-      "building"
-     ],
-     [
-      "right"
-     ],
-     [
-      "pedestrian",
-      "foot"
-     ],
-     [
-      "bridge"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/j_mural (1.00); live: perception(highlight: painting on the building wall to the right of the pedestrian bridge)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000012_2026-09-08_17-07-21",
@@ -591,11 +419,8 @@
    "he": "זהה את הצבע של הרכב הקרוב ביותר",
    "expect": {
     "kind": "perception",
+    "vision": "describe",
     "groups": [
-     [
-      "identif",
-      "spot"
-     ],
      [
       "color",
       "colour"
@@ -614,31 +439,7 @@
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000016_2026-09-08_17-16-11.wav",
    "file": "perception.json",
    "case": "pq_identify_color",
-   "note": "nearest perception.json/pq_identify_color (0.98); live: perception(describe)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "identif",
-      "spot"
-     ],
-     [
-      "color",
-      "colour"
-     ],
-     [
-      "vehicle",
-      "car"
-     ],
-     [
-      "near",
-      "nearest",
-      "close"
-     ]
-    ],
-    "vision": "describe",
-    "draft": true
-   }
+   "note": "nearest perception.json/pq_identify_color (0.98); live: perception(describe)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000017_2026-09-08_17-16-22",
@@ -737,7 +538,24 @@
    "name": "session-20260908-170015-rog__audio_000022_2026-09-08_17-16-52",
    "he": "טוב, בוא נעשה סיבוב קטן: טוס אחורה ארבעה מטרים, זוז שמאלה שלושה מטרים ואז רד שני מטרים וזהו",
    "expect": {
-    "kind": "review"
+    "kind": "mission",
+    "steps": [
+     [
+      "fly_by",
+      "dx",
+      -4
+     ],
+     [
+      "fly_by",
+      "dy",
+      -3
+     ],
+     [
+      "fly_by",
+      "dz",
+      -2
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000022_2026-09-08_17-16-52.wav",
    "file": "verbose.json",
@@ -758,41 +576,8 @@
       "black"
      ],
      [
-      "two"
-     ],
-     [
-      "rider",
-      "passenger"
-     ],
-     [
-      "right"
-     ],
-     [
-      "lane"
-     ],
-     [
-      "intersection",
-      "junction",
-      "crossroad"
-     ]
-    ]
-   },
-   "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000023_2026-09-08_17-17-04.wav",
-   "file": "perception.json",
-   "case": "j_pin_2riders",
-   "note": "nearest perception.json/j_pin_2riders (1.00); live: perception(highlight: black motorcycle with 2 riders on the right lane towards the intersection)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "motorcycle",
-      "motorbike"
-     ],
-     [
-      "black"
-     ],
-     [
-      "two"
+      "two",
+      "2"
      ],
      [
       "rider",
@@ -810,9 +595,12 @@
       "crossroad"
      ]
     ],
-    "vision": "highlight",
-    "draft": true
-   }
+    "vision": "highlight"
+   },
+   "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000023_2026-09-08_17-17-04.wav",
+   "file": "perception.json",
+   "case": "j_pin_2riders",
+   "note": "nearest perception.json/j_pin_2riders (1.00); live: perception(highlight: black motorcycle with 2 riders on the right lane towards the intersection)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000024_2026-09-08_17-17-15",
@@ -842,41 +630,13 @@
      [
       "shirt"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000024_2026-09-08_17-17-15.wav",
    "file": "perception.json",
    "case": "i_glasses_talk",
-   "note": "nearest perception.json/i_glasses_talk (1.00); live: perception(highlight: man with glasses talking to woman in yellow shirt)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "man",
-      "person"
-     ],
-     [
-      "glasses"
-     ],
-     [
-      "talk",
-      "speak",
-      "convers"
-     ],
-     [
-      "woman",
-      "lady"
-     ],
-     [
-      "yellow"
-     ],
-     [
-      "shirt"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/i_glasses_talk (1.00); live: perception(highlight: man with glasses talking to woman in yellow shirt)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000025_2026-09-08_17-21-06",
@@ -968,35 +728,13 @@
      [
       "white"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000029_2026-09-08_17-21-27.wav",
    "file": "perception.json",
    "case": "i_man_on_roof",
-   "note": "nearest perception.json/i_man_on_roof (1.00); live: perception(highlight: person standing on the roof of the white building)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "man",
-      "person"
-     ],
-     [
-      "stand"
-     ],
-     [
-      "roof"
-     ],
-     [
-      "building"
-     ],
-     [
-      "white"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/i_man_on_roof (1.00); live: perception(highlight: person standing on the roof of the white building)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000030_2026-09-08_17-21-40",
@@ -1065,6 +803,7 @@
       "backpack"
      ],
      [
+      "held",
       "hold",
       "carry"
      ],
@@ -1074,43 +813,15 @@
       "boy"
      ],
      [
-      "green"
-     ],
-     [
-      "shirt"
+      "green shirt"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000032_2026-09-08_17-21-51.wav",
    "file": "perception.json",
    "case": "i_kid_bag",
-   "note": "nearest perception.json/i_kid_bag (0.97); live: perception(highlight: backpack held by child with green shirt)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "bag",
-      "backpack"
-     ],
-     [
-      "hold",
-      "carry"
-     ],
-     [
-      "child",
-      "kid",
-      "boy"
-     ],
-     [
-      "green"
-     ],
-     [
-      "shirt"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/i_kid_bag (0.97); live: perception(highlight: backpack held by child with green shirt)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000033_2026-09-08_17-22-00",
@@ -1145,46 +856,13 @@
       "coffee",
       "cafe"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000033_2026-09-08_17-22-00.wav",
    "file": "perception.json",
    "case": "j_pin_window3",
-   "note": "nearest perception.json/j_pin_window3 (0.99); live: perception(highlight: third window on the right side of the second floor of the building with yellow walls next to the cafe)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "window"
-     ],
-     [
-      "third"
-     ],
-     [
-      "right"
-     ],
-     [
-      "second"
-     ],
-     [
-      "floor",
-      "story",
-      "storey"
-     ],
-     [
-      "yellow"
-     ],
-     [
-      "wall"
-     ],
-     [
-      "coffee",
-      "cafe"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/j_pin_window3 (0.99); live: perception(highlight: third window on the right side of the second floor of the building with yellow walls next to the cafe)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000034_2026-09-08_17-22-08",
@@ -1223,7 +901,24 @@
    "name": "session-20260908-170015-rog__audio_000037_2026-09-08_17-22-54",
    "he": "תקשיב, אני רואה שקודם כל טוס אחורה 4 מטרים אחרי זה זוז שמאלה 3 מטים ועד 2 מטים.",
    "expect": {
-    "kind": "review"
+    "kind": "mission",
+    "steps": [
+     [
+      "fly_by",
+      "dx",
+      -4
+     ],
+     [
+      "fly_by",
+      "dy",
+      -3
+     ],
+     [
+      "fly_by",
+      "dz",
+      -2
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000037_2026-09-08_17-22-54.wav",
    "file": "verbose.json",
@@ -1262,45 +957,13 @@
       "center",
       "middle"
      ]
-    ]
+    ],
+    "vision": "highlight"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000038_2026-09-08_17-23-02.wav",
    "file": "perception.json",
    "case": "j_pin_antennas",
-   "note": "nearest perception.json/j_pin_antennas (0.98); live: perception(highlight: tall building with antennas on the roof behind the playground slightly to the right of the center)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "building"
-     ],
-     [
-      "tall",
-      "high"
-     ],
-     [
-      "antenna"
-     ],
-     [
-      "roof"
-     ],
-     [
-      "behind"
-     ],
-     [
-      "playground"
-     ],
-     [
-      "right"
-     ],
-     [
-      "center",
-      "middle"
-     ]
-    ],
-    "vision": "highlight",
-    "draft": true
-   }
+   "note": "nearest perception.json/j_pin_antennas (0.98); live: perception(highlight: tall building with antennas on the roof behind the playground slightly to the right of the center)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000039_2026-09-08_17-24-13",
@@ -1328,39 +991,13 @@
       "jetty",
       "wharf"
      ]
-    ]
+    ],
+    "vision": "count"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000039_2026-09-08_17-24-13.wav",
    "file": "perception.json",
    "case": "i_boats_pier",
-   "note": "nearest perception.json/i_boats_pier (1.00); live: perception(count: boats tied to the north pier)",
-   "draft": {
-    "kind": "perception",
-    "groups": [
-     [
-      "count",
-      "how many"
-     ],
-     [
-      "boat"
-     ],
-     [
-      "tie",
-      "moor"
-     ],
-     [
-      "north"
-     ],
-     [
-      "pier",
-      "dock",
-      "jetty",
-      "wharf"
-     ]
-    ],
-    "vision": "count",
-    "draft": true
-   }
+   "note": "nearest perception.json/i_boats_pier (1.00); live: perception(count: boats tied to the north pier)"
   },
   {
    "name": "session-20260908-170015-rog__audio_000040_2026-09-08_17-24-21",
@@ -1463,7 +1100,24 @@
    "name": "session-20260908-170015-rog__audio_000044_2026-09-08_17-24-53",
    "he": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
    "expect": {
-    "kind": "review"
+    "kind": "mission",
+    "steps": [
+     [
+      "fly_by",
+      "dz",
+      20
+     ],
+     [
+      "spin_by",
+      "degrees",
+      45
+     ],
+     [
+      "fly_by",
+      "dx",
+      12
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000044_2026-09-08_17-24-53.wav",
    "file": "verbose.json",
@@ -1493,29 +1147,56 @@
    "he": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
    "expect": {
     "kind": "mission",
-    "steps": [
+    "alternatives": [
      [
-      "takeoff",
-      null,
-      null
-     ],
-     [
-      "fly_by",
-      "dx",
-      10
-     ],
-     [
-      "spin_by",
-      "degrees",
       [
-       "abs",
-       180
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
       ]
      ],
      [
-      "fly_by",
-      "dx",
-      10
+      [
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "home",
+       null,
+       null
+      ]
      ]
     ]
    },
@@ -1529,29 +1210,56 @@
    "he": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
    "expect": {
     "kind": "mission",
-    "steps": [
+    "alternatives": [
      [
-      "takeoff",
-      null,
-      null
-     ],
-     [
-      "fly_by",
-      "dx",
-      10
-     ],
-     [
-      "spin_by",
-      "degrees",
       [
-       "abs",
-       180
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
       ]
      ],
      [
-      "fly_by",
-      "dx",
-      10
+      [
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "home",
+       null,
+       null
+      ]
      ]
     ]
    },
@@ -1582,7 +1290,14 @@
    "name": "session-20260908-170015-rog__audio_000049_2026-09-08_17-25-38",
    "he": "תעלה לגוי 20",
    "expect": {
-    "kind": "review"
+    "kind": "mission",
+    "steps": [
+     [
+      "fly_by",
+      "dz",
+      20
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000049_2026-09-08_17-25-38.wav",
    "file": "commands.json",
@@ -1723,7 +1438,7 @@
    "name": "session-20260908-170015-rog__audio_000058_2026-09-08_17-26-31",
    "he": "תקשיב, אבד קשר, סליחה, סריקה בגזרה הצפונית.",
    "expect": {
-    "kind": "review"
+    "kind": "none"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000058_2026-09-08_17-26-31.wav",
    "file": "military.json",
@@ -1734,7 +1449,7 @@
    "name": "session-20260908-170015-rog__audio_000059_2026-09-08_17-26-42",
    "he": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית.",
    "expect": {
-    "kind": "review"
+    "kind": "none"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000059_2026-09-08_17-26-42.wav",
    "file": "military.json",
@@ -1745,7 +1460,7 @@
    "name": "session-20260908-170015-rog__audio_000060_2026-09-08_17-26-51",
    "he": "רות ממשיך בסריקה, עבור.",
    "expect": {
-    "kind": "review"
+    "kind": "none"
    },
    "wav": "datasets/asr/clips/session-20260908-170015-rog__audio_000060_2026-09-08_17-26-51.wav",
    "file": "military.json",
@@ -1847,7 +1562,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000004_2026-09-09_02-53-03.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000005_2026-09-09_02-53-10",
@@ -1858,7 +1575,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000005_2026-09-09_02-53-10.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000006_2026-09-09_02-53-19",
@@ -1869,7 +1588,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000006_2026-09-09_02-53-19.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000007_2026-09-09_02-53-30",
@@ -1880,7 +1601,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000007_2026-09-09_02-53-30.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000008_2026-09-09_02-53-59",
@@ -1891,7 +1614,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000008_2026-09-09_02-53-59.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000009_2026-09-09_02-54-05",
@@ -1902,7 +1627,9 @@
    "wav": "datasets/asr/clips/session-20260909-025023-rog__audio_000009_2026-09-09_02-54-05.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260909-025023-rog__audio_000010_2026-09-09_02-54-15",
@@ -2061,7 +1788,9 @@
    "wav": "datasets/asr/clips/session-20260912-124932-rog__audio_000001_2026-09-12_12-50-17.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "inaudible (owner QC1, 2026-10-01)"
   },
   {
    "name": "session-20260912-124932-rog__audio_000002_2026-09-12_12-50-46",
@@ -2137,9 +1866,6 @@
     "groups": [
      [
       "guitar"
-     ],
-     [
-      "all"
      ]
     ]
    },
@@ -2201,7 +1927,9 @@
    "wav": "datasets/asr/clips/session-20260912-124932-rog__audio_000010_2026-09-12_12-54-07.wav",
    "file": "commands.json",
    "case": "up10",
-   "note": "nearest commands.json/up10 (0.00); live: None"
+   "note": "nearest commands.json/up10 (0.00); live: None",
+   "removed": true,
+   "removed_reason": "owner L91, 2026-10-01: can be removed"
   },
   {
    "name": "session-20260912-124932-rog__audio_000011_2026-09-12_12-54-11",
@@ -2243,7 +1971,8 @@
     "groups": [
      [
       "drawer",
-      "cabinet"
+      "cabinet",
+      "dresser"
      ]
     ]
    },
@@ -2308,7 +2037,16 @@
    "name": "session-20260912-124932-rog__audio_000017_2026-09-12_13-02-43",
    "he": "תסמן את ה-\"אדידס\" על החולצה שלי",
    "expect": {
-    "kind": "review"
+    "kind": "perception",
+    "vision": "highlight",
+    "groups": [
+     [
+      "adidas"
+     ],
+     [
+      "shirt"
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260912-124932-rog__audio_000017_2026-09-12_13-02-43.wav",
    "file": "commands.json",
@@ -2323,11 +2061,10 @@
     "vision": "highlight",
     "groups": [
      [
-      "logo",
-      "logos"
+      "logo"
      ],
      [
-      "all"
+      "shirt"
      ]
     ]
    },
@@ -2390,30 +2127,26 @@
    "he": "תסמן את המכונית בצד השמאלי של הבניין בכיוון הימני.",
    "expect": {
     "kind": "perception",
+    "vision": "highlight",
     "groups": [
      [
-      "highlight",
-      "mark"
+      "car",
+      "vehicle"
      ],
      [
-      "window"
-     ],
-     [
-      "middle",
-      "center"
+      "left"
      ],
      [
       "building"
-     ],
-     [
-      "right"
      ]
     ]
    },
    "wav": "datasets/asr/clips/session-20260912-175633-rog__audio_000000_2026-09-12_17-56-52.wav",
    "file": "perception.json",
    "case": "i_mid_windows",
-   "note": "nearest perception.json/i_mid_windows (0.59); live: perception(highlight: car on the left side of the building facing right)"
+   "note": "nearest perception.json/i_mid_windows (0.59); live: perception(highlight: car on the left side of the building facing right)",
+   "removed": true,
+   "removed_reason": "owner L103, 2026-10-01: intent unknown"
   },
   {
    "name": "session-20260912-183503-rog__audio_000000_2026-09-12_18-35-36",
@@ -2484,9 +2217,6 @@
     "groups": [
      [
       "glasses"
-     ],
-     [
-      "person-with-glasses"
      ]
     ]
    },
@@ -2529,11 +2259,8 @@
     "vision": "highlight",
     "groups": [
      [
-      "guitars",
-      "guitar"
-     ],
-     [
-      "encased-guitars"
+      "guitar case",
+      "guitar bag"
      ]
     ]
    },
@@ -2550,10 +2277,8 @@
     "vision": "describe",
     "groups": [
      [
-      "guitar-case"
-     ],
-     [
-      "many"
+      "guitar case",
+      "guitar bag"
      ]
     ]
    },
@@ -2570,13 +2295,19 @@
     "vision": "describe",
     "groups": [
      [
-      "guitar-cases"
+      "guitar case",
+      "guitar bag"
+     ],
+     [
+      "under",
+      "below",
+      "beneath"
      ],
      [
       "board"
      ],
      [
-      "below"
+      "behind"
      ]
     ]
    },
@@ -2619,7 +2350,14 @@
    "name": "session-20260912-183503-rog__audio_000012_2026-09-12_18-39-16",
    "he": "יש לוח בתמונה, אבל הוא מוסתר חלקית, האם אתה רואה אותו?",
    "expect": {
-    "kind": "review"
+    "kind": "perception",
+    "vision": "describe",
+    "groups": [
+     [
+      "whiteboard",
+      "drawing board"
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260912-183503-rog__audio_000012_2026-09-12_18-39-16.wav",
    "file": "commands.json",
@@ -2630,7 +2368,14 @@
    "name": "session-20260912-183503-rog__audio_000013_2026-09-12_18-39-29",
    "he": "Do you see a drawing board in the picture that is hidden?",
    "expect": {
-    "kind": "review"
+    "kind": "perception",
+    "vision": "describe",
+    "groups": [
+     [
+      "whiteboard",
+      "drawing board"
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260912-183503-rog__audio_000013_2026-09-12_18-39-29.wav",
    "file": "commands.json",
@@ -2658,10 +2403,8 @@
     "vision": "highlight",
     "groups": [
      [
-      "pencils"
-     ],
-     [
-      "markers"
+      "pencil",
+      "marker"
      ]
     ]
    },
@@ -2674,7 +2417,13 @@
    "name": "session-20260912-183503-rog__audio_000016_2026-09-12_18-40-07",
    "he": "האם אתה רואה את המרקרים בתמונה?",
    "expect": {
-    "kind": "review"
+    "kind": "perception",
+    "vision": "describe",
+    "groups": [
+     [
+      "marker"
+     ]
+    ]
    },
    "wav": "datasets/asr/clips/session-20260912-183503-rog__audio_000016_2026-09-12_18-40-07.wav",
    "file": "commands.json",
@@ -2758,13 +2507,7 @@
     "vision": "highlight",
     "groups": [
      [
-      "boxes"
-     ],
-     [
       "box"
-     ],
-     [
-      "many"
      ]
     ]
    },
@@ -2820,16 +2563,7 @@
     "vision": "highlight",
     "groups": [
      [
-      "clothing"
-     ],
-     [
-      "lump-of-clothing"
-     ],
-     [
-      "clothes"
-     ],
-     [
-      "cloth-lump"
+      "cloth"
      ]
     ]
    },
@@ -2846,13 +2580,11 @@
     "vision": "highlight",
     "groups": [
      [
-      "cases-guitar"
+      "guitar case",
+      "guitar bag"
      ],
      [
-      "guitar"
-     ],
-     [
-      "cases"
+      "behind"
      ]
     ]
    },
@@ -2896,9 +2628,6 @@
     "groups": [
      [
       "shirt"
-     ],
-     [
-      "wearing-shirt"
      ]
     ]
    },
@@ -2918,10 +2647,8 @@
       "shirt"
      ],
      [
-      "his-shirt"
-     ],
-     [
-      "persons-shirt"
+      "person",
+      "man"
      ]
     ]
    },
@@ -2948,15 +2675,17 @@
    "he": "תסמן את החולצה שהבן אדם לובש.",
    "expect": {
     "kind": "perception",
+    "vision": "highlight",
     "groups": [
      [
       "shirt"
      ],
      [
-      "wearing-shirt"
+      "person",
+      "man"
      ],
      [
-      "person-wearing-shirt"
+      "wear"
      ]
     ]
    },

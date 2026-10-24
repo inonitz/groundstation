@@ -40,8 +40,9 @@ following rules apply to all benchmarks we have currently and will create in the
 
 | bench | measures | status |
 |---|---|---|
-| recognizer | the recognizer as a function of the backend: route() + one scorer over datasets/recognizer/*.json (545 sentences, each once; text, no ASR/vision) | LIVE, 458 PASS / 76 FAIL / 11 REVIEW of 545 sentences (2026-09-29) |
+| recognizer | the recognizer as a function of the backend: route() + one scorer over datasets/recognizer/*.json (545 sentences, each once; text, no ASR/vision) | LIVE, 473 PASS / 61 FAIL / 11 REVIEW of 545 sentences (2026-10-01, after the joint review); path B on 106 recordings |
 | hebrew-command-bench | RETIRED 2026-09-29 (G1, G2, J5); results: docs/research-complete-hebrew-command-bench.md; raw data in its results/ | retired |
+| gemma-plan-timing | one Gemma plan split into the server's own work and the time around it; GPU free and next to SAM3 | LIVE, outside the server ~40 ms; SAM3 makes Gemma 2.8x slower (2026-10-01) |
 | perception | the vision system alone: SAM3 highlight + verify vs human-labelled boxes, 137 rows (English input; no recognizer) | LIVE, verify 105/137 correct |
 | whole-system | RETIRED 2026-09-28 (D1); results: docs/research-complete-whole-system.md | retired |
 | sam3-assessment | SAM3 in the app: detect alone / Gemma idle / Gemma busy, concept fan-out, frame transfer to its own process, start-up; results: docs/research-complete-sam3-assessment.md | LIVE (2026-09-28) |

@@ -1,0 +1,3268 @@
+{
+ "backend": "gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf, thinking off",
+ "results": {
+  "recordings": [
+   {
+    "name": "session-20260908-170015-rog__audio_000000_2026-09-08_17-05-05",
+    "he": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+    "he_label": "הדגש את התיבה שליד האיש שעומד על הגג של הבניין הלבן",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "box",
+       "crate",
+       "chest"
+      ],
+      [
+       "next",
+       "beside",
+       "near"
+      ],
+      [
+       "man",
+       "person"
+      ],
+      [
+       "stand"
+      ],
+      [
+       "roof"
+      ],
+      [
+       "building"
+      ],
+      [
+       "white"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "box next to the person standing on the roof of the white building",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 1594
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000001_2026-09-08_17-05-15",
+    "he": "טוס ימינה מטר אחד",
+    "he_label": "טוס ימינה מטר אחד",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dy",
+       1
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dy": 1
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 559
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000002_2026-09-08_17-05-24",
+    "he": "התמקד בשלולית הגדולה באמצע הדרך, זו שמשקפת את הבניין",
+    "he_label": "התמקד בשלולית הגדולה באמצע הדרך, זו שמשקפת את הבניין",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "puddle",
+       "pool",
+       "water"
+      ],
+      [
+       "big",
+       "large"
+      ],
+      [
+       "middle",
+       "center"
+      ],
+      [
+       "road",
+       "street",
+       "path"
+      ],
+      [
+       "reflect"
+      ],
+      [
+       "building"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "large puddle in the middle of the road reflecting the building",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 524
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000003_2026-09-08_17-05-34",
+    "he": "סמן את החלון הפתוח בקומה השנייה",
+    "he_label": "סמן את החלון הפתוח בקומה השנייה",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "window"
+      ],
+      [
+       "open"
+      ],
+      [
+       "second",
+       "2nd"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "open window on the second floor",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 489
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000004_2026-09-08_17-05-43",
+    "he": "הסתובב 60 מעלות נגד כיוון השעון.",
+    "he_label": "הסתובב 60 מעלות נגד כיוון השעון.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "spin_by",
+       "degrees",
+       -60
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": -60.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000005_2026-09-08_17-05-54",
+    "he": "תרד תשעה מטרים",
+    "he_label": "תרד תשעה מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       -9
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -9.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000006_2026-09-08_17-06-07",
+    "he": "תראה, סליחה, תרד תשעה מטרים.",
+    "he_label": "תראה, סליחה, תרד תשעה מטרים.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       -9
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -9
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 526
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000007_2026-09-08_17-06-25",
+    "he": "תראה, סליחה, תרד, לא, לא, לא, אני מתקן את עצמי, תראה תשעה מטר קדימה.",
+    "he_label": "תראה, סליחה, תרד, לא, לא, לא, אני מתקן את עצמי, תראה תשעה מטר קדימה.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 9
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 547
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000008_2026-09-08_17-06-40",
+    "he": "חירום חירום",
+    "he_label": "חירום חירום",
+    "expect": {
+     "kind": "emergency"
+    },
+    "kind": "emergency",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000009_2026-09-08_17-06-47",
+    "he": "התמקד בחלון השבור בקומה השנייה של הבית שמול תחנת הדלק",
+    "he_label": "התמקד בחלון השבור בקומה השנייה של הבית שמול תחנת הדלק",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "window"
+      ],
+      [
+       "broken"
+      ],
+      [
+       "second"
+      ],
+      [
+       "floor",
+       "story",
+       "storey"
+      ],
+      [
+       "house",
+       "home",
+       "building"
+      ],
+      [
+       "opposite",
+       "facing",
+       "across",
+       "front"
+      ],
+      [
+       "gas",
+       "fuel",
+       "petrol"
+      ],
+      [
+       "station"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "broken window on the second floor of the house across from the gas station",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 595
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000010_2026-09-08_17-06-56",
+    "he": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+    "he_label": "סמן את המכונית החונה בין הטנדר הלבן למשאית האדומה",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "car",
+       "vehicle"
+      ],
+      [
+       "park"
+      ],
+      [
+       "between"
+      ],
+      [
+       "white"
+      ],
+      [
+       "pickup",
+       "van"
+      ],
+      [
+       "red"
+      ],
+      [
+       "truck",
+       "lorry"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "car parked between white truck and red truck",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: pickup|van in 'car parked between white truck and red truck'",
+    "ms": 500
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000011_2026-09-08_17-07-10",
+    "he": "הדגש את הציור שעל הקיר של הבניין שמימין לגשר להולכי הרגל",
+    "he_label": "הדגש את הציור שעל הקיר של הבניין שמימין לגשר להולכי הרגל",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "paint",
+       "mural",
+       "graffiti",
+       "drawing"
+      ],
+      [
+       "wall"
+      ],
+      [
+       "building"
+      ],
+      [
+       "right"
+      ],
+      [
+       "pedestrian",
+       "foot"
+      ],
+      [
+       "bridge"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "painting on the building wall to the right of the pedestrian bridge",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 542
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000012_2026-09-08_17-07-21",
+    "he": "טוס אחורה 8 מטרים",
+    "he_label": "טוס אחורה 8 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       -8
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000013_2026-09-08_17-07-33",
+    "he": "טוס אחורה 8 מטרים",
+    "he_label": "טוס אחורה 8 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       -8
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -8.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000014_2026-09-08_17-15-51",
+    "he": "המשימה היא כזאת: עלה 10 מטרים, לאחר מכן פנייה ימינה 45 מעלות ואז טוס קדימה 12 מטרים.",
+    "he_label": "המשימה היא כזאת: עלה 10 מטרים, לאחר מכן פנייה ימינה 45 מעלות ואז טוס קדימה 12 מטרים.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       45
+      ],
+      [
+       "fly_by",
+       "dx",
+       12
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 1035
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000015_2026-09-08_17-16-03",
+    "he": "המשימה היא כזאת: עלה עשרים מטרים, לאחר מכן פנה ימינה 45 מעלות, ואז טוס קדימה 12 מטרים",
+    "he_label": "המשימה היא כזאת: עלה עשרים מטרים, לאחר מכן פנה ימינה 45 מעלות, ואז טוס קדימה 12 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       20
+      ],
+      [
+       "spin_by",
+       "degrees",
+       45
+      ],
+      [
+       "fly_by",
+       "dx",
+       12
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 988
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000016_2026-09-08_17-16-11",
+    "he": "זהה את הצבע של הרכב הקרוב ביותר",
+    "he_label": "זהה את הצבע של הרכב הקרוב ביותר",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "identif",
+       "spot"
+      ],
+      [
+       "color",
+       "colour"
+      ],
+      [
+       "vehicle",
+       "car"
+      ],
+      [
+       "near",
+       "nearest",
+       "close"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "closest vehicle color",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: identif|spot in 'closest vehicle color'",
+    "ms": 407
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000017_2026-09-08_17-16-22",
+    "he": "רד שמונה מטרים, התקדם עשרים מטרים ואז זוז אחורה שישה מטרים",
+    "he_label": "רד שמונה מטרים, התקדם עשרים מטרים ואז זוז אחורה שישה מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       -8
+      ],
+      [
+       "fly_by",
+       "dx",
+       20
+      ],
+      [
+       "fly_by",
+       "dx",
+       -6
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -8
+     },
+     {
+      "type": "fly_by",
+      "dx": 20
+     },
+     {
+      "type": "fly_by",
+      "dx": -6
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 998
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000018_2026-09-08_17-16-33",
+    "he": "הסתובב 120 מעלות עם כיוון השעון.",
+    "he_label": "הסתובב 120 מעלות עם כיוון השעון.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "spin_by",
+       "degrees",
+       120
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 120.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000019_2026-09-08_17-16-38",
+    "he": "טוס קדימה שישה מטרים",
+    "he_label": "טוס קדימה שישה מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       6
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 6.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000020_2026-09-08_17-16-40",
+    "he": "עצור שם ל-10 שניות.",
+    "he_label": "עצור שם ל-10 שניות.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "delay",
+       "seconds",
+       10
+      ]
+     ]
+    },
+    "kind": "emergency",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "routed emergency",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000021_2026-09-08_17-16-43",
+    "he": "כמה זמן טיסה נשאר לך?",
+    "he_label": "כמה זמן טיסה נשאר לך?",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 345
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000022_2026-09-08_17-16-52",
+    "he": "טוב, בוא נעשה סיבוב קטן: טוס אחורה ארבעה מטרים, זוז שמאלה שלושה מטרים ואז רד שני מטרים וזהו",
+    "he_label": "טוב, בוא נעשה סיבוב קטן: טוס אחורה ארבעה מטרים, זוז שמאלה שלושה מטרים ואז רד שני מטרים וזהו",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 956
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000023_2026-09-08_17-17-04",
+    "he": "עקוב אחרי האופנוע השחור, זה עם שני הרוכבים, שנוסע בנתיב הימני, לכיוון הצומת",
+    "he_label": "עקוב אחרי האופנוע השחור, זה עם שני הרוכבים, שנוסע בנתיב הימני, לכיוון הצומת",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "motorcycle",
+       "motorbike"
+      ],
+      [
+       "black"
+      ],
+      [
+       "two"
+      ],
+      [
+       "rider",
+       "passenger"
+      ],
+      [
+       "right"
+      ],
+      [
+       "lane"
+      ],
+      [
+       "intersection",
+       "junction",
+       "crossroad"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "black motorcycle with 2 riders on the right lane towards the intersection",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "FAIL",
+    "reason": "words missed: two in 'black motorcycle with 2 riders on the right lane towards the intersection'",
+    "ms": 601
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000024_2026-09-08_17-17-15",
+    "he": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+    "he_label": "הדגש את האיש עם המשקפיים שמדבר עם האישה בחולצה הצהובה",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "man",
+       "person"
+      ],
+      [
+       "glasses"
+      ],
+      [
+       "talk",
+       "speak",
+       "convers"
+      ],
+      [
+       "woman",
+       "lady"
+      ],
+      [
+       "yellow"
+      ],
+      [
+       "shirt"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "man with glasses talking to woman in yellow shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 516
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000025_2026-09-08_17-21-06",
+    "he": "עלה מטר אחד",
+    "he_label": "עלה מטר אחד",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       1
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 523
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000026_2026-09-08_17-21-11",
+    "he": "טוס קדימה חמישה מטרים ותצלם את הבית.",
+    "he_label": "טוס קדימה חמישה מטרים ותצלם את הבית.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 5
+     },
+     {
+      "type": "gimbal_pitch",
+      "angle": 0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 789
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000027_2026-09-08_17-21-15",
+    "he": "אל תטוס קדימה.",
+    "he_label": "אל תטוס קדימה.",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject-neg-guard",
+    "flags": [
+     "neg-guard"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000028_2026-09-08_17-21-22",
+    "he": "המשימה היא כזאת, טוס אחורה 4 מטרים ולאחר מכן זוז שמאלה 3 מטרים ואז רד 2 מטרים",
+    "he_label": "המשימה היא כזאת, טוס אחורה 4 מטרים ולאחר מכן זוז שמאלה 3 מטרים ואז רד 2 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       -4
+      ],
+      [
+       "fly_by",
+       "dy",
+       -3
+      ],
+      [
+       "fly_by",
+       "dz",
+       -2
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dz": -2
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 985
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000029_2026-09-08_17-21-27",
+    "he": "סמן את האיש שעומד על הגג של הבניין הלבן.",
+    "he_label": "סמן את האיש שעומד על הגג של הבניין הלבן.",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "man",
+       "person"
+      ],
+      [
+       "stand"
+      ],
+      [
+       "roof"
+      ],
+      [
+       "building"
+      ],
+      [
+       "white"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "person standing on the roof of the white building",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 501
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000030_2026-09-08_17-21-40",
+    "he": "תעלה עשרים מטרים, רד שמונה מטרים ואז טוס קדימה מטר אחד",
+    "he_label": "תעלה עשרים מטרים, רד שמונה מטרים ואז טוס קדימה מטר אחד",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       20
+      ],
+      [
+       "fly_by",
+       "dz",
+       -8
+      ],
+      [
+       "fly_by",
+       "dx",
+       1
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "fly_by",
+      "dz": -8
+     },
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 957
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000031_2026-09-08_17-21-45",
+    "he": "עלה מטר אחד, תעלה ארבעה מטרים ואז תעלה 8 מטרים",
+    "he_label": "עלה מטר אחד, תעלה ארבעה מטרים ואז תעלה 8 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       1
+      ],
+      [
+       "fly_by",
+       "dz",
+       4
+      ],
+      [
+       "fly_by",
+       "dz",
+       8
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 1
+     },
+     {
+      "type": "fly_by",
+      "dz": 4
+     },
+     {
+      "type": "fly_by",
+      "dz": 8
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 935
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000032_2026-09-08_17-21-51",
+    "he": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+    "he_label": "הדגש את התיק שמחזיק הילד עם החולצה הירוקה",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "bag",
+       "backpack"
+      ],
+      [
+       "hold",
+       "carry"
+      ],
+      [
+       "child",
+       "kid",
+       "boy"
+      ],
+      [
+       "green"
+      ],
+      [
+       "shirt"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "backpack held by child with green shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: hold|carry in 'backpack held by child with green shirt'",
+    "ms": 464
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000033_2026-09-08_17-22-00",
+    "he": "התמקד בחלון השלישי מימין, בקומה השנייה, של הבניין עם הקירות הצהובים, זה שליד בית הקפה",
+    "he_label": "התמקד בחלון השלישי מימין, בקומה השנייה, של הבניין עם הקירות הצהובים, זה שליד בית הקפה",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "window"
+      ],
+      [
+       "third"
+      ],
+      [
+       "right"
+      ],
+      [
+       "second"
+      ],
+      [
+       "floor",
+       "story",
+       "storey"
+      ],
+      [
+       "yellow"
+      ],
+      [
+       "wall"
+      ],
+      [
+       "coffee",
+       "cafe"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "third window on the second floor of the yellow building near the cafe",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: right, wall in 'third window on the second floor of the yellow building near the cafe'",
+    "ms": 610
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000034_2026-09-08_17-22-08",
+    "he": "יש אפשרות לנחות עכשיו",
+    "he_label": "יש אפשרות לנחות עכשיו",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "register"
+    ],
+    "verdict": "FAIL",
+    "reason": "flew 1 steps",
+    "ms": 447
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000035_2026-09-08_17-22-23",
+    "he": "אל תפנה 90 מעלות שמאלה כנגד כיוון השעון ואז אל תפנה ימינה.",
+    "he_label": "אל תפנה 90 מעלות שמאלה כנגד כיוון השעון ואז אל תפנה ימינה.",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject-neg-guard",
+    "flags": [
+     "neg-guard"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000036_2026-09-08_17-22-38",
+    "he": "אל תפנה 90 מעלות שמאלה כנגד כיוון השעון, ואז אל תפנה ימינה.",
+    "he_label": "אל תפנה 90 מעלות שמאלה כנגד כיוון השעון, ואז אל תפנה ימינה.",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject-neg-guard",
+    "flags": [
+     "neg-guard"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000037_2026-09-08_17-22-54",
+    "he": "תקשיב, אני רואה שקודם כל טוס אחורה 4 מטרים אחרי זה זוז שמאלה 3 מטים ועד 2 מטים.",
+    "he_label": "תקשיב, אני רואה שקודם כל טוס אחורה 4 מטרים אחרי זה זוז שמאלה 3 מטים ועד 2 מטים.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": -4
+     },
+     {
+      "type": "fly_by",
+      "dy": -3
+     },
+     {
+      "type": "fly_by",
+      "dy": -2
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 1002
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000038_2026-09-08_17-23-02",
+    "he": "הדגש את הבניין הגבוה, זה עם האנטנות על הגג, שנמצא מאחורי מגרש המשחקים, קצת ימינה מהמרכז",
+    "he_label": "הדגש את הבניין הגבוה, זה עם האנטנות על הגג, שנמצא מאחורי מגרש המשחקים, קצת ימינה מהמרכז",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "building"
+      ],
+      [
+       "tall",
+       "high"
+      ],
+      [
+       "antenna"
+      ],
+      [
+       "roof"
+      ],
+      [
+       "behind"
+      ],
+      [
+       "playground"
+      ],
+      [
+       "right"
+      ],
+      [
+       "center",
+       "middle"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "tall building with antennas on the roof behind the playground, slightly to the right of the center",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 634
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000039_2026-09-08_17-24-13",
+    "he": "ספור את הסירות הקשורות למזח הצפוני",
+    "he_label": "ספור את הסירות הקשורות למזח הצפוני",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "count",
+       "how many"
+      ],
+      [
+       "boat"
+      ],
+      [
+       "tie",
+       "moor"
+      ],
+      [
+       "north"
+      ],
+      [
+       "pier",
+       "dock",
+       "jetty",
+       "wharf"
+      ]
+     ]
+    },
+    "kind": "count",
+    "tag": "",
+    "mission": [],
+    "target": "boats tied to the north pier",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 467
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000040_2026-09-08_17-24-21",
+    "he": "בסדר, עכשיו רד לאט, שלושה מטרים ואז טוס אחורה שני מטרים.",
+    "he_label": "בסדר, עכשיו רד לאט, שלושה מטרים ואז טוס אחורה שני מטרים.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       -3
+      ],
+      [
+       "fly_by",
+       "dx",
+       -2
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -3
+     },
+     {
+      "type": "fly_by",
+      "dx": -2
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 731
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000041_2026-09-08_17-24-24",
+    "he": "טפס לגובה עשרים מטרים",
+    "he_label": "טפס לגובה עשרים מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       20
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits",
+     "register"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 543
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000042_2026-09-08_17-24-33",
+    "he": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 2 מטרים בבקשה",
+    "he_label": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 2 מטרים בבקשה",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       20
+      ],
+      [
+       "spin_by",
+       "degrees",
+       45
+      ],
+      [
+       "fly_by",
+       "dx",
+       2
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 2
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 976
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000043_2026-09-08_17-24-43",
+    "he": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
+    "he_label": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       20
+      ],
+      [
+       "spin_by",
+       "degrees",
+       45
+      ],
+      [
+       "fly_by",
+       "dx",
+       12
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 982
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000044_2026-09-08_17-24-53",
+    "he": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
+    "he_label": "עלה עשרים מטרים, כשתסיים פנה ימינה 45 מעלות, ובסוף טוס קדימה 12 מטרים בבקשה",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 20
+     },
+     {
+      "type": "spin_by",
+      "degrees": 45
+     },
+     {
+      "type": "fly_by",
+      "dx": 12
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 962
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000045_2026-09-08_17-24-58",
+    "he": "רד 20 מטרים",
+    "he_label": "רד 20 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       -20
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": -20.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000046_2026-09-08_17-25-04",
+    "he": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+    "he_label": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "home"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "verdict": "FAIL",
+    "reason": "step home, expected fly_by",
+    "ms": 980
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000047_2026-09-08_17-25-24",
+    "he": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+    "he_label": "תמריא, טוס קדימה עשרה מטרים, תסתובב חצי סיבוב וחזור",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ],
+      [
+       "spin_by",
+       "degrees",
+       [
+        "abs",
+        180
+       ]
+      ],
+      [
+       "fly_by",
+       "dx",
+       10
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dx": 10
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     },
+     {
+      "type": "home"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits",
+     "takeoff-verb-inline"
+    ],
+    "verdict": "FAIL",
+    "reason": "step home, expected fly_by",
+    "ms": 1016
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000048_2026-09-08_17-25-35",
+    "he": "יאללה תמריא",
+    "he_label": "יאללה תמריא",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "takeoff",
+       null,
+       null
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 410
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000049_2026-09-08_17-25-38",
+    "he": "תעלה לגוי 20",
+    "he_label": "תעלה לגוי 20",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "reject",
+    "ms": 352
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000050_2026-09-08_17-25-41",
+    "he": "המראה",
+    "he_label": "המראה",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "takeoff",
+       null,
+       null
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "takeoff"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000051_2026-09-08_17-25-46",
+    "he": "אה טוס קדימה שלושה מטרים בבקשה",
+    "he_label": "אה טוס קדימה שלושה מטרים בבקשה",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       3
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 532
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000052_2026-09-08_17-25-52",
+    "he": "תוכל לטוס קדימה שלושה מטרים",
+    "he_label": "תוכל לטוס קדימה שלושה מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       3
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 531
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000053_2026-09-08_17-26-00",
+    "he": "בשום אופן אל תרד עכשיו",
+    "he_label": "בשום אופן אל תרד עכשיו",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject-neg-guard",
+    "flags": [
+     "neg-guard"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000054_2026-09-08_17-26-06",
+    "he": "בשום פנים ואופן אל תרד גובה עכשיו",
+    "he_label": "בשום פנים ואופן אל תרד גובה עכשיו",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject-neg-guard",
+    "flags": [
+     "neg-guard"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000055_2026-09-08_17-26-15",
+    "he": "התקדם 10 מטרים",
+    "he_label": "התקדם 10 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       10
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 10
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 576
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000056_2026-09-08_17-26-18",
+    "he": "התקדם 20 מטרים.",
+    "he_label": "התקדם 20 מטרים.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       20
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 20
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 579
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000057_2026-09-08_17-26-21",
+    "he": "תתקדם 20 מטרים.",
+    "he_label": "תתקדם 20 מטרים.",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       20
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 20
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 546
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000058_2026-09-08_17-26-31",
+    "he": "תקשיב, אבד קשר, סליחה, סריקה בגזרה הצפונית.",
+    "he_label": "תקשיב, אבד קשר, סליחה, סריקה בגזרה הצפונית.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [
+     "slang-sector"
+    ],
+    "verdict": "REVIEW",
+    "reason": "reject",
+    "ms": 366
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000059_2026-09-08_17-26-42",
+    "he": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית.",
+    "he_label": "אבד קשר עם הכטב\"ם, תתחיל סריקה בגזרה הצפונית.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [
+     "acronym-uav",
+     "slang-sector"
+    ],
+    "verdict": "REVIEW",
+    "reason": "reject",
+    "ms": 384
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000060_2026-09-08_17-26-51",
+    "he": "רות ממשיך בסריקה, עבור.",
+    "he_label": "רות ממשיך בסריקה, עבור.",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "mission",
+    "ms": 590
+   },
+   {
+    "name": "session-20260908-170015-rog__audio_000061_2026-09-08_17-26-55",
+    "he": "טוס קדימה מטר אחד",
+    "he_label": "טוס קדימה מטר אחד",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       1
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 1
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "hebnum-digits"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 523
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000000_2026-09-09_02-51-33",
+    "he": "",
+    "he_label": "",
+    "expect": {
+     "kind": "none"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 348
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000001_2026-09-09_02-51-54",
+    "he": "טוס קדימה 3 מטרים ואז פנה ימינה 90 מעלות",
+    "he_label": "טוס קדימה 3 מטרים ואז פנה ימינה 90 מעלות",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dx",
+       3
+      ],
+      [
+       "spin_by",
+       "degrees",
+       90
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dx": 3
+     },
+     {
+      "type": "spin_by",
+      "degrees": 90
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 757
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000002_2026-09-09_02-52-08",
+    "he": "סמן את הכיסא",
+    "he_label": "סמן את הכיסא",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "chair"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "chair",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 379
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000003_2026-09-09_02-52-44",
+    "he": "ספור את הכיסאות",
+    "he_label": "ספור את הכיסאות",
+    "expect": {
+     "kind": "perception",
+     "vision": "count",
+     "groups": [
+      [
+       "chair"
+      ]
+     ]
+    },
+    "kind": "count",
+    "tag": "",
+    "mission": [],
+    "target": "chairs",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 405
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000011_2026-09-09_02-55-49",
+    "he": "תמריא, עלה 5 מטרים, הסתובב 180 מעלות",
+    "he_label": "תמריא, עלה 5 מטרים, הסתובב 180 מעלות",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "takeoff",
+       null,
+       null
+      ],
+      [
+       "fly_by",
+       "dz",
+       5
+      ],
+      [
+       "spin_by",
+       "degrees",
+       180
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "takeoff"
+     },
+     {
+      "type": "fly_by",
+      "dz": 5
+     },
+     {
+      "type": "spin_by",
+      "degrees": 180
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [
+     "takeoff-verb-inline"
+    ],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 913
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000012_2026-09-09_02-56-04",
+    "he": "תסתובב כמו משוגע",
+    "he_label": "תסתובב כמו משוגע",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "reject",
+    "ms": 354
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000013_2026-09-09_02-56-25",
+    "he": "תסתובב 720 מעלות, מאוד מהר",
+    "he_label": "תסתובב 720 מעלות, מאוד מהר",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "spin_by",
+       "degrees",
+       720
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "planned",
+    "mission": [
+     {
+      "type": "spin_by",
+      "degrees": 720
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 546
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000014_2026-09-09_02-56-43",
+    "he": "עלה 2 מטרים",
+    "he_label": "עלה 2 מטרים",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "fly_by",
+       "dz",
+       2
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "fly_by",
+      "dz": 2.0
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000015_2026-09-09_02-56-56",
+    "he": "אפשר ללכת לקפ\"ק שנייה ולתצפת את הזירה?",
+    "he_label": "אפשר ללכת לקפ\"ק שנייה ולתצפת את הזירה?",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "reject",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "reject",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "reject",
+    "ms": 358
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000016_2026-09-09_02-57-06",
+    "he": "עצור ל10 שניות",
+    "he_label": "עצור ל10 שניות",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "delay",
+       "seconds",
+       10
+      ]
+     ]
+    },
+    "kind": "emergency",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "routed emergency",
+    "ms": 0
+   },
+   {
+    "name": "session-20260909-025023-rog__audio_000017_2026-09-09_02-57-19",
+    "he": "תנחת",
+    "he_label": "תנחת",
+    "expect": {
+     "kind": "mission",
+     "steps": [
+      [
+       "land",
+       null,
+       null
+      ]
+     ]
+    },
+    "kind": "mission",
+    "tag": "bypass",
+    "mission": [
+     {
+      "type": "land"
+     }
+    ],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 0
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000000_2026-09-12_12-50-13",
+    "he": "מה אתה רואה בתמונה",
+    "he_label": "מה אתה רואה בתמונה",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": []
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 343
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000005_2026-09-12_12-51-29",
+    "he": "מה אתה חושב על אופי החדר?",
+    "he_label": "מה אתה חושב על אופי החדר?",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": []
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 382
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000006_2026-09-12_12-52-07",
+    "he": "תתאר לי את אופי הסצנה שאתה רואה",
+    "he_label": "תתאר לי את אופי הסצנה שאתה רואה",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": []
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 363
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000007_2026-09-12_12-53-19",
+    "he": "תסמן את כל הגיטרות",
+    "he_label": "תסמן את כל הגיטרות",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitar"
+      ],
+      [
+       "all"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "all guitars",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 397
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000008_2026-09-12_12-53-53",
+    "he": "Highlight guitars",
+    "he_label": "Highlight guitars",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitars"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitars",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 388
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000009_2026-09-12_12-54-01",
+    "he": "Highlight guitar",
+    "he_label": "Highlight guitar",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitar"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitar",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 361
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000010_2026-09-12_12-54-07",
+    "he": "סמן את כל הגיטרות",
+    "he_label": "סמן את כל הגיטרות",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitars",
+       "guitar"
+      ],
+      [
+       "all"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "all guitars",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 405
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000012_2026-09-12_12-58-40",
+    "he": "תסמן את המיקרופון",
+    "he_label": "תסמן את המיקרופון",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "microphone",
+       "mic"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "microphone",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 413
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000013_2026-09-12_12-58-46",
+    "he": "תסמן את השידה מאחוריי",
+    "he_label": "תסמן את השידה מאחוריי",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "drawer",
+       "cabinet"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "dresser behind me",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: drawer|cabinet in 'dresser behind me'",
+    "ms": 436
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000014_2026-09-12_12-59-15",
+    "he": "תסמן כל בלטה ברצפה באופן נפרד",
+    "he_label": "תסמן כל בלטה ברצפה באופן נפרד",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "floortile",
+       "tile"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "each tile on the floor",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 475
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000015_2026-09-12_12-59-29",
+    "he": "תסמן את המשקפיים שלי",
+    "he_label": "תסמן את המשקפיים שלי",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "glasses"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "my glasses",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 423
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000016_2026-09-12_13-02-13",
+    "he": "תסמן את המיטה",
+    "he_label": "תסמן את המיטה",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "bed"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "bed",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 394
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000017_2026-09-12_13-02-43",
+    "he": "תסמן את ה-\"אדידס\" על החולצה שלי",
+    "he_label": "תסמן את ה-\"אדידס\" על החולצה שלי",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "Adidas on shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "highlight",
+    "ms": 444
+   },
+   {
+    "name": "session-20260912-124932-rog__audio_000018_2026-09-12_13-02-55",
+    "he": "תסמן את ה-\"לוגויים\" על החולצה שלי",
+    "he_label": "תסמן את ה-\"לוגויים\" על החולצה שלי",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "logo",
+       "logos"
+      ],
+      [
+       "all"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "logos on my shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: all in 'logos on my shirt'",
+    "ms": 459
+   },
+   {
+    "name": "session-20260912-172810-rog__audio_000000_2026-09-12_17-28-45",
+    "he": "highlight the guitar",
+    "he_label": "highlight the guitar",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitar",
+       "guitars"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitar",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 362
+   },
+   {
+    "name": "session-20260912-172810-rog__audio_000001_2026-09-12_17-29-13",
+    "he": "סמן את הגיטרות",
+    "he_label": "סמן את הגיטרות",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitar",
+       "guitars"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitars",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 408
+   },
+   {
+    "name": "session-20260912-175633-rog__audio_000000_2026-09-12_17-56-52",
+    "he": "תסמן את המכונית בצד השמאלי של הבניין בכיוון הימני.",
+    "he_label": "תסמן את המכונית בצד השמאלי של הבניין בכיוון הימני.",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "highlight",
+       "mark"
+      ],
+      [
+       "window"
+      ],
+      [
+       "middle",
+       "center"
+      ],
+      [
+       "building"
+      ],
+      [
+       "right"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "car on the left side of the building facing right",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: window, middle|center in 'car on the left side of the building facing right'",
+    "ms": 513
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000002_2026-09-12_18-35-57",
+    "he": "סמן את המגירה",
+    "he_label": "סמן את המגירה",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "drawer"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "drawer",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 374
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000003_2026-09-12_18-36-04",
+    "he": "סמן את הרצפה",
+    "he_label": "סמן את הרצפה",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "floor"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "floor",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 386
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000004_2026-09-12_18-37-35",
+    "he": "סמן את המשקפיים שלי.",
+    "he_label": "סמן את המשקפיים שלי.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "glasses"
+      ],
+      [
+       "person-with-glasses"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "my glasses",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: person-with-glasses in 'my glasses'",
+    "ms": 417
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000007_2026-09-12_18-38-15",
+    "he": "סמן את הגיטרות בתוך התיקים שלהם.",
+    "he_label": "סמן את הגיטרות בתוך התיקים שלהם.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "guitars",
+       "guitar"
+      ],
+      [
+       "encased-guitars"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitars inside their cases",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: encased-guitars in 'guitars inside their cases'",
+    "ms": 492
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000008_2026-09-12_18-38-22",
+    "he": "האם אתה רואה תיקי גיטרות?",
+    "he_label": "האם אתה רואה תיקי גיטרות?",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": [
+      [
+       "guitar-case"
+      ],
+      [
+       "many"
+      ]
+     ]
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "guitar bags",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: guitar-case, many in 'guitar bags'",
+    "ms": 424
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000009_2026-09-12_18-38-35",
+    "he": "האם אתה רואה תיקי גיטרות מתחת ללוח מאחוריי?",
+    "he_label": "האם אתה רואה תיקי גיטרות מתחת ללוח מאחוריי?",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": [
+      [
+       "guitar-cases"
+      ],
+      [
+       "board"
+      ],
+      [
+       "below"
+      ]
+     ]
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "guitar cases under the board behind me",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: guitar-cases, below in 'guitar cases under the board behind me'",
+    "ms": 508
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000011_2026-09-12_18-39-06",
+    "he": "יש לוח בתמונה, האם אתה רואה אותו?",
+    "he_label": "יש לוח בתמונה, האם אתה רואה אותו?",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": [
+      [
+       "whiteboard"
+      ]
+     ]
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "sign",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: whiteboard in 'sign'",
+    "ms": 409
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000012_2026-09-12_18-39-16",
+    "he": "יש לוח בתמונה, אבל הוא מוסתר חלקית, האם אתה רואה אותו?",
+    "he_label": "יש לוח בתמונה, אבל הוא מוסתר חלקית, האם אתה רואה אותו?",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "partially hidden sign",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "describe",
+    "ms": 464
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000013_2026-09-12_18-39-29",
+    "he": "Do you see a drawing board in the picture that is hidden?",
+    "he_label": "Do you see a drawing board in the picture that is hidden?",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "drawing board",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "describe",
+    "ms": 427
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000014_2026-09-12_18-39-44",
+    "he": "What kind of setting do you recognize from the general scene?",
+    "he_label": "What kind of setting do you recognize from the general scene?",
+    "expect": {
+     "kind": "perception",
+     "vision": "describe",
+     "groups": []
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 378
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000015_2026-09-12_18-40-01",
+    "he": "Highlight the pencils or the markers that you can see in the image",
+    "he_label": "Highlight the pencils or the markers that you can see in the image",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "pencils"
+      ],
+      [
+       "markers"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "pencils or markers",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 461
+   },
+   {
+    "name": "session-20260912-183503-rog__audio_000016_2026-09-12_18-40-07",
+    "he": "האם אתה רואה את המרקרים בתמונה?",
+    "he_label": "האם אתה רואה את המרקרים בתמונה?",
+    "expect": {
+     "kind": "review"
+    },
+    "kind": "describe",
+    "tag": "",
+    "mission": [],
+    "target": "markers",
+    "action": "",
+    "flags": [],
+    "verdict": "REVIEW",
+    "reason": "describe",
+    "ms": 411
+   },
+   {
+    "name": "session-20260912-195111-rog__audio_000002_2026-09-12_19-52-49",
+    "he": "תסמן את הכיסא",
+    "he_label": "תסמן את הכיסא",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "chair"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "chair",
+    "action": "",
+    "flags": [],
+    "verdict": "PASS",
+    "reason": "",
+    "ms": 411
+   },
+   {
+    "name": "session-20260912-195111-rog__audio_000003_2026-09-12_19-53-14",
+    "he": "סמן את הקופסאות",
+    "he_label": "סמן את הקופסאות",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "boxes"
+      ],
+      [
+       "box"
+      ],
+      [
+       "many"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "boxes",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: many in 'boxes'",
+    "ms": 411
+   },
+   {
+    "name": "session-20260912-200954-rog__audio_000001_2026-09-12_20-10-35",
+    "he": "סמן את הגוש של הבגדים מאחוריי.",
+    "he_label": "סמן את הגוש של הבגדים מאחוריי.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "clothing"
+      ],
+      [
+       "lump-of-clothing"
+      ],
+      [
+       "clothes"
+      ],
+      [
+       "cloth-lump"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "pile of clothes behind me",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: clothing, lump-of-clothing, cloth-lump in 'pile of clothes behind me'",
+    "ms": 475
+   },
+   {
+    "name": "session-20260912-200954-rog__audio_000002_2026-09-12_20-10-46",
+    "he": "סמן את הקייסים של הגיטרות מאחורי.",
+    "he_label": "סמן את הקייסים של הגיטרות מאחורי.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "cases-guitar"
+      ],
+      [
+       "guitar"
+      ],
+      [
+       "cases"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "guitar cases behind",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: cases-guitar in 'guitar cases behind'",
+    "ms": 445
+   },
+   {
+    "name": "session-20260912-200954-rog__audio_000005_2026-09-12_20-11-48",
+    "he": "תסמן את החולצה שלי.",
+    "he_label": "תסמן את החולצה שלי.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "shirt"
+      ],
+      [
+       "wearing-shirt"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "my shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: wearing-shirt in 'my shirt'",
+    "ms": 423
+   },
+   {
+    "name": "session-20260912-200954-rog__audio_000006_2026-09-12_20-11-54",
+    "he": "תסמן את החולצה של הבן אדם.",
+    "he_label": "תסמן את החולצה של הבן אדם.",
+    "expect": {
+     "kind": "perception",
+     "vision": "highlight",
+     "groups": [
+      [
+       "shirt"
+      ],
+      [
+       "his-shirt"
+      ],
+      [
+       "persons-shirt"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "person's shirt",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: his-shirt, persons-shirt in 'person's shirt'",
+    "ms": 453
+   },
+   {
+    "name": "session-20260912-200954-rog__audio_000008_2026-09-12_20-12-12",
+    "he": "תסמן את החולצה שהבן אדם לובש.",
+    "he_label": "תסמן את החולצה שהבן אדם לובש.",
+    "expect": {
+     "kind": "perception",
+     "groups": [
+      [
+       "shirt"
+      ],
+      [
+       "wearing-shirt"
+      ],
+      [
+       "person-wearing-shirt"
+      ]
+     ]
+    },
+    "kind": "highlight",
+    "tag": "",
+    "mission": [],
+    "target": "shirt the person is wearing",
+    "action": "",
+    "flags": [],
+    "verdict": "FAIL",
+    "reason": "words missed: wearing-shirt, person-wearing-shirt in 'shirt the person is wearing'",
+    "ms": 472
+   }
+  ]
+ },
+ "asr": {
+  "recordings": null
+ }
+}

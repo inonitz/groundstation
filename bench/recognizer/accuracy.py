@@ -14,9 +14,12 @@ It sends nothing: the Recognizer gets no control and no vision.
     --thinking    start Gemma with thinking on
     --first N     only the first N cases of each file (a quick look)
     --tag T       the results' name (default: the backend)
+    --labels      a recordings file: score the owner's labels, not whisper's text
 
 Results: bench/recognizer/results/<date>-<tag>.json (every case) and .md (the table).
-Path B (task B2, not built): a case with "wav" gets whisper's text first, then path A.
+Path B (task B2, ruling U2.2): a recordings file (cases with "wav", for example
+datasets/asr/recordings.json) drops its removed clips; prepass.py replaces each sentence
+with whisper's text, then path A scores it. The report adds whisper's word error rate.
 """
 import argparse
 import datetime
@@ -38,6 +41,7 @@ from gemma.client import Gemma                                  # noqa: E402
 from recognizer import Recognizer                               # noqa: E402
 from runtime.fatal import die                                    # noqa: E402
 from runtime.supervisor import Supervisor                        # noqa: E402
+from prepass import heard                                       # noqa: E402
 from scorer import score                                        # noqa: E402
 
 DATASET_DIR = os.path.join(ROOT, "datasets", "recognizer")
@@ -73,15 +77,11 @@ def case_pool():
 
 
 def load(path):
-    """-> (name, cases). A live list is resolved through the topical files. A recordings
-    file (path B) is task B2."""
+    """-> (name, cases). A live list is resolved through the topical files."""
     data = read(path)
     if "list" in data:
         pool = case_pool()
         return data["list"], [pool[name] for name in data["cases"]]
-    for case in data["cases"]:
-        if "wav" in case:
-            die(f"{path}: a recordings file is path B (task B2), not built yet")
     return data["set"], data["cases"]
 
 
@@ -119,6 +119,7 @@ def run_file(recognizer, cases):
         rows.append({
             "name": case["name"],
             "he": case["he"],
+            "he_label": case.get("he_label"),
             "expect": case["expect"],
             "kind": decision.kind,
             "tag": decision.tag,
@@ -201,10 +202,13 @@ def main():
     ap.add_argument("--tag", default="")
     ap.add_argument("--list", default="")
     ap.add_argument("--print", default="", dest="print_name")
+    ap.add_argument("--labels", action="store_true")
     args = ap.parse_args()
     files = args.files or topical_files()
     supervisor = Supervisor()
     results = {}
+    asr = {}
+    loaded = []
     t0 = time.time()
 
     if args.print_name:
@@ -220,6 +224,18 @@ def main():
         backend += ", thinking " + ("on" if args.thinking else "off")
     print(f"[accuracy] backend: {backend}; {len(files)} files", flush=True)
 
+    # every file first, whisper included: whisper has the GPU before Gemma loads, and a
+    # whisper failure ends the run before Gemma's start-up is paid
+    for path in files:
+        name, cases = load(path)
+        if any("wav" in case for case in cases):
+            cases = [case for case in cases if not case.get("removed")]
+        if args.first:
+            cases = cases[:args.first]
+        if any("wav" in case for case in cases):
+            cases, asr[name] = heard(cases, keep_labels=args.labels)
+        loaded.append((name, cases))
+
     if args.port:
         gemma = Gemma(args.port)
     else:
@@ -227,22 +243,28 @@ def main():
     # route() decides only: no control and no vision, so nothing can be sent
     recognizer = Recognizer(None, None, gemma)
 
-    for path in files:
-        name, cases = load(path)
-        if args.first:
-            cases = cases[:args.first]
+    for name, cases in loaded:
         print(f"[accuracy] {name}: {len(cases)} cases", flush=True)
         results[name] = run_file(recognizer, cases)
     supervisor.stop_all()
 
     text = report(backend, results, time.time() - t0)
+    for name, rate in asr.items():
+        if rate is None:
+            text += f"\n\n{name}: the owner's labels, not whisper (--labels)."
+            continue
+        text += (
+            f"\n\n{name}: whisper's word error rate {rate['wer']} % over "
+            f"{rate['clips']} clips ({rate['words']} label words); "
+            f"{rate['wer_digits']} % with number words as digits."
+        )
     print(text)
     tag = args.tag or backend.split(",")[0].replace(" ", "-")
     stem = os.path.join(RESULTS_DIR, f"{datetime.date.today()}-{tag}")
     os.makedirs(RESULTS_DIR, exist_ok=True)
     with open(stem + ".json", "w", encoding="utf-8") as f:
         json.dump(
-            {"backend": backend, "results": results},
+            {"backend": backend, "results": results, "asr": asr},
             f,
             ensure_ascii=False,
             indent=1

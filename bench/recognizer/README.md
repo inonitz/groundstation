@@ -21,8 +21,8 @@ decision. route() sends nothing, so no drone, phone or camera is needed; only th
 - It replaced two copies of the recognizer's routing (bench/hebrew-command-bench/unified_bench.py
   and bench/whole-system/run_list.py) and a second scorer (log/score.py). A copy of the routing
   hid the guards (2026-09-26); now the benchmark calls route() itself.
-- Two input paths (owner, U2.2): path A (sentences, built) and path B (recordings: whisper's text
-  first, then path A; task B2, not built).
+- Two input paths (owner, U2.2): path A (sentences) and path B (recordings: whisper's text
+  first, then path A; prepass.py, built 2026-10-01).
 
 ## Run it
 Gemma needs the GPU: take the lock first when other agents run.
@@ -40,6 +40,12 @@ python3 /root/groundstation/bench/recognizer/accuracy.py
   `python3 /root/groundstation/bench/recognizer/accuracy.py --print live-test-50`
 - The script starts Gemma the way the app does (the supervisor, gemma.server.process) on port
   18091, and stops it at the end. Start-up takes ~15-60 s.
+- Path B: a recordings file as the argument. prepass.py runs whisper-cli on every active clip
+  with the app's ASR model and the live ASR server's decode settings (beam 8, its starting
+  prompt, one thread). The report adds whisper's word error rate against the owner's labels:
+  `python3 /root/groundstation/bench/recognizer/accuracy.py /root/groundstation/datasets/asr/recordings.json`
+- `--labels` scores the owner's labels instead of whisper's text. The two runs side by side
+  split the speech-recognition errors from the recognizer's errors.
 - `--port P` measures another backend: any llama-server already up on port P.
 - `--thinking` starts Gemma with thinking on. `--first N` runs the first N cases of each file.
   `--tag T` names the results.
@@ -112,6 +118,29 @@ nearest case and a `note`), after every clip. The file sits next to the clips, s
 of accuracy.py does not grade it half-labelled. How to run it: tools/asr-verify-transcript/README.md.
 
 ## Results
+Scorecard, 2026-10-01, after the joint review (every draft confirmed); results/2026-10-01-joint-review.md.
+
+| set | cases | PASS | FAIL | REVIEW |
+|---|---|---|---|---|
+| commands | 267 | 244 | 16 | 7 |
+| emergency | 13 | 12 | 0 | 1 |
+| military | 21 | 16 | 5 | 0 |
+| numbers | 40 | 38 | 2 | 0 |
+| perception | 141 | 104 | 34 | 3 |
+| verbose | 63 | 59 | 4 | 0 |
+| ALL | 545 | 473 | 61 | 11 |
+
+Path B, the 106 active recordings (results/2026-10-01-recordings-*-jr*.md):
+
+| input | PASS | FAIL | REVIEW |
+|---|---|---|---|
+| whisper's text | 85 | 18 | 3 |
+| the owner's labels (`--labels`) | 92 | 11 | 3 |
+
+Whisper's word error rate: 9.6 % (716 label words); 7.5 % with number words as digits.
+
+Superseded below (kept for the trend):
+
 Scorecard, 2026-09-29, gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf, thinking off: every sentence once
 (J5). Source: results/2026-09-29-j5-one-home-gemma4.json.
 

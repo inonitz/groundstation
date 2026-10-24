@@ -55,3 +55,24 @@ def test_alternatives_and_a_halt():
     assert score(expect, Decision("mission", mission=wait))[0] == "PASS"
     fly = [{"type": "fly_by", "dx": 1}]
     assert score(expect, Decision("mission", mission=fly))[0] == "FAIL"
+
+
+def test_a_word_inside_another_word_is_not_a_match():
+    """"man" must not pass on a woman, nor "low" on a yellow house (2026-10-02)."""
+    man = {"kind": "perception", "groups": [["man"]]}
+    low = {"kind": "perception", "groups": [["low"]]}
+    logo = {"kind": "perception", "groups": [["logo"]]}
+    assert score(man, Decision("highlight", "woman"))[0] == "FAIL"
+    assert score(low, Decision("highlight", "yellow house"))[0] == "FAIL"
+    assert score(logo, Decision("highlight", "logos"))[0] == "PASS"
+
+
+def test_a_group_word_matches_only_at_the_start_of_a_word():
+    from scorer import starts_a_word
+    assert starts_a_word("identif", "highlight the identify color")
+    assert starts_a_word("logo", "highlight the logos on my shirt")
+    assert starts_a_word("guitar case", "highlight the guitar cases")
+    assert not starts_a_word("man", "highlight the woman")
+    assert not starts_a_word("low", "highlight the yellow house")
+    assert not starts_a_word("hat", "highlight the car that is parked")
+    assert not starts_a_word("2", "highlight the 12 windows")
