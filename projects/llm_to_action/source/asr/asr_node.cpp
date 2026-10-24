@@ -230,11 +230,17 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             localtime_r(&tnow, &tm);
 
             // Index + timestamp in one snprintf (no std::to_string). Format straight from the tm fields.
-            char name[96];
-            std::snprintf(name, sizeof(name), "/audio_%06u_%04d-%02d-%02d_%02d-%02d-%02d.wav",
-                        static_cast<unsigned>(m_audioClipIndex++),
-                        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-                        tm.tm_hour, tm.tm_min, tm.tm_sec);
+            static constexpr u8 k_filenameMaxSize = 96; 
+            char name[k_filenameMaxSize];
+            std::snprintf(name, k_filenameMaxSize, "/audio_%06u_%04d-%02d-%02d_%02d-%02d-%02d.wav",
+                static_cast<unsigned>(m_audioClipIndex++),
+                tm.tm_year + 1900, 
+                tm.tm_mon + 1, 
+                tm.tm_mday,
+                tm.tm_hour,
+                tm.tm_min,
+                tm.tm_sec
+            );
 
             std::string path;
             path.reserve(m_recordFolderPath.size() + std::strlen(name));
@@ -245,9 +251,13 @@ void ASRStandaloneNode::audioProcessingConsumerThread()
             if (wavman.open(path, m_audioMan.channelCount(), m_audioMan.resampleRate())) {
                 wavman.write(resampledBuf.data(), framesToWrite64);
                 wavman.close();
+                name[k_filenameMaxSize - 1] = '\0';
+                RCLCPP_INFO(this->get_logger(), "[WORKER] Wrote Audio to %s", name);
             }
         }
 
+
+        /* Should printf name of file written to disk out of the hot path */
 
         // Pass resampled buffer to whisper/parakeet backend
         auto transcript_time_ns = this->now().nanoseconds();

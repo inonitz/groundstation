@@ -1,4 +1,4 @@
-"""The vision service (owner design 2026-09-23; API: docs/api-harden2/perception.h).
+"""The vision service (owner design 2026-09-23; API: docs/api-harden2/rev3/perception.h).
 
 count / highlight / clear / describe each run as ONE task on its own thread, started by
 the dispatcher (at most config.VISION_MAX_TASKS alive). Every SAM3 forward pass takes the

@@ -452,6 +452,24 @@ def test_the_perf_report_gives_percentiles_per_stage(tmp_path):
     assert "waiting for the lock" in text and "  draw" in text
 
 
+def test_the_perf_report_splits_gemma_and_skips_a_failed_request(tmp_path):
+    """The gemma rows get the server's prompt and answer times (KI2, 2026-10-01). A
+    failed request has none, and it must not count as 0 ms."""
+    from log.perf import Perf
+    from log.perf_report import report
+    perf = Perf(str(tmp_path))
+    perf.record("gemma", 500, label="plan", ok=True, prompt_ms=40, predicted_ms=420)
+    perf.record("gemma", 600, label="plan", ok=True, prompt_ms=60, predicted_ms=500)
+    perf.record("gemma", 9000, label="plan", ok=False)
+    perf.close()
+    lines = report(str(tmp_path))
+    prompt = next(line for line in lines if "server's prompt" in line)
+    answer = next(line for line in lines if "server's answer" in line)
+    want = ["2", "40.0", "40.0", "40.0", "60.0", "60.0", "60.0", "60.0"]
+    assert prompt.split()[-8:] == want
+    assert answer.split()[-8] == "2"
+
+
 def test_the_perf_report_lists_the_slowest_frames(tmp_path):
     """REWRITTEN 2026-09-28 (owner ruling V1 a: the 20 slowest frames with their times,
     no fps threshold). Was: test_the_perf_report_lists_the_slow_seconds."""
@@ -492,4 +510,3 @@ def test_the_scripted_run_refuses_anything_but_the_mock():
     assert r.returncode == 1
     assert "it runs only with CONTROL=mock" in r.stderr
     assert "[feed]" not in r.stdout
-

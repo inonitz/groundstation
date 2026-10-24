@@ -16,7 +16,7 @@ the rest is pure logic around it.
 
 | file | role |
 |---|---|
-| `vision.py` | `Vision`: count / highlight / clear / describe. One task thread each; results go to the app through `Sinks` callbacks. API: docs/api-harden2/perception.h. |
+| `vision.py` | `Vision`: count / highlight / clear / describe. One task thread each; results go to the app through `Sinks` callbacks. API: docs/api-harden2/rev3/perception.h. |
 | `dispatcher.py` | `Dispatcher`: one thread on a condition variable starts one thread per task, at most `config.VISION_MAX_TASKS`; past that a request is refused (FULL). |
 | `sam3_lock.py` | `PriorityLock`: one SAM3 forward pass at a time; a user command outranks a highlight refresh. |
 | `engine.py` | `PerceptionEngine`: relative-confidence gate, mask hygiene, VLM fallback, presence gate. Models are injected. |

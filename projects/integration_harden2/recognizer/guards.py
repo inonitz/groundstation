@@ -8,7 +8,7 @@ call.
 import json
 import re
 
-from .numbers import nums_en, nums_he
+from .numbers import nums_he
 from .prompts import PLANNER_SHOTS_D
 
 
@@ -57,14 +57,17 @@ def _shot_missions():
 SHOT_MISSIONS = _shot_missions()
 
 
-def is_shot_echo(english, mission):
+def is_shot_echo(he2, mission):
+    """True when the plan equals a planner example and the sentence holds none of that
+    example's numbers. The sentence is Hebrew, so its numbers are read the Hebrew way:
+    "בעשרים" is 20 (review finding 7, 2026-10-02)."""
     nums = set()
     for shot in SHOT_MISSIONS:
         if mission != shot:
             continue
 
         nums = mission_numbers(shot)
-        if not nums or not (set(nums_en(english)) & nums):
+        if not nums or not (set(nums_he(he2)) & nums):
             return True
     return False
 

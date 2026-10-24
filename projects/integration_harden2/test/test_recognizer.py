@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import recognizer as R
 from recognizer import Recognizer, reject_why, recognize_direct
-from recognizer.fast_path import critical
+from recognizer.fast_path import critical, is_clear
 from recognizer.guards import negation_only
 from recognizer.lexicon import find_nouns, fix_target
 from recognizer.rewrites import register_imperative
@@ -361,6 +361,35 @@ def test_fast_path_hebrew():
     assert critical("רחפן תעצור מיד בבקשה") == "emergency"
 
 
+def test_a_stop_word_with_a_duration_waits_and_alone_still_stops():
+    """Owner STOP1 (3), 2026-10-02: "STOP WITHOUT ANYTHING ELSE SHOULD STOP REGARDLESS OF
+    THE MODE"; "stop for 10 seconds" is a wait."""
+    from recognizer.bypass import bypass
+    wait = [{"type": "delay", "seconds": 10.0}]
+    for s in ("עצור", "תעצור!", "רחפן תעצור מיד בבקשה", "stop", "עצור, די"):
+        assert critical(s) == "emergency", s
+    for s in ("עצור שם ל-10 שניות.", "עצור ל10 שניות", "עצור שם לעשר שניות"):
+        assert critical(s) is None, s
+        assert bypass(s) == wait, s
+    assert critical("stop for 10 seconds") is None
+
+
+def test_stop_tracking_clears_and_does_not_halt():
+    """Review finding 10: the English stop never reached the clear."""
+    for s in ("stop tracking the car", "stop highlighting", "stop following him"):
+        assert critical(s) is None, s
+        assert is_clear(s), s
+
+
+def test_auto_acts_only_as_the_whole_sentence():
+    """Owner AUTO1, 2026-10-02: auto is a trigger word; "continue forward 5 m" is a
+    command (review finding 4)."""
+    for s in ("המשך", "המשך בבקשה", "resume", "auto", "Auto, please."):
+        assert critical(s) == "auto", s
+    for s in ("המשך קדימה 5 מטר", "המשך לעקוב אחרי האיש", "resume the scan of the field"):
+        assert critical(s) is None, s
+
+
 def test_everything_else_is_not_critical():
     for t in (
         "what do you see",
@@ -620,6 +649,10 @@ def test_a_copied_few_shot_example_is_an_echo():
     # the example, without its numbers
     assert is_shot_echo("fly", SHOT_MISSIONS[0]) is True
     assert is_shot_echo("fly", [{"type": "delay", "seconds": 0.0}]) is False
+    # a real Hebrew command with the example's number is a plan, not an echo (finding 7)
+    spin20 = [{"type": "spin_by", "degrees": 20}]
+    assert spin20 in SHOT_MISSIONS
+    assert is_shot_echo("סובב את הרחפן ימינה בעשרים מעלות", spin20) is False
 
 
 def test_a_spoken_clear_clears_without_the_model():

@@ -7,6 +7,8 @@ is a False the caller reads; the server's health is on the status panel (the
 supervisor reports it). Temperature is always 0.
 A reply that is not the chat-completions shape (bad JSON, a short read, a missing
 key, null content) is a failed request too, never an exception (review finding R6).
+Each request goes into the perf record with its own time and, when the reply has them,
+llama-server's own times (TIMING_KEYS; owner KI2, 2026-10-01).
 """
 import json
 import time
@@ -15,6 +17,11 @@ import config
 from log.perf import NO_PERF
 from util.guarded import http_request, parse_json
 from util.net import JSON_HEADERS
+
+# llama-server's own times for one request, as its reply names them: the prompt and the
+# generation, in ms, with their token counts; cache_n = the prompt tokens served from
+# its prompt cache (the warm-up puts the planner prompt there)
+TIMING_KEYS = ("cache_n", "prompt_n", "prompt_ms", "predicted_n", "predicted_ms")
 
 
 def _content(body):
@@ -34,6 +41,22 @@ def _content(body):
     if not isinstance(content, str):
         return None
     return content
+
+
+def _timings(body):
+    """The server's TIMING_KEYS from body["timings"], or {} when the reply has none.
+    Next to our own time they show how much of a request is the server's work and how
+    much is the time around it (owner KI2, 2026-10-01). No throw."""
+    timings = body.get("timings") if isinstance(body, dict) else None
+    if not isinstance(timings, dict):
+        return {}
+
+    fields = {}
+    for key in TIMING_KEYS:
+        value = timings.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            fields[key] = round(value, 1)
+    return fields
 
 
 class Gemma:
@@ -59,8 +82,14 @@ class Gemma:
         """POST one chat completion. @label names the caller in the perf record (plan,
         vision). -> (True, reply_text) on success, (False, "") on any failure."""
         t0 = time.monotonic()
-        ok, text = self._request(messages, grammar, max_tokens, timeout_s)
-        self._perf.record("gemma", (time.monotonic() - t0) * 1000, label=label, ok=ok)
+        ok, text, timings = self._request(messages, grammar, max_tokens, timeout_s)
+        self._perf.record(
+            "gemma",
+            (time.monotonic() - t0) * 1000,
+            label=label,
+            ok=ok,
+            **timings
+        )
         return ok, text
 
     def _request(self, messages, grammar, max_tokens, timeout_s):
@@ -79,15 +108,15 @@ class Gemma:
         )
         if code is None:
             print(f"[gemma] request failed: {error}", flush=True)
-            return False, ""
+            return False, "", {}
         if code != 200:
             print(f"[gemma] request failed: HTTP {code}", flush=True)
-            return False, ""
+            return False, "", {}
 
         ok, body = parse_json(raw)
         if not ok:
             print(f"[gemma] reply is not JSON: {body}", flush=True)
-            return False, ""
+            return False, "", {}
 
         text = _content(body)
         if text is None:
@@ -95,5 +124,5 @@ class Gemma:
                 f"[gemma] reply has no choices[0].message.content: {str(body)[:120]}",
                 flush=True
             )
-            return False, ""
-        return True, text.strip()
+            return False, "", {}
+        return True, text.strip(), _timings(body)

@@ -4,6 +4,7 @@ vision flow (main.py), the screen helpers (ui.py), and the status and chat panes
 import glob
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -30,7 +31,15 @@ from app.chat_pane import render_chat
 from app.status_pane import detail_lines, render_status
 from runtime.status import StatusBoard
 from scripted_e2e_run import publish_transcript, speech_publisher
-from support import CAR, GemmaStub, RecordingPhone, StandInBackend, PlannerStub, wait_for
+from support import (
+    CAR,
+    GemmaStub,
+    PlannerStub,
+    RecordingPerf,
+    RecordingPhone,
+    StandInBackend,
+    wait_for,
+)
 
 
 # ==================== main.py: the global keys ====================
@@ -396,20 +405,11 @@ def test_layout_camera_on_top_status_and_chat_below():
     assert np.array_equal(canvas[:720, :, :][400:500, 400:500], disp[400:500, 400:500])
 
 
-class _RecordingPerf:
-    def __init__(self):
-        self.rows = []
-
-    def record(self, stage, ms, **fields):
-        self.rows.append(dict(fields, stage=stage, ms=ms))
-        return
-
-
 def test_every_frame_is_recorded_with_its_parts_and_the_gap():
     """REWRITTEN 2026-09-28 (owner ruling C.1 + V1 a): one "frame" event per frame, not
     one summary per second.
     Was: test_the_frame_record_keeps_the_worst_frame_of_each_second."""
-    perf = _RecordingPerf()
+    perf = RecordingPerf()
     U.record_frame(perf, 10.0, 10.3, 10.32, 10.37, 9.97)   # a slow read, a 400 ms gap
     U.record_frame(perf, 10.37, 10.38, 10.40, 10.41, 10.37)
     assert [r["stage"] for r in perf.rows] == ["frame", "frame"]
@@ -627,6 +627,8 @@ def test_a_line_break_in_a_chat_line_does_not_crash_the_pane():
 # Needs the GPU, a webcam and the mic stack; ~1-5 min. Control is the mock ONLY.
 APP_TEST = os.environ.get("HARDEN2_APP_TEST") == "1"
 ON_SCREEN = os.environ.get("HARDEN2_APP_TEST_SCREEN") == "1"
+# a running app, as `pgrep -f` sees it: "<python> -m app.main", the command at the start
+APP_COMMAND = "^[^ ]*python[^ ]* (.* )?-m app[.]main( |$)"   # interpreter flags allowed
 XVFB_DISPLAY = ":97"
 READY_SECONDS = 420.0      # Gemma and SAM3 load from a cold start
 ANSWER_SECONDS = 120.0
@@ -752,14 +754,17 @@ class _LiveApp:
 
 
 def _gemma_pid():
+    """The pid that listens on Gemma's port, or None. By the port (ss), not by a
+    command-line pattern: a pattern also matches a shell that names the server."""
     r = subprocess.run(
-        ["pgrep", "-f", f"llama-server.*--port {config.LLAMA_SERVER_PORT}"],
+        ["ss", "-ltnpH", f"sport = :{config.LLAMA_SERVER_PORT}"],
         capture_output=True,
         text=True
     )
-    if not r.stdout.split():
+    m = re.search(r"pid=(\d+)", r.stdout)
+    if m is None:
         return None
-    return int(r.stdout.split()[0])
+    return int(m.group(1))
 
 
 @pytest.mark.skipif(
@@ -767,9 +772,17 @@ def _gemma_pid():
     reason="the whole app: GPU, webcam, mic, ~5 min; set HARDEN2_APP_TEST=1"
 )
 def test_app_end_to_end_over_ros(tmp_path):
-    running = subprocess.run(["pgrep", "-f", "app[.]main"], capture_output=True)
-    assert running.returncode == 1, "another app is running: run.sh down first"
-    assert _gemma_pid() is None, "a Gemma server holds the app's port"
+    # each start check names what it found: a 0.18 s failure once lost its reason (KI1).
+    # The pattern is anchored to a real app's command line: a loose "app[.]main" also
+    # matched any shell whose command text named the app (KI1, 2026-10-01).
+    running = subprocess.run(
+        ["pgrep", "-af", APP_COMMAND],
+        capture_output=True,
+        text=True
+    )
+    assert running.returncode == 1, f"another app is running:\n{running.stdout}"
+    gemma_pid = _gemma_pid()
+    assert gemma_pid is None, f"a Gemma server (pid {gemma_pid}) holds the app's port"
     app = _LiveApp(tmp_path)
 
     try:
@@ -796,7 +809,9 @@ def test_app_end_to_end_over_ros(tmp_path):
         assert wait_for(lambda: any("auto:" in b for b in app.commands("/tts")), 10.0)
 
         # Gemma dies: the supervisor restarts it, and it answers again
-        os.kill(_gemma_pid(), signal.SIGKILL)
+        gemma_pid = _gemma_pid()
+        assert gemma_pid is not None, "no Gemma server listens on the app's port"
+        os.kill(gemma_pid, signal.SIGKILL)
         assert wait_for(lambda: "[status] gemma: RECOVERING" in app.output(), 30.0)
         assert wait_for(
             lambda: app.output().count("[status] gemma: UP") == 2,

@@ -159,3 +159,19 @@ class GemmaStub:
 
     def close(self):
         return
+
+
+class RecordingPerf:
+    """Stands in for log.perf.Perf: keeps every recorded row in memory."""
+
+    def __init__(self):
+        self.rows = []
+        return
+
+    def record(self, stage, ms, **fields):
+        self.rows.append(dict(fields, stage=stage, ms=ms))
+        return
+
+    def close(self):
+        """Nothing to release: the rows stay readable."""
+        return

@@ -98,7 +98,11 @@ BYPASS_PATTERNS = [
         _build_move
     ),
     (
-        re.compile(r"^(?:חכה|תחכה|המתן|תמתין)\s+(\d+(?:\.\d+)?)\s+שניות$"),
+        # "stop (there) for 10 seconds" is a wait too (owner STOP1 (3), 2026-10-02)
+        re.compile(
+            r"^(?:חכה|תחכה|המתן|תמתין|עצור|תעצור)(?:\s+שם)?\s+(?:ל-?)?"
+            r"(\d+(?:\.\d+)?)\s+שניות$"
+        ),
         _build_delay
     ),
     (
@@ -113,7 +117,8 @@ def bypass(s):
     m = None
     mission = None
 
-    s = hebnum_to_digits(s).strip().rstrip(".!")
+    # front letters too: "לעשר שניות" -> "ל-10 שניות"
+    s = hebnum_to_digits(s, front_letters=True).strip().rstrip(".!")
     for pattern, build in BYPASS_PATTERNS:
         m = pattern.match(s)
         if not m:

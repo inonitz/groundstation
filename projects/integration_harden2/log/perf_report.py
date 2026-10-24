@@ -17,6 +17,10 @@ PERCENTILES = (25, 50, 75, 95, 99)
 PARTS = {
     "sam3": [("wait_ms", "of which waiting for the lock")],
     "frame": [("read_ms", "read"), ("draw_ms", "draw"), ("show_ms", "show")],
+    "gemma": [
+        ("prompt_ms", "of which the server's prompt"),
+        ("predicted_ms", "of which the server's answer"),
+    ],
 }
 # a field that splits a stage into groups: "gemma (plan)", "e2e (ptt) (command)"
 GROUP_FIELDS = ("label", "kind", "output", "row", "start", "end")
@@ -64,7 +68,11 @@ def stage_table(rows):
             continue
         lines.append(stats_line(key, [r["ms"] for r in group]))
         for field, label in PARTS.get(stage, []):
-            lines.append(stats_line("  " + label, [r.get(field, 0) for r in group]))
+            # only the events that carry the field: a failed Gemma request has no
+            # server times, and a 0 for it would pull the percentiles down
+            values = [r[field] for r in group if field in r]
+            if values:
+                lines.append(stats_line("  " + label, values))
     return lines
 
 

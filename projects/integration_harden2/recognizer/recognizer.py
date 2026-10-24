@@ -1,4 +1,4 @@
-"""The Recognizer: ONE sentence in -> a Routed out (API: docs/api-harden2/recognizer.h).
+"""The Recognizer: ONE sentence in -> a Routed out (API: docs/api-harden2/rev3/recognizer.h).
 It parses EVERY sentence (owner ruling 2026-09-23) in two chained steps
 (owner 2026-09-26, "One should make the decision, one should do the acting"):
 

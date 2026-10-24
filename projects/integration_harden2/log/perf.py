@@ -10,7 +10,9 @@ it times. A part built without one gets NO_PERF, which records nothing (tests, b
 
 Stages: startup (per status row: launch -> the row is first UP; also "imports" and
 "every row"), asr (push-to-talk release -> transcript, mic only), turn (the recognizer's
-handle), gemma (one request; label plan | vision), sam3 (lock wait + forward per pass),
+handle), gemma (one request; label plan | vision; llama-server's own cache_n,
+prompt_n, prompt_ms, predicted_n, predicted_ms when its reply has them), sam3 (lock
+wait + forward per pass),
 highlight_gate / count / describe (vision tasks), say (one speech output), e2e (command
 -> action, ROADMAP: under 1 s: start = the push-to-talk release, a phone transcript, or a
 ROS transcript with no release (the scripted run); end = the command reaches the phone

@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
 from gemma import client, server
+from support import RecordingPerf
 
 
 # ==================== server ====================
@@ -145,3 +146,51 @@ def test_a_malformed_reply_is_a_failed_request_not_an_exception():
         srv.shutdown()
         assert result == (False, ""), bad
     _Chat.reply = good
+
+
+def test_a_request_records_the_server_timings_next_to_its_own_time(monkeypatch):
+    timings = {
+        "cache_n": 2000,
+        "prompt_n": 12,
+        "prompt_ms": 30.04,
+        "predicted_n": 5,
+        "predicted_ms": 70.0,
+        "predicted_per_second": 71.4,
+        "draft_n": True,
+    }
+    body = {"choices": [{"message": {"content": "hello"}}], "timings": timings}
+    monkeypatch.setattr(_Chat, "reply", (json.dumps(body).encode(), 200))
+    perf = RecordingPerf()
+    srv = _serve()
+
+    ok, text = client.Gemma(srv.server_port, perf=perf).request(
+        [{"role": "user", "content": "hi"}],
+        label="plan"
+    )
+    srv.shutdown()
+
+    row = perf.rows[-1]
+    assert ok and text == "hello"
+    assert row["stage"] == "gemma" and row["label"] == "plan" and row["ok"]
+    assert row["cache_n"] == 2000 and row["prompt_n"] == 12 and row["prompt_ms"] == 30.0
+    assert row["predicted_n"] == 5 and row["predicted_ms"] == 70.0
+    assert "predicted_per_second" not in row and "draft_n" not in row
+    assert row["ms"] > 0
+
+
+def test_a_reply_without_timings_records_only_the_own_time(monkeypatch):
+    body = {"choices": [{"message": {"content": "hello"}}]}
+    monkeypatch.setattr(_Chat, "reply", (json.dumps(body).encode(), 200))
+    perf = RecordingPerf()
+    srv = _serve()
+    client.Gemma(srv.server_port, perf=perf).request([{"role": "user", "content": "hi"}])
+    srv.shutdown()
+
+    row = perf.rows[-1]
+    assert row["ok"] and row["ms"] > 0
+    assert not any(key in row for key in client.TIMING_KEYS)
+
+
+def test_a_true_or_false_timing_is_not_recorded_as_a_number():
+    body = {"timings": {"prompt_ms": True, "prompt_n": 3}}
+    assert client._timings(body) == {"prompt_n": 3}

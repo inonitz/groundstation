@@ -38,7 +38,7 @@ in place. Python talks to the phone app's frozen ApiServer — no C++ FMU engine
 | gemma/ | keeps the ONE Gemma server alive (server.py) and gives the one client to it (client.py) |
 | runtime/ | fatal.py (die + crash hooks), status.py (Status: a row its owner sets; StatusBoard: asks each part for its rows), supervisor.py (ProcessSpec -> Process handle that owns its row; restarts, waits or dies), ros.py (the ONE ROS2 context + Subscription) |
 | config/ | constants.py (baked values) + defaults.py (env-overridable); the one home of every setting |
-| test/ | one test file per module: app, audio, control, dji_app, gemma, log, perception2, recognizer, system, util, video |
+| test/ | one test file per module: app, audio, control, dji_app, gemma, keys, log, perception2, recognizer, runtime, sam3, util, video |
 | top-level | run.sh (launches the app: `python3 -m app.main`) |
 
 ## Data flow
