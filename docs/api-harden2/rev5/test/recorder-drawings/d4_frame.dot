@@ -1,0 +1,39 @@
+digraph d4 { rankdir=TB; splines=ortho; compound=true; nodesep=1.1; ranksep=1.0;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_sam { label="THE SAM3 SERVER PROCESS"; fontsize=12; style="rounded"; color="#666666";
+    sam [label="reads the same slot (inherited descriptor)\n• detects; its reply carries boxes and masks\n~ sam3_server.h (module 06)", fillcolor="#f2f2f2"];
+  }
+  subgraph cluster_proc { label="THE APP PROCESS"; fontsize=12; style="rounded"; color="#666666";
+    fb [label="THE FRAME BUFFER, its own component (04)\n• one shared-memory block (memfd), 12 frame slots\n• the frame source writes; readers hold a slot\n~ framebuffer.h", fillcolor="#fde2c8"];
+    subgraph cluster_j { label="one vision job thread (up to 8 such lanes)"; style="rounded"; color="#999999";
+      acq [label="hold the frame buffer's latest slot\n~ FramebufferAcquireLatest", fillcolor="#dbe9f6"];
+      req [label="send the detect request to the SAM3 server\n• the reply brings the masks into this thread's memory\n• the server reads the slot from the shared block\n~ Sam3ServerSendDetectRequest", fillcolor="#dbe9f6"];
+      call [label="record the frame, then each mask\n• a view of the pixels, a folder, a name, a time stamp\n~ RecordFrame(FrameView)", fillcolor="#dbe9f6"];
+      chk [label="the checks\n• no pools, under reserve, wrong size: a result code\n~ RecordResult", fillcolor="#dbe9f6"];
+      claim [label="take a free buffer from the pool's free list\n• pop under the free list's lock; none: drop, count\n~ ImageBufferPoolTakeFree", fillcolor="#dbe9f6"];
+      copy [label="copy the pixels into a pool buffer\n• from the held shared slot into the recorder's memory", fillcolor="#dbe9f6"];
+      pub [label="enqueue the buffer; release the shared slot\n• index on the work queue; stamp; wake the writer\n~ ImageBufferPoolEnqueueFilled", fillcolor="#dbe9f6"];
+      spR [style=invis, width=0.1, label=""];
+      {rank=same; copy; spR;}
+      acq -> req -> call -> chk -> claim -> copy -> pub [weight=20];
+    }
+    pool [label="THE RECORDER'S BUFFER POOL: 8 frames, 24 masks\n• a free list and a work queue, each under its own lock\n• many producers (the jobs), one consumer (the writer)\n~ ImageBufferPool.m_freeList, m_workQueue", fillcolor="#e9d8f2"];
+    subgraph cluster_w { label="the writer thread"; style="rounded"; color="#999999";
+      cv [label="the wake flag\n~ RecordWriter.m_wakeFlag", fillcolor="#d8efd8"];
+      take [width=4.8, label="peek the oldest filled buffer\n• the front, under the work queue's lock\n~ ImageBufferPoolPeekFilled", fillcolor="#d8efd8"];
+      png [label="encode the pool buffer to a PNG, once\n• exclusive create; a clash counted; result kept\n~ PngOnDiskStatus, RECORD_PNG_OPEN_FLAGS", fillcolor="#d8efd8"];
+      line [label="append the frame line to the file\n~ LINE_FRAME", fillcolor="#f6e7c1"];
+      rel [label="dequeue it; return it to the free list above\n• after the frame line; a failed append leaves it there\n~ ImageBufferPoolDequeueFilled, ReturnFree", fillcolor="#d8efd8"];
+      {rank=same; cv; take;}
+      cv -> take [label="wait returns"];
+      take -> png -> line -> rel [weight=20];
+    }
+  }
+  fb -> acq [label="acquire latest, release", style=dashed];
+  fb -> sam [label="the same block, read-only", style=dashed];
+  claim -> pool [label="take free", style=dashed, tailport=e, headport=e];
+  pub -> pool [label="enqueue filled", style=dashed];
+  pub -> cv [label="set the flag ~ OsEventSet"];
+  pool -> take [label="peek filled", style=dashed];
+}

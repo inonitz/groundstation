@@ -1,0 +1,29 @@
+digraph d6 { rankdir=TB; splines=ortho; compound=true; nodesep=0.8; ranksep=1.0;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_proc { label="ONE PROCESS: who counts what, who reads it"; fontsize=12; style="rounded"; color="#666666";
+    subgraph cluster_r { label="a recording thread"; style="rounded"; color="#999999";
+      r1 [label="a push into a full queue\n• count the drop in my own statistics; the hole becomes a drop line\n~ RecordingThreadCountDroppedRecord", fillcolor="#dbe9f6"];
+    }
+    subgraph cluster_j { label="a vision job thread"; style="rounded"; color="#999999";
+      j1 [label="no free buffer, or under reserve\n• count the drop in my own statistics; the hole becomes a drop line\n~ RecordingThreadCountDroppedRecord", fillcolor="#dbe9f6"];
+    }
+    subgraph cluster_w { label="the writer thread"; style="rounded"; color="#999999";
+      w1 [label="a failed append, a PNG name clash\n• add 1; store 'last write failed'\n~ m_failedWrites, m_pngNameClashes", fillcolor="#d8efd8"];
+      w2 [label="every 5 s: the free space\n• store free GiB; store 'under reserve'\n~ mb_underReserve, m_freeGiB", fillcolor="#d8efd8"];
+      w3 [label="end of each pass\n• take every statistics; sum; a fault line per change\n~ RecordingThreadStatistics, LINE_FAULT", fillcolor="#d8efd8"];
+    }
+    counters [label="the health counters: atomic, one writer\n• the statistics: one short mutex each\n~ RecorderHealth, RecordingThreadStatistics", fillcolor="#e9d8f2"];
+    subgraph cluster_m { label="the main thread, each frame"; style="rounded"; color="#999999";
+      m1 [label="read the health\n• load every counter; stalled = a frame waited over 5 s\n~ RecorderReadHealth, WriterIsStalled", fillcolor="#f6e7c1"];
+      m2 [label="the status row on the screen\n• drops, failed appends, stalled, under reserve", fillcolor="#f6e7c1"];
+      m1 -> m2;
+    }
+  }
+  r1 -> counters [label="summed by the writer", style=dashed];
+  j1 -> counters [label="summed by the writer", style=dashed];
+  w1 -> counters [label="add 1, store"];
+  w2 -> counters [label="store"];
+  w3 -> counters [label="add the sums, store"];
+  counters -> m1 [label="load"];
+}

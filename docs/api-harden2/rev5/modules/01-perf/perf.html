@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>perf Module Drawing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: one wide diagram in its own scroll box, then two reference tables; a runtime map, not a brochure */
+:root {
+  --bg: #f5f7f6; --fg: #1a1f24; --muted: #5a6572; --line: #c3cbd3; --box: #ffffff; --main: #e4eff1;
+  --msg: #0e7c8b; --queue: #6b7680; --http: #6a4ec2; --ros: #2f8f5b; --shm: #b4761a; --sig: #8a6d3b;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15191d; --fg: #e4e8ec; --muted: #9ba6b1; --line: #3b454f; --box: #1e252c; --main: #1f3137;
+  --msg: #4fc6d6; --queue: #9aa5b0; --http: #a993f2; --ros: #6fcf97; --shm: #e3a94c; --sig: #cfae76; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15191d; --fg: #e4e8ec; --muted: #9ba6b1; --line: #3b454f; --box: #1e252c; --main: #1f3137;
+  --msg: #4fc6d6; --queue: #9aa5b0; --http: #a993f2; --ros: #6fcf97; --shm: #e3a94c; --sig: #cfae76; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 40px; }
+.wrap { max-width: 1400px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; text-wrap: balance; }
+h2 { font-size: 17px; font-weight: 600; margin: 28px 0 8px; }
+.sub { color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--box); }
+svg { display: block; min-width: 1400px; width: 100%; height: auto; font-family: var(--font); }
+svg text { fill: var(--fg); font-size: 13px; }
+svg .t { font-weight: 600; font-size: 14px; }
+svg .s { fill: var(--muted); font-size: 12px; }
+svg .mono { font-family: var(--mono); font-size: 12px; }
+svg .proc { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 4; }
+svg .box { fill: var(--box); stroke: var(--line); stroke-width: 1.2; }
+svg .mainbox { fill: var(--main); stroke: var(--msg); stroke-width: 1.6; }
+svg .inbox { fill: var(--box); stroke: var(--msg); stroke-width: 2; }
+svg .pill { fill: var(--bg); stroke: var(--queue); stroke-width: 1; }
+svg .outside { fill: var(--box); stroke: var(--fg); stroke-width: 1.2; }
+svg .changed { stroke: var(--shm); stroke-width: 2.4; stroke-dasharray: none; }
+svg .delta { fill: var(--shm); font-weight: 600; font-size: 13px; }
+svg .shmbox { fill: var(--box); stroke: var(--shm); stroke-width: 2; }
+svg .l-msg { fill: none; stroke: var(--msg); stroke-width: 2; }
+svg .l-queue { fill: none; stroke: var(--queue); stroke-width: 1.6; }
+svg .l-http { fill: none; stroke: var(--http); stroke-width: 1.8; }
+svg .l-ros { fill: none; stroke: var(--ros); stroke-width: 1.8; stroke-dasharray: 7 4; }
+svg .l-shm { fill: none; stroke: var(--shm); stroke-width: 3; }
+svg .l-sig { fill: none; stroke: var(--sig); stroke-width: 1.4; stroke-dasharray: 2 4; }
+svg .mk-msg { fill: var(--msg); } svg .mk-queue { fill: var(--queue); } svg .mk-http { fill: var(--http); }
+svg .mk-ros { fill: var(--ros); } svg .mk-shm { fill: var(--shm); } svg .mk-sig { fill: var(--sig); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+td code, .k { font-family: var(--mono); font-size: 13px; }
+.tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+.tables > div { min-width: 0; overflow-x: auto; }
+.note { color: var(--muted); font-size: 13px; }
+</style>
+<style>svg { min-width: 1400px; } svg .l-msg, svg .l-queue, svg .l-shm { fill: none; stroke-width: 1.6; } svg .l-msg { stroke: var(--msg); } svg .l-queue { stroke: var(--queue); } svg .l-shm { stroke: var(--shm); }</style>
+</head><body><div class="wrap">
+<h1>perf: one tracer per process, a ring per thread (rev5 module drawing, 2026-10-12)</h1>
+<p class="sub">The document is perf.md; the header is perf.h. A thread records into its own ring. A writer thread drains every ring to a file. The report merges the files by the shared clock.</p>
+<div class="scroll">
+<svg viewBox="0 0 1400 820" xmlns="http://www.w3.org/2000/svg">
+<text class="s" x="60" y="552">1  a thread takes PerfNow() before and after a step, then calls PerfRecord once</text>
+<text class="s" x="60" y="570">2  the record goes into that thread's own ring: one producer, one consumer, no lock</text>
+<text class="s" x="60" y="588">3  the writer thread drains every ring every 5 s and appends the file: one write, one fsync</text>
+<text class="s" x="60" y="606">4  the report reads every file of the session and merges by the shared clock</text>
+<rect class="proc" x="30" y="30" width="860" height="632"/>
+<text class="t" x="44" y="56">THE APP PROCESS</text>
+<text class="s" x="200" y="56">one tracer: PerfCreate(session, "app") first, PerfDestroy last</text>
+<text class="s" x="60" y="78">1  threads that record</text>
+<text class="s" x="350" y="78">2  one ring per thread</text>
+<text class="s" x="560" y="78">3  one writer thread</text>
+<rect class="box" x="60" y="90" width="230" height="44"/><text class="t" x="70" y="108">main thread</text><text class="s" x="70" y="125">frame, gpu, startup, e2e</text><path class="l-msg" d="M290,112 H350"/><rect class="pill" x="350" y="96" width="150" height="32"/><text class="mono" x="360" y="116">ring 0</text><path class="l-queue" d="M500,112 H560"/><rect class="box" x="60" y="144" width="230" height="44"/><text class="t" x="70" y="162">frame source</text><text class="s" x="70" y="179">frame read</text><path class="l-msg" d="M290,166 H350"/><rect class="pill" x="350" y="150" width="150" height="32"/><text class="mono" x="360" y="170">ring 1</text><path class="l-queue" d="M500,166 H560"/><rect class="box" x="60" y="198" width="230" height="44"/><text class="t" x="70" y="216">recognizer worker</text><text class="s" x="70" y="233">turn, llama request</text><path class="l-msg" d="M290,220 H350"/><rect class="pill" x="350" y="204" width="150" height="32"/><text class="mono" x="360" y="224">ring 2</text><path class="l-queue" d="M500,220 H560"/><rect class="box" x="60" y="252" width="230" height="44"/><text class="t" x="70" y="270">platform worker</text><text class="s" x="70" y="287">dji request</text><path class="l-msg" d="M290,274 H350"/><rect class="pill" x="350" y="258" width="150" height="32"/><text class="mono" x="360" y="278">ring 3</text><path class="l-queue" d="M500,274 H560"/><rect class="box" x="60" y="306" width="230" height="44"/><text class="t" x="70" y="324">emergency thread</text><text class="s" x="70" y="341">emergency</text><path class="l-msg" d="M290,328 H350"/><rect class="pill" x="350" y="312" width="150" height="32"/><text class="mono" x="360" y="332">ring 4</text><path class="l-queue" d="M500,328 H560"/><rect class="box" x="60" y="360" width="230" height="44"/><text class="t" x="70" y="378">voice workers x2</text><text class="s" x="70" y="395">say</text><path class="l-msg" d="M290,382 H350"/><rect class="pill" x="350" y="366" width="150" height="32"/><text class="mono" x="360" y="386">rings 5, 6</text><path class="l-queue" d="M500,382 H560"/><rect class="box" x="60" y="414" width="230" height="44"/><text class="t" x="70" y="432">job pool x8</text><text class="s" x="70" y="449">sam3 request, gate, count</text><path class="l-msg" d="M290,436 H350"/><rect class="pill" x="350" y="420" width="150" height="32"/><text class="mono" x="360" y="440">rings 7 to 14</text><path class="l-queue" d="M500,436 H560"/><rect class="box" x="60" y="468" width="230" height="44"/><text class="t" x="70" y="486">supervisor thread</text><text class="s" x="70" y="503">startup restart</text><path class="l-msg" d="M290,490 H350"/><rect class="pill" x="350" y="474" width="150" height="32"/><text class="mono" x="360" y="494">ring 15</text><path class="l-queue" d="M500,490 H560"/>
+<rect class="mainbox" x="560" y="90" width="200" height="422"/>
+<text class="t" x="572" y="114">writer thread</text>
+<text x="572" y="140">every 5 s:</text>
+<text x="572" y="158">drain each ring</text>
+<text x="572" y="176">encode JSON lines</text>
+<text x="572" y="194">one write, one fsync</text>
+<text class="s" x="572" y="230">a full ring drops the</text>
+<text class="s" x="572" y="248">new record and counts</text>
+<text class="s" x="572" y="284">PerfFlush: the same,</text>
+<text class="s" x="572" y="302">now, from the caller</text>
+<text class="s" x="572" y="338">die(): PerfFlush after</text>
+<text class="s" x="572" y="356">stop, manual, notify;</text>
+<text class="s" x="572" y="374">1 s timeout on the lock</text>
+<text class="s" x="572" y="410">Destroy: wake, join,</text>
+<text class="s" x="572" y="428">drain once more, close</text>
+<path class="l-queue" d="M660,512 V642"/>
+<rect class="outside" x="560" y="642" width="300" height="70"/>
+<text class="t" x="572" y="664">perf-app-&lt;pid&gt;.jsonl</text>
+<text class="mono" x="572" y="684">k: clock | thread | drop | rec</text>
+<text class="s" x="572" y="702">the clock line first</text>
+<rect class="proc" x="920" y="30" width="450" height="632"/>
+<text class="t" x="934" y="56">THE SAM3 PROCESS</text>
+<text class="s" x="1100" y="56">the same module, its own tracer</text>
+<rect class="box" x="940" y="90" width="200" height="44"/>
+<text class="t" x="950" y="108">server thread</text>
+<text class="s" x="950" y="125">sam3 pass: req, wait</text>
+<path class="l-msg" d="M1140,112 H1170"/>
+<rect class="pill" x="1170" y="96" width="150" height="32"/>
+<text class="mono" x="1180" y="116">ring 0</text>
+<path class="l-queue" d="M1245,128 V200"/>
+<rect class="mainbox" x="1150" y="200" width="200" height="60"/>
+<text class="t" x="1162" y="222">writer thread</text>
+<text x="1162" y="242">every 5 s, one fsync</text>
+<path class="l-queue" d="M1245,260 V642"/>
+<rect class="outside" x="1060" y="642" width="290" height="70"/>
+<text class="t" x="1072" y="664">perf-sam3-&lt;pid&gt;.jsonl</text>
+<text class="s" x="1072" y="684">the pid in the name: a restart</text>
+<text class="s" x="1072" y="702">never overwrites the first file</text>
+<path class="l-shm" d="M710,712 V752"/>
+<path class="l-shm" d="M1205,712 V737 H850 V752"/>
+<rect class="inbox" x="600" y="752" width="300" height="60"/>
+<text class="t" x="612" y="774">4  run.sh perf, the report</text>
+<text x="612" y="794">merges by the clock; percentiles</text>
+</svg>
+</div></div></body></html>

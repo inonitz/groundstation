@@ -1,0 +1,21 @@
+digraph d1 { rankdir=TB; splines=ortho; compound=true; nodesep=0.8; ranksep=1.0;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_proc { label="ONE PROCESS (the app, or the SAM3 server)"; fontsize=12; style="rounded"; color="#666666";
+    subgraph cluster_t { label="one recording thread (up to 16 such lanes)"; style="rounded"; color="#999999";
+      call [label="the call\n• a stage, two time stamps, typed fields\n~ RecordSpan / RecordEvent", fillcolor="#dbe9f6"];
+      prod [label="this thread's entry of the thread table\n• registered at the thread's start; the 17th dies\n~ RecorderRegisterThread", fillcolor="#dbe9f6"];
+      q [label="bounded SPSC queue, one per thread\n• push at the back; full: count the drop\n~ RecordingThread.m_recordsToWriter", fillcolor="#e9d8f2"];
+      half [label="half full crossed by this push?\n• yes: notify the writer, once per crossing\n~ RecordingThreadWakeWriterIfHalfFull", fillcolor="#dbe9f6"];
+      call -> prod [label="its entry"];
+      prod -> q [label="push ~ RecordingThreadPushSpan"];
+      q -> half [label="count before, count after"];
+    }
+    subgraph cluster_w { label="the writer thread (one per process)"; style="rounded"; color="#999999";
+      cv [label="condition variable, notify remembered\n• the writer waits here, timeout 5 s\n~ RecordWriter.m_wakeFlag", fillcolor="#d8efd8"];
+      pass [label="one pass over every queue and pool\n• front, pop from each queue; drawing 2\n~ RecordWriterRun", fillcolor="#d8efd8"];
+      cv -> pass [label="wait returns"];
+    }
+  }
+  half -> cv [label="notify ~ OsEventSet", constraint=false];
+}

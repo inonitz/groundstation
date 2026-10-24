@@ -4,20 +4,32 @@ One C header per module of `projects/integration_harden2`. The Python modules mi
 and boundaries. Purpose (owner 2026-09-26): the owner reads the design here; every Python API
 change updates its header in the same change, so the two never disagree. SERVICES are built first and handed to the MODULES' constructors (app.h).
 
+The owner's terms (definitions 2026-09-27; ruling 1.8.2): a SERVICE is a module that a system or another
+module depends on; it starts once and is handed to whoever needs it. A SYSTEM is a group of modules with
+one purpose; a service may serve several systems (Gemma serves the recognizer and perception).
+
+Services (built first, in this order of the table):
+
 | header | module | owns |
 |---|---|---|
 | runtime.h | runtime/ | the start-up dependency check, die, the status rows (each part owns its row; the board asks each part), supervisor (ProcessSpec -> Process handle), the ROS2 context + Subscription |
-| util.h | util/ | the guarded third-party calls (the only try/except), net, process, hebrew, mission helpers |
-| dji_app.h | dji_app/ | the phone app (or mock): commands, /tts, the transmit switch, its one status |
-| gemma.h | gemma/ | the Gemma server's life, and one request call |
-| audio.h | audio/ | mic ASR, phone speech in, speech out (phone or laptop) |
-| video.h | video/ | the one frame source and its stall guard |
-| sam3.h | sam3/ | the SAM3 service: the backend contract, the loader (its "sam3" row), the SAM3 model |
-| perception.h | perception2/ | the vision system: the priority lock, count / highlight / describe tasks (uses sam3.h) |
-| control.h | control/ | executes flight: critical commands, missions, the transmit switch |
-| recognizer.h | recognizer/ | parses every sentence (fast path first) and routes it |
 | log.h | log/ | the session record (checked once at start, no status row), the timings (perf), the read-only tools |
-| app.h | app/, keys/ | start order, transcript -> actions, the global keys (keys/: F1 quit, F2 clear, F4 kill), the UI, the scripted run (test/scripted_e2e_run.py) |
+| gemma.h | gemma/ | the Gemma server's life, and one request call |
+| sam3.h | sam3/ | the SAM3 service: the backend contract, the loader (its "sam3" row), the SAM3 model |
+| dji_app.h | dji_app/ | the phone app (or mock): commands, /tts, the transmit switch, its one status |
+| video.h | video/ | the one frame source and its stall guard (not named in 1.8.2; perception and the screen depend on it) |
+
+Systems (each gets its services in its constructor):
+
+| header | system | module | owns |
+|---|---|---|---|
+| recognizer.h | recognizer | recognizer/ | parses every sentence (fast path first) and routes it |
+| perception.h | perception | perception2/ | the vision system: the priority lock, count / highlight / describe tasks (uses sam3.h) |
+| control.h | flight | control/ | executes flight: critical commands, missions, the transmit switch |
+| audio.h | speech | audio/ | mic ASR, phone speech in, speech out (phone or laptop) |
+| app.h | screen | app/, keys/ | start order, transcript -> actions, the global keys (keys/: F1 quit, F2 clear, F4 kill), the UI, the scripted run (test/scripted_e2e_run.py) |
+
+Shared helpers: util.h (util/), used by services and systems alike.
 
 config/ has no header: it holds every constant and start-up value the structs above are filled from.
 

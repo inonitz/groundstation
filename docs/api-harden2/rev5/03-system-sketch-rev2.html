@@ -1,0 +1,264 @@
+<title>harden2 Sketch Rev 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: one wide diagram in its own scroll box, then two reference tables; a runtime map, not a brochure */
+:root {
+  --bg: #f5f7f6; --fg: #1a1f24; --muted: #5a6572; --line: #c3cbd3; --box: #ffffff; --main: #e4eff1;
+  --msg: #0e7c8b; --queue: #6b7680; --http: #6a4ec2; --ros: #2f8f5b; --shm: #b4761a; --sig: #8a6d3b;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15191d; --fg: #e4e8ec; --muted: #9ba6b1; --line: #3b454f; --box: #1e252c; --main: #1f3137;
+  --msg: #4fc6d6; --queue: #9aa5b0; --http: #a993f2; --ros: #6fcf97; --shm: #e3a94c; --sig: #cfae76; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15191d; --fg: #e4e8ec; --muted: #9ba6b1; --line: #3b454f; --box: #1e252c; --main: #1f3137;
+  --msg: #4fc6d6; --queue: #9aa5b0; --http: #a993f2; --ros: #6fcf97; --shm: #e3a94c; --sig: #cfae76; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 40px; }
+.wrap { max-width: 1400px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; text-wrap: balance; }
+h2 { font-size: 17px; font-weight: 600; margin: 28px 0 8px; }
+.sub { color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--box); }
+svg { display: block; min-width: 1400px; width: 100%; height: auto; font-family: var(--font); }
+svg text { fill: var(--fg); font-size: 13px; }
+svg .t { font-weight: 600; font-size: 14px; }
+svg .s { fill: var(--muted); font-size: 12px; }
+svg .mono { font-family: var(--mono); font-size: 12px; }
+svg .proc { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 4; }
+svg .box { fill: var(--box); stroke: var(--line); stroke-width: 1.2; }
+svg .mainbox { fill: var(--main); stroke: var(--msg); stroke-width: 1.6; }
+svg .inbox { fill: var(--box); stroke: var(--msg); stroke-width: 2; }
+svg .pill { fill: var(--bg); stroke: var(--queue); stroke-width: 1; }
+svg .outside { fill: var(--box); stroke: var(--fg); stroke-width: 1.2; }
+svg .changed { stroke: var(--shm); stroke-width: 2.4; stroke-dasharray: none; }
+svg .delta { fill: var(--shm); font-weight: 600; font-size: 13px; }
+svg .shmbox { fill: var(--box); stroke: var(--shm); stroke-width: 2; }
+svg .l-msg { fill: none; stroke: var(--msg); stroke-width: 2; }
+svg .l-queue { fill: none; stroke: var(--queue); stroke-width: 1.6; }
+svg .l-http { fill: none; stroke: var(--http); stroke-width: 1.8; }
+svg .l-ros { fill: none; stroke: var(--ros); stroke-width: 1.8; stroke-dasharray: 7 4; }
+svg .l-shm { fill: none; stroke: var(--shm); stroke-width: 3; }
+svg .l-sig { fill: none; stroke: var(--sig); stroke-width: 1.4; stroke-dasharray: 2 4; }
+svg .mk-msg { fill: var(--msg); } svg .mk-queue { fill: var(--queue); } svg .mk-http { fill: var(--http); }
+svg .mk-ros { fill: var(--ros); } svg .mk-shm { fill: var(--shm); } svg .mk-sig { fill: var(--sig); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+td code, .k { font-family: var(--mono); font-size: 13px; }
+.tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+.tables > div { min-width: 0; overflow-x: auto; }
+.note { color: var(--muted); font-size: 13px; }
+</style>
+<div class="wrap">
+<h1>harden2 Sketch Rev 2</h1>
+<p class="sub">rev5, step 1, the sketch after your answers of 2026-10-06. Boxes with an amber outline and a Δ changed since the first sketch. The table under the drawing lists every change. From <code class="k">01-system-sketch.md</code>, sections 10 to 11.</p>
+
+<div class="scroll">
+<svg viewBox="0 0 1700 1060" role="img" aria-label="The harden2 runtime after the owner's answers: three listeners, one message queue, the main thread, two queues to two workers, a FIFO per voice, a thread pool for the vision jobs, a shared-memory frame buffer with atomic counters, status rows read each frame, and the outside processes">
+<defs>
+  <marker id="m-msg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="mk-msg" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="m-queue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-queue" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="m-http" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-http" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="m-ros" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-ros" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="m-shm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-shm" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="m-sig" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-sig" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+
+<!-- the app process -->
+<rect class="proc" x="20" y="40" width="1130" height="990" rx="12"/>
+<text class="t" x="36" y="64">THE APP PROCESS</text>
+<text class="s mono" x="36" y="82">python3 -m app.main</text>
+
+<!-- the rule and the legend -->
+<rect class="box" x="50" y="100" width="520" height="250" rx="8"/>
+<text class="t" x="70" y="126">The rule, and the lines</text>
+<text x="70" y="152">Only the main thread changes app state. Every other thread</text>
+<text x="70" y="172">produces a message, or takes work from a queue it filled.</text>
+<path class="l-msg" d="M70,202 H130" marker-end="url(#m-msg)"/><text x="145" y="206">a message into the queue (multi-producer, one consumer)</text>
+<path class="l-queue" d="M70,226 H130" marker-end="url(#m-queue)"/><text x="145" y="230">a FIFO queue to a worker thread</text>
+<path class="l-http" d="M70,250 H130" marker-end="url(#m-http)"/><text x="145" y="254">HTTP, a TCP line, or the SAM3 socket</text>
+<path class="l-ros" d="M70,274 H130" marker-end="url(#m-ros)"/><text x="145" y="278">a ROS2 topic</text>
+<path class="l-shm" d="M70,298 H130" marker-end="url(#m-shm)"/><text x="145" y="302">shared memory with C11 atomics</text>
+<path class="l-sig" d="M70,322 H130" marker-end="url(#m-sig)"/><text x="145" y="326">a variable written atomically, read each frame</text>
+
+<!-- the status rows -->
+<rect class="box changed" x="600" y="240" width="290" height="90" rx="8"/>
+<text class="delta" x="866" y="262">Δ</text>
+<text class="t" x="614" y="264">STATUS ROWS</text>
+<text class="s" x="614" y="283">one row per part: (name, state, detail)</text>
+<text class="s" x="614" y="300">written by its owner with an atomic store</text>
+<text class="s" x="614" y="317">read by the main thread each frame</text>
+<path class="l-sig" d="M735,330 V398" marker-end="url(#m-sig)"/>
+<text class="s" x="745" y="370">changed → a chat line</text>
+
+<!-- the producer threads -->
+<rect class="box" x="920" y="60" width="230" height="60" rx="6"/>
+<text class="t" x="934" y="84">keys listener</text><text class="s mono" x="934" y="104">ROS spin → Key</text>
+<rect class="box" x="920" y="140" width="230" height="60" rx="6"/>
+<text class="t" x="934" y="164">mic listener</text><text class="s mono" x="934" y="184">ROS spin → Transcript</text>
+<rect class="box changed" x="920" y="220" width="230" height="60" rx="6"/>
+<text class="delta" x="1128" y="240">Δ</text>
+<text class="t" x="934" y="244">phone listener</text><text class="s mono" x="934" y="264">TCP line only → Transcript</text>
+<rect class="box changed" x="920" y="300" width="230" height="60" rx="6"/>
+<text class="delta" x="1128" y="320">Δ</text>
+<text class="t" x="934" y="324">supervisor thread</text><text class="s mono" x="934" y="344">SIGCHLD → its queue → rows</text>
+<path class="l-sig" d="M920,330 H900 V285 H892" marker-end="url(#m-sig)"/>
+
+<!-- the bus from the producers to the message queue -->
+<path class="l-msg" d="M920,90 H900 V375 H170 V398" marker-end="url(#m-msg)"/>
+<path class="l-msg" d="M920,170 H900"/>
+<path class="l-msg" d="M920,250 H900"/>
+
+<!-- the message queue -->
+<rect class="inbox" x="50" y="400" width="240" height="420" rx="10"/>
+<text class="t" x="70" y="428">MESSAGE QUEUE</text>
+<text class="s" x="70" y="450">multi-producer, one consumer,</text>
+<text class="s" x="70" y="468">bounded, arrival order</text>
+<text class="mono" x="70" y="506">Key</text>
+<text class="mono" x="70" y="530">Transcript</text>
+<text class="mono" x="70" y="554">Decision</text>
+<text class="mono" x="70" y="578">PlatformReply</text>
+<text class="mono" x="70" y="602">VisionResult</text>
+<text class="s" x="70" y="650">under one message per frame</text>
+<text class="s" x="70" y="760">producers: five threads, plus</text>
+<text class="s" x="70" y="780">the job threads; one consumer</text>
+
+<!-- queue to main -->
+<path class="l-msg" d="M290,520 H328" marker-end="url(#m-msg)"/>
+<text class="s" x="296" y="510">drain</text>
+
+<!-- the main thread -->
+<rect class="mainbox" x="330" y="400" width="820" height="240" rx="10"/>
+<text class="t" x="350" y="428">MAIN THREAD, the one owner of app state. Every frame, 33 ms:</text>
+<text class="mono" x="350" y="454">1  drain the queue; act on each message:</text>
+<text class="mono" x="350" y="474">   Transcript      → the trigger table (pure): emergency, manual, auto, clear → act now</text>
+<text class="mono" x="350" y="494">                     emergency = STOP in manual, HALT in auto; anything else → the route queue</text>
+<text class="mono" x="350" y="514">   Decision        → mission → the command queue (409 if manual) | vision → start a job | reject → say</text>
+<text class="mono" x="350" y="534">   PlatformReply   → the turn's status → say → telemetry(turn) → perf(E2E)</text>
+<text class="mono" x="350" y="554">   VisionResult    → the job's view → say | telemetry(job) at an end state</text>
+<text class="mono" x="350" y="574">   Key             → F1 quit · F2 stop every job · F4 manual (+ stop) · F5 release = the ASR mark</text>
+<text class="mono" x="350" y="594">2  read the status rows; a changed state → a chat line        say = append to EVERY voice's FIFO</text>
+<text class="mono" x="350" y="614">3  draw: the latest frame + views + the panes      4  waitKey(1)</text>
+<text class="s" x="350" y="632">state owned here: manual, the turns, the views, the chat, the last-drawn rows, quit</text>
+
+<!-- the queues between the main thread and the workers -->
+<path class="l-queue" d="M425,640 V678" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M635,640 V678" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M845,640 V678" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M1045,640 V678" marker-end="url(#m-queue)"/>
+<rect class="pill changed" x="330" y="680" width="190" height="28" rx="14"/><text class="s mono" x="352" y="698">FIFO ×2, no cutting</text>
+<rect class="pill" x="560" y="680" width="150" height="28" rx="14"/><text class="s mono" x="575" y="698">route FIFO</text>
+<rect class="pill" x="725" y="680" width="250" height="28" rx="14"/><text class="s mono" x="740" y="698">priority queue, emergency 1st</text>
+<rect class="pill" x="985" y="680" width="140" height="28" rx="14"/><text class="s mono" x="985" y="698">submit(job)</text>
+<path class="l-queue" d="M425,708 V738" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M635,708 V738" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M845,708 V738" marker-end="url(#m-queue)"/>
+<path class="l-queue" d="M1045,708 V738" marker-end="url(#m-queue)"/>
+
+<!-- the workers -->
+<rect class="box changed" x="330" y="740" width="190" height="70" rx="6"/>
+<text class="delta" x="498" y="760">Δ</text>
+<text class="t" x="344" y="762">voice workers ×2</text><text class="s" x="344" y="781">speaks its FIFO in order</text><text class="s" x="344" y="798">all sentences, both voices</text>
+<rect class="box" x="540" y="740" width="190" height="70" rx="6"/>
+<text class="t" x="554" y="762">recognizer worker</text><text class="s" x="554" y="781">the route is pure functions</text><text class="s" x="554" y="798">a plan blocks 0.5-1.5 s</text>
+<rect class="box" x="750" y="740" width="190" height="70" rx="6"/>
+<text class="t" x="764" y="762">platform worker ×1</text><text class="s" x="764" y="781">sends in order</text><text class="s" x="764" y="798">HTTP blocks up to 3 s</text>
+<rect class="box" x="960" y="740" width="170" height="70" rx="6"/>
+<text class="t" x="974" y="762">thread pool (8)</text><text class="s" x="974" y="781">the 9th job is refused</text><text class="s" x="974" y="798">a stop flag per job</text>
+
+<!-- results back into the queue -->
+<path class="l-msg" d="M570,810 V860 H170 V822" marker-end="url(#m-msg)"/>
+<path class="l-msg" d="M780,810 V860"/>
+<path class="l-msg" d="M990,810 V860"/>
+<text class="s mono" x="580" y="846">Decision</text>
+<text class="s mono" x="790" y="846">PlatformReply</text>
+<text class="s mono" x="1000" y="846">VisionResult</text>
+
+<!-- the workers reach outside -->
+<path class="l-http" d="M490,810 V890 H1170 V250 H1218" marker-end="url(#m-http)"/>
+<path class="l-http" d="M700,810 V890"/>
+<path class="l-http" d="M930,810 V890"/>
+<path class="l-http" d="M1120,810 V890"/>
+<path class="l-http" d="M1170,590 H1218" marker-end="url(#m-http)"/>
+<path class="l-http" d="M1170,690 H1218" marker-end="url(#m-http)"/>
+<text class="s" x="498" y="880">/tts</text>
+<text class="s" x="708" y="880">chat: the plan</text>
+<text class="s" x="800" y="880">/c/fly, /c/stop</text>
+<text class="s" x="1005" y="880">detect; describe</text>
+
+<!-- the frame row -->
+<rect class="box" x="50" y="930" width="240" height="70" rx="6"/>
+<text class="t" x="64" y="952">frame source thread</text><text class="s" x="64" y="971">webcam | drone stream | file</text><text class="s" x="64" y="988">writes a slot; publishes latest</text>
+<path class="l-shm" d="M290,965 H328" marker-end="url(#m-shm)"/>
+<rect class="shmbox changed" x="330" y="930" width="400" height="70" rx="6"/>
+<text class="delta" x="708" y="950">Δ</text>
+<text class="t" x="344" y="952">FRAME BUFFER, shared memory</text><text class="s" x="344" y="971">32 slots · latest · a reference count per slot</text><text class="s" x="344" y="988">the counts are C11 atomics; any process may hold a slot</text>
+<rect class="box" x="780" y="930" width="160" height="70" rx="6"/>
+<text class="t" x="794" y="952">telemetry</text><text class="s" x="794" y="971">opaque; const data in</text><text class="s" x="794" y="988">from any thread</text>
+<rect class="box" x="970" y="930" width="160" height="70" rx="6"/>
+<text class="t" x="984" y="952">perf</text><text class="s" x="984" y="971">record(start, end)</text><text class="s" x="984" y="988">any thread, no lock</text>
+
+<!-- the outside processes -->
+<text class="t" x="1220" y="34">OUTSIDE PROCESSES</text>
+<rect class="outside" x="1220" y="60" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="84">keyboard hook (C++)</text><text class="s mono" x="1234" y="104">ROS /keyboard/in/raw</text>
+<rect class="outside" x="1220" y="140" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="164">ASR node, whisper (C++)</text><text class="s mono" x="1234" y="184">ROS /asr_server/transcribe · F5 records</text>
+<rect class="outside changed" x="1220" y="220" width="440" height="60" rx="6"/>
+<text class="delta" x="1638" y="240">Δ</text>
+<text class="t" x="1234" y="244">phone app | mock</text><text class="s mono" x="1234" y="264">one persistent TCP line in · HTTP /c/*, /tts out</text>
+<rect class="outside" x="1220" y="300" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="324">the OS</text><text class="s mono" x="1234" y="344">the child-exit signal (SIGCHLD)</text>
+<rect class="outside" x="1220" y="380" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="404">gstreamer receiver (C++)</text><text class="s mono" x="1234" y="424">ROS camera/stream, bgr8</text>
+<rect class="outside" x="1220" y="560" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="584">llama-server, Gemma 4 E4B</text><text class="s mono" x="1234" y="604">HTTP :18090 · ONE slot</text>
+<rect class="outside" x="1220" y="660" width="440" height="60" rx="6"/>
+<text class="t" x="1234" y="684">SAM3 server (our process)</text><text class="s mono" x="1234" y="704">priority queue inside · holds a slot by its count</text>
+<text class="s" x="1220" y="770">All six are created, watched and destroyed</text>
+<text class="s" x="1220" y="790">by the supervisor. Each has a graceful stop.</text>
+<text class="s" x="1220" y="810">A kill is only a logged last resort.</text>
+
+<!-- inputs from outside -->
+<path class="l-ros" d="M1220,90 H1132" marker-end="url(#m-ros)"/>
+<path class="l-ros" d="M1220,170 H1132" marker-end="url(#m-ros)"/>
+<path class="l-http" d="M1220,250 H1132" marker-end="url(#m-http)"/>
+<path class="l-sig" d="M1220,330 H1132" marker-end="url(#m-sig)"/>
+<!-- the drone stream to the frame source -->
+<path class="l-ros" d="M1660,410 H1690 V1045 H170 V1002" marker-end="url(#m-ros)"/>
+<!-- the SAM3 server and the shared frames -->
+<path class="l-shm" d="M1640,720 V1020 H530 V1002" marker-end="url(#m-shm)"/>
+<text class="s" x="1220" y="850">The SAM3 server increments the slot's count, reads, decrements.</text>
+<text class="s" x="1220" y="870">The same atomics as the app.</text>
+</svg>
+</div>
+<p class="note">Teal lines are messages into the queue. Grey lines are FIFO queues the main thread fills. Violet is HTTP, the TCP line, or the SAM3 socket. Green dashed is a ROS2 topic. Amber is shared memory. Dotted is a variable read each frame. Amber outlines with a Δ changed since the first sketch.</p>
+
+<h2>What changed since the first sketch</h2>
+<div class="tables">
+<div>
+<table>
+<tr><th>part</th><th>first sketch</th><th>rev 2</th><th>source</th></tr>
+<tr><td>the voices</td><td>one pending sentence per voice; the newest cut the old one</td><td>a FIFO per voice; every sentence is spoken on both voices, in order; no cutting</td><td>your answer, 2026-10-06: "We need to transmit the TTS both on the phone &amp; the groundstation."</td></tr>
+<tr><td>the phone transcript</td><td>both channels, with a dedup</td><td>the persistent TCP line only; the HTTP POST is answered and ignored</td><td>your answer, 2026-10-06: the TCP line measured faster</td></tr>
+<tr><td>process events</td><td>a message from the supervisor thread</td><td>none; each part writes its status row atomically; the main thread reads the rows each frame</td><td>STA1; your answer on point 2</td></tr>
+<tr><td>the supervisor</td><td>the child-exit signal into the message queue</td><td>the child-exit signal into the supervisor's own queue; it writes the rows</td><td>SUP1; your answer on point 4</td></tr>
+<tr><td>the slot counters</td><td>"atomic" counters, mechanism unstated</td><td>C11 atomics in the shared block, proven in Python on 2026-10-06; both processes may hold a slot</td><td>SK5</td></tr>
+<tr><td>the vision jobs</td><td>a JobScheduler, shape open</td><td>a thread pool of 8 with a stop flag per job; the 9th job is refused</td><td>your answer: a generic scheduler; the YAGNI pass</td></tr>
+<tr><td>the message kinds</td><td>six</td><td>five: Key, Transcript, Decision, PlatformReply, VisionResult</td><td>follows from the rows</td></tr>
+</table>
+</div>
+<div>
+<table>
+<tr><th>unchanged</th><th>why</th></tr>
+<tr><td>one owner thread; one message queue; the drain each frame</td><td>SYS1</td></tr>
+<tr><td>the trigger table on arrival; the route on one worker, in order</td><td>the emergency never meets the model; Gemma has one slot</td></tr>
+<tr><td>the platform worker with a priority queue, the emergency first</td><td>commands keep their order; HTTP blocks up to 3 s</td></tr>
+<tr><td>the frame buffer as a shared-memory ring; readers start from "latest"</td><td>R2, R3</td></tr>
+<tr><td>Create and Destroy for every process, a graceful stop</td><td>PROC2, NAM3</td></tr>
+<tr><td>the loggers take const data from any thread</td><td>TEL1, PRF2</td></tr>
+</table>
+</div>
+</div>
+</div>

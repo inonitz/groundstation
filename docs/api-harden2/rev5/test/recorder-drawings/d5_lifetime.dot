@@ -1,0 +1,33 @@
+digraph d5 { rankdir=TB; splines=ortho; compound=true; nodesep=0.8; ranksep=1.0;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_proc { label="ONE PROCESS: the lifetime"; fontsize=12; style="rounded"; color="#666666";
+    subgraph cluster_m { label="the main thread"; style="rounded"; color="#999999";
+      create [label="Create\n• the file, exclusive; the header; the pools\n~ RecorderCreate", fillcolor="#dbe9f6"];
+      start [label="start the writer thread\n• state RUNNING\n~ OsThread", fillcolor="#dbe9f6"];
+      destroy [label="Destroy(timeout)\n• the stop request under the state lock: the deadline, then STOPPING; notify\n~ RecorderDestroy", fillcolor="#dbe9f6"];
+      join [label="wait for 'stopped' up to the timeout, then join\n• past the timeout: false, nothing stored, the daemon thread ends with the process", fillcolor="#dbe9f6"];
+      create -> start -> destroy -> join;
+    }
+    subgraph cluster_d { label="any thread, inside Die"; style="rounded"; color="#999999";
+      die [label="FlushInDie(reason, deadline)\n• the same stop request: the reason, the deadline, then STOPPING; notify\n~ RecorderFlushInDie", fillcolor="#f6d5d5"];
+      diew [label="wait for 'stopped' until the deadline\n• never joins; on the writer's own thread: returns", fillcolor="#f6d5d5"];
+      die -> diew;
+    }
+    subgraph cluster_w { label="the writer thread"; style="rounded"; color="#999999";
+      run [label="RUNNING: wait, pass, repeat\n• drawings 2 and 3", fillcolor="#d8efd8"];
+      last [label="the last pass\n• drain every queue and work queue to empty, or to the deadline\n~ RecordWriterRun", fillcolor="#d8efd8"];
+      flush [label="die line; sums; faults; health; flush\n• what the deadline cut off is counted first\n• then state STOPPED; notify 'stopped'\n~ LINE_DIE, RecordWriter.m_stoppedFlag", fillcolor="#d8efd8"];
+      run -> last [label="STOPPING seen"];
+      last -> flush;
+    }
+    subgraph cluster_r { label="a recording thread"; style="rounded"; color="#999999";
+      push [label="push while RUNNING\n• after the stop request: drop, count\n~ RecordingThreadPushSpan", fillcolor="#dbe9f6"];
+    }
+  }
+  start -> run [label="thread start"];
+  destroy -> run [label="notify", style=dashed, constraint=false];
+  die -> run [label="notify", style=dashed, constraint=false];
+  flush -> join [label="'stopped'", style=dashed, constraint=false];
+  flush -> diew [label="'stopped'", style=dashed, constraint=false];
+}

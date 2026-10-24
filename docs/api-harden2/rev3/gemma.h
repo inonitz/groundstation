@@ -7,6 +7,14 @@
 #define __HARDEN2_API_GEMMA_H__
 #include "runtime.h"
 
+/* ---- the object of this module, with its data members ---- */
+typedef struct Perf Perf;
+typedef struct Gemma Gemma;
+struct Gemma {                            /* python: gemma.client.Gemma: the ONE client      */
+	uint16_t port;                        /* the llama-server on 127.0.0.1:port              */
+	Perf*    perf;                        /* a "gemma" record per request                    */
+};
+
 /* The supervised llama-server: a laptop part (3 restarts, then die). A bench passes its
  * own port so it never collides with the app's. */
 /* @warmUp: NULL, or one request run once /health answers, before the row turns UP (owner
@@ -15,7 +23,7 @@ SupProcess GemmaProcess(const char* logDir, uint16_t port, bool thinking, void (
 
 typedef struct Gemma Gemma;
 typedef struct Perf Perf;
-Gemma* GemmaCreate(uint16_t port, Perf* perf);   /* perf: a "gemma" record per request */
+Gemma* GemmaCreate(uint16_t port, Perf* perf);   /* perf: a "gemma" record per request, with llama-server's own cache_n, prompt_n, prompt_ms, predicted_n, predicted_ms */
 void   GemmaClose(Gemma* g);
 /* true = reply filled. false = no answer, timeout, or a malformed body: the CALLER reports
  * it ("gemma-failed"), never as "the user said something invalid". Thread-safe. */

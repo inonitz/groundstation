@@ -1,0 +1,34 @@
+digraph d2 { rankdir=TB; splines=ortho; compound=true; nodesep=1.2; ranksep=0.8;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_proc { label="ONE PROCESS"; fontsize=12; style="rounded"; color="#666666";
+    subgraph cluster_t { label="the recording threads (the producers)"; style="rounded"; color="#999999";
+      qs [label="16 bounded queues, one per thread\n• single producer each; the writer is the one consumer\n~ RecordingThread.m_recordsToWriter", fillcolor="#e9d8f2"];
+    }
+    subgraph cluster_j { label="the vision job threads (the producers)"; style="rounded"; color="#999999";
+      pools [label="two buffer pools: frames, masks\n• a free list and a work queue each; drawing 4\n~ Recorder.m_framePool, m_maskPool", fillcolor="#e9d8f2"];
+    }
+    subgraph cluster_w { label="the writer thread, one pass"; style="rounded"; color="#999999";
+      wait [label="1. sleep until the flag is set, 5 s max; then reset it\n• a flag set during the last pass ends this sleep at once\n~ OsEventWait, OsEventClear", fillcolor="#d8efd8", width=4.8];
+      clear [label="2. every producer entry, all 16
+• an unregistered entry has an empty queue and zero statistics
+~ Recorder.m_producers", fillcolor="#d8efd8", width=4.8];
+      drain [label="3. for EVERY queue: front, format, append, pop\n• a failed append ends the pass; the record stays at the front; a drop line is a record too\n~ RecordWriterFormatRecord", fillcolor="#d8efd8", width=4.8];
+      drops [label="4. copy every producer's statistics
+• one writer each; summed in step 7\n~ RecordingThreadStatistics", fillcolor="#d8efd8", width=4.8];
+      frames [label="5. for every filled buffer of each pool\n• peek; the PNG once; its frame line; then dequeue, back to the free list\n~ ImageBufferPoolPeekFilled, DequeueFilled, ReturnFree", fillcolor="#d8efd8", width=4.8];
+      checks [label="6. every 5 s: free space, time reference, health line, flush\n• 7. the end of the pass: sum the statistics; a fault line per changed fault counter\n~ RecordFileFlushToDisk, LINE_FAULT", fillcolor="#d8efd8", width=4.8];
+      again [label="back to step 1, always\n• a flag set during this pass: the sleep ends at once\n• no set: the sleep lasts up to 5 s", fillcolor="#d8efd8", width=4.8];
+      file [label="append-only file, one per process\n• one JSON line per record\n~ RecordFile, RecordFileAppendLine", fillcolor="#f6e7c1"];
+      wNo [style=invis, shape=point, width=0.01, label=""];
+      {rank=same; wNo; wait;}
+      wait -> clear -> drain -> drops -> frames -> checks -> again [weight=20];
+      wNo -> wait [label="the next pass"];
+      wNo -> again [dir=none, weight=0];
+      {rank=same; file; drops;}
+      drain -> file [label="append (steps 3, 5, 6, 7)"];
+    }
+  }
+  qs -> drain [label="front, pop", style=dashed, constraint=false];
+  pools -> frames [label="peek filled; dequeue; return free", style=dashed, constraint=false];
+}

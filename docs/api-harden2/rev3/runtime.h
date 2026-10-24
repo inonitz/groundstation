@@ -1,0 +1,137 @@
+/*
+ * runtime.h -- harden2 API v2.4 (2026-09-26). Module runtime/: fatal errors, the status rows
+ * and the board, the supervisor, the ROS2 context, and the preflight's dependency check.
+ *
+ * House rule: nothing in our code throws. A fatal error calls SysDie(). Everything else
+ * returns a status. A third-party call that can throw is wrapped ONCE, in util.h.
+ */
+#ifndef __HARDEN2_API_RUNTIME_H__
+#define __HARDEN2_API_RUNTIME_H__
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include "util.h"
+
+/* ---- the objects of this module, with their data members ---- */
+typedef struct Supervisor Supervisor;
+typedef struct Process Process;
+typedef struct Status Status;
+typedef struct StatusBoard StatusBoard;
+typedef struct RosSubscription RosSubscription;
+struct Status {                           /* python: runtime.status.Status: ONE status row   */
+	const char* name;                     /* "gemma", "sam3", "dji app", "video", ...        */
+	OsLock*     lock;
+	int         state;                    /* a SysState                                      */
+	const char* detail;                   /* the reason, shown on the status pane            */
+};
+struct Supervisor {                       /* python: runtime.supervisor.Supervisor           */
+	uint32_t    maxRestarts;              /* mk_maxRestarts: failed restarts before FAILED   */
+	float       stableS;                  /* mk_stableS: a run this long resets the count    */
+	OsLock*     lock;
+	void*       procs;                    /* name -> the running OS process                  */
+	void*       statuses;                 /* name -> its Status                              */
+	void*       planned;                  /* name -> a planned restart is under way          */
+	void*       up;                       /* name -> OsEvent set when the process is ready   */
+	bool        stopping;                 /* mb_stopping: stop_all began                     */
+	OsEvent*    stopped;
+};
+struct Process {                          /* python: runtime.supervisor.Process: the handle  */
+	Supervisor* supervisor;
+	const char* name;
+	Status*     status;                   /* its ONE row                                     */
+};
+struct RosSubscription {                  /* python: runtime.ros.Subscription                */
+	void*       node;                     /* the rclpy node                                  */
+	void*       executor;                 /* a SingleThreadedExecutor                        */
+	OsThread*   spin;                     /* the thread that spins it                        */
+};
+
+/* ---------------------------------------------------------------- fatal (fatal.py) */
+typedef void (*SysCleanupFn)(void);
+/* run on die, in the order registered, each one guarded; first = before all (Perf's flush) */
+void SysOnDie(SysCleanupFn fn, bool first);
+void SysDie(const char* reason);          /* one at a time; a 2nd caller waits. No return. */
+void SysInstallCrashHooks(void);          /* uncaught error, any thread or loop -> SysDie */
+
+/* ---------------------------------------------------------------- status board (status.py) */
+typedef enum {
+	STATE_STARTING,                       /* launched, not ready yet                         */
+	STATE_UP,                             /* green                                           */
+	STATE_RECOVERING,                     /* died, being restarted                           */
+	STATE_WAITING,                        /* external, down: waiting for the USER to fix it  */
+	STATE_FAILED,                         /* not recoverable: the app is about to die        */
+	STATE_DOWN                            /* stopped on purpose                              */
+} SysState;
+typedef struct StatusRow {
+	char     name[32];                    /* "gemma", "sam3", "asr", "keys", "dji app", ...  */
+	SysState state;
+	char     detail[128];                 /* the reason, shown on the status pane            */
+	uint64_t sinceUs;                     /* when this state began                           */
+} SysStatusRow;
+typedef SysStatusRow StatusRow;
+
+/* Each part that has a row OWNS it (owner ruling 2026-09-24): only the part sets it, and
+ * the part reports it through its own XxxStatus() call. The board owns nothing. */
+typedef struct Status Status;             /* one row: set by its owner, read by anyone      */
+Status*  StatusCreate(const char* name);  /* starts STARTING                                */
+void     StatusSet(Status* s, SysState state, const char* detail);   /* logs a change    */
+void     SysFail(Status* s, const char* detail, const char* reason);  /* FAILED + die     */
+
+/* A source: any part with rows. It writes its rows and returns how many (0 = none). */
+typedef uint32_t (*StatusSourceFn)(void* part, StatusRow* rows, uint32_t cap);
+typedef struct { void* part; StatusSourceFn status; } StatusSource;
+typedef struct StatusBoard StatusBoard;   /* the app builds it once, from its sources       */
+struct StatusBoard {                      /* python: runtime.status.StatusBoard              */
+	const StatusSource* sources;          /* every part that has rows, in the pane's order   */
+	uint32_t            nSources;
+};
+StatusBoard* StatusBoardCreate(const StatusSource* sources, uint32_t n);
+uint32_t     StatusBoardSnapshot(StatusBoard* b, StatusRow* rows, uint32_t cap);  /* order */
+
+/* ---------------------------------------------------------------- supervisor (supervisor.py)
+ * Owns every process the app launches. One watcher thread per process blocks on its exit
+ * (no polling). On an unplanned exit: RECOVERING, relaunch; after kSupRestartBudget failed
+ * restarts: FAILED + SysDie, or WAITING when the process is not required. A planned restart
+ * (e.g. the video stall guard) is not counted. */
+enum { kSupRestartBudget = 3 };
+typedef bool (*SupReadyFn)(void);         /* is the process serving? (port open, /health)    */
+typedef struct {
+	const char*  name;
+	const char** argv;                    /* NULL-terminated                                 */
+	const char** env;                     /* NULL = inherit; native_env() for ROS binaries   */
+	SupReadyFn   ready;                   /* NULL = ready once launched                      */
+	float        readyTimeoutS;
+	const char*  logPath;                 /* <session>/proc-<name>.log                       */
+	bool         required;                /* true: past the budget -> FAILED + SysDie (laptop
+	                                         parts). false: WAITING + a slow retry (it depends
+	                                         on the phone app: the mock, gstreamer)          */
+} SupProcess;                             /* a module describes it; the app starts it */
+typedef struct Process Process;           /* the handle SupStart returns                    */
+Process* SupStart(const SupProcess* spec);  /* launch + supervise on its own thread         */
+bool     ProcessRestart(Process* p, const char* reason);   /* planned: not counted          */
+bool     ProcessWaitUp(Process* p, float timeoutS);        /* a bench waits for ready       */
+uint32_t ProcessStatus(Process* p, StatusRow* rows, uint32_t cap);   /* its own ONE row   */
+void     SupStopAll(void);                /* registered with SysOnDie; every row -> DOWN     */
+
+/* ---------------------------------------------------------------- dependency check (deps.py)
+ * ONE place: the preflight (`run.sh preflight` runs `python3 -m runtime.deps`); main does NOT
+ * run it (owner Q5 a). Replaces the scattered find_spec guards. Every missing python package,
+ * native program or model file dies here, with what is missing and how to install it. Every
+ * one is required. A camera is not checked here: the preflight checks WEBCAM_DEV. */
+typedef struct { const char* importName; const char* installCommand; } SysPackage;
+void     SysCheckDependencies(void);   /* every package and file below; missing -> die   */
+uint32_t SysMissingPackages(const SysPackage* pkgs, uint32_t n, const char** missing);
+uint32_t SysMissingFiles(const char* const* paths, uint32_t n, const char** missing);
+
+/* ---------------------------------------------------------------- the ROS2 context (ros.py)
+ * ONE for the app: started before the first node, stopped after the last. rclpy's own
+ * Ctrl+C handler is off, so a node stops with no exception: executor shutdown, join, destroy. */
+void RosStart(void);
+void RosStop(void);
+/* One topic on its own node and executor thread: the keys, speech in and ROS video use it. */
+typedef void (*RosMessageFn)(const void* msg);
+typedef struct RosSubscription RosSubscription;
+RosSubscription* RosSubscribe(const char* node, const char* topic, RosMessageFn onMessage);
+void             RosSubscriptionClose(RosSubscription* s);   /* executor, thread, node */
+
+#endif /* __HARDEN2_API_RUNTIME_H__ */

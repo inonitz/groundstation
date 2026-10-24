@@ -1,0 +1,35 @@
+digraph d3 { rankdir=TB; splines=ortho; compound=true; nodesep=1.2; ranksep=1.0;
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.24,0.15", fillcolor="#f2f2f2"];
+  edge [fontname="DejaVu Sans", fontsize=10, arrowsize=0.8];
+  subgraph cluster_proc { label="ONE PROCESS: who wakes the writer, and what the writer does with a wake"; fontsize=12; style="rounded"; color="#666666";
+    subgraph cluster_a { label="a recording thread"; style="rounded"; color="#999999";
+      n1 [label="my queue just became half full\n• wake the writer, once\n~ RecordingThreadWakeWriterIfHalfFull", fillcolor="#dbe9f6"];
+    }
+    subgraph cluster_b { label="a vision job thread"; style="rounded"; color="#999999";
+      n2 [label="I enqueued a filled buffer\n• wake the writer\n~ ImageBufferPoolEnqueueFilled", fillcolor="#dbe9f6"];
+    }
+    subgraph cluster_c { label="the main thread"; style="rounded"; color="#999999";
+      n3 [label="Destroy: drain everything, then stop\n• wake the writer\n~ RecorderDestroy", fillcolor="#dbe9f6"];
+    }
+    subgraph cluster_d { label="any thread, inside Die"; style="rounded"; color="#999999";
+      n4 [label="Die: flush everything, then stop\n• wake the writer\n~ RecorderFlushInDie", fillcolor="#f6d5d5"];
+    }
+    subgraph cluster_w { label="the writer thread"; style="rounded"; color="#999999";
+      cv [label="the wake flag (a condition variable)\n• a wake arriving while nobody waits is kept\n~ RecordWriter.m_wakeFlag, threading.Event", fillcolor="#d8efd8"];
+      wait [label="sleep until the flag is set, 5 s max\n• then wake up\n~ OsEventWait", fillcolor="#d8efd8"];
+      clear [label="reset the flag\n• a wake from now on counts for the next pass\n~ OsEventClear", fillcolor="#d8efd8"];
+      pass [label="one pass (drawing 2)\n• all queues, both pools, the file\n~ RecordWriterRun", fillcolor="#d8efd8"];
+      again [label="back to sleep, always\n• a set during the pass ends the sleep at once\n• a set is never lost", fillcolor="#d8efd8"];
+      wNo [style=invis, shape=point, width=0.01, label=""];
+      {rank=same; wNo; wait;}
+      cv -> wait [label="flag set, or 5 s passed"];
+      wait -> clear -> pass -> again [weight=20];
+      wNo -> wait [label="the next pass"];
+      wNo -> again [dir=none, weight=0];
+    }
+  }
+  n1 -> cv [label="set the flag ~ OsEventSet"];
+  n2 -> cv [label="set the flag"];
+  n3 -> cv [label="set the flag"];
+  n4 -> cv [label="set the flag"];
+}
