@@ -166,7 +166,7 @@ Boot: `VIDEO=webcam WEBCAM_DEV=2 SCENE_TTS=off bash projects/integration_harden2
 ## Conventions (2026-09-19)
 
 - The no-exceptions rule lives in `guidelines.md`; harden2 follows it. Our error conditions call
-  `system/fatal.py::die(msg)` (a loud crash), never a raise. Third-party code that throws is still caught.
+  `runtime/fatal.py::die(msg)` (a loud crash), never a raise. Third-party code that throws is still caught.
 - The vision backend sits behind a contract, chosen once at startup. `perception2/backend.py` holds the
   `VisionBackend` Protocol (two calls: `detect(frame, phrase, conf, topk)` and `mask_for_box(frame, box)`) and
   a `BACKENDS` name->factory registry. The app builds `BackendLoader(config.SEG)`, which loads that one

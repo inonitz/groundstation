@@ -69,7 +69,7 @@ docs/spec-harden2-cleanup.md (last sections). Suite: `test/` = 185 pass. Excepti
   root module (mvd, overlay, session_log). config has no tests. Each file must test ALL cases of its package.
 - Git: SUPERSEDED 2026-09-23. The owner commits now, in stages, each message marked BROKEN BUILD / not run
   end to end. The owner reviews the code after the commit.
-- Global phase 7, after the webcam mock test: make SAM3.1 work and experiment with EOVSAM, both quantized.
+- Global phase 7, after the webcam mock test: make SAM3.1 work and experiment with EOVSAM, both quantized. SUPERSEDED by S6 (2), POST (2): after the freeze, with the owner.
 
 ### 4b. DONE (each verified by the 2026-09-22 self-test)
 - [x] Phase 1 tts_io: one-slot mailbox + event (no poll, no queue); die on an invalid backend and on an
@@ -181,11 +181,11 @@ docs/spec-harden2-cleanup.md (last sections). Suite: `test/` = 185 pass. Excepti
       redundant state; _snapshot_frame (5 copies -> 1, copy outside the lock); one lock block per frame; fps
       a local; unreachable Voice "off" path; np.frombuffer without an extra copy; clips glob audio_*.wav.
       SKIPPED, need the owner (4d): see the simplify items there.
-- [ ] Webcam mock test with the REAL app (the run skill / run.sh up webcam mock); checklist in section 8.
-- [ ] Stale-doc sweep (list in section 8b): harden2 README beyond the table, spec-harden2-architecture.md,
+- [x] DONE 2026-09-28 (the end-to-end test: the real app, webcam, mock; 81b1865). Webcam mock test with the REAL app (the run skill / run.sh up webcam mock); checklist in section 8.
+- [x] MOVED to road step 8 (F1, the doc sweep). Stale-doc sweep (list in section 8b): harden2 README beyond the table, spec-harden2-architecture.md,
       perception2/README.md "Tests", tools/prewarm_llama.sh.
-- [ ] Ask the owner every 4d item + the 8b first-audit leftovers; record each ruling in the docs at once.
-- [ ] Apply the rulings, one more code-review pass, then prepare (never run) the owner's ONE commit (8b).
+- [x] SUPERSEDED by 9b (mvd.py, DjiWire, LlamaServer are gone); live 4d leftovers go to step 4 (code review). Ask the owner every 4d item + the 8b first-audit leftovers; record each ruling in the docs at once.
+- [x] SUPERSEDED by RM1 and CP3 (the owner commits; step 4 is the review). Apply the rulings, one more code-review pass, then prepare (never run) the owner's ONE commit (8b).
 
 ### 4d. OPEN (owner to rule)
 - Simplify-pass items that change behavior or design (skipped, not argued):
@@ -237,7 +237,7 @@ commands are prepared before then.
 This refactor is one step inside the harden2 freeze arc (docs/task-scheduled-harden2-field-test-and-freeze.md).
 When the cleanup (phases 3-5) and the review findings are done and green, the next steps, in order:
 
-0. The webcam mock test, then global phase 7 (SAM3.1 + EOVSAM, quantized), then the owner's one commit.
+0. The webcam mock test, then global phase 7 (SAM3.1 + EOVSAM, quantized), then the owner's one commit. SUPERSEDED by S6 (2), POST (2): after the freeze, with the owner.
 1. Outdoor FIELD TEST on the real drone. The owner runs it, aircraft secured; the assistant never fires motor
    commands. Field-test commands live in docs/task-active-restructure-progress.md ("Field test" block):
    run.sh preflight dji -> run.sh up dji real, PHONE_IP = the WiFi gateway.
@@ -317,7 +317,7 @@ Read section 4 first (4a rulings, 4b done, 4c remaining, 4d open). This section 
    (769 lines), display-loop caching after measuring, dead benches: compare_engines.py, run_indepth.py,
    run_list.py; the pipeline flat-import try; refresh period from task start; count frames as delayed tasks).
 3. After the owner's rulings: apply them, re-run code-review once more, then the owner commits.
-4. Then the roadmap in section 7: global phase 7 (SAM3.1 + EOVSAM, quantized) after the webcam test, the
+4. Then the roadmap in section 7: global phase 7 (SAM3.1 + EOVSAM, quantized) after the webcam test, the SUPERSEDED by S6 (2), POST (2): after the freeze, with the owner.
    field test (owner runs it, aircraft secured), freeze, post-freeze benches, drone-link resilience
    (keep-alive Noop + bounded reconnect), fuse into llm_to_action.
 
@@ -419,7 +419,7 @@ Rulings behind each step: docs/spec-harden2-cleanup.md, "Owner rulings 2026-09-2
 11. Dead benches: repoint run_list.py; delete compare_engines.py and run_indepth.py (recorded in HISTORY.md).
 12. Stale-doc sweep. HISTORY.md updated at every step (Why / Setup / Result / Verdict / Where).
 13. Code review, the webcam mock run of the real app, then prepare the owner's commits.
-After: phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured), freeze, fuse into llm_to_action.
+After: phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured), freeze, fuse into llm_to_action. SUPERSEDED by S6 (2), POST (2): after the freeze, with the owner.
 
 ### 9a. Validation of steps 1-5 (2026-09-23, against sections 4c/4d/8b/9 and the spec rulings)
 Verified in the code: F4 global kill (step 1); API v2.1 headers compile and match the code after
@@ -432,7 +432,7 @@ Gaps found, added to the plan (none were in it before):
       cannot restart it, but the ruling says "no per-system retry loops". ASK the owner.
 - [x] 9a-2 (recognizer part) DONE 2026-09-24: recognizer/ split by job (largest file 284). render.py (542) and log/session.py (363) remain. Was: recognizer/recognizer.py is 470 lines; app/render.py 298; log/session.py 256. Only
       app/main.py (609) had a planned split (steps 4/6). Split these too (KISS, ~150-200).
-- [ ] 9a-3 gemma/server.py LlamaServer (bench launcher) repeats the supervisor's start/wait/stop
+- [x] 9a-3 CLOSED by 9b (its "Closes" line). gemma/server.py LlamaServer (bench launcher) repeats the supervisor's start/wait/stop
       (4d leftover, never ruled). ASK: benches use the supervisor, or keep it.
 - [x] 9a-4 (done in step 6) app/main.py module-level one-key dict globals (OM, ENGINE, VISION, SUPERVISOR) and config
       aliases (4d leftover). Resolve in the step 6 rewrite.
@@ -456,18 +456,18 @@ Gaps found, added to the plan (none were in it before):
 - [x] 9a-11 CLOSED by 9b-1 (checked 2026-09-26: recognizer/lexicon.py exists; perception2/lexicon.py
       is gone). Was: the recognizer imports perception2.lexicon (the HE->EN target fix). Only the recognizer
       uses it: it belongs in recognizer/.
-- [ ] 9a-12 Density pass (owner 2026-09-23): blank lines between logical steps, one statement per line,
+- [x] 9a-12 DONE 2026-09-24 (below). Density pass (owner 2026-09-23): blank lines between logical steps, one statement per line,
       no packed assignments or dense lambdas, in every file touched this session.
 - 9a-10 detail: pipeline._fly reads raw HTTP codes (BLOCKED / UNREACHABLE / sent) because control.fly()
       returns the phone's HTTP code. Fix: control returns its own result; the recognizer never sees HTTP.
-- [ ] 9a-13 "Internals by hand" in app/main.py (owner: constructors exist for this): build_vision wires
+- [x] 9a-13 CLOSED by 9b (its "Closes" line). "Internals by hand" in app/main.py (owner: constructors exist for this): build_vision wires
       BackendLoader + PerceptionEngine + Vision with a two-phase set_engine; build_flight REPLACES
       dji.fly_mission / dji.halt with recording wrappers from outside; the app opens the video source,
       retries it, reports the "video" row and builds StallGuard itself. Each module's constructor must
       build its own parts.
-- [ ] 9a-14 Speech in vs speech out: Voice hides its two backends in one object, but speech IN is two
+- [x] 9a-14 CLOSED by 9b (its "Closes" line). Speech in vs speech out: Voice hides its two backends in one object, but speech IN is two
       objects (Ears, PhoneEars) the app builds and wires by hand. One audio object for speech in.
-- [ ] 9a-15 Shared standalone helpers living inside one module (owner: shared = a shared folder):
+- [x] 9a-15 CLOSED by 9b (its "Closes" line). Shared standalone helpers living inside one module (owner: shared = a shared folder):
       port_open, native_env (system/supervisor.py; used by dji_app, audio, gemma, video), sent
       (dji_app; used by control, recognizer), hebnum_to_digits (recognizer; used by log/score.py).
       Misplaced single-user helpers: perception2/lexicon.py (only the recognizer uses it),
@@ -538,7 +538,7 @@ HTTP results: http.HTTPStatus (.is_success; 409 = CONFLICT = blocked); None = no
 Open findings: the number guard does not see a leading ו-number word (וחמישה); SAM3 558 ms p50 on the
 shared GPU (vs ~400 alone, unverified cause); the keyboard hook wrote 28,291 log lines in ~4 min
 (1.5 MB, proc-keys.log; the owner's C++ decides); both webcams read black in a dark room.
-After plan 9 (global): phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured),
+After plan 9 (global): phase 7 (SAM3.1, EOVSAM quantized), field test (owner, aircraft secured), SUPERSEDED by S6 (2), POST (2): after the freeze, with the owner.
 freeze, fuse into llm_to_action.
 Speedrun split (owner 2026-09-25): agent A = step 11; agent B = 9a-2 (render.py, session.py);
 the main agent = steps 8, 9 and the 3.6 fps dips; step 12 runs LAST, over the finished state

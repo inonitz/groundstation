@@ -1,5 +1,5 @@
-RESUME HERE (2026-10-01): a FRESH AGENT starts from docs/task-active-harden2-handoff-2026-10-01.md (the full handoff),
-then docs/harden2-status.md. All agent tasks are done; the owner finished labelling; next is handoff 9h step 1.
+RESUME HERE (2026-10-02): a NEW AGENT starts from docs/task-active-harden2-handoff-2026-10-02.md, then
+docs/api-harden2/rev3/README.md (the ground-truth procedure; step 1 done). PLANNING STAGE: implement nothing yet.
 # harden2 session log, 2026-09-23 / 24 (for the next agent after compaction)
 
 SUPERSEDED by line 1 (was RESUME HERE, 2026-09-25): read docs/guidelines.md ("All guidelines at a glance") FIRST, then the
@@ -17,7 +17,7 @@ open items), 9b (the built design). Rulings: docs/spec-harden2-cleanup.md, secti
 
 ## Done this session (plan steps; details in the handoff and HISTORY)
 1. F4 global kill key via /keyboard/in/raw (app/keys.py); letters never act.
-2. API v2 -> v2.2 headers in docs/api-harden2/ (compile with gcc -fsyntax-only).
+2. API v2 -> v2.2 headers in docs/api-harden2/rev1/ (compile with gcc -fsyntax-only).
 3. Layout: app/, log/, dji_app/, util/, system/fatal.py, video/cam_list.py; "wire" renamed out.
 4. One transmit switch (dji_app), control/flight.py = the drone ONLY; recognizer fast path.
 5. Failure policies: WAITING (orange); phone app waits for the user; laptop parts restart then die;

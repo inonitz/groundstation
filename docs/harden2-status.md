@@ -22,10 +22,10 @@ The owner's order (ruling RM1, 2026-10-01). A freeze tags the exact commit that 
 
 | # | step | state |
 |---|---|---|
-| 1 | Joint review: every recording label, the 34 expected-result drafts, the 144 vision-kind drafts | next |
-| 2 | Run whisper and the recognizer on the recordings (B2); rerun the recognizer benchmark | after 1 |
-| 3 | Finish the cleanup and the refactor | almost done |
-| 4 | Code review with the review tools, then fix what they find | after 3 |
+| 1 | Joint review: every recording label, the expected-result drafts, the vision-kind drafts | done 2026-10-01 |
+| 2 | Run whisper and the recognizer on the recordings (B2); rerun the recognizer benchmark | done 2026-10-01: 473 of 545 PASS; whisper 9.6 % word error rate |
+| 3 | Finish the cleanup and the refactor | done 2026-10-01 |
+| 4 | Code review with the review tools, then fix what they find | both reviews done; BLOCKED: the headers and the code are not 1:1, so the owner's ground-truth procedure runs first (docs/api-harden2/rev3/README.md, step 1 of 7 done); nothing is implemented until he approves it |
 | 5 | The owner's live webcam test, with a microphone input-level check | after the owner's review of the state with the new agent |
 | 6 | The field test on the real drone, secured, until done | after 5 |
 | 7 | A walk-through, so the owner understands the whole system | after 6 |
@@ -35,7 +35,7 @@ The owner's order (ruling RM1, 2026-10-01). A freeze tags the exact commit that 
 | area | result |
 |---|---|
 | speed | a highlight shows its first box about 0.95 s after the transcript (it was 3.8 s on first use); a planned mission takes 0.77 s |
-| recognizer | the number guard reads 40 of 40 test sentences (it read 7); every test sentence is stored once (545); honest score 458 of 545 |
+| recognizer | the number guard reads 40 of 40 test sentences (it read 7); every test sentence is stored once (545); 473 of 545 PASS after the joint review |
 | vision | one image encoding per pass (a three-name search 1126 -> 744 ms); SAM3 in its own folder; SAM3 saved ready in 4-bit form |
 | start-up | the app's import takes 0.15 s (it took 1.3 s); every status row is UP after about 13 s, warm-ups included |
 | tests | 248 tests pass; every try/except is in one audited place (5) |
@@ -50,7 +50,11 @@ The owner's order (ruling RM1, 2026-10-01). A freeze tags the exact commit that 
 | identity | none: each refresh detects again, so boxes can jump between objects |
 | view | only the camera's current view; no scan yet |
 | relations | "on", "under", "held by" by box geometry; colour by hue; others unverified |
-| sharing the GPU | SAM3 is 51 % slower while Gemma answers |
+| long targets | the parts after the main object are dropped without warning (lane, direction, position, "wearing") |
+| colour | checked on the whole related box (the child), not the named garment (the shirt) |
+| positions | "car on the left side of the building" becomes every vehicle in view |
+| hidden objects | an object out of sight (a guitar zipped in its case) cannot be found; the relation check only compares boxes |
+| sharing the GPU | SAM3 is 51 % slower while Gemma answers; Gemma is 2.8 times slower while SAM3 runs without a pause |
 | start | every row UP after about 13 s; the video stutters for the first 9-11 s |
 | accuracy (137 labelled rows) | 105 correct, 16 partial, 8 false draws |
 | low light | not measured |
@@ -68,15 +72,19 @@ Each release ends with a new field test.
 5. Far: the fusion onto the C++ llm_to_action engine.
 
 ## Open with the owner
-- The joint review (step 1). It includes clips 116, 117 and 120 (highlight or describe?) and the removal of
-  the inaudible clips 67-73 and 82.
-- Nothing is committed yet: the owner commits just before the freeze.
-- First: the owner reviews the current state with the new agent.
+- The API redesign with the owner: docs/api-harden2/rev4 (drafts; the owner reviews them). rev3 holds what was ruled before it.
+- Round 3 (2026-10-02): the owner's review is rev4/REVIEW-3-owner.md; the answers, the plan and the decision table D1-D11 are rev4/REVIEW-3-answers.md. Next: the owner rules on D1-D11, then the header pass, then GAPS for rev4, then the build.
+- rev5 (2026-10-04): the owner rejected REVIEW-4-answers.md too ("Its horrible"); docs/api-harden2/rev5/ starts the architecture review, one system at a time; the order is proposed in its README and waits for the owner.
+- Round 4 (2026-10-04): the round-3 designs were rejected; the house rules are in the ledger (HDR6 .. AUD3); every point is answered with its full picture in rev4/REVIEW-4-answers.md. Next: the owner reviews it; then a design review per system in plan mode (the vision system first), a spec per system, then the headers, then GAPS, then the build.
+- The four half-done recognizer files (handoff 2026-10-02, section 4): keep or revert.
+- Nothing is implemented from the two reviews; the planning stage holds until the ground truth is approved.
 
 ## Where the details live
 | document | what it holds | readability |
 |---|---|---|
 | docs/harden2-status.md | this overview | written for people |
+| docs/task-active-harden2-handoff-2026-10-02.md | the handoff to the agent that builds | for agents |
+| docs/api-harden2/rev3/ | the ground truth being assembled: the procedure, the v2.3 base | for people and agents |
 | docs/task-active-harden2-refactor-handoff.md, section 9h | the road to the freeze and after, step by step | for people and agents |
 | docs/spec-harden2-cleanup.md, "Decision ledger" | every owner ruling, word for word, with its decision (about 250 rows) | an audit record: dense |
 | docs/HISTORY.md | every finished piece of work, dated, with its measurements and verdicts | readable entries; long |
@@ -84,4 +92,4 @@ Each release ends with a new field test.
 | docs/guidelines.md | every standing rule for the work | for people and agents |
 | docs/task-active-harden2-session-log-2026-09-23.md | line 1: where an agent resumes; then a dense progress list | for agents |
 | docs/refactor/<agent>_doc.md | each agent's brief, notes and evidence | for agents |
-| docs/ROADMAP.md | the long-term phases | out of date (2026-09-14); the doc sweep updates it |
+| docs/ROADMAP.md | the road to the freeze and the releases after it | current (2026-10-01) |

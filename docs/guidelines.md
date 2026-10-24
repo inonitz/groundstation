@@ -312,6 +312,35 @@ Keep sentences short. Put one idea in each sentence. Make each sentence lead int
 
 This is about prose: explanations, reports, and messages. Code style is separate and lives above the `Writing Style (prose)` Title.
 
+Two rules from the rev5 design sessions (the owner, 2026-10-06, W4: "This response was amazing. I
+understood everything in one go."):
+- Name a mechanism by its standard term in the field, never by a name the project invented: a
+  reference count, a multi-producer single-consumer queue, an atomic store, polling against
+  event-driven, a persistent TCP socket, the child-exit signal. A project name (the inbox, a pin)
+  may follow the standard term once, in parentheses, and then the standard term is used.
+- One topic per sentence, and one topic per numbered item. The reasoning behind an item follows it
+  in its own short sentences; it is never joined to the item with "because", "so" or a comma. A
+  sentence that connects two topics is split.
+
+
+### Explaining a mechanism, and naming it (owner-ruled, 2026-10-22)
+
+Write every explanation of a mechanism in four steps, in this order.
+1. One paragraph that names the scheme in the field's established words, so that anyone with CS
+   knowledge understands it with no project context.
+2. The specifics of the case at hand: which threads, which objects, which rates.
+3. The names in the code, mapped to those words, with a short snippet that respects every type's
+   interface. A snippet never reaches into another object's lock or container. The snippet
+   carries its own context: the objects are declared once, with their fields, and every name in
+   a snippet is defined there or in the header. The prose after a snippet holds only what the
+   code cannot show: the edge cases, the numbers, the why (the owner, 2026-10-23).
+4. What went wrong, and what happens now.
+
+Name a type by the scheme it is. Name its members and operations by their roles in that scheme. A
+reader who knows the scheme must understand the header at first glance, with no translation in the
+head. Full sentences, one idea each; no fragments under bold labels; a decision carries its full
+context, and a broken form is never offered as an option.
+
 ## Result documents (added 2026-09-02, owner-ruled)
 
 Benchmark and test reports use the register of a senior robotics/software engineer:
@@ -337,6 +366,15 @@ and they are NOT EQUIVALENT(!):
 ## Reporting rules (from experience)
 
 - Answer first. Lead with the result, then a single table if it helps, then detail.
+- A design answer is CODE: the header snippet, with prose only for the why (the owner, 2026-10-04, CODE1).
+  Each point carries its whole answer in one place; no forward references (ONE1). Before any design
+  question: the system, how it works today, the owner's words, then the proposal; one system at a time
+  (CTX1: "You do not perform a design-review/architecture-design of a system without a full complete
+  picture of it.").
+- A review answer is structured, never a block of text per item (the owner, 2026-10-03, W3): one
+  heading per point that quotes it, short bullets with a bold lead (Answer, Today, Fault, Change), a
+  table for a list of values, a code block for a sequence. A long answer goes to a file; the chat
+  gives the path.
 - Put detail in files, not the chat. Long write-ups pasted into chat get rejected.
 - Address every point of a multi-point message, by number, none skipped.
 - Name things plainly. No task-ID jargon; use an ID only as a parenthetical reference.
@@ -451,6 +489,8 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
   option does and costs, and the recommendation with its reason. Never a shortened list of
   one-line rows (the owner, 2026-09-28: "Don't give me this shortened list! There is no FUCKING
   CONTEXT LIKE THIS! IM ALREADY USED TO READING YOUR PAMPHLETS !").
+- A batch of work ends in ONE consolidated report: no checkpoint reports in between (the owner,
+  2026-10-01: "Why a checkpoint? I was waiting for all the results in a consolidated report.").
 - Every reply that carries open items lists ALL of them, each with its full context; never spread
   open items over several replies (the owner, 2026-09-30: "Put all your notes together, don't break
   them into multiple responses.").
@@ -468,6 +508,8 @@ the recognizer system." ("The definitions are a bit fuzzy, but that is the gist.
   against the brief's task list; then the main agent reads every file the agent touched.
 - Agents sharing a file or resource (the GPU, the webcam, a config file) take it through LOCK.md
   (tools/lock.sh, atomic) and release it when done; the main agent clears a dead agent's locks.
+- A design review builds no mechanism for a failure without a cause (SEEN, DESIGNED or FORCED): gate
+  item 12 "Need" in docs/api-harden2/rev5/modules/README.md (the owner, 2026-10-18, REV8).
 - Validate the agent's work AGAINST THE BRIEF you gave it: you hold the context the agent lacks,
   so only you can verify it. Reading the files it touched is part of that validation, not a
   redo of its work.

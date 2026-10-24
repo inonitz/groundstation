@@ -1,5 +1,8 @@
 # harden2 handoff, 2026-10-01: to a fresh agent
 
+SUPERSEDED IN PART 2026-10-02: start from docs/task-active-harden2-handoff-2026-10-02.md. Sections 1-3 and 7
+here stay in force; sections 4-6 are history.
+
 You take over the harden2 work from an agent that worked with the owner for ten days (2026-09-21 .. 2026-10-01).
 This file gives you the full context: the rules, the lessons, the system, the state, and the road ahead.
 NEW RULES TAKE PRECEDENCE: where this file or a newer ruling differs from an older document, the newer one wins.
@@ -113,8 +116,8 @@ projects/integration_harden2 (branch feature-hardening-mvd). Long-term it fuses 
 - **Key results:** a highlight shows its first box about 0.95 s after the transcript (3.8 s before, cold); a planned
   mission 0.77 s; the number guard reads 40 of 40 (was 7); the recognizer benchmark 458 PASS of 545 sentences, each once;
   SAM3 and SAM3.1 video tracking fit 8 GiB in nf4 with a 16-frame limit. Details: docs/harden2-status.md.
-- **Uncommitted:** about 150 paths (everything since the owner's commits 81b1865, 3c20847, fdd2550, 9fc6c67 of
-  2026-09-28). All validated. The owner commits just before the freeze.
+- **Committed (2026-10-01, ruling CP3):** the owner committed and pushed everything (ce551d8,
+  origin/feature-hardening-mvd). After the freeze, the owner aims to merge it into master.
 - **The owner finished labelling the 139 recordings** (datasets/asr/recordings.json) and wants every label verified.
 
 ## 5. The road ahead
@@ -133,7 +136,7 @@ The owner's order (ruling RM1, 2026-10-01; handoff 9h). Do not reorder it. The o
      the main object (SAM3 searches it as one phrase), the relation and the related object (verify checks them). In
      the page each comma-separated word must appear in Gemma's target, any order ("logo" matches "logos");
    - clip 13's sentence must be the Hebrew for "fly back 8 meters" (check it was fixed);
-   - the 34 expected-result drafts (21 military, 13 open cases) and the 144 drafted vision kinds: review tables in
+   - the expected-result drafts (21 military, 15 open cases; 36, not 34) and the drafted vision kinds (152, not 144). DONE 2026-10-01 (JR4-JR17): review tables in
      docs/refactor/recognizer_doc.md ("Review for the owner"); the square must trace a square (four legs).
 2. **B2 and the benchmark rerun:** whisper plus the recognizer on the recordings (path B: whisper prepass, then
    route(); report whisper's word error rate; clips 63-100 have no whisper text in the manifest, so run whisper);
@@ -153,13 +156,16 @@ and EOVSAM evaluated BY THE OWNER AND YOU TOGETHER (EOVSAM in a fresh container)
 16-frame limit), scan, vision-driven action; far: the C++ fusion.
 
 ## 6. Open items and known issues
-- Unexplained, seen once each: the end-to-end test failed after 0.18 s; one warm-up run's plan took 735 ms in the app
-  against 371 ms in llama-server's log.
+- Explained 2026-10-01 (HISTORY): the 0.18 s end-to-end failure (a loose start check, KI1); the 735 ms plan
+  (a rare spike outside the server, 1 in 250 plans; its cause unverified, KI2).
+- For the code review (step 4): run.sh kill_stack's loose `pkill -9 -f` names also kill other processes.
+- SAM3 running without a pause makes Gemma's own work 2.8 times slower (KI2).
 - The start stutter (the first 9-11 s, while SAM3 loads) stays; only SAM3 in its own process removed it.
 - A mutation-check script can leave stale bytecode when a file is restored within the same second: clear __pycache__
   after mutation checks.
 - Meta's SAM3.1 code gives an empty box-prompt output after frame 0 (bench/sam3-video reads the tracker state instead).
-- The phone app: unverified whether /c/fly answers when a flight ends or when it starts (matters for compound plans).
+- The phone app (KI3, checked in its source): /c/fly answers when the mission STARTS; a new /c/fly cancels the
+  running one. A compound plan must learn the end of a flight another way. The phone's running build is unverified.
 
 ## 7. Agents
 - The agent type `harden2-agent` (.claude/agents/harden2-agent.md: Opus, medium effort) loads at session start.
