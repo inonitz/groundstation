@@ -19,6 +19,14 @@ echo "[install-runtime-deps] 1/5 system packages..."
 apt-get update
 apt-get install -y espeak-ng alsa-utils libportaudio2 fonts-freefont-ttf xvfb
 
+# --- 1b. the TLS trust store (the eMudhra/emSign CA incident, discuss.python.org 109576,
+#         2026-10): pip and certifi below the fixed versions trust a CA whose keys leaked.
+#         pip first, by a hash-pinned wheel so the upgrade itself cannot be tampered with.
+python3 -m pip install --user "pip @ https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
+python3 -m pip install -U "certifi>=2026.10.19"
+# the system store: the four emSign roots distrusted, then the bundle rebuilt
+sed -i 's|^mozilla/emSign_|!mozilla/emSign_|' /etc/ca-certificates.conf && update-ca-certificates
+
 # --- 2. python packages (pip) -------------------------------------------------------------
 echo "[install-runtime-deps] 2/5 python packages..."
 pip install aiohttp                                          # tools/dji_mock/mock_apiserver.py
@@ -26,6 +34,7 @@ pip install python-bidi                                      # right-to-left Heb
 pip install "bitsandbytes==0.50.2" "accelerate==1.14.0"      # SAM3-nf4 backend; pins match sam3-mask-bench/setup.sh
 pip install phonikud phonikud-onnx phonikud-tts sounddevice  # offline Hebrew TTS (SCENE_TTS=phonikud) + playback
 pip install nvidia-ml-py                                     # pynvml: the perf record's GPU samples (log/perf.py)
+pip install "atomics==1.0.3"                                  # C11 atomics on ints and on shared-memory buffers (the frame buffer's reader counts; rev5 SK5)
 
 # --- 3. model files: phonikud, SAM3 nf4 -----------------------------------------------------
 # phonikud G2P (niqqud+stress -> IPA) + the Piper onnx voice. Models are cc-nc (SASpeech/ILSpeech),

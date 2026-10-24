@@ -29,6 +29,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libcurl4-openssl-dev \
     libssl-dev \
     python3-pip \
+    ca-certificates \
     mesa-utils \
     libegl1 \
     libgl1 \
@@ -74,6 +75,15 @@ RUN curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/in
 #     setup. devenv.sh already passes /dev/kfd + /dev/dri, so to run the detectors on the AMD GPU
 #     instead, build with tools/devenv/build-devenv.sh (auto-detects NVIDIA/AMD/CPU) which sets --build-arg TORCH_INDEX for you.
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
+# 1.6a The TLS trust store first (the eMudhra/emSign CA incident, discuss.python.org 109576,
+#      2026-10): the base image's pip 24.0 and its certifi trust a CA whose keys leaked. pip is
+#      upgraded by a hash-pinned wheel, so this step itself cannot be tampered with; then certifi;
+#      then the four emSign roots are distrusted in the system store and the bundle rebuilt.
+RUN pip install "pip @ https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70" \
+    && pip install -U "certifi>=2026.10.19" \
+    && sed -i 's|^mozilla/emSign_|!mozilla/emSign_|' /etc/ca-certificates.conf \
+    && update-ca-certificates \
+    && test "$(ls /etc/ssl/certs | grep -ci emsign)" = "0"
 ARG TORCH_INDEX=https://download.pytorch.org/whl/cpu
 RUN --mount=type=cache,target=/root/.cache/pip pip install --index-url ${TORCH_INDEX} torch torchvision && pip install "numpy<2" "opencv-python<4.12" ultralytics "transformers>=5.15" pillow safetensors lapx requests timm aiohttp python-bidi "bitsandbytes==0.50.2" "accelerate==1.14.0" phonikud phonikud-onnx phonikud-tts
 
